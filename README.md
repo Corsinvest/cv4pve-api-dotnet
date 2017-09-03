@@ -3,6 +3,8 @@ ProxmoVE Client API DotNet
 
 [ProxmoxVE Api](https://pve.proxmox.com/pve-docs/api-viewer/)
 
+[Nuget] (https://www.nuget.org/packages/EnterpriseVE.ProxmoxVE.Api) 
+
 ```
     ______      __                       _              _    ________
    / ____/___  / /____  _________  _____(_)_______     | |  / / ____/
@@ -15,6 +17,7 @@ ProxmoVE Client API DotNet
 ```
 
 #General
+
 The client is generated from a JSON Api on ProxmoxVE. 
 
 # Usage
