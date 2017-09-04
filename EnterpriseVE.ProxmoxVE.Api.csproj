@@ -1,16 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>1.0.2-beta</Version>
-    <Authors>Daniele Corsini</Authors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <Version>1.0.3</Version>
     <Company>Enterprise VE</Company>
+    <Authors>Daniele Corsini</Authors>
+    <Copyright>Enterprise VE</Copyright>
+    <Product>EnterpriseVE for ProxmoxVE Api Client</Product>
+
     <AssemblyTitle>EnterpriseVE for ProxmoxVE Api Client</AssemblyTitle>
     <Description>Api Client for ProxmoxVE.</Description>
-    <Copyright>Enterprise VE</Copyright>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
     <PackageLicenseUrl>https://raw.githubusercontent.com/EnterpriseVE/EnterpriseVE.ProxmoxVE.Api/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/EnterpriseVE/EnterpriseVE.ProxmoxVE.Api</PackageProjectUrl>
-    <PackageTags>ProxmoxVE;Api,Client;Rest</PackageTags>
+    <PackageTags>ProxmoxVE;Api,Client;Rest;EnterpriseVE;</PackageTags>
+    <PackageIconUrl>http://www.enterpriseve.com/wp-content/uploads/2017/01/eve.png</PackageIconUrl>
+    <PackageReleaseNotes></PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
