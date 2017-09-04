@@ -49,12 +49,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
         public bool Login(string userName, string password, string realm = "pam")
         {
             dynamic ticket = Access.Ticket.CreateTicket(username: userName, password: password, realm: realm);
-            _ticketCSRFPreventionToken = ticket.CSRFPreventionToken;
-            _ticketPVEAuthCookie = ticket.ticket;
+            _ticketCSRFPreventionToken = ticket.data.CSRFPreventionToken;
+            _ticketPVEAuthCookie = ticket.data.ticket;
             return ticket != null;
         }
 
-        private T Execute<T>(string resource, HttpMethod method, IDictionary<string, object> parameters = null)
+        private ExpandoObject Execute(string resource, HttpMethod method, IDictionary<string, object> parameters = null)
         {
             using (var handler = new HttpClientHandler()
             {
@@ -90,8 +90,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 var response = client.SendAsync(request).Result;
 
                 var stringContent = response.Content.ReadAsStringAsync().Result;
-                var data = JObject.Parse(stringContent).SelectToken("data").ToString();
-                return JsonConvert.DeserializeObject<T>(data);
+                dynamic result = JsonConvert.DeserializeObject<ExpandoObject>(stringContent);
+
+                //check in error
+                result.InError = ((IDictionary<String, object>)result).ContainsKey("errors");
+
+                return result;
             }
         }
 
@@ -112,7 +116,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <summary>
             /// Cluster index.
             /// </summary>
-            public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/cluster", HttpMethod.Get); }
+            public ExpandoObject Index() { return _client.Execute($"/cluster", HttpMethod.Get); }
 
             private PVEReplication _replication;
             public PVEReplication Replication { get { return _replication ?? (_replication = new PVEReplication(_client)); } }
@@ -125,7 +129,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <summary>
                 /// List replication jobs.
                 /// </summary>
-                public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/cluster/replication", HttpMethod.Get); }
+                public ExpandoObject Index() { return _client.Execute($"/cluster/replication", HttpMethod.Get); }
 
                 /// <summary>
                 /// Create a new replication job
@@ -151,7 +155,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("schedule", schedule);
                     parameters.Add("target", target);
                     parameters.Add("type", type);
-                    _client.Execute<ExpandoObject>($"/cluster/replication", HttpMethod.Post, parameters);
+                    _client.Execute($"/cluster/replication", HttpMethod.Post, parameters);
                 }
 
                 public PVEItemId this[object id] { get { return new PVEItemId(_client, id: id); } }
@@ -176,13 +180,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("force", force);
                         parameters.Add("keep", keep);
-                        _client.Execute<ExpandoObject>($"/cluster/replication/{_id}", HttpMethod.Delete, parameters);
+                        _client.Execute($"/cluster/replication/{_id}", HttpMethod.Delete, parameters);
                     }
 
                     /// <summary>
                     /// Read replication job configuration.
                     /// </summary>
-                    public ExpandoObject Read() { return _client.Execute<ExpandoObject>($"/cluster/replication/{_id}", HttpMethod.Get); }
+                    public ExpandoObject Read() { return _client.Execute($"/cluster/replication/{_id}", HttpMethod.Get); }
 
                     /// <summary>
                     /// Update replication job configuration.
@@ -205,7 +209,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("rate", rate);
                         parameters.Add("remove_job", remove_job);
                         parameters.Add("schedule", schedule);
-                        _client.Execute<ExpandoObject>($"/cluster/replication/{_id}", HttpMethod.Put, parameters);
+                        _client.Execute($"/cluster/replication/{_id}", HttpMethod.Put, parameters);
                     }
                 }
             }
@@ -221,7 +225,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <summary>
                 /// Directory index.
                 /// </summary>
-                public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/cluster/config", HttpMethod.Get); }
+                public ExpandoObject Index() { return _client.Execute($"/cluster/config", HttpMethod.Get); }
 
                 private PVENodes _nodes;
                 public PVENodes Nodes { get { return _nodes ?? (_nodes = new PVENodes(_client)); } }
@@ -234,7 +238,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Corosync node list.
                     /// </summary>
-                    public ExpandoObject[] Nodes() { return _client.Execute<ExpandoObject[]>($"/cluster/config/nodes", HttpMethod.Get); }
+                    public ExpandoObject Nodes() { return _client.Execute($"/cluster/config/nodes", HttpMethod.Get); }
                 }
 
                 private PVETotem _totem;
@@ -248,7 +252,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Get corosync totem protocol settings.
                     /// </summary>
-                    public ExpandoObject Totem() { return _client.Execute<ExpandoObject>($"/cluster/config/totem", HttpMethod.Get); }
+                    public ExpandoObject Totem() { return _client.Execute($"/cluster/config/totem", HttpMethod.Get); }
                 }
             }
 
@@ -263,7 +267,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <summary>
                 /// Directory index.
                 /// </summary>
-                public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/cluster/firewall", HttpMethod.Get); }
+                public ExpandoObject Index() { return _client.Execute($"/cluster/firewall", HttpMethod.Get); }
 
                 private PVEGroups _groups;
                 public PVEGroups Groups { get { return _groups ?? (_groups = new PVEGroups(_client)); } }
@@ -276,7 +280,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// List security groups.
                     /// </summary>
-                    public ExpandoObject[] ListSecurityGroups() { return _client.Execute<ExpandoObject[]>($"/cluster/firewall/groups", HttpMethod.Get); }
+                    public ExpandoObject ListSecurityGroups() { return _client.Execute($"/cluster/firewall/groups", HttpMethod.Get); }
 
                     /// <summary>
                     /// Create new security group.
@@ -292,7 +296,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("digest", digest);
                         parameters.Add("group", group);
                         parameters.Add("rename", rename);
-                        _client.Execute<ExpandoObject>($"/cluster/firewall/groups", HttpMethod.Post, parameters);
+                        _client.Execute($"/cluster/firewall/groups", HttpMethod.Post, parameters);
                     }
 
                     public PVEItemGroup this[object group] { get { return new PVEItemGroup(_client, group: group); } }
@@ -310,12 +314,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// Delete security group.
                         /// </summary>
-                        public void DeleteSecurityGroup() { _client.Execute<ExpandoObject>($"/cluster/firewall/groups/{_group}", HttpMethod.Delete); }
+                        public void DeleteSecurityGroup() { _client.Execute($"/cluster/firewall/groups/{_group}", HttpMethod.Delete); }
 
                         /// <summary>
                         /// List rules.
                         /// </summary>
-                        public ExpandoObject[] GetRules() { return _client.Execute<ExpandoObject[]>($"/cluster/firewall/groups/{_group}", HttpMethod.Get); }
+                        public ExpandoObject GetRules() { return _client.Execute($"/cluster/firewall/groups/{_group}", HttpMethod.Get); }
 
                         /// <summary>
                         /// Create new rule.
@@ -350,7 +354,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("source", source);
                             parameters.Add("sport", sport);
                             parameters.Add("type", type);
-                            _client.Execute<ExpandoObject>($"/cluster/firewall/groups/{_group}", HttpMethod.Post, parameters);
+                            _client.Execute($"/cluster/firewall/groups/{_group}", HttpMethod.Post, parameters);
                         }
 
                         public PVEItemPos this[object pos] { get { return new PVEItemPos(_client, group: _group, pos: pos); } }
@@ -375,13 +379,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("digest", digest);
-                                _client.Execute<ExpandoObject>($"/cluster/firewall/groups/{_group}/{_pos}", HttpMethod.Delete, parameters);
+                                _client.Execute($"/cluster/firewall/groups/{_group}/{_pos}", HttpMethod.Delete, parameters);
                             }
 
                             /// <summary>
                             /// Get single rule data.
                             /// </summary>
-                            public ExpandoObject GetRule() { return _client.Execute<ExpandoObject>($"/cluster/firewall/groups/{_group}/{_pos}", HttpMethod.Get); }
+                            public ExpandoObject GetRule() { return _client.Execute($"/cluster/firewall/groups/{_group}/{_pos}", HttpMethod.Get); }
 
                             /// <summary>
                             /// Modify rule data.
@@ -418,7 +422,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("source", source);
                                 parameters.Add("sport", sport);
                                 parameters.Add("type", type);
-                                _client.Execute<ExpandoObject>($"/cluster/firewall/groups/{_group}/{_pos}", HttpMethod.Put, parameters);
+                                _client.Execute($"/cluster/firewall/groups/{_group}/{_pos}", HttpMethod.Put, parameters);
                             }
                         }
                     }
@@ -435,7 +439,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// List rules.
                     /// </summary>
-                    public ExpandoObject[] GetRules() { return _client.Execute<ExpandoObject[]>($"/cluster/firewall/rules", HttpMethod.Get); }
+                    public ExpandoObject GetRules() { return _client.Execute($"/cluster/firewall/rules", HttpMethod.Get); }
 
                     /// <summary>
                     /// Create new rule.
@@ -470,7 +474,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("source", source);
                         parameters.Add("sport", sport);
                         parameters.Add("type", type);
-                        _client.Execute<ExpandoObject>($"/cluster/firewall/rules", HttpMethod.Post, parameters);
+                        _client.Execute($"/cluster/firewall/rules", HttpMethod.Post, parameters);
                     }
 
                     public PVEItemPos this[object pos] { get { return new PVEItemPos(_client, pos: pos); } }
@@ -493,13 +497,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("digest", digest);
-                            _client.Execute<ExpandoObject>($"/cluster/firewall/rules/{_pos}", HttpMethod.Delete, parameters);
+                            _client.Execute($"/cluster/firewall/rules/{_pos}", HttpMethod.Delete, parameters);
                         }
 
                         /// <summary>
                         /// Get single rule data.
                         /// </summary>
-                        public ExpandoObject GetRule() { return _client.Execute<ExpandoObject>($"/cluster/firewall/rules/{_pos}", HttpMethod.Get); }
+                        public ExpandoObject GetRule() { return _client.Execute($"/cluster/firewall/rules/{_pos}", HttpMethod.Get); }
 
                         /// <summary>
                         /// Modify rule data.
@@ -536,7 +540,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("source", source);
                             parameters.Add("sport", sport);
                             parameters.Add("type", type);
-                            _client.Execute<ExpandoObject>($"/cluster/firewall/rules/{_pos}", HttpMethod.Put, parameters);
+                            _client.Execute($"/cluster/firewall/rules/{_pos}", HttpMethod.Put, parameters);
                         }
                     }
                 }
@@ -552,7 +556,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// List IPSets
                     /// </summary>
-                    public ExpandoObject[] IpsetIndex() { return _client.Execute<ExpandoObject[]>($"/cluster/firewall/ipset", HttpMethod.Get); }
+                    public ExpandoObject IpsetIndex() { return _client.Execute($"/cluster/firewall/ipset", HttpMethod.Get); }
 
                     /// <summary>
                     /// Create new IPSet
@@ -568,7 +572,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("digest", digest);
                         parameters.Add("name", name);
                         parameters.Add("rename", rename);
-                        _client.Execute<ExpandoObject>($"/cluster/firewall/ipset", HttpMethod.Post, parameters);
+                        _client.Execute($"/cluster/firewall/ipset", HttpMethod.Post, parameters);
                     }
 
                     public PVEItemName this[object name] { get { return new PVEItemName(_client, name: name); } }
@@ -586,12 +590,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// Delete IPSet
                         /// </summary>
-                        public void DeleteIpset() { _client.Execute<ExpandoObject>($"/cluster/firewall/ipset/{_name}", HttpMethod.Delete); }
+                        public void DeleteIpset() { _client.Execute($"/cluster/firewall/ipset/{_name}", HttpMethod.Delete); }
 
                         /// <summary>
                         /// List IPSet content
                         /// </summary>
-                        public ExpandoObject[] GetIpset() { return _client.Execute<ExpandoObject[]>($"/cluster/firewall/ipset/{_name}", HttpMethod.Get); }
+                        public ExpandoObject GetIpset() { return _client.Execute($"/cluster/firewall/ipset/{_name}", HttpMethod.Get); }
 
                         /// <summary>
                         /// Add IP or Network to IPSet.
@@ -605,7 +609,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("cidr", cidr);
                             parameters.Add("comment", comment);
                             parameters.Add("nomatch", nomatch);
-                            _client.Execute<ExpandoObject>($"/cluster/firewall/ipset/{_name}", HttpMethod.Post, parameters);
+                            _client.Execute($"/cluster/firewall/ipset/{_name}", HttpMethod.Post, parameters);
                         }
 
                         public PVEItemCidr this[object cidr] { get { return new PVEItemCidr(_client, name: _name, cidr: cidr); } }
@@ -630,13 +634,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("digest", digest);
-                                _client.Execute<ExpandoObject>($"/cluster/firewall/ipset/{_name}/{_cidr}", HttpMethod.Delete, parameters);
+                                _client.Execute($"/cluster/firewall/ipset/{_name}/{_cidr}", HttpMethod.Delete, parameters);
                             }
 
                             /// <summary>
                             /// Read IP or Network settings from IPSet.
                             /// </summary>
-                            public ExpandoObject ReadIp() { return _client.Execute<ExpandoObject>($"/cluster/firewall/ipset/{_name}/{_cidr}", HttpMethod.Get); }
+                            public ExpandoObject ReadIp() { return _client.Execute($"/cluster/firewall/ipset/{_name}/{_cidr}", HttpMethod.Get); }
 
                             /// <summary>
                             /// Update IP or Network settings
@@ -650,7 +654,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("comment", comment);
                                 parameters.Add("digest", digest);
                                 parameters.Add("nomatch", nomatch);
-                                _client.Execute<ExpandoObject>($"/cluster/firewall/ipset/{_name}/{_cidr}", HttpMethod.Put, parameters);
+                                _client.Execute($"/cluster/firewall/ipset/{_name}/{_cidr}", HttpMethod.Put, parameters);
                             }
                         }
                     }
@@ -667,7 +671,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// List aliases
                     /// </summary>
-                    public ExpandoObject[] GetAliases() { return _client.Execute<ExpandoObject[]>($"/cluster/firewall/aliases", HttpMethod.Get); }
+                    public ExpandoObject GetAliases() { return _client.Execute($"/cluster/firewall/aliases", HttpMethod.Get); }
 
                     /// <summary>
                     /// Create IP or Network Alias.
@@ -681,7 +685,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("cidr", cidr);
                         parameters.Add("comment", comment);
                         parameters.Add("name", name);
-                        _client.Execute<ExpandoObject>($"/cluster/firewall/aliases", HttpMethod.Post, parameters);
+                        _client.Execute($"/cluster/firewall/aliases", HttpMethod.Post, parameters);
                     }
 
                     public PVEItemName this[object name] { get { return new PVEItemName(_client, name: name); } }
@@ -704,13 +708,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("digest", digest);
-                            _client.Execute<ExpandoObject>($"/cluster/firewall/aliases/{_name}", HttpMethod.Delete, parameters);
+                            _client.Execute($"/cluster/firewall/aliases/{_name}", HttpMethod.Delete, parameters);
                         }
 
                         /// <summary>
                         /// Read alias.
                         /// </summary>
-                        public ExpandoObject ReadAlias() { return _client.Execute<ExpandoObject>($"/cluster/firewall/aliases/{_name}", HttpMethod.Get); }
+                        public ExpandoObject ReadAlias() { return _client.Execute($"/cluster/firewall/aliases/{_name}", HttpMethod.Get); }
 
                         /// <summary>
                         /// Update IP or Network alias.
@@ -726,7 +730,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("comment", comment);
                             parameters.Add("digest", digest);
                             parameters.Add("rename", rename);
-                            _client.Execute<ExpandoObject>($"/cluster/firewall/aliases/{_name}", HttpMethod.Put, parameters);
+                            _client.Execute($"/cluster/firewall/aliases/{_name}", HttpMethod.Put, parameters);
                         }
                     }
                 }
@@ -742,7 +746,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Get Firewall options.
                     /// </summary>
-                    public ExpandoObject GetOptions() { return _client.Execute<ExpandoObject>($"/cluster/firewall/options", HttpMethod.Get); }
+                    public ExpandoObject GetOptions() { return _client.Execute($"/cluster/firewall/options", HttpMethod.Get); }
 
                     /// <summary>
                     /// Set Firewall options.
@@ -762,7 +766,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("enable", enable);
                         parameters.Add("policy_in", policy_in);
                         parameters.Add("policy_out", policy_out);
-                        _client.Execute<ExpandoObject>($"/cluster/firewall/options", HttpMethod.Put, parameters);
+                        _client.Execute($"/cluster/firewall/options", HttpMethod.Put, parameters);
                     }
                 }
 
@@ -777,7 +781,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// List available macros
                     /// </summary>
-                    public ExpandoObject[] GetMacros() { return _client.Execute<ExpandoObject[]>($"/cluster/firewall/macros", HttpMethod.Get); }
+                    public ExpandoObject GetMacros() { return _client.Execute($"/cluster/firewall/macros", HttpMethod.Get); }
                 }
 
                 private PVERefs _refs;
@@ -793,11 +797,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="type">Only list references of specified type.
                     ///   Enum: alias,ipset</param>
-                    public ExpandoObject[] Refs(string type = null)
+                    public ExpandoObject Refs(string type = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("type", type);
-                        return _client.Execute<ExpandoObject[]>($"/cluster/firewall/refs", HttpMethod.Get, parameters);
+                        return _client.Execute($"/cluster/firewall/refs", HttpMethod.Get, parameters);
                     }
                 }
             }
@@ -813,7 +817,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <summary>
                 /// List vzdump backup schedule.
                 /// </summary>
-                public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/cluster/backup", HttpMethod.Get); }
+                public ExpandoObject Index() { return _client.Execute($"/cluster/backup", HttpMethod.Get); }
 
                 /// <summary>
                 /// Create new vzdump backup job.
@@ -878,7 +882,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("storage", storage);
                     parameters.Add("tmpdir", tmpdir);
                     parameters.Add("vmid", vmid);
-                    _client.Execute<ExpandoObject>($"/cluster/backup", HttpMethod.Post, parameters);
+                    _client.Execute($"/cluster/backup", HttpMethod.Post, parameters);
                 }
 
                 public PVEItemId this[object id] { get { return new PVEItemId(_client, id: id); } }
@@ -896,12 +900,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Delete vzdump backup job definition.
                     /// </summary>
-                    public void DeleteJob() { _client.Execute<ExpandoObject>($"/cluster/backup/{_id}", HttpMethod.Delete); }
+                    public void DeleteJob() { _client.Execute($"/cluster/backup/{_id}", HttpMethod.Delete); }
 
                     /// <summary>
                     /// Read vzdump backup job definition.
                     /// </summary>
-                    public ExpandoObject ReadJob() { return _client.Execute<ExpandoObject>($"/cluster/backup/{_id}", HttpMethod.Get); }
+                    public ExpandoObject ReadJob() { return _client.Execute($"/cluster/backup/{_id}", HttpMethod.Get); }
 
                     /// <summary>
                     /// Update vzdump backup job definition.
@@ -968,7 +972,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("storage", storage);
                         parameters.Add("tmpdir", tmpdir);
                         parameters.Add("vmid", vmid);
-                        _client.Execute<ExpandoObject>($"/cluster/backup/{_id}", HttpMethod.Put, parameters);
+                        _client.Execute($"/cluster/backup/{_id}", HttpMethod.Put, parameters);
                     }
                 }
             }
@@ -984,7 +988,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <summary>
                 /// Directory index.
                 /// </summary>
-                public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/cluster/ha", HttpMethod.Get); }
+                public ExpandoObject Index() { return _client.Execute($"/cluster/ha", HttpMethod.Get); }
 
                 private PVEResources _resources;
                 public PVEResources Resources { get { return _resources ?? (_resources = new PVEResources(_client)); } }
@@ -999,11 +1003,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="type">Only list resources of specific type
                     ///   Enum: ct,vm</param>
-                    public ExpandoObject[] Index(string type = null)
+                    public ExpandoObject Index(string type = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("type", type);
-                        return _client.Execute<ExpandoObject[]>($"/cluster/ha/resources", HttpMethod.Get, parameters);
+                        return _client.Execute($"/cluster/ha/resources", HttpMethod.Get, parameters);
                     }
 
                     /// <summary>
@@ -1028,7 +1032,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("sid", sid);
                         parameters.Add("state", state);
                         parameters.Add("type", type);
-                        _client.Execute<ExpandoObject>($"/cluster/ha/resources", HttpMethod.Post, parameters);
+                        _client.Execute($"/cluster/ha/resources", HttpMethod.Post, parameters);
                     }
 
                     public PVEItemSid this[object sid] { get { return new PVEItemSid(_client, sid: sid); } }
@@ -1046,12 +1050,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// Delete resource configuration.
                         /// </summary>
-                        public void Delete() { _client.Execute<ExpandoObject>($"/cluster/ha/resources/{_sid}", HttpMethod.Delete); }
+                        public void Delete() { _client.Execute($"/cluster/ha/resources/{_sid}", HttpMethod.Delete); }
 
                         /// <summary>
                         /// Read resource configuration.
                         /// </summary>
-                        public ExpandoObject Read() { return _client.Execute<ExpandoObject>($"/cluster/ha/resources/{_sid}", HttpMethod.Get); }
+                        public ExpandoObject Read() { return _client.Execute($"/cluster/ha/resources/{_sid}", HttpMethod.Get); }
 
                         /// <summary>
                         /// Update resource configuration.
@@ -1074,7 +1078,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("max_relocate", max_relocate);
                             parameters.Add("max_restart", max_restart);
                             parameters.Add("state", state);
-                            _client.Execute<ExpandoObject>($"/cluster/ha/resources/{_sid}", HttpMethod.Put, parameters);
+                            _client.Execute($"/cluster/ha/resources/{_sid}", HttpMethod.Put, parameters);
                         }
 
                         private PVEMigrate _migrate;
@@ -1098,7 +1102,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("node", node);
-                                _client.Execute<ExpandoObject>($"/cluster/ha/resources/{_sid}/migrate", HttpMethod.Post, parameters);
+                                _client.Execute($"/cluster/ha/resources/{_sid}/migrate", HttpMethod.Post, parameters);
                             }
                         }
 
@@ -1123,7 +1127,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("node", node);
-                                _client.Execute<ExpandoObject>($"/cluster/ha/resources/{_sid}/relocate", HttpMethod.Post, parameters);
+                                _client.Execute($"/cluster/ha/resources/{_sid}/relocate", HttpMethod.Post, parameters);
                             }
                         }
                     }
@@ -1140,7 +1144,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Get HA groups.
                     /// </summary>
-                    public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/cluster/ha/groups", HttpMethod.Get); }
+                    public ExpandoObject Index() { return _client.Execute($"/cluster/ha/groups", HttpMethod.Get); }
 
                     /// <summary>
                     /// Create a new HA group.
@@ -1161,7 +1165,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("nofailback", nofailback);
                         parameters.Add("restricted", restricted);
                         parameters.Add("type", type);
-                        _client.Execute<ExpandoObject>($"/cluster/ha/groups", HttpMethod.Post, parameters);
+                        _client.Execute($"/cluster/ha/groups", HttpMethod.Post, parameters);
                     }
 
                     public PVEItemGroup this[object group] { get { return new PVEItemGroup(_client, group: group); } }
@@ -1179,12 +1183,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// Delete ha group configuration.
                         /// </summary>
-                        public void Delete() { _client.Execute<ExpandoObject>($"/cluster/ha/groups/{_group}", HttpMethod.Delete); }
+                        public void Delete() { _client.Execute($"/cluster/ha/groups/{_group}", HttpMethod.Delete); }
 
                         /// <summary>
                         /// Read ha group configuration.
                         /// </summary>
-                        public ExpandoObject Read() { return _client.Execute<ExpandoObject>($"/cluster/ha/groups/{_group}", HttpMethod.Get); }
+                        public ExpandoObject Read() { return _client.Execute($"/cluster/ha/groups/{_group}", HttpMethod.Get); }
 
                         /// <summary>
                         /// Update ha group configuration.
@@ -1204,7 +1208,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("nodes", nodes);
                             parameters.Add("nofailback", nofailback);
                             parameters.Add("restricted", restricted);
-                            _client.Execute<ExpandoObject>($"/cluster/ha/groups/{_group}", HttpMethod.Put, parameters);
+                            _client.Execute($"/cluster/ha/groups/{_group}", HttpMethod.Put, parameters);
                         }
                     }
                 }
@@ -1220,7 +1224,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Directory index.
                     /// </summary>
-                    public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/cluster/ha/status", HttpMethod.Get); }
+                    public ExpandoObject Index() { return _client.Execute($"/cluster/ha/status", HttpMethod.Get); }
 
                     private PVECurrent _current;
                     public PVECurrent Current { get { return _current ?? (_current = new PVECurrent(_client)); } }
@@ -1233,7 +1237,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// Get HA manger status.
                         /// </summary>
-                        public ExpandoObject[] Status() { return _client.Execute<ExpandoObject[]>($"/cluster/ha/status/current", HttpMethod.Get); }
+                        public ExpandoObject Status() { return _client.Execute($"/cluster/ha/status/current", HttpMethod.Get); }
                     }
 
                     private PVEManager_Status _manager_status;
@@ -1247,7 +1251,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// Get full HA manger status, including LRM status.
                         /// </summary>
-                        public ExpandoObject ManagerStatus() { return _client.Execute<ExpandoObject>($"/cluster/ha/status/manager_status", HttpMethod.Get); }
+                        public ExpandoObject ManagerStatus() { return _client.Execute($"/cluster/ha/status/manager_status", HttpMethod.Get); }
                     }
                 }
             }
@@ -1264,11 +1268,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// Read cluster log
                 /// </summary>
                 /// <param name="max">Maximum number of entries.</param>
-                public ExpandoObject[] Log(int? max = null)
+                public ExpandoObject Log(int? max = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("max", max);
-                    return _client.Execute<ExpandoObject[]>($"/cluster/log", HttpMethod.Get, parameters);
+                    return _client.Execute($"/cluster/log", HttpMethod.Get, parameters);
                 }
             }
 
@@ -1285,11 +1289,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// </summary>
                 /// <param name="type">
                 ///   Enum: vm,storage,node</param>
-                public ExpandoObject[] Resources(string type = null)
+                public ExpandoObject Resources(string type = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("type", type);
-                    return _client.Execute<ExpandoObject[]>($"/cluster/resources", HttpMethod.Get, parameters);
+                    return _client.Execute($"/cluster/resources", HttpMethod.Get, parameters);
                 }
             }
 
@@ -1304,7 +1308,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <summary>
                 /// List recent tasks (cluster wide).
                 /// </summary>
-                public ExpandoObject[] Tasks() { return _client.Execute<ExpandoObject[]>($"/cluster/tasks", HttpMethod.Get); }
+                public ExpandoObject Tasks() { return _client.Execute($"/cluster/tasks", HttpMethod.Get); }
             }
 
             private PVEOptions _options;
@@ -1318,7 +1322,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <summary>
                 /// Get datacenter options.
                 /// </summary>
-                public ExpandoObject GetOptions() { return _client.Execute<ExpandoObject>($"/cluster/options", HttpMethod.Get); }
+                public ExpandoObject GetOptions() { return _client.Execute($"/cluster/options", HttpMethod.Get); }
 
                 /// <summary>
                 /// Set datacenter options.
@@ -1355,7 +1359,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("max_workers", max_workers);
                     parameters.Add("migration", migration);
                     parameters.Add("migration_unsecure", migration_unsecure);
-                    _client.Execute<ExpandoObject>($"/cluster/options", HttpMethod.Put, parameters);
+                    _client.Execute($"/cluster/options", HttpMethod.Put, parameters);
                 }
             }
 
@@ -1370,7 +1374,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <summary>
                 /// Get cluster status informations.
                 /// </summary>
-                public ExpandoObject[] GetStatus() { return _client.Execute<ExpandoObject[]>($"/cluster/status", HttpMethod.Get); }
+                public ExpandoObject GetStatus() { return _client.Execute($"/cluster/status", HttpMethod.Get); }
             }
 
             private PVENextid _nextid;
@@ -1389,7 +1393,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("vmid", vmid);
-                    return _client.Execute<ExpandoObject>($"/cluster/nextid", HttpMethod.Get, parameters);
+                    return _client.Execute($"/cluster/nextid", HttpMethod.Get, parameters);
                 }
             }
         }
@@ -1405,7 +1409,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <summary>
             /// Cluster node index.
             /// </summary>
-            public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/nodes", HttpMethod.Get); }
+            public ExpandoObject Index() { return _client.Execute($"/nodes", HttpMethod.Get); }
 
             public PVEItemNode this[object node] { get { return new PVEItemNode(_client, node: node); } }
 
@@ -1422,7 +1426,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <summary>
                 /// Node index.
                 /// </summary>
-                public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}", HttpMethod.Get); }
+                public ExpandoObject Index() { return _client.Execute($"/nodes/{_node}", HttpMethod.Get); }
 
                 private PVEQemu _qemu;
                 public PVEQemu Qemu { get { return _qemu ?? (_qemu = new PVEQemu(_client, node: _node)); } }
@@ -1441,11 +1445,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Virtual machine index (per node).
                     /// </summary>
                     /// <param name="full">Determine the full status of active VMs.</param>
-                    public ExpandoObject[] Vmlist(bool? full = null)
+                    public ExpandoObject Vmlist(bool? full = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("full", full);
-                        return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/qemu", HttpMethod.Get, parameters);
+                        return _client.Execute($"/nodes/{_node}/qemu", HttpMethod.Get, parameters);
                     }
 
                     /// <summary>
@@ -1829,7 +1833,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         AddComplexParmeterToDictionary(parameters, "virtio", virtioN);
                         parameters.Add("vmid", vmid);
                         parameters.Add("watchdog", watchdog);
-                        return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu", HttpMethod.Post, parameters);
+                        return _client.Execute($"/nodes/{_node}/qemu", HttpMethod.Post, parameters);
                     }
 
                     public PVEItemVmid this[object vmid] { get { return new PVEItemVmid(_client, node: _node, vmid: vmid); } }
@@ -1854,13 +1858,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("skiplock", skiplock);
-                            return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}", HttpMethod.Delete, parameters);
+                            return _client.Execute($"/nodes/{_node}/qemu/{_vmid}", HttpMethod.Delete, parameters);
                         }
 
                         /// <summary>
                         /// Directory index
                         /// </summary>
-                        public ExpandoObject[] Vmdiridx() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/qemu/{_vmid}", HttpMethod.Get); }
+                        public ExpandoObject Vmdiridx() { return _client.Execute($"/nodes/{_node}/qemu/{_vmid}", HttpMethod.Get); }
 
                         private PVEFirewall _firewall;
                         public PVEFirewall Firewall { get { return _firewall ?? (_firewall = new PVEFirewall(_client, node: _node, vmid: _vmid)); } }
@@ -1880,7 +1884,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// Directory index.
                             /// </summary>
-                            public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/qemu/{_vmid}/firewall", HttpMethod.Get); }
+                            public ExpandoObject Index() { return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall", HttpMethod.Get); }
 
                             private PVERules _rules;
                             public PVERules Rules { get { return _rules ?? (_rules = new PVERules(_client, node: _node, vmid: _vmid)); } }
@@ -1900,7 +1904,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <summary>
                                 /// List rules.
                                 /// </summary>
-                                public ExpandoObject[] GetRules() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/qemu/{_vmid}/firewall/rules", HttpMethod.Get); }
+                                public ExpandoObject GetRules() { return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/rules", HttpMethod.Get); }
 
                                 /// <summary>
                                 /// Create new rule.
@@ -1935,7 +1939,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("source", source);
                                     parameters.Add("sport", sport);
                                     parameters.Add("type", type);
-                                    _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/firewall/rules", HttpMethod.Post, parameters);
+                                    _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/rules", HttpMethod.Post, parameters);
                                 }
 
                                 public PVEItemPos this[object pos] { get { return new PVEItemPos(_client, node: _node, vmid: _vmid, pos: pos); } }
@@ -1962,13 +1966,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("digest", digest);
-                                        _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", HttpMethod.Delete, parameters);
+                                        _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", HttpMethod.Delete, parameters);
                                     }
 
                                     /// <summary>
                                     /// Get single rule data.
                                     /// </summary>
-                                    public ExpandoObject GetRule() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", HttpMethod.Get); }
+                                    public ExpandoObject GetRule() { return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", HttpMethod.Get); }
 
                                     /// <summary>
                                     /// Modify rule data.
@@ -2005,7 +2009,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         parameters.Add("source", source);
                                         parameters.Add("sport", sport);
                                         parameters.Add("type", type);
-                                        _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", HttpMethod.Put, parameters);
+                                        _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", HttpMethod.Put, parameters);
                                     }
                                 }
                             }
@@ -2028,7 +2032,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <summary>
                                 /// List aliases
                                 /// </summary>
-                                public ExpandoObject[] GetAliases() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases", HttpMethod.Get); }
+                                public ExpandoObject GetAliases() { return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases", HttpMethod.Get); }
 
                                 /// <summary>
                                 /// Create IP or Network Alias.
@@ -2042,7 +2046,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("cidr", cidr);
                                     parameters.Add("comment", comment);
                                     parameters.Add("name", name);
-                                    _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases", HttpMethod.Post, parameters);
+                                    _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases", HttpMethod.Post, parameters);
                                 }
 
                                 public PVEItemName this[object name] { get { return new PVEItemName(_client, node: _node, vmid: _vmid, name: name); } }
@@ -2069,13 +2073,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("digest", digest);
-                                        _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", HttpMethod.Delete, parameters);
+                                        _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", HttpMethod.Delete, parameters);
                                     }
 
                                     /// <summary>
                                     /// Read alias.
                                     /// </summary>
-                                    public ExpandoObject ReadAlias() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", HttpMethod.Get); }
+                                    public ExpandoObject ReadAlias() { return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", HttpMethod.Get); }
 
                                     /// <summary>
                                     /// Update IP or Network alias.
@@ -2091,7 +2095,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         parameters.Add("comment", comment);
                                         parameters.Add("digest", digest);
                                         parameters.Add("rename", rename);
-                                        _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", HttpMethod.Put, parameters);
+                                        _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", HttpMethod.Put, parameters);
                                     }
                                 }
                             }
@@ -2114,7 +2118,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <summary>
                                 /// List IPSets
                                 /// </summary>
-                                public ExpandoObject[] IpsetIndex() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset", HttpMethod.Get); }
+                                public ExpandoObject IpsetIndex() { return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset", HttpMethod.Get); }
 
                                 /// <summary>
                                 /// Create new IPSet
@@ -2130,7 +2134,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("digest", digest);
                                     parameters.Add("name", name);
                                     parameters.Add("rename", rename);
-                                    _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset", HttpMethod.Post, parameters);
+                                    _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset", HttpMethod.Post, parameters);
                                 }
 
                                 public PVEItemName this[object name] { get { return new PVEItemName(_client, node: _node, vmid: _vmid, name: name); } }
@@ -2152,12 +2156,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <summary>
                                     /// Delete IPSet
                                     /// </summary>
-                                    public void DeleteIpset() { _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}", HttpMethod.Delete); }
+                                    public void DeleteIpset() { _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}", HttpMethod.Delete); }
 
                                     /// <summary>
                                     /// List IPSet content
                                     /// </summary>
-                                    public ExpandoObject[] GetIpset() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}", HttpMethod.Get); }
+                                    public ExpandoObject GetIpset() { return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}", HttpMethod.Get); }
 
                                     /// <summary>
                                     /// Add IP or Network to IPSet.
@@ -2171,7 +2175,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         parameters.Add("cidr", cidr);
                                         parameters.Add("comment", comment);
                                         parameters.Add("nomatch", nomatch);
-                                        _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}", HttpMethod.Post, parameters);
+                                        _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}", HttpMethod.Post, parameters);
                                     }
 
                                     public PVEItemCidr this[object cidr] { get { return new PVEItemCidr(_client, node: _node, vmid: _vmid, name: _name, cidr: cidr); } }
@@ -2200,13 +2204,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         {
                                             var parameters = new Dictionary<string, object>();
                                             parameters.Add("digest", digest);
-                                            _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Delete, parameters);
+                                            _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Delete, parameters);
                                         }
 
                                         /// <summary>
                                         /// Read IP or Network settings from IPSet.
                                         /// </summary>
-                                        public ExpandoObject ReadIp() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Get); }
+                                        public ExpandoObject ReadIp() { return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Get); }
 
                                         /// <summary>
                                         /// Update IP or Network settings
@@ -2220,7 +2224,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                             parameters.Add("comment", comment);
                                             parameters.Add("digest", digest);
                                             parameters.Add("nomatch", nomatch);
-                                            _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Put, parameters);
+                                            _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Put, parameters);
                                         }
                                     }
                                 }
@@ -2244,7 +2248,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <summary>
                                 /// Get VM firewall options.
                                 /// </summary>
-                                public ExpandoObject GetOptions() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/firewall/options", HttpMethod.Get); }
+                                public ExpandoObject GetOptions() { return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/options", HttpMethod.Get); }
 
                                 /// <summary>
                                 /// Set Firewall options.
@@ -2280,7 +2284,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("policy_in", policy_in);
                                     parameters.Add("policy_out", policy_out);
                                     parameters.Add("radv", radv);
-                                    _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/firewall/options", HttpMethod.Put, parameters);
+                                    _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/options", HttpMethod.Put, parameters);
                                 }
                             }
 
@@ -2304,12 +2308,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="limit"></param>
                                 /// <param name="start"></param>
-                                public ExpandoObject[] Log(int? limit = null, int? start = null)
+                                public ExpandoObject Log(int? limit = null, int? start = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("limit", limit);
                                     parameters.Add("start", start);
-                                    return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/qemu/{_vmid}/firewall/log", HttpMethod.Get, parameters);
+                                    return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/log", HttpMethod.Get, parameters);
                                 }
                             }
 
@@ -2333,11 +2337,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="type">Only list references of specified type.
                                 ///   Enum: alias,ipset</param>
-                                public ExpandoObject[] Refs(string type = null)
+                                public ExpandoObject Refs(string type = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("type", type);
-                                    return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/qemu/{_vmid}/firewall/refs", HttpMethod.Get, parameters);
+                                    return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/firewall/refs", HttpMethod.Get, parameters);
                                 }
                             }
                         }
@@ -2371,7 +2375,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("cf", cf);
                                 parameters.Add("ds", ds);
                                 parameters.Add("timeframe", timeframe);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/rrd", HttpMethod.Get, parameters);
+                                return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/rrd", HttpMethod.Get, parameters);
                             }
                         }
 
@@ -2397,12 +2401,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             ///   Enum: hour,day,week,month,year</param>
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
-                            public ExpandoObject[] Rrddata(string timeframe, string cf = null)
+                            public ExpandoObject Rrddata(string timeframe, string cf = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("cf", cf);
                                 parameters.Add("timeframe", timeframe);
-                                return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/qemu/{_vmid}/rrddata", HttpMethod.Get, parameters);
+                                return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/rrddata", HttpMethod.Get, parameters);
                             }
                         }
 
@@ -2429,7 +2433,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("current", current);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/config", HttpMethod.Get, parameters);
+                                return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/config", HttpMethod.Get, parameters);
                             }
 
                             /// <summary>
@@ -2813,7 +2817,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("vga", vga);
                                 AddComplexParmeterToDictionary(parameters, "virtio", virtioN);
                                 parameters.Add("watchdog", watchdog);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/config", HttpMethod.Post, parameters);
+                                return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/config", HttpMethod.Post, parameters);
                             }
 
                             /// <summary>
@@ -3195,7 +3199,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("vga", vga);
                                 AddComplexParmeterToDictionary(parameters, "virtio", virtioN);
                                 parameters.Add("watchdog", watchdog);
-                                _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/config", HttpMethod.Put, parameters);
+                                _client.Execute($"/nodes/{_node}/qemu/{_vmid}/config", HttpMethod.Put, parameters);
                             }
                         }
 
@@ -3217,7 +3221,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// Get virtual machine configuration, including pending changes.
                             /// </summary>
-                            public ExpandoObject[] VmPending() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/qemu/{_vmid}/pending", HttpMethod.Get); }
+                            public ExpandoObject VmPending() { return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/pending", HttpMethod.Get); }
                         }
 
                         private PVEUnlink _unlink;
@@ -3245,7 +3249,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("force", force);
                                 parameters.Add("idlist", idlist);
-                                _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/unlink", HttpMethod.Put, parameters);
+                                _client.Execute($"/nodes/{_node}/qemu/{_vmid}/unlink", HttpMethod.Put, parameters);
                             }
                         }
 
@@ -3272,7 +3276,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("websocket", websocket);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/vncproxy", HttpMethod.Post, parameters);
+                                return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/vncproxy", HttpMethod.Post, parameters);
                             }
                         }
 
@@ -3301,7 +3305,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("port", port);
                                 parameters.Add("vncticket", vncticket);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/vncwebsocket", HttpMethod.Get, parameters);
+                                return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/vncwebsocket", HttpMethod.Get, parameters);
                             }
                         }
 
@@ -3328,7 +3332,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("proxy", proxy);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/spiceproxy", HttpMethod.Post, parameters);
+                                return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/spiceproxy", HttpMethod.Post, parameters);
                             }
                         }
 
@@ -3350,7 +3354,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// Directory index
                             /// </summary>
-                            public ExpandoObject[] Vmcmdidx() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/qemu/{_vmid}/status", HttpMethod.Get); }
+                            public ExpandoObject Vmcmdidx() { return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/status", HttpMethod.Get); }
 
                             private PVECurrent _current;
                             public PVECurrent Current { get { return _current ?? (_current = new PVECurrent(_client, node: _node, vmid: _vmid)); } }
@@ -3370,7 +3374,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <summary>
                                 /// Get virtual machine status.
                                 /// </summary>
-                                public ExpandoObject VmStatus() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/status/current", HttpMethod.Get); }
+                                public ExpandoObject VmStatus() { return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/status/current", HttpMethod.Get); }
                             }
 
                             private PVEStart _start;
@@ -3409,7 +3413,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("skiplock", skiplock);
                                     parameters.Add("stateuri", stateuri);
                                     parameters.Add("targetstorage", targetstorage);
-                                    return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/status/start", HttpMethod.Post, parameters);
+                                    return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/status/start", HttpMethod.Post, parameters);
                                 }
                             }
 
@@ -3442,7 +3446,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("migratedfrom", migratedfrom);
                                     parameters.Add("skiplock", skiplock);
                                     parameters.Add("timeout", timeout);
-                                    return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/status/stop", HttpMethod.Post, parameters);
+                                    return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/status/stop", HttpMethod.Post, parameters);
                                 }
                             }
 
@@ -3469,7 +3473,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("skiplock", skiplock);
-                                    return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/status/reset", HttpMethod.Post, parameters);
+                                    return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/status/reset", HttpMethod.Post, parameters);
                                 }
                             }
 
@@ -3502,7 +3506,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("keepActive", keepActive);
                                     parameters.Add("skiplock", skiplock);
                                     parameters.Add("timeout", timeout);
-                                    return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/status/shutdown", HttpMethod.Post, parameters);
+                                    return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/status/shutdown", HttpMethod.Post, parameters);
                                 }
                             }
 
@@ -3529,7 +3533,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("skiplock", skiplock);
-                                    return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/status/suspend", HttpMethod.Post, parameters);
+                                    return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/status/suspend", HttpMethod.Post, parameters);
                                 }
                             }
 
@@ -3558,7 +3562,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("nocheck", nocheck);
                                     parameters.Add("skiplock", skiplock);
-                                    return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/status/resume", HttpMethod.Post, parameters);
+                                    return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/status/resume", HttpMethod.Post, parameters);
                                 }
                             }
                         }
@@ -3588,7 +3592,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("key", key);
                                 parameters.Add("skiplock", skiplock);
-                                _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/sendkey", HttpMethod.Put, parameters);
+                                _client.Execute($"/nodes/{_node}/qemu/{_vmid}/sendkey", HttpMethod.Put, parameters);
                             }
                         }
 
@@ -3618,7 +3622,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("feature", feature);
                                 parameters.Add("snapname", snapname);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/feature", HttpMethod.Get, parameters);
+                                return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/feature", HttpMethod.Get, parameters);
                             }
                         }
 
@@ -3662,7 +3666,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("snapname", snapname);
                                 parameters.Add("storage", storage);
                                 parameters.Add("target", target);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/clone", HttpMethod.Post, parameters);
+                                return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/clone", HttpMethod.Post, parameters);
                             }
                         }
 
@@ -3699,7 +3703,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("disk", disk);
                                 parameters.Add("format", format);
                                 parameters.Add("storage", storage);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/move_disk", HttpMethod.Post, parameters);
+                                return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/move_disk", HttpMethod.Post, parameters);
                             }
                         }
 
@@ -3739,7 +3743,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("target", target);
                                 parameters.Add("targetstorage", targetstorage);
                                 parameters.Add("with-local-disks", with_local_disks);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/migrate", HttpMethod.Post, parameters);
+                                return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/migrate", HttpMethod.Post, parameters);
                             }
                         }
 
@@ -3766,7 +3770,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("command", command);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/monitor", HttpMethod.Post, parameters);
+                                return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/monitor", HttpMethod.Post, parameters);
                             }
                         }
 
@@ -3794,7 +3798,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("command", command);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/agent", HttpMethod.Post, parameters);
+                                return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/agent", HttpMethod.Post, parameters);
                             }
                         }
 
@@ -3828,7 +3832,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("disk", disk);
                                 parameters.Add("size", size);
                                 parameters.Add("skiplock", skiplock);
-                                _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/resize", HttpMethod.Put, parameters);
+                                _client.Execute($"/nodes/{_node}/qemu/{_vmid}/resize", HttpMethod.Put, parameters);
                             }
                         }
 
@@ -3850,7 +3854,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// List all snapshots.
                             /// </summary>
-                            public ExpandoObject[] SnapshotList() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/qemu/{_vmid}/snapshot", HttpMethod.Get); }
+                            public ExpandoObject SnapshotList() { return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/snapshot", HttpMethod.Get); }
 
                             /// <summary>
                             /// Snapshot a VM.
@@ -3864,7 +3868,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("description", description);
                                 parameters.Add("snapname", snapname);
                                 parameters.Add("vmstate", vmstate);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/snapshot", HttpMethod.Post, parameters);
+                                return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/snapshot", HttpMethod.Post, parameters);
                             }
 
                             public PVEItemSnapname this[object snapname] { get { return new PVEItemSnapname(_client, node: _node, vmid: _vmid, snapname: snapname); } }
@@ -3891,13 +3895,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("force", force);
-                                    return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}", HttpMethod.Delete, parameters);
+                                    return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}", HttpMethod.Delete, parameters);
                                 }
 
                                 /// <summary>
                                 /// 
                                 /// </summary>
-                                public ExpandoObject[] SnapshotCmdIdx() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}", HttpMethod.Get); }
+                                public ExpandoObject SnapshotCmdIdx() { return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}", HttpMethod.Get); }
 
                                 private PVEConfig _config;
                                 public PVEConfig Config { get { return _config ?? (_config = new PVEConfig(_client, node: _node, vmid: _vmid, snapname: _snapname)); } }
@@ -3919,7 +3923,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <summary>
                                     /// Get snapshot configuration
                                     /// </summary>
-                                    public ExpandoObject GetSnapshotConfig() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config", HttpMethod.Get); }
+                                    public ExpandoObject GetSnapshotConfig() { return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config", HttpMethod.Get); }
 
                                     /// <summary>
                                     /// Update snapshot metadata.
@@ -3929,7 +3933,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("description", description);
-                                        _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config", HttpMethod.Put, parameters);
+                                        _client.Execute($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config", HttpMethod.Put, parameters);
                                     }
                                 }
 
@@ -3953,7 +3957,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <summary>
                                     /// Rollback VM state to specified snapshot.
                                     /// </summary>
-                                    public ExpandoObject Rollback() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/rollback", HttpMethod.Post); }
+                                    public ExpandoObject Rollback() { return _client.Execute($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/rollback", HttpMethod.Post); }
                                 }
                             }
                         }
@@ -3982,7 +3986,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("disk", disk);
-                                _client.Execute<ExpandoObject>($"/nodes/{_node}/qemu/{_vmid}/template", HttpMethod.Post, parameters);
+                                _client.Execute($"/nodes/{_node}/qemu/{_vmid}/template", HttpMethod.Post, parameters);
                             }
                         }
                     }
@@ -4004,7 +4008,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// LXC container index (per node).
                     /// </summary>
-                    public ExpandoObject[] Vmlist() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/lxc", HttpMethod.Get); }
+                    public ExpandoObject Vmlist() { return _client.Execute($"/nodes/{_node}/lxc", HttpMethod.Get); }
 
                     /// <summary>
                     /// Create or restore a container.
@@ -4112,7 +4116,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("unprivileged", unprivileged);
                         AddComplexParmeterToDictionary(parameters, "unused", unusedN);
                         parameters.Add("vmid", vmid);
-                        return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc", HttpMethod.Post, parameters);
+                        return _client.Execute($"/nodes/{_node}/lxc", HttpMethod.Post, parameters);
                     }
 
                     public PVEItemVmid this[object vmid] { get { return new PVEItemVmid(_client, node: _node, vmid: vmid); } }
@@ -4132,12 +4136,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// Destroy the container (also delete all uses files).
                         /// </summary>
-                        public ExpandoObject DestroyVm() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}", HttpMethod.Delete); }
+                        public ExpandoObject DestroyVm() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}", HttpMethod.Delete); }
 
                         /// <summary>
                         /// Directory index
                         /// </summary>
-                        public ExpandoObject[] Vmdiridx() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/lxc/{_vmid}", HttpMethod.Get); }
+                        public ExpandoObject Vmdiridx() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}", HttpMethod.Get); }
 
                         private PVEConfig _config;
                         public PVEConfig Config { get { return _config ?? (_config = new PVEConfig(_client, node: _node, vmid: _vmid)); } }
@@ -4157,7 +4161,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// Get container configuration.
                             /// </summary>
-                            public ExpandoObject VmConfig() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/config", HttpMethod.Get); }
+                            public ExpandoObject VmConfig() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/config", HttpMethod.Get); }
 
                             /// <summary>
                             /// Set container options.
@@ -4251,7 +4255,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("tty", tty);
                                 parameters.Add("unprivileged", unprivileged);
                                 AddComplexParmeterToDictionary(parameters, "unused", unusedN);
-                                _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/config", HttpMethod.Put, parameters);
+                                _client.Execute($"/nodes/{_node}/lxc/{_vmid}/config", HttpMethod.Put, parameters);
                             }
                         }
 
@@ -4273,7 +4277,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// Directory index
                             /// </summary>
-                            public ExpandoObject[] Vmcmdidx() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/lxc/{_vmid}/status", HttpMethod.Get); }
+                            public ExpandoObject Vmcmdidx() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/status", HttpMethod.Get); }
 
                             private PVECurrent _current;
                             public PVECurrent Current { get { return _current ?? (_current = new PVECurrent(_client, node: _node, vmid: _vmid)); } }
@@ -4293,7 +4297,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <summary>
                                 /// Get virtual machine status.
                                 /// </summary>
-                                public ExpandoObject VmStatus() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/status/current", HttpMethod.Get); }
+                                public ExpandoObject VmStatus() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/status/current", HttpMethod.Get); }
                             }
 
                             private PVEStart _start;
@@ -4319,7 +4323,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("skiplock", skiplock);
-                                    return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/status/start", HttpMethod.Post, parameters);
+                                    return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/status/start", HttpMethod.Post, parameters);
                                 }
                             }
 
@@ -4346,7 +4350,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("skiplock", skiplock);
-                                    return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/status/stop", HttpMethod.Post, parameters);
+                                    return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/status/stop", HttpMethod.Post, parameters);
                                 }
                             }
 
@@ -4375,7 +4379,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("forceStop", forceStop);
                                     parameters.Add("timeout", timeout);
-                                    return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/status/shutdown", HttpMethod.Post, parameters);
+                                    return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/status/shutdown", HttpMethod.Post, parameters);
                                 }
                             }
 
@@ -4397,7 +4401,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <summary>
                                 /// Suspend the container.
                                 /// </summary>
-                                public ExpandoObject VmSuspend() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/status/suspend", HttpMethod.Post); }
+                                public ExpandoObject VmSuspend() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/status/suspend", HttpMethod.Post); }
                             }
 
                             private PVEResume _resume;
@@ -4418,7 +4422,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <summary>
                                 /// Resume the container.
                                 /// </summary>
-                                public ExpandoObject VmResume() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/status/resume", HttpMethod.Post); }
+                                public ExpandoObject VmResume() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/status/resume", HttpMethod.Post); }
                             }
                         }
 
@@ -4440,7 +4444,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// List all snapshots.
                             /// </summary>
-                            public ExpandoObject[] List() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/lxc/{_vmid}/snapshot", HttpMethod.Get); }
+                            public ExpandoObject List() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/snapshot", HttpMethod.Get); }
 
                             /// <summary>
                             /// Snapshot a container.
@@ -4452,7 +4456,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("description", description);
                                 parameters.Add("snapname", snapname);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/snapshot", HttpMethod.Post, parameters);
+                                return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/snapshot", HttpMethod.Post, parameters);
                             }
 
                             public PVEItemSnapname this[object snapname] { get { return new PVEItemSnapname(_client, node: _node, vmid: _vmid, snapname: snapname); } }
@@ -4479,13 +4483,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("force", force);
-                                    return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}", HttpMethod.Delete, parameters);
+                                    return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}", HttpMethod.Delete, parameters);
                                 }
 
                                 /// <summary>
                                 /// 
                                 /// </summary>
-                                public ExpandoObject[] SnapshotCmdIdx() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}", HttpMethod.Get); }
+                                public ExpandoObject SnapshotCmdIdx() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}", HttpMethod.Get); }
 
                                 private PVERollback _rollback;
                                 public PVERollback Rollback { get { return _rollback ?? (_rollback = new PVERollback(_client, node: _node, vmid: _vmid, snapname: _snapname)); } }
@@ -4507,7 +4511,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <summary>
                                     /// Rollback LXC state to specified snapshot.
                                     /// </summary>
-                                    public ExpandoObject Rollback() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/rollback", HttpMethod.Post); }
+                                    public ExpandoObject Rollback() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/rollback", HttpMethod.Post); }
                                 }
 
                                 private PVEConfig _config;
@@ -4530,7 +4534,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <summary>
                                     /// Get snapshot configuration
                                     /// </summary>
-                                    public ExpandoObject GetSnapshotConfig() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config", HttpMethod.Get); }
+                                    public ExpandoObject GetSnapshotConfig() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config", HttpMethod.Get); }
 
                                     /// <summary>
                                     /// Update snapshot metadata.
@@ -4540,7 +4544,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("description", description);
-                                        _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config", HttpMethod.Put, parameters);
+                                        _client.Execute($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config", HttpMethod.Put, parameters);
                                     }
                                 }
                             }
@@ -4564,7 +4568,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// Directory index.
                             /// </summary>
-                            public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/lxc/{_vmid}/firewall", HttpMethod.Get); }
+                            public ExpandoObject Index() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall", HttpMethod.Get); }
 
                             private PVERules _rules;
                             public PVERules Rules { get { return _rules ?? (_rules = new PVERules(_client, node: _node, vmid: _vmid)); } }
@@ -4584,7 +4588,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <summary>
                                 /// List rules.
                                 /// </summary>
-                                public ExpandoObject[] GetRules() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/lxc/{_vmid}/firewall/rules", HttpMethod.Get); }
+                                public ExpandoObject GetRules() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/rules", HttpMethod.Get); }
 
                                 /// <summary>
                                 /// Create new rule.
@@ -4619,7 +4623,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("source", source);
                                     parameters.Add("sport", sport);
                                     parameters.Add("type", type);
-                                    _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/firewall/rules", HttpMethod.Post, parameters);
+                                    _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/rules", HttpMethod.Post, parameters);
                                 }
 
                                 public PVEItemPos this[object pos] { get { return new PVEItemPos(_client, node: _node, vmid: _vmid, pos: pos); } }
@@ -4646,13 +4650,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("digest", digest);
-                                        _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", HttpMethod.Delete, parameters);
+                                        _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", HttpMethod.Delete, parameters);
                                     }
 
                                     /// <summary>
                                     /// Get single rule data.
                                     /// </summary>
-                                    public ExpandoObject GetRule() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", HttpMethod.Get); }
+                                    public ExpandoObject GetRule() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", HttpMethod.Get); }
 
                                     /// <summary>
                                     /// Modify rule data.
@@ -4689,7 +4693,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         parameters.Add("source", source);
                                         parameters.Add("sport", sport);
                                         parameters.Add("type", type);
-                                        _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", HttpMethod.Put, parameters);
+                                        _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", HttpMethod.Put, parameters);
                                     }
                                 }
                             }
@@ -4712,7 +4716,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <summary>
                                 /// List aliases
                                 /// </summary>
-                                public ExpandoObject[] GetAliases() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases", HttpMethod.Get); }
+                                public ExpandoObject GetAliases() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases", HttpMethod.Get); }
 
                                 /// <summary>
                                 /// Create IP or Network Alias.
@@ -4726,7 +4730,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("cidr", cidr);
                                     parameters.Add("comment", comment);
                                     parameters.Add("name", name);
-                                    _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases", HttpMethod.Post, parameters);
+                                    _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases", HttpMethod.Post, parameters);
                                 }
 
                                 public PVEItemName this[object name] { get { return new PVEItemName(_client, node: _node, vmid: _vmid, name: name); } }
@@ -4753,13 +4757,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("digest", digest);
-                                        _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", HttpMethod.Delete, parameters);
+                                        _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", HttpMethod.Delete, parameters);
                                     }
 
                                     /// <summary>
                                     /// Read alias.
                                     /// </summary>
-                                    public ExpandoObject ReadAlias() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", HttpMethod.Get); }
+                                    public ExpandoObject ReadAlias() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", HttpMethod.Get); }
 
                                     /// <summary>
                                     /// Update IP or Network alias.
@@ -4775,7 +4779,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         parameters.Add("comment", comment);
                                         parameters.Add("digest", digest);
                                         parameters.Add("rename", rename);
-                                        _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", HttpMethod.Put, parameters);
+                                        _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", HttpMethod.Put, parameters);
                                     }
                                 }
                             }
@@ -4798,7 +4802,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <summary>
                                 /// List IPSets
                                 /// </summary>
-                                public ExpandoObject[] IpsetIndex() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset", HttpMethod.Get); }
+                                public ExpandoObject IpsetIndex() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset", HttpMethod.Get); }
 
                                 /// <summary>
                                 /// Create new IPSet
@@ -4814,7 +4818,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("digest", digest);
                                     parameters.Add("name", name);
                                     parameters.Add("rename", rename);
-                                    _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset", HttpMethod.Post, parameters);
+                                    _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset", HttpMethod.Post, parameters);
                                 }
 
                                 public PVEItemName this[object name] { get { return new PVEItemName(_client, node: _node, vmid: _vmid, name: name); } }
@@ -4836,12 +4840,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <summary>
                                     /// Delete IPSet
                                     /// </summary>
-                                    public void DeleteIpset() { _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}", HttpMethod.Delete); }
+                                    public void DeleteIpset() { _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}", HttpMethod.Delete); }
 
                                     /// <summary>
                                     /// List IPSet content
                                     /// </summary>
-                                    public ExpandoObject[] GetIpset() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}", HttpMethod.Get); }
+                                    public ExpandoObject GetIpset() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}", HttpMethod.Get); }
 
                                     /// <summary>
                                     /// Add IP or Network to IPSet.
@@ -4855,7 +4859,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         parameters.Add("cidr", cidr);
                                         parameters.Add("comment", comment);
                                         parameters.Add("nomatch", nomatch);
-                                        _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}", HttpMethod.Post, parameters);
+                                        _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}", HttpMethod.Post, parameters);
                                     }
 
                                     public PVEItemCidr this[object cidr] { get { return new PVEItemCidr(_client, node: _node, vmid: _vmid, name: _name, cidr: cidr); } }
@@ -4884,13 +4888,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         {
                                             var parameters = new Dictionary<string, object>();
                                             parameters.Add("digest", digest);
-                                            _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Delete, parameters);
+                                            _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Delete, parameters);
                                         }
 
                                         /// <summary>
                                         /// Read IP or Network settings from IPSet.
                                         /// </summary>
-                                        public ExpandoObject ReadIp() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Get); }
+                                        public ExpandoObject ReadIp() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Get); }
 
                                         /// <summary>
                                         /// Update IP or Network settings
@@ -4904,7 +4908,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                             parameters.Add("comment", comment);
                                             parameters.Add("digest", digest);
                                             parameters.Add("nomatch", nomatch);
-                                            _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Put, parameters);
+                                            _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Put, parameters);
                                         }
                                     }
                                 }
@@ -4928,7 +4932,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <summary>
                                 /// Get VM firewall options.
                                 /// </summary>
-                                public ExpandoObject GetOptions() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/firewall/options", HttpMethod.Get); }
+                                public ExpandoObject GetOptions() { return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/options", HttpMethod.Get); }
 
                                 /// <summary>
                                 /// Set Firewall options.
@@ -4964,7 +4968,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("policy_in", policy_in);
                                     parameters.Add("policy_out", policy_out);
                                     parameters.Add("radv", radv);
-                                    _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/firewall/options", HttpMethod.Put, parameters);
+                                    _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/options", HttpMethod.Put, parameters);
                                 }
                             }
 
@@ -4988,12 +4992,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="limit"></param>
                                 /// <param name="start"></param>
-                                public ExpandoObject[] Log(int? limit = null, int? start = null)
+                                public ExpandoObject Log(int? limit = null, int? start = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("limit", limit);
                                     parameters.Add("start", start);
-                                    return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/lxc/{_vmid}/firewall/log", HttpMethod.Get, parameters);
+                                    return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/log", HttpMethod.Get, parameters);
                                 }
                             }
 
@@ -5017,11 +5021,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="type">Only list references of specified type.
                                 ///   Enum: alias,ipset</param>
-                                public ExpandoObject[] Refs(string type = null)
+                                public ExpandoObject Refs(string type = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("type", type);
-                                    return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/lxc/{_vmid}/firewall/refs", HttpMethod.Get, parameters);
+                                    return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/firewall/refs", HttpMethod.Get, parameters);
                                 }
                             }
                         }
@@ -5055,7 +5059,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("cf", cf);
                                 parameters.Add("ds", ds);
                                 parameters.Add("timeframe", timeframe);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/rrd", HttpMethod.Get, parameters);
+                                return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/rrd", HttpMethod.Get, parameters);
                             }
                         }
 
@@ -5081,12 +5085,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             ///   Enum: hour,day,week,month,year</param>
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
-                            public ExpandoObject[] Rrddata(string timeframe, string cf = null)
+                            public ExpandoObject Rrddata(string timeframe, string cf = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("cf", cf);
                                 parameters.Add("timeframe", timeframe);
-                                return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/lxc/{_vmid}/rrddata", HttpMethod.Get, parameters);
+                                return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/rrddata", HttpMethod.Get, parameters);
                             }
                         }
 
@@ -5117,7 +5121,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("height", height);
                                 parameters.Add("websocket", websocket);
                                 parameters.Add("width", width);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/vncproxy", HttpMethod.Post, parameters);
+                                return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/vncproxy", HttpMethod.Post, parameters);
                             }
                         }
 
@@ -5146,7 +5150,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("port", port);
                                 parameters.Add("vncticket", vncticket);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/vncwebsocket", HttpMethod.Get, parameters);
+                                return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/vncwebsocket", HttpMethod.Get, parameters);
                             }
                         }
 
@@ -5173,7 +5177,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("proxy", proxy);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/spiceproxy", HttpMethod.Post, parameters);
+                                return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/spiceproxy", HttpMethod.Post, parameters);
                             }
                         }
 
@@ -5208,7 +5212,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("restart", restart);
                                 parameters.Add("target", target);
                                 parameters.Add("timeout", timeout);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/migrate", HttpMethod.Post, parameters);
+                                return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/migrate", HttpMethod.Post, parameters);
                             }
                         }
 
@@ -5238,7 +5242,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("feature", feature);
                                 parameters.Add("snapname", snapname);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/feature", HttpMethod.Get, parameters);
+                                return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/feature", HttpMethod.Get, parameters);
                             }
                         }
 
@@ -5265,7 +5269,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("experimental", experimental);
-                                _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/template", HttpMethod.Post, parameters);
+                                _client.Execute($"/nodes/{_node}/lxc/{_vmid}/template", HttpMethod.Post, parameters);
                             }
                         }
 
@@ -5306,7 +5310,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("pool", pool);
                                 parameters.Add("snapname", snapname);
                                 parameters.Add("storage", storage);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/clone", HttpMethod.Post, parameters);
+                                return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/clone", HttpMethod.Post, parameters);
                             }
                         }
 
@@ -5338,7 +5342,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("digest", digest);
                                 parameters.Add("disk", disk);
                                 parameters.Add("size", size);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/lxc/{_vmid}/resize", HttpMethod.Put, parameters);
+                                return _client.Execute($"/nodes/{_node}/lxc/{_vmid}/resize", HttpMethod.Put, parameters);
                             }
                         }
                     }
@@ -5360,7 +5364,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Directory index.
                     /// </summary>
-                    public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/ceph", HttpMethod.Get); }
+                    public ExpandoObject Index() { return _client.Execute($"/nodes/{_node}/ceph", HttpMethod.Get); }
 
                     private PVEOsd _osd;
                     public PVEOsd Osd { get { return _osd ?? (_osd = new PVEOsd(_client, node: _node)); } }
@@ -5378,7 +5382,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// Get Ceph osd list/tree.
                         /// </summary>
-                        public ExpandoObject Index() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/ceph/osd", HttpMethod.Get); }
+                        public ExpandoObject Index() { return _client.Execute($"/nodes/{_node}/ceph/osd", HttpMethod.Get); }
 
                         /// <summary>
                         /// Create OSD
@@ -5395,7 +5399,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("dev", dev);
                             parameters.Add("fstype", fstype);
                             parameters.Add("journal_dev", journal_dev);
-                            return _client.Execute<ExpandoObject>($"/nodes/{_node}/ceph/osd", HttpMethod.Post, parameters);
+                            return _client.Execute($"/nodes/{_node}/ceph/osd", HttpMethod.Post, parameters);
                         }
 
                         public PVEItemOsdid this[object osdid] { get { return new PVEItemOsdid(_client, node: _node, osdid: osdid); } }
@@ -5420,7 +5424,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("cleanup", cleanup);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/ceph/osd/{_osdid}", HttpMethod.Delete, parameters);
+                                return _client.Execute($"/nodes/{_node}/ceph/osd/{_osdid}", HttpMethod.Delete, parameters);
                             }
 
                             private PVEIn _in;
@@ -5441,7 +5445,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <summary>
                                 /// ceph osd in
                                 /// </summary>
-                                public void In() { _client.Execute<ExpandoObject>($"/nodes/{_node}/ceph/osd/{_osdid}/in", HttpMethod.Post); }
+                                public void In() { _client.Execute($"/nodes/{_node}/ceph/osd/{_osdid}/in", HttpMethod.Post); }
                             }
 
                             private PVEOut _out;
@@ -5462,7 +5466,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <summary>
                                 /// ceph osd out
                                 /// </summary>
-                                public void Out() { _client.Execute<ExpandoObject>($"/nodes/{_node}/ceph/osd/{_osdid}/out", HttpMethod.Post); }
+                                public void Out() { _client.Execute($"/nodes/{_node}/ceph/osd/{_osdid}/out", HttpMethod.Post); }
                             }
                         }
                     }
@@ -5485,11 +5489,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="type">Only list specific types of disks.
                         ///   Enum: unused,journal_disks</param>
-                        public ExpandoObject[] Disks(string type = null)
+                        public ExpandoObject Disks(string type = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("type", type);
-                            return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/ceph/disks", HttpMethod.Get, parameters);
+                            return _client.Execute($"/nodes/{_node}/ceph/disks", HttpMethod.Get, parameters);
                         }
                     }
 
@@ -5509,7 +5513,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// Get Ceph configuration.
                         /// </summary>
-                        public ExpandoObject Config() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/ceph/config", HttpMethod.Get); }
+                        public ExpandoObject Config() { return _client.Execute($"/nodes/{_node}/ceph/config", HttpMethod.Get); }
                     }
 
                     private PVEMon _mon;
@@ -5528,12 +5532,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// Get Ceph monitor list.
                         /// </summary>
-                        public ExpandoObject[] Listmon() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/ceph/mon", HttpMethod.Get); }
+                        public ExpandoObject Listmon() { return _client.Execute($"/nodes/{_node}/ceph/mon", HttpMethod.Get); }
 
                         /// <summary>
                         /// Create Ceph Monitor
                         /// </summary>
-                        public ExpandoObject Createmon() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/ceph/mon", HttpMethod.Post); }
+                        public ExpandoObject Createmon() { return _client.Execute($"/nodes/{_node}/ceph/mon", HttpMethod.Post); }
 
                         public PVEItemMonid this[object monid] { get { return new PVEItemMonid(_client, node: _node, monid: monid); } }
 
@@ -5552,7 +5556,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// Destroy Ceph monitor.
                             /// </summary>
-                            public ExpandoObject Destroymon() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/ceph/mon/{_monid}", HttpMethod.Delete); }
+                            public ExpandoObject Destroymon() { return _client.Execute($"/nodes/{_node}/ceph/mon/{_monid}", HttpMethod.Delete); }
                         }
                     }
 
@@ -5585,7 +5589,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("network", network);
                             parameters.Add("pg_bits", pg_bits);
                             parameters.Add("size", size);
-                            _client.Execute<ExpandoObject>($"/nodes/{_node}/ceph/init", HttpMethod.Post, parameters);
+                            _client.Execute($"/nodes/{_node}/ceph/init", HttpMethod.Post, parameters);
                         }
                     }
 
@@ -5610,7 +5614,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("service", service);
-                            return _client.Execute<ExpandoObject>($"/nodes/{_node}/ceph/stop", HttpMethod.Post, parameters);
+                            return _client.Execute($"/nodes/{_node}/ceph/stop", HttpMethod.Post, parameters);
                         }
                     }
 
@@ -5635,7 +5639,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("service", service);
-                            return _client.Execute<ExpandoObject>($"/nodes/{_node}/ceph/start", HttpMethod.Post, parameters);
+                            return _client.Execute($"/nodes/{_node}/ceph/start", HttpMethod.Post, parameters);
                         }
                     }
 
@@ -5655,7 +5659,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// Get ceph status.
                         /// </summary>
-                        public ExpandoObject Status() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/ceph/status", HttpMethod.Get); }
+                        public ExpandoObject Status() { return _client.Execute($"/nodes/{_node}/ceph/status", HttpMethod.Get); }
                     }
 
                     private PVEPools _pools;
@@ -5674,7 +5678,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// List all pools.
                         /// </summary>
-                        public ExpandoObject[] Lspools() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/ceph/pools", HttpMethod.Get); }
+                        public ExpandoObject Lspools() { return _client.Execute($"/nodes/{_node}/ceph/pools", HttpMethod.Get); }
 
                         /// <summary>
                         /// Create POOL
@@ -5692,7 +5696,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("name", name);
                             parameters.Add("pg_num", pg_num);
                             parameters.Add("size", size);
-                            _client.Execute<ExpandoObject>($"/nodes/{_node}/ceph/pools", HttpMethod.Post, parameters);
+                            _client.Execute($"/nodes/{_node}/ceph/pools", HttpMethod.Post, parameters);
                         }
 
                         public PVEItemName this[object name] { get { return new PVEItemName(_client, node: _node, name: name); } }
@@ -5717,7 +5721,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("force", force);
-                                _client.Execute<ExpandoObject>($"/nodes/{_node}/ceph/pools/{_name}", HttpMethod.Delete, parameters);
+                                _client.Execute($"/nodes/{_node}/ceph/pools/{_name}", HttpMethod.Delete, parameters);
                             }
                         }
                     }
@@ -5738,7 +5742,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// get all set ceph flags
                         /// </summary>
-                        public ExpandoObject GetFlags() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/ceph/flags", HttpMethod.Get); }
+                        public ExpandoObject GetFlags() { return _client.Execute($"/nodes/{_node}/ceph/flags", HttpMethod.Get); }
 
                         public PVEItemFlag this[object flag] { get { return new PVEItemFlag(_client, node: _node, flag: flag); } }
 
@@ -5757,12 +5761,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// Unset a ceph flag
                             /// </summary>
-                            public void UnsetFlag() { _client.Execute<ExpandoObject>($"/nodes/{_node}/ceph/flags/{_flag}", HttpMethod.Delete); }
+                            public void UnsetFlag() { _client.Execute($"/nodes/{_node}/ceph/flags/{_flag}", HttpMethod.Delete); }
 
                             /// <summary>
                             /// Set a ceph flag
                             /// </summary>
-                            public void SetFlag() { _client.Execute<ExpandoObject>($"/nodes/{_node}/ceph/flags/{_flag}", HttpMethod.Post); }
+                            public void SetFlag() { _client.Execute($"/nodes/{_node}/ceph/flags/{_flag}", HttpMethod.Post); }
                         }
                     }
 
@@ -5782,7 +5786,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// Get OSD crush map
                         /// </summary>
-                        public ExpandoObject Crush() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/ceph/crush", HttpMethod.Get); }
+                        public ExpandoObject Crush() { return _client.Execute($"/nodes/{_node}/ceph/crush", HttpMethod.Get); }
                     }
 
                     private PVELog _log;
@@ -5803,12 +5807,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="limit"></param>
                         /// <param name="start"></param>
-                        public ExpandoObject[] Log(int? limit = null, int? start = null)
+                        public ExpandoObject Log(int? limit = null, int? start = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("limit", limit);
                             parameters.Add("start", start);
-                            return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/ceph/log", HttpMethod.Get, parameters);
+                            return _client.Execute($"/nodes/{_node}/ceph/log", HttpMethod.Get, parameters);
                         }
                     }
                 }
@@ -5883,7 +5887,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("storage", storage);
                         parameters.Add("tmpdir", tmpdir);
                         parameters.Add("vmid", vmid);
-                        return _client.Execute<ExpandoObject>($"/nodes/{_node}/vzdump", HttpMethod.Post, parameters);
+                        return _client.Execute($"/nodes/{_node}/vzdump", HttpMethod.Post, parameters);
                     }
 
                     private PVEExtractconfig _extractconfig;
@@ -5907,7 +5911,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("volume", volume);
-                            return _client.Execute<ExpandoObject>($"/nodes/{_node}/vzdump/extractconfig", HttpMethod.Get, parameters);
+                            return _client.Execute($"/nodes/{_node}/vzdump/extractconfig", HttpMethod.Get, parameters);
                         }
                     }
                 }
@@ -5928,7 +5932,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Service list.
                     /// </summary>
-                    public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/services", HttpMethod.Get); }
+                    public ExpandoObject Index() { return _client.Execute($"/nodes/{_node}/services", HttpMethod.Get); }
 
                     public PVEItemService this[object service] { get { return new PVEItemService(_client, node: _node, service: service); } }
 
@@ -5947,7 +5951,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// Directory index
                         /// </summary>
-                        public ExpandoObject[] Srvcmdidx() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/services/{_service}", HttpMethod.Get); }
+                        public ExpandoObject Srvcmdidx() { return _client.Execute($"/nodes/{_node}/services/{_service}", HttpMethod.Get); }
 
                         private PVEState _state;
                         public PVEState State { get { return _state ?? (_state = new PVEState(_client, node: _node, service: _service)); } }
@@ -5967,7 +5971,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// Read service properties
                             /// </summary>
-                            public ExpandoObject ServiceState() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/services/{_service}/state", HttpMethod.Get); }
+                            public ExpandoObject ServiceState() { return _client.Execute($"/nodes/{_node}/services/{_service}/state", HttpMethod.Get); }
                         }
 
                         private PVEStart _start;
@@ -5988,7 +5992,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// Start service.
                             /// </summary>
-                            public ExpandoObject ServiceStart() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/services/{_service}/start", HttpMethod.Post); }
+                            public ExpandoObject ServiceStart() { return _client.Execute($"/nodes/{_node}/services/{_service}/start", HttpMethod.Post); }
                         }
 
                         private PVEStop _stop;
@@ -6009,7 +6013,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// Stop service.
                             /// </summary>
-                            public ExpandoObject ServiceStop() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/services/{_service}/stop", HttpMethod.Post); }
+                            public ExpandoObject ServiceStop() { return _client.Execute($"/nodes/{_node}/services/{_service}/stop", HttpMethod.Post); }
                         }
 
                         private PVERestart _restart;
@@ -6030,7 +6034,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// Restart service.
                             /// </summary>
-                            public ExpandoObject ServiceRestart() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/services/{_service}/restart", HttpMethod.Post); }
+                            public ExpandoObject ServiceRestart() { return _client.Execute($"/nodes/{_node}/services/{_service}/restart", HttpMethod.Post); }
                         }
 
                         private PVEReload _reload;
@@ -6051,7 +6055,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// Reload service.
                             /// </summary>
-                            public ExpandoObject ServiceReload() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/services/{_service}/reload", HttpMethod.Post); }
+                            public ExpandoObject ServiceReload() { return _client.Execute($"/nodes/{_node}/services/{_service}/reload", HttpMethod.Post); }
                         }
                     }
                 }
@@ -6072,7 +6076,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Read subscription info.
                     /// </summary>
-                    public ExpandoObject Get() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/subscription", HttpMethod.Get); }
+                    public ExpandoObject Get() { return _client.Execute($"/nodes/{_node}/subscription", HttpMethod.Get); }
 
                     /// <summary>
                     /// Update subscription info.
@@ -6082,7 +6086,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("force", force);
-                        _client.Execute<ExpandoObject>($"/nodes/{_node}/subscription", HttpMethod.Post, parameters);
+                        _client.Execute($"/nodes/{_node}/subscription", HttpMethod.Post, parameters);
                     }
 
                     /// <summary>
@@ -6093,7 +6097,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("key", key);
-                        _client.Execute<ExpandoObject>($"/nodes/{_node}/subscription", HttpMethod.Put, parameters);
+                        _client.Execute($"/nodes/{_node}/subscription", HttpMethod.Put, parameters);
                     }
                 }
 
@@ -6113,18 +6117,18 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Revert network configuration changes.
                     /// </summary>
-                    public void RevertNetworkChanges() { _client.Execute<ExpandoObject>($"/nodes/{_node}/network", HttpMethod.Delete); }
+                    public void RevertNetworkChanges() { _client.Execute($"/nodes/{_node}/network", HttpMethod.Delete); }
 
                     /// <summary>
                     /// List available networks
                     /// </summary>
                     /// <param name="type">Only list specific interface types.
                     ///   Enum: bridge,bond,eth,alias,vlan,OVSBridge,OVSBond,OVSPort,OVSIntPort,any_bridge</param>
-                    public ExpandoObject[] Index(string type = null)
+                    public ExpandoObject Index(string type = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("type", type);
-                        return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/network", HttpMethod.Get, parameters);
+                        return _client.Execute($"/nodes/{_node}/network", HttpMethod.Get, parameters);
                     }
 
                     /// <summary>
@@ -6178,7 +6182,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("ovs_tag", ovs_tag);
                         parameters.Add("slaves", slaves);
                         parameters.Add("type", type);
-                        _client.Execute<ExpandoObject>($"/nodes/{_node}/network", HttpMethod.Post, parameters);
+                        _client.Execute($"/nodes/{_node}/network", HttpMethod.Post, parameters);
                     }
 
                     public PVEItemIface this[object iface] { get { return new PVEItemIface(_client, node: _node, iface: iface); } }
@@ -6198,12 +6202,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// Delete network device configuration
                         /// </summary>
-                        public void DeleteNetwork() { _client.Execute<ExpandoObject>($"/nodes/{_node}/network/{_iface}", HttpMethod.Delete); }
+                        public void DeleteNetwork() { _client.Execute($"/nodes/{_node}/network/{_iface}", HttpMethod.Delete); }
 
                         /// <summary>
                         /// Read network device configuration
                         /// </summary>
-                        public ExpandoObject NetworkConfig() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/network/{_iface}", HttpMethod.Get); }
+                        public ExpandoObject NetworkConfig() { return _client.Execute($"/nodes/{_node}/network/{_iface}", HttpMethod.Get); }
 
                         /// <summary>
                         /// Update network device configuration
@@ -6256,7 +6260,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("ovs_tag", ovs_tag);
                             parameters.Add("slaves", slaves);
                             parameters.Add("type", type);
-                            _client.Execute<ExpandoObject>($"/nodes/{_node}/network/{_iface}", HttpMethod.Put, parameters);
+                            _client.Execute($"/nodes/{_node}/network/{_iface}", HttpMethod.Put, parameters);
                         }
                     }
                 }
@@ -6282,7 +6286,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="start"></param>
                     /// <param name="userfilter"></param>
                     /// <param name="vmid">Only list tasks for this VM.</param>
-                    public ExpandoObject[] NodeTasks(bool? errors = null, int? limit = null, int? start = null, string userfilter = null, int? vmid = null)
+                    public ExpandoObject NodeTasks(bool? errors = null, int? limit = null, int? start = null, string userfilter = null, int? vmid = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("errors", errors);
@@ -6290,7 +6294,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("start", start);
                         parameters.Add("userfilter", userfilter);
                         parameters.Add("vmid", vmid);
-                        return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/tasks", HttpMethod.Get, parameters);
+                        return _client.Execute($"/nodes/{_node}/tasks", HttpMethod.Get, parameters);
                     }
 
                     public PVEItemUpid this[object upid] { get { return new PVEItemUpid(_client, node: _node, upid: upid); } }
@@ -6310,12 +6314,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// Stop a task.
                         /// </summary>
-                        public void StopTask() { _client.Execute<ExpandoObject>($"/nodes/{_node}/tasks/{_upid}", HttpMethod.Delete); }
+                        public void StopTask() { _client.Execute($"/nodes/{_node}/tasks/{_upid}", HttpMethod.Delete); }
 
                         /// <summary>
                         /// 
                         /// </summary>
-                        public ExpandoObject[] UpidIndex() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/tasks/{_upid}", HttpMethod.Get); }
+                        public ExpandoObject UpidIndex() { return _client.Execute($"/nodes/{_node}/tasks/{_upid}", HttpMethod.Get); }
 
                         private PVELog _log;
                         public PVELog Log { get { return _log ?? (_log = new PVELog(_client, node: _node, upid: _upid)); } }
@@ -6337,12 +6341,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="limit"></param>
                             /// <param name="start"></param>
-                            public ExpandoObject[] ReadTaskLog(int? limit = null, int? start = null)
+                            public ExpandoObject ReadTaskLog(int? limit = null, int? start = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("limit", limit);
                                 parameters.Add("start", start);
-                                return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/tasks/{_upid}/log", HttpMethod.Get, parameters);
+                                return _client.Execute($"/nodes/{_node}/tasks/{_upid}/log", HttpMethod.Get, parameters);
                             }
                         }
 
@@ -6364,7 +6368,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// Read task status.
                             /// </summary>
-                            public ExpandoObject ReadTaskStatus() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/tasks/{_upid}/status", HttpMethod.Get); }
+                            public ExpandoObject ReadTaskStatus() { return _client.Execute($"/nodes/{_node}/tasks/{_upid}/status", HttpMethod.Get); }
                         }
                     }
                 }
@@ -6385,7 +6389,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Index of available scan methods
                     /// </summary>
-                    public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/scan", HttpMethod.Get); }
+                    public ExpandoObject Index() { return _client.Execute($"/nodes/{_node}/scan", HttpMethod.Get); }
 
                     private PVEZfs _zfs;
                     public PVEZfs Zfs { get { return _zfs ?? (_zfs = new PVEZfs(_client, node: _node)); } }
@@ -6403,7 +6407,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// Scan zfs pool list on local node.
                         /// </summary>
-                        public ExpandoObject[] Zfsscan() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/scan/zfs", HttpMethod.Get); }
+                        public ExpandoObject Zfsscan() { return _client.Execute($"/nodes/{_node}/scan/zfs", HttpMethod.Get); }
                     }
 
                     private PVENfs _nfs;
@@ -6423,11 +6427,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Scan remote NFS server.
                         /// </summary>
                         /// <param name="server"></param>
-                        public ExpandoObject[] Nfsscan(string server)
+                        public ExpandoObject Nfsscan(string server)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("server", server);
-                            return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/scan/nfs", HttpMethod.Get, parameters);
+                            return _client.Execute($"/nodes/{_node}/scan/nfs", HttpMethod.Get, parameters);
                         }
                     }
 
@@ -6448,11 +6452,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Scan remote GlusterFS server.
                         /// </summary>
                         /// <param name="server"></param>
-                        public ExpandoObject[] Glusterfsscan(string server)
+                        public ExpandoObject Glusterfsscan(string server)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("server", server);
-                            return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/scan/glusterfs", HttpMethod.Get, parameters);
+                            return _client.Execute($"/nodes/{_node}/scan/glusterfs", HttpMethod.Get, parameters);
                         }
                     }
 
@@ -6473,11 +6477,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Scan remote iSCSI server.
                         /// </summary>
                         /// <param name="portal"></param>
-                        public ExpandoObject[] Iscsiscan(string portal)
+                        public ExpandoObject Iscsiscan(string portal)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("portal", portal);
-                            return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/scan/iscsi", HttpMethod.Get, parameters);
+                            return _client.Execute($"/nodes/{_node}/scan/iscsi", HttpMethod.Get, parameters);
                         }
                     }
 
@@ -6497,7 +6501,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// List local LVM volume groups.
                         /// </summary>
-                        public ExpandoObject[] Lvmscan() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/scan/lvm", HttpMethod.Get); }
+                        public ExpandoObject Lvmscan() { return _client.Execute($"/nodes/{_node}/scan/lvm", HttpMethod.Get); }
                     }
 
                     private PVELvmthin _lvmthin;
@@ -6517,11 +6521,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// List local LVM Thin Pools.
                         /// </summary>
                         /// <param name="vg"></param>
-                        public ExpandoObject[] Lvmthinscan(string vg)
+                        public ExpandoObject Lvmthinscan(string vg)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("vg", vg);
-                            return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/scan/lvmthin", HttpMethod.Get, parameters);
+                            return _client.Execute($"/nodes/{_node}/scan/lvmthin", HttpMethod.Get, parameters);
                         }
                     }
 
@@ -6541,7 +6545,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// List local USB devices.
                         /// </summary>
-                        public ExpandoObject[] Usbscan() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/scan/usb", HttpMethod.Get); }
+                        public ExpandoObject Usbscan() { return _client.Execute($"/nodes/{_node}/scan/usb", HttpMethod.Get); }
                     }
                 }
 
@@ -6565,14 +6569,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="enabled">Only list stores which are enabled (not disabled in config).</param>
                     /// <param name="storage">Only list status for  specified storage</param>
                     /// <param name="target">If target is different to 'node', we only lists shared storages which content is accessible on this 'node' and the specified 'target' node.</param>
-                    public ExpandoObject[] Index(string content = null, bool? enabled = null, string storage = null, string target = null)
+                    public ExpandoObject Index(string content = null, bool? enabled = null, string storage = null, string target = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("content", content);
                         parameters.Add("enabled", enabled);
                         parameters.Add("storage", storage);
                         parameters.Add("target", target);
-                        return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/storage", HttpMethod.Get, parameters);
+                        return _client.Execute($"/nodes/{_node}/storage", HttpMethod.Get, parameters);
                     }
 
                     public PVEItemStorage this[object storage] { get { return new PVEItemStorage(_client, node: _node, storage: storage); } }
@@ -6592,7 +6596,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// 
                         /// </summary>
-                        public ExpandoObject[] Diridx() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/storage/{_storage}", HttpMethod.Get); }
+                        public ExpandoObject Diridx() { return _client.Execute($"/nodes/{_node}/storage/{_storage}", HttpMethod.Get); }
 
                         private PVEContent _content;
                         public PVEContent Content { get { return _content ?? (_content = new PVEContent(_client, node: _node, storage: _storage)); } }
@@ -6614,12 +6618,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="content">Only list content of this type.</param>
                             /// <param name="vmid">Only list images for this VM</param>
-                            public ExpandoObject[] Index(string content = null, int? vmid = null)
+                            public ExpandoObject Index(string content = null, int? vmid = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("content", content);
                                 parameters.Add("vmid", vmid);
-                                return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/storage/{_storage}/content", HttpMethod.Get, parameters);
+                                return _client.Execute($"/nodes/{_node}/storage/{_storage}/content", HttpMethod.Get, parameters);
                             }
 
                             /// <summary>
@@ -6637,7 +6641,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("format", format);
                                 parameters.Add("size", size);
                                 parameters.Add("vmid", vmid);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/storage/{_storage}/content", HttpMethod.Post, parameters);
+                                return _client.Execute($"/nodes/{_node}/storage/{_storage}/content", HttpMethod.Post, parameters);
                             }
 
                             public PVEItemVolume this[object volume] { get { return new PVEItemVolume(_client, node: _node, storage: _storage, volume: volume); } }
@@ -6659,12 +6663,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <summary>
                                 /// Delete volume
                                 /// </summary>
-                                public void Delete() { _client.Execute<ExpandoObject>($"/nodes/{_node}/storage/{_storage}/content/{_volume}", HttpMethod.Delete); }
+                                public void Delete() { _client.Execute($"/nodes/{_node}/storage/{_storage}/content/{_volume}", HttpMethod.Delete); }
 
                                 /// <summary>
                                 /// Get volume attributes
                                 /// </summary>
-                                public ExpandoObject Info() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/storage/{_storage}/content/{_volume}", HttpMethod.Get); }
+                                public ExpandoObject Info() { return _client.Execute($"/nodes/{_node}/storage/{_storage}/content/{_volume}", HttpMethod.Get); }
 
                                 /// <summary>
                                 /// Copy a volume. This is experimental code - do not use.
@@ -6676,7 +6680,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("target", target);
                                     parameters.Add("target_node", target_node);
-                                    return _client.Execute<ExpandoObject>($"/nodes/{_node}/storage/{_storage}/content/{_volume}", HttpMethod.Post, parameters);
+                                    return _client.Execute($"/nodes/{_node}/storage/{_storage}/content/{_volume}", HttpMethod.Post, parameters);
                                 }
                             }
                         }
@@ -6699,7 +6703,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// Read storage status.
                             /// </summary>
-                            public ExpandoObject ReadStatus() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/storage/{_storage}/status", HttpMethod.Get); }
+                            public ExpandoObject ReadStatus() { return _client.Execute($"/nodes/{_node}/storage/{_storage}/status", HttpMethod.Get); }
                         }
 
                         private PVERrd _rrd;
@@ -6731,7 +6735,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("cf", cf);
                                 parameters.Add("ds", ds);
                                 parameters.Add("timeframe", timeframe);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/storage/{_storage}/rrd", HttpMethod.Get, parameters);
+                                return _client.Execute($"/nodes/{_node}/storage/{_storage}/rrd", HttpMethod.Get, parameters);
                             }
                         }
 
@@ -6757,12 +6761,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             ///   Enum: hour,day,week,month,year</param>
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
-                            public ExpandoObject[] Rrddata(string timeframe, string cf = null)
+                            public ExpandoObject Rrddata(string timeframe, string cf = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("cf", cf);
                                 parameters.Add("timeframe", timeframe);
-                                return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/storage/{_storage}/rrddata", HttpMethod.Get, parameters);
+                                return _client.Execute($"/nodes/{_node}/storage/{_storage}/rrddata", HttpMethod.Get, parameters);
                             }
                         }
 
@@ -6793,7 +6797,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("content", content);
                                 parameters.Add("filename", filename);
                                 parameters.Add("tmpfilename", tmpfilename);
-                                return _client.Execute<ExpandoObject>($"/nodes/{_node}/storage/{_storage}/upload", HttpMethod.Post, parameters);
+                                return _client.Execute($"/nodes/{_node}/storage/{_storage}/upload", HttpMethod.Post, parameters);
                             }
                         }
                     }
@@ -6815,7 +6819,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Node index.
                     /// </summary>
-                    public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/disks", HttpMethod.Get); }
+                    public ExpandoObject Index() { return _client.Execute($"/nodes/{_node}/disks", HttpMethod.Get); }
 
                     private PVEList _list;
                     public PVEList List { get { return _list ?? (_list = new PVEList(_client, node: _node)); } }
@@ -6833,7 +6837,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// List local disks.
                         /// </summary>
-                        public ExpandoObject[] List() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/disks/list", HttpMethod.Get); }
+                        public ExpandoObject List() { return _client.Execute($"/nodes/{_node}/disks/list", HttpMethod.Get); }
                     }
 
                     private PVESmart _smart;
@@ -6859,7 +6863,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("disk", disk);
                             parameters.Add("healthonly", healthonly);
-                            return _client.Execute<ExpandoObject>($"/nodes/{_node}/disks/smart", HttpMethod.Get, parameters);
+                            return _client.Execute($"/nodes/{_node}/disks/smart", HttpMethod.Get, parameters);
                         }
                     }
 
@@ -6886,7 +6890,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("disk", disk);
                             parameters.Add("uuid", uuid);
-                            return _client.Execute<ExpandoObject>($"/nodes/{_node}/disks/initgpt", HttpMethod.Post, parameters);
+                            return _client.Execute($"/nodes/{_node}/disks/initgpt", HttpMethod.Post, parameters);
                         }
                     }
                 }
@@ -6907,7 +6911,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Directory index for apt (Advanced Package Tool).
                     /// </summary>
-                    public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/apt", HttpMethod.Get); }
+                    public ExpandoObject Index() { return _client.Execute($"/nodes/{_node}/apt", HttpMethod.Get); }
 
                     private PVEUpdate _update;
                     public PVEUpdate Update { get { return _update ?? (_update = new PVEUpdate(_client, node: _node)); } }
@@ -6925,7 +6929,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// List available updates.
                         /// </summary>
-                        public ExpandoObject[] ListUpdates() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/apt/update", HttpMethod.Get); }
+                        public ExpandoObject ListUpdates() { return _client.Execute($"/nodes/{_node}/apt/update", HttpMethod.Get); }
 
                         /// <summary>
                         /// This is used to resynchronize the package index files from their sources (apt-get update).
@@ -6937,7 +6941,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("notify", notify);
                             parameters.Add("quiet", quiet);
-                            return _client.Execute<ExpandoObject>($"/nodes/{_node}/apt/update", HttpMethod.Post, parameters);
+                            return _client.Execute($"/nodes/{_node}/apt/update", HttpMethod.Post, parameters);
                         }
                     }
 
@@ -6964,7 +6968,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("name", name);
                             parameters.Add("version", version);
-                            return _client.Execute<ExpandoObject>($"/nodes/{_node}/apt/changelog", HttpMethod.Get, parameters);
+                            return _client.Execute($"/nodes/{_node}/apt/changelog", HttpMethod.Get, parameters);
                         }
                     }
 
@@ -6984,7 +6988,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// Get package information for important Proxmox packages.
                         /// </summary>
-                        public ExpandoObject[] Versions() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/apt/versions", HttpMethod.Get); }
+                        public ExpandoObject Versions() { return _client.Execute($"/nodes/{_node}/apt/versions", HttpMethod.Get); }
                     }
                 }
 
@@ -7004,7 +7008,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Directory index.
                     /// </summary>
-                    public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/firewall", HttpMethod.Get); }
+                    public ExpandoObject Index() { return _client.Execute($"/nodes/{_node}/firewall", HttpMethod.Get); }
 
                     private PVERules _rules;
                     public PVERules Rules { get { return _rules ?? (_rules = new PVERules(_client, node: _node)); } }
@@ -7022,7 +7026,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// List rules.
                         /// </summary>
-                        public ExpandoObject[] GetRules() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/firewall/rules", HttpMethod.Get); }
+                        public ExpandoObject GetRules() { return _client.Execute($"/nodes/{_node}/firewall/rules", HttpMethod.Get); }
 
                         /// <summary>
                         /// Create new rule.
@@ -7057,7 +7061,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("source", source);
                             parameters.Add("sport", sport);
                             parameters.Add("type", type);
-                            _client.Execute<ExpandoObject>($"/nodes/{_node}/firewall/rules", HttpMethod.Post, parameters);
+                            _client.Execute($"/nodes/{_node}/firewall/rules", HttpMethod.Post, parameters);
                         }
 
                         public PVEItemPos this[object pos] { get { return new PVEItemPos(_client, node: _node, pos: pos); } }
@@ -7082,13 +7086,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("digest", digest);
-                                _client.Execute<ExpandoObject>($"/nodes/{_node}/firewall/rules/{_pos}", HttpMethod.Delete, parameters);
+                                _client.Execute($"/nodes/{_node}/firewall/rules/{_pos}", HttpMethod.Delete, parameters);
                             }
 
                             /// <summary>
                             /// Get single rule data.
                             /// </summary>
-                            public ExpandoObject GetRule() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/firewall/rules/{_pos}", HttpMethod.Get); }
+                            public ExpandoObject GetRule() { return _client.Execute($"/nodes/{_node}/firewall/rules/{_pos}", HttpMethod.Get); }
 
                             /// <summary>
                             /// Modify rule data.
@@ -7125,7 +7129,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("source", source);
                                 parameters.Add("sport", sport);
                                 parameters.Add("type", type);
-                                _client.Execute<ExpandoObject>($"/nodes/{_node}/firewall/rules/{_pos}", HttpMethod.Put, parameters);
+                                _client.Execute($"/nodes/{_node}/firewall/rules/{_pos}", HttpMethod.Put, parameters);
                             }
                         }
                     }
@@ -7146,7 +7150,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// Get host firewall options.
                         /// </summary>
-                        public ExpandoObject GetOptions() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/firewall/options", HttpMethod.Get); }
+                        public ExpandoObject GetOptions() { return _client.Execute($"/nodes/{_node}/firewall/options", HttpMethod.Get); }
 
                         /// <summary>
                         /// Set Firewall options.
@@ -7182,7 +7186,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("smurf_log_level", smurf_log_level);
                             parameters.Add("tcp_flags_log_level", tcp_flags_log_level);
                             parameters.Add("tcpflags", tcpflags);
-                            _client.Execute<ExpandoObject>($"/nodes/{_node}/firewall/options", HttpMethod.Put, parameters);
+                            _client.Execute($"/nodes/{_node}/firewall/options", HttpMethod.Put, parameters);
                         }
                     }
 
@@ -7204,12 +7208,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="limit"></param>
                         /// <param name="start"></param>
-                        public ExpandoObject[] Log(int? limit = null, int? start = null)
+                        public ExpandoObject Log(int? limit = null, int? start = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("limit", limit);
                             parameters.Add("start", start);
-                            return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/firewall/log", HttpMethod.Get, parameters);
+                            return _client.Execute($"/nodes/{_node}/firewall/log", HttpMethod.Get, parameters);
                         }
                     }
                 }
@@ -7231,11 +7235,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// List status of all replication jobs on this node.
                     /// </summary>
                     /// <param name="guest">Only list replication jobs for this guest.</param>
-                    public ExpandoObject[] Status(int? guest = null)
+                    public ExpandoObject Status(int? guest = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("guest", guest);
-                        return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/replication", HttpMethod.Get, parameters);
+                        return _client.Execute($"/nodes/{_node}/replication", HttpMethod.Get, parameters);
                     }
 
                     public PVEItemId this[object id] { get { return new PVEItemId(_client, node: _node, id: id); } }
@@ -7255,7 +7259,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <summary>
                         /// Directory index.
                         /// </summary>
-                        public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/replication/{_id}", HttpMethod.Get); }
+                        public ExpandoObject Index() { return _client.Execute($"/nodes/{_node}/replication/{_id}", HttpMethod.Get); }
 
                         private PVEStatus _status;
                         public PVEStatus Status { get { return _status ?? (_status = new PVEStatus(_client, node: _node, id: _id)); } }
@@ -7275,7 +7279,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// Get replication job status.
                             /// </summary>
-                            public ExpandoObject JobStatus() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/replication/{_id}/status", HttpMethod.Get); }
+                            public ExpandoObject JobStatus() { return _client.Execute($"/nodes/{_node}/replication/{_id}/status", HttpMethod.Get); }
                         }
 
                         private PVELog _log;
@@ -7298,12 +7302,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="limit"></param>
                             /// <param name="start"></param>
-                            public ExpandoObject[] ReadJobLog(int? limit = null, int? start = null)
+                            public ExpandoObject ReadJobLog(int? limit = null, int? start = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("limit", limit);
                                 parameters.Add("start", start);
-                                return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/replication/{_id}/log", HttpMethod.Get, parameters);
+                                return _client.Execute($"/nodes/{_node}/replication/{_id}/log", HttpMethod.Get, parameters);
                             }
                         }
 
@@ -7325,7 +7329,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// Schedule replication job to start as soon as possible.
                             /// </summary>
-                            public ExpandoObject ScheduleNow() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/replication/{_id}/schedule_now", HttpMethod.Post); }
+                            public ExpandoObject ScheduleNow() { return _client.Execute($"/nodes/{_node}/replication/{_id}/schedule_now", HttpMethod.Post); }
                         }
                     }
                 }
@@ -7346,7 +7350,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// API version details
                     /// </summary>
-                    public ExpandoObject Version() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/version", HttpMethod.Get); }
+                    public ExpandoObject Version() { return _client.Execute($"/nodes/{_node}/version", HttpMethod.Get); }
                 }
 
                 private PVEStatus _status;
@@ -7365,7 +7369,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Read node status
                     /// </summary>
-                    public ExpandoObject Status() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/status", HttpMethod.Get); }
+                    public ExpandoObject Status() { return _client.Execute($"/nodes/{_node}/status", HttpMethod.Get); }
 
                     /// <summary>
                     /// Reboot or shutdown a node.
@@ -7376,7 +7380,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("command", command);
-                        _client.Execute<ExpandoObject>($"/nodes/{_node}/status", HttpMethod.Post, parameters);
+                        _client.Execute($"/nodes/{_node}/status", HttpMethod.Post, parameters);
                     }
                 }
 
@@ -7396,7 +7400,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Read tap/vm network device interface counters
                     /// </summary>
-                    public ExpandoObject[] Netstat() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/netstat", HttpMethod.Get); }
+                    public ExpandoObject Netstat() { return _client.Execute($"/nodes/{_node}/netstat", HttpMethod.Get); }
                 }
 
                 private PVEExecute _execute;
@@ -7416,11 +7420,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Execute multiple commands in order.
                     /// </summary>
                     /// <param name="commands">JSON encoded array of commands.</param>
-                    public ExpandoObject[] Execute(string commands)
+                    public ExpandoObject Execute(string commands)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("commands", commands);
-                        return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/execute", HttpMethod.Post, parameters);
+                        return _client.Execute($"/nodes/{_node}/execute", HttpMethod.Post, parameters);
                     }
                 }
 
@@ -7451,7 +7455,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("cf", cf);
                         parameters.Add("ds", ds);
                         parameters.Add("timeframe", timeframe);
-                        return _client.Execute<ExpandoObject>($"/nodes/{_node}/rrd", HttpMethod.Get, parameters);
+                        return _client.Execute($"/nodes/{_node}/rrd", HttpMethod.Get, parameters);
                     }
                 }
 
@@ -7475,12 +7479,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     ///   Enum: hour,day,week,month,year</param>
                     /// <param name="cf">The RRD consolidation function
                     ///   Enum: AVERAGE,MAX</param>
-                    public ExpandoObject[] Rrddata(string timeframe, string cf = null)
+                    public ExpandoObject Rrddata(string timeframe, string cf = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("cf", cf);
                         parameters.Add("timeframe", timeframe);
-                        return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/rrddata", HttpMethod.Get, parameters);
+                        return _client.Execute($"/nodes/{_node}/rrddata", HttpMethod.Get, parameters);
                     }
                 }
 
@@ -7504,14 +7508,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="since">Display all log since this date-time string.</param>
                     /// <param name="start"></param>
                     /// <param name="until">Display all log until this date-time string.</param>
-                    public ExpandoObject[] Syslog(int? limit = null, string since = null, int? start = null, string until = null)
+                    public ExpandoObject Syslog(int? limit = null, string since = null, int? start = null, string until = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("limit", limit);
                         parameters.Add("since", since);
                         parameters.Add("start", start);
                         parameters.Add("until", until);
-                        return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/syslog", HttpMethod.Get, parameters);
+                        return _client.Execute($"/nodes/{_node}/syslog", HttpMethod.Get, parameters);
                     }
                 }
 
@@ -7542,7 +7546,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("upgrade", upgrade);
                         parameters.Add("websocket", websocket);
                         parameters.Add("width", width);
-                        return _client.Execute<ExpandoObject>($"/nodes/{_node}/vncshell", HttpMethod.Post, parameters);
+                        return _client.Execute($"/nodes/{_node}/vncshell", HttpMethod.Post, parameters);
                     }
                 }
 
@@ -7569,7 +7573,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("port", port);
                         parameters.Add("vncticket", vncticket);
-                        return _client.Execute<ExpandoObject>($"/nodes/{_node}/vncwebsocket", HttpMethod.Get, parameters);
+                        return _client.Execute($"/nodes/{_node}/vncwebsocket", HttpMethod.Get, parameters);
                     }
                 }
 
@@ -7596,7 +7600,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("proxy", proxy);
                         parameters.Add("upgrade", upgrade);
-                        return _client.Execute<ExpandoObject>($"/nodes/{_node}/spiceshell", HttpMethod.Post, parameters);
+                        return _client.Execute($"/nodes/{_node}/spiceshell", HttpMethod.Post, parameters);
                     }
                 }
 
@@ -7616,7 +7620,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Read DNS settings.
                     /// </summary>
-                    public ExpandoObject Dns() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/dns", HttpMethod.Get); }
+                    public ExpandoObject Dns() { return _client.Execute($"/nodes/{_node}/dns", HttpMethod.Get); }
 
                     /// <summary>
                     /// Write DNS settings.
@@ -7632,7 +7636,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("dns2", dns2);
                         parameters.Add("dns3", dns3);
                         parameters.Add("search", search);
-                        _client.Execute<ExpandoObject>($"/nodes/{_node}/dns", HttpMethod.Put, parameters);
+                        _client.Execute($"/nodes/{_node}/dns", HttpMethod.Put, parameters);
                     }
                 }
 
@@ -7652,7 +7656,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Read server time and time zone settings.
                     /// </summary>
-                    public ExpandoObject Time() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/time", HttpMethod.Get); }
+                    public ExpandoObject Time() { return _client.Execute($"/nodes/{_node}/time", HttpMethod.Get); }
 
                     /// <summary>
                     /// Set time zone.
@@ -7662,7 +7666,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("timezone", timezone);
-                        _client.Execute<ExpandoObject>($"/nodes/{_node}/time", HttpMethod.Put, parameters);
+                        _client.Execute($"/nodes/{_node}/time", HttpMethod.Put, parameters);
                     }
                 }
 
@@ -7682,7 +7686,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Get list of appliances.
                     /// </summary>
-                    public ExpandoObject[] Aplinfo() { return _client.Execute<ExpandoObject[]>($"/nodes/{_node}/aplinfo", HttpMethod.Get); }
+                    public ExpandoObject Aplinfo() { return _client.Execute($"/nodes/{_node}/aplinfo", HttpMethod.Get); }
 
                     /// <summary>
                     /// Download appliance templates.
@@ -7694,7 +7698,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("storage", storage);
                         parameters.Add("template", template);
-                        return _client.Execute<ExpandoObject>($"/nodes/{_node}/aplinfo", HttpMethod.Post, parameters);
+                        return _client.Execute($"/nodes/{_node}/aplinfo", HttpMethod.Post, parameters);
                     }
                 }
 
@@ -7714,7 +7718,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Gather various systems information about a node
                     /// </summary>
-                    public ExpandoObject Report() { return _client.Execute<ExpandoObject>($"/nodes/{_node}/report", HttpMethod.Get); }
+                    public ExpandoObject Report() { return _client.Execute($"/nodes/{_node}/report", HttpMethod.Get); }
                 }
 
                 private PVEStartall _startall;
@@ -7740,7 +7744,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("force", force);
                         parameters.Add("vms", vms);
-                        return _client.Execute<ExpandoObject>($"/nodes/{_node}/startall", HttpMethod.Post, parameters);
+                        return _client.Execute($"/nodes/{_node}/startall", HttpMethod.Post, parameters);
                     }
                 }
 
@@ -7765,7 +7769,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("vms", vms);
-                        return _client.Execute<ExpandoObject>($"/nodes/{_node}/stopall", HttpMethod.Post, parameters);
+                        return _client.Execute($"/nodes/{_node}/stopall", HttpMethod.Post, parameters);
                     }
                 }
 
@@ -7794,7 +7798,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("maxworkers", maxworkers);
                         parameters.Add("target", target);
                         parameters.Add("vms", vms);
-                        return _client.Execute<ExpandoObject>($"/nodes/{_node}/migrateall", HttpMethod.Post, parameters);
+                        return _client.Execute($"/nodes/{_node}/migrateall", HttpMethod.Post, parameters);
                     }
                 }
             }
@@ -7813,11 +7817,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// </summary>
             /// <param name="type">Only list storage of specific type
             ///   Enum: dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
-            public ExpandoObject[] Index(string type = null)
+            public ExpandoObject Index(string type = null)
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("type", type);
-                return _client.Execute<ExpandoObject[]>($"/storage", HttpMethod.Get, parameters);
+                return _client.Execute($"/storage", HttpMethod.Get, parameters);
             }
 
             /// <summary>
@@ -7902,7 +7906,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 parameters.Add("username", username);
                 parameters.Add("vgname", vgname);
                 parameters.Add("volume", volume);
-                _client.Execute<ExpandoObject>($"/storage", HttpMethod.Post, parameters);
+                _client.Execute($"/storage", HttpMethod.Post, parameters);
             }
 
             public PVEItemStorage this[object storage] { get { return new PVEItemStorage(_client, storage: storage); } }
@@ -7920,12 +7924,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <summary>
                 /// Delete storage configuration.
                 /// </summary>
-                public void Delete() { _client.Execute<ExpandoObject>($"/storage/{_storage}", HttpMethod.Delete); }
+                public void Delete() { _client.Execute($"/storage/{_storage}", HttpMethod.Delete); }
 
                 /// <summary>
                 /// Read storage configuration.
                 /// </summary>
-                public ExpandoObject Read() { return _client.Execute<ExpandoObject>($"/storage/{_storage}", HttpMethod.Get); }
+                public ExpandoObject Read() { return _client.Execute($"/storage/{_storage}", HttpMethod.Get); }
 
                 /// <summary>
                 /// Update storage configuration.
@@ -7986,7 +7990,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("tagged_only", tagged_only);
                     parameters.Add("transport", transport);
                     parameters.Add("username", username);
-                    _client.Execute<ExpandoObject>($"/storage/{_storage}", HttpMethod.Put, parameters);
+                    _client.Execute($"/storage/{_storage}", HttpMethod.Put, parameters);
                 }
             }
         }
@@ -8002,7 +8006,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <summary>
             /// Directory index.
             /// </summary>
-            public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/access", HttpMethod.Get); }
+            public ExpandoObject Index() { return _client.Execute($"/access", HttpMethod.Get); }
 
             private PVEUsers _users;
             public PVEUsers Users { get { return _users ?? (_users = new PVEUsers(_client)); } }
@@ -8016,11 +8020,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// User index.
                 /// </summary>
                 /// <param name="enabled">Optional filter for enable property.</param>
-                public ExpandoObject[] Index(bool? enabled = null)
+                public ExpandoObject Index(bool? enabled = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("enabled", enabled);
-                    return _client.Execute<ExpandoObject[]>($"/access/users", HttpMethod.Get, parameters);
+                    return _client.Execute($"/access/users", HttpMethod.Get, parameters);
                 }
 
                 /// <summary>
@@ -8049,7 +8053,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("lastname", lastname);
                     parameters.Add("password", password);
                     parameters.Add("userid", userid);
-                    _client.Execute<ExpandoObject>($"/access/users", HttpMethod.Post, parameters);
+                    _client.Execute($"/access/users", HttpMethod.Post, parameters);
                 }
 
                 public PVEItemUserid this[object userid] { get { return new PVEItemUserid(_client, userid: userid); } }
@@ -8067,12 +8071,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Delete user.
                     /// </summary>
-                    public void DeleteUser() { _client.Execute<ExpandoObject>($"/access/users/{_userid}", HttpMethod.Delete); }
+                    public void DeleteUser() { _client.Execute($"/access/users/{_userid}", HttpMethod.Delete); }
 
                     /// <summary>
                     /// Get user configuration.
                     /// </summary>
-                    public ExpandoObject ReadUser() { return _client.Execute<ExpandoObject>($"/access/users/{_userid}", HttpMethod.Get); }
+                    public ExpandoObject ReadUser() { return _client.Execute($"/access/users/{_userid}", HttpMethod.Get); }
 
                     /// <summary>
                     /// Update user configuration.
@@ -8098,7 +8102,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("groups", groups);
                         parameters.Add("keys", keys);
                         parameters.Add("lastname", lastname);
-                        _client.Execute<ExpandoObject>($"/access/users/{_userid}", HttpMethod.Put, parameters);
+                        _client.Execute($"/access/users/{_userid}", HttpMethod.Put, parameters);
                     }
                 }
             }
@@ -8114,7 +8118,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <summary>
                 /// Group index.
                 /// </summary>
-                public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/access/groups", HttpMethod.Get); }
+                public ExpandoObject Index() { return _client.Execute($"/access/groups", HttpMethod.Get); }
 
                 /// <summary>
                 /// Create new group.
@@ -8126,7 +8130,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("comment", comment);
                     parameters.Add("groupid", groupid);
-                    _client.Execute<ExpandoObject>($"/access/groups", HttpMethod.Post, parameters);
+                    _client.Execute($"/access/groups", HttpMethod.Post, parameters);
                 }
 
                 public PVEItemGroupid this[object groupid] { get { return new PVEItemGroupid(_client, groupid: groupid); } }
@@ -8144,12 +8148,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Delete group.
                     /// </summary>
-                    public void DeleteGroup() { _client.Execute<ExpandoObject>($"/access/groups/{_groupid}", HttpMethod.Delete); }
+                    public void DeleteGroup() { _client.Execute($"/access/groups/{_groupid}", HttpMethod.Delete); }
 
                     /// <summary>
                     /// Get group configuration.
                     /// </summary>
-                    public ExpandoObject ReadGroup() { return _client.Execute<ExpandoObject>($"/access/groups/{_groupid}", HttpMethod.Get); }
+                    public ExpandoObject ReadGroup() { return _client.Execute($"/access/groups/{_groupid}", HttpMethod.Get); }
 
                     /// <summary>
                     /// Update group data.
@@ -8159,7 +8163,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("comment", comment);
-                        _client.Execute<ExpandoObject>($"/access/groups/{_groupid}", HttpMethod.Put, parameters);
+                        _client.Execute($"/access/groups/{_groupid}", HttpMethod.Put, parameters);
                     }
                 }
             }
@@ -8175,7 +8179,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <summary>
                 /// Role index.
                 /// </summary>
-                public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/access/roles", HttpMethod.Get); }
+                public ExpandoObject Index() { return _client.Execute($"/access/roles", HttpMethod.Get); }
 
                 /// <summary>
                 /// Create new role.
@@ -8187,7 +8191,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("privs", privs);
                     parameters.Add("roleid", roleid);
-                    _client.Execute<ExpandoObject>($"/access/roles", HttpMethod.Post, parameters);
+                    _client.Execute($"/access/roles", HttpMethod.Post, parameters);
                 }
 
                 public PVEItemRoleid this[object roleid] { get { return new PVEItemRoleid(_client, roleid: roleid); } }
@@ -8205,12 +8209,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Delete role.
                     /// </summary>
-                    public void DeleteRole() { _client.Execute<ExpandoObject>($"/access/roles/{_roleid}", HttpMethod.Delete); }
+                    public void DeleteRole() { _client.Execute($"/access/roles/{_roleid}", HttpMethod.Delete); }
 
                     /// <summary>
                     /// Get role configuration.
                     /// </summary>
-                    public ExpandoObject ReadRole() { return _client.Execute<ExpandoObject>($"/access/roles/{_roleid}", HttpMethod.Get); }
+                    public ExpandoObject ReadRole() { return _client.Execute($"/access/roles/{_roleid}", HttpMethod.Get); }
 
                     /// <summary>
                     /// Create new role.
@@ -8222,7 +8226,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("append", append);
                         parameters.Add("privs", privs);
-                        _client.Execute<ExpandoObject>($"/access/roles/{_roleid}", HttpMethod.Put, parameters);
+                        _client.Execute($"/access/roles/{_roleid}", HttpMethod.Put, parameters);
                     }
                 }
             }
@@ -8238,7 +8242,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <summary>
                 /// Get Access Control List (ACLs).
                 /// </summary>
-                public ExpandoObject[] ReadAcl() { return _client.Execute<ExpandoObject[]>($"/access/acl", HttpMethod.Get); }
+                public ExpandoObject ReadAcl() { return _client.Execute($"/access/acl", HttpMethod.Get); }
 
                 /// <summary>
                 /// Update Access Control List (add or remove permissions).
@@ -8258,7 +8262,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("propagate", propagate);
                     parameters.Add("roles", roles);
                     parameters.Add("users", users);
-                    _client.Execute<ExpandoObject>($"/access/acl", HttpMethod.Put, parameters);
+                    _client.Execute($"/access/acl", HttpMethod.Put, parameters);
                 }
             }
 
@@ -8273,7 +8277,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <summary>
                 /// Authentication domain index.
                 /// </summary>
-                public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/access/domains", HttpMethod.Get); }
+                public ExpandoObject Index() { return _client.Execute($"/access/domains", HttpMethod.Get); }
 
                 /// <summary>
                 /// Add an authentication server.
@@ -8308,7 +8312,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("tfa", tfa);
                     parameters.Add("type", type);
                     parameters.Add("user_attr", user_attr);
-                    _client.Execute<ExpandoObject>($"/access/domains", HttpMethod.Post, parameters);
+                    _client.Execute($"/access/domains", HttpMethod.Post, parameters);
                 }
 
                 public PVEItemRealm this[object realm] { get { return new PVEItemRealm(_client, realm: realm); } }
@@ -8326,12 +8330,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <summary>
                     /// Delete an authentication server.
                     /// </summary>
-                    public void Delete() { _client.Execute<ExpandoObject>($"/access/domains/{_realm}", HttpMethod.Delete); }
+                    public void Delete() { _client.Execute($"/access/domains/{_realm}", HttpMethod.Delete); }
 
                     /// <summary>
                     /// Get auth server configuration.
                     /// </summary>
-                    public ExpandoObject Read() { return _client.Execute<ExpandoObject>($"/access/domains/{_realm}", HttpMethod.Get); }
+                    public ExpandoObject Read() { return _client.Execute($"/access/domains/{_realm}", HttpMethod.Get); }
 
                     /// <summary>
                     /// Update authentication server settings.
@@ -8365,7 +8369,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("server2", server2);
                         parameters.Add("tfa", tfa);
                         parameters.Add("user_attr", user_attr);
-                        _client.Execute<ExpandoObject>($"/access/domains/{_realm}", HttpMethod.Put, parameters);
+                        _client.Execute($"/access/domains/{_realm}", HttpMethod.Put, parameters);
                     }
                 }
             }
@@ -8381,7 +8385,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <summary>
                 /// Dummy. Useful for formaters which want to priovde a login page.
                 /// </summary>
-                public void GetTicket() { _client.Execute<ExpandoObject>($"/access/ticket", HttpMethod.Get); }
+                public void GetTicket() { _client.Execute($"/access/ticket", HttpMethod.Get); }
 
                 /// <summary>
                 /// Create or verify authentication ticket.
@@ -8401,7 +8405,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("privs", privs);
                     parameters.Add("realm", realm);
                     parameters.Add("username", username);
-                    return _client.Execute<ExpandoObject>($"/access/ticket", HttpMethod.Post, parameters);
+                    return _client.Execute($"/access/ticket", HttpMethod.Post, parameters);
                 }
             }
 
@@ -8423,7 +8427,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("password", password);
                     parameters.Add("userid", userid);
-                    _client.Execute<ExpandoObject>($"/access/password", HttpMethod.Put, parameters);
+                    _client.Execute($"/access/password", HttpMethod.Put, parameters);
                 }
             }
         }
@@ -8439,7 +8443,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <summary>
             /// Pool index.
             /// </summary>
-            public ExpandoObject[] Index() { return _client.Execute<ExpandoObject[]>($"/pools", HttpMethod.Get); }
+            public ExpandoObject Index() { return _client.Execute($"/pools", HttpMethod.Get); }
 
             /// <summary>
             /// Create new pool.
@@ -8451,7 +8455,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("comment", comment);
                 parameters.Add("poolid", poolid);
-                _client.Execute<ExpandoObject>($"/pools", HttpMethod.Post, parameters);
+                _client.Execute($"/pools", HttpMethod.Post, parameters);
             }
 
             public PVEItemPoolid this[object poolid] { get { return new PVEItemPoolid(_client, poolid: poolid); } }
@@ -8469,12 +8473,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <summary>
                 /// Delete pool.
                 /// </summary>
-                public void DeletePool() { _client.Execute<ExpandoObject>($"/pools/{_poolid}", HttpMethod.Delete); }
+                public void DeletePool() { _client.Execute($"/pools/{_poolid}", HttpMethod.Delete); }
 
                 /// <summary>
                 /// Get pool configuration.
                 /// </summary>
-                public ExpandoObject ReadPool() { return _client.Execute<ExpandoObject>($"/pools/{_poolid}", HttpMethod.Get); }
+                public ExpandoObject ReadPool() { return _client.Execute($"/pools/{_poolid}", HttpMethod.Get); }
 
                 /// <summary>
                 /// Update pool data.
@@ -8490,7 +8494,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("delete", delete);
                     parameters.Add("storage", storage);
                     parameters.Add("vms", vms);
-                    _client.Execute<ExpandoObject>($"/pools/{_poolid}", HttpMethod.Put, parameters);
+                    _client.Execute($"/pools/{_poolid}", HttpMethod.Put, parameters);
                 }
             }
         }
@@ -8506,7 +8510,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <summary>
             /// API version details. The result also includes the global datacenter confguration.
             /// </summary>
-            public ExpandoObject Version() { return _client.Execute<ExpandoObject>($"/version", HttpMethod.Get); }
+            public ExpandoObject Version() { return _client.Execute($"/version", HttpMethod.Get); }
         }
     }
 }

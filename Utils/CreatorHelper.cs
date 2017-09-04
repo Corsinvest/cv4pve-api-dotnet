@@ -73,12 +73,12 @@ public static string ObjectToJson(object obj) { return JsonConvert.SerializeObje
 public bool Login(string userName, string password, string realm = ""pam"")
 {
     dynamic ticket = Access.Ticket.CreateTicket(username: userName, password: password, realm: realm);
-    _ticketCSRFPreventionToken = ticket.CSRFPreventionToken;
-    _ticketPVEAuthCookie = ticket.ticket;
+    _ticketCSRFPreventionToken = ticket.data.CSRFPreventionToken;
+    _ticketPVEAuthCookie = ticket.data.ticket;
     return ticket != null;
 }
 
-private T Execute<T>(string resource, HttpMethod method, IDictionary<string, object> parameters = null)
+private ExpandoObject Execute(string resource, HttpMethod method, IDictionary<string, object> parameters = null)
 {
     using (var handler = new HttpClientHandler()
     {
@@ -114,8 +114,12 @@ private T Execute<T>(string resource, HttpMethod method, IDictionary<string, obj
         var response = client.SendAsync(request).Result;
 
         var stringContent = response.Content.ReadAsStringAsync().Result;
-        var data = JObject.Parse(stringContent).SelectToken(""data"").ToString();
-        return JsonConvert.DeserializeObject<T>(data);
+        dynamic result = JsonConvert.DeserializeObject<ExpandoObject>(stringContent);
+
+        //check in error
+        result.InError = ((IDictionary<String, object>)result).ContainsKey(""errors"");
+
+        return result;
     }
 }
 
@@ -390,7 +394,7 @@ private Client _client;");
 
                     switch ((returns["type"] + ""))
                     {
-                        case "array": returnType += "[]"; break;
+                        //case "array": returnType += "[]"; break;
                         case "null": voidReturn = true; break;
                         default: break;
                     }
@@ -465,7 +469,7 @@ private Client _client;");
                     }
                 }
 
-                data.Append($@" {(voidReturn ? "" : "return")} _client.Execute<{returnType}>($""{resource}"",HttpMethod.{name.Capitalize()}");
+                data.Append($@" {(voidReturn ? "" : "return")} _client.Execute($""{resource}"",HttpMethod.{name.Capitalize()}");
                 if (parms.Count > 0) { data.Append(",parameters"); }
                 data.AppendLine(");}");
             }

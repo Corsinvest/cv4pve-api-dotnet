@@ -17,18 +17,81 @@ ProxmoVE Client API .Net
 ```
 
 # General
-The client is generated from a JSON Api on ProxmoxVE. The result is object or array the [ExpandoObject](https://msdn.microsoft.com/en-US/library/system.dynamic.expandoobject(v=vs.110).aspx) 
+The client is generated from a JSON Api on ProxmoxVE. 
+
+# Result
+The result is [ExpandoObject](https://msdn.microsoft.com/en-US/library/system.dynamic.expandoobject(v=vs.110).aspx). 
+
+The result contain more property:
+- returned from ProxmoxVE (data,errors,...) 
+- InError (bool) : contain errors 
+
+Example:
+
+With errors:
+```json
+{
+  "errors": {
+    "snapname": "invalid format - invalid configuration ID 'Test 2311'\n"
+  },
+  "data": null
+}
+```
+
+Normal result
+```json
+{
+  "data": {
+    "smbios1": "uuid=9246585e-0c8b-4d02-8fe2-f48fd0da3975",
+    "ide2": "none,media=cdrom",
+    "onboot": 1,
+    "boot": "cdn",
+    "cores": 2,
+    "agent": 1,
+    "memory": 4096,
+    "numa": 0,
+    "bootdisk": "virtio0",
+    "sockets": 1,
+    "net0": "virtio=3A:39:38:30:36:31,bridge=vmbr0",
+    "parent": "auto4hours170904080002",
+    "digest": "acafde32daab50bce801fef2e029440c54ebe2f7",
+    "vga": "qxl",
+    "virtio0": "local-zfs:vm-100-disk-1,cache=writeback,size=50G",
+    "ostype": "win8",
+    "name": "phenometa"
+  },
+  "InError": false
+}
+```
+
 
 # Usage
 
 ```c#
 var client = new Client("10.92.90.91");
-if(client.Login("root", "password")) {
-    //list all snapshot
-    foreach (dynamic item in client.Nodes["pve1"].Qemu[100].Snapshot.SnapshotList())
+if (client.Login("root", "password"))
+{
+    var vm = client.Nodes["pve1"].Qemu[100];
+
+    //config vm 
+    var config = vm.Config.VmConfig();
+    Console.WriteLine(Client.ObjectToJson(config));
+
+    //create snapshot
+    dynamic ret = vm.Snapshot.Snapshot("pippo2311");
+
+    //update snapshot description
+    vm.Snapshot["pippo2311"].Config.UpdateSnapshotConfig("descr");
+
+    //delete snapshot
+    vm.Snapshot["pippo2311"].Delsnapshot();
+
+    //list of snapshot 
+    dynamic snapshots = vm.Snapshot.SnapshotList();
+    foreach (dynamic snapshot in snapshots.data)
     {
-        Console.WriteLine(item.name);
-        Console.WriteLine(Client.ObjectToJson(item.name));
+        Console.WriteLine(Client.ObjectToJson(snapshot));
+        Console.WriteLine(snapshot.name);
     }
 }
 ```
