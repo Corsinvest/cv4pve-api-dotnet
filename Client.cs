@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Linq;
 using System.Dynamic;
+using System.Web;
 
 namespace EnterpriseVE.ProxmoxVE.Api
 {
@@ -33,6 +34,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
         public string HostName { get; private set; }
 
         public int Port { get; private set; }
+
+        public bool ThrowExceptionNoSuccess { get; set; } = false;
 
         /// <summary>
         /// Convert object to JSON.
@@ -73,12 +76,19 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         var value = parameter.Value;
                         if (value is bool) { value = ((bool)value) ? 1 : 0; }
-                        parms.Add(parameter.Key, value.ToString());
+                        parms.Add(parameter.Key, HttpUtility.UrlEncode(value.ToString()));
                     }
                 }
 
-                var request = new HttpRequestMessage(method, new Uri(_baseUrl + resource));
-                request.Content = new FormUrlEncodedContent(parms);
+                var uriString = _baseUrl + resource;
+                if (method == HttpMethod.Get && parms.Count > 0)
+                {
+                    uriString += "?" + string.Join("&", (from a in parms
+                                                         select $"{a.Key}={a.Value}"));
+                }
+
+                var request = new HttpRequestMessage(method, new Uri(uriString));
+                if (method != HttpMethod.Get) { request.Content = new FormUrlEncodedContent(parms); }
 
                 //tiket login
                 if (_ticketCSRFPreventionToken != null)
@@ -88,6 +98,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 }
 
                 var response = client.SendAsync(request).Result;
+                if (ThrowExceptionNoSuccess && !response.IsSuccessStatusCode) { throw new Exception(response.ReasonPhrase); }
 
                 var stringContent = response.Content.ReadAsStringAsync().Result;
                 dynamic result = JsonConvert.DeserializeObject<ExpandoObject>(stringContent);

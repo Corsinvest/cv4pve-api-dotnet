@@ -20,11 +20,9 @@ ProxmoVE Client API .Net
 The client is generated from a JSON Api on ProxmoxVE. 
 
 # Result
-The result is [ExpandoObject](https://msdn.microsoft.com/en-US/library/system.dynamic.expandoobject(v=vs.110).aspx). 
-
-The result contain more property:
+The result is [ExpandoObject](https://msdn.microsoft.com/en-US/library/system.dynamic.expandoobject(v=vs.110).aspx) and  contains more property:
 - returned from ProxmoxVE (data,errors,...) 
-- InError (bool) : contain errors 
+- **InError** (bool) : contains errors
 
 Example:
 
@@ -34,7 +32,8 @@ With errors:
   "errors": {
     "snapname": "invalid format - invalid configuration ID 'Test 2311'\n"
   },
-  "data": null
+  "data": null,
+  "InError": true
 }
 ```
 
@@ -63,7 +62,6 @@ Normal result
   "InError": false
 }
 ```
-
 
 # Usage
 
