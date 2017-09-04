@@ -1,5 +1,5 @@
 # EnterpriseVE.ProxmoxVE.Api
-ProxmoVE Client API DotNet
+ProxmoVE Client API .Net
 
 [ProxmoxVE Api](https://pve.proxmox.com/pve-docs/api-viewer/)
 
@@ -16,19 +16,19 @@ ProxmoVE Client API DotNet
                                                        (Made in Italy)
 ```
 
-#General
-
-The client is generated from a JSON Api on ProxmoxVE. 
+# General
+The client is generated from a JSON Api on ProxmoxVE. The result is object or array the [ExpandoObject](https://msdn.microsoft.com/en-US/library/system.dynamic.expandoobject(v=vs.110).aspx) 
 
 # Usage
 
 ```c#
 var client = new Client("10.92.90.91");
-client.Login("root", "password");
-
-foreach (dynamic item in client.Nodes["pve1"].Qemu[100].Snapshot.SnapshotList())
-{
-    Console.WriteLine(item.name);
-    Console.WriteLine(Client.ObjectToJson(item.name));
+if(client.Login("root", "password")) {
+    //list all snapshot
+    foreach (dynamic item in client.Nodes["pve1"].Qemu[100].Snapshot.SnapshotList())
+    {
+        Console.WriteLine(item.name);
+        Console.WriteLine(Client.ObjectToJson(item.name));
+    }
 }
 ```
