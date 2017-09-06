@@ -1251,13 +1251,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         public ExpandoObject Status() { return _client.Execute($"/cluster/ha/status/current", HttpMethod.Get); }
                     }
 
-                    private PVEManager_Status _manager_status;
-                    public PVEManager_Status Manager_Status { get { return _manager_status ?? (_manager_status = new PVEManager_Status(_client)); } }
+                    private PVEManagerStatus _managerStatus;
+                    public PVEManagerStatus ManagerStatus { get { return _managerStatus ?? (_managerStatus = new PVEManagerStatus(_client)); } }
 
-                    public class PVEManager_Status
+                    public class PVEManagerStatus
                     {
                         private Client _client;
-                        internal PVEManager_Status(Client client) { _client = client; }
+                        internal PVEManagerStatus(Client client) { _client = client; }
 
                         /// <summary>
                         /// Get full HA manger status, including LRM status.
@@ -3681,15 +3681,15 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                         }
 
-                        private PVEMove_Disk _move_disk;
-                        public PVEMove_Disk Move_Disk { get { return _move_disk ?? (_move_disk = new PVEMove_Disk(_client, node: _node, vmid: _vmid)); } }
+                        private PVEMoveDisk _moveDisk;
+                        public PVEMoveDisk MoveDisk { get { return _moveDisk ?? (_moveDisk = new PVEMoveDisk(_client, node: _node, vmid: _vmid)); } }
 
-                        public class PVEMove_Disk
+                        public class PVEMoveDisk
                         {
                             private Client _client;
                             private object _node;
                             private object _vmid;
-                            internal PVEMove_Disk(Client client, object node, object vmid)
+                            internal PVEMoveDisk(Client client, object node, object vmid)
                             {
                                 _client = client;
                                 _node = node;
@@ -7322,15 +7322,15 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                         }
 
-                        private PVESchedule_Now _schedule_now;
-                        public PVESchedule_Now Schedule_Now { get { return _schedule_now ?? (_schedule_now = new PVESchedule_Now(_client, node: _node, id: _id)); } }
+                        private PVEScheduleNow _scheduleNow;
+                        public PVEScheduleNow ScheduleNow { get { return _scheduleNow ?? (_scheduleNow = new PVEScheduleNow(_client, node: _node, id: _id)); } }
 
-                        public class PVESchedule_Now
+                        public class PVEScheduleNow
                         {
                             private Client _client;
                             private object _node;
                             private object _id;
-                            internal PVESchedule_Now(Client client, object node, object id)
+                            internal PVEScheduleNow(Client client, object node, object id)
                             {
                                 _client = client;
                                 _node = node;

@@ -148,10 +148,21 @@ private static void AddComplexParmeterToDictionary(Dictionary<string, object> pa
             return data.ToString();
         }
 
+        private static string FixVarName(string name)
+        {
+            var ret = new StringBuilder();
+            var names = name.Split('_');
+
+            ret.Append(names[0]);
+            for (int i = 1; i < names.Length; i++) { ret.Append(names[i].Capitalize()); }
+
+            return ret.ToString();
+        }
+
         private static void NavigateItem(JToken item, StringBuilder data, IList<string> keys)
         {
             var originalName = item["text"].ToString();
-            var name = originalName.Capitalize();
+            var name = FixClassAndMethodName(originalName);
             var thisKey = originalName.Replace("{", "").Replace("}", "");
 
             var inIndex = false;
@@ -171,11 +182,11 @@ private static void AddComplexParmeterToDictionary(Dictionary<string, object> pa
 
             if (!inIndex)
             {
-                var varName = $"_{originalName}";
+                var varName = $"_{FixVarName(originalName)}";
 
                 data.AppendLine($@"
 private {className} {varName};
-public {className} {thisKey.Capitalize()} {{ get {{ return {varName} ?? ({varName} = new {className}(_client{parmsKeys.ToString()})); }} }}");
+public {className} {FixClassAndMethodName(thisKey)} {{ get {{ return {varName} ?? ({varName} = new {className}(_client{parmsKeys.ToString()})); }} }}");
             }
             else
             {
@@ -256,13 +267,13 @@ private Client _client;");
 
             public Parameter(JToken parameter)
             {
-                OrigName = ((JProperty)parameter).Name;
-                Name = FixNameParmameteForCSharp(OrigName);
-                Description = parameter.Parent[OrigName]["description"] + "";
-                OrigType = parameter.Parent[OrigName]["type"] + "";
-                Type = FixTypeForCSharp(OrigType);
+                OriginalName = ((JProperty)parameter).Name;
+                Name = FixNameParmameteForCSharp(OriginalName);
+                Description = parameter.Parent[OriginalName]["description"] + "";
+                OriginalType = parameter.Parent[OriginalName]["type"] + "";
+                Type = FixTypeForCSharp(OriginalType);
                 //    csharpDesc += Environment.NewLine + "/// Format: " + propFormatDef;
-                Optional = (parameter.Parent[OrigName]["optional"] ?? 0).ToString() == "1";
+                Optional = (parameter.Parent[OriginalName]["optional"] ?? 0).ToString() == "1";
 
                 //if Indexed collection
                 if (Indexed) { Type = "IDictionary<int, string>"; }
@@ -275,7 +286,7 @@ private Client _client;");
             private void ParseFormat(JToken parameter)
             {
                 var parameters = new List<Parameter>();
-                var format = parameter.Parent[OrigName]["format"];
+                var format = parameter.Parent[OriginalName]["format"];
                 if (format != null && format.HasValues && !format.ToString().StartsWith("pve-"))
                 {
                     parameters = format.Select(a => new Parameter(a)).ToList();
@@ -286,7 +297,7 @@ private Client _client;");
             private void ParseEnum(JToken parameter)
             {
                 var enumValues = new List<string>();
-                var enumValue = parameter.Parent[OrigName]["enum"];
+                var enumValue = parameter.Parent[OriginalName]["enum"];
                 if (enumValue != null)
                 {
                     foreach (var item in enumValue) { enumValues.Add(item.ToString()); }
@@ -295,17 +306,15 @@ private Client _client;");
             }
 
             public string[] EnumValues { get; private set; }
-
             public Parameter[] Parameters { get; private set; }
-
-            public string OrigName { get; private set; }
-            public string OrigType { get; private set; }
+            public string OriginalName { get; private set; }
+            public string OriginalType { get; private set; }
             public string Name { get; private set; }
             public string Type { get; private set; }
             public string Description { get; private set; }
             public string Format { get; private set; }
             public bool Optional { get; private set; }
-            public bool Indexed { get { return OrigName.EndsWith("[n]"); } }
+            public bool Indexed { get { return OriginalName.EndsWith("[n]"); } }
 
             public string GetParameter()
             {
@@ -355,58 +364,59 @@ private Client _client;");
             }
         }
 
+        private static string FixClassAndMethodName(string name) { return name.Capitalize().Replace("_", ""); }
+
         private static void CreateMethod(JToken item, StringBuilder data, IList<string> keys)
         {
             var infos = item["info"];
             foreach (var name in infos.Select(a => ((JProperty)a).Name))
             {
                 var info = infos[name];
-                var methodName = info["name"].ToString().Capitalize().Replace("_", "");
+                var methodName = FixClassAndMethodName(info["name"].ToString());
 
                 var returnType = "ExpandoObject";
-                var voidReturn = false;
                 var returns = info["returns"];
                 if (returns != null)
                 {
-                    var createClassResult = false;
-                    if (createClassResult)
-                    {
-                        var props = new List<Parameter>();
-                        if (returns["properties"] != null)
-                        {
-                            props = returns["properties"].Select(a => new Parameter(a))
-                                                         .OrderBy(a => a.OrigName)
-                                                         .ToList();
-                        }
-                        else if (returns["items"] != null && returns["items"]["properties"] != null)
-                        {
-                            props = returns["items"]["properties"].Select(a => new Parameter(a))
-                                                                  .OrderBy(a => a.OrigName)
-                                                                  .ToList();
-                        }
+                    // var createClassResult = false;
+                    // if (createClassResult)
+                    // {
+                    //     var props = new List<Parameter>();
+                    //     if (returns["properties"] != null)
+                    //     {
+                    //         props = returns["properties"].Select(a => new Parameter(a))
+                    //                                      .OrderBy(a => a.OrigName)
+                    //                                      .ToList();
+                    //     }
+                    //     else if (returns["items"] != null && returns["items"]["properties"] != null)
+                    //     {
+                    //         props = returns["items"]["properties"].Select(a => new Parameter(a))
+                    //                                               .OrderBy(a => a.OrigName)
+                    //                                               .ToList();
+                    //     }
 
-                        //create result class
-                        if (props.Count > 0)
-                        {
-                            returnType = $"PVEResult{methodName}";
+                    //     //create result class
+                    //     if (props.Count > 0)
+                    //     {
+                    //         returnType = $"PVEResult{methodName}";
 
-                            data.AppendLine($"public class {returnType} {{");
+                    //         data.AppendLine($"public class {returnType} {{");
 
-                            foreach (var prop in props)
-                            {
-                                var comment = prop.GetCommentForProperty();
-                                if (!string.IsNullOrWhiteSpace(comment)) { data.AppendLine(comment); }
-                                data.AppendLine(prop.GetProperty());
-                            }
+                    //         foreach (var prop in props)
+                    //         {
+                    //             var comment = prop.GetCommentForProperty();
+                    //             if (!string.IsNullOrWhiteSpace(comment)) { data.AppendLine(comment); }
+                    //             data.AppendLine(prop.GetProperty());
+                    //         }
 
-                            data.AppendLine("}");
-                        }
-                    }
+                    //         data.AppendLine("}");
+                    //     }
+                    // }
 
                     switch ((returns["type"] + ""))
                     {
                         //case "array": returnType += "[]"; break;
-                        case "null": voidReturn = true; break;
+                        case "null": returnType = "void"; break;
                         default: break;
                     }
                 }
@@ -426,41 +436,22 @@ private Client _client;");
                     foreach (var key in keys)
                     {
                         resource = resource.Replace($"{{{key}}}", $"{{_{key}}}");
-                        parms.Remove(parms.FirstOrDefault(a => a.OrigName == key));
+                        parms.Remove(parms.FirstOrDefault(a => a.OriginalName == key));
                     }
 
-                    foreach (var parm in parms.Where(a => !a.Optional).OrderBy(a => a.OrigName))
+                    foreach (var comment in parms.OrderBy(a => a.Optional ? 1 : 0)
+                                                 .ThenBy(a => a.OriginalName)
+                                                 .Select(a => a.GetCommentForParameter()))
                     {
-                        data.AppendLine(parm.GetCommentForParameter());
-                    }
-
-                    foreach (var parm in parms.Where(a => a.Optional).OrderBy(a => a.OrigName))
-                    {
-                        data.AppendLine(parm.GetCommentForParameter());
+                        data.AppendLine(comment);
                     }
                 }
 
-                data.Append($"public {(voidReturn ? "void" : returnType)} {methodName} (");
-                if (parms.Count > 0)
-                {
-                    var parmsReq = 0;
-                    foreach (var parm in parms.Where(a => !a.Optional).OrderBy(a => a.OrigName))
-                    {
-                        if (parmsReq > 0) { data.Append(","); }
-                        data.Append(parm.GetParameter());
-                        parmsReq++;
-                    }
-
-                    var parmsOpt = 0;
-                    foreach (var parm in parms.Where(a => a.Optional).OrderBy(a => a.OrigName))
-                    {
-                        if (parmsReq > 0 || parmsOpt > 0) { data.Append(","); }
-                        data.Append(parm.GetParameter());
-                        parmsOpt++;
-                    }
-                }
-
-                data.Append(") {");
+                data.Append($"public {returnType} {methodName} (")
+                    .Append(string.Join(",", parms.OrderBy(a => a.Optional ? 1 : 0)
+                                                  .ThenBy(a => a.OriginalName)
+                                                  .Select(a => a.GetParameter())))
+                    .Append(") {");
 
                 if (parms.Count > 0)
                 {
@@ -471,16 +462,16 @@ private Client _client;");
                     {
                         if (parm.Indexed)
                         {
-                            data.AppendLine($@"AddComplexParmeterToDictionary(parameters, ""{parm.OrigName.Replace("[n]", "")}"", {parm.Name});");
+                            data.AppendLine($@"AddComplexParmeterToDictionary(parameters, ""{parm.OriginalName.Replace("[n]", "")}"", {parm.Name});");
                         }
                         else
                         {
-                            data.AppendLine($@"parameters.Add(""{parm.OrigName}"", {parm.Name});");
+                            data.AppendLine($@"parameters.Add(""{parm.OriginalName}"", {parm.Name});");
                         }
                     }
                 }
 
-                data.Append($@" {(voidReturn ? "" : "return")} _client.Execute($""{resource}"",HttpMethod.{name.Capitalize()}");
+                data.Append($@" {(returnType == "void" ? "" : "return")} _client.Execute($""{resource}"",HttpMethod.{name.Capitalize()}");
                 if (parms.Count > 0) { data.Append(",parameters"); }
                 data.AppendLine(");}");
             }
