@@ -12,8 +12,8 @@
     <AssemblyTitle>EnterpriseVE for ProxmoxVE Api Client</AssemblyTitle>
     <Description>Api Client for ProxmoxVE.</Description>
 
-    <PackageLicenseUrl>https://raw.githubusercontent.com/EnterpriseVE/EnterpriseVE.ProxmoxVE.Api/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/EnterpriseVE/EnterpriseVE.ProxmoxVE.Api</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/EnterpriseVE/eve2pve-api-dotnet/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/EnterpriseVE/eve2pve-api-dotnet</PackageProjectUrl>
     <PackageTags>ProxmoxVE;Api,Client;Rest;EnterpriseVE;</PackageTags>
     <PackageIconUrl>http://www.enterpriseve.com/wp-content/uploads/2017/01/eve.png</PackageIconUrl>
     <PackageReleaseNotes></PackageReleaseNotes>

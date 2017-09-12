@@ -22,7 +22,12 @@ The client is generated from a JSON Api on ProxmoxVE.
 # Result
 The result is [ExpandoObject](https://msdn.microsoft.com/en-US/library/system.dynamic.expandoobject(v=vs.110).aspx) and  contains more property:
 - returned from ProxmoxVE (data,errors,...) 
-- **InError** (bool) : contains errors
+- **InError** (bool) : Contains errors.
+- **Response** (ExpandoObject): response Http request.
+  - **StatusCode** (System.Net.HttpStatusCode): Status code of the HTTP response.
+  - **ReasonPhrase** (string): The reason phrase which typically is sent by servers together with the status code.
+  - **IsSuccessStatusCode** (bool) : Gets a value that indicates if the HTTP response was successful.
+  
 
 Example:
 
@@ -33,6 +38,11 @@ With errors:
     "snapname": "invalid format - invalid configuration ID 'Test 2311'\n"
   },
   "data": null,
+  "Response": {
+    "StatusCode": 400,
+    "ReasonPhrase": "Parameter verification failed.",
+    "IsSuccessStatusCode": false
+  },
   "InError": true
 }
 ```
@@ -59,6 +69,11 @@ Normal result
     "ostype": "win8",
     "name": "phenometa"
   },
+  "Response": {
+    "StatusCode": 200,
+    "ReasonPhrase": "OK",
+    "IsSuccessStatusCode": true
+  },  
   "InError": false
 }
 ```
