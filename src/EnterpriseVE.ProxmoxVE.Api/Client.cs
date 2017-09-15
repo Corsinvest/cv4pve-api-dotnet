@@ -53,6 +53,23 @@ namespace EnterpriseVE.ProxmoxVE.Api
             }
             return ticket.Response.IsSuccessStatusCode;
         }
+        /// <summary>
+        /// Creation ticket from login split username &lt;username&gt;@&lt;relam&gt;.
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="password"></param>
+        public bool Login(string userName, string password)
+        {
+            var realm = "pam";
+            //check username
+            var uData = userName.Split('@');
+            if (uData.Length > 1)
+            {
+                userName = uData[0];
+                realm = uData[1];
+            }
+            return Login(userName, password, realm);
+        }
         private ExpandoObject ExecuteAction(string resource, HttpMethod method, IDictionary<string, object> parameters = null)
         {
             using (var handler = new HttpClientHandler()
@@ -218,7 +235,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 }
                 /// <summary>
                 /// Create a new replication job
-                /// <param name="id">Replication Job ID. The ID is composed of a Guest ID and a job number, separated by a hyphen, i.e. '&amp;lt;GUEST>-&amp;lt;JOBNUM>'.</param>
+                /// <param name="id">Replication Job ID. The ID is composed of a Guest ID and a job number, separated by a hyphen, i.e. '&amp;lt;GUEST&amp;gt;-&amp;lt;JOBNUM&amp;gt;'.</param>
                 /// <param name="target">Target node.</param>
                 /// <param name="type">Section type.
                 ///   Enum: local</param>
@@ -367,7 +384,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="enable">Flag to enable/disable a rule.</param>
                             /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                             /// <param name="macro">Use predefined standard macro.</param>
-                            /// <param name="moveto">Move rule to new position &amp;lt;moveto>. Other arguments are ignored.</param>
+                            /// <param name="moveto">Move rule to new position &amp;lt;moveto&amp;gt;. Other arguments are ignored.</param>
                             /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                             /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                             /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -421,7 +438,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <param name="enable">Flag to enable/disable a rule.</param>
                         /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                         /// <param name="macro">Use predefined standard macro.</param>
-                        /// <param name="pos">Update rule at position &amp;lt;pos>.</param>
+                        /// <param name="pos">Update rule at position &amp;lt;pos&amp;gt;.</param>
                         /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                         /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                         /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -514,7 +531,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <param name="enable">Flag to enable/disable a rule.</param>
                         /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                         /// <param name="macro">Use predefined standard macro.</param>
-                        /// <param name="moveto">Move rule to new position &amp;lt;moveto>. Other arguments are ignored.</param>
+                        /// <param name="moveto">Move rule to new position &amp;lt;moveto&amp;gt;. Other arguments are ignored.</param>
                         /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                         /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                         /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -561,7 +578,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="enable">Flag to enable/disable a rule.</param>
                     /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                     /// <param name="macro">Use predefined standard macro.</param>
-                    /// <param name="pos">Update rule at position &amp;lt;pos>.</param>
+                    /// <param name="pos">Update rule at position &amp;lt;pos&amp;gt;.</param>
                     /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                     /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                     /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -902,7 +919,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="mode">Backup mode.
                     ///   Enum: snapshot,suspend,stop</param>
                     /// <param name="node">Only run if executed on this node.</param>
-                    /// <param name="pigz">Use pigz instead of gzip when N>0. N=1 uses half of cores, N>1 uses N as thread count.</param>
+                    /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
                     /// <param name="quiet">Be quiet.</param>
                     /// <param name="remove">Remove old backup files if there are more than 'maxfiles' backup files.</param>
                     /// <param name="script">Use specified hook script.</param>
@@ -977,7 +994,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="mode">Backup mode.
                 ///   Enum: snapshot,suspend,stop</param>
                 /// <param name="node">Only run if executed on this node.</param>
-                /// <param name="pigz">Use pigz instead of gzip when N>0. N=1 uses half of cores, N>1 uses N as thread count.</param>
+                /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
                 /// <param name="quiet">Be quiet.</param>
                 /// <param name="remove">Remove old backup files if there are more than 'maxfiles' backup files.</param>
                 /// <param name="script">Use specified hook script.</param>
@@ -1659,7 +1676,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <param name="enable">Flag to enable/disable a rule.</param>
                                     /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                                     /// <param name="macro">Use predefined standard macro.</param>
-                                    /// <param name="moveto">Move rule to new position &amp;lt;moveto>. Other arguments are ignored.</param>
+                                    /// <param name="moveto">Move rule to new position &amp;lt;moveto&amp;gt;. Other arguments are ignored.</param>
                                     /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                                     /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                                     /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -1706,7 +1723,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <param name="enable">Flag to enable/disable a rule.</param>
                                 /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                                 /// <param name="macro">Use predefined standard macro.</param>
-                                /// <param name="pos">Update rule at position &amp;lt;pos>.</param>
+                                /// <param name="pos">Update rule at position &amp;lt;pos&amp;gt;.</param>
                                 /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                                 /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                                 /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -1961,7 +1978,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <param name="dhcp">Enable DHCP.</param>
                                 /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                 /// <param name="enable">Enable/disable firewall rules.</param>
-                                /// <param name="ipfilter">Enable default IP filters. This is equivalent to adding an empty ipfilter-net&amp;lt;id> ipset for every interface. Such ipsets implicitly contain sane default restrictions such as restricting IPv6 link local addresses to the one derived from the interface's MAC address. For containers the configured IP addresses will be implicitly added.</param>
+                                /// <param name="ipfilter">Enable default IP filters. This is equivalent to adding an empty ipfilter-net&amp;lt;id&amp;gt; ipset for every interface. Such ipsets implicitly contain sane default restrictions such as restricting IPv6 link local addresses to the one derived from the interface's MAC address. For containers the configured IP addresses will be implicitly added.</param>
                                 /// <param name="log_level_in">Log level for incoming traffic.
                                 ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                                 /// <param name="log_level_out">Log level for outgoing traffic.
@@ -3346,7 +3363,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="nameserver">Sets DNS server IP address for a container. Create will automatically use the setting from the host if you neither set searchdomain nor nameserver.</param>
                             /// <param name="netN">Specifies network interfaces for the container.</param>
                             /// <param name="onboot">Specifies whether a VM will be started during system bootup.</param>
-                            /// <param name="ostype">OS type. This is used to setup configuration inside the container, and corresponds to lxc setup scripts in /usr/share/lxc/config/&amp;lt;ostype>.common.conf. Value 'unmanaged' can be used to skip and OS specific setup.
+                            /// <param name="ostype">OS type. This is used to setup configuration inside the container, and corresponds to lxc setup scripts in /usr/share/lxc/config/&amp;lt;ostype&amp;gt;.common.conf. Value 'unmanaged' can be used to skip and OS specific setup.
                             ///   Enum: debian,ubuntu,centos,fedora,opensuse,archlinux,alpine,gentoo,unmanaged</param>
                             /// <param name="protection">Sets the protection flag of the container. This will prevent the CT or CT's disk remove/update operation.</param>
                             /// <param name="rootfs">Use volume as container root.</param>
@@ -3741,7 +3758,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <param name="enable">Flag to enable/disable a rule.</param>
                                     /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                                     /// <param name="macro">Use predefined standard macro.</param>
-                                    /// <param name="moveto">Move rule to new position &amp;lt;moveto>. Other arguments are ignored.</param>
+                                    /// <param name="moveto">Move rule to new position &amp;lt;moveto&amp;gt;. Other arguments are ignored.</param>
                                     /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                                     /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                                     /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -3788,7 +3805,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <param name="enable">Flag to enable/disable a rule.</param>
                                 /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                                 /// <param name="macro">Use predefined standard macro.</param>
-                                /// <param name="pos">Update rule at position &amp;lt;pos>.</param>
+                                /// <param name="pos">Update rule at position &amp;lt;pos&amp;gt;.</param>
                                 /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                                 /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                                 /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -4043,7 +4060,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <param name="dhcp">Enable DHCP.</param>
                                 /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                 /// <param name="enable">Enable/disable firewall rules.</param>
-                                /// <param name="ipfilter">Enable default IP filters. This is equivalent to adding an empty ipfilter-net&amp;lt;id> ipset for every interface. Such ipsets implicitly contain sane default restrictions such as restricting IPv6 link local addresses to the one derived from the interface's MAC address. For containers the configured IP addresses will be implicitly added.</param>
+                                /// <param name="ipfilter">Enable default IP filters. This is equivalent to adding an empty ipfilter-net&amp;lt;id&amp;gt; ipset for every interface. Such ipsets implicitly contain sane default restrictions such as restricting IPv6 link local addresses to the one derived from the interface's MAC address. For containers the configured IP addresses will be implicitly added.</param>
                                 /// <param name="log_level_in">Log level for incoming traffic.
                                 ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                                 /// <param name="log_level_out">Log level for outgoing traffic.
@@ -4443,7 +4460,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="nameserver">Sets DNS server IP address for a container. Create will automatically use the setting from the host if you neither set searchdomain nor nameserver.</param>
                     /// <param name="netN">Specifies network interfaces for the container.</param>
                     /// <param name="onboot">Specifies whether a VM will be started during system bootup.</param>
-                    /// <param name="ostype">OS type. This is used to setup configuration inside the container, and corresponds to lxc setup scripts in /usr/share/lxc/config/&amp;lt;ostype>.common.conf. Value 'unmanaged' can be used to skip and OS specific setup.
+                    /// <param name="ostype">OS type. This is used to setup configuration inside the container, and corresponds to lxc setup scripts in /usr/share/lxc/config/&amp;lt;ostype&amp;gt;.common.conf. Value 'unmanaged' can be used to skip and OS specific setup.
                     ///   Enum: debian,ubuntu,centos,fedora,opensuse,archlinux,alpine,gentoo,unmanaged</param>
                     /// <param name="password">Sets root password inside container.</param>
                     /// <param name="pool">Add the VM to the specified pool.</param>
@@ -4992,7 +5009,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="maxfiles">Maximal number of backup files per guest system.</param>
                     /// <param name="mode">Backup mode.
                     ///   Enum: snapshot,suspend,stop</param>
-                    /// <param name="pigz">Use pigz instead of gzip when N>0. N=1 uses half of cores, N>1 uses N as thread count.</param>
+                    /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
                     /// <param name="quiet">Be quiet.</param>
                     /// <param name="remove">Remove old backup files if there are more than 'maxfiles' backup files.</param>
                     /// <param name="script">Use specified hook script.</param>
@@ -6117,7 +6134,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="enable">Flag to enable/disable a rule.</param>
                             /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                             /// <param name="macro">Use predefined standard macro.</param>
-                            /// <param name="moveto">Move rule to new position &amp;lt;moveto>. Other arguments are ignored.</param>
+                            /// <param name="moveto">Move rule to new position &amp;lt;moveto&amp;gt;. Other arguments are ignored.</param>
                             /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                             /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                             /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -6164,7 +6181,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <param name="enable">Flag to enable/disable a rule.</param>
                         /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                         /// <param name="macro">Use predefined standard macro.</param>
-                        /// <param name="pos">Update rule at position &amp;lt;pos>.</param>
+                        /// <param name="pos">Update rule at position &amp;lt;pos&amp;gt;.</param>
                         /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                         /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                         /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -7395,7 +7412,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="otp">One-time password for Two-factor authentication.</param>
                 /// <param name="path">Verify ticket, and check if user have access 'privs' on 'path'</param>
                 /// <param name="privs">Verify ticket, and check if user have access 'privs' on 'path'</param>
-                /// <param name="realm">You can optionally pass the realm using this parameter. Normally the realm is simply added to the username &amp;lt;username>@&amp;lt;relam>.</param>
+                /// <param name="realm">You can optionally pass the realm using this parameter. Normally the realm is simply added to the username &amp;lt;username&amp;gt;@&amp;lt;relam&amp;gt;.</param>
                 /// </summary>
                 /// <returns></returns>
                 public ExpandoObject CreateTicket(string password, string username, string otp = null, string path = null, string privs = null, string realm = null)
