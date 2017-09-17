@@ -70,6 +70,22 @@ namespace EnterpriseVE.ProxmoxVE.Api
             }
             return Login(userName, password, realm);
         }
+        public ExpandoObject Get(string resource, IDictionary<string, object> parameters = null)
+        {
+            return ExecuteAction(resource, HttpMethod.Get, parameters);
+        }
+        public ExpandoObject Post(string resource, IDictionary<string, object> parameters = null)
+        {
+            return ExecuteAction(resource, HttpMethod.Post, parameters);
+        }
+        public ExpandoObject Put(string resource, IDictionary<string, object> parameters = null)
+        {
+            return ExecuteAction(resource, HttpMethod.Put, parameters);
+        }
+        public ExpandoObject Delete(string resource, IDictionary<string, object> parameters = null)
+        {
+            return ExecuteAction(resource, HttpMethod.Delete, parameters);
+        }
         private ExpandoObject ExecuteAction(string resource, HttpMethod method, IDictionary<string, object> parameters = null)
         {
             using (var handler = new HttpClientHandler()
