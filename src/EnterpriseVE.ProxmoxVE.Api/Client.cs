@@ -199,9 +199,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     }
                     /// <summary>
                     /// Mark replication job for removal.
+                    /// </summary>
                     /// <param name="force">Will remove the jobconfig entry, but will not cleanup.</param>
                     /// <param name="keep">Keep replicated data at target (do not remove).</param>
-                    /// </summary>
                     public void Delete(bool? force = null, bool? keep = null)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -213,12 +213,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Read replication job configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Read()
+                    public dynamic Read()
                     {
                         return _client.ExecuteAction($"/cluster/replication/{_id}", HttpMethod.Get);
                     }
                     /// <summary>
                     /// Update replication job configuration.
+                    /// </summary>
                     /// <param name="comment">Description.</param>
                     /// <param name="delete">A list of settings you want to delete.</param>
                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
@@ -227,7 +228,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="remove_job">Mark the replication job for removal. The job will remove all local replication snapshots. When set to 'full', it also tries to remove replicated volumes on the target. The job then removes itself from the configuration file.
                     ///   Enum: local,full</param>
                     /// <param name="schedule">Storage replication schedule. The format is a subset of `systemd` calender events.</param>
-                    /// </summary>
                     public void Update(string comment = null, string delete = null, string digest = null, bool? disable = null, int? rate = null, string remove_job = null, string schedule = null)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -245,12 +245,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// List replication jobs.
                 /// </summary>
                 /// <returns></returns>
-                public ExpandoObject Index()
+                public dynamic Index()
                 {
                     return _client.ExecuteAction($"/cluster/replication", HttpMethod.Get);
                 }
                 /// <summary>
                 /// Create a new replication job
+                /// </summary>
                 /// <param name="id">Replication Job ID. The ID is composed of a Guest ID and a job number, separated by a hyphen, i.e. '&amp;lt;GUEST&amp;gt;-&amp;lt;JOBNUM&amp;gt;'.</param>
                 /// <param name="target">Target node.</param>
                 /// <param name="type">Section type.
@@ -261,7 +262,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="remove_job">Mark the replication job for removal. The job will remove all local replication snapshots. When set to 'full', it also tries to remove replicated volumes on the target. The job then removes itself from the configuration file.
                 ///   Enum: local,full</param>
                 /// <param name="schedule">Storage replication schedule. The format is a subset of `systemd` calender events.</param>
-                /// </summary>
                 public void Create(string id, string target, string type, string comment = null, bool? disable = null, int? rate = null, string remove_job = null, string schedule = null)
                 {
                     var parameters = new Dictionary<string, object>();
@@ -296,7 +296,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Corosync node list.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Nodes()
+                    public dynamic Nodes()
                     {
                         return _client.ExecuteAction($"/cluster/config/nodes", HttpMethod.Get);
                     }
@@ -311,7 +311,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Get corosync totem protocol settings.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Totem()
+                    public dynamic Totem()
                     {
                         return _client.ExecuteAction($"/cluster/config/totem", HttpMethod.Get);
                     }
@@ -320,7 +320,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
-                public ExpandoObject Index()
+                public dynamic Index()
                 {
                     return _client.ExecuteAction($"/cluster/config", HttpMethod.Get);
                 }
@@ -373,8 +373,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Delete rule.
-                            /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// </summary>
+                            /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             public void DeleteRule(string digest = null)
                             {
                                 var parameters = new Dictionary<string, object>();
@@ -385,12 +385,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Get single rule data.
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject GetRule()
+                            public dynamic GetRule()
                             {
                                 return _client.ExecuteAction($"/cluster/firewall/groups/{_group}/{_pos}", HttpMethod.Get);
                             }
                             /// <summary>
                             /// Modify rule data.
+                            /// </summary>
                             /// <param name="action">Rule action ('ACCEPT', 'DROP', 'REJECT') or security group name.</param>
                             /// <param name="comment">Descriptive comment.</param>
                             /// <param name="delete">A list of settings you want to delete.</param>
@@ -406,7 +407,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                             /// <param name="type">Rule type.
                             ///   Enum: in,out,group</param>
-                            /// </summary>
                             public void UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
                             {
                                 var parameters = new Dictionary<string, object>();
@@ -438,12 +438,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// List rules.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject GetRules()
+                        public dynamic GetRules()
                         {
                             return _client.ExecuteAction($"/cluster/firewall/groups/{_group}", HttpMethod.Get);
                         }
                         /// <summary>
                         /// Create new rule.
+                        /// </summary>
                         /// <param name="action">Rule action ('ACCEPT', 'DROP', 'REJECT') or security group name.</param>
                         /// <param name="type">Rule type.
                         ///   Enum: in,out,group</param>
@@ -458,7 +459,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                         /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                         /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
-                        /// </summary>
                         public void CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
                         {
                             var parameters = new Dictionary<string, object>();
@@ -482,17 +482,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// List security groups.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject ListSecurityGroups()
+                    public dynamic ListSecurityGroups()
                     {
                         return _client.ExecuteAction($"/cluster/firewall/groups", HttpMethod.Get);
                     }
                     /// <summary>
                     /// Create new security group.
+                    /// </summary>
                     /// <param name="group">Security Group name.</param>
                     /// <param name="comment"></param>
                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                     /// <param name="rename">Rename/update an existing security group. You can set 'rename' to the same value as 'name' to update the 'comment' of an existing group.</param>
-                    /// </summary>
                     public void CreateSecurityGroup(string group, string comment = null, string digest = null, string rename = null)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -520,8 +520,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         }
                         /// <summary>
                         /// Delete rule.
-                        /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         /// </summary>
+                        /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         public void DeleteRule(string digest = null)
                         {
                             var parameters = new Dictionary<string, object>();
@@ -532,12 +532,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Get single rule data.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject GetRule()
+                        public dynamic GetRule()
                         {
                             return _client.ExecuteAction($"/cluster/firewall/rules/{_pos}", HttpMethod.Get);
                         }
                         /// <summary>
                         /// Modify rule data.
+                        /// </summary>
                         /// <param name="action">Rule action ('ACCEPT', 'DROP', 'REJECT') or security group name.</param>
                         /// <param name="comment">Descriptive comment.</param>
                         /// <param name="delete">A list of settings you want to delete.</param>
@@ -553,7 +554,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                         /// <param name="type">Rule type.
                         ///   Enum: in,out,group</param>
-                        /// </summary>
                         public void UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
                         {
                             var parameters = new Dictionary<string, object>();
@@ -578,12 +578,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// List rules.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject GetRules()
+                    public dynamic GetRules()
                     {
                         return _client.ExecuteAction($"/cluster/firewall/rules", HttpMethod.Get);
                     }
                     /// <summary>
                     /// Create new rule.
+                    /// </summary>
                     /// <param name="action">Rule action ('ACCEPT', 'DROP', 'REJECT') or security group name.</param>
                     /// <param name="type">Rule type.
                     ///   Enum: in,out,group</param>
@@ -598,7 +599,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                     /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                     /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
-                    /// </summary>
                     public void CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -646,8 +646,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Remove IP or Network from IPSet.
-                            /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// </summary>
+                            /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             public void RemoveIp(string digest = null)
                             {
                                 var parameters = new Dictionary<string, object>();
@@ -658,16 +658,16 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Read IP or Network settings from IPSet.
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject ReadIp()
+                            public dynamic ReadIp()
                             {
                                 return _client.ExecuteAction($"/cluster/firewall/ipset/{_name}/{_cidr}", HttpMethod.Get);
                             }
                             /// <summary>
                             /// Update IP or Network settings
+                            /// </summary>
                             /// <param name="comment"></param>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <param name="nomatch"></param>
-                            /// </summary>
                             public void UpdateIp(string comment = null, string digest = null, bool? nomatch = null)
                             {
                                 var parameters = new Dictionary<string, object>();
@@ -688,16 +688,16 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// List IPSet content
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject GetIpset()
+                        public dynamic GetIpset()
                         {
                             return _client.ExecuteAction($"/cluster/firewall/ipset/{_name}", HttpMethod.Get);
                         }
                         /// <summary>
                         /// Add IP or Network to IPSet.
+                        /// </summary>
                         /// <param name="cidr">Network/IP specification in CIDR format.</param>
                         /// <param name="comment"></param>
                         /// <param name="nomatch"></param>
-                        /// </summary>
                         public void CreateIp(string cidr, string comment = null, bool? nomatch = null)
                         {
                             var parameters = new Dictionary<string, object>();
@@ -711,17 +711,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// List IPSets
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject IpsetIndex()
+                    public dynamic IpsetIndex()
                     {
                         return _client.ExecuteAction($"/cluster/firewall/ipset", HttpMethod.Get);
                     }
                     /// <summary>
                     /// Create new IPSet
+                    /// </summary>
                     /// <param name="name">IP set name.</param>
                     /// <param name="comment"></param>
                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                     /// <param name="rename">Rename an existing IPSet. You can set 'rename' to the same value as 'name' to update the 'comment' of an existing IPSet.</param>
-                    /// </summary>
                     public void CreateIpset(string name, string comment = null, string digest = null, string rename = null)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -749,8 +749,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         }
                         /// <summary>
                         /// Remove IP or Network alias.
-                        /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         /// </summary>
+                        /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         public void RemoveAlias(string digest = null)
                         {
                             var parameters = new Dictionary<string, object>();
@@ -761,17 +761,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Read alias.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject ReadAlias()
+                        public dynamic ReadAlias()
                         {
                             return _client.ExecuteAction($"/cluster/firewall/aliases/{_name}", HttpMethod.Get);
                         }
                         /// <summary>
                         /// Update IP or Network alias.
+                        /// </summary>
                         /// <param name="cidr">Network/IP specification in CIDR format.</param>
                         /// <param name="comment"></param>
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         /// <param name="rename">Rename an existing alias.</param>
-                        /// </summary>
                         public void UpdateAlias(string cidr, string comment = null, string digest = null, string rename = null)
                         {
                             var parameters = new Dictionary<string, object>();
@@ -786,16 +786,16 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// List aliases
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject GetAliases()
+                    public dynamic GetAliases()
                     {
                         return _client.ExecuteAction($"/cluster/firewall/aliases", HttpMethod.Get);
                     }
                     /// <summary>
                     /// Create IP or Network Alias.
+                    /// </summary>
                     /// <param name="cidr">Network/IP specification in CIDR format.</param>
                     /// <param name="name">Alias name.</param>
                     /// <param name="comment"></param>
-                    /// </summary>
                     public void CreateAlias(string cidr, string name, string comment = null)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -815,12 +815,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Get Firewall options.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject GetOptions()
+                    public dynamic GetOptions()
                     {
                         return _client.ExecuteAction($"/cluster/firewall/options", HttpMethod.Get);
                     }
                     /// <summary>
                     /// Set Firewall options.
+                    /// </summary>
                     /// <param name="delete">A list of settings you want to delete.</param>
                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                     /// <param name="enable">Enable or disable the firewall cluster wide.</param>
@@ -828,7 +829,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     ///   Enum: ACCEPT,REJECT,DROP</param>
                     /// <param name="policy_out">Output policy.
                     ///   Enum: ACCEPT,REJECT,DROP</param>
-                    /// </summary>
                     public void SetOptions(string delete = null, string digest = null, int? enable = null, string policy_in = null, string policy_out = null)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -850,7 +850,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// List available macros
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject GetMacros()
+                    public dynamic GetMacros()
                     {
                         return _client.ExecuteAction($"/cluster/firewall/macros", HttpMethod.Get);
                     }
@@ -863,11 +863,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     }
                     /// <summary>
                     /// Lists possible IPSet/Alias reference which are allowed in source/dest properties.
+                    /// </summary>
                     /// <param name="type">Only list references of specified type.
                     ///   Enum: alias,ipset</param>
-                    /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Refs(string type = null)
+                    public dynamic Refs(string type = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("type", type);
@@ -878,7 +878,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
-                public ExpandoObject Index()
+                public dynamic Index()
                 {
                     return _client.ExecuteAction($"/cluster/firewall", HttpMethod.Get);
                 }
@@ -909,12 +909,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Read vzdump backup job definition.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject ReadJob()
+                    public dynamic ReadJob()
                     {
                         return _client.ExecuteAction($"/cluster/backup/{_id}", HttpMethod.Get);
                     }
                     /// <summary>
                     /// Update vzdump backup job definition.
+                    /// </summary>
                     /// <param name="starttime">Job Start time.</param>
                     /// <param name="all">Backup all known guest systems on this host.</param>
                     /// <param name="bwlimit">Limit I/O bandwidth (KBytes per second).</param>
@@ -946,7 +947,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="storage">Store resulting file to this storage.</param>
                     /// <param name="tmpdir">Store temporary files to specified directory.</param>
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
-                    /// </summary>
                     public void UpdateJob(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -985,12 +985,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// List vzdump backup schedule.
                 /// </summary>
                 /// <returns></returns>
-                public ExpandoObject Index()
+                public dynamic Index()
                 {
                     return _client.ExecuteAction($"/cluster/backup", HttpMethod.Get);
                 }
                 /// <summary>
                 /// Create new vzdump backup job.
+                /// </summary>
                 /// <param name="starttime">Job Start time.</param>
                 /// <param name="all">Backup all known guest systems on this host.</param>
                 /// <param name="bwlimit">Limit I/O bandwidth (KBytes per second).</param>
@@ -1021,7 +1022,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="storage">Store resulting file to this storage.</param>
                 /// <param name="tmpdir">Store temporary files to specified directory.</param>
                 /// <param name="vmid">The ID of the guest system you want to backup.</param>
-                /// </summary>
                 public void CreateJob(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null)
                 {
                     var parameters = new Dictionary<string, object>();
@@ -1096,8 +1096,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Request resource migration (online) to another node.
-                            /// <param name="node">The cluster node name.</param>
                             /// </summary>
+                            /// <param name="node">The cluster node name.</param>
                             public void Migrate(string node)
                             {
                                 var parameters = new Dictionary<string, object>();
@@ -1115,8 +1115,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Request resource relocatzion to another node. This stops the service on the old node, and restarts it on the target node.
-                            /// <param name="node">The cluster node name.</param>
                             /// </summary>
+                            /// <param name="node">The cluster node name.</param>
                             public void Relocate(string node)
                             {
                                 var parameters = new Dictionary<string, object>();
@@ -1135,12 +1135,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Read resource configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Read()
+                        public dynamic Read()
                         {
                             return _client.ExecuteAction($"/cluster/ha/resources/{_sid}", HttpMethod.Get);
                         }
                         /// <summary>
                         /// Update resource configuration.
+                        /// </summary>
                         /// <param name="comment">Description.</param>
                         /// <param name="delete">A list of settings you want to delete.</param>
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
@@ -1149,7 +1150,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <param name="max_restart">Maximal number of tries to restart the service on a node after its start failed.</param>
                         /// <param name="state">Requested resource state.
                         ///   Enum: started,stopped,enabled,disabled</param>
-                        /// </summary>
                         public void Update(string comment = null, string delete = null, string digest = null, string group = null, int? max_relocate = null, int? max_restart = null, string state = null)
                         {
                             var parameters = new Dictionary<string, object>();
@@ -1165,11 +1165,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     }
                     /// <summary>
                     /// List HA resources.
+                    /// </summary>
                     /// <param name="type">Only list resources of specific type
                     ///   Enum: ct,vm</param>
-                    /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Index(string type = null)
+                    public dynamic Index(string type = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("type", type);
@@ -1177,6 +1177,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     }
                     /// <summary>
                     /// Create a new HA resource.
+                    /// </summary>
                     /// <param name="sid">HA resource ID. This consists of a resource type followed by a resource specific name, separated with colon (example: vm:100 / ct:100). For virtual machines and containers, you can simply use the VM or CT id as a shortcut (example: 100).</param>
                     /// <param name="comment">Description.</param>
                     /// <param name="group">The HA group identifier.</param>
@@ -1186,7 +1187,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     ///   Enum: started,stopped,enabled,disabled</param>
                     /// <param name="type">Resource type.
                     ///   Enum: ct,vm</param>
-                    /// </summary>
                     public void Create(string sid, string comment = null, string group = null, int? max_relocate = null, int? max_restart = null, string state = null, string type = null)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -1226,19 +1226,19 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Read ha group configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Read()
+                        public dynamic Read()
                         {
                             return _client.ExecuteAction($"/cluster/ha/groups/{_group}", HttpMethod.Get);
                         }
                         /// <summary>
                         /// Update ha group configuration.
+                        /// </summary>
                         /// <param name="comment">Description.</param>
                         /// <param name="delete">A list of settings you want to delete.</param>
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         /// <param name="nodes">List of cluster node names with optional priority.</param>
                         /// <param name="nofailback">The CRM tries to run services on the node with the highest priority. If a node with higher priority comes online, the CRM migrates the service to that node. Enabling nofailback prevents that behavior.</param>
                         /// <param name="restricted">Resources bound to restricted groups may only run on nodes defined by the group.</param>
-                        /// </summary>
                         public void Update(string comment = null, string delete = null, string digest = null, string nodes = null, bool? nofailback = null, bool? restricted = null)
                         {
                             var parameters = new Dictionary<string, object>();
@@ -1255,12 +1255,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Get HA groups.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Index()
+                    public dynamic Index()
                     {
                         return _client.ExecuteAction($"/cluster/ha/groups", HttpMethod.Get);
                     }
                     /// <summary>
                     /// Create a new HA group.
+                    /// </summary>
                     /// <param name="group">The HA group identifier.</param>
                     /// <param name="nodes">List of cluster node names with optional priority.</param>
                     /// <param name="comment">Description.</param>
@@ -1268,7 +1269,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="restricted">Resources bound to restricted groups may only run on nodes defined by the group.</param>
                     /// <param name="type">Group type.
                     ///   Enum: group</param>
-                    /// </summary>
                     public void Create(string group, string nodes, string comment = null, bool? nofailback = null, bool? restricted = null, string type = null)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -1301,7 +1301,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Get HA manger status.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Status()
+                        public dynamic Status()
                         {
                             return _client.ExecuteAction($"/cluster/ha/status/current", HttpMethod.Get);
                         }
@@ -1316,7 +1316,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Get full HA manger status, including LRM status.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject ManagerStatus()
+                        public dynamic ManagerStatus()
                         {
                             return _client.ExecuteAction($"/cluster/ha/status/manager_status", HttpMethod.Get);
                         }
@@ -1325,7 +1325,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Directory index.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Index()
+                    public dynamic Index()
                     {
                         return _client.ExecuteAction($"/cluster/ha/status", HttpMethod.Get);
                     }
@@ -1334,7 +1334,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
-                public ExpandoObject Index()
+                public dynamic Index()
                 {
                     return _client.ExecuteAction($"/cluster/ha", HttpMethod.Get);
                 }
@@ -1347,10 +1347,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 }
                 /// <summary>
                 /// Read cluster log
-                /// <param name="max">Maximum number of entries.</param>
                 /// </summary>
+                /// <param name="max">Maximum number of entries.</param>
                 /// <returns></returns>
-                public ExpandoObject Log(int? max = null)
+                public dynamic Log(int? max = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("max", max);
@@ -1365,11 +1365,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 }
                 /// <summary>
                 /// Resources index (cluster wide).
+                /// </summary>
                 /// <param name="type">
                 ///   Enum: vm,storage,node</param>
-                /// </summary>
                 /// <returns></returns>
-                public ExpandoObject Resources(string type = null)
+                public dynamic Resources(string type = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("type", type);
@@ -1386,7 +1386,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// List recent tasks (cluster wide).
                 /// </summary>
                 /// <returns></returns>
-                public ExpandoObject Tasks()
+                public dynamic Tasks()
                 {
                     return _client.ExecuteAction($"/cluster/tasks", HttpMethod.Get);
                 }
@@ -1401,12 +1401,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// Get datacenter options.
                 /// </summary>
                 /// <returns></returns>
-                public ExpandoObject GetOptions()
+                public dynamic GetOptions()
                 {
                     return _client.ExecuteAction($"/cluster/options", HttpMethod.Get);
                 }
                 /// <summary>
                 /// Set datacenter options.
+                /// </summary>
                 /// <param name="console">Select the default Console viewer. You can either use the builtin java applet (VNC), an external virt-viewer comtatible application (SPICE), or an HTML5 based viewer (noVNC).
                 ///   Enum: applet,vv,html5</param>
                 /// <param name="delete">A list of settings you want to delete.</param>
@@ -1422,7 +1423,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="max_workers">Defines how many workers (per node) are maximal started  on actions like 'stopall VMs' or task from the ha-manager.</param>
                 /// <param name="migration">For cluster wide migration settings.</param>
                 /// <param name="migration_unsecure">Migration is secure using SSH tunnel by default. For secure private networks you can disable it to speed up migration. Deprecated, use the 'migration' property instead!</param>
-                /// </summary>
                 public void SetOptions(string console = null, string delete = null, string email_from = null, string fencing = null, string http_proxy = null, string keyboard = null, string language = null, string mac_prefix = null, int? max_workers = null, string migration = null, bool? migration_unsecure = null)
                 {
                     var parameters = new Dictionary<string, object>();
@@ -1450,7 +1450,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// Get cluster status informations.
                 /// </summary>
                 /// <returns></returns>
-                public ExpandoObject GetStatus()
+                public dynamic GetStatus()
                 {
                     return _client.ExecuteAction($"/cluster/status", HttpMethod.Get);
                 }
@@ -1463,10 +1463,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 }
                 /// <summary>
                 /// Get next free VMID. If you pass an VMID it will raise an error if the ID is already used.
-                /// <param name="vmid">The (unique) ID of the VM.</param>
                 /// </summary>
+                /// <param name="vmid">The (unique) ID of the VM.</param>
                 /// <returns></returns>
-                public ExpandoObject Nextid(int? vmid = null)
+                public dynamic Nextid(int? vmid = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("vmid", vmid);
@@ -1477,7 +1477,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// Cluster index.
             /// </summary>
             /// <returns></returns>
-            public ExpandoObject Index()
+            public dynamic Index()
             {
                 return _client.ExecuteAction($"/cluster", HttpMethod.Get);
             }
@@ -1665,8 +1665,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     }
                                     /// <summary>
                                     /// Delete rule.
-                                    /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// </summary>
+                                    /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     public void DeleteRule(string digest = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
@@ -1677,12 +1677,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// Get single rule data.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public ExpandoObject GetRule()
+                                    public dynamic GetRule()
                                     {
                                         return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", HttpMethod.Get);
                                     }
                                     /// <summary>
                                     /// Modify rule data.
+                                    /// </summary>
                                     /// <param name="action">Rule action ('ACCEPT', 'DROP', 'REJECT') or security group name.</param>
                                     /// <param name="comment">Descriptive comment.</param>
                                     /// <param name="delete">A list of settings you want to delete.</param>
@@ -1698,7 +1699,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                                     /// <param name="type">Rule type.
                                     ///   Enum: in,out,group</param>
-                                    /// </summary>
                                     public void UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
@@ -1723,12 +1723,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// List rules.
                                 /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject GetRules()
+                                public dynamic GetRules()
                                 {
                                     return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/rules", HttpMethod.Get);
                                 }
                                 /// <summary>
                                 /// Create new rule.
+                                /// </summary>
                                 /// <param name="action">Rule action ('ACCEPT', 'DROP', 'REJECT') or security group name.</param>
                                 /// <param name="type">Rule type.
                                 ///   Enum: in,out,group</param>
@@ -1743,7 +1744,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                                 /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                                 /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
-                                /// </summary>
                                 public void CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
@@ -1788,8 +1788,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     }
                                     /// <summary>
                                     /// Remove IP or Network alias.
-                                    /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// </summary>
+                                    /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     public void RemoveAlias(string digest = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
@@ -1800,17 +1800,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// Read alias.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public ExpandoObject ReadAlias()
+                                    public dynamic ReadAlias()
                                     {
                                         return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", HttpMethod.Get);
                                     }
                                     /// <summary>
                                     /// Update IP or Network alias.
+                                    /// </summary>
                                     /// <param name="cidr">Network/IP specification in CIDR format.</param>
                                     /// <param name="comment"></param>
                                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// <param name="rename">Rename an existing alias.</param>
-                                    /// </summary>
                                     public void UpdateAlias(string cidr, string comment = null, string digest = null, string rename = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
@@ -1825,16 +1825,16 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// List aliases
                                 /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject GetAliases()
+                                public dynamic GetAliases()
                                 {
                                     return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases", HttpMethod.Get);
                                 }
                                 /// <summary>
                                 /// Create IP or Network Alias.
+                                /// </summary>
                                 /// <param name="cidr">Network/IP specification in CIDR format.</param>
                                 /// <param name="name">Alias name.</param>
                                 /// <param name="comment"></param>
-                                /// </summary>
                                 public void CreateAlias(string cidr, string name, string comment = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
@@ -1884,8 +1884,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         }
                                         /// <summary>
                                         /// Remove IP or Network from IPSet.
-                                        /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                         /// </summary>
+                                        /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                         public void RemoveIp(string digest = null)
                                         {
                                             var parameters = new Dictionary<string, object>();
@@ -1896,16 +1896,16 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         /// Read IP or Network settings from IPSet.
                                         /// </summary>
                                         /// <returns></returns>
-                                        public ExpandoObject ReadIp()
+                                        public dynamic ReadIp()
                                         {
                                             return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Get);
                                         }
                                         /// <summary>
                                         /// Update IP or Network settings
+                                        /// </summary>
                                         /// <param name="comment"></param>
                                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                         /// <param name="nomatch"></param>
-                                        /// </summary>
                                         public void UpdateIp(string comment = null, string digest = null, bool? nomatch = null)
                                         {
                                             var parameters = new Dictionary<string, object>();
@@ -1926,16 +1926,16 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// List IPSet content
                                     /// </summary>
                                     /// <returns></returns>
-                                    public ExpandoObject GetIpset()
+                                    public dynamic GetIpset()
                                     {
                                         return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}", HttpMethod.Get);
                                     }
                                     /// <summary>
                                     /// Add IP or Network to IPSet.
+                                    /// </summary>
                                     /// <param name="cidr">Network/IP specification in CIDR format.</param>
                                     /// <param name="comment"></param>
                                     /// <param name="nomatch"></param>
-                                    /// </summary>
                                     public void CreateIp(string cidr, string comment = null, bool? nomatch = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
@@ -1949,17 +1949,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// List IPSets
                                 /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject IpsetIndex()
+                                public dynamic IpsetIndex()
                                 {
                                     return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset", HttpMethod.Get);
                                 }
                                 /// <summary>
                                 /// Create new IPSet
+                                /// </summary>
                                 /// <param name="name">IP set name.</param>
                                 /// <param name="comment"></param>
                                 /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                 /// <param name="rename">Rename an existing IPSet. You can set 'rename' to the same value as 'name' to update the 'comment' of an existing IPSet.</param>
-                                /// </summary>
                                 public void CreateIpset(string name, string comment = null, string digest = null, string rename = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
@@ -1984,12 +1984,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// Get VM firewall options.
                                 /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject GetOptions()
+                                public dynamic GetOptions()
                                 {
                                     return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/options", HttpMethod.Get);
                                 }
                                 /// <summary>
                                 /// Set Firewall options.
+                                /// </summary>
                                 /// <param name="delete">A list of settings you want to delete.</param>
                                 /// <param name="dhcp">Enable DHCP.</param>
                                 /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
@@ -2006,7 +2007,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <param name="policy_out">Output policy.
                                 ///   Enum: ACCEPT,REJECT,DROP</param>
                                 /// <param name="radv">Allow sending Router Advertisement.</param>
-                                /// </summary>
                                 public void SetOptions(string delete = null, bool? dhcp = null, string digest = null, bool? enable = null, bool? ipfilter = null, string log_level_in = null, string log_level_out = null, bool? macfilter = null, bool? ndp = null, string policy_in = null, string policy_out = null, bool? radv = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
@@ -2037,11 +2037,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 }
                                 /// <summary>
                                 /// Read firewall log
+                                /// </summary>
                                 /// <param name="limit"></param>
                                 /// <param name="start"></param>
-                                /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject Log(int? limit = null, int? start = null)
+                                public dynamic Log(int? limit = null, int? start = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("limit", limit);
@@ -2061,11 +2061,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 }
                                 /// <summary>
                                 /// Lists possible IPSet/Alias reference which are allowed in source/dest properties.
+                                /// </summary>
                                 /// <param name="type">Only list references of specified type.
                                 ///   Enum: alias,ipset</param>
-                                /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject Refs(string type = null)
+                                public dynamic Refs(string type = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("type", type);
@@ -2076,7 +2076,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Directory index.
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Index()
+                            public dynamic Index()
                             {
                                 return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall", HttpMethod.Get);
                             }
@@ -2093,14 +2093,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Read VM RRD statistics (returns PNG)
+                            /// </summary>
                             /// <param name="ds">The list of datasources you want to display.</param>
                             /// <param name="timeframe">Specify the time frame you are interested in.
                             ///   Enum: hour,day,week,month,year</param>
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Rrd(string ds, string timeframe, string cf = null)
+                            public dynamic Rrd(string ds, string timeframe, string cf = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("ds", ds);
@@ -2121,13 +2121,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Read VM RRD statistics
+                            /// </summary>
                             /// <param name="timeframe">Specify the time frame you are interested in.
                             ///   Enum: hour,day,week,month,year</param>
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Rrddata(string timeframe, string cf = null)
+                            public dynamic Rrddata(string timeframe, string cf = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("timeframe", timeframe);
@@ -2147,10 +2147,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Get current virtual machine configuration. This does not include pending configuration changes (see 'pending' API).
-                            /// <param name="current">Get current values (instead of pending values).</param>
                             /// </summary>
+                            /// <param name="current">Get current values (instead of pending values).</param>
                             /// <returns></returns>
-                            public ExpandoObject VmConfig(bool? current = null)
+                            public dynamic VmConfig(bool? current = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("current", current);
@@ -2158,6 +2158,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Set virtual machine options (asynchrounous API).
+                            /// </summary>
                             /// <param name="acpi">Enable/disable ACPI.</param>
                             /// <param name="agent">Enable/disable Qemu GuestAgent.</param>
                             /// <param name="args">Arbitrary arguments passed to kvm.</param>
@@ -2226,9 +2227,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             ///   Enum: std,cirrus,vmware,qxl,serial0,serial1,serial2,serial3,qxl2,qxl3,qxl4</param>
                             /// <param name="virtioN">Use volume as VIRTIO hard disk (n is 0 to 15).</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject UpdateVmAsync(bool? acpi = null, bool? agent = null, string args = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string watchdog = null)
+                            public dynamic UpdateVmAsync(bool? acpi = null, bool? agent = null, string args = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string watchdog = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("acpi", acpi);
@@ -2296,6 +2296,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Set virtual machine options (synchrounous API) - You should consider using the POST method instead for any actions involving hotplug or storage allocation.
+                            /// </summary>
                             /// <param name="acpi">Enable/disable ACPI.</param>
                             /// <param name="agent">Enable/disable Qemu GuestAgent.</param>
                             /// <param name="args">Arbitrary arguments passed to kvm.</param>
@@ -2363,7 +2364,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             ///   Enum: std,cirrus,vmware,qxl,serial0,serial1,serial2,serial3,qxl2,qxl3,qxl4</param>
                             /// <param name="virtioN">Use volume as VIRTIO hard disk (n is 0 to 15).</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
-                            /// </summary>
                             public void UpdateVm(bool? acpi = null, bool? agent = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string watchdog = null)
                             {
                                 var parameters = new Dictionary<string, object>();
@@ -2444,7 +2444,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Get virtual machine configuration, including pending changes.
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject VmPending()
+                            public dynamic VmPending()
                             {
                                 return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/pending", HttpMethod.Get);
                             }
@@ -2461,9 +2461,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Unlink/delete disk images.
+                            /// </summary>
                             /// <param name="idlist">A list of disk IDs you want to delete.</param>
                             /// <param name="force">Force physical removal. Without this, we simple remove the disk from the config file and create an additional configuration entry called 'unused[n]', which contains the volume ID. Unlink of unused[n] always cause physical removal.</param>
-                            /// </summary>
                             public void Unlink(string idlist, bool? force = null)
                             {
                                 var parameters = new Dictionary<string, object>();
@@ -2484,10 +2484,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Creates a TCP VNC proxy connections.
-                            /// <param name="websocket">starts websockify instead of vncproxy</param>
                             /// </summary>
+                            /// <param name="websocket">starts websockify instead of vncproxy</param>
                             /// <returns></returns>
-                            public ExpandoObject Vncproxy(bool? websocket = null)
+                            public dynamic Vncproxy(bool? websocket = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("websocket", websocket);
@@ -2506,11 +2506,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Opens a weksocket for VNC traffic.
+                            /// </summary>
                             /// <param name="port">Port number returned by previous vncproxy call.</param>
                             /// <param name="vncticket">Ticket from previous call to vncproxy.</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Vncwebsocket(int port, string vncticket)
+                            public dynamic Vncwebsocket(int port, string vncticket)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("port", port);
@@ -2530,10 +2530,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Returns a SPICE configuration to connect to the VM.
-                            /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As resonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                             /// </summary>
+                            /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As resonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                             /// <returns></returns>
-                            public ExpandoObject Spiceproxy(string proxy = null)
+                            public dynamic Spiceproxy(string proxy = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("proxy", proxy);
@@ -2578,7 +2578,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// Get virtual machine status.
                                 /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject VmStatus()
+                                public dynamic VmStatus()
                                 {
                                     return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/status/current", HttpMethod.Get);
                                 }
@@ -2595,6 +2595,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 }
                                 /// <summary>
                                 /// Start virtual machine.
+                                /// </summary>
                                 /// <param name="machine">Specific the Qemu machine type.</param>
                                 /// <param name="migratedfrom">The cluster node name.</param>
                                 /// <param name="migration_network">CIDR of the (sub) network that is used for migration.</param>
@@ -2603,9 +2604,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <param name="stateuri">Some command save/restore state from this location.</param>
                                 /// <param name="targetstorage">Target storage for the migration. (Can be '1' to use the same storage id as on the source node.)</param>
-                                /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject VmStart(string machine = null, string migratedfrom = null, string migration_network = null, string migration_type = null, bool? skiplock = null, string stateuri = null, string targetstorage = null)
+                                public dynamic VmStart(string machine = null, string migratedfrom = null, string migration_network = null, string migration_type = null, bool? skiplock = null, string stateuri = null, string targetstorage = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("machine", machine);
@@ -2630,13 +2630,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 }
                                 /// <summary>
                                 /// Stop virtual machine. The qemu process will exit immediately. Thisis akin to pulling the power plug of a running computer and may damage the VM data
+                                /// </summary>
                                 /// <param name="keepActive">Do not deactivate storage volumes.</param>
                                 /// <param name="migratedfrom">The cluster node name.</param>
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <param name="timeout">Wait maximal timeout seconds.</param>
-                                /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject VmStop(bool? keepActive = null, string migratedfrom = null, bool? skiplock = null, int? timeout = null)
+                                public dynamic VmStop(bool? keepActive = null, string migratedfrom = null, bool? skiplock = null, int? timeout = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("keepActive", keepActive);
@@ -2658,10 +2658,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 }
                                 /// <summary>
                                 /// Reset virtual machine.
-                                /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// </summary>
+                                /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <returns></returns>
-                                public ExpandoObject VmReset(bool? skiplock = null)
+                                public dynamic VmReset(bool? skiplock = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("skiplock", skiplock);
@@ -2680,13 +2680,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 }
                                 /// <summary>
                                 /// Shutdown virtual machine. This is similar to pressing the power button on a physical machine.This will send an ACPI event for the guest OS, which should then proceed to a clean shutdown.
+                                /// </summary>
                                 /// <param name="forceStop">Make sure the VM stops.</param>
                                 /// <param name="keepActive">Do not deactivate storage volumes.</param>
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <param name="timeout">Wait maximal timeout seconds.</param>
-                                /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject VmShutdown(bool? forceStop = null, bool? keepActive = null, bool? skiplock = null, int? timeout = null)
+                                public dynamic VmShutdown(bool? forceStop = null, bool? keepActive = null, bool? skiplock = null, int? timeout = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("forceStop", forceStop);
@@ -2708,10 +2708,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 }
                                 /// <summary>
                                 /// Suspend virtual machine.
-                                /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// </summary>
+                                /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <returns></returns>
-                                public ExpandoObject VmSuspend(bool? skiplock = null)
+                                public dynamic VmSuspend(bool? skiplock = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("skiplock", skiplock);
@@ -2730,11 +2730,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 }
                                 /// <summary>
                                 /// Resume virtual machine.
+                                /// </summary>
                                 /// <param name="nocheck"></param>
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
-                                /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject VmResume(bool? nocheck = null, bool? skiplock = null)
+                                public dynamic VmResume(bool? nocheck = null, bool? skiplock = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("nocheck", nocheck);
@@ -2746,7 +2746,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Directory index
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Vmcmdidx()
+                            public dynamic Vmcmdidx()
                             {
                                 return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/status", HttpMethod.Get);
                             }
@@ -2763,9 +2763,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Send key event to virtual machine.
+                            /// </summary>
                             /// <param name="key">The key (qemu monitor encoding).</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
-                            /// </summary>
                             public void VmSendkey(string key, bool? skiplock = null)
                             {
                                 var parameters = new Dictionary<string, object>();
@@ -2786,12 +2786,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Check if feature for virtual machine is available.
+                            /// </summary>
                             /// <param name="feature">Feature to check.
                             ///   Enum: snapshot,clone,copy</param>
                             /// <param name="snapname">The name of the snapshot.</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject VmFeature(string feature, string snapname = null)
+                            public dynamic VmFeature(string feature, string snapname = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("feature", feature);
@@ -2811,6 +2811,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Create a copy of virtual machine/template.
+                            /// </summary>
                             /// <param name="newid">VMID for the clone.</param>
                             /// <param name="description">Description for the new VM.</param>
                             /// <param name="format">Target format for file storage.
@@ -2821,9 +2822,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="snapname">The name of the snapshot.</param>
                             /// <param name="storage">Target storage for full clone.</param>
                             /// <param name="target">Target node. Only allowed if the original VM is on shared storage.</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject CloneVm(int newid, string description = null, string format = null, bool? full = null, string name = null, string pool = null, string snapname = null, string storage = null, string target = null)
+                            public dynamic CloneVm(int newid, string description = null, string format = null, bool? full = null, string name = null, string pool = null, string snapname = null, string storage = null, string target = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("newid", newid);
@@ -2850,6 +2850,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Move volume to different storage.
+                            /// </summary>
                             /// <param name="disk">The disk you want to move.
                             ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
                             /// <param name="storage">Target storage.</param>
@@ -2857,9 +2858,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <param name="format">Target Format.
                             ///   Enum: raw,qcow2,vmdk</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject MoveVmDisk(string disk, string storage, bool? delete = null, string digest = null, string format = null)
+                            public dynamic MoveVmDisk(string disk, string storage, bool? delete = null, string digest = null, string format = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("disk", disk);
@@ -2882,6 +2882,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Migrate virtual machine. Creates a new migration task.
+                            /// </summary>
                             /// <param name="target">Target node.</param>
                             /// <param name="force">Allow to migrate VMs which use local devices. Only root may use this option.</param>
                             /// <param name="migration_network">CIDR of the (sub) network that is used for migration.</param>
@@ -2890,9 +2891,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="online">Use online/live migration.</param>
                             /// <param name="targetstorage">Default target storage.</param>
                             /// <param name="with_local_disks">Enable live storage migration for local disk</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject MigrateVm(string target, bool? force = null, string migration_network = null, string migration_type = null, bool? online = null, string targetstorage = null, bool? with_local_disks = null)
+                            public dynamic MigrateVm(string target, bool? force = null, string migration_network = null, string migration_type = null, bool? online = null, string targetstorage = null, bool? with_local_disks = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("target", target);
@@ -2917,10 +2917,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Execute Qemu monitor commands.
-                            /// <param name="command">The monitor command.</param>
                             /// </summary>
+                            /// <param name="command">The monitor command.</param>
                             /// <returns></returns>
-                            public ExpandoObject Monitor(string command)
+                            public dynamic Monitor(string command)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("command", command);
@@ -2939,11 +2939,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Execute Qemu Guest Agent commands.
+                            /// </summary>
                             /// <param name="command">The QGA command.
                             ///   Enum: ping,get-time,info,fsfreeze-status,fsfreeze-freeze,fsfreeze-thaw,fstrim,network-get-interfaces,get-vcpus,get-fsinfo,get-memory-blocks,get-memory-block-info,suspend-hybrid,suspend-ram,suspend-disk,shutdown</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Agent(string command)
+                            public dynamic Agent(string command)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("command", command);
@@ -2962,12 +2962,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Extend volume size.
+                            /// </summary>
                             /// <param name="disk">The disk you want to resize.
                             ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
                             /// <param name="size">The new size. With the `+` sign the value is added to the actual size of the volume and without it, the value is taken as an absolute one. Shrinking disk size is not supported.</param>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
-                            /// </summary>
                             public void ResizeVm(string disk, string size, string digest = null, bool? skiplock = null)
                             {
                                 var parameters = new Dictionary<string, object>();
@@ -3021,14 +3021,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// Get snapshot configuration
                                     /// </summary>
                                     /// <returns></returns>
-                                    public ExpandoObject GetSnapshotConfig()
+                                    public dynamic GetSnapshotConfig()
                                     {
                                         return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config", HttpMethod.Get);
                                     }
                                     /// <summary>
                                     /// Update snapshot metadata.
-                                    /// <param name="description">A textual description or comment.</param>
                                     /// </summary>
+                                    /// <param name="description">A textual description or comment.</param>
                                     public void UpdateSnapshotConfig(string description = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
@@ -3052,17 +3052,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// Rollback VM state to specified snapshot.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public ExpandoObject Rollback()
+                                    public dynamic Rollback()
                                     {
                                         return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/rollback", HttpMethod.Post);
                                     }
                                 }
                                 /// <summary>
                                 /// Delete a VM snapshot.
-                                /// <param name="force">For removal from config file, even if removing disk snapshots fails.</param>
                                 /// </summary>
+                                /// <param name="force">For removal from config file, even if removing disk snapshots fails.</param>
                                 /// <returns></returns>
-                                public ExpandoObject Delsnapshot(bool? force = null)
+                                public dynamic Delsnapshot(bool? force = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("force", force);
@@ -3072,7 +3072,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// 
                                 /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject SnapshotCmdIdx()
+                                public dynamic SnapshotCmdIdx()
                                 {
                                     return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}", HttpMethod.Get);
                                 }
@@ -3081,18 +3081,18 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// List all snapshots.
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject SnapshotList()
+                            public dynamic SnapshotList()
                             {
                                 return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/snapshot", HttpMethod.Get);
                             }
                             /// <summary>
                             /// Snapshot a VM.
+                            /// </summary>
                             /// <param name="snapname">The name of the snapshot.</param>
                             /// <param name="description">A textual description or comment.</param>
                             /// <param name="vmstate">Save the vmstate</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Snapshot(string snapname, string description = null, bool? vmstate = null)
+                            public dynamic Snapshot(string snapname, string description = null, bool? vmstate = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("snapname", snapname);
@@ -3113,9 +3113,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Create a Template.
+                            /// </summary>
                             /// <param name="disk">If you want to convert only 1 disk to base image.
                             ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
-                            /// </summary>
                             public void Template(string disk = null)
                             {
                                 var parameters = new Dictionary<string, object>();
@@ -3125,10 +3125,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         }
                         /// <summary>
                         /// Destroy the vm (also delete all used/owned volumes).
-                        /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                         /// </summary>
+                        /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                         /// <returns></returns>
-                        public ExpandoObject DestroyVm(bool? skiplock = null)
+                        public dynamic DestroyVm(bool? skiplock = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("skiplock", skiplock);
@@ -3138,17 +3138,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Directory index
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Vmdiridx()
+                        public dynamic Vmdiridx()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}", HttpMethod.Get);
                         }
                     }
                     /// <summary>
                     /// Virtual machine index (per node).
-                    /// <param name="full">Determine the full status of active VMs.</param>
                     /// </summary>
+                    /// <param name="full">Determine the full status of active VMs.</param>
                     /// <returns></returns>
-                    public ExpandoObject Vmlist(bool? full = null)
+                    public dynamic Vmlist(bool? full = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("full", full);
@@ -3156,6 +3156,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     }
                     /// <summary>
                     /// Create or restore a virtual machine.
+                    /// </summary>
                     /// <param name="vmid">The (unique) ID of the VM.</param>
                     /// <param name="acpi">Enable/disable ACPI.</param>
                     /// <param name="agent">Enable/disable Qemu GuestAgent.</param>
@@ -3224,9 +3225,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     ///   Enum: std,cirrus,vmware,qxl,serial0,serial1,serial2,serial3,qxl2,qxl3,qxl4</param>
                     /// <param name="virtioN">Use volume as VIRTIO hard disk (n is 0 to 15).</param>
                     /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
-                    /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject CreateVm(int vmid, bool? acpi = null, bool? agent = null, string archive = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string watchdog = null)
+                    public dynamic CreateVm(int vmid, bool? acpi = null, bool? agent = null, string archive = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string watchdog = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("vmid", vmid);
@@ -3354,12 +3354,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Get container configuration.
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject VmConfig()
+                            public dynamic VmConfig()
                             {
                                 return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/config", HttpMethod.Get);
                             }
                             /// <summary>
                             /// Set container options.
+                            /// </summary>
                             /// <param name="arch">OS architecture type.
                             ///   Enum: amd64,i386</param>
                             /// <param name="cmode">Console mode. By default, the console command tries to open a connection to one of the available tty devices. By setting cmode to 'console' it tries to attach to /dev/console instead. If you set cmode to 'shell', it simply invokes a shell inside the container (no login).
@@ -3390,7 +3391,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="tty">Specify the number of tty available to the container</param>
                             /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
                             /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
-                            /// </summary>
                             public void UpdateVm(string arch = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string hostname = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, bool? protection = null, string rootfs = null, string searchdomain = null, string startup = null, int? swap = null, bool? template = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
                             {
                                 var parameters = new Dictionary<string, object>();
@@ -3459,7 +3459,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// Get virtual machine status.
                                 /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject VmStatus()
+                                public dynamic VmStatus()
                                 {
                                     return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/status/current", HttpMethod.Get);
                                 }
@@ -3476,10 +3476,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 }
                                 /// <summary>
                                 /// Start the container.
-                                /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// </summary>
+                                /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <returns></returns>
-                                public ExpandoObject VmStart(bool? skiplock = null)
+                                public dynamic VmStart(bool? skiplock = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("skiplock", skiplock);
@@ -3498,10 +3498,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 }
                                 /// <summary>
                                 /// Stop the container. This will abruptly stop all processes running in the container.
-                                /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// </summary>
+                                /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <returns></returns>
-                                public ExpandoObject VmStop(bool? skiplock = null)
+                                public dynamic VmStop(bool? skiplock = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("skiplock", skiplock);
@@ -3520,11 +3520,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 }
                                 /// <summary>
                                 /// Shutdown the container. This will trigger a clean shutdown of the container, see lxc-stop(1) for details.
+                                /// </summary>
                                 /// <param name="forceStop">Make sure the Container stops.</param>
                                 /// <param name="timeout">Wait maximal timeout seconds.</param>
-                                /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject VmShutdown(bool? forceStop = null, int? timeout = null)
+                                public dynamic VmShutdown(bool? forceStop = null, int? timeout = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("forceStop", forceStop);
@@ -3546,7 +3546,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// Suspend the container.
                                 /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject VmSuspend()
+                                public dynamic VmSuspend()
                                 {
                                     return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/status/suspend", HttpMethod.Post);
                                 }
@@ -3565,7 +3565,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// Resume the container.
                                 /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject VmResume()
+                                public dynamic VmResume()
                                 {
                                     return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/status/resume", HttpMethod.Post);
                                 }
@@ -3574,7 +3574,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Directory index
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Vmcmdidx()
+                            public dynamic Vmcmdidx()
                             {
                                 return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/status", HttpMethod.Get);
                             }
@@ -3622,7 +3622,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// Rollback LXC state to specified snapshot.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public ExpandoObject Rollback()
+                                    public dynamic Rollback()
                                     {
                                         return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/rollback", HttpMethod.Post);
                                     }
@@ -3643,14 +3643,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// Get snapshot configuration
                                     /// </summary>
                                     /// <returns></returns>
-                                    public ExpandoObject GetSnapshotConfig()
+                                    public dynamic GetSnapshotConfig()
                                     {
                                         return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config", HttpMethod.Get);
                                     }
                                     /// <summary>
                                     /// Update snapshot metadata.
-                                    /// <param name="description">A textual description or comment.</param>
                                     /// </summary>
+                                    /// <param name="description">A textual description or comment.</param>
                                     public void UpdateSnapshotConfig(string description = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
@@ -3660,10 +3660,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 }
                                 /// <summary>
                                 /// Delete a LXC snapshot.
-                                /// <param name="force">For removal from config file, even if removing disk snapshots fails.</param>
                                 /// </summary>
+                                /// <param name="force">For removal from config file, even if removing disk snapshots fails.</param>
                                 /// <returns></returns>
-                                public ExpandoObject Delsnapshot(bool? force = null)
+                                public dynamic Delsnapshot(bool? force = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("force", force);
@@ -3673,7 +3673,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// 
                                 /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject SnapshotCmdIdx()
+                                public dynamic SnapshotCmdIdx()
                                 {
                                     return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}", HttpMethod.Get);
                                 }
@@ -3682,17 +3682,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// List all snapshots.
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject List()
+                            public dynamic List()
                             {
                                 return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/snapshot", HttpMethod.Get);
                             }
                             /// <summary>
                             /// Snapshot a container.
+                            /// </summary>
                             /// <param name="snapname">The name of the snapshot.</param>
                             /// <param name="description">A textual description or comment.</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Snapshot(string snapname, string description = null)
+                            public dynamic Snapshot(string snapname, string description = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("snapname", snapname);
@@ -3747,8 +3747,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     }
                                     /// <summary>
                                     /// Delete rule.
-                                    /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// </summary>
+                                    /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     public void DeleteRule(string digest = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
@@ -3759,12 +3759,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// Get single rule data.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public ExpandoObject GetRule()
+                                    public dynamic GetRule()
                                     {
                                         return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", HttpMethod.Get);
                                     }
                                     /// <summary>
                                     /// Modify rule data.
+                                    /// </summary>
                                     /// <param name="action">Rule action ('ACCEPT', 'DROP', 'REJECT') or security group name.</param>
                                     /// <param name="comment">Descriptive comment.</param>
                                     /// <param name="delete">A list of settings you want to delete.</param>
@@ -3780,7 +3781,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                                     /// <param name="type">Rule type.
                                     ///   Enum: in,out,group</param>
-                                    /// </summary>
                                     public void UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
@@ -3805,12 +3805,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// List rules.
                                 /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject GetRules()
+                                public dynamic GetRules()
                                 {
                                     return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/rules", HttpMethod.Get);
                                 }
                                 /// <summary>
                                 /// Create new rule.
+                                /// </summary>
                                 /// <param name="action">Rule action ('ACCEPT', 'DROP', 'REJECT') or security group name.</param>
                                 /// <param name="type">Rule type.
                                 ///   Enum: in,out,group</param>
@@ -3825,7 +3826,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                                 /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                                 /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
-                                /// </summary>
                                 public void CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
@@ -3870,8 +3870,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     }
                                     /// <summary>
                                     /// Remove IP or Network alias.
-                                    /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// </summary>
+                                    /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     public void RemoveAlias(string digest = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
@@ -3882,17 +3882,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// Read alias.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public ExpandoObject ReadAlias()
+                                    public dynamic ReadAlias()
                                     {
                                         return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", HttpMethod.Get);
                                     }
                                     /// <summary>
                                     /// Update IP or Network alias.
+                                    /// </summary>
                                     /// <param name="cidr">Network/IP specification in CIDR format.</param>
                                     /// <param name="comment"></param>
                                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// <param name="rename">Rename an existing alias.</param>
-                                    /// </summary>
                                     public void UpdateAlias(string cidr, string comment = null, string digest = null, string rename = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
@@ -3907,16 +3907,16 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// List aliases
                                 /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject GetAliases()
+                                public dynamic GetAliases()
                                 {
                                     return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases", HttpMethod.Get);
                                 }
                                 /// <summary>
                                 /// Create IP or Network Alias.
+                                /// </summary>
                                 /// <param name="cidr">Network/IP specification in CIDR format.</param>
                                 /// <param name="name">Alias name.</param>
                                 /// <param name="comment"></param>
-                                /// </summary>
                                 public void CreateAlias(string cidr, string name, string comment = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
@@ -3966,8 +3966,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         }
                                         /// <summary>
                                         /// Remove IP or Network from IPSet.
-                                        /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                         /// </summary>
+                                        /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                         public void RemoveIp(string digest = null)
                                         {
                                             var parameters = new Dictionary<string, object>();
@@ -3978,16 +3978,16 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         /// Read IP or Network settings from IPSet.
                                         /// </summary>
                                         /// <returns></returns>
-                                        public ExpandoObject ReadIp()
+                                        public dynamic ReadIp()
                                         {
                                             return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Get);
                                         }
                                         /// <summary>
                                         /// Update IP or Network settings
+                                        /// </summary>
                                         /// <param name="comment"></param>
                                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                         /// <param name="nomatch"></param>
-                                        /// </summary>
                                         public void UpdateIp(string comment = null, string digest = null, bool? nomatch = null)
                                         {
                                             var parameters = new Dictionary<string, object>();
@@ -4008,16 +4008,16 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// List IPSet content
                                     /// </summary>
                                     /// <returns></returns>
-                                    public ExpandoObject GetIpset()
+                                    public dynamic GetIpset()
                                     {
                                         return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}", HttpMethod.Get);
                                     }
                                     /// <summary>
                                     /// Add IP or Network to IPSet.
+                                    /// </summary>
                                     /// <param name="cidr">Network/IP specification in CIDR format.</param>
                                     /// <param name="comment"></param>
                                     /// <param name="nomatch"></param>
-                                    /// </summary>
                                     public void CreateIp(string cidr, string comment = null, bool? nomatch = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
@@ -4031,17 +4031,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// List IPSets
                                 /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject IpsetIndex()
+                                public dynamic IpsetIndex()
                                 {
                                     return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset", HttpMethod.Get);
                                 }
                                 /// <summary>
                                 /// Create new IPSet
+                                /// </summary>
                                 /// <param name="name">IP set name.</param>
                                 /// <param name="comment"></param>
                                 /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                 /// <param name="rename">Rename an existing IPSet. You can set 'rename' to the same value as 'name' to update the 'comment' of an existing IPSet.</param>
-                                /// </summary>
                                 public void CreateIpset(string name, string comment = null, string digest = null, string rename = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
@@ -4066,12 +4066,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// Get VM firewall options.
                                 /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject GetOptions()
+                                public dynamic GetOptions()
                                 {
                                     return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/options", HttpMethod.Get);
                                 }
                                 /// <summary>
                                 /// Set Firewall options.
+                                /// </summary>
                                 /// <param name="delete">A list of settings you want to delete.</param>
                                 /// <param name="dhcp">Enable DHCP.</param>
                                 /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
@@ -4088,7 +4089,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <param name="policy_out">Output policy.
                                 ///   Enum: ACCEPT,REJECT,DROP</param>
                                 /// <param name="radv">Allow sending Router Advertisement.</param>
-                                /// </summary>
                                 public void SetOptions(string delete = null, bool? dhcp = null, string digest = null, bool? enable = null, bool? ipfilter = null, string log_level_in = null, string log_level_out = null, bool? macfilter = null, bool? ndp = null, string policy_in = null, string policy_out = null, bool? radv = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
@@ -4119,11 +4119,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 }
                                 /// <summary>
                                 /// Read firewall log
+                                /// </summary>
                                 /// <param name="limit"></param>
                                 /// <param name="start"></param>
-                                /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject Log(int? limit = null, int? start = null)
+                                public dynamic Log(int? limit = null, int? start = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("limit", limit);
@@ -4143,11 +4143,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 }
                                 /// <summary>
                                 /// Lists possible IPSet/Alias reference which are allowed in source/dest properties.
+                                /// </summary>
                                 /// <param name="type">Only list references of specified type.
                                 ///   Enum: alias,ipset</param>
-                                /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject Refs(string type = null)
+                                public dynamic Refs(string type = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("type", type);
@@ -4158,7 +4158,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Directory index.
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Index()
+                            public dynamic Index()
                             {
                                 return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall", HttpMethod.Get);
                             }
@@ -4175,14 +4175,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Read VM RRD statistics (returns PNG)
+                            /// </summary>
                             /// <param name="ds">The list of datasources you want to display.</param>
                             /// <param name="timeframe">Specify the time frame you are interested in.
                             ///   Enum: hour,day,week,month,year</param>
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Rrd(string ds, string timeframe, string cf = null)
+                            public dynamic Rrd(string ds, string timeframe, string cf = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("ds", ds);
@@ -4203,13 +4203,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Read VM RRD statistics
+                            /// </summary>
                             /// <param name="timeframe">Specify the time frame you are interested in.
                             ///   Enum: hour,day,week,month,year</param>
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Rrddata(string timeframe, string cf = null)
+                            public dynamic Rrddata(string timeframe, string cf = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("timeframe", timeframe);
@@ -4229,12 +4229,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Creates a TCP VNC proxy connections.
+                            /// </summary>
                             /// <param name="height">sets the height of the console in pixels.</param>
                             /// <param name="websocket">use websocket instead of standard VNC.</param>
                             /// <param name="width">sets the width of the console in pixels.</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Vncproxy(int? height = null, bool? websocket = null, int? width = null)
+                            public dynamic Vncproxy(int? height = null, bool? websocket = null, int? width = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("height", height);
@@ -4255,11 +4255,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Opens a weksocket for VNC traffic.
+                            /// </summary>
                             /// <param name="port">Port number returned by previous vncproxy call.</param>
                             /// <param name="vncticket">Ticket from previous call to vncproxy.</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Vncwebsocket(int port, string vncticket)
+                            public dynamic Vncwebsocket(int port, string vncticket)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("port", port);
@@ -4279,10 +4279,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Returns a SPICE configuration to connect to the CT.
-                            /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As resonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                             /// </summary>
+                            /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As resonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                             /// <returns></returns>
-                            public ExpandoObject Spiceproxy(string proxy = null)
+                            public dynamic Spiceproxy(string proxy = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("proxy", proxy);
@@ -4301,14 +4301,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Migrate the container to another node. Creates a new migration task.
+                            /// </summary>
                             /// <param name="target">Target node.</param>
                             /// <param name="force">Force migration despite local bind / device mounts. NOTE: deprecated, use 'shared' property of mount point instead.</param>
                             /// <param name="online">Use online/live migration.</param>
                             /// <param name="restart">Use restart migration</param>
                             /// <param name="timeout">Timeout in seconds for shutdown for restart migration</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject MigrateVm(string target, bool? force = null, bool? online = null, bool? restart = null, int? timeout = null)
+                            public dynamic MigrateVm(string target, bool? force = null, bool? online = null, bool? restart = null, int? timeout = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("target", target);
@@ -4331,12 +4331,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Check if feature for virtual machine is available.
+                            /// </summary>
                             /// <param name="feature">Feature to check.
                             ///   Enum: snapshot</param>
                             /// <param name="snapname">The name of the snapshot.</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject VmFeature(string feature, string snapname = null)
+                            public dynamic VmFeature(string feature, string snapname = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("feature", feature);
@@ -4356,8 +4356,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Create a Template.
-                            /// <param name="experimental">The template feature is experimental, set this flag if you know what you are doing.</param>
                             /// </summary>
+                            /// <param name="experimental">The template feature is experimental, set this flag if you know what you are doing.</param>
                             public void Template(bool experimental)
                             {
                                 var parameters = new Dictionary<string, object>();
@@ -4377,6 +4377,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Create a container clone/copy
+                            /// </summary>
                             /// <param name="experimental">The clone feature is experimental, set this flag if you know what you are doing.</param>
                             /// <param name="newid">VMID for the clone.</param>
                             /// <param name="description">Description for the new CT.</param>
@@ -4385,9 +4386,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="pool">Add the new CT to the specified pool.</param>
                             /// <param name="snapname">The name of the snapshot.</param>
                             /// <param name="storage">Target storage for full clone.</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject CloneVm(bool experimental, int newid, string description = null, bool? full = null, string hostname = null, string pool = null, string snapname = null, string storage = null)
+                            public dynamic CloneVm(bool experimental, int newid, string description = null, bool? full = null, string hostname = null, string pool = null, string snapname = null, string storage = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("experimental", experimental);
@@ -4413,13 +4413,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Resize a container mount point.
+                            /// </summary>
                             /// <param name="disk">The disk you want to resize.
                             ///   Enum: rootfs,mp0,mp1,mp2,mp3,mp4,mp5,mp6,mp7,mp8,mp9</param>
                             /// <param name="size">The new size. With the '+' sign the value is added to the actual size of the volume and without it, the value is taken as an absolute one. Shrinking disk size is not supported.</param>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject ResizeVm(string disk, string size, string digest = null)
+                            public dynamic ResizeVm(string disk, string size, string digest = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("disk", disk);
@@ -4432,7 +4432,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Destroy the container (also delete all uses files).
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject DestroyVm()
+                        public dynamic DestroyVm()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}", HttpMethod.Delete);
                         }
@@ -4440,7 +4440,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Directory index
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Vmdiridx()
+                        public dynamic Vmdiridx()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}", HttpMethod.Get);
                         }
@@ -4449,12 +4449,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// LXC container index (per node).
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Vmlist()
+                    public dynamic Vmlist()
                     {
                         return _client.ExecuteAction($"/nodes/{_node}/lxc", HttpMethod.Get);
                     }
                     /// <summary>
                     /// Create or restore a container.
+                    /// </summary>
                     /// <param name="ostemplate">The OS template or backup file.</param>
                     /// <param name="vmid">The (unique) ID of the VM.</param>
                     /// <param name="arch">OS architecture type.
@@ -4492,9 +4493,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="tty">Specify the number of tty available to the container</param>
                     /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
                     /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
-                    /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject CreateVm(string ostemplate, int vmid, string arch = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, string startup = null, string storage = null, int? swap = null, bool? template = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
+                    public dynamic CreateVm(string ostemplate, int vmid, string arch = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, string startup = null, string storage = null, int? swap = null, bool? template = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("ostemplate", ostemplate);
@@ -4626,10 +4626,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Destroy OSD
-                            /// <param name="cleanup">If set, we remove partition table entries.</param>
                             /// </summary>
+                            /// <param name="cleanup">If set, we remove partition table entries.</param>
                             /// <returns></returns>
-                            public ExpandoObject Destroyosd(bool? cleanup = null)
+                            public dynamic Destroyosd(bool? cleanup = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("cleanup", cleanup);
@@ -4640,20 +4640,20 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Get Ceph osd list/tree.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Index()
+                        public dynamic Index()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/ceph/osd", HttpMethod.Get);
                         }
                         /// <summary>
                         /// Create OSD
+                        /// </summary>
                         /// <param name="dev">Block device name.</param>
                         /// <param name="bluestore">Use bluestore instead of filestore.</param>
                         /// <param name="fstype">File system type (filestore only).
                         ///   Enum: xfs,ext4,btrfs</param>
                         /// <param name="journal_dev">Block device name for journal.</param>
-                        /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Createosd(string dev, bool? bluestore = null, string fstype = null, string journal_dev = null)
+                        public dynamic Createosd(string dev, bool? bluestore = null, string fstype = null, string journal_dev = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("dev", dev);
@@ -4673,11 +4673,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         }
                         /// <summary>
                         /// List local disks.
+                        /// </summary>
                         /// <param name="type">Only list specific types of disks.
                         ///   Enum: unused,journal_disks</param>
-                        /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Disks(string type = null)
+                        public dynamic Disks(string type = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("type", type);
@@ -4696,7 +4696,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Get Ceph configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Config()
+                        public dynamic Config()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/ceph/config", HttpMethod.Get);
                         }
@@ -4724,7 +4724,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Destroy Ceph monitor.
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Destroymon()
+                            public dynamic Destroymon()
                             {
                                 return _client.ExecuteAction($"/nodes/{_node}/ceph/mon/{_monid}", HttpMethod.Delete);
                             }
@@ -4733,7 +4733,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Get Ceph monitor list.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Listmon()
+                        public dynamic Listmon()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/ceph/mon", HttpMethod.Get);
                         }
@@ -4741,7 +4741,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Create Ceph Monitor
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Createmon()
+                        public dynamic Createmon()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/ceph/mon", HttpMethod.Post);
                         }
@@ -4756,12 +4756,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         }
                         /// <summary>
                         /// Create initial ceph default configuration and setup symlinks.
+                        /// </summary>
                         /// <param name="disable_cephx">Disable cephx authentification.  WARNING: cephx is a security feature protecting against man-in-the-middle attacks. Only consider disabling cephx if your network is private!</param>
                         /// <param name="min_size">Minimum number of available replicas per object to allow I/O</param>
                         /// <param name="network">Use specific network for all ceph related traffic</param>
                         /// <param name="pg_bits">Placement group bits, used to specify the default number of placement groups.  NOTE: 'osd pool default pg num' does not work for default pools.</param>
                         /// <param name="size">Targeted number of replicas per object</param>
-                        /// </summary>
                         public void Init(bool? disable_cephx = null, int? min_size = null, string network = null, int? pg_bits = null, int? size = null)
                         {
                             var parameters = new Dictionary<string, object>();
@@ -4783,10 +4783,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         }
                         /// <summary>
                         /// Stop ceph services.
-                        /// <param name="service">Ceph service name.</param>
                         /// </summary>
+                        /// <param name="service">Ceph service name.</param>
                         /// <returns></returns>
-                        public ExpandoObject Stop(string service = null)
+                        public dynamic Stop(string service = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("service", service);
@@ -4803,10 +4803,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         }
                         /// <summary>
                         /// Start ceph services.
-                        /// <param name="service">Ceph service name.</param>
                         /// </summary>
+                        /// <param name="service">Ceph service name.</param>
                         /// <returns></returns>
-                        public ExpandoObject Start(string service = null)
+                        public dynamic Start(string service = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("service", service);
@@ -4825,7 +4825,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Get ceph status.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Status()
+                        public dynamic Status()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/ceph/status", HttpMethod.Get);
                         }
@@ -4851,8 +4851,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Destroy pool
-                            /// <param name="force">If true, destroys pool even if in use</param>
                             /// </summary>
+                            /// <param name="force">If true, destroys pool even if in use</param>
                             public void Destroypool(bool? force = null)
                             {
                                 var parameters = new Dictionary<string, object>();
@@ -4864,18 +4864,18 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// List all pools.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Lspools()
+                        public dynamic Lspools()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/ceph/pools", HttpMethod.Get);
                         }
                         /// <summary>
                         /// Create POOL
+                        /// </summary>
                         /// <param name="name">The name of the pool. It must be unique.</param>
                         /// <param name="crush_ruleset">The ruleset to use for mapping object placement in the cluster.</param>
                         /// <param name="min_size">Minimum number of replicas per object</param>
                         /// <param name="pg_num">Number of placement groups.</param>
                         /// <param name="size">Number of replicas per object</param>
-                        /// </summary>
                         public void Createpool(string name, int? crush_ruleset = null, int? min_size = null, int? pg_num = null, int? size = null)
                         {
                             var parameters = new Dictionary<string, object>();
@@ -4925,7 +4925,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// get all set ceph flags
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject GetFlags()
+                        public dynamic GetFlags()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/ceph/flags", HttpMethod.Get);
                         }
@@ -4942,7 +4942,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Get OSD crush map
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Crush()
+                        public dynamic Crush()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/ceph/crush", HttpMethod.Get);
                         }
@@ -4957,11 +4957,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         }
                         /// <summary>
                         /// Read ceph log
+                        /// </summary>
                         /// <param name="limit"></param>
                         /// <param name="start"></param>
-                        /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Log(int? limit = null, int? start = null)
+                        public dynamic Log(int? limit = null, int? start = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("limit", limit);
@@ -4973,7 +4973,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Directory index.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Index()
+                    public dynamic Index()
                     {
                         return _client.ExecuteAction($"/nodes/{_node}/ceph", HttpMethod.Get);
                     }
@@ -4998,10 +4998,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         }
                         /// <summary>
                         /// Extract configuration from vzdump backup archive.
-                        /// <param name="volume">Volume identifier</param>
                         /// </summary>
+                        /// <param name="volume">Volume identifier</param>
                         /// <returns></returns>
-                        public ExpandoObject Extractconfig(string volume)
+                        public dynamic Extractconfig(string volume)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("volume", volume);
@@ -5010,6 +5010,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     }
                     /// <summary>
                     /// Create backup.
+                    /// </summary>
                     /// <param name="all">Backup all known guest systems on this host.</param>
                     /// <param name="bwlimit">Limit I/O bandwidth (KBytes per second).</param>
                     /// <param name="compress">Compress dump file.
@@ -5037,9 +5038,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="storage">Store resulting file to this storage.</param>
                     /// <param name="tmpdir">Store temporary files to specified directory.</param>
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
-                    /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Vzdump(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, int? pigz = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null)
+                    public dynamic Vzdump(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, int? pigz = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("all", all);
@@ -5112,7 +5112,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Read service properties
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject ServiceState()
+                            public dynamic ServiceState()
                             {
                                 return _client.ExecuteAction($"/nodes/{_node}/services/{_service}/state", HttpMethod.Get);
                             }
@@ -5131,7 +5131,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Start service.
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject ServiceStart()
+                            public dynamic ServiceStart()
                             {
                                 return _client.ExecuteAction($"/nodes/{_node}/services/{_service}/start", HttpMethod.Post);
                             }
@@ -5150,7 +5150,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Stop service.
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject ServiceStop()
+                            public dynamic ServiceStop()
                             {
                                 return _client.ExecuteAction($"/nodes/{_node}/services/{_service}/stop", HttpMethod.Post);
                             }
@@ -5169,7 +5169,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Restart service.
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject ServiceRestart()
+                            public dynamic ServiceRestart()
                             {
                                 return _client.ExecuteAction($"/nodes/{_node}/services/{_service}/restart", HttpMethod.Post);
                             }
@@ -5188,7 +5188,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Reload service.
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject ServiceReload()
+                            public dynamic ServiceReload()
                             {
                                 return _client.ExecuteAction($"/nodes/{_node}/services/{_service}/reload", HttpMethod.Post);
                             }
@@ -5197,7 +5197,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Directory index
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Srvcmdidx()
+                        public dynamic Srvcmdidx()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/services/{_service}", HttpMethod.Get);
                         }
@@ -5206,7 +5206,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Service list.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Index()
+                    public dynamic Index()
                     {
                         return _client.ExecuteAction($"/nodes/{_node}/services", HttpMethod.Get);
                     }
@@ -5223,14 +5223,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Read subscription info.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Get()
+                    public dynamic Get()
                     {
                         return _client.ExecuteAction($"/nodes/{_node}/subscription", HttpMethod.Get);
                     }
                     /// <summary>
                     /// Update subscription info.
-                    /// <param name="force">Always connect to server, even if we have up to date info inside local cache.</param>
                     /// </summary>
+                    /// <param name="force">Always connect to server, even if we have up to date info inside local cache.</param>
                     public void Update(bool? force = null)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -5239,8 +5239,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     }
                     /// <summary>
                     /// Set subscription key.
-                    /// <param name="key">Proxmox VE subscription key</param>
                     /// </summary>
+                    /// <param name="key">Proxmox VE subscription key</param>
                     public void Set(string key)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -5278,12 +5278,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Read network device configuration
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject NetworkConfig()
+                        public dynamic NetworkConfig()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/network/{_iface}", HttpMethod.Get);
                         }
                         /// <summary>
                         /// Update network device configuration
+                        /// </summary>
                         /// <param name="type">Network interface type
                         ///   Enum: bridge,bond,eth,alias,vlan,OVSBridge,OVSBond,OVSPort,OVSIntPort,unknown</param>
                         /// <param name="address">IP address.</param>
@@ -5308,7 +5309,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <param name="ovs_ports">Specify the iterfaces you want to add to your bridge.</param>
                         /// <param name="ovs_tag">Specify a VLan tag (used by OVSPort, OVSIntPort, OVSBond)</param>
                         /// <param name="slaves">Specify the interfaces used by the bonding device.</param>
-                        /// </summary>
                         public void UpdateNetwork(string type, string address = null, string address6 = null, bool? autostart = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string comments = null, string comments6 = null, string delete = null, string gateway = null, string gateway6 = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null)
                         {
                             var parameters = new Dictionary<string, object>();
@@ -5345,11 +5345,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     }
                     /// <summary>
                     /// List available networks
+                    /// </summary>
                     /// <param name="type">Only list specific interface types.
                     ///   Enum: bridge,bond,eth,alias,vlan,OVSBridge,OVSBond,OVSPort,OVSIntPort,any_bridge</param>
-                    /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Index(string type = null)
+                    public dynamic Index(string type = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("type", type);
@@ -5357,6 +5357,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     }
                     /// <summary>
                     /// Create network device configuration
+                    /// </summary>
                     /// <param name="iface">Network interface name.</param>
                     /// <param name="type">Network interface type
                     ///   Enum: bridge,bond,eth,alias,vlan,OVSBridge,OVSBond,OVSPort,OVSIntPort,unknown</param>
@@ -5381,7 +5382,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="ovs_ports">Specify the iterfaces you want to add to your bridge.</param>
                     /// <param name="ovs_tag">Specify a VLan tag (used by OVSPort, OVSIntPort, OVSBond)</param>
                     /// <param name="slaves">Specify the interfaces used by the bonding device.</param>
-                    /// </summary>
                     public void CreateNetwork(string iface, string type, string address = null, string address6 = null, bool? autostart = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string comments = null, string comments6 = null, string gateway = null, string gateway6 = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -5444,11 +5444,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Read task log.
+                            /// </summary>
                             /// <param name="limit"></param>
                             /// <param name="start"></param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject ReadTaskLog(int? limit = null, int? start = null)
+                            public dynamic ReadTaskLog(int? limit = null, int? start = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("limit", limit);
@@ -5470,7 +5470,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Read task status.
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject ReadTaskStatus()
+                            public dynamic ReadTaskStatus()
                             {
                                 return _client.ExecuteAction($"/nodes/{_node}/tasks/{_upid}/status", HttpMethod.Get);
                             }
@@ -5486,21 +5486,21 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// 
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject UpidIndex()
+                        public dynamic UpidIndex()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/tasks/{_upid}", HttpMethod.Get);
                         }
                     }
                     /// <summary>
                     /// Read task list for one node (finished tasks).
+                    /// </summary>
                     /// <param name="errors"></param>
                     /// <param name="limit"></param>
                     /// <param name="start"></param>
                     /// <param name="userfilter"></param>
                     /// <param name="vmid">Only list tasks for this VM.</param>
-                    /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject NodeTasks(bool? errors = null, int? limit = null, int? start = null, string userfilter = null, int? vmid = null)
+                    public dynamic NodeTasks(bool? errors = null, int? limit = null, int? start = null, string userfilter = null, int? vmid = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("errors", errors);
@@ -5545,7 +5545,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Scan zfs pool list on local node.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Zfsscan()
+                        public dynamic Zfsscan()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/scan/zfs", HttpMethod.Get);
                         }
@@ -5560,10 +5560,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         }
                         /// <summary>
                         /// Scan remote NFS server.
-                        /// <param name="server"></param>
                         /// </summary>
+                        /// <param name="server"></param>
                         /// <returns></returns>
-                        public ExpandoObject Nfsscan(string server)
+                        public dynamic Nfsscan(string server)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("server", server);
@@ -5580,10 +5580,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         }
                         /// <summary>
                         /// Scan remote GlusterFS server.
-                        /// <param name="server"></param>
                         /// </summary>
+                        /// <param name="server"></param>
                         /// <returns></returns>
-                        public ExpandoObject Glusterfsscan(string server)
+                        public dynamic Glusterfsscan(string server)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("server", server);
@@ -5600,10 +5600,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         }
                         /// <summary>
                         /// Scan remote iSCSI server.
-                        /// <param name="portal"></param>
                         /// </summary>
+                        /// <param name="portal"></param>
                         /// <returns></returns>
-                        public ExpandoObject Iscsiscan(string portal)
+                        public dynamic Iscsiscan(string portal)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("portal", portal);
@@ -5622,7 +5622,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// List local LVM volume groups.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Lvmscan()
+                        public dynamic Lvmscan()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/scan/lvm", HttpMethod.Get);
                         }
@@ -5637,10 +5637,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         }
                         /// <summary>
                         /// List local LVM Thin Pools.
-                        /// <param name="vg"></param>
                         /// </summary>
+                        /// <param name="vg"></param>
                         /// <returns></returns>
-                        public ExpandoObject Lvmthinscan(string vg)
+                        public dynamic Lvmthinscan(string vg)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("vg", vg);
@@ -5659,7 +5659,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// List local USB devices.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Usbscan()
+                        public dynamic Usbscan()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/scan/usb", HttpMethod.Get);
                         }
@@ -5668,7 +5668,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Index of available scan methods
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Index()
+                    public dynamic Index()
                     {
                         return _client.ExecuteAction($"/nodes/{_node}/scan", HttpMethod.Get);
                     }
@@ -5736,17 +5736,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// Get volume attributes
                                 /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject Info()
+                                public dynamic Info()
                                 {
                                     return _client.ExecuteAction($"/nodes/{_node}/storage/{_storage}/content/{_volume}", HttpMethod.Get);
                                 }
                                 /// <summary>
                                 /// Copy a volume. This is experimental code - do not use.
+                                /// </summary>
                                 /// <param name="target">Target volume identifier</param>
                                 /// <param name="target_node">Target node. Default is local node.</param>
-                                /// </summary>
                                 /// <returns></returns>
-                                public ExpandoObject Copy(string target, string target_node = null)
+                                public dynamic Copy(string target, string target_node = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("target", target);
@@ -5756,11 +5756,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// List storage content.
+                            /// </summary>
                             /// <param name="content">Only list content of this type.</param>
                             /// <param name="vmid">Only list images for this VM</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Index(string content = null, int? vmid = null)
+                            public dynamic Index(string content = null, int? vmid = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("content", content);
@@ -5769,14 +5769,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Allocate disk images.
+                            /// </summary>
                             /// <param name="filename">The name of the file to create.</param>
                             /// <param name="size">Size in kilobyte (1024 bytes). Optional suffixes 'M' (megabyte, 1024K) and 'G' (gigabyte, 1024M)</param>
                             /// <param name="vmid">Specify owner VM</param>
                             /// <param name="format">
                             ///   Enum: raw,qcow2,subvol</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Create(string filename, string size, int vmid, string format = null)
+                            public dynamic Create(string filename, string size, int vmid, string format = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("filename", filename);
@@ -5800,7 +5800,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Read storage status.
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject ReadStatus()
+                            public dynamic ReadStatus()
                             {
                                 return _client.ExecuteAction($"/nodes/{_node}/storage/{_storage}/status", HttpMethod.Get);
                             }
@@ -5817,14 +5817,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Read storage RRD statistics (returns PNG).
+                            /// </summary>
                             /// <param name="ds">The list of datasources you want to display.</param>
                             /// <param name="timeframe">Specify the time frame you are interested in.
                             ///   Enum: hour,day,week,month,year</param>
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Rrd(string ds, string timeframe, string cf = null)
+                            public dynamic Rrd(string ds, string timeframe, string cf = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("ds", ds);
@@ -5845,13 +5845,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Read storage RRD statistics.
+                            /// </summary>
                             /// <param name="timeframe">Specify the time frame you are interested in.
                             ///   Enum: hour,day,week,month,year</param>
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Rrddata(string timeframe, string cf = null)
+                            public dynamic Rrddata(string timeframe, string cf = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("timeframe", timeframe);
@@ -5871,12 +5871,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Upload templates and ISO images.
+                            /// </summary>
                             /// <param name="content">Content type.</param>
                             /// <param name="filename">The name of the file to create.</param>
                             /// <param name="tmpfilename">The source file name. This parameter is usually set by the REST handler. You can only overwrite it when connecting to the trustet port on localhost.</param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject Upload(string content, string filename, string tmpfilename = null)
+                            public dynamic Upload(string content, string filename, string tmpfilename = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("content", content);
@@ -5889,20 +5889,20 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// 
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Diridx()
+                        public dynamic Diridx()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/storage/{_storage}", HttpMethod.Get);
                         }
                     }
                     /// <summary>
                     /// Get status for all datastores.
+                    /// </summary>
                     /// <param name="content">Only list stores which support this content type.</param>
                     /// <param name="enabled">Only list stores which are enabled (not disabled in config).</param>
                     /// <param name="storage">Only list status for  specified storage</param>
                     /// <param name="target">If target is different to 'node', we only lists shared storages which content is accessible on this 'node' and the specified 'target' node.</param>
-                    /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Index(string content = null, bool? enabled = null, string storage = null, string target = null)
+                    public dynamic Index(string content = null, bool? enabled = null, string storage = null, string target = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("content", content);
@@ -5938,7 +5938,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// List local disks.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject List()
+                        public dynamic List()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/disks/list", HttpMethod.Get);
                         }
@@ -5953,11 +5953,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         }
                         /// <summary>
                         /// Get SMART Health of a disk.
+                        /// </summary>
                         /// <param name="disk">Block device name</param>
                         /// <param name="healthonly">If true returns only the health status</param>
-                        /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Smart(string disk, bool? healthonly = null)
+                        public dynamic Smart(string disk, bool? healthonly = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("disk", disk);
@@ -5975,11 +5975,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         }
                         /// <summary>
                         /// Initialize Disk with GPT
+                        /// </summary>
                         /// <param name="disk">Block device name</param>
                         /// <param name="uuid">UUID for the GPT table</param>
-                        /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Initgpt(string disk, string uuid = null)
+                        public dynamic Initgpt(string disk, string uuid = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("disk", disk);
@@ -5991,7 +5991,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Node index.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Index()
+                    public dynamic Index()
                     {
                         return _client.ExecuteAction($"/nodes/{_node}/disks", HttpMethod.Get);
                     }
@@ -6022,17 +6022,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// List available updates.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject ListUpdates()
+                        public dynamic ListUpdates()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/apt/update", HttpMethod.Get);
                         }
                         /// <summary>
                         /// This is used to resynchronize the package index files from their sources (apt-get update).
+                        /// </summary>
                         /// <param name="notify">Send notification mail about new packages (to email address specified for user 'root@pam').</param>
                         /// <param name="quiet">Only produces output suitable for logging, omitting progress indicators.</param>
-                        /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject UpdateDatabase(bool? notify = null, bool? quiet = null)
+                        public dynamic UpdateDatabase(bool? notify = null, bool? quiet = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("notify", notify);
@@ -6050,11 +6050,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         }
                         /// <summary>
                         /// Get package changelogs.
+                        /// </summary>
                         /// <param name="name">Package name.</param>
                         /// <param name="version">Package version.</param>
-                        /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Changelog(string name, string version = null)
+                        public dynamic Changelog(string name, string version = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("name", name);
@@ -6074,7 +6074,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Get package information for important Proxmox packages.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Versions()
+                        public dynamic Versions()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/apt/versions", HttpMethod.Get);
                         }
@@ -6083,7 +6083,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Directory index for apt (Advanced Package Tool).
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Index()
+                    public dynamic Index()
                     {
                         return _client.ExecuteAction($"/nodes/{_node}/apt", HttpMethod.Get);
                     }
@@ -6123,8 +6123,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Delete rule.
-                            /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// </summary>
+                            /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             public void DeleteRule(string digest = null)
                             {
                                 var parameters = new Dictionary<string, object>();
@@ -6135,12 +6135,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Get single rule data.
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject GetRule()
+                            public dynamic GetRule()
                             {
                                 return _client.ExecuteAction($"/nodes/{_node}/firewall/rules/{_pos}", HttpMethod.Get);
                             }
                             /// <summary>
                             /// Modify rule data.
+                            /// </summary>
                             /// <param name="action">Rule action ('ACCEPT', 'DROP', 'REJECT') or security group name.</param>
                             /// <param name="comment">Descriptive comment.</param>
                             /// <param name="delete">A list of settings you want to delete.</param>
@@ -6156,7 +6157,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                             /// <param name="type">Rule type.
                             ///   Enum: in,out,group</param>
-                            /// </summary>
                             public void UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
                             {
                                 var parameters = new Dictionary<string, object>();
@@ -6181,12 +6181,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// List rules.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject GetRules()
+                        public dynamic GetRules()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/firewall/rules", HttpMethod.Get);
                         }
                         /// <summary>
                         /// Create new rule.
+                        /// </summary>
                         /// <param name="action">Rule action ('ACCEPT', 'DROP', 'REJECT') or security group name.</param>
                         /// <param name="type">Rule type.
                         ///   Enum: in,out,group</param>
@@ -6201,7 +6202,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                         /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                         /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
-                        /// </summary>
                         public void CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
                         {
                             var parameters = new Dictionary<string, object>();
@@ -6233,12 +6233,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Get host firewall options.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject GetOptions()
+                        public dynamic GetOptions()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/firewall/options", HttpMethod.Get);
                         }
                         /// <summary>
                         /// Set Firewall options.
+                        /// </summary>
                         /// <param name="delete">A list of settings you want to delete.</param>
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         /// <param name="enable">Enable host firewall rules.</param>
@@ -6255,7 +6256,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <param name="tcp_flags_log_level">Log level for illegal tcp flags filter.
                         ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                         /// <param name="tcpflags">Filter illegal combinations of TCP flags.</param>
-                        /// </summary>
                         public void SetOptions(string delete = null, string digest = null, bool? enable = null, string log_level_in = null, string log_level_out = null, bool? ndp = null, int? nf_conntrack_max = null, int? nf_conntrack_tcp_timeout_established = null, bool? nosmurfs = null, string smurf_log_level = null, string tcp_flags_log_level = null, bool? tcpflags = null)
                         {
                             var parameters = new Dictionary<string, object>();
@@ -6284,11 +6284,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         }
                         /// <summary>
                         /// Read firewall log
+                        /// </summary>
                         /// <param name="limit"></param>
                         /// <param name="start"></param>
-                        /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Log(int? limit = null, int? start = null)
+                        public dynamic Log(int? limit = null, int? start = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("limit", limit);
@@ -6300,7 +6300,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Directory index.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Index()
+                    public dynamic Index()
                     {
                         return _client.ExecuteAction($"/nodes/{_node}/firewall", HttpMethod.Get);
                     }
@@ -6344,7 +6344,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Get replication job status.
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject JobStatus()
+                            public dynamic JobStatus()
                             {
                                 return _client.ExecuteAction($"/nodes/{_node}/replication/{_id}/status", HttpMethod.Get);
                             }
@@ -6361,11 +6361,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             }
                             /// <summary>
                             /// Read replication job log.
+                            /// </summary>
                             /// <param name="limit"></param>
                             /// <param name="start"></param>
-                            /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject ReadJobLog(int? limit = null, int? start = null)
+                            public dynamic ReadJobLog(int? limit = null, int? start = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("limit", limit);
@@ -6387,7 +6387,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Schedule replication job to start as soon as possible.
                             /// </summary>
                             /// <returns></returns>
-                            public ExpandoObject ScheduleNow()
+                            public dynamic ScheduleNow()
                             {
                                 return _client.ExecuteAction($"/nodes/{_node}/replication/{_id}/schedule_now", HttpMethod.Post);
                             }
@@ -6396,17 +6396,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Directory index.
                         /// </summary>
                         /// <returns></returns>
-                        public ExpandoObject Index()
+                        public dynamic Index()
                         {
                             return _client.ExecuteAction($"/nodes/{_node}/replication/{_id}", HttpMethod.Get);
                         }
                     }
                     /// <summary>
                     /// List status of all replication jobs on this node.
-                    /// <param name="guest">Only list replication jobs for this guest.</param>
                     /// </summary>
+                    /// <param name="guest">Only list replication jobs for this guest.</param>
                     /// <returns></returns>
-                    public ExpandoObject Status(int? guest = null)
+                    public dynamic Status(int? guest = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("guest", guest);
@@ -6425,7 +6425,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// API version details
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Version()
+                    public dynamic Version()
                     {
                         return _client.ExecuteAction($"/nodes/{_node}/version", HttpMethod.Get);
                     }
@@ -6442,15 +6442,15 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Read node status
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Status()
+                    public dynamic Status()
                     {
                         return _client.ExecuteAction($"/nodes/{_node}/status", HttpMethod.Get);
                     }
                     /// <summary>
                     /// Reboot or shutdown a node.
+                    /// </summary>
                     /// <param name="command">Specify the command.
                     ///   Enum: reboot,shutdown</param>
-                    /// </summary>
                     public void NodeCmd(string command)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -6470,7 +6470,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Read tap/vm network device interface counters
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Netstat()
+                    public dynamic Netstat()
                     {
                         return _client.ExecuteAction($"/nodes/{_node}/netstat", HttpMethod.Get);
                     }
@@ -6485,10 +6485,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     }
                     /// <summary>
                     /// Execute multiple commands in order.
-                    /// <param name="commands">JSON encoded array of commands.</param>
                     /// </summary>
+                    /// <param name="commands">JSON encoded array of commands.</param>
                     /// <returns></returns>
-                    public ExpandoObject Execute(string commands)
+                    public dynamic Execute(string commands)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("commands", commands);
@@ -6505,14 +6505,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     }
                     /// <summary>
                     /// Read node RRD statistics (returns PNG)
+                    /// </summary>
                     /// <param name="ds">The list of datasources you want to display.</param>
                     /// <param name="timeframe">Specify the time frame you are interested in.
                     ///   Enum: hour,day,week,month,year</param>
                     /// <param name="cf">The RRD consolidation function
                     ///   Enum: AVERAGE,MAX</param>
-                    /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Rrd(string ds, string timeframe, string cf = null)
+                    public dynamic Rrd(string ds, string timeframe, string cf = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("ds", ds);
@@ -6531,13 +6531,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     }
                     /// <summary>
                     /// Read node RRD statistics
+                    /// </summary>
                     /// <param name="timeframe">Specify the time frame you are interested in.
                     ///   Enum: hour,day,week,month,year</param>
                     /// <param name="cf">The RRD consolidation function
                     ///   Enum: AVERAGE,MAX</param>
-                    /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Rrddata(string timeframe, string cf = null)
+                    public dynamic Rrddata(string timeframe, string cf = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("timeframe", timeframe);
@@ -6555,13 +6555,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     }
                     /// <summary>
                     /// Read system log
+                    /// </summary>
                     /// <param name="limit"></param>
                     /// <param name="since">Display all log since this date-time string.</param>
                     /// <param name="start"></param>
                     /// <param name="until">Display all log until this date-time string.</param>
-                    /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Syslog(int? limit = null, string since = null, int? start = null, string until = null)
+                    public dynamic Syslog(int? limit = null, string since = null, int? start = null, string until = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("limit", limit);
@@ -6581,13 +6581,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     }
                     /// <summary>
                     /// Creates a VNC Shell proxy.
+                    /// </summary>
                     /// <param name="height">sets the height of the console in pixels.</param>
                     /// <param name="upgrade">Run 'apt-get dist-upgrade' instead of normal shell.</param>
                     /// <param name="websocket">use websocket instead of standard vnc.</param>
                     /// <param name="width">sets the width of the console in pixels.</param>
-                    /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Vncshell(int? height = null, bool? upgrade = null, bool? websocket = null, int? width = null)
+                    public dynamic Vncshell(int? height = null, bool? upgrade = null, bool? websocket = null, int? width = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("height", height);
@@ -6607,11 +6607,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     }
                     /// <summary>
                     /// Opens a weksocket for VNC traffic.
+                    /// </summary>
                     /// <param name="port">Port number returned by previous vncproxy call.</param>
                     /// <param name="vncticket">Ticket from previous call to vncproxy.</param>
-                    /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Vncwebsocket(int port, string vncticket)
+                    public dynamic Vncwebsocket(int port, string vncticket)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("port", port);
@@ -6629,11 +6629,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     }
                     /// <summary>
                     /// Creates a SPICE shell.
+                    /// </summary>
                     /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As resonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                     /// <param name="upgrade">Run 'apt-get dist-upgrade' instead of normal shell.</param>
-                    /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Spiceshell(string proxy = null, bool? upgrade = null)
+                    public dynamic Spiceshell(string proxy = null, bool? upgrade = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("proxy", proxy);
@@ -6653,17 +6653,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Read DNS settings.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Dns()
+                    public dynamic Dns()
                     {
                         return _client.ExecuteAction($"/nodes/{_node}/dns", HttpMethod.Get);
                     }
                     /// <summary>
                     /// Write DNS settings.
+                    /// </summary>
                     /// <param name="search">Search domain for host-name lookup.</param>
                     /// <param name="dns1">First name server IP address.</param>
                     /// <param name="dns2">Second name server IP address.</param>
                     /// <param name="dns3">Third name server IP address.</param>
-                    /// </summary>
                     public void UpdateDns(string search, string dns1 = null, string dns2 = null, string dns3 = null)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -6686,14 +6686,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Read server time and time zone settings.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Time()
+                    public dynamic Time()
                     {
                         return _client.ExecuteAction($"/nodes/{_node}/time", HttpMethod.Get);
                     }
                     /// <summary>
                     /// Set time zone.
-                    /// <param name="timezone">Time zone. The file '/usr/share/zoneinfo/zone.tab' contains the list of valid names.</param>
                     /// </summary>
+                    /// <param name="timezone">Time zone. The file '/usr/share/zoneinfo/zone.tab' contains the list of valid names.</param>
                     public void SetTimezone(string timezone)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -6713,17 +6713,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Get list of appliances.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Aplinfo()
+                    public dynamic Aplinfo()
                     {
                         return _client.ExecuteAction($"/nodes/{_node}/aplinfo", HttpMethod.Get);
                     }
                     /// <summary>
                     /// Download appliance templates.
+                    /// </summary>
                     /// <param name="storage">The storage where the template will be stored</param>
                     /// <param name="template">The template wich will downloaded</param>
-                    /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject AplDownload(string storage, string template)
+                    public dynamic AplDownload(string storage, string template)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("storage", storage);
@@ -6743,7 +6743,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Gather various systems information about a node
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Report()
+                    public dynamic Report()
                     {
                         return _client.ExecuteAction($"/nodes/{_node}/report", HttpMethod.Get);
                     }
@@ -6758,11 +6758,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     }
                     /// <summary>
                     /// Start all VMs and containers (when onboot=1).
+                    /// </summary>
                     /// <param name="force">force if onboot=0.</param>
                     /// <param name="vms">Only consider Guests with these IDs.</param>
-                    /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Startall(bool? force = null, string vms = null)
+                    public dynamic Startall(bool? force = null, string vms = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("force", force);
@@ -6780,10 +6780,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     }
                     /// <summary>
                     /// Stop all VMs and Containers.
-                    /// <param name="vms">Only consider Guests with these IDs.</param>
                     /// </summary>
+                    /// <param name="vms">Only consider Guests with these IDs.</param>
                     /// <returns></returns>
-                    public ExpandoObject Stopall(string vms = null)
+                    public dynamic Stopall(string vms = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("vms", vms);
@@ -6800,12 +6800,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     }
                     /// <summary>
                     /// Migrate all VMs and Containers.
+                    /// </summary>
                     /// <param name="target">Target node.</param>
                     /// <param name="maxworkers">Maximal number of parallel migration job. If not set use 'max_workers' from datacenter.cfg, one of both must be set!</param>
                     /// <param name="vms">Only consider Guests with these IDs.</param>
-                    /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Migrateall(string target, int? maxworkers = null, string vms = null)
+                    public dynamic Migrateall(string target, int? maxworkers = null, string vms = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("target", target);
@@ -6818,7 +6818,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// Node index.
                 /// </summary>
                 /// <returns></returns>
-                public ExpandoObject Index()
+                public dynamic Index()
                 {
                     return _client.ExecuteAction($"/nodes/{_node}", HttpMethod.Get);
                 }
@@ -6827,7 +6827,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// Cluster node index.
             /// </summary>
             /// <returns></returns>
-            public ExpandoObject Index()
+            public dynamic Index()
             {
                 return _client.ExecuteAction($"/nodes", HttpMethod.Get);
             }
@@ -6858,12 +6858,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// Read storage configuration.
                 /// </summary>
                 /// <returns></returns>
-                public ExpandoObject Read()
+                public dynamic Read()
                 {
                     return _client.ExecuteAction($"/storage/{_storage}", HttpMethod.Get);
                 }
                 /// <summary>
                 /// Update storage configuration.
+                /// </summary>
                 /// <param name="blocksize">block size</param>
                 /// <param name="comstar_hg">host group for comstar views</param>
                 /// <param name="comstar_tg">target group for comstar views</param>
@@ -6891,7 +6892,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="transport">Gluster transport: tcp or rdma
                 ///   Enum: tcp,rdma,unix</param>
                 /// <param name="username">RBD Id.</param>
-                /// </summary>
                 public void Update(string blocksize = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string format = null, bool? is_mountpoint = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string nodes = null, bool? nowritecache = null, string options = null, string pool = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, bool? sparse = null, bool? tagged_only = null, string transport = null, string username = null)
                 {
                     var parameters = new Dictionary<string, object>();
@@ -6926,11 +6926,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
             }
             /// <summary>
             /// Storage index.
+            /// </summary>
             /// <param name="type">Only list storage of specific type
             ///   Enum: dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
-            /// </summary>
             /// <returns></returns>
-            public ExpandoObject Index(string type = null)
+            public dynamic Index(string type = null)
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("type", type);
@@ -6938,6 +6938,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             }
             /// <summary>
             /// Create a new storage.
+            /// </summary>
             /// <param name="storage">The storage identifier.</param>
             /// <param name="type">Storage type.
             ///   Enum: dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
@@ -6977,7 +6978,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <param name="username">RBD Id.</param>
             /// <param name="vgname">Volume group name.</param>
             /// <param name="volume">Glusterfs Volume.</param>
-            /// </summary>
             public void Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string comstar_hg = null, string comstar_tg = null, string content = null, bool? disable = null, string export = null, string format = null, bool? is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, bool? sparse = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null)
             {
                 var parameters = new Dictionary<string, object>();
@@ -7067,12 +7067,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Get user configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject ReadUser()
+                    public dynamic ReadUser()
                     {
                         return _client.ExecuteAction($"/access/users/{_userid}", HttpMethod.Get);
                     }
                     /// <summary>
                     /// Update user configuration.
+                    /// </summary>
                     /// <param name="append"></param>
                     /// <param name="comment"></param>
                     /// <param name="email"></param>
@@ -7082,7 +7083,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="groups"></param>
                     /// <param name="keys">Keys for two factor auth (yubico).</param>
                     /// <param name="lastname"></param>
-                    /// </summary>
                     public void UpdateUser(bool? append = null, string comment = null, string email = null, bool? enable = null, int? expire = null, string firstname = null, string groups = null, string keys = null, string lastname = null)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -7100,10 +7100,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 }
                 /// <summary>
                 /// User index.
-                /// <param name="enabled">Optional filter for enable property.</param>
                 /// </summary>
+                /// <param name="enabled">Optional filter for enable property.</param>
                 /// <returns></returns>
-                public ExpandoObject Index(bool? enabled = null)
+                public dynamic Index(bool? enabled = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("enabled", enabled);
@@ -7111,6 +7111,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 }
                 /// <summary>
                 /// Create new user.
+                /// </summary>
                 /// <param name="userid">User ID</param>
                 /// <param name="comment"></param>
                 /// <param name="email"></param>
@@ -7121,7 +7122,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="keys">Keys for two factor auth (yubico).</param>
                 /// <param name="lastname"></param>
                 /// <param name="password">Initial password.</param>
-                /// </summary>
                 public void CreateUser(string userid, string comment = null, string email = null, bool? enable = null, int? expire = null, string firstname = null, string groups = null, string keys = null, string lastname = null, string password = null)
                 {
                     var parameters = new Dictionary<string, object>();
@@ -7164,14 +7164,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Get group configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject ReadGroup()
+                    public dynamic ReadGroup()
                     {
                         return _client.ExecuteAction($"/access/groups/{_groupid}", HttpMethod.Get);
                     }
                     /// <summary>
                     /// Update group data.
-                    /// <param name="comment"></param>
                     /// </summary>
+                    /// <param name="comment"></param>
                     public void UpdateGroup(string comment = null)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -7183,15 +7183,15 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// Group index.
                 /// </summary>
                 /// <returns></returns>
-                public ExpandoObject Index()
+                public dynamic Index()
                 {
                     return _client.ExecuteAction($"/access/groups", HttpMethod.Get);
                 }
                 /// <summary>
                 /// Create new group.
+                /// </summary>
                 /// <param name="groupid"></param>
                 /// <param name="comment"></param>
-                /// </summary>
                 public void CreateGroup(string groupid, string comment = null)
                 {
                     var parameters = new Dictionary<string, object>();
@@ -7226,15 +7226,15 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Get role configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject ReadRole()
+                    public dynamic ReadRole()
                     {
                         return _client.ExecuteAction($"/access/roles/{_roleid}", HttpMethod.Get);
                     }
                     /// <summary>
                     /// Create new role.
+                    /// </summary>
                     /// <param name="privs"></param>
                     /// <param name="append"></param>
-                    /// </summary>
                     public void UpdateRole(string privs, bool? append = null)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -7247,15 +7247,15 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// Role index.
                 /// </summary>
                 /// <returns></returns>
-                public ExpandoObject Index()
+                public dynamic Index()
                 {
                     return _client.ExecuteAction($"/access/roles", HttpMethod.Get);
                 }
                 /// <summary>
                 /// Create new role.
+                /// </summary>
                 /// <param name="roleid"></param>
                 /// <param name="privs"></param>
-                /// </summary>
                 public void CreateRole(string roleid, string privs = null)
                 {
                     var parameters = new Dictionary<string, object>();
@@ -7274,19 +7274,19 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// Get Access Control List (ACLs).
                 /// </summary>
                 /// <returns></returns>
-                public ExpandoObject ReadAcl()
+                public dynamic ReadAcl()
                 {
                     return _client.ExecuteAction($"/access/acl", HttpMethod.Get);
                 }
                 /// <summary>
                 /// Update Access Control List (add or remove permissions).
+                /// </summary>
                 /// <param name="path">Access control path</param>
                 /// <param name="roles">List of roles.</param>
                 /// <param name="delete">Remove permissions (instead of adding it).</param>
                 /// <param name="groups">List of groups.</param>
                 /// <param name="propagate">Allow to propagate (inherit) permissions.</param>
                 /// <param name="users">List of users.</param>
-                /// </summary>
                 public void UpdateAcl(string path, string roles, bool? delete = null, string groups = null, bool? propagate = null, string users = null)
                 {
                     var parameters = new Dictionary<string, object>();
@@ -7325,12 +7325,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Get auth server configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public ExpandoObject Read()
+                    public dynamic Read()
                     {
                         return _client.ExecuteAction($"/access/domains/{_realm}", HttpMethod.Get);
                     }
                     /// <summary>
                     /// Update authentication server settings.
+                    /// </summary>
                     /// <param name="base_dn">LDAP base domain name</param>
                     /// <param name="bind_dn">LDAP bind domain name</param>
                     /// <param name="comment">Description.</param>
@@ -7344,7 +7345,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="server2">Fallback Server IP address (or DNS name)</param>
                     /// <param name="tfa">Use Two-factor authentication.</param>
                     /// <param name="user_attr">LDAP user attribute name</param>
-                    /// </summary>
                     public void Update(string base_dn = null, string bind_dn = null, string comment = null, bool? default_ = null, string delete = null, string digest = null, string domain = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string tfa = null, string user_attr = null)
                     {
                         var parameters = new Dictionary<string, object>();
@@ -7368,12 +7368,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// Authentication domain index.
                 /// </summary>
                 /// <returns></returns>
-                public ExpandoObject Index()
+                public dynamic Index()
                 {
                     return _client.ExecuteAction($"/access/domains", HttpMethod.Get);
                 }
                 /// <summary>
                 /// Add an authentication server.
+                /// </summary>
                 /// <param name="realm">Authentication domain ID</param>
                 /// <param name="type">Realm type.
                 ///   Enum: ad,ldap,pam,pve</param>
@@ -7388,7 +7389,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="server2">Fallback Server IP address (or DNS name)</param>
                 /// <param name="tfa">Use Two-factor authentication.</param>
                 /// <param name="user_attr">LDAP user attribute name</param>
-                /// </summary>
                 public void Create(string realm, string type, string base_dn = null, string bind_dn = null, string comment = null, bool? default_ = null, string domain = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string tfa = null, string user_attr = null)
                 {
                     var parameters = new Dictionary<string, object>();
@@ -7423,15 +7423,15 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 }
                 /// <summary>
                 /// Create or verify authentication ticket.
+                /// </summary>
                 /// <param name="password">The secret password. This can also be a valid ticket.</param>
                 /// <param name="username">User name</param>
                 /// <param name="otp">One-time password for Two-factor authentication.</param>
                 /// <param name="path">Verify ticket, and check if user have access 'privs' on 'path'</param>
                 /// <param name="privs">Verify ticket, and check if user have access 'privs' on 'path'</param>
                 /// <param name="realm">You can optionally pass the realm using this parameter. Normally the realm is simply added to the username &amp;lt;username&amp;gt;@&amp;lt;relam&amp;gt;.</param>
-                /// </summary>
                 /// <returns></returns>
-                public ExpandoObject CreateTicket(string password, string username, string otp = null, string path = null, string privs = null, string realm = null)
+                public dynamic CreateTicket(string password, string username, string otp = null, string path = null, string privs = null, string realm = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("password", password);
@@ -7451,9 +7451,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 }
                 /// <summary>
                 /// Change user password.
+                /// </summary>
                 /// <param name="password">The new password.</param>
                 /// <param name="userid">User ID</param>
-                /// </summary>
                 public void ChangePasssword(string password, string userid)
                 {
                     var parameters = new Dictionary<string, object>();
@@ -7466,7 +7466,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// Directory index.
             /// </summary>
             /// <returns></returns>
-            public ExpandoObject Index()
+            public dynamic Index()
             {
                 return _client.ExecuteAction($"/access", HttpMethod.Get);
             }
@@ -7497,17 +7497,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// Get pool configuration.
                 /// </summary>
                 /// <returns></returns>
-                public ExpandoObject ReadPool()
+                public dynamic ReadPool()
                 {
                     return _client.ExecuteAction($"/pools/{_poolid}", HttpMethod.Get);
                 }
                 /// <summary>
                 /// Update pool data.
+                /// </summary>
                 /// <param name="comment"></param>
                 /// <param name="delete">Remove vms/storage (instead of adding it).</param>
                 /// <param name="storage">List of storage IDs.</param>
                 /// <param name="vms">List of virtual machines.</param>
-                /// </summary>
                 public void UpdatePool(string comment = null, bool? delete = null, string storage = null, string vms = null)
                 {
                     var parameters = new Dictionary<string, object>();
@@ -7522,15 +7522,15 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// Pool index.
             /// </summary>
             /// <returns></returns>
-            public ExpandoObject Index()
+            public dynamic Index()
             {
                 return _client.ExecuteAction($"/pools", HttpMethod.Get);
             }
             /// <summary>
             /// Create new pool.
+            /// </summary>
             /// <param name="poolid"></param>
             /// <param name="comment"></param>
-            /// </summary>
             public void CreatePool(string poolid, string comment = null)
             {
                 var parameters = new Dictionary<string, object>();
@@ -7549,7 +7549,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// API version details. The result also includes the global datacenter confguration.
             /// </summary>
             /// <returns></returns>
-            public ExpandoObject Version()
+            public dynamic Version()
             {
                 return _client.ExecuteAction($"/version", HttpMethod.Get);
             }

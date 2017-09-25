@@ -20,7 +20,7 @@ ProxmoVE Client API .Net
 The client is generated from a JSON Api on ProxmoxVE. 
 
 # Result
-The result is [ExpandoObject](https://msdn.microsoft.com/en-US/library/system.dynamic.expandoobject(v=vs.110).aspx) and  contains more property:
+The result is dynamic [ExpandoObject](https://msdn.microsoft.com/en-US/library/system.dynamic.expandoobject(v=vs.110).aspx) and  contains more property:
 - returned from ProxmoxVE (data,errors,...) 
 - **InError** (bool) : Contains errors.
 - **Response** (ExpandoObject): response Http request.
@@ -100,8 +100,7 @@ if (client.Login("root", "password"))
     vm.Snapshot["pippo2311"].Delsnapshot();
 
     //list of snapshot 
-    dynamic snapshots = vm.Snapshot.SnapshotList();
-    foreach (dynamic snapshot in snapshots.data)
+    foreach (dynamic snapshot in vm.Snapshot.SnapshotList().data)
     {
         Console.WriteLine(Client.ObjectToJson(snapshot));
         Console.WriteLine(snapshot.name);
