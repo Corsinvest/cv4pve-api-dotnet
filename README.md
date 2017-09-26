@@ -19,6 +19,26 @@ ProxmoVE Client API .Net
 # General
 The client is generated from a JSON Api on ProxmoxVE. 
 
+#Main features
+* Easy to learn
+* Method named
+* Full method generated from documentation
+* Comment any method and parameters
+* Parameters indexed eg [n] is structured in array index and value
+* Tree structure
+  * client.Nodes["pve1"].Qemu[100].Snapshot().snapshotList()->data
+* Return data proxmox
+* Return result status
+  * StatusCode
+  * ReasonPhrase
+* Method directry access
+  * Get
+  * Post
+  * Put
+  * Delete
+* login return bool if access
+* return dynamix ExpandoObject
+
 # Result
 The result is dynamic [ExpandoObject](https://msdn.microsoft.com/en-US/library/system.dynamic.expandoobject(v=vs.110).aspx) and  contains more property:
 - returned from ProxmoxVE (data,errors,...) 

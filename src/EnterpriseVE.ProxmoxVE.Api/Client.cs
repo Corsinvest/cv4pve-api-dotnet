@@ -70,19 +70,19 @@ namespace EnterpriseVE.ProxmoxVE.Api
             }
             return Login(userName, password, realm);
         }
-        public ExpandoObject Get(string resource, IDictionary<string, object> parameters = null)
+        public dynamic Get(string resource, IDictionary<string, object> parameters = null)
         {
             return ExecuteAction(resource, HttpMethod.Get, parameters);
         }
-        public ExpandoObject Post(string resource, IDictionary<string, object> parameters = null)
+        public dynamic Post(string resource, IDictionary<string, object> parameters = null)
         {
             return ExecuteAction(resource, HttpMethod.Post, parameters);
         }
-        public ExpandoObject Put(string resource, IDictionary<string, object> parameters = null)
+        public dynamic Put(string resource, IDictionary<string, object> parameters = null)
         {
             return ExecuteAction(resource, HttpMethod.Put, parameters);
         }
-        public ExpandoObject Delete(string resource, IDictionary<string, object> parameters = null)
+        public dynamic Delete(string resource, IDictionary<string, object> parameters = null)
         {
             return ExecuteAction(resource, HttpMethod.Delete, parameters);
         }
@@ -207,7 +207,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("force", force);
                         parameters.Add("keep", keep);
-                        _client.ExecuteAction($"/cluster/replication/{_id}", HttpMethod.Delete, parameters);
+                        _client.Delete($"/cluster/replication/{_id}", parameters);
                     }
                     /// <summary>
                     /// Read replication job configuration.
@@ -215,7 +215,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Read()
                     {
-                        return _client.ExecuteAction($"/cluster/replication/{_id}", HttpMethod.Get);
+                        return _client.Get($"/cluster/replication/{_id}");
                     }
                     /// <summary>
                     /// Update replication job configuration.
@@ -238,7 +238,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("rate", rate);
                         parameters.Add("remove_job", remove_job);
                         parameters.Add("schedule", schedule);
-                        _client.ExecuteAction($"/cluster/replication/{_id}", HttpMethod.Put, parameters);
+                        _client.Put($"/cluster/replication/{_id}", parameters);
                     }
                 }
                 /// <summary>
@@ -247,7 +247,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <returns></returns>
                 public dynamic Index()
                 {
-                    return _client.ExecuteAction($"/cluster/replication", HttpMethod.Get);
+                    return _client.Get($"/cluster/replication");
                 }
                 /// <summary>
                 /// Create a new replication job
@@ -273,7 +273,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("rate", rate);
                     parameters.Add("remove_job", remove_job);
                     parameters.Add("schedule", schedule);
-                    _client.ExecuteAction($"/cluster/replication", HttpMethod.Post, parameters);
+                    _client.Post($"/cluster/replication", parameters);
                 }
             }
             public class PVEConfig : Base
@@ -298,7 +298,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Nodes()
                     {
-                        return _client.ExecuteAction($"/cluster/config/nodes", HttpMethod.Get);
+                        return _client.Get($"/cluster/config/nodes");
                     }
                 }
                 public class PVETotem : Base
@@ -313,7 +313,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Totem()
                     {
-                        return _client.ExecuteAction($"/cluster/config/totem", HttpMethod.Get);
+                        return _client.Get($"/cluster/config/totem");
                     }
                 }
                 /// <summary>
@@ -322,7 +322,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <returns></returns>
                 public dynamic Index()
                 {
-                    return _client.ExecuteAction($"/cluster/config", HttpMethod.Get);
+                    return _client.Get($"/cluster/config");
                 }
             }
             public class PVEFirewall : Base
@@ -379,7 +379,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("digest", digest);
-                                _client.ExecuteAction($"/cluster/firewall/groups/{_group}/{_pos}", HttpMethod.Delete, parameters);
+                                _client.Delete($"/cluster/firewall/groups/{_group}/{_pos}", parameters);
                             }
                             /// <summary>
                             /// Get single rule data.
@@ -387,7 +387,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic GetRule()
                             {
-                                return _client.ExecuteAction($"/cluster/firewall/groups/{_group}/{_pos}", HttpMethod.Get);
+                                return _client.Get($"/cluster/firewall/groups/{_group}/{_pos}");
                             }
                             /// <summary>
                             /// Modify rule data.
@@ -424,7 +424,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("source", source);
                                 parameters.Add("sport", sport);
                                 parameters.Add("type", type);
-                                _client.ExecuteAction($"/cluster/firewall/groups/{_group}/{_pos}", HttpMethod.Put, parameters);
+                                _client.Put($"/cluster/firewall/groups/{_group}/{_pos}", parameters);
                             }
                         }
                         /// <summary>
@@ -432,7 +432,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// </summary>
                         public void DeleteSecurityGroup()
                         {
-                            _client.ExecuteAction($"/cluster/firewall/groups/{_group}", HttpMethod.Delete);
+                            _client.Delete($"/cluster/firewall/groups/{_group}");
                         }
                         /// <summary>
                         /// List rules.
@@ -440,7 +440,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic GetRules()
                         {
-                            return _client.ExecuteAction($"/cluster/firewall/groups/{_group}", HttpMethod.Get);
+                            return _client.Get($"/cluster/firewall/groups/{_group}");
                         }
                         /// <summary>
                         /// Create new rule.
@@ -475,7 +475,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("proto", proto);
                             parameters.Add("source", source);
                             parameters.Add("sport", sport);
-                            _client.ExecuteAction($"/cluster/firewall/groups/{_group}", HttpMethod.Post, parameters);
+                            _client.Post($"/cluster/firewall/groups/{_group}", parameters);
                         }
                     }
                     /// <summary>
@@ -484,7 +484,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic ListSecurityGroups()
                     {
-                        return _client.ExecuteAction($"/cluster/firewall/groups", HttpMethod.Get);
+                        return _client.Get($"/cluster/firewall/groups");
                     }
                     /// <summary>
                     /// Create new security group.
@@ -500,7 +500,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("comment", comment);
                         parameters.Add("digest", digest);
                         parameters.Add("rename", rename);
-                        _client.ExecuteAction($"/cluster/firewall/groups", HttpMethod.Post, parameters);
+                        _client.Post($"/cluster/firewall/groups", parameters);
                     }
                 }
                 public class PVERules : Base
@@ -526,7 +526,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("digest", digest);
-                            _client.ExecuteAction($"/cluster/firewall/rules/{_pos}", HttpMethod.Delete, parameters);
+                            _client.Delete($"/cluster/firewall/rules/{_pos}", parameters);
                         }
                         /// <summary>
                         /// Get single rule data.
@@ -534,7 +534,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic GetRule()
                         {
-                            return _client.ExecuteAction($"/cluster/firewall/rules/{_pos}", HttpMethod.Get);
+                            return _client.Get($"/cluster/firewall/rules/{_pos}");
                         }
                         /// <summary>
                         /// Modify rule data.
@@ -571,7 +571,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("source", source);
                             parameters.Add("sport", sport);
                             parameters.Add("type", type);
-                            _client.ExecuteAction($"/cluster/firewall/rules/{_pos}", HttpMethod.Put, parameters);
+                            _client.Put($"/cluster/firewall/rules/{_pos}", parameters);
                         }
                     }
                     /// <summary>
@@ -580,7 +580,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic GetRules()
                     {
-                        return _client.ExecuteAction($"/cluster/firewall/rules", HttpMethod.Get);
+                        return _client.Get($"/cluster/firewall/rules");
                     }
                     /// <summary>
                     /// Create new rule.
@@ -615,7 +615,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("proto", proto);
                         parameters.Add("source", source);
                         parameters.Add("sport", sport);
-                        _client.ExecuteAction($"/cluster/firewall/rules", HttpMethod.Post, parameters);
+                        _client.Post($"/cluster/firewall/rules", parameters);
                     }
                 }
                 public class PVEIpset : Base
@@ -652,7 +652,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("digest", digest);
-                                _client.ExecuteAction($"/cluster/firewall/ipset/{_name}/{_cidr}", HttpMethod.Delete, parameters);
+                                _client.Delete($"/cluster/firewall/ipset/{_name}/{_cidr}", parameters);
                             }
                             /// <summary>
                             /// Read IP or Network settings from IPSet.
@@ -660,7 +660,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic ReadIp()
                             {
-                                return _client.ExecuteAction($"/cluster/firewall/ipset/{_name}/{_cidr}", HttpMethod.Get);
+                                return _client.Get($"/cluster/firewall/ipset/{_name}/{_cidr}");
                             }
                             /// <summary>
                             /// Update IP or Network settings
@@ -674,7 +674,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("comment", comment);
                                 parameters.Add("digest", digest);
                                 parameters.Add("nomatch", nomatch);
-                                _client.ExecuteAction($"/cluster/firewall/ipset/{_name}/{_cidr}", HttpMethod.Put, parameters);
+                                _client.Put($"/cluster/firewall/ipset/{_name}/{_cidr}", parameters);
                             }
                         }
                         /// <summary>
@@ -682,7 +682,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// </summary>
                         public void DeleteIpset()
                         {
-                            _client.ExecuteAction($"/cluster/firewall/ipset/{_name}", HttpMethod.Delete);
+                            _client.Delete($"/cluster/firewall/ipset/{_name}");
                         }
                         /// <summary>
                         /// List IPSet content
@@ -690,7 +690,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic GetIpset()
                         {
-                            return _client.ExecuteAction($"/cluster/firewall/ipset/{_name}", HttpMethod.Get);
+                            return _client.Get($"/cluster/firewall/ipset/{_name}");
                         }
                         /// <summary>
                         /// Add IP or Network to IPSet.
@@ -704,7 +704,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("cidr", cidr);
                             parameters.Add("comment", comment);
                             parameters.Add("nomatch", nomatch);
-                            _client.ExecuteAction($"/cluster/firewall/ipset/{_name}", HttpMethod.Post, parameters);
+                            _client.Post($"/cluster/firewall/ipset/{_name}", parameters);
                         }
                     }
                     /// <summary>
@@ -713,7 +713,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic IpsetIndex()
                     {
-                        return _client.ExecuteAction($"/cluster/firewall/ipset", HttpMethod.Get);
+                        return _client.Get($"/cluster/firewall/ipset");
                     }
                     /// <summary>
                     /// Create new IPSet
@@ -729,7 +729,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("comment", comment);
                         parameters.Add("digest", digest);
                         parameters.Add("rename", rename);
-                        _client.ExecuteAction($"/cluster/firewall/ipset", HttpMethod.Post, parameters);
+                        _client.Post($"/cluster/firewall/ipset", parameters);
                     }
                 }
                 public class PVEAliases : Base
@@ -755,7 +755,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("digest", digest);
-                            _client.ExecuteAction($"/cluster/firewall/aliases/{_name}", HttpMethod.Delete, parameters);
+                            _client.Delete($"/cluster/firewall/aliases/{_name}", parameters);
                         }
                         /// <summary>
                         /// Read alias.
@@ -763,7 +763,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic ReadAlias()
                         {
-                            return _client.ExecuteAction($"/cluster/firewall/aliases/{_name}", HttpMethod.Get);
+                            return _client.Get($"/cluster/firewall/aliases/{_name}");
                         }
                         /// <summary>
                         /// Update IP or Network alias.
@@ -779,7 +779,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("comment", comment);
                             parameters.Add("digest", digest);
                             parameters.Add("rename", rename);
-                            _client.ExecuteAction($"/cluster/firewall/aliases/{_name}", HttpMethod.Put, parameters);
+                            _client.Put($"/cluster/firewall/aliases/{_name}", parameters);
                         }
                     }
                     /// <summary>
@@ -788,7 +788,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic GetAliases()
                     {
-                        return _client.ExecuteAction($"/cluster/firewall/aliases", HttpMethod.Get);
+                        return _client.Get($"/cluster/firewall/aliases");
                     }
                     /// <summary>
                     /// Create IP or Network Alias.
@@ -802,7 +802,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("cidr", cidr);
                         parameters.Add("name", name);
                         parameters.Add("comment", comment);
-                        _client.ExecuteAction($"/cluster/firewall/aliases", HttpMethod.Post, parameters);
+                        _client.Post($"/cluster/firewall/aliases", parameters);
                     }
                 }
                 public class PVEOptions : Base
@@ -817,7 +817,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic GetOptions()
                     {
-                        return _client.ExecuteAction($"/cluster/firewall/options", HttpMethod.Get);
+                        return _client.Get($"/cluster/firewall/options");
                     }
                     /// <summary>
                     /// Set Firewall options.
@@ -837,7 +837,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("enable", enable);
                         parameters.Add("policy_in", policy_in);
                         parameters.Add("policy_out", policy_out);
-                        _client.ExecuteAction($"/cluster/firewall/options", HttpMethod.Put, parameters);
+                        _client.Put($"/cluster/firewall/options", parameters);
                     }
                 }
                 public class PVEMacros : Base
@@ -852,7 +852,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic GetMacros()
                     {
-                        return _client.ExecuteAction($"/cluster/firewall/macros", HttpMethod.Get);
+                        return _client.Get($"/cluster/firewall/macros");
                     }
                 }
                 public class PVERefs : Base
@@ -871,7 +871,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("type", type);
-                        return _client.ExecuteAction($"/cluster/firewall/refs", HttpMethod.Get, parameters);
+                        return _client.Get($"/cluster/firewall/refs", parameters);
                     }
                 }
                 /// <summary>
@@ -880,7 +880,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <returns></returns>
                 public dynamic Index()
                 {
-                    return _client.ExecuteAction($"/cluster/firewall", HttpMethod.Get);
+                    return _client.Get($"/cluster/firewall");
                 }
             }
             public class PVEBackup : Base
@@ -903,7 +903,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// </summary>
                     public void DeleteJob()
                     {
-                        _client.ExecuteAction($"/cluster/backup/{_id}", HttpMethod.Delete);
+                        _client.Delete($"/cluster/backup/{_id}");
                     }
                     /// <summary>
                     /// Read vzdump backup job definition.
@@ -911,7 +911,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic ReadJob()
                     {
-                        return _client.ExecuteAction($"/cluster/backup/{_id}", HttpMethod.Get);
+                        return _client.Get($"/cluster/backup/{_id}");
                     }
                     /// <summary>
                     /// Update vzdump backup job definition.
@@ -978,7 +978,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("storage", storage);
                         parameters.Add("tmpdir", tmpdir);
                         parameters.Add("vmid", vmid);
-                        _client.ExecuteAction($"/cluster/backup/{_id}", HttpMethod.Put, parameters);
+                        _client.Put($"/cluster/backup/{_id}", parameters);
                     }
                 }
                 /// <summary>
@@ -987,7 +987,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <returns></returns>
                 public dynamic Index()
                 {
-                    return _client.ExecuteAction($"/cluster/backup", HttpMethod.Get);
+                    return _client.Get($"/cluster/backup");
                 }
                 /// <summary>
                 /// Create new vzdump backup job.
@@ -1052,7 +1052,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("storage", storage);
                     parameters.Add("tmpdir", tmpdir);
                     parameters.Add("vmid", vmid);
-                    _client.ExecuteAction($"/cluster/backup", HttpMethod.Post, parameters);
+                    _client.Post($"/cluster/backup", parameters);
                 }
             }
             public class PVEHa : Base
@@ -1102,7 +1102,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("node", node);
-                                _client.ExecuteAction($"/cluster/ha/resources/{_sid}/migrate", HttpMethod.Post, parameters);
+                                _client.Post($"/cluster/ha/resources/{_sid}/migrate", parameters);
                             }
                         }
                         public class PVERelocate : Base
@@ -1121,7 +1121,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("node", node);
-                                _client.ExecuteAction($"/cluster/ha/resources/{_sid}/relocate", HttpMethod.Post, parameters);
+                                _client.Post($"/cluster/ha/resources/{_sid}/relocate", parameters);
                             }
                         }
                         /// <summary>
@@ -1129,7 +1129,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// </summary>
                         public void Delete()
                         {
-                            _client.ExecuteAction($"/cluster/ha/resources/{_sid}", HttpMethod.Delete);
+                            _client.Delete($"/cluster/ha/resources/{_sid}");
                         }
                         /// <summary>
                         /// Read resource configuration.
@@ -1137,7 +1137,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic Read()
                         {
-                            return _client.ExecuteAction($"/cluster/ha/resources/{_sid}", HttpMethod.Get);
+                            return _client.Get($"/cluster/ha/resources/{_sid}");
                         }
                         /// <summary>
                         /// Update resource configuration.
@@ -1160,7 +1160,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("max_relocate", max_relocate);
                             parameters.Add("max_restart", max_restart);
                             parameters.Add("state", state);
-                            _client.ExecuteAction($"/cluster/ha/resources/{_sid}", HttpMethod.Put, parameters);
+                            _client.Put($"/cluster/ha/resources/{_sid}", parameters);
                         }
                     }
                     /// <summary>
@@ -1173,7 +1173,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("type", type);
-                        return _client.ExecuteAction($"/cluster/ha/resources", HttpMethod.Get, parameters);
+                        return _client.Get($"/cluster/ha/resources", parameters);
                     }
                     /// <summary>
                     /// Create a new HA resource.
@@ -1197,7 +1197,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("max_restart", max_restart);
                         parameters.Add("state", state);
                         parameters.Add("type", type);
-                        _client.ExecuteAction($"/cluster/ha/resources", HttpMethod.Post, parameters);
+                        _client.Post($"/cluster/ha/resources", parameters);
                     }
                 }
                 public class PVEGroups : Base
@@ -1220,7 +1220,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// </summary>
                         public void Delete()
                         {
-                            _client.ExecuteAction($"/cluster/ha/groups/{_group}", HttpMethod.Delete);
+                            _client.Delete($"/cluster/ha/groups/{_group}");
                         }
                         /// <summary>
                         /// Read ha group configuration.
@@ -1228,7 +1228,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic Read()
                         {
-                            return _client.ExecuteAction($"/cluster/ha/groups/{_group}", HttpMethod.Get);
+                            return _client.Get($"/cluster/ha/groups/{_group}");
                         }
                         /// <summary>
                         /// Update ha group configuration.
@@ -1248,7 +1248,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("nodes", nodes);
                             parameters.Add("nofailback", nofailback);
                             parameters.Add("restricted", restricted);
-                            _client.ExecuteAction($"/cluster/ha/groups/{_group}", HttpMethod.Put, parameters);
+                            _client.Put($"/cluster/ha/groups/{_group}", parameters);
                         }
                     }
                     /// <summary>
@@ -1257,7 +1257,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Index()
                     {
-                        return _client.ExecuteAction($"/cluster/ha/groups", HttpMethod.Get);
+                        return _client.Get($"/cluster/ha/groups");
                     }
                     /// <summary>
                     /// Create a new HA group.
@@ -1278,7 +1278,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("nofailback", nofailback);
                         parameters.Add("restricted", restricted);
                         parameters.Add("type", type);
-                        _client.ExecuteAction($"/cluster/ha/groups", HttpMethod.Post, parameters);
+                        _client.Post($"/cluster/ha/groups", parameters);
                     }
                 }
                 public class PVEStatus : Base
@@ -1303,7 +1303,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic Status()
                         {
-                            return _client.ExecuteAction($"/cluster/ha/status/current", HttpMethod.Get);
+                            return _client.Get($"/cluster/ha/status/current");
                         }
                     }
                     public class PVEManagerStatus : Base
@@ -1318,7 +1318,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic ManagerStatus()
                         {
-                            return _client.ExecuteAction($"/cluster/ha/status/manager_status", HttpMethod.Get);
+                            return _client.Get($"/cluster/ha/status/manager_status");
                         }
                     }
                     /// <summary>
@@ -1327,7 +1327,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Index()
                     {
-                        return _client.ExecuteAction($"/cluster/ha/status", HttpMethod.Get);
+                        return _client.Get($"/cluster/ha/status");
                     }
                 }
                 /// <summary>
@@ -1336,7 +1336,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <returns></returns>
                 public dynamic Index()
                 {
-                    return _client.ExecuteAction($"/cluster/ha", HttpMethod.Get);
+                    return _client.Get($"/cluster/ha");
                 }
             }
             public class PVELog : Base
@@ -1354,7 +1354,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("max", max);
-                    return _client.ExecuteAction($"/cluster/log", HttpMethod.Get, parameters);
+                    return _client.Get($"/cluster/log", parameters);
                 }
             }
             public class PVEResources : Base
@@ -1373,7 +1373,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("type", type);
-                    return _client.ExecuteAction($"/cluster/resources", HttpMethod.Get, parameters);
+                    return _client.Get($"/cluster/resources", parameters);
                 }
             }
             public class PVETasks : Base
@@ -1388,7 +1388,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <returns></returns>
                 public dynamic Tasks()
                 {
-                    return _client.ExecuteAction($"/cluster/tasks", HttpMethod.Get);
+                    return _client.Get($"/cluster/tasks");
                 }
             }
             public class PVEOptions : Base
@@ -1403,7 +1403,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <returns></returns>
                 public dynamic GetOptions()
                 {
-                    return _client.ExecuteAction($"/cluster/options", HttpMethod.Get);
+                    return _client.Get($"/cluster/options");
                 }
                 /// <summary>
                 /// Set datacenter options.
@@ -1437,7 +1437,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("max_workers", max_workers);
                     parameters.Add("migration", migration);
                     parameters.Add("migration_unsecure", migration_unsecure);
-                    _client.ExecuteAction($"/cluster/options", HttpMethod.Put, parameters);
+                    _client.Put($"/cluster/options", parameters);
                 }
             }
             public class PVEStatus : Base
@@ -1452,7 +1452,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <returns></returns>
                 public dynamic GetStatus()
                 {
-                    return _client.ExecuteAction($"/cluster/status", HttpMethod.Get);
+                    return _client.Get($"/cluster/status");
                 }
             }
             public class PVENextid : Base
@@ -1470,7 +1470,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("vmid", vmid);
-                    return _client.ExecuteAction($"/cluster/nextid", HttpMethod.Get, parameters);
+                    return _client.Get($"/cluster/nextid", parameters);
                 }
             }
             /// <summary>
@@ -1479,7 +1479,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <returns></returns>
             public dynamic Index()
             {
-                return _client.ExecuteAction($"/cluster", HttpMethod.Get);
+                return _client.Get($"/cluster");
             }
         }
         public class PVENodes : Base
@@ -1671,7 +1671,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("digest", digest);
-                                        _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", HttpMethod.Delete, parameters);
+                                        _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", parameters);
                                     }
                                     /// <summary>
                                     /// Get single rule data.
@@ -1679,7 +1679,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <returns></returns>
                                     public dynamic GetRule()
                                     {
-                                        return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", HttpMethod.Get);
+                                        return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}");
                                     }
                                     /// <summary>
                                     /// Modify rule data.
@@ -1716,7 +1716,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         parameters.Add("source", source);
                                         parameters.Add("sport", sport);
                                         parameters.Add("type", type);
-                                        _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", HttpMethod.Put, parameters);
+                                        _client.Put($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", parameters);
                                     }
                                 }
                                 /// <summary>
@@ -1725,7 +1725,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public dynamic GetRules()
                                 {
-                                    return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/rules", HttpMethod.Get);
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/rules");
                                 }
                                 /// <summary>
                                 /// Create new rule.
@@ -1760,7 +1760,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("proto", proto);
                                     parameters.Add("source", source);
                                     parameters.Add("sport", sport);
-                                    _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/rules", HttpMethod.Post, parameters);
+                                    _client.Post($"/nodes/{_node}/qemu/{_vmid}/firewall/rules", parameters);
                                 }
                             }
                             public class PVEAliases : Base
@@ -1794,7 +1794,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("digest", digest);
-                                        _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", HttpMethod.Delete, parameters);
+                                        _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", parameters);
                                     }
                                     /// <summary>
                                     /// Read alias.
@@ -1802,7 +1802,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <returns></returns>
                                     public dynamic ReadAlias()
                                     {
-                                        return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", HttpMethod.Get);
+                                        return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}");
                                     }
                                     /// <summary>
                                     /// Update IP or Network alias.
@@ -1818,7 +1818,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         parameters.Add("comment", comment);
                                         parameters.Add("digest", digest);
                                         parameters.Add("rename", rename);
-                                        _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", HttpMethod.Put, parameters);
+                                        _client.Put($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", parameters);
                                     }
                                 }
                                 /// <summary>
@@ -1827,7 +1827,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public dynamic GetAliases()
                                 {
-                                    return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases", HttpMethod.Get);
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases");
                                 }
                                 /// <summary>
                                 /// Create IP or Network Alias.
@@ -1841,7 +1841,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("cidr", cidr);
                                     parameters.Add("name", name);
                                     parameters.Add("comment", comment);
-                                    _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases", HttpMethod.Post, parameters);
+                                    _client.Post($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases", parameters);
                                 }
                             }
                             public class PVEIpset : Base
@@ -1890,7 +1890,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         {
                                             var parameters = new Dictionary<string, object>();
                                             parameters.Add("digest", digest);
-                                            _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Delete, parameters);
+                                            _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
                                         }
                                         /// <summary>
                                         /// Read IP or Network settings from IPSet.
@@ -1898,7 +1898,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         /// <returns></returns>
                                         public dynamic ReadIp()
                                         {
-                                            return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Get);
+                                            return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}");
                                         }
                                         /// <summary>
                                         /// Update IP or Network settings
@@ -1912,7 +1912,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                             parameters.Add("comment", comment);
                                             parameters.Add("digest", digest);
                                             parameters.Add("nomatch", nomatch);
-                                            _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Put, parameters);
+                                            _client.Put($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
                                         }
                                     }
                                     /// <summary>
@@ -1920,7 +1920,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// </summary>
                                     public void DeleteIpset()
                                     {
-                                        _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}", HttpMethod.Delete);
+                                        _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}");
                                     }
                                     /// <summary>
                                     /// List IPSet content
@@ -1928,7 +1928,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <returns></returns>
                                     public dynamic GetIpset()
                                     {
-                                        return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}", HttpMethod.Get);
+                                        return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}");
                                     }
                                     /// <summary>
                                     /// Add IP or Network to IPSet.
@@ -1942,7 +1942,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         parameters.Add("cidr", cidr);
                                         parameters.Add("comment", comment);
                                         parameters.Add("nomatch", nomatch);
-                                        _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}", HttpMethod.Post, parameters);
+                                        _client.Post($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}", parameters);
                                     }
                                 }
                                 /// <summary>
@@ -1951,7 +1951,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public dynamic IpsetIndex()
                                 {
-                                    return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset", HttpMethod.Get);
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset");
                                 }
                                 /// <summary>
                                 /// Create new IPSet
@@ -1967,7 +1967,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("comment", comment);
                                     parameters.Add("digest", digest);
                                     parameters.Add("rename", rename);
-                                    _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset", HttpMethod.Post, parameters);
+                                    _client.Post($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset", parameters);
                                 }
                             }
                             public class PVEOptions : Base
@@ -1986,7 +1986,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public dynamic GetOptions()
                                 {
-                                    return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/options", HttpMethod.Get);
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/options");
                                 }
                                 /// <summary>
                                 /// Set Firewall options.
@@ -2022,7 +2022,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("policy_in", policy_in);
                                     parameters.Add("policy_out", policy_out);
                                     parameters.Add("radv", radv);
-                                    _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/options", HttpMethod.Put, parameters);
+                                    _client.Put($"/nodes/{_node}/qemu/{_vmid}/firewall/options", parameters);
                                 }
                             }
                             public class PVELog : Base
@@ -2046,7 +2046,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("limit", limit);
                                     parameters.Add("start", start);
-                                    return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/log", HttpMethod.Get, parameters);
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/log", parameters);
                                 }
                             }
                             public class PVERefs : Base
@@ -2069,7 +2069,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("type", type);
-                                    return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall/refs", HttpMethod.Get, parameters);
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/refs", parameters);
                                 }
                             }
                             /// <summary>
@@ -2078,7 +2078,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic Index()
                             {
-                                return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/firewall", HttpMethod.Get);
+                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall");
                             }
                         }
                         public class PVERrd : Base
@@ -2106,7 +2106,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("ds", ds);
                                 parameters.Add("timeframe", timeframe);
                                 parameters.Add("cf", cf);
-                                return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/rrd", HttpMethod.Get, parameters);
+                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/rrd", parameters);
                             }
                         }
                         public class PVERrddata : Base
@@ -2132,7 +2132,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("timeframe", timeframe);
                                 parameters.Add("cf", cf);
-                                return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/rrddata", HttpMethod.Get, parameters);
+                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/rrddata", parameters);
                             }
                         }
                         public class PVEConfig : Base
@@ -2154,7 +2154,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("current", current);
-                                return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/config", HttpMethod.Get, parameters);
+                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
                             }
                             /// <summary>
                             /// Set virtual machine options (asynchrounous API).
@@ -2292,7 +2292,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 AddIndexedParmeter(parameters, "unused", unusedN);
                                 AddIndexedParmeter(parameters, "usb", usbN);
                                 AddIndexedParmeter(parameters, "virtio", virtioN);
-                                return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/config", HttpMethod.Post, parameters);
+                                return _client.Post($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
                             }
                             /// <summary>
                             /// Set virtual machine options (synchrounous API) - You should consider using the POST method instead for any actions involving hotplug or storage allocation.
@@ -2427,7 +2427,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 AddIndexedParmeter(parameters, "unused", unusedN);
                                 AddIndexedParmeter(parameters, "usb", usbN);
                                 AddIndexedParmeter(parameters, "virtio", virtioN);
-                                _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/config", HttpMethod.Put, parameters);
+                                _client.Put($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
                             }
                         }
                         public class PVEPending : Base
@@ -2446,7 +2446,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic VmPending()
                             {
-                                return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/pending", HttpMethod.Get);
+                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/pending");
                             }
                         }
                         public class PVEUnlink : Base
@@ -2469,7 +2469,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("idlist", idlist);
                                 parameters.Add("force", force);
-                                _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/unlink", HttpMethod.Put, parameters);
+                                _client.Put($"/nodes/{_node}/qemu/{_vmid}/unlink", parameters);
                             }
                         }
                         public class PVEVncproxy : Base
@@ -2491,7 +2491,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("websocket", websocket);
-                                return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/vncproxy", HttpMethod.Post, parameters);
+                                return _client.Post($"/nodes/{_node}/qemu/{_vmid}/vncproxy", parameters);
                             }
                         }
                         public class PVEVncwebsocket : Base
@@ -2515,7 +2515,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("port", port);
                                 parameters.Add("vncticket", vncticket);
-                                return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/vncwebsocket", HttpMethod.Get, parameters);
+                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/vncwebsocket", parameters);
                             }
                         }
                         public class PVESpiceproxy : Base
@@ -2537,7 +2537,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("proxy", proxy);
-                                return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/spiceproxy", HttpMethod.Post, parameters);
+                                return _client.Post($"/nodes/{_node}/qemu/{_vmid}/spiceproxy", parameters);
                             }
                         }
                         public class PVEStatus : Base
@@ -2580,7 +2580,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public dynamic VmStatus()
                                 {
-                                    return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/status/current", HttpMethod.Get);
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/status/current");
                                 }
                             }
                             public class PVEStart : Base
@@ -2615,7 +2615,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("skiplock", skiplock);
                                     parameters.Add("stateuri", stateuri);
                                     parameters.Add("targetstorage", targetstorage);
-                                    return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/status/start", HttpMethod.Post, parameters);
+                                    return _client.Post($"/nodes/{_node}/qemu/{_vmid}/status/start", parameters);
                                 }
                             }
                             public class PVEStop : Base
@@ -2643,7 +2643,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("migratedfrom", migratedfrom);
                                     parameters.Add("skiplock", skiplock);
                                     parameters.Add("timeout", timeout);
-                                    return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/status/stop", HttpMethod.Post, parameters);
+                                    return _client.Post($"/nodes/{_node}/qemu/{_vmid}/status/stop", parameters);
                                 }
                             }
                             public class PVEReset : Base
@@ -2665,7 +2665,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("skiplock", skiplock);
-                                    return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/status/reset", HttpMethod.Post, parameters);
+                                    return _client.Post($"/nodes/{_node}/qemu/{_vmid}/status/reset", parameters);
                                 }
                             }
                             public class PVEShutdown : Base
@@ -2693,7 +2693,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("keepActive", keepActive);
                                     parameters.Add("skiplock", skiplock);
                                     parameters.Add("timeout", timeout);
-                                    return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/status/shutdown", HttpMethod.Post, parameters);
+                                    return _client.Post($"/nodes/{_node}/qemu/{_vmid}/status/shutdown", parameters);
                                 }
                             }
                             public class PVESuspend : Base
@@ -2715,7 +2715,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("skiplock", skiplock);
-                                    return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/status/suspend", HttpMethod.Post, parameters);
+                                    return _client.Post($"/nodes/{_node}/qemu/{_vmid}/status/suspend", parameters);
                                 }
                             }
                             public class PVEResume : Base
@@ -2739,7 +2739,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("nocheck", nocheck);
                                     parameters.Add("skiplock", skiplock);
-                                    return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/status/resume", HttpMethod.Post, parameters);
+                                    return _client.Post($"/nodes/{_node}/qemu/{_vmid}/status/resume", parameters);
                                 }
                             }
                             /// <summary>
@@ -2748,7 +2748,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic Vmcmdidx()
                             {
-                                return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/status", HttpMethod.Get);
+                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/status");
                             }
                         }
                         public class PVESendkey : Base
@@ -2771,7 +2771,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("key", key);
                                 parameters.Add("skiplock", skiplock);
-                                _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/sendkey", HttpMethod.Put, parameters);
+                                _client.Put($"/nodes/{_node}/qemu/{_vmid}/sendkey", parameters);
                             }
                         }
                         public class PVEFeature : Base
@@ -2796,7 +2796,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("feature", feature);
                                 parameters.Add("snapname", snapname);
-                                return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/feature", HttpMethod.Get, parameters);
+                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/feature", parameters);
                             }
                         }
                         public class PVEClone : Base
@@ -2835,7 +2835,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("snapname", snapname);
                                 parameters.Add("storage", storage);
                                 parameters.Add("target", target);
-                                return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/clone", HttpMethod.Post, parameters);
+                                return _client.Post($"/nodes/{_node}/qemu/{_vmid}/clone", parameters);
                             }
                         }
                         public class PVEMoveDisk : Base
@@ -2867,7 +2867,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("delete", delete);
                                 parameters.Add("digest", digest);
                                 parameters.Add("format", format);
-                                return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/move_disk", HttpMethod.Post, parameters);
+                                return _client.Post($"/nodes/{_node}/qemu/{_vmid}/move_disk", parameters);
                             }
                         }
                         public class PVEMigrate : Base
@@ -2902,7 +2902,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("online", online);
                                 parameters.Add("targetstorage", targetstorage);
                                 parameters.Add("with-local-disks", with_local_disks);
-                                return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/migrate", HttpMethod.Post, parameters);
+                                return _client.Post($"/nodes/{_node}/qemu/{_vmid}/migrate", parameters);
                             }
                         }
                         public class PVEMonitor : Base
@@ -2924,7 +2924,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("command", command);
-                                return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/monitor", HttpMethod.Post, parameters);
+                                return _client.Post($"/nodes/{_node}/qemu/{_vmid}/monitor", parameters);
                             }
                         }
                         public class PVEAgent : Base
@@ -2947,7 +2947,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("command", command);
-                                return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/agent", HttpMethod.Post, parameters);
+                                return _client.Post($"/nodes/{_node}/qemu/{_vmid}/agent", parameters);
                             }
                         }
                         public class PVEResize : Base
@@ -2975,7 +2975,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("size", size);
                                 parameters.Add("digest", digest);
                                 parameters.Add("skiplock", skiplock);
-                                _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/resize", HttpMethod.Put, parameters);
+                                _client.Put($"/nodes/{_node}/qemu/{_vmid}/resize", parameters);
                             }
                         }
                         public class PVESnapshot : Base
@@ -3023,7 +3023,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <returns></returns>
                                     public dynamic GetSnapshotConfig()
                                     {
-                                        return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config", HttpMethod.Get);
+                                        return _client.Get($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config");
                                     }
                                     /// <summary>
                                     /// Update snapshot metadata.
@@ -3033,7 +3033,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("description", description);
-                                        _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config", HttpMethod.Put, parameters);
+                                        _client.Put($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config", parameters);
                                     }
                                 }
                                 public class PVERollback : Base
@@ -3054,7 +3054,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <returns></returns>
                                     public dynamic Rollback()
                                     {
-                                        return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/rollback", HttpMethod.Post);
+                                        return _client.Post($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/rollback");
                                     }
                                 }
                                 /// <summary>
@@ -3066,7 +3066,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("force", force);
-                                    return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}", HttpMethod.Delete, parameters);
+                                    return _client.Delete($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}", parameters);
                                 }
                                 /// <summary>
                                 /// 
@@ -3074,7 +3074,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public dynamic SnapshotCmdIdx()
                                 {
-                                    return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}", HttpMethod.Get);
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}");
                                 }
                             }
                             /// <summary>
@@ -3083,7 +3083,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic SnapshotList()
                             {
-                                return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/snapshot", HttpMethod.Get);
+                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/snapshot");
                             }
                             /// <summary>
                             /// Snapshot a VM.
@@ -3098,7 +3098,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("snapname", snapname);
                                 parameters.Add("description", description);
                                 parameters.Add("vmstate", vmstate);
-                                return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/snapshot", HttpMethod.Post, parameters);
+                                return _client.Post($"/nodes/{_node}/qemu/{_vmid}/snapshot", parameters);
                             }
                         }
                         public class PVETemplate : Base
@@ -3120,7 +3120,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("disk", disk);
-                                _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}/template", HttpMethod.Post, parameters);
+                                _client.Post($"/nodes/{_node}/qemu/{_vmid}/template", parameters);
                             }
                         }
                         /// <summary>
@@ -3132,7 +3132,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("skiplock", skiplock);
-                            return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}", HttpMethod.Delete, parameters);
+                            return _client.Delete($"/nodes/{_node}/qemu/{_vmid}", parameters);
                         }
                         /// <summary>
                         /// Directory index
@@ -3140,7 +3140,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic Vmdiridx()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/qemu/{_vmid}", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/qemu/{_vmid}");
                         }
                     }
                     /// <summary>
@@ -3152,7 +3152,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("full", full);
-                        return _client.ExecuteAction($"/nodes/{_node}/qemu", HttpMethod.Get, parameters);
+                        return _client.Get($"/nodes/{_node}/qemu", parameters);
                     }
                     /// <summary>
                     /// Create or restore a virtual machine.
@@ -3290,7 +3290,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         AddIndexedParmeter(parameters, "unused", unusedN);
                         AddIndexedParmeter(parameters, "usb", usbN);
                         AddIndexedParmeter(parameters, "virtio", virtioN);
-                        return _client.ExecuteAction($"/nodes/{_node}/qemu", HttpMethod.Post, parameters);
+                        return _client.Post($"/nodes/{_node}/qemu", parameters);
                     }
                 }
                 public class PVELxc : Base
@@ -3356,7 +3356,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic VmConfig()
                             {
-                                return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/config", HttpMethod.Get);
+                                return _client.Get($"/nodes/{_node}/lxc/{_vmid}/config");
                             }
                             /// <summary>
                             /// Set container options.
@@ -3420,7 +3420,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 AddIndexedParmeter(parameters, "mp", mpN);
                                 AddIndexedParmeter(parameters, "net", netN);
                                 AddIndexedParmeter(parameters, "unused", unusedN);
-                                _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/config", HttpMethod.Put, parameters);
+                                _client.Put($"/nodes/{_node}/lxc/{_vmid}/config", parameters);
                             }
                         }
                         public class PVEStatus : Base
@@ -3461,7 +3461,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public dynamic VmStatus()
                                 {
-                                    return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/status/current", HttpMethod.Get);
+                                    return _client.Get($"/nodes/{_node}/lxc/{_vmid}/status/current");
                                 }
                             }
                             public class PVEStart : Base
@@ -3483,7 +3483,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("skiplock", skiplock);
-                                    return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/status/start", HttpMethod.Post, parameters);
+                                    return _client.Post($"/nodes/{_node}/lxc/{_vmid}/status/start", parameters);
                                 }
                             }
                             public class PVEStop : Base
@@ -3505,7 +3505,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("skiplock", skiplock);
-                                    return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/status/stop", HttpMethod.Post, parameters);
+                                    return _client.Post($"/nodes/{_node}/lxc/{_vmid}/status/stop", parameters);
                                 }
                             }
                             public class PVEShutdown : Base
@@ -3529,7 +3529,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("forceStop", forceStop);
                                     parameters.Add("timeout", timeout);
-                                    return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/status/shutdown", HttpMethod.Post, parameters);
+                                    return _client.Post($"/nodes/{_node}/lxc/{_vmid}/status/shutdown", parameters);
                                 }
                             }
                             public class PVESuspend : Base
@@ -3548,7 +3548,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public dynamic VmSuspend()
                                 {
-                                    return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/status/suspend", HttpMethod.Post);
+                                    return _client.Post($"/nodes/{_node}/lxc/{_vmid}/status/suspend");
                                 }
                             }
                             public class PVEResume : Base
@@ -3567,7 +3567,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public dynamic VmResume()
                                 {
-                                    return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/status/resume", HttpMethod.Post);
+                                    return _client.Post($"/nodes/{_node}/lxc/{_vmid}/status/resume");
                                 }
                             }
                             /// <summary>
@@ -3576,7 +3576,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic Vmcmdidx()
                             {
-                                return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/status", HttpMethod.Get);
+                                return _client.Get($"/nodes/{_node}/lxc/{_vmid}/status");
                             }
                         }
                         public class PVESnapshot : Base
@@ -3624,7 +3624,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <returns></returns>
                                     public dynamic Rollback()
                                     {
-                                        return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/rollback", HttpMethod.Post);
+                                        return _client.Post($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/rollback");
                                     }
                                 }
                                 public class PVEConfig : Base
@@ -3645,7 +3645,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <returns></returns>
                                     public dynamic GetSnapshotConfig()
                                     {
-                                        return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config", HttpMethod.Get);
+                                        return _client.Get($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config");
                                     }
                                     /// <summary>
                                     /// Update snapshot metadata.
@@ -3655,7 +3655,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("description", description);
-                                        _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config", HttpMethod.Put, parameters);
+                                        _client.Put($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config", parameters);
                                     }
                                 }
                                 /// <summary>
@@ -3667,7 +3667,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("force", force);
-                                    return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}", HttpMethod.Delete, parameters);
+                                    return _client.Delete($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}", parameters);
                                 }
                                 /// <summary>
                                 /// 
@@ -3675,7 +3675,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public dynamic SnapshotCmdIdx()
                                 {
-                                    return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}", HttpMethod.Get);
+                                    return _client.Get($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}");
                                 }
                             }
                             /// <summary>
@@ -3684,7 +3684,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic List()
                             {
-                                return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/snapshot", HttpMethod.Get);
+                                return _client.Get($"/nodes/{_node}/lxc/{_vmid}/snapshot");
                             }
                             /// <summary>
                             /// Snapshot a container.
@@ -3697,7 +3697,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("snapname", snapname);
                                 parameters.Add("description", description);
-                                return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/snapshot", HttpMethod.Post, parameters);
+                                return _client.Post($"/nodes/{_node}/lxc/{_vmid}/snapshot", parameters);
                             }
                         }
                         public class PVEFirewall : Base
@@ -3753,7 +3753,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("digest", digest);
-                                        _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", HttpMethod.Delete, parameters);
+                                        _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", parameters);
                                     }
                                     /// <summary>
                                     /// Get single rule data.
@@ -3761,7 +3761,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <returns></returns>
                                     public dynamic GetRule()
                                     {
-                                        return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", HttpMethod.Get);
+                                        return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}");
                                     }
                                     /// <summary>
                                     /// Modify rule data.
@@ -3798,7 +3798,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         parameters.Add("source", source);
                                         parameters.Add("sport", sport);
                                         parameters.Add("type", type);
-                                        _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", HttpMethod.Put, parameters);
+                                        _client.Put($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", parameters);
                                     }
                                 }
                                 /// <summary>
@@ -3807,7 +3807,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public dynamic GetRules()
                                 {
-                                    return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/rules", HttpMethod.Get);
+                                    return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/rules");
                                 }
                                 /// <summary>
                                 /// Create new rule.
@@ -3842,7 +3842,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("proto", proto);
                                     parameters.Add("source", source);
                                     parameters.Add("sport", sport);
-                                    _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/rules", HttpMethod.Post, parameters);
+                                    _client.Post($"/nodes/{_node}/lxc/{_vmid}/firewall/rules", parameters);
                                 }
                             }
                             public class PVEAliases : Base
@@ -3876,7 +3876,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("digest", digest);
-                                        _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", HttpMethod.Delete, parameters);
+                                        _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", parameters);
                                     }
                                     /// <summary>
                                     /// Read alias.
@@ -3884,7 +3884,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <returns></returns>
                                     public dynamic ReadAlias()
                                     {
-                                        return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", HttpMethod.Get);
+                                        return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}");
                                     }
                                     /// <summary>
                                     /// Update IP or Network alias.
@@ -3900,7 +3900,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         parameters.Add("comment", comment);
                                         parameters.Add("digest", digest);
                                         parameters.Add("rename", rename);
-                                        _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", HttpMethod.Put, parameters);
+                                        _client.Put($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", parameters);
                                     }
                                 }
                                 /// <summary>
@@ -3909,7 +3909,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public dynamic GetAliases()
                                 {
-                                    return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases", HttpMethod.Get);
+                                    return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases");
                                 }
                                 /// <summary>
                                 /// Create IP or Network Alias.
@@ -3923,7 +3923,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("cidr", cidr);
                                     parameters.Add("name", name);
                                     parameters.Add("comment", comment);
-                                    _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases", HttpMethod.Post, parameters);
+                                    _client.Post($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases", parameters);
                                 }
                             }
                             public class PVEIpset : Base
@@ -3972,7 +3972,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         {
                                             var parameters = new Dictionary<string, object>();
                                             parameters.Add("digest", digest);
-                                            _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Delete, parameters);
+                                            _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
                                         }
                                         /// <summary>
                                         /// Read IP or Network settings from IPSet.
@@ -3980,7 +3980,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         /// <returns></returns>
                                         public dynamic ReadIp()
                                         {
-                                            return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Get);
+                                            return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}");
                                         }
                                         /// <summary>
                                         /// Update IP or Network settings
@@ -3994,7 +3994,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                             parameters.Add("comment", comment);
                                             parameters.Add("digest", digest);
                                             parameters.Add("nomatch", nomatch);
-                                            _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", HttpMethod.Put, parameters);
+                                            _client.Put($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
                                         }
                                     }
                                     /// <summary>
@@ -4002,7 +4002,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// </summary>
                                     public void DeleteIpset()
                                     {
-                                        _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}", HttpMethod.Delete);
+                                        _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}");
                                     }
                                     /// <summary>
                                     /// List IPSet content
@@ -4010,7 +4010,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     /// <returns></returns>
                                     public dynamic GetIpset()
                                     {
-                                        return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}", HttpMethod.Get);
+                                        return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}");
                                     }
                                     /// <summary>
                                     /// Add IP or Network to IPSet.
@@ -4024,7 +4024,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         parameters.Add("cidr", cidr);
                                         parameters.Add("comment", comment);
                                         parameters.Add("nomatch", nomatch);
-                                        _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}", HttpMethod.Post, parameters);
+                                        _client.Post($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}", parameters);
                                     }
                                 }
                                 /// <summary>
@@ -4033,7 +4033,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public dynamic IpsetIndex()
                                 {
-                                    return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset", HttpMethod.Get);
+                                    return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset");
                                 }
                                 /// <summary>
                                 /// Create new IPSet
@@ -4049,7 +4049,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("comment", comment);
                                     parameters.Add("digest", digest);
                                     parameters.Add("rename", rename);
-                                    _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset", HttpMethod.Post, parameters);
+                                    _client.Post($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset", parameters);
                                 }
                             }
                             public class PVEOptions : Base
@@ -4068,7 +4068,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public dynamic GetOptions()
                                 {
-                                    return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/options", HttpMethod.Get);
+                                    return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/options");
                                 }
                                 /// <summary>
                                 /// Set Firewall options.
@@ -4104,7 +4104,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     parameters.Add("policy_in", policy_in);
                                     parameters.Add("policy_out", policy_out);
                                     parameters.Add("radv", radv);
-                                    _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/options", HttpMethod.Put, parameters);
+                                    _client.Put($"/nodes/{_node}/lxc/{_vmid}/firewall/options", parameters);
                                 }
                             }
                             public class PVELog : Base
@@ -4128,7 +4128,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("limit", limit);
                                     parameters.Add("start", start);
-                                    return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/log", HttpMethod.Get, parameters);
+                                    return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/log", parameters);
                                 }
                             }
                             public class PVERefs : Base
@@ -4151,7 +4151,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("type", type);
-                                    return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall/refs", HttpMethod.Get, parameters);
+                                    return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/refs", parameters);
                                 }
                             }
                             /// <summary>
@@ -4160,7 +4160,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic Index()
                             {
-                                return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/firewall", HttpMethod.Get);
+                                return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall");
                             }
                         }
                         public class PVERrd : Base
@@ -4188,7 +4188,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("ds", ds);
                                 parameters.Add("timeframe", timeframe);
                                 parameters.Add("cf", cf);
-                                return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/rrd", HttpMethod.Get, parameters);
+                                return _client.Get($"/nodes/{_node}/lxc/{_vmid}/rrd", parameters);
                             }
                         }
                         public class PVERrddata : Base
@@ -4214,7 +4214,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("timeframe", timeframe);
                                 parameters.Add("cf", cf);
-                                return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/rrddata", HttpMethod.Get, parameters);
+                                return _client.Get($"/nodes/{_node}/lxc/{_vmid}/rrddata", parameters);
                             }
                         }
                         public class PVEVncproxy : Base
@@ -4240,7 +4240,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("height", height);
                                 parameters.Add("websocket", websocket);
                                 parameters.Add("width", width);
-                                return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/vncproxy", HttpMethod.Post, parameters);
+                                return _client.Post($"/nodes/{_node}/lxc/{_vmid}/vncproxy", parameters);
                             }
                         }
                         public class PVEVncwebsocket : Base
@@ -4264,7 +4264,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("port", port);
                                 parameters.Add("vncticket", vncticket);
-                                return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/vncwebsocket", HttpMethod.Get, parameters);
+                                return _client.Get($"/nodes/{_node}/lxc/{_vmid}/vncwebsocket", parameters);
                             }
                         }
                         public class PVESpiceproxy : Base
@@ -4286,7 +4286,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("proxy", proxy);
-                                return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/spiceproxy", HttpMethod.Post, parameters);
+                                return _client.Post($"/nodes/{_node}/lxc/{_vmid}/spiceproxy", parameters);
                             }
                         }
                         public class PVEMigrate : Base
@@ -4316,7 +4316,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("online", online);
                                 parameters.Add("restart", restart);
                                 parameters.Add("timeout", timeout);
-                                return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/migrate", HttpMethod.Post, parameters);
+                                return _client.Post($"/nodes/{_node}/lxc/{_vmid}/migrate", parameters);
                             }
                         }
                         public class PVEFeature : Base
@@ -4341,7 +4341,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("feature", feature);
                                 parameters.Add("snapname", snapname);
-                                return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/feature", HttpMethod.Get, parameters);
+                                return _client.Get($"/nodes/{_node}/lxc/{_vmid}/feature", parameters);
                             }
                         }
                         public class PVETemplate : Base
@@ -4362,7 +4362,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("experimental", experimental);
-                                _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/template", HttpMethod.Post, parameters);
+                                _client.Post($"/nodes/{_node}/lxc/{_vmid}/template", parameters);
                             }
                         }
                         public class PVEClone : Base
@@ -4398,7 +4398,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("pool", pool);
                                 parameters.Add("snapname", snapname);
                                 parameters.Add("storage", storage);
-                                return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/clone", HttpMethod.Post, parameters);
+                                return _client.Post($"/nodes/{_node}/lxc/{_vmid}/clone", parameters);
                             }
                         }
                         public class PVEResize : Base
@@ -4425,7 +4425,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("disk", disk);
                                 parameters.Add("size", size);
                                 parameters.Add("digest", digest);
-                                return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}/resize", HttpMethod.Put, parameters);
+                                return _client.Put($"/nodes/{_node}/lxc/{_vmid}/resize", parameters);
                             }
                         }
                         /// <summary>
@@ -4434,7 +4434,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic DestroyVm()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}", HttpMethod.Delete);
+                            return _client.Delete($"/nodes/{_node}/lxc/{_vmid}");
                         }
                         /// <summary>
                         /// Directory index
@@ -4442,7 +4442,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic Vmdiridx()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/lxc/{_vmid}", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/lxc/{_vmid}");
                         }
                     }
                     /// <summary>
@@ -4451,7 +4451,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Vmlist()
                     {
-                        return _client.ExecuteAction($"/nodes/{_node}/lxc", HttpMethod.Get);
+                        return _client.Get($"/nodes/{_node}/lxc");
                     }
                     /// <summary>
                     /// Create or restore a container.
@@ -4530,7 +4530,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         AddIndexedParmeter(parameters, "mp", mpN);
                         AddIndexedParmeter(parameters, "net", netN);
                         AddIndexedParmeter(parameters, "unused", unusedN);
-                        return _client.ExecuteAction($"/nodes/{_node}/lxc", HttpMethod.Post, parameters);
+                        return _client.Post($"/nodes/{_node}/lxc", parameters);
                     }
                 }
                 public class PVECeph : Base
@@ -4603,7 +4603,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// </summary>
                                 public void In()
                                 {
-                                    _client.ExecuteAction($"/nodes/{_node}/ceph/osd/{_osdid}/in", HttpMethod.Post);
+                                    _client.Post($"/nodes/{_node}/ceph/osd/{_osdid}/in");
                                 }
                             }
                             public class PVEOut : Base
@@ -4621,7 +4621,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// </summary>
                                 public void Out()
                                 {
-                                    _client.ExecuteAction($"/nodes/{_node}/ceph/osd/{_osdid}/out", HttpMethod.Post);
+                                    _client.Post($"/nodes/{_node}/ceph/osd/{_osdid}/out");
                                 }
                             }
                             /// <summary>
@@ -4633,7 +4633,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("cleanup", cleanup);
-                                return _client.ExecuteAction($"/nodes/{_node}/ceph/osd/{_osdid}", HttpMethod.Delete, parameters);
+                                return _client.Delete($"/nodes/{_node}/ceph/osd/{_osdid}", parameters);
                             }
                         }
                         /// <summary>
@@ -4642,7 +4642,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic Index()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/ceph/osd", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/ceph/osd");
                         }
                         /// <summary>
                         /// Create OSD
@@ -4660,7 +4660,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("bluestore", bluestore);
                             parameters.Add("fstype", fstype);
                             parameters.Add("journal_dev", journal_dev);
-                            return _client.ExecuteAction($"/nodes/{_node}/ceph/osd", HttpMethod.Post, parameters);
+                            return _client.Post($"/nodes/{_node}/ceph/osd", parameters);
                         }
                     }
                     public class PVEDisks : Base
@@ -4681,7 +4681,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("type", type);
-                            return _client.ExecuteAction($"/nodes/{_node}/ceph/disks", HttpMethod.Get, parameters);
+                            return _client.Get($"/nodes/{_node}/ceph/disks", parameters);
                         }
                     }
                     public class PVEConfig : Base
@@ -4698,7 +4698,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic Config()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/ceph/config", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/ceph/config");
                         }
                     }
                     public class PVEMon : Base
@@ -4726,7 +4726,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic Destroymon()
                             {
-                                return _client.ExecuteAction($"/nodes/{_node}/ceph/mon/{_monid}", HttpMethod.Delete);
+                                return _client.Delete($"/nodes/{_node}/ceph/mon/{_monid}");
                             }
                         }
                         /// <summary>
@@ -4735,7 +4735,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic Listmon()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/ceph/mon", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/ceph/mon");
                         }
                         /// <summary>
                         /// Create Ceph Monitor
@@ -4743,7 +4743,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic Createmon()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/ceph/mon", HttpMethod.Post);
+                            return _client.Post($"/nodes/{_node}/ceph/mon");
                         }
                     }
                     public class PVEInit : Base
@@ -4770,7 +4770,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("network", network);
                             parameters.Add("pg_bits", pg_bits);
                             parameters.Add("size", size);
-                            _client.ExecuteAction($"/nodes/{_node}/ceph/init", HttpMethod.Post, parameters);
+                            _client.Post($"/nodes/{_node}/ceph/init", parameters);
                         }
                     }
                     public class PVEStop : Base
@@ -4790,7 +4790,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("service", service);
-                            return _client.ExecuteAction($"/nodes/{_node}/ceph/stop", HttpMethod.Post, parameters);
+                            return _client.Post($"/nodes/{_node}/ceph/stop", parameters);
                         }
                     }
                     public class PVEStart : Base
@@ -4810,7 +4810,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("service", service);
-                            return _client.ExecuteAction($"/nodes/{_node}/ceph/start", HttpMethod.Post, parameters);
+                            return _client.Post($"/nodes/{_node}/ceph/start", parameters);
                         }
                     }
                     public class PVEStatus : Base
@@ -4827,7 +4827,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic Status()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/ceph/status", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/ceph/status");
                         }
                     }
                     public class PVEPools : Base
@@ -4857,7 +4857,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("force", force);
-                                _client.ExecuteAction($"/nodes/{_node}/ceph/pools/{_name}", HttpMethod.Delete, parameters);
+                                _client.Delete($"/nodes/{_node}/ceph/pools/{_name}", parameters);
                             }
                         }
                         /// <summary>
@@ -4866,7 +4866,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic Lspools()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/ceph/pools", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/ceph/pools");
                         }
                         /// <summary>
                         /// Create POOL
@@ -4884,7 +4884,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("min_size", min_size);
                             parameters.Add("pg_num", pg_num);
                             parameters.Add("size", size);
-                            _client.ExecuteAction($"/nodes/{_node}/ceph/pools", HttpMethod.Post, parameters);
+                            _client.Post($"/nodes/{_node}/ceph/pools", parameters);
                         }
                     }
                     public class PVEFlags : Base
@@ -4911,14 +4911,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// </summary>
                             public void UnsetFlag()
                             {
-                                _client.ExecuteAction($"/nodes/{_node}/ceph/flags/{_flag}", HttpMethod.Delete);
+                                _client.Delete($"/nodes/{_node}/ceph/flags/{_flag}");
                             }
                             /// <summary>
                             /// Set a ceph flag
                             /// </summary>
                             public void SetFlag()
                             {
-                                _client.ExecuteAction($"/nodes/{_node}/ceph/flags/{_flag}", HttpMethod.Post);
+                                _client.Post($"/nodes/{_node}/ceph/flags/{_flag}");
                             }
                         }
                         /// <summary>
@@ -4927,7 +4927,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic GetFlags()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/ceph/flags", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/ceph/flags");
                         }
                     }
                     public class PVECrush : Base
@@ -4944,7 +4944,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic Crush()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/ceph/crush", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/ceph/crush");
                         }
                     }
                     public class PVELog : Base
@@ -4966,7 +4966,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("limit", limit);
                             parameters.Add("start", start);
-                            return _client.ExecuteAction($"/nodes/{_node}/ceph/log", HttpMethod.Get, parameters);
+                            return _client.Get($"/nodes/{_node}/ceph/log", parameters);
                         }
                     }
                     /// <summary>
@@ -4975,7 +4975,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Index()
                     {
-                        return _client.ExecuteAction($"/nodes/{_node}/ceph", HttpMethod.Get);
+                        return _client.Get($"/nodes/{_node}/ceph");
                     }
                 }
                 public class PVEVzdump : Base
@@ -5005,7 +5005,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("volume", volume);
-                            return _client.ExecuteAction($"/nodes/{_node}/vzdump/extractconfig", HttpMethod.Get, parameters);
+                            return _client.Get($"/nodes/{_node}/vzdump/extractconfig", parameters);
                         }
                     }
                     /// <summary>
@@ -5066,7 +5066,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("storage", storage);
                         parameters.Add("tmpdir", tmpdir);
                         parameters.Add("vmid", vmid);
-                        return _client.ExecuteAction($"/nodes/{_node}/vzdump", HttpMethod.Post, parameters);
+                        return _client.Post($"/nodes/{_node}/vzdump", parameters);
                     }
                 }
                 public class PVEServices : Base
@@ -5114,7 +5114,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic ServiceState()
                             {
-                                return _client.ExecuteAction($"/nodes/{_node}/services/{_service}/state", HttpMethod.Get);
+                                return _client.Get($"/nodes/{_node}/services/{_service}/state");
                             }
                         }
                         public class PVEStart : Base
@@ -5133,7 +5133,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic ServiceStart()
                             {
-                                return _client.ExecuteAction($"/nodes/{_node}/services/{_service}/start", HttpMethod.Post);
+                                return _client.Post($"/nodes/{_node}/services/{_service}/start");
                             }
                         }
                         public class PVEStop : Base
@@ -5152,7 +5152,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic ServiceStop()
                             {
-                                return _client.ExecuteAction($"/nodes/{_node}/services/{_service}/stop", HttpMethod.Post);
+                                return _client.Post($"/nodes/{_node}/services/{_service}/stop");
                             }
                         }
                         public class PVERestart : Base
@@ -5171,7 +5171,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic ServiceRestart()
                             {
-                                return _client.ExecuteAction($"/nodes/{_node}/services/{_service}/restart", HttpMethod.Post);
+                                return _client.Post($"/nodes/{_node}/services/{_service}/restart");
                             }
                         }
                         public class PVEReload : Base
@@ -5190,7 +5190,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic ServiceReload()
                             {
-                                return _client.ExecuteAction($"/nodes/{_node}/services/{_service}/reload", HttpMethod.Post);
+                                return _client.Post($"/nodes/{_node}/services/{_service}/reload");
                             }
                         }
                         /// <summary>
@@ -5199,7 +5199,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic Srvcmdidx()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/services/{_service}", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/services/{_service}");
                         }
                     }
                     /// <summary>
@@ -5208,7 +5208,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Index()
                     {
-                        return _client.ExecuteAction($"/nodes/{_node}/services", HttpMethod.Get);
+                        return _client.Get($"/nodes/{_node}/services");
                     }
                 }
                 public class PVESubscription : Base
@@ -5225,7 +5225,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Get()
                     {
-                        return _client.ExecuteAction($"/nodes/{_node}/subscription", HttpMethod.Get);
+                        return _client.Get($"/nodes/{_node}/subscription");
                     }
                     /// <summary>
                     /// Update subscription info.
@@ -5235,7 +5235,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("force", force);
-                        _client.ExecuteAction($"/nodes/{_node}/subscription", HttpMethod.Post, parameters);
+                        _client.Post($"/nodes/{_node}/subscription", parameters);
                     }
                     /// <summary>
                     /// Set subscription key.
@@ -5245,7 +5245,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("key", key);
-                        _client.ExecuteAction($"/nodes/{_node}/subscription", HttpMethod.Put, parameters);
+                        _client.Put($"/nodes/{_node}/subscription", parameters);
                     }
                 }
                 public class PVENetwork : Base
@@ -5272,7 +5272,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// </summary>
                         public void DeleteNetwork()
                         {
-                            _client.ExecuteAction($"/nodes/{_node}/network/{_iface}", HttpMethod.Delete);
+                            _client.Delete($"/nodes/{_node}/network/{_iface}");
                         }
                         /// <summary>
                         /// Read network device configuration
@@ -5280,7 +5280,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic NetworkConfig()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/network/{_iface}", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/network/{_iface}");
                         }
                         /// <summary>
                         /// Update network device configuration
@@ -5333,7 +5333,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("ovs_ports", ovs_ports);
                             parameters.Add("ovs_tag", ovs_tag);
                             parameters.Add("slaves", slaves);
-                            _client.ExecuteAction($"/nodes/{_node}/network/{_iface}", HttpMethod.Put, parameters);
+                            _client.Put($"/nodes/{_node}/network/{_iface}", parameters);
                         }
                     }
                     /// <summary>
@@ -5341,7 +5341,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// </summary>
                     public void RevertNetworkChanges()
                     {
-                        _client.ExecuteAction($"/nodes/{_node}/network", HttpMethod.Delete);
+                        _client.Delete($"/nodes/{_node}/network");
                     }
                     /// <summary>
                     /// List available networks
@@ -5353,7 +5353,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("type", type);
-                        return _client.ExecuteAction($"/nodes/{_node}/network", HttpMethod.Get, parameters);
+                        return _client.Get($"/nodes/{_node}/network", parameters);
                     }
                     /// <summary>
                     /// Create network device configuration
@@ -5406,7 +5406,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("ovs_ports", ovs_ports);
                         parameters.Add("ovs_tag", ovs_tag);
                         parameters.Add("slaves", slaves);
-                        _client.ExecuteAction($"/nodes/{_node}/network", HttpMethod.Post, parameters);
+                        _client.Post($"/nodes/{_node}/network", parameters);
                     }
                 }
                 public class PVETasks : Base
@@ -5453,7 +5453,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("limit", limit);
                                 parameters.Add("start", start);
-                                return _client.ExecuteAction($"/nodes/{_node}/tasks/{_upid}/log", HttpMethod.Get, parameters);
+                                return _client.Get($"/nodes/{_node}/tasks/{_upid}/log", parameters);
                             }
                         }
                         public class PVEStatus : Base
@@ -5472,7 +5472,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic ReadTaskStatus()
                             {
-                                return _client.ExecuteAction($"/nodes/{_node}/tasks/{_upid}/status", HttpMethod.Get);
+                                return _client.Get($"/nodes/{_node}/tasks/{_upid}/status");
                             }
                         }
                         /// <summary>
@@ -5480,7 +5480,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// </summary>
                         public void StopTask()
                         {
-                            _client.ExecuteAction($"/nodes/{_node}/tasks/{_upid}", HttpMethod.Delete);
+                            _client.Delete($"/nodes/{_node}/tasks/{_upid}");
                         }
                         /// <summary>
                         /// 
@@ -5488,7 +5488,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic UpidIndex()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/tasks/{_upid}", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/tasks/{_upid}");
                         }
                     }
                     /// <summary>
@@ -5508,7 +5508,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("start", start);
                         parameters.Add("userfilter", userfilter);
                         parameters.Add("vmid", vmid);
-                        return _client.ExecuteAction($"/nodes/{_node}/tasks", HttpMethod.Get, parameters);
+                        return _client.Get($"/nodes/{_node}/tasks", parameters);
                     }
                 }
                 public class PVEScan : Base
@@ -5547,7 +5547,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic Zfsscan()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/scan/zfs", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/scan/zfs");
                         }
                     }
                     public class PVENfs : Base
@@ -5567,7 +5567,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("server", server);
-                            return _client.ExecuteAction($"/nodes/{_node}/scan/nfs", HttpMethod.Get, parameters);
+                            return _client.Get($"/nodes/{_node}/scan/nfs", parameters);
                         }
                     }
                     public class PVEGlusterfs : Base
@@ -5587,7 +5587,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("server", server);
-                            return _client.ExecuteAction($"/nodes/{_node}/scan/glusterfs", HttpMethod.Get, parameters);
+                            return _client.Get($"/nodes/{_node}/scan/glusterfs", parameters);
                         }
                     }
                     public class PVEIscsi : Base
@@ -5607,7 +5607,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("portal", portal);
-                            return _client.ExecuteAction($"/nodes/{_node}/scan/iscsi", HttpMethod.Get, parameters);
+                            return _client.Get($"/nodes/{_node}/scan/iscsi", parameters);
                         }
                     }
                     public class PVELvm : Base
@@ -5624,7 +5624,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic Lvmscan()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/scan/lvm", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/scan/lvm");
                         }
                     }
                     public class PVELvmthin : Base
@@ -5644,7 +5644,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("vg", vg);
-                            return _client.ExecuteAction($"/nodes/{_node}/scan/lvmthin", HttpMethod.Get, parameters);
+                            return _client.Get($"/nodes/{_node}/scan/lvmthin", parameters);
                         }
                     }
                     public class PVEUsb : Base
@@ -5661,7 +5661,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic Usbscan()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/scan/usb", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/scan/usb");
                         }
                     }
                     /// <summary>
@@ -5670,7 +5670,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Index()
                     {
-                        return _client.ExecuteAction($"/nodes/{_node}/scan", HttpMethod.Get);
+                        return _client.Get($"/nodes/{_node}/scan");
                     }
                 }
                 public class PVEStorage : Base
@@ -5730,7 +5730,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// </summary>
                                 public void Delete()
                                 {
-                                    _client.ExecuteAction($"/nodes/{_node}/storage/{_storage}/content/{_volume}", HttpMethod.Delete);
+                                    _client.Delete($"/nodes/{_node}/storage/{_storage}/content/{_volume}");
                                 }
                                 /// <summary>
                                 /// Get volume attributes
@@ -5738,7 +5738,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public dynamic Info()
                                 {
-                                    return _client.ExecuteAction($"/nodes/{_node}/storage/{_storage}/content/{_volume}", HttpMethod.Get);
+                                    return _client.Get($"/nodes/{_node}/storage/{_storage}/content/{_volume}");
                                 }
                                 /// <summary>
                                 /// Copy a volume. This is experimental code - do not use.
@@ -5751,7 +5751,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("target", target);
                                     parameters.Add("target_node", target_node);
-                                    return _client.ExecuteAction($"/nodes/{_node}/storage/{_storage}/content/{_volume}", HttpMethod.Post, parameters);
+                                    return _client.Post($"/nodes/{_node}/storage/{_storage}/content/{_volume}", parameters);
                                 }
                             }
                             /// <summary>
@@ -5765,7 +5765,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("content", content);
                                 parameters.Add("vmid", vmid);
-                                return _client.ExecuteAction($"/nodes/{_node}/storage/{_storage}/content", HttpMethod.Get, parameters);
+                                return _client.Get($"/nodes/{_node}/storage/{_storage}/content", parameters);
                             }
                             /// <summary>
                             /// Allocate disk images.
@@ -5783,7 +5783,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("size", size);
                                 parameters.Add("vmid", vmid);
                                 parameters.Add("format", format);
-                                return _client.ExecuteAction($"/nodes/{_node}/storage/{_storage}/content", HttpMethod.Post, parameters);
+                                return _client.Post($"/nodes/{_node}/storage/{_storage}/content", parameters);
                             }
                         }
                         public class PVEStatus : Base
@@ -5802,7 +5802,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic ReadStatus()
                             {
-                                return _client.ExecuteAction($"/nodes/{_node}/storage/{_storage}/status", HttpMethod.Get);
+                                return _client.Get($"/nodes/{_node}/storage/{_storage}/status");
                             }
                         }
                         public class PVERrd : Base
@@ -5830,7 +5830,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("ds", ds);
                                 parameters.Add("timeframe", timeframe);
                                 parameters.Add("cf", cf);
-                                return _client.ExecuteAction($"/nodes/{_node}/storage/{_storage}/rrd", HttpMethod.Get, parameters);
+                                return _client.Get($"/nodes/{_node}/storage/{_storage}/rrd", parameters);
                             }
                         }
                         public class PVERrddata : Base
@@ -5856,7 +5856,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("timeframe", timeframe);
                                 parameters.Add("cf", cf);
-                                return _client.ExecuteAction($"/nodes/{_node}/storage/{_storage}/rrddata", HttpMethod.Get, parameters);
+                                return _client.Get($"/nodes/{_node}/storage/{_storage}/rrddata", parameters);
                             }
                         }
                         public class PVEUpload : Base
@@ -5882,7 +5882,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("content", content);
                                 parameters.Add("filename", filename);
                                 parameters.Add("tmpfilename", tmpfilename);
-                                return _client.ExecuteAction($"/nodes/{_node}/storage/{_storage}/upload", HttpMethod.Post, parameters);
+                                return _client.Post($"/nodes/{_node}/storage/{_storage}/upload", parameters);
                             }
                         }
                         /// <summary>
@@ -5891,7 +5891,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic Diridx()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/storage/{_storage}", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/storage/{_storage}");
                         }
                     }
                     /// <summary>
@@ -5909,7 +5909,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("enabled", enabled);
                         parameters.Add("storage", storage);
                         parameters.Add("target", target);
-                        return _client.ExecuteAction($"/nodes/{_node}/storage", HttpMethod.Get, parameters);
+                        return _client.Get($"/nodes/{_node}/storage", parameters);
                     }
                 }
                 public class PVEDisks : Base
@@ -5940,7 +5940,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic List()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/disks/list", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/disks/list");
                         }
                     }
                     public class PVESmart : Base
@@ -5962,7 +5962,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("disk", disk);
                             parameters.Add("healthonly", healthonly);
-                            return _client.ExecuteAction($"/nodes/{_node}/disks/smart", HttpMethod.Get, parameters);
+                            return _client.Get($"/nodes/{_node}/disks/smart", parameters);
                         }
                     }
                     public class PVEInitgpt : Base
@@ -5984,7 +5984,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("disk", disk);
                             parameters.Add("uuid", uuid);
-                            return _client.ExecuteAction($"/nodes/{_node}/disks/initgpt", HttpMethod.Post, parameters);
+                            return _client.Post($"/nodes/{_node}/disks/initgpt", parameters);
                         }
                     }
                     /// <summary>
@@ -5993,7 +5993,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Index()
                     {
-                        return _client.ExecuteAction($"/nodes/{_node}/disks", HttpMethod.Get);
+                        return _client.Get($"/nodes/{_node}/disks");
                     }
                 }
                 public class PVEApt : Base
@@ -6024,7 +6024,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic ListUpdates()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/apt/update", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/apt/update");
                         }
                         /// <summary>
                         /// This is used to resynchronize the package index files from their sources (apt-get update).
@@ -6037,7 +6037,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("notify", notify);
                             parameters.Add("quiet", quiet);
-                            return _client.ExecuteAction($"/nodes/{_node}/apt/update", HttpMethod.Post, parameters);
+                            return _client.Post($"/nodes/{_node}/apt/update", parameters);
                         }
                     }
                     public class PVEChangelog : Base
@@ -6059,7 +6059,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("name", name);
                             parameters.Add("version", version);
-                            return _client.ExecuteAction($"/nodes/{_node}/apt/changelog", HttpMethod.Get, parameters);
+                            return _client.Get($"/nodes/{_node}/apt/changelog", parameters);
                         }
                     }
                     public class PVEVersions : Base
@@ -6076,7 +6076,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic Versions()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/apt/versions", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/apt/versions");
                         }
                     }
                     /// <summary>
@@ -6085,7 +6085,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Index()
                     {
-                        return _client.ExecuteAction($"/nodes/{_node}/apt", HttpMethod.Get);
+                        return _client.Get($"/nodes/{_node}/apt");
                     }
                 }
                 public class PVEFirewall : Base
@@ -6129,7 +6129,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("digest", digest);
-                                _client.ExecuteAction($"/nodes/{_node}/firewall/rules/{_pos}", HttpMethod.Delete, parameters);
+                                _client.Delete($"/nodes/{_node}/firewall/rules/{_pos}", parameters);
                             }
                             /// <summary>
                             /// Get single rule data.
@@ -6137,7 +6137,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic GetRule()
                             {
-                                return _client.ExecuteAction($"/nodes/{_node}/firewall/rules/{_pos}", HttpMethod.Get);
+                                return _client.Get($"/nodes/{_node}/firewall/rules/{_pos}");
                             }
                             /// <summary>
                             /// Modify rule data.
@@ -6174,7 +6174,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("source", source);
                                 parameters.Add("sport", sport);
                                 parameters.Add("type", type);
-                                _client.ExecuteAction($"/nodes/{_node}/firewall/rules/{_pos}", HttpMethod.Put, parameters);
+                                _client.Put($"/nodes/{_node}/firewall/rules/{_pos}", parameters);
                             }
                         }
                         /// <summary>
@@ -6183,7 +6183,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic GetRules()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/firewall/rules", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/firewall/rules");
                         }
                         /// <summary>
                         /// Create new rule.
@@ -6218,7 +6218,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("proto", proto);
                             parameters.Add("source", source);
                             parameters.Add("sport", sport);
-                            _client.ExecuteAction($"/nodes/{_node}/firewall/rules", HttpMethod.Post, parameters);
+                            _client.Post($"/nodes/{_node}/firewall/rules", parameters);
                         }
                     }
                     public class PVEOptions : Base
@@ -6235,7 +6235,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic GetOptions()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/firewall/options", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/firewall/options");
                         }
                         /// <summary>
                         /// Set Firewall options.
@@ -6271,7 +6271,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             parameters.Add("smurf_log_level", smurf_log_level);
                             parameters.Add("tcp_flags_log_level", tcp_flags_log_level);
                             parameters.Add("tcpflags", tcpflags);
-                            _client.ExecuteAction($"/nodes/{_node}/firewall/options", HttpMethod.Put, parameters);
+                            _client.Put($"/nodes/{_node}/firewall/options", parameters);
                         }
                     }
                     public class PVELog : Base
@@ -6293,7 +6293,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("limit", limit);
                             parameters.Add("start", start);
-                            return _client.ExecuteAction($"/nodes/{_node}/firewall/log", HttpMethod.Get, parameters);
+                            return _client.Get($"/nodes/{_node}/firewall/log", parameters);
                         }
                     }
                     /// <summary>
@@ -6302,7 +6302,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Index()
                     {
-                        return _client.ExecuteAction($"/nodes/{_node}/firewall", HttpMethod.Get);
+                        return _client.Get($"/nodes/{_node}/firewall");
                     }
                 }
                 public class PVEReplication : Base
@@ -6346,7 +6346,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic JobStatus()
                             {
-                                return _client.ExecuteAction($"/nodes/{_node}/replication/{_id}/status", HttpMethod.Get);
+                                return _client.Get($"/nodes/{_node}/replication/{_id}/status");
                             }
                         }
                         public class PVELog : Base
@@ -6370,7 +6370,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("limit", limit);
                                 parameters.Add("start", start);
-                                return _client.ExecuteAction($"/nodes/{_node}/replication/{_id}/log", HttpMethod.Get, parameters);
+                                return _client.Get($"/nodes/{_node}/replication/{_id}/log", parameters);
                             }
                         }
                         public class PVEScheduleNow : Base
@@ -6389,7 +6389,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public dynamic ScheduleNow()
                             {
-                                return _client.ExecuteAction($"/nodes/{_node}/replication/{_id}/schedule_now", HttpMethod.Post);
+                                return _client.Post($"/nodes/{_node}/replication/{_id}/schedule_now");
                             }
                         }
                         /// <summary>
@@ -6398,7 +6398,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public dynamic Index()
                         {
-                            return _client.ExecuteAction($"/nodes/{_node}/replication/{_id}", HttpMethod.Get);
+                            return _client.Get($"/nodes/{_node}/replication/{_id}");
                         }
                     }
                     /// <summary>
@@ -6410,7 +6410,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("guest", guest);
-                        return _client.ExecuteAction($"/nodes/{_node}/replication", HttpMethod.Get, parameters);
+                        return _client.Get($"/nodes/{_node}/replication", parameters);
                     }
                 }
                 public class PVEVersion : Base
@@ -6427,7 +6427,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Version()
                     {
-                        return _client.ExecuteAction($"/nodes/{_node}/version", HttpMethod.Get);
+                        return _client.Get($"/nodes/{_node}/version");
                     }
                 }
                 public class PVEStatus : Base
@@ -6444,7 +6444,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Status()
                     {
-                        return _client.ExecuteAction($"/nodes/{_node}/status", HttpMethod.Get);
+                        return _client.Get($"/nodes/{_node}/status");
                     }
                     /// <summary>
                     /// Reboot or shutdown a node.
@@ -6455,7 +6455,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("command", command);
-                        _client.ExecuteAction($"/nodes/{_node}/status", HttpMethod.Post, parameters);
+                        _client.Post($"/nodes/{_node}/status", parameters);
                     }
                 }
                 public class PVENetstat : Base
@@ -6472,7 +6472,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Netstat()
                     {
-                        return _client.ExecuteAction($"/nodes/{_node}/netstat", HttpMethod.Get);
+                        return _client.Get($"/nodes/{_node}/netstat");
                     }
                 }
                 public class PVEExecute : Base
@@ -6492,7 +6492,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("commands", commands);
-                        return _client.ExecuteAction($"/nodes/{_node}/execute", HttpMethod.Post, parameters);
+                        return _client.Post($"/nodes/{_node}/execute", parameters);
                     }
                 }
                 public class PVERrd : Base
@@ -6518,7 +6518,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("ds", ds);
                         parameters.Add("timeframe", timeframe);
                         parameters.Add("cf", cf);
-                        return _client.ExecuteAction($"/nodes/{_node}/rrd", HttpMethod.Get, parameters);
+                        return _client.Get($"/nodes/{_node}/rrd", parameters);
                     }
                 }
                 public class PVERrddata : Base
@@ -6542,7 +6542,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("timeframe", timeframe);
                         parameters.Add("cf", cf);
-                        return _client.ExecuteAction($"/nodes/{_node}/rrddata", HttpMethod.Get, parameters);
+                        return _client.Get($"/nodes/{_node}/rrddata", parameters);
                     }
                 }
                 public class PVESyslog : Base
@@ -6568,7 +6568,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("since", since);
                         parameters.Add("start", start);
                         parameters.Add("until", until);
-                        return _client.ExecuteAction($"/nodes/{_node}/syslog", HttpMethod.Get, parameters);
+                        return _client.Get($"/nodes/{_node}/syslog", parameters);
                     }
                 }
                 public class PVEVncshell : Base
@@ -6594,7 +6594,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("upgrade", upgrade);
                         parameters.Add("websocket", websocket);
                         parameters.Add("width", width);
-                        return _client.ExecuteAction($"/nodes/{_node}/vncshell", HttpMethod.Post, parameters);
+                        return _client.Post($"/nodes/{_node}/vncshell", parameters);
                     }
                 }
                 public class PVEVncwebsocket : Base
@@ -6616,7 +6616,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("port", port);
                         parameters.Add("vncticket", vncticket);
-                        return _client.ExecuteAction($"/nodes/{_node}/vncwebsocket", HttpMethod.Get, parameters);
+                        return _client.Get($"/nodes/{_node}/vncwebsocket", parameters);
                     }
                 }
                 public class PVESpiceshell : Base
@@ -6638,7 +6638,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("proxy", proxy);
                         parameters.Add("upgrade", upgrade);
-                        return _client.ExecuteAction($"/nodes/{_node}/spiceshell", HttpMethod.Post, parameters);
+                        return _client.Post($"/nodes/{_node}/spiceshell", parameters);
                     }
                 }
                 public class PVEDns : Base
@@ -6655,7 +6655,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Dns()
                     {
-                        return _client.ExecuteAction($"/nodes/{_node}/dns", HttpMethod.Get);
+                        return _client.Get($"/nodes/{_node}/dns");
                     }
                     /// <summary>
                     /// Write DNS settings.
@@ -6671,7 +6671,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("dns1", dns1);
                         parameters.Add("dns2", dns2);
                         parameters.Add("dns3", dns3);
-                        _client.ExecuteAction($"/nodes/{_node}/dns", HttpMethod.Put, parameters);
+                        _client.Put($"/nodes/{_node}/dns", parameters);
                     }
                 }
                 public class PVETime : Base
@@ -6688,7 +6688,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Time()
                     {
-                        return _client.ExecuteAction($"/nodes/{_node}/time", HttpMethod.Get);
+                        return _client.Get($"/nodes/{_node}/time");
                     }
                     /// <summary>
                     /// Set time zone.
@@ -6698,7 +6698,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("timezone", timezone);
-                        _client.ExecuteAction($"/nodes/{_node}/time", HttpMethod.Put, parameters);
+                        _client.Put($"/nodes/{_node}/time", parameters);
                     }
                 }
                 public class PVEAplinfo : Base
@@ -6715,7 +6715,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Aplinfo()
                     {
-                        return _client.ExecuteAction($"/nodes/{_node}/aplinfo", HttpMethod.Get);
+                        return _client.Get($"/nodes/{_node}/aplinfo");
                     }
                     /// <summary>
                     /// Download appliance templates.
@@ -6728,7 +6728,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("storage", storage);
                         parameters.Add("template", template);
-                        return _client.ExecuteAction($"/nodes/{_node}/aplinfo", HttpMethod.Post, parameters);
+                        return _client.Post($"/nodes/{_node}/aplinfo", parameters);
                     }
                 }
                 public class PVEReport : Base
@@ -6745,7 +6745,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Report()
                     {
-                        return _client.ExecuteAction($"/nodes/{_node}/report", HttpMethod.Get);
+                        return _client.Get($"/nodes/{_node}/report");
                     }
                 }
                 public class PVEStartall : Base
@@ -6767,7 +6767,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("force", force);
                         parameters.Add("vms", vms);
-                        return _client.ExecuteAction($"/nodes/{_node}/startall", HttpMethod.Post, parameters);
+                        return _client.Post($"/nodes/{_node}/startall", parameters);
                     }
                 }
                 public class PVEStopall : Base
@@ -6787,7 +6787,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("vms", vms);
-                        return _client.ExecuteAction($"/nodes/{_node}/stopall", HttpMethod.Post, parameters);
+                        return _client.Post($"/nodes/{_node}/stopall", parameters);
                     }
                 }
                 public class PVEMigrateall : Base
@@ -6811,7 +6811,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("target", target);
                         parameters.Add("maxworkers", maxworkers);
                         parameters.Add("vms", vms);
-                        return _client.ExecuteAction($"/nodes/{_node}/migrateall", HttpMethod.Post, parameters);
+                        return _client.Post($"/nodes/{_node}/migrateall", parameters);
                     }
                 }
                 /// <summary>
@@ -6820,7 +6820,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <returns></returns>
                 public dynamic Index()
                 {
-                    return _client.ExecuteAction($"/nodes/{_node}", HttpMethod.Get);
+                    return _client.Get($"/nodes/{_node}");
                 }
             }
             /// <summary>
@@ -6829,7 +6829,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <returns></returns>
             public dynamic Index()
             {
-                return _client.ExecuteAction($"/nodes", HttpMethod.Get);
+                return _client.Get($"/nodes");
             }
         }
         public class PVEStorage : Base
@@ -6852,7 +6852,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// </summary>
                 public void Delete()
                 {
-                    _client.ExecuteAction($"/storage/{_storage}", HttpMethod.Delete);
+                    _client.Delete($"/storage/{_storage}");
                 }
                 /// <summary>
                 /// Read storage configuration.
@@ -6860,7 +6860,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <returns></returns>
                 public dynamic Read()
                 {
-                    return _client.ExecuteAction($"/storage/{_storage}", HttpMethod.Get);
+                    return _client.Get($"/storage/{_storage}");
                 }
                 /// <summary>
                 /// Update storage configuration.
@@ -6921,7 +6921,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("tagged_only", tagged_only);
                     parameters.Add("transport", transport);
                     parameters.Add("username", username);
-                    _client.ExecuteAction($"/storage/{_storage}", HttpMethod.Put, parameters);
+                    _client.Put($"/storage/{_storage}", parameters);
                 }
             }
             /// <summary>
@@ -6934,7 +6934,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("type", type);
-                return _client.ExecuteAction($"/storage", HttpMethod.Get, parameters);
+                return _client.Get($"/storage", parameters);
             }
             /// <summary>
             /// Create a new storage.
@@ -7018,7 +7018,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 parameters.Add("username", username);
                 parameters.Add("vgname", vgname);
                 parameters.Add("volume", volume);
-                _client.ExecuteAction($"/storage", HttpMethod.Post, parameters);
+                _client.Post($"/storage", parameters);
             }
         }
         public class PVEAccess : Base
@@ -7061,7 +7061,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// </summary>
                     public void DeleteUser()
                     {
-                        _client.ExecuteAction($"/access/users/{_userid}", HttpMethod.Delete);
+                        _client.Delete($"/access/users/{_userid}");
                     }
                     /// <summary>
                     /// Get user configuration.
@@ -7069,7 +7069,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic ReadUser()
                     {
-                        return _client.ExecuteAction($"/access/users/{_userid}", HttpMethod.Get);
+                        return _client.Get($"/access/users/{_userid}");
                     }
                     /// <summary>
                     /// Update user configuration.
@@ -7095,7 +7095,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("groups", groups);
                         parameters.Add("keys", keys);
                         parameters.Add("lastname", lastname);
-                        _client.ExecuteAction($"/access/users/{_userid}", HttpMethod.Put, parameters);
+                        _client.Put($"/access/users/{_userid}", parameters);
                     }
                 }
                 /// <summary>
@@ -7107,7 +7107,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("enabled", enabled);
-                    return _client.ExecuteAction($"/access/users", HttpMethod.Get, parameters);
+                    return _client.Get($"/access/users", parameters);
                 }
                 /// <summary>
                 /// Create new user.
@@ -7135,7 +7135,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("keys", keys);
                     parameters.Add("lastname", lastname);
                     parameters.Add("password", password);
-                    _client.ExecuteAction($"/access/users", HttpMethod.Post, parameters);
+                    _client.Post($"/access/users", parameters);
                 }
             }
             public class PVEGroups : Base
@@ -7158,7 +7158,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// </summary>
                     public void DeleteGroup()
                     {
-                        _client.ExecuteAction($"/access/groups/{_groupid}", HttpMethod.Delete);
+                        _client.Delete($"/access/groups/{_groupid}");
                     }
                     /// <summary>
                     /// Get group configuration.
@@ -7166,7 +7166,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic ReadGroup()
                     {
-                        return _client.ExecuteAction($"/access/groups/{_groupid}", HttpMethod.Get);
+                        return _client.Get($"/access/groups/{_groupid}");
                     }
                     /// <summary>
                     /// Update group data.
@@ -7176,7 +7176,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("comment", comment);
-                        _client.ExecuteAction($"/access/groups/{_groupid}", HttpMethod.Put, parameters);
+                        _client.Put($"/access/groups/{_groupid}", parameters);
                     }
                 }
                 /// <summary>
@@ -7185,7 +7185,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <returns></returns>
                 public dynamic Index()
                 {
-                    return _client.ExecuteAction($"/access/groups", HttpMethod.Get);
+                    return _client.Get($"/access/groups");
                 }
                 /// <summary>
                 /// Create new group.
@@ -7197,7 +7197,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("groupid", groupid);
                     parameters.Add("comment", comment);
-                    _client.ExecuteAction($"/access/groups", HttpMethod.Post, parameters);
+                    _client.Post($"/access/groups", parameters);
                 }
             }
             public class PVERoles : Base
@@ -7220,7 +7220,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// </summary>
                     public void DeleteRole()
                     {
-                        _client.ExecuteAction($"/access/roles/{_roleid}", HttpMethod.Delete);
+                        _client.Delete($"/access/roles/{_roleid}");
                     }
                     /// <summary>
                     /// Get role configuration.
@@ -7228,7 +7228,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic ReadRole()
                     {
-                        return _client.ExecuteAction($"/access/roles/{_roleid}", HttpMethod.Get);
+                        return _client.Get($"/access/roles/{_roleid}");
                     }
                     /// <summary>
                     /// Create new role.
@@ -7240,7 +7240,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("privs", privs);
                         parameters.Add("append", append);
-                        _client.ExecuteAction($"/access/roles/{_roleid}", HttpMethod.Put, parameters);
+                        _client.Put($"/access/roles/{_roleid}", parameters);
                     }
                 }
                 /// <summary>
@@ -7249,7 +7249,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <returns></returns>
                 public dynamic Index()
                 {
-                    return _client.ExecuteAction($"/access/roles", HttpMethod.Get);
+                    return _client.Get($"/access/roles");
                 }
                 /// <summary>
                 /// Create new role.
@@ -7261,7 +7261,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("roleid", roleid);
                     parameters.Add("privs", privs);
-                    _client.ExecuteAction($"/access/roles", HttpMethod.Post, parameters);
+                    _client.Post($"/access/roles", parameters);
                 }
             }
             public class PVEAcl : Base
@@ -7276,7 +7276,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <returns></returns>
                 public dynamic ReadAcl()
                 {
-                    return _client.ExecuteAction($"/access/acl", HttpMethod.Get);
+                    return _client.Get($"/access/acl");
                 }
                 /// <summary>
                 /// Update Access Control List (add or remove permissions).
@@ -7296,7 +7296,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("groups", groups);
                     parameters.Add("propagate", propagate);
                     parameters.Add("users", users);
-                    _client.ExecuteAction($"/access/acl", HttpMethod.Put, parameters);
+                    _client.Put($"/access/acl", parameters);
                 }
             }
             public class PVEDomains : Base
@@ -7319,7 +7319,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// </summary>
                     public void Delete()
                     {
-                        _client.ExecuteAction($"/access/domains/{_realm}", HttpMethod.Delete);
+                        _client.Delete($"/access/domains/{_realm}");
                     }
                     /// <summary>
                     /// Get auth server configuration.
@@ -7327,7 +7327,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public dynamic Read()
                     {
-                        return _client.ExecuteAction($"/access/domains/{_realm}", HttpMethod.Get);
+                        return _client.Get($"/access/domains/{_realm}");
                     }
                     /// <summary>
                     /// Update authentication server settings.
@@ -7361,7 +7361,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("server2", server2);
                         parameters.Add("tfa", tfa);
                         parameters.Add("user_attr", user_attr);
-                        _client.ExecuteAction($"/access/domains/{_realm}", HttpMethod.Put, parameters);
+                        _client.Put($"/access/domains/{_realm}", parameters);
                     }
                 }
                 /// <summary>
@@ -7370,7 +7370,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <returns></returns>
                 public dynamic Index()
                 {
-                    return _client.ExecuteAction($"/access/domains", HttpMethod.Get);
+                    return _client.Get($"/access/domains");
                 }
                 /// <summary>
                 /// Add an authentication server.
@@ -7405,7 +7405,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("server2", server2);
                     parameters.Add("tfa", tfa);
                     parameters.Add("user_attr", user_attr);
-                    _client.ExecuteAction($"/access/domains", HttpMethod.Post, parameters);
+                    _client.Post($"/access/domains", parameters);
                 }
             }
             public class PVETicket : Base
@@ -7419,7 +7419,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// </summary>
                 public void GetTicket()
                 {
-                    _client.ExecuteAction($"/access/ticket", HttpMethod.Get);
+                    _client.Get($"/access/ticket");
                 }
                 /// <summary>
                 /// Create or verify authentication ticket.
@@ -7440,7 +7440,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("path", path);
                     parameters.Add("privs", privs);
                     parameters.Add("realm", realm);
-                    return _client.ExecuteAction($"/access/ticket", HttpMethod.Post, parameters);
+                    return _client.Post($"/access/ticket", parameters);
                 }
             }
             public class PVEPassword : Base
@@ -7459,7 +7459,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("password", password);
                     parameters.Add("userid", userid);
-                    _client.ExecuteAction($"/access/password", HttpMethod.Put, parameters);
+                    _client.Put($"/access/password", parameters);
                 }
             }
             /// <summary>
@@ -7468,7 +7468,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <returns></returns>
             public dynamic Index()
             {
-                return _client.ExecuteAction($"/access", HttpMethod.Get);
+                return _client.Get($"/access");
             }
         }
         public class PVEPools : Base
@@ -7491,7 +7491,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// </summary>
                 public void DeletePool()
                 {
-                    _client.ExecuteAction($"/pools/{_poolid}", HttpMethod.Delete);
+                    _client.Delete($"/pools/{_poolid}");
                 }
                 /// <summary>
                 /// Get pool configuration.
@@ -7499,7 +7499,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <returns></returns>
                 public dynamic ReadPool()
                 {
-                    return _client.ExecuteAction($"/pools/{_poolid}", HttpMethod.Get);
+                    return _client.Get($"/pools/{_poolid}");
                 }
                 /// <summary>
                 /// Update pool data.
@@ -7515,7 +7515,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("delete", delete);
                     parameters.Add("storage", storage);
                     parameters.Add("vms", vms);
-                    _client.ExecuteAction($"/pools/{_poolid}", HttpMethod.Put, parameters);
+                    _client.Put($"/pools/{_poolid}", parameters);
                 }
             }
             /// <summary>
@@ -7524,7 +7524,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <returns></returns>
             public dynamic Index()
             {
-                return _client.ExecuteAction($"/pools", HttpMethod.Get);
+                return _client.Get($"/pools");
             }
             /// <summary>
             /// Create new pool.
@@ -7536,7 +7536,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("poolid", poolid);
                 parameters.Add("comment", comment);
-                _client.ExecuteAction($"/pools", HttpMethod.Post, parameters);
+                _client.Post($"/pools", parameters);
             }
         }
         public class PVEVersion : Base
@@ -7551,7 +7551,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <returns></returns>
             public dynamic Version()
             {
-                return _client.ExecuteAction($"/version", HttpMethod.Get);
+                return _client.Get($"/version");
             }
         }
     }

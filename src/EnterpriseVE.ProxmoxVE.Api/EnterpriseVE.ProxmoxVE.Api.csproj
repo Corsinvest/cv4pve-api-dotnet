@@ -3,7 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
-    <Version>1.0.9</Version>
+    <Version>1.0.10</Version>
     <Company>Enterprise VE</Company>
     <Authors>Daniele Corsini</Authors>
     <Copyright>Enterprise VE</Copyright>
