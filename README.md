@@ -1,11 +1,12 @@
 # EnterpriseVE.ProxmoxVE.Api
+
 ProxmoVE Client API .Net
 
 [ProxmoxVE Api](https://pve.proxmox.com/pve-docs/api-viewer/)
 
-[Nuget](https://www.nuget.org/packages/EnterpriseVE.ProxmoxVE.Api) 
+[Nuget](https://www.nuget.org/packages/EnterpriseVE.ProxmoxVE.Api)
 
-```
+```text
     ______      __                       _              _    ________
    / ____/___  / /____  _________  _____(_)_______     | |  / / ____/
   / __/ / __ \/ __/ _ \/ ___/ __ \/ ___/ / ___/ _ \    | | / / __/
@@ -16,58 +17,47 @@ ProxmoVE Client API .Net
                                                        (Made in Italy)
 ```
 
-# General
-The client is generated from a JSON Api on ProxmoxVE. 
+## General
 
-#Main features
+The client is generated from a JSON Api on ProxmoxVE.
+
+## Main features
+
 * Easy to learn
 * Method named
 * Full method generated from documentation
 * Comment any method and parameters
 * Parameters indexed eg [n] is structured in array index and value
 * Tree structure
-  * client.Nodes["pve1"].Qemu[100].Snapshot().snapshotList()->data
-* Return data proxmox
+  * client.Nodes["pve1"].Qemu[100].Snapshot().snapshotList().Response.data
+* Return data Proxmox VE
 * Return result status
   * StatusCode
   * ReasonPhrase
+  * IsSuccessStatusCode
+* Wait task finish task
+  * WaitForTaskToFinish
 * Method directry access
   * Get
   * Post
   * Put
   * Delete
-* login return bool if access
-* return dynamix ExpandoObject
+* Login return bool if access
+* Return Result class more information
 
-# Result
-The result is dynamic [ExpandoObject](https://msdn.microsoft.com/en-US/library/system.dynamic.expandoobject(v=vs.110).aspx) and  contains more property:
-- returned from ProxmoxVE (data,errors,...) 
-- **InError** (bool) : Contains errors.
-- **Response** (ExpandoObject): response Http request.
-  - **StatusCode** (System.Net.HttpStatusCode): Status code of the HTTP response.
-  - **ReasonPhrase** (string): The reason phrase which typically is sent by servers together with the status code.
-  - **IsSuccessStatusCode** (bool) : Gets a value that indicates if the HTTP response was successful.
-  
+## Result
 
-Example:
+The result is class **Result** and contain properties:
 
-With errors:
-```json
-{
-  "errors": {
-    "snapname": "invalid format - invalid configuration ID 'Test 2311'\n"
-  },
-  "data": null,
-  "Response": {
-    "StatusCode": 400,
-    "ReasonPhrase": "Parameter verification failed.",
-    "IsSuccessStatusCode": false
-  },
-  "InError": true
-}
-```
+* **Response** returned from ProxmoxVE (data,errors,...) dynamic [ExpandoObject](https://msdn.microsoft.com/en-US/library/system.dynamic.expandoobject(v=vs.110).aspx)
+* **ResponseInError** (bool) : Contains errors from ProxmoxVE.
+* **StatusCode** (System.Net.HttpStatusCode): Status code of the HTTP response.
+* **ReasonPhrase** (string): The reason phrase which typically is sent by servers together with the status code.
+* **IsSuccessStatusCode** (bool) : Gets a value that indicates if the HTTP response was successful.
+* **GetError()** (string) : Get error.
 
-Normal result
+Example result:
+
 ```json
 {
   "data": {
@@ -88,17 +78,11 @@ Normal result
     "virtio0": "local-zfs:vm-100-disk-1,cache=writeback,size=50G",
     "ostype": "win8",
     "name": "phenometa"
-  },
-  "Response": {
-    "StatusCode": 200,
-    "ReasonPhrase": "OK",
-    "IsSuccessStatusCode": true
-  },  
-  "InError": false
+  }
 }
 ```
 
-# Usage
+## Usage
 
 ```c#
 var client = new Client("10.92.90.91");
@@ -106,12 +90,12 @@ if (client.Login("root", "password"))
 {
     var vm = client.Nodes["pve1"].Qemu[100];
 
-    //config vm 
+    //config vm
     var config = vm.Config.VmConfig();
-    Console.WriteLine(Client.ObjectToJson(config));
+    Console.WriteLine(Client.ObjectToJson(config.Response));
 
     //create snapshot
-    dynamic ret = vm.Snapshot.Snapshot("pippo2311");
+    var response = vm.Snapshot.Snapshot("pippo2311");
 
     //update snapshot description
     vm.Snapshot["pippo2311"].Config.UpdateSnapshotConfig("descr");
@@ -119,8 +103,8 @@ if (client.Login("root", "password"))
     //delete snapshot
     vm.Snapshot["pippo2311"].Delsnapshot();
 
-    //list of snapshot 
-    foreach (dynamic snapshot in vm.Snapshot.SnapshotList().data)
+    //list of snapshot
+    foreach (var snapshot in vm.Snapshot.SnapshotList().Response.data)
     {
         Console.WriteLine(Client.ObjectToJson(snapshot));
         Console.WriteLine(snapshot.name);
