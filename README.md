@@ -6,6 +6,8 @@ ProxmoVE Client API .Net
 
 [Nuget](https://www.nuget.org/packages/EnterpriseVE.ProxmoxVE.Api)
 
+[![AppVeyor branch](https://img.shields.io/appveyor/ci/franklupo/eve2pve-api-dotnet/master.svg)](https://ci.appveyor.com/project/franklupo/eve2pve-api-dotnet)
+
 ```text
     ______      __                       _              _    ________
    / ____/___  / /____  _________  _____(_)_______     | |  / / ____/
