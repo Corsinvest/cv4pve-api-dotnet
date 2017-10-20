@@ -2,8 +2,6 @@ version: 1.0.{build}
 image: Visual Studio 2017
 build_script:
 - cmd: >-
-    cd src/EnterpriseVE.ProxmoxVE.Api
-
     dotnet --version
 
     dotnet restore

@@ -1,5 +1,7 @@
 # EnterpriseVE.ProxmoxVE.Api
 
+[![License](https://img.shields.io/github/license/EnterpriseVE/EnterpriseVE.ProxmoxVE.Api.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+
 ProxmoVE Client API .Net
 
 [ProxmoxVE Api](https://pve.proxmox.com/pve-docs/api-viewer/)
@@ -27,6 +29,11 @@ The client is generated from a JSON Api on ProxmoxVE.
 
 * Easy to learn
 * Method named
+* Method native sufix Rest (prevent)
+  * GetRest
+  * CreateRest (Post)
+  * SetRest (Put)
+  * DeleteRest
 * Full method generated from documentation
 * Comment any method and parameters
 * Parameters indexed eg [n] is structured in array index and value
@@ -41,8 +48,8 @@ The client is generated from a JSON Api on ProxmoxVE.
   * WaitForTaskToFinish
 * Method directry access
   * Get
-  * Post
-  * Put
+  * Create (Post)
+  * Set (Put)
   * Delete
 * Login return bool if access
 * Return Result class more information
