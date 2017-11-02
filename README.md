@@ -34,6 +34,7 @@ The client is generated from a JSON Api on ProxmoxVE.
   * CreateRest (Post)
   * SetRest (Put)
   * DeleteRest
+* Set ResponseType json, png
 * Full method generated from documentation
 * Comment any method and parameters
 * Parameters indexed eg [n] is structured in array index and value
@@ -118,5 +119,9 @@ if (client.Login("root", "password"))
         Console.WriteLine(Client.ObjectToJson(snapshot));
         Console.WriteLine(snapshot.name);
     }
+
+    client.ResponseType = "png";
+    var dataImg = client.Nodes["pve1"].Rrd.Rrd("cpu", "day").Response;
+    Console.WriteLine("<img src=\"{dataImg}\" \>");
 }
 ```

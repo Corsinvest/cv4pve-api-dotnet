@@ -77,16 +77,22 @@ namespace EnterpriseVE.ProxmoxVE.Api
     {
         private string _ticketCSRFPreventionToken;
         private string _ticketPVEAuthCookie;
-        private string _baseUrl;
-        public Client(string hostName, int port = 8006)
+        public Client(string hostname, int port = 8006)
         {
             _client = this;
-            HostName = hostName;
+            Hostname = hostname;
             Port = port;
-            _baseUrl = "https://" + hostName + ":" + port + "/api2/json";
         }
-        public string HostName { get; private set; }
+        public string Hostname { get; private set; }
         public int Port { get; private set; }
+        /// <summary>
+        /// Get/Set the response type that is going to be returned when doing requests (json, png). 
+        /// </summary>
+        public string ResponseType { get; set; } = "json";
+        /// <summary>
+        /// Returns the base URL used to interact with the ProxmoxVE API. 
+        /// </summary>
+        public string GetApiUrl() { return $"https://{Hostname}:{Port}/api2/{ResponseType}"; }
         /// <summary>
         /// Convert object to JSON.
         /// </summary>
@@ -150,7 +156,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             })
             using (var client = new HttpClient(handler))
             {
-                client.BaseAddress = new Uri(_baseUrl);
+                client.BaseAddress = new Uri(GetApiUrl());
                 //load parameters
                 var @params = new Dictionary<string, string>();
                 if (parameters != null)
@@ -162,7 +168,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         @params.Add(parameter.Key, HttpUtility.UrlEncode(value.ToString()));
                     }
                 }
-                var uriString = _baseUrl + resource;
+                var uriString = GetApiUrl() + resource;
                 if (method == HttpMethod.Get && @params.Count > 0)
                 {
                     uriString += "?" + string.Join("&", (from a in @params
@@ -176,9 +182,19 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     handler.CookieContainer.Add(request.RequestUri, new Cookie("PVEAuthCookie", _ticketPVEAuthCookie));
                     request.Headers.Add("CSRFPreventionToken", _ticketCSRFPreventionToken);
                 }
+
                 var response = client.SendAsync(request).Result;
-                var stringContent = response.Content.ReadAsStringAsync().Result;
-                dynamic result = JsonConvert.DeserializeObject<ExpandoObject>(stringContent);
+                dynamic result = null;
+                if (ResponseType == "json")
+                {
+                    var stringContent = response.Content.ReadAsStringAsync().Result;
+                    result = JsonConvert.DeserializeObject<ExpandoObject>(stringContent);
+                }
+                else if (ResponseType == "png")
+                {
+                    result = "data:image/png;base64," +
+                             Convert.ToBase64String(response.Content.ReadAsByteArrayAsync().Result);
+                }
                 if (result == null) { result = new ExpandoObject(); }
                 return new Result(result,
                                 response.StatusCode,
@@ -1667,7 +1683,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <param name="max_relocate">Maximal number of service relocate tries when a service failes to start.</param>
                         /// <param name="max_restart">Maximal number of tries to restart the service on a node after its start failed.</param>
                         /// <param name="state">Requested resource state.
-                        ///   Enum: started,stopped,enabled,disabled</param>
+                        ///   Enum: started,stopped,enabled,disabled,ignored</param>
                         /// <returns></returns>
                         public Result SetRest(string comment = null, string delete = null, string digest = null, string group = null, int? max_relocate = null, int? max_restart = null, string state = null)
                         {
@@ -1691,7 +1707,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <param name="max_relocate">Maximal number of service relocate tries when a service failes to start.</param>
                         /// <param name="max_restart">Maximal number of tries to restart the service on a node after its start failed.</param>
                         /// <param name="state">Requested resource state.
-                        ///   Enum: started,stopped,enabled,disabled</param>
+                        ///   Enum: started,stopped,enabled,disabled,ignored</param>
                         /// <returns></returns>
                         public Result Update(string comment = null, string delete = null, string digest = null, string group = null, int? max_relocate = null, int? max_restart = null, string state = null) { return SetRest(comment, delete, digest, group, max_relocate, max_restart, state); }
                     }
@@ -1723,7 +1739,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="max_relocate">Maximal number of service relocate tries when a service failes to start.</param>
                     /// <param name="max_restart">Maximal number of tries to restart the service on a node after its start failed.</param>
                     /// <param name="state">Requested resource state.
-                    ///   Enum: started,stopped,enabled,disabled</param>
+                    ///   Enum: started,stopped,enabled,disabled,ignored</param>
                     /// <param name="type">Resource type.
                     ///   Enum: ct,vm</param>
                     /// <returns></returns>
@@ -1748,7 +1764,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="max_relocate">Maximal number of service relocate tries when a service failes to start.</param>
                     /// <param name="max_restart">Maximal number of tries to restart the service on a node after its start failed.</param>
                     /// <param name="state">Requested resource state.
-                    ///   Enum: started,stopped,enabled,disabled</param>
+                    ///   Enum: started,stopped,enabled,disabled,ignored</param>
                     /// <param name="type">Resource type.
                     ///   Enum: ct,vm</param>
                     /// <returns></returns>
@@ -3122,9 +3138,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="vga">Select the VGA type.
                             ///   Enum: std,cirrus,vmware,qxl,serial0,serial1,serial2,serial3,qxl2,qxl3,qxl4</param>
                             /// <param name="virtioN">Use volume as VIRTIO hard disk (n is 0 to 15).</param>
+                            /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result CreateRest(bool? acpi = null, bool? agent = null, string args = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string watchdog = null)
+                            public Result CreateRest(bool? acpi = null, bool? agent = null, string args = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("acpi", acpi);
@@ -3176,6 +3193,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("template", template);
                                 parameters.Add("vcpus", vcpus);
                                 parameters.Add("vga", vga);
+                                parameters.Add("vmstatestorage", vmstatestorage);
                                 parameters.Add("watchdog", watchdog);
                                 AddIndexedParameter(parameters, "hostpci", hostpciN);
                                 AddIndexedParameter(parameters, "ide", ideN);
@@ -3260,9 +3278,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="vga">Select the VGA type.
                             ///   Enum: std,cirrus,vmware,qxl,serial0,serial1,serial2,serial3,qxl2,qxl3,qxl4</param>
                             /// <param name="virtioN">Use volume as VIRTIO hard disk (n is 0 to 15).</param>
+                            /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result UpdateVmAsync(bool? acpi = null, bool? agent = null, string args = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string watchdog = null) { return CreateRest(acpi, agent, args, autostart, background_delay, balloon, bios, boot, bootdisk, cdrom, cores, cpu, cpulimit, cpuunits, delete, description, digest, force, freeze, hostpciN, hotplug, hugepages, ideN, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, sataN, scsiN, scsihw, serialN, shares, skiplock, smbios1, smp, sockets, startdate, startup, tablet, tdf, template, unusedN, usbN, vcpus, vga, virtioN, watchdog); }
+                            public Result UpdateVmAsync(bool? acpi = null, bool? agent = null, string args = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null) { return CreateRest(acpi, agent, args, autostart, background_delay, balloon, bios, boot, bootdisk, cdrom, cores, cpu, cpulimit, cpuunits, delete, description, digest, force, freeze, hostpciN, hotplug, hugepages, ideN, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, sataN, scsiN, scsihw, serialN, shares, skiplock, smbios1, smp, sockets, startdate, startup, tablet, tdf, template, unusedN, usbN, vcpus, vga, virtioN, vmstatestorage, watchdog); }
                             /// <summary>
                             /// Set virtual machine options (synchrounous API) - You should consider using the POST method instead for any actions involving hotplug or storage allocation.
                             /// </summary>
@@ -3332,9 +3351,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="vga">Select the VGA type.
                             ///   Enum: std,cirrus,vmware,qxl,serial0,serial1,serial2,serial3,qxl2,qxl3,qxl4</param>
                             /// <param name="virtioN">Use volume as VIRTIO hard disk (n is 0 to 15).</param>
+                            /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result SetRest(bool? acpi = null, bool? agent = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string watchdog = null)
+                            public Result SetRest(bool? acpi = null, bool? agent = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("acpi", acpi);
@@ -3385,6 +3405,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("template", template);
                                 parameters.Add("vcpus", vcpus);
                                 parameters.Add("vga", vga);
+                                parameters.Add("vmstatestorage", vmstatestorage);
                                 parameters.Add("watchdog", watchdog);
                                 AddIndexedParameter(parameters, "hostpci", hostpciN);
                                 AddIndexedParameter(parameters, "ide", ideN);
@@ -3468,9 +3489,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="vga">Select the VGA type.
                             ///   Enum: std,cirrus,vmware,qxl,serial0,serial1,serial2,serial3,qxl2,qxl3,qxl4</param>
                             /// <param name="virtioN">Use volume as VIRTIO hard disk (n is 0 to 15).</param>
+                            /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result UpdateVm(bool? acpi = null, bool? agent = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string watchdog = null) { return SetRest(acpi, agent, args, autostart, balloon, bios, boot, bootdisk, cdrom, cores, cpu, cpulimit, cpuunits, delete, description, digest, force, freeze, hostpciN, hotplug, hugepages, ideN, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, sataN, scsiN, scsihw, serialN, shares, skiplock, smbios1, smp, sockets, startdate, startup, tablet, tdf, template, unusedN, usbN, vcpus, vga, virtioN, watchdog); }
+                            public Result UpdateVm(bool? acpi = null, bool? agent = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null) { return SetRest(acpi, agent, args, autostart, balloon, bios, boot, bootdisk, cdrom, cores, cpu, cpulimit, cpuunits, delete, description, digest, force, freeze, hostpciN, hotplug, hugepages, ideN, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, sataN, scsiN, scsihw, serialN, shares, skiplock, smbios1, smp, sockets, startdate, startup, tablet, tdf, template, unusedN, usbN, vcpus, vga, virtioN, vmstatestorage, watchdog); }
                         }
                         public class PVEPending : Base
                         {
@@ -4504,9 +4526,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="vga">Select the VGA type.
                     ///   Enum: std,cirrus,vmware,qxl,serial0,serial1,serial2,serial3,qxl2,qxl3,qxl4</param>
                     /// <param name="virtioN">Use volume as VIRTIO hard disk (n is 0 to 15).</param>
+                    /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                     /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                     /// <returns></returns>
-                    public Result CreateRest(int vmid, bool? acpi = null, bool? agent = null, string archive = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string watchdog = null)
+                    public Result CreateRest(int vmid, bool? acpi = null, bool? agent = null, string archive = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("vmid", vmid);
@@ -4558,6 +4581,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("unique", unique);
                         parameters.Add("vcpus", vcpus);
                         parameters.Add("vga", vga);
+                        parameters.Add("vmstatestorage", vmstatestorage);
                         parameters.Add("watchdog", watchdog);
                         AddIndexedParameter(parameters, "hostpci", hostpciN);
                         AddIndexedParameter(parameters, "ide", ideN);
@@ -4642,9 +4666,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="vga">Select the VGA type.
                     ///   Enum: std,cirrus,vmware,qxl,serial0,serial1,serial2,serial3,qxl2,qxl3,qxl4</param>
                     /// <param name="virtioN">Use volume as VIRTIO hard disk (n is 0 to 15).</param>
+                    /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                     /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                     /// <returns></returns>
-                    public Result CreateVm(int vmid, bool? acpi = null, bool? agent = null, string archive = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string watchdog = null) { return CreateRest(vmid, acpi, agent, archive, args, autostart, balloon, bios, boot, bootdisk, cdrom, cores, cpu, cpulimit, cpuunits, description, force, freeze, hostpciN, hotplug, hugepages, ideN, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, netN, numa, numaN, onboot, ostype, parallelN, pool, protection, reboot, sataN, scsiN, scsihw, serialN, shares, smbios1, smp, sockets, startdate, startup, storage, tablet, tdf, template, unique, unusedN, usbN, vcpus, vga, virtioN, watchdog); }
+                    public Result CreateVm(int vmid, bool? acpi = null, bool? agent = null, string archive = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null) { return CreateRest(vmid, acpi, agent, archive, args, autostart, balloon, bios, boot, bootdisk, cdrom, cores, cpu, cpulimit, cpuunits, description, force, freeze, hostpciN, hotplug, hugepages, ideN, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, netN, numa, numaN, onboot, ostype, parallelN, pool, protection, reboot, sataN, scsiN, scsihw, serialN, shares, smbios1, smp, sockets, startdate, startup, storage, tablet, tdf, template, unique, unusedN, usbN, vcpus, vga, virtioN, vmstatestorage, watchdog); }
                 }
                 public class PVELxc : Base
                 {
@@ -6364,6 +6389,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     public PVEMon Mon { get { return _mon ?? (_mon = new PVEMon(_client, _node)); } }
                     private PVEInit _init;
                     public PVEInit Init { get { return _init ?? (_init = new PVEInit(_client, _node)); } }
+                    private PVEMgr _mgr;
+                    public PVEMgr Mgr { get { return _mgr ?? (_mgr = new PVEMgr(_client, _node)); } }
                     private PVEStop _stop;
                     public PVEStop Stop { get { return _stop ?? (_stop = new PVEStop(_client, _node)); } }
                     private PVEStart _start;
@@ -6378,6 +6405,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     public PVECrush Crush { get { return _crush ?? (_crush = new PVECrush(_client, _node)); } }
                     private PVELog _log;
                     public PVELog Log { get { return _log ?? (_log = new PVELog(_client, _node)); } }
+                    private PVERules _rules;
+                    public PVERules Rules { get { return _rules ?? (_rules = new PVERules(_client, _node)); } }
                     public class PVEOsd : Base
                     {
                         private object _node;
@@ -6487,15 +6516,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <param name="bluestore">Use bluestore instead of filestore.</param>
                         /// <param name="fstype">File system type (filestore only).
                         ///   Enum: xfs,ext4,btrfs</param>
-                        /// <param name="journal_dev">Block device name for journal.</param>
+                        /// <param name="journal_dev">Block device name for journal (filestore) or block.db (bluestore).</param>
+                        /// <param name="wal_dev">Block device name for block.wal (bluestore only).</param>
                         /// <returns></returns>
-                        public Result CreateRest(string dev, bool? bluestore = null, string fstype = null, string journal_dev = null)
+                        public Result CreateRest(string dev, bool? bluestore = null, string fstype = null, string journal_dev = null, string wal_dev = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("dev", dev);
                             parameters.Add("bluestore", bluestore);
                             parameters.Add("fstype", fstype);
                             parameters.Add("journal_dev", journal_dev);
+                            parameters.Add("wal_dev", wal_dev);
                             return _client.Create($"/nodes/{_node}/ceph/osd", parameters);
                         }
                         /// <summary>
@@ -6505,9 +6536,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <param name="bluestore">Use bluestore instead of filestore.</param>
                         /// <param name="fstype">File system type (filestore only).
                         ///   Enum: xfs,ext4,btrfs</param>
-                        /// <param name="journal_dev">Block device name for journal.</param>
+                        /// <param name="journal_dev">Block device name for journal (filestore) or block.db (bluestore).</param>
+                        /// <param name="wal_dev">Block device name for block.wal (bluestore only).</param>
                         /// <returns></returns>
-                        public Result Createosd(string dev, bool? bluestore = null, string fstype = null, string journal_dev = null) { return CreateRest(dev, bluestore, fstype, journal_dev); }
+                        public Result Createosd(string dev, bool? bluestore = null, string fstype = null, string journal_dev = null, string wal_dev = null) { return CreateRest(dev, bluestore, fstype, journal_dev, wal_dev); }
                     }
                     public class PVEDisks : Base
                     {
@@ -6579,18 +6611,22 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 _monid = monid;
                             }
                             /// <summary>
-                            /// Destroy Ceph monitor.
+                            /// Destroy Ceph Monitor and Manager.
                             /// </summary>
+                            /// <param name="exclude_manager">When set, removes only the monitor, not the manager</param>
                             /// <returns></returns>
-                            public Result DeleteRest()
+                            public Result DeleteRest(bool? exclude_manager = null)
                             {
-                                return _client.Delete($"/nodes/{_node}/ceph/mon/{_monid}");
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("exclude-manager", exclude_manager);
+                                return _client.Delete($"/nodes/{_node}/ceph/mon/{_monid}", parameters);
                             }
                             /// <summary>
-                            /// Destroy Ceph monitor.
+                            /// Destroy Ceph Monitor and Manager.
                             /// </summary>
+                            /// <param name="exclude_manager">When set, removes only the monitor, not the manager</param>
                             /// <returns></returns>
-                            public Result Destroymon() { return DeleteRest(); }
+                            public Result Destroymon(bool? exclude_manager = null) { return DeleteRest(exclude_manager); }
                         }
                         /// <summary>
                         /// Get Ceph monitor list.
@@ -6606,18 +6642,25 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result Listmon() { return GetRest(); }
                         /// <summary>
-                        /// Create Ceph Monitor
+                        /// Create Ceph Monitor and Manager
                         /// </summary>
+                        /// <param name="exclude_manager">When set, only a monitor will be created.</param>
+                        /// <param name="id">The ID for the monitor, when omitted the same as the nodename</param>
                         /// <returns></returns>
-                        public Result CreateRest()
+                        public Result CreateRest(bool? exclude_manager = null, string id = null)
                         {
-                            return _client.Create($"/nodes/{_node}/ceph/mon");
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("exclude-manager", exclude_manager);
+                            parameters.Add("id", id);
+                            return _client.Create($"/nodes/{_node}/ceph/mon", parameters);
                         }
                         /// <summary>
-                        /// Create Ceph Monitor
+                        /// Create Ceph Monitor and Manager
                         /// </summary>
+                        /// <param name="exclude_manager">When set, only a monitor will be created.</param>
+                        /// <param name="id">The ID for the monitor, when omitted the same as the nodename</param>
                         /// <returns></returns>
-                        public Result Createmon() { return CreateRest(); }
+                        public Result Createmon(bool? exclude_manager = null, string id = null) { return CreateRest(exclude_manager, id); }
                     }
                     public class PVEInit : Base
                     {
@@ -6656,6 +6699,57 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <param name="size">Targeted number of replicas per object</param>
                         /// <returns></returns>
                         public Result Init(bool? disable_cephx = null, int? min_size = null, string network = null, int? pg_bits = null, int? size = null) { return CreateRest(disable_cephx, min_size, network, pg_bits, size); }
+                    }
+                    public class PVEMgr : Base
+                    {
+                        private object _node;
+                        internal PVEMgr(Client client, object node)
+                        {
+                            _client = client;
+                            _node = node;
+                        }
+                        public PVEItemId this[object id] { get { return new PVEItemId(_client, _node, id); } }
+                        public class PVEItemId : Base
+                        {
+                            private object _node;
+                            private object _id;
+                            internal PVEItemId(Client client, object node, object id)
+                            {
+                                _client = client;
+                                _node = node;
+                                _id = id;
+                            }
+                            /// <summary>
+                            /// Destroy Ceph Manager.
+                            /// </summary>
+                            /// <returns></returns>
+                            public Result DeleteRest()
+                            {
+                                return _client.Delete($"/nodes/{_node}/ceph/mgr/{_id}");
+                            }
+                            /// <summary>
+                            /// Destroy Ceph Manager.
+                            /// </summary>
+                            /// <returns></returns>
+                            public Result Destroymgr() { return DeleteRest(); }
+                        }
+                        /// <summary>
+                        /// Create Ceph Manager
+                        /// </summary>
+                        /// <param name="id">The ID for the manager, when omitted the same as the nodename</param>
+                        /// <returns></returns>
+                        public Result CreateRest(string id = null)
+                        {
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("id", id);
+                            return _client.Create($"/nodes/{_node}/ceph/mgr", parameters);
+                        }
+                        /// <summary>
+                        /// Create Ceph Manager
+                        /// </summary>
+                        /// <param name="id">The ID for the manager, when omitted the same as the nodename</param>
+                        /// <returns></returns>
+                        public Result Createmgr(string id = null) { return CreateRest(id); }
                     }
                     public class PVEStop : Base
                     {
@@ -6754,19 +6848,22 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Destroy pool
                             /// </summary>
                             /// <param name="force">If true, destroys pool even if in use</param>
+                            /// <param name="remove_storages">Remove all pveceph-managed storages configured for this pool</param>
                             /// <returns></returns>
-                            public Result DeleteRest(bool? force = null)
+                            public Result DeleteRest(bool? force = null, bool? remove_storages = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("force", force);
+                                parameters.Add("remove_storages", remove_storages);
                                 return _client.Delete($"/nodes/{_node}/ceph/pools/{_name}", parameters);
                             }
                             /// <summary>
                             /// Destroy pool
                             /// </summary>
                             /// <param name="force">If true, destroys pool even if in use</param>
+                            /// <param name="remove_storages">Remove all pveceph-managed storages configured for this pool</param>
                             /// <returns></returns>
-                            public Result Destroypool(bool? force = null) { return DeleteRest(force); }
+                            public Result Destroypool(bool? force = null, bool? remove_storages = null) { return DeleteRest(force, remove_storages); }
                         }
                         /// <summary>
                         /// List all pools.
@@ -6785,16 +6882,21 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Create POOL
                         /// </summary>
                         /// <param name="name">The name of the pool. It must be unique.</param>
-                        /// <param name="crush_ruleset">The ruleset to use for mapping object placement in the cluster.</param>
+                        /// <param name="add_storages">Configure VM and CT storages using the new pool.</param>
+                        /// <param name="application">The application of the pool, 'rbd' by default.
+                        ///   Enum: rbd,cephfs,rgw</param>
+                        /// <param name="crush_rule">The rule to use for mapping object placement in the cluster.</param>
                         /// <param name="min_size">Minimum number of replicas per object</param>
                         /// <param name="pg_num">Number of placement groups.</param>
                         /// <param name="size">Number of replicas per object</param>
                         /// <returns></returns>
-                        public Result CreateRest(string name, int? crush_ruleset = null, int? min_size = null, int? pg_num = null, int? size = null)
+                        public Result CreateRest(string name, bool? add_storages = null, string application = null, string crush_rule = null, int? min_size = null, int? pg_num = null, int? size = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("name", name);
-                            parameters.Add("crush_ruleset", crush_ruleset);
+                            parameters.Add("add_storages", add_storages);
+                            parameters.Add("application", application);
+                            parameters.Add("crush_rule", crush_rule);
                             parameters.Add("min_size", min_size);
                             parameters.Add("pg_num", pg_num);
                             parameters.Add("size", size);
@@ -6804,12 +6906,15 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Create POOL
                         /// </summary>
                         /// <param name="name">The name of the pool. It must be unique.</param>
-                        /// <param name="crush_ruleset">The ruleset to use for mapping object placement in the cluster.</param>
+                        /// <param name="add_storages">Configure VM and CT storages using the new pool.</param>
+                        /// <param name="application">The application of the pool, 'rbd' by default.
+                        ///   Enum: rbd,cephfs,rgw</param>
+                        /// <param name="crush_rule">The rule to use for mapping object placement in the cluster.</param>
                         /// <param name="min_size">Minimum number of replicas per object</param>
                         /// <param name="pg_num">Number of placement groups.</param>
                         /// <param name="size">Number of replicas per object</param>
                         /// <returns></returns>
-                        public Result Createpool(string name, int? crush_ruleset = null, int? min_size = null, int? pg_num = null, int? size = null) { return CreateRest(name, crush_ruleset, min_size, pg_num, size); }
+                        public Result Createpool(string name, bool? add_storages = null, string application = null, string crush_rule = null, int? min_size = null, int? pg_num = null, int? size = null) { return CreateRest(name, add_storages, application, crush_rule, min_size, pg_num, size); }
                     }
                     public class PVEFlags : Base
                     {
@@ -6921,6 +7026,28 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <param name="start"></param>
                         /// <returns></returns>
                         public Result Log(int? limit = null, int? start = null) { return GetRest(limit, start); }
+                    }
+                    public class PVERules : Base
+                    {
+                        private object _node;
+                        internal PVERules(Client client, object node)
+                        {
+                            _client = client;
+                            _node = node;
+                        }
+                        /// <summary>
+                        /// List ceph rules.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result GetRest()
+                        {
+                            return _client.Get($"/nodes/{_node}/ceph/rules");
+                        }
+                        /// <summary>
+                        /// List ceph rules.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result Rules() { return GetRest(); }
                     }
                     /// <summary>
                     /// Directory index.
@@ -9509,10 +9636,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                 /// <param name="disable">Flag to disable the storage.</param>
                 /// <param name="format">Default image format.</param>
-                /// <param name="is_mountpoint">Assume the directory is an externally managed mountpoint. If nothing is mounted the storage will be considered offline.</param>
+                /// <param name="is_mountpoint">Assume the given path is an externally managed mountpoint and consider the storage offline if it is not mounted. Using a boolean (yes/no) value serves as a shortcut to using the target path in this field.</param>
                 /// <param name="krbd">Access rbd through krbd kernel module.</param>
                 /// <param name="maxfiles">Maximal number of backup files per VM. Use '0' for unlimted.</param>
                 /// <param name="mkdir">Create the directory if it doesn't exist.</param>
+                /// <param name="monhost">IP addresses of monitors (for external clusters).</param>
                 /// <param name="nodes">List of cluster node names.</param>
                 /// <param name="nowritecache">disable write caching on the target</param>
                 /// <param name="options">NFS mount options (see 'man nfs')</param>
@@ -9529,7 +9657,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 ///   Enum: tcp,rdma,unix</param>
                 /// <param name="username">RBD Id.</param>
                 /// <returns></returns>
-                public Result SetRest(string blocksize = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string format = null, bool? is_mountpoint = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string nodes = null, bool? nowritecache = null, string options = null, string pool = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, bool? sparse = null, bool? tagged_only = null, string transport = null, string username = null)
+                public Result SetRest(string blocksize = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string format = null, string is_mountpoint = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string pool = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, bool? sparse = null, bool? tagged_only = null, string transport = null, string username = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("blocksize", blocksize);
@@ -9544,6 +9672,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("krbd", krbd);
                     parameters.Add("maxfiles", maxfiles);
                     parameters.Add("mkdir", mkdir);
+                    parameters.Add("monhost", monhost);
                     parameters.Add("nodes", nodes);
                     parameters.Add("nowritecache", nowritecache);
                     parameters.Add("options", options);
@@ -9571,10 +9700,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                 /// <param name="disable">Flag to disable the storage.</param>
                 /// <param name="format">Default image format.</param>
-                /// <param name="is_mountpoint">Assume the directory is an externally managed mountpoint. If nothing is mounted the storage will be considered offline.</param>
+                /// <param name="is_mountpoint">Assume the given path is an externally managed mountpoint and consider the storage offline if it is not mounted. Using a boolean (yes/no) value serves as a shortcut to using the target path in this field.</param>
                 /// <param name="krbd">Access rbd through krbd kernel module.</param>
                 /// <param name="maxfiles">Maximal number of backup files per VM. Use '0' for unlimted.</param>
                 /// <param name="mkdir">Create the directory if it doesn't exist.</param>
+                /// <param name="monhost">IP addresses of monitors (for external clusters).</param>
                 /// <param name="nodes">List of cluster node names.</param>
                 /// <param name="nowritecache">disable write caching on the target</param>
                 /// <param name="options">NFS mount options (see 'man nfs')</param>
@@ -9591,7 +9721,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 ///   Enum: tcp,rdma,unix</param>
                 /// <param name="username">RBD Id.</param>
                 /// <returns></returns>
-                public Result Update(string blocksize = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string format = null, bool? is_mountpoint = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string nodes = null, bool? nowritecache = null, string options = null, string pool = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, bool? sparse = null, bool? tagged_only = null, string transport = null, string username = null) { return SetRest(blocksize, comstar_hg, comstar_tg, content, delete, digest, disable, format, is_mountpoint, krbd, maxfiles, mkdir, nodes, nowritecache, options, pool, redundancy, saferemove, saferemove_throughput, server, server2, shared, sparse, tagged_only, transport, username); }
+                public Result Update(string blocksize = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string format = null, string is_mountpoint = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string pool = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, bool? sparse = null, bool? tagged_only = null, string transport = null, string username = null) { return SetRest(blocksize, comstar_hg, comstar_tg, content, delete, digest, disable, format, is_mountpoint, krbd, maxfiles, mkdir, monhost, nodes, nowritecache, options, pool, redundancy, saferemove, saferemove_throughput, server, server2, shared, sparse, tagged_only, transport, username); }
             }
             /// <summary>
             /// Storage index.
@@ -9627,12 +9757,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <param name="disable">Flag to disable the storage.</param>
             /// <param name="export">NFS export path.</param>
             /// <param name="format">Default image format.</param>
-            /// <param name="is_mountpoint">Assume the directory is an externally managed mountpoint. If nothing is mounted the storage will be considered offline.</param>
+            /// <param name="is_mountpoint">Assume the given path is an externally managed mountpoint and consider the storage offline if it is not mounted. Using a boolean (yes/no) value serves as a shortcut to using the target path in this field.</param>
             /// <param name="iscsiprovider">iscsi provider</param>
             /// <param name="krbd">Access rbd through krbd kernel module.</param>
             /// <param name="maxfiles">Maximal number of backup files per VM. Use '0' for unlimted.</param>
             /// <param name="mkdir">Create the directory if it doesn't exist.</param>
-            /// <param name="monhost">Monitors daemon ips.</param>
+            /// <param name="monhost">IP addresses of monitors (for external clusters).</param>
             /// <param name="nodes">List of cluster node names.</param>
             /// <param name="nowritecache">disable write caching on the target</param>
             /// <param name="options">NFS mount options (see 'man nfs')</param>
@@ -9655,7 +9785,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <param name="vgname">Volume group name.</param>
             /// <param name="volume">Glusterfs Volume.</param>
             /// <returns></returns>
-            public Result CreateRest(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string comstar_hg = null, string comstar_tg = null, string content = null, bool? disable = null, string export = null, string format = null, bool? is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, bool? sparse = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null)
+            public Result CreateRest(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string comstar_hg = null, string comstar_tg = null, string content = null, bool? disable = null, string export = null, string format = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, bool? sparse = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null)
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("storage", storage);
@@ -9712,12 +9842,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <param name="disable">Flag to disable the storage.</param>
             /// <param name="export">NFS export path.</param>
             /// <param name="format">Default image format.</param>
-            /// <param name="is_mountpoint">Assume the directory is an externally managed mountpoint. If nothing is mounted the storage will be considered offline.</param>
+            /// <param name="is_mountpoint">Assume the given path is an externally managed mountpoint and consider the storage offline if it is not mounted. Using a boolean (yes/no) value serves as a shortcut to using the target path in this field.</param>
             /// <param name="iscsiprovider">iscsi provider</param>
             /// <param name="krbd">Access rbd through krbd kernel module.</param>
             /// <param name="maxfiles">Maximal number of backup files per VM. Use '0' for unlimted.</param>
             /// <param name="mkdir">Create the directory if it doesn't exist.</param>
-            /// <param name="monhost">Monitors daemon ips.</param>
+            /// <param name="monhost">IP addresses of monitors (for external clusters).</param>
             /// <param name="nodes">List of cluster node names.</param>
             /// <param name="nowritecache">disable write caching on the target</param>
             /// <param name="options">NFS mount options (see 'man nfs')</param>
@@ -9740,7 +9870,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <param name="vgname">Volume group name.</param>
             /// <param name="volume">Glusterfs Volume.</param>
             /// <returns></returns>
-            public Result Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string comstar_hg = null, string comstar_tg = null, string content = null, bool? disable = null, string export = null, string format = null, bool? is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, bool? sparse = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null) { return CreateRest(storage, type, authsupported, base_, blocksize, comstar_hg, comstar_tg, content, disable, export, format, is_mountpoint, iscsiprovider, krbd, maxfiles, mkdir, monhost, nodes, nowritecache, options, path, pool, portal, redundancy, saferemove, saferemove_throughput, server, server2, shared, sparse, tagged_only, target, thinpool, transport, username, vgname, volume); }
+            public Result Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string comstar_hg = null, string comstar_tg = null, string content = null, bool? disable = null, string export = null, string format = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, bool? sparse = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null) { return CreateRest(storage, type, authsupported, base_, blocksize, comstar_hg, comstar_tg, content, disable, export, format, is_mountpoint, iscsiprovider, krbd, maxfiles, mkdir, monhost, nodes, nowritecache, options, path, pool, portal, redundancy, saferemove, saferemove_throughput, server, server2, shared, sparse, tagged_only, target, thinpool, transport, username, vgname, volume); }
         }
         public class PVEAccess : Base
         {
@@ -10194,6 +10324,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="base_dn">LDAP base domain name</param>
                     /// <param name="bind_dn">LDAP bind domain name</param>
+                    /// <param name="capath">Path to the CA certificate store</param>
+                    /// <param name="cert">Path to the client certificate</param>
+                    /// <param name="certkey">Path to the client certificate key</param>
                     /// <param name="comment">Description.</param>
                     /// <param name="default_">Use this as default realm</param>
                     /// <param name="delete">A list of settings you want to delete.</param>
@@ -10205,12 +10338,16 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="server2">Fallback Server IP address (or DNS name)</param>
                     /// <param name="tfa">Use Two-factor authentication.</param>
                     /// <param name="user_attr">LDAP user attribute name</param>
+                    /// <param name="verify">Verify the server's SSL certificate</param>
                     /// <returns></returns>
-                    public Result SetRest(string base_dn = null, string bind_dn = null, string comment = null, bool? default_ = null, string delete = null, string digest = null, string domain = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string tfa = null, string user_attr = null)
+                    public Result SetRest(string base_dn = null, string bind_dn = null, string capath = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string delete = null, string digest = null, string domain = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string tfa = null, string user_attr = null, bool? verify = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("base_dn", base_dn);
                         parameters.Add("bind_dn", bind_dn);
+                        parameters.Add("capath", capath);
+                        parameters.Add("cert", cert);
+                        parameters.Add("certkey", certkey);
                         parameters.Add("comment", comment);
                         parameters.Add("default", default_);
                         parameters.Add("delete", delete);
@@ -10222,6 +10359,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("server2", server2);
                         parameters.Add("tfa", tfa);
                         parameters.Add("user_attr", user_attr);
+                        parameters.Add("verify", verify);
                         return _client.Set($"/access/domains/{_realm}", parameters);
                     }
                     /// <summary>
@@ -10229,6 +10367,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="base_dn">LDAP base domain name</param>
                     /// <param name="bind_dn">LDAP bind domain name</param>
+                    /// <param name="capath">Path to the CA certificate store</param>
+                    /// <param name="cert">Path to the client certificate</param>
+                    /// <param name="certkey">Path to the client certificate key</param>
                     /// <param name="comment">Description.</param>
                     /// <param name="default_">Use this as default realm</param>
                     /// <param name="delete">A list of settings you want to delete.</param>
@@ -10240,8 +10381,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="server2">Fallback Server IP address (or DNS name)</param>
                     /// <param name="tfa">Use Two-factor authentication.</param>
                     /// <param name="user_attr">LDAP user attribute name</param>
+                    /// <param name="verify">Verify the server's SSL certificate</param>
                     /// <returns></returns>
-                    public Result Update(string base_dn = null, string bind_dn = null, string comment = null, bool? default_ = null, string delete = null, string digest = null, string domain = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string tfa = null, string user_attr = null) { return SetRest(base_dn, bind_dn, comment, default_, delete, digest, domain, port, secure, server1, server2, tfa, user_attr); }
+                    public Result Update(string base_dn = null, string bind_dn = null, string capath = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string delete = null, string digest = null, string domain = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string tfa = null, string user_attr = null, bool? verify = null) { return SetRest(base_dn, bind_dn, capath, cert, certkey, comment, default_, delete, digest, domain, port, secure, server1, server2, tfa, user_attr, verify); }
                 }
                 /// <summary>
                 /// Authentication domain index.
@@ -10264,6 +10406,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 ///   Enum: ad,ldap,pam,pve</param>
                 /// <param name="base_dn">LDAP base domain name</param>
                 /// <param name="bind_dn">LDAP bind domain name</param>
+                /// <param name="capath">Path to the CA certificate store</param>
+                /// <param name="cert">Path to the client certificate</param>
+                /// <param name="certkey">Path to the client certificate key</param>
                 /// <param name="comment">Description.</param>
                 /// <param name="default_">Use this as default realm</param>
                 /// <param name="domain">AD domain name</param>
@@ -10273,14 +10418,18 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="server2">Fallback Server IP address (or DNS name)</param>
                 /// <param name="tfa">Use Two-factor authentication.</param>
                 /// <param name="user_attr">LDAP user attribute name</param>
+                /// <param name="verify">Verify the server's SSL certificate</param>
                 /// <returns></returns>
-                public Result CreateRest(string realm, string type, string base_dn = null, string bind_dn = null, string comment = null, bool? default_ = null, string domain = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string tfa = null, string user_attr = null)
+                public Result CreateRest(string realm, string type, string base_dn = null, string bind_dn = null, string capath = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string domain = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string tfa = null, string user_attr = null, bool? verify = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("realm", realm);
                     parameters.Add("type", type);
                     parameters.Add("base_dn", base_dn);
                     parameters.Add("bind_dn", bind_dn);
+                    parameters.Add("capath", capath);
+                    parameters.Add("cert", cert);
+                    parameters.Add("certkey", certkey);
                     parameters.Add("comment", comment);
                     parameters.Add("default", default_);
                     parameters.Add("domain", domain);
@@ -10290,6 +10439,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("server2", server2);
                     parameters.Add("tfa", tfa);
                     parameters.Add("user_attr", user_attr);
+                    parameters.Add("verify", verify);
                     return _client.Create($"/access/domains", parameters);
                 }
                 /// <summary>
@@ -10300,6 +10450,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 ///   Enum: ad,ldap,pam,pve</param>
                 /// <param name="base_dn">LDAP base domain name</param>
                 /// <param name="bind_dn">LDAP bind domain name</param>
+                /// <param name="capath">Path to the CA certificate store</param>
+                /// <param name="cert">Path to the client certificate</param>
+                /// <param name="certkey">Path to the client certificate key</param>
                 /// <param name="comment">Description.</param>
                 /// <param name="default_">Use this as default realm</param>
                 /// <param name="domain">AD domain name</param>
@@ -10309,8 +10462,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="server2">Fallback Server IP address (or DNS name)</param>
                 /// <param name="tfa">Use Two-factor authentication.</param>
                 /// <param name="user_attr">LDAP user attribute name</param>
+                /// <param name="verify">Verify the server's SSL certificate</param>
                 /// <returns></returns>
-                public Result Create(string realm, string type, string base_dn = null, string bind_dn = null, string comment = null, bool? default_ = null, string domain = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string tfa = null, string user_attr = null) { return CreateRest(realm, type, base_dn, bind_dn, comment, default_, domain, port, secure, server1, server2, tfa, user_attr); }
+                public Result Create(string realm, string type, string base_dn = null, string bind_dn = null, string capath = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string domain = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string tfa = null, string user_attr = null, bool? verify = null) { return CreateRest(realm, type, base_dn, bind_dn, capath, cert, certkey, comment, default_, domain, port, secure, server1, server2, tfa, user_attr, verify); }
             }
             public class PVETicket : Base
             {
@@ -10319,7 +10473,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     _client = client;
                 }
                 /// <summary>
-                /// Dummy. Useful for formaters which want to priovde a login page.
+                /// Dummy. Useful for formatters which want to provide a login page.
                 /// </summary>
                 /// <returns></returns>
                 public Result GetRest()
@@ -10327,7 +10481,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     return _client.Get($"/access/ticket");
                 }
                 /// <summary>
-                /// Dummy. Useful for formaters which want to priovde a login page.
+                /// Dummy. Useful for formatters which want to provide a login page.
                 /// </summary>
                 /// <returns></returns>
                 public Result GetTicket() { return GetRest(); }
