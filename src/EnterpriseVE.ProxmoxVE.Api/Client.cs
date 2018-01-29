@@ -28,12 +28,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
             IsSuccessStatusCode = isSuccessStatusCode;
         }
         /// <summary>
-        /// Get if response ProxmoxVE contain errors
+        /// Get if response Proxmox VE contain errors
         /// </summary>
         /// <returns></returns>
         public bool ResponseInError { get { return ((IDictionary<String, object>)Response).ContainsKey("errors"); } }
         /// <summary>
-        /// ProxmoxVE response.
+        /// Proxmox VE response.
         /// </summary>
         /// <returns></returns>    
         public dynamic Response { get; private set; }
@@ -71,7 +71,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
         }
     }
     /// <summary>
-    /// ProxmoxVE Client
+    /// Proxmox VE Client
     /// </summary>
     public class Client : Base
     {
@@ -83,14 +83,20 @@ namespace EnterpriseVE.ProxmoxVE.Api
             Hostname = hostname;
             Port = port;
         }
+        /// <summary>
+        /// Get hostname configured. 
+        /// </summary>
         public string Hostname { get; private set; }
+        /// <summary>
+        /// Get port configured. 
+        /// </summary>
         public int Port { get; private set; }
         /// <summary>
         /// Get/Set the response type that is going to be returned when doing requests (json, png). 
         /// </summary>
         public string ResponseType { get; set; } = "json";
         /// <summary>
-        /// Returns the base URL used to interact with the ProxmoxVE API. 
+        /// Returns the base URL used to interact with the Proxmox VE API. 
         /// </summary>
         public string GetApiUrl() { return $"https://{Hostname}:{Port}/api2/{ResponseType}"; }
         /// <summary>
@@ -115,7 +121,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             return ticket.IsSuccessStatusCode;
         }
         /// <summary>
-        /// Creation ticket from login split username &lt;username&gt;@&lt;relam&gt;.
+        /// Creation ticket from login split username &lt;username&gt;@&lt;realm&gt;.
         /// </summary>
         /// <param name="userName"></param>
         /// <param name="password"></param>
@@ -131,18 +137,42 @@ namespace EnterpriseVE.ProxmoxVE.Api
             }
             return Login(userName, password, realm);
         }
+        /// <summary>
+        /// Execute Execute method GET
+        /// </summary>
+        /// <param name="resource">Url request</param>
+        /// <param name="parameters">Additional parameters</param>
+        /// <returns>Result</returns>
         public Result Get(string resource, IDictionary<string, object> parameters = null)
         {
             return ExecuteAction(resource, HttpMethod.Get, parameters);
         }
+        /// <summary>
+        /// Execute Execute method POST
+        /// </summary>
+        /// <param name="resource">Url request</param>
+        /// <param name="parameters">Additional parameters</param>
+        /// <returns>Result</returns>
         public Result Create(string resource, IDictionary<string, object> parameters = null)
         {
             return ExecuteAction(resource, HttpMethod.Post, parameters);
         }
+        /// <summary>
+        /// Execute Execute method PUT
+        /// </summary>
+        /// <param name="resource">Url request</param>
+        /// <param name="parameters">Additional parameters</param>
+        /// <returns>Result</returns>
         public Result Set(string resource, IDictionary<string, object> parameters = null)
         {
             return ExecuteAction(resource, HttpMethod.Put, parameters);
         }
+        /// <summary>
+        /// Execute Execute method DELETE
+        /// </summary>
+        /// <param name="resource">Url request</param>
+        /// <param name="parameters">Additional parameters</param>
+        /// <returns>Result</returns>
         public Result Delete(string resource, IDictionary<string, object> parameters = null)
         {
             return ExecuteAction(resource, HttpMethod.Delete, parameters);
