@@ -293,6 +293,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
             public PVEBackup Backup { get { return _backup ?? (_backup = new PVEBackup(_client)); } }
             private PVEHa _ha;
             public PVEHa Ha { get { return _ha ?? (_ha = new PVEHa(_client)); } }
+            private PVEAcme _acme;
+            public PVEAcme Acme { get { return _acme ?? (_acme = new PVEAcme(_client)); } }
             private PVELog _log;
             public PVELog Log { get { return _log ?? (_log = new PVELog(_client)); } }
             private PVEResources _resources;
@@ -364,8 +366,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="remove_job">Mark the replication job for removal. The job will remove all local replication snapshots. When set to 'full', it also tries to remove replicated volumes on the target. The job then removes itself from the configuration file.
                     ///   Enum: local,full</param>
                     /// <param name="schedule">Storage replication schedule. The format is a subset of `systemd` calender events.</param>
+                    /// <param name="source">Source of the replication.</param>
                     /// <returns></returns>
-                    public Result SetRest(string comment = null, string delete = null, string digest = null, bool? disable = null, int? rate = null, string remove_job = null, string schedule = null)
+                    public Result SetRest(string comment = null, string delete = null, string digest = null, bool? disable = null, int? rate = null, string remove_job = null, string schedule = null, string source = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("comment", comment);
@@ -375,6 +378,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("rate", rate);
                         parameters.Add("remove_job", remove_job);
                         parameters.Add("schedule", schedule);
+                        parameters.Add("source", source);
                         return _client.Set($"/cluster/replication/{_id}", parameters);
                     }
                     /// <summary>
@@ -388,8 +392,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="remove_job">Mark the replication job for removal. The job will remove all local replication snapshots. When set to 'full', it also tries to remove replicated volumes on the target. The job then removes itself from the configuration file.
                     ///   Enum: local,full</param>
                     /// <param name="schedule">Storage replication schedule. The format is a subset of `systemd` calender events.</param>
+                    /// <param name="source">Source of the replication.</param>
                     /// <returns></returns>
-                    public Result Update(string comment = null, string delete = null, string digest = null, bool? disable = null, int? rate = null, string remove_job = null, string schedule = null) { return SetRest(comment, delete, digest, disable, rate, remove_job, schedule); }
+                    public Result Update(string comment = null, string delete = null, string digest = null, bool? disable = null, int? rate = null, string remove_job = null, string schedule = null, string source = null) { return SetRest(comment, delete, digest, disable, rate, remove_job, schedule, source); }
                 }
                 /// <summary>
                 /// List replication jobs.
@@ -417,8 +422,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="remove_job">Mark the replication job for removal. The job will remove all local replication snapshots. When set to 'full', it also tries to remove replicated volumes on the target. The job then removes itself from the configuration file.
                 ///   Enum: local,full</param>
                 /// <param name="schedule">Storage replication schedule. The format is a subset of `systemd` calender events.</param>
+                /// <param name="source">Source of the replication.</param>
                 /// <returns></returns>
-                public Result CreateRest(string id, string target, string type, string comment = null, bool? disable = null, int? rate = null, string remove_job = null, string schedule = null)
+                public Result CreateRest(string id, string target, string type, string comment = null, bool? disable = null, int? rate = null, string remove_job = null, string schedule = null, string source = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("id", id);
@@ -429,6 +435,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("rate", rate);
                     parameters.Add("remove_job", remove_job);
                     parameters.Add("schedule", schedule);
+                    parameters.Add("source", source);
                     return _client.Create($"/cluster/replication", parameters);
                 }
                 /// <summary>
@@ -444,8 +451,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="remove_job">Mark the replication job for removal. The job will remove all local replication snapshots. When set to 'full', it also tries to remove replicated volumes on the target. The job then removes itself from the configuration file.
                 ///   Enum: local,full</param>
                 /// <param name="schedule">Storage replication schedule. The format is a subset of `systemd` calender events.</param>
+                /// <param name="source">Source of the replication.</param>
                 /// <returns></returns>
-                public Result Create(string id, string target, string type, string comment = null, bool? disable = null, int? rate = null, string remove_job = null, string schedule = null) { return CreateRest(id, target, type, comment, disable, rate, remove_job, schedule); }
+                public Result Create(string id, string target, string type, string comment = null, bool? disable = null, int? rate = null, string remove_job = null, string schedule = null, string source = null) { return CreateRest(id, target, type, comment, disable, rate, remove_job, schedule, source); }
             }
             public class PVEConfig : Base
             {
@@ -455,6 +463,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 }
                 private PVENodes _nodes;
                 public PVENodes Nodes { get { return _nodes ?? (_nodes = new PVENodes(_client)); } }
+                private PVEJoin _join;
+                public PVEJoin Join { get { return _join ?? (_join = new PVEJoin(_client)); } }
                 private PVETotem _totem;
                 public PVETotem Totem { get { return _totem ?? (_totem = new PVETotem(_client)); } }
                 public class PVENodes : Base
@@ -462,6 +472,58 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     internal PVENodes(Client client)
                     {
                         _client = client;
+                    }
+                    public PVEItemNode this[object node] { get { return new PVEItemNode(_client, node); } }
+                    public class PVEItemNode : Base
+                    {
+                        private object _node;
+                        internal PVEItemNode(Client client, object node)
+                        {
+                            _client = client;
+                            _node = node;
+                        }
+                        /// <summary>
+                        /// Removes a node from the cluster configuration.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result DeleteRest()
+                        {
+                            return _client.Delete($"/cluster/config/nodes/{_node}");
+                        }
+                        /// <summary>
+                        /// Removes a node from the cluster configuration.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result Delnode() { return DeleteRest(); }
+                        /// <summary>
+                        /// Adds a node to the cluster configuration.
+                        /// </summary>
+                        /// <param name="force">Do not throw error if node already exists.</param>
+                        /// <param name="nodeid">Node id for this node.</param>
+                        /// <param name="ring0_addr">Hostname (or IP) of the corosync ring0 address of this node.</param>
+                        /// <param name="ring1_addr">Hostname (or IP) of the corosync ring1 address of this node. Requires a valid configured ring 1 (bindnet1_addr) in the cluster.</param>
+                        /// <param name="votes">Number of votes for this node</param>
+                        /// <returns></returns>
+                        public Result CreateRest(bool? force = null, int? nodeid = null, string ring0_addr = null, string ring1_addr = null, int? votes = null)
+                        {
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("force", force);
+                            parameters.Add("nodeid", nodeid);
+                            parameters.Add("ring0_addr", ring0_addr);
+                            parameters.Add("ring1_addr", ring1_addr);
+                            parameters.Add("votes", votes);
+                            return _client.Create($"/cluster/config/nodes/{_node}", parameters);
+                        }
+                        /// <summary>
+                        /// Adds a node to the cluster configuration.
+                        /// </summary>
+                        /// <param name="force">Do not throw error if node already exists.</param>
+                        /// <param name="nodeid">Node id for this node.</param>
+                        /// <param name="ring0_addr">Hostname (or IP) of the corosync ring0 address of this node.</param>
+                        /// <param name="ring1_addr">Hostname (or IP) of the corosync ring1 address of this node. Requires a valid configured ring 1 (bindnet1_addr) in the cluster.</param>
+                        /// <param name="votes">Number of votes for this node</param>
+                        /// <returns></returns>
+                        public Result Addnode(bool? force = null, int? nodeid = null, string ring0_addr = null, string ring1_addr = null, int? votes = null) { return CreateRest(force, nodeid, ring0_addr, ring1_addr, votes); }
                     }
                     /// <summary>
                     /// Corosync node list.
@@ -476,6 +538,68 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// </summary>
                     /// <returns></returns>
                     public Result Nodes() { return GetRest(); }
+                }
+                public class PVEJoin : Base
+                {
+                    internal PVEJoin(Client client)
+                    {
+                        _client = client;
+                    }
+                    /// <summary>
+                    /// Get information needed to join this cluster over the connected node.
+                    /// </summary>
+                    /// <param name="node">The node for which the joinee gets the nodeinfo. </param>
+                    /// <returns></returns>
+                    public Result GetRest(string node = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("node", node);
+                        return _client.Get($"/cluster/config/join", parameters);
+                    }
+                    /// <summary>
+                    /// Get information needed to join this cluster over the connected node.
+                    /// </summary>
+                    /// <param name="node">The node for which the joinee gets the nodeinfo. </param>
+                    /// <returns></returns>
+                    public Result JoinInfo(string node = null) { return GetRest(node); }
+                    /// <summary>
+                    /// Joins this node into an existing cluster.
+                    /// </summary>
+                    /// <param name="fingerprint">Certificate SHA 256 fingerprint.</param>
+                    /// <param name="hostname">Hostname (or IP) of an existing cluster member.</param>
+                    /// <param name="password">Superuser (root) password of peer node.</param>
+                    /// <param name="force">Do not throw error if node already exists.</param>
+                    /// <param name="nodeid">Node id for this node.</param>
+                    /// <param name="ring0_addr">Hostname (or IP) of the corosync ring0 address of this node.</param>
+                    /// <param name="ring1_addr">Hostname (or IP) of the corosync ring1 address of this node. Requires a valid configured ring 1 (bindnet1_addr) in the cluster.</param>
+                    /// <param name="votes">Number of votes for this node</param>
+                    /// <returns></returns>
+                    public Result CreateRest(string fingerprint, string hostname, string password, bool? force = null, int? nodeid = null, string ring0_addr = null, string ring1_addr = null, int? votes = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("fingerprint", fingerprint);
+                        parameters.Add("hostname", hostname);
+                        parameters.Add("password", password);
+                        parameters.Add("force", force);
+                        parameters.Add("nodeid", nodeid);
+                        parameters.Add("ring0_addr", ring0_addr);
+                        parameters.Add("ring1_addr", ring1_addr);
+                        parameters.Add("votes", votes);
+                        return _client.Create($"/cluster/config/join", parameters);
+                    }
+                    /// <summary>
+                    /// Joins this node into an existing cluster.
+                    /// </summary>
+                    /// <param name="fingerprint">Certificate SHA 256 fingerprint.</param>
+                    /// <param name="hostname">Hostname (or IP) of an existing cluster member.</param>
+                    /// <param name="password">Superuser (root) password of peer node.</param>
+                    /// <param name="force">Do not throw error if node already exists.</param>
+                    /// <param name="nodeid">Node id for this node.</param>
+                    /// <param name="ring0_addr">Hostname (or IP) of the corosync ring0 address of this node.</param>
+                    /// <param name="ring1_addr">Hostname (or IP) of the corosync ring1 address of this node. Requires a valid configured ring 1 (bindnet1_addr) in the cluster.</param>
+                    /// <param name="votes">Number of votes for this node</param>
+                    /// <returns></returns>
+                    public Result Join(string fingerprint, string hostname, string password, bool? force = null, int? nodeid = null, string ring0_addr = null, string ring1_addr = null, int? votes = null) { return CreateRest(fingerprint, hostname, password, force, nodeid, ring0_addr, ring1_addr, votes); }
                 }
                 public class PVETotem : Base
                 {
@@ -510,6 +634,41 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// </summary>
                 /// <returns></returns>
                 public Result Index() { return GetRest(); }
+                /// <summary>
+                /// Generate new cluster configuration.
+                /// </summary>
+                /// <param name="clustername">The name of the cluster.</param>
+                /// <param name="bindnet0_addr">This specifies the network address the corosync ring 0 executive should bind to and defaults to the local IP address of the node.</param>
+                /// <param name="bindnet1_addr">This specifies the network address the corosync ring 1 executive should bind to and is optional.</param>
+                /// <param name="nodeid">Node id for this node.</param>
+                /// <param name="ring0_addr">Hostname (or IP) of the corosync ring0 address of this node.</param>
+                /// <param name="ring1_addr">Hostname (or IP) of the corosync ring1 address of this node. Requires a valid configured ring 1 (bindnet1_addr) in the cluster.</param>
+                /// <param name="votes">Number of votes for this node.</param>
+                /// <returns></returns>
+                public Result CreateRest(string clustername, string bindnet0_addr = null, string bindnet1_addr = null, int? nodeid = null, string ring0_addr = null, string ring1_addr = null, int? votes = null)
+                {
+                    var parameters = new Dictionary<string, object>();
+                    parameters.Add("clustername", clustername);
+                    parameters.Add("bindnet0_addr", bindnet0_addr);
+                    parameters.Add("bindnet1_addr", bindnet1_addr);
+                    parameters.Add("nodeid", nodeid);
+                    parameters.Add("ring0_addr", ring0_addr);
+                    parameters.Add("ring1_addr", ring1_addr);
+                    parameters.Add("votes", votes);
+                    return _client.Create($"/cluster/config", parameters);
+                }
+                /// <summary>
+                /// Generate new cluster configuration.
+                /// </summary>
+                /// <param name="clustername">The name of the cluster.</param>
+                /// <param name="bindnet0_addr">This specifies the network address the corosync ring 0 executive should bind to and defaults to the local IP address of the node.</param>
+                /// <param name="bindnet1_addr">This specifies the network address the corosync ring 1 executive should bind to and is optional.</param>
+                /// <param name="nodeid">Node id for this node.</param>
+                /// <param name="ring0_addr">Hostname (or IP) of the corosync ring0 address of this node.</param>
+                /// <param name="ring1_addr">Hostname (or IP) of the corosync ring1 address of this node. Requires a valid configured ring 1 (bindnet1_addr) in the cluster.</param>
+                /// <param name="votes">Number of votes for this node.</param>
+                /// <returns></returns>
+                public Result Create(string clustername, string bindnet0_addr = null, string bindnet1_addr = null, int? nodeid = null, string ring0_addr = null, string ring1_addr = null, int? votes = null) { return CreateRest(clustername, bindnet0_addr, bindnet1_addr, nodeid, ring0_addr, ring1_addr, votes); }
             }
             public class PVEFirewall : Base
             {
@@ -2000,6 +2159,175 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <returns></returns>
                 public Result Index() { return GetRest(); }
             }
+            public class PVEAcme : Base
+            {
+                internal PVEAcme(Client client)
+                {
+                    _client = client;
+                }
+                private PVEAccount _account;
+                public PVEAccount Account { get { return _account ?? (_account = new PVEAccount(_client)); } }
+                private PVETos _tos;
+                public PVETos Tos { get { return _tos ?? (_tos = new PVETos(_client)); } }
+                private PVEDirectories _directories;
+                public PVEDirectories Directories { get { return _directories ?? (_directories = new PVEDirectories(_client)); } }
+                public class PVEAccount : Base
+                {
+                    internal PVEAccount(Client client)
+                    {
+                        _client = client;
+                    }
+                    public PVEItemName this[object name] { get { return new PVEItemName(_client, name); } }
+                    public class PVEItemName : Base
+                    {
+                        private object _name;
+                        internal PVEItemName(Client client, object name)
+                        {
+                            _client = client;
+                            _name = name;
+                        }
+                        /// <summary>
+                        /// Deactivate existing ACME account at CA.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result DeleteRest()
+                        {
+                            return _client.Delete($"/cluster/acme/account/{_name}");
+                        }
+                        /// <summary>
+                        /// Deactivate existing ACME account at CA.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result DeactivateAccount() { return DeleteRest(); }
+                        /// <summary>
+                        /// Return existing ACME account information.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result GetRest()
+                        {
+                            return _client.Get($"/cluster/acme/account/{_name}");
+                        }
+                        /// <summary>
+                        /// Return existing ACME account information.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result GetAccount() { return GetRest(); }
+                        /// <summary>
+                        /// Update existing ACME account information with CA. Note: not specifying any new account information triggers a refresh.
+                        /// </summary>
+                        /// <param name="contact">Contact email addresses.</param>
+                        /// <returns></returns>
+                        public Result SetRest(string contact = null)
+                        {
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("contact", contact);
+                            return _client.Set($"/cluster/acme/account/{_name}", parameters);
+                        }
+                        /// <summary>
+                        /// Update existing ACME account information with CA. Note: not specifying any new account information triggers a refresh.
+                        /// </summary>
+                        /// <param name="contact">Contact email addresses.</param>
+                        /// <returns></returns>
+                        public Result UpdateAccount(string contact = null) { return SetRest(contact); }
+                    }
+                    /// <summary>
+                    /// ACMEAccount index.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result GetRest()
+                    {
+                        return _client.Get($"/cluster/acme/account");
+                    }
+                    /// <summary>
+                    /// ACMEAccount index.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result AccountIndex() { return GetRest(); }
+                    /// <summary>
+                    /// Register a new ACME account with CA.
+                    /// </summary>
+                    /// <param name="contact">Contact email addresses.</param>
+                    /// <param name="directory">URL of ACME CA directory endpoint.</param>
+                    /// <param name="name">ACME account config file name.</param>
+                    /// <param name="tos_url">URL of CA TermsOfService - setting this indicates agreement.</param>
+                    /// <returns></returns>
+                    public Result CreateRest(string contact, string directory = null, string name = null, string tos_url = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("contact", contact);
+                        parameters.Add("directory", directory);
+                        parameters.Add("name", name);
+                        parameters.Add("tos_url", tos_url);
+                        return _client.Create($"/cluster/acme/account", parameters);
+                    }
+                    /// <summary>
+                    /// Register a new ACME account with CA.
+                    /// </summary>
+                    /// <param name="contact">Contact email addresses.</param>
+                    /// <param name="directory">URL of ACME CA directory endpoint.</param>
+                    /// <param name="name">ACME account config file name.</param>
+                    /// <param name="tos_url">URL of CA TermsOfService - setting this indicates agreement.</param>
+                    /// <returns></returns>
+                    public Result RegisterAccount(string contact, string directory = null, string name = null, string tos_url = null) { return CreateRest(contact, directory, name, tos_url); }
+                }
+                public class PVETos : Base
+                {
+                    internal PVETos(Client client)
+                    {
+                        _client = client;
+                    }
+                    /// <summary>
+                    /// Retrieve ACME TermsOfService URL from CA.
+                    /// </summary>
+                    /// <param name="directory">URL of ACME CA directory endpoint.</param>
+                    /// <returns></returns>
+                    public Result GetRest(string directory = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("directory", directory);
+                        return _client.Get($"/cluster/acme/tos", parameters);
+                    }
+                    /// <summary>
+                    /// Retrieve ACME TermsOfService URL from CA.
+                    /// </summary>
+                    /// <param name="directory">URL of ACME CA directory endpoint.</param>
+                    /// <returns></returns>
+                    public Result GetTos(string directory = null) { return GetRest(directory); }
+                }
+                public class PVEDirectories : Base
+                {
+                    internal PVEDirectories(Client client)
+                    {
+                        _client = client;
+                    }
+                    /// <summary>
+                    /// Get named known ACME directory endpoints.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result GetRest()
+                    {
+                        return _client.Get($"/cluster/acme/directories");
+                    }
+                    /// <summary>
+                    /// Get named known ACME directory endpoints.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result GetDirectories() { return GetRest(); }
+                }
+                /// <summary>
+                /// ACMEAccount index.
+                /// </summary>
+                /// <returns></returns>
+                public Result GetRest()
+                {
+                    return _client.Get($"/cluster/acme");
+                }
+                /// <summary>
+                /// ACMEAccount index.
+                /// </summary>
+                /// <returns></returns>
+                public Result Index() { return GetRest(); }
+            }
             public class PVELog : Base
             {
                 internal PVELog(Client client)
@@ -2092,8 +2420,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <summary>
                 /// Set datacenter options.
                 /// </summary>
-                /// <param name="console">Select the default Console viewer. You can either use the builtin java applet (VNC), an external virt-viewer comtatible application (SPICE), or an HTML5 based viewer (noVNC).
-                ///   Enum: applet,vv,html5</param>
+                /// <param name="bwlimit">Set bandwidth/io limits various operations.</param>
+                /// <param name="console">Select the default Console viewer. You can either use the builtin java applet (VNC; deprecated and maps to html5), an external virt-viewer comtatible application (SPICE), an HTML5 based vnc viewer (noVNC), or an HTML5 based console client (xtermjs). If the selected viewer is not available (e.g. SPICE not activated for the VM), the fallback is noVNC.
+                ///   Enum: applet,vv,html5,xtermjs</param>
                 /// <param name="delete">A list of settings you want to delete.</param>
                 /// <param name="email_from">Specify email address to send notification from (default is root@$hostname)</param>
                 /// <param name="fencing">Set the fencing mode of the HA cluster. Hardware mode needs a valid configuration of fence devices in /etc/pve/ha/fence.cfg. With both all two modes are used.  WARNING: 'hardware' and 'both' are EXPERIMENTAL &amp; WIP
@@ -2108,9 +2437,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="migration">For cluster wide migration settings.</param>
                 /// <param name="migration_unsecure">Migration is secure using SSH tunnel by default. For secure private networks you can disable it to speed up migration. Deprecated, use the 'migration' property instead!</param>
                 /// <returns></returns>
-                public Result SetRest(string console = null, string delete = null, string email_from = null, string fencing = null, string http_proxy = null, string keyboard = null, string language = null, string mac_prefix = null, int? max_workers = null, string migration = null, bool? migration_unsecure = null)
+                public Result SetRest(string bwlimit = null, string console = null, string delete = null, string email_from = null, string fencing = null, string http_proxy = null, string keyboard = null, string language = null, string mac_prefix = null, int? max_workers = null, string migration = null, bool? migration_unsecure = null)
                 {
                     var parameters = new Dictionary<string, object>();
+                    parameters.Add("bwlimit", bwlimit);
                     parameters.Add("console", console);
                     parameters.Add("delete", delete);
                     parameters.Add("email_from", email_from);
@@ -2127,8 +2457,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <summary>
                 /// Set datacenter options.
                 /// </summary>
-                /// <param name="console">Select the default Console viewer. You can either use the builtin java applet (VNC), an external virt-viewer comtatible application (SPICE), or an HTML5 based viewer (noVNC).
-                ///   Enum: applet,vv,html5</param>
+                /// <param name="bwlimit">Set bandwidth/io limits various operations.</param>
+                /// <param name="console">Select the default Console viewer. You can either use the builtin java applet (VNC; deprecated and maps to html5), an external virt-viewer comtatible application (SPICE), an HTML5 based vnc viewer (noVNC), or an HTML5 based console client (xtermjs). If the selected viewer is not available (e.g. SPICE not activated for the VM), the fallback is noVNC.
+                ///   Enum: applet,vv,html5,xtermjs</param>
                 /// <param name="delete">A list of settings you want to delete.</param>
                 /// <param name="email_from">Specify email address to send notification from (default is root@$hostname)</param>
                 /// <param name="fencing">Set the fencing mode of the HA cluster. Hardware mode needs a valid configuration of fence devices in /etc/pve/ha/fence.cfg. With both all two modes are used.  WARNING: 'hardware' and 'both' are EXPERIMENTAL &amp; WIP
@@ -2143,7 +2474,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="migration">For cluster wide migration settings.</param>
                 /// <param name="migration_unsecure">Migration is secure using SSH tunnel by default. For secure private networks you can disable it to speed up migration. Deprecated, use the 'migration' property instead!</param>
                 /// <returns></returns>
-                public Result SetOptions(string console = null, string delete = null, string email_from = null, string fencing = null, string http_proxy = null, string keyboard = null, string language = null, string mac_prefix = null, int? max_workers = null, string migration = null, bool? migration_unsecure = null) { return SetRest(console, delete, email_from, fencing, http_proxy, keyboard, language, mac_prefix, max_workers, migration, migration_unsecure); }
+                public Result SetOptions(string bwlimit = null, string console = null, string delete = null, string email_from = null, string fencing = null, string http_proxy = null, string keyboard = null, string language = null, string mac_prefix = null, int? max_workers = null, string migration = null, bool? migration_unsecure = null) { return SetRest(bwlimit, console, delete, email_from, fencing, http_proxy, keyboard, language, mac_prefix, max_workers, migration, migration_unsecure); }
             }
             public class PVEStatus : Base
             {
@@ -2246,6 +2577,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 public PVEFirewall Firewall { get { return _firewall ?? (_firewall = new PVEFirewall(_client, _node)); } }
                 private PVEReplication _replication;
                 public PVEReplication Replication { get { return _replication ?? (_replication = new PVEReplication(_client, _node)); } }
+                private PVECertificates _certificates;
+                public PVECertificates Certificates { get { return _certificates ?? (_certificates = new PVECertificates(_client, _node)); } }
+                private PVEConfig _config;
+                public PVEConfig Config { get { return _config ?? (_config = new PVEConfig(_client, _node)); } }
                 private PVEVersion _version;
                 public PVEVersion Version { get { return _version ?? (_version = new PVEVersion(_client, _node)); } }
                 private PVEStatus _status;
@@ -2262,6 +2597,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 public PVESyslog Syslog { get { return _syslog ?? (_syslog = new PVESyslog(_client, _node)); } }
                 private PVEVncshell _vncshell;
                 public PVEVncshell Vncshell { get { return _vncshell ?? (_vncshell = new PVEVncshell(_client, _node)); } }
+                private PVETermproxy _termproxy;
+                public PVETermproxy Termproxy { get { return _termproxy ?? (_termproxy = new PVETermproxy(_client, _node)); } }
                 private PVEVncwebsocket _vncwebsocket;
                 public PVEVncwebsocket Vncwebsocket { get { return _vncwebsocket ?? (_vncwebsocket = new PVEVncwebsocket(_client, _node)); } }
                 private PVESpiceshell _spiceshell;
@@ -2301,6 +2638,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         }
                         private PVEFirewall _firewall;
                         public PVEFirewall Firewall { get { return _firewall ?? (_firewall = new PVEFirewall(_client, _node, _vmid)); } }
+                        private PVEAgent _agent;
+                        public PVEAgent Agent { get { return _agent ?? (_agent = new PVEAgent(_client, _node, _vmid)); } }
                         private PVERrd _rrd;
                         public PVERrd Rrd { get { return _rrd ?? (_rrd = new PVERrd(_client, _node, _vmid)); } }
                         private PVERrddata _rrddata;
@@ -2313,6 +2652,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         public PVEUnlink Unlink { get { return _unlink ?? (_unlink = new PVEUnlink(_client, _node, _vmid)); } }
                         private PVEVncproxy _vncproxy;
                         public PVEVncproxy Vncproxy { get { return _vncproxy ?? (_vncproxy = new PVEVncproxy(_client, _node, _vmid)); } }
+                        private PVETermproxy _termproxy;
+                        public PVETermproxy Termproxy { get { return _termproxy ?? (_termproxy = new PVETermproxy(_client, _node, _vmid)); } }
                         private PVEVncwebsocket _vncwebsocket;
                         public PVEVncwebsocket Vncwebsocket { get { return _vncwebsocket ?? (_vncwebsocket = new PVEVncwebsocket(_client, _node, _vmid)); } }
                         private PVESpiceproxy _spiceproxy;
@@ -2331,8 +2672,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         public PVEMigrate Migrate { get { return _migrate ?? (_migrate = new PVEMigrate(_client, _node, _vmid)); } }
                         private PVEMonitor _monitor;
                         public PVEMonitor Monitor { get { return _monitor ?? (_monitor = new PVEMonitor(_client, _node, _vmid)); } }
-                        private PVEAgent _agent;
-                        public PVEAgent Agent { get { return _agent ?? (_agent = new PVEAgent(_client, _node, _vmid)); } }
                         private PVEResize _resize;
                         public PVEResize Resize { get { return _resize ?? (_resize = new PVEResize(_client, _node, _vmid)); } }
                         private PVESnapshot _snapshot;
@@ -2998,6 +3337,569 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Index() { return GetRest(); }
                         }
+                        public class PVEAgent : Base
+                        {
+                            private object _node;
+                            private object _vmid;
+                            internal PVEAgent(Client client, object node, object vmid)
+                            {
+                                _client = client;
+                                _node = node;
+                                _vmid = vmid;
+                            }
+                            private PVEFsfreeze_Freeze _fsfreeze_Freeze;
+                            public PVEFsfreeze_Freeze Fsfreeze_Freeze { get { return _fsfreeze_Freeze ?? (_fsfreeze_Freeze = new PVEFsfreeze_Freeze(_client, _node, _vmid)); } }
+                            private PVEFsfreeze_Status _fsfreeze_Status;
+                            public PVEFsfreeze_Status Fsfreeze_Status { get { return _fsfreeze_Status ?? (_fsfreeze_Status = new PVEFsfreeze_Status(_client, _node, _vmid)); } }
+                            private PVEFsfreeze_Thaw _fsfreeze_Thaw;
+                            public PVEFsfreeze_Thaw Fsfreeze_Thaw { get { return _fsfreeze_Thaw ?? (_fsfreeze_Thaw = new PVEFsfreeze_Thaw(_client, _node, _vmid)); } }
+                            private PVEFstrim _fstrim;
+                            public PVEFstrim Fstrim { get { return _fstrim ?? (_fstrim = new PVEFstrim(_client, _node, _vmid)); } }
+                            private PVEGet_Fsinfo _get_Fsinfo;
+                            public PVEGet_Fsinfo Get_Fsinfo { get { return _get_Fsinfo ?? (_get_Fsinfo = new PVEGet_Fsinfo(_client, _node, _vmid)); } }
+                            private PVEGet_Host_Name _get_Host_Name;
+                            public PVEGet_Host_Name Get_Host_Name { get { return _get_Host_Name ?? (_get_Host_Name = new PVEGet_Host_Name(_client, _node, _vmid)); } }
+                            private PVEGet_Memory_Block_Info _get_Memory_Block_Info;
+                            public PVEGet_Memory_Block_Info Get_Memory_Block_Info { get { return _get_Memory_Block_Info ?? (_get_Memory_Block_Info = new PVEGet_Memory_Block_Info(_client, _node, _vmid)); } }
+                            private PVEGet_Memory_Blocks _get_Memory_Blocks;
+                            public PVEGet_Memory_Blocks Get_Memory_Blocks { get { return _get_Memory_Blocks ?? (_get_Memory_Blocks = new PVEGet_Memory_Blocks(_client, _node, _vmid)); } }
+                            private PVEGet_Osinfo _get_Osinfo;
+                            public PVEGet_Osinfo Get_Osinfo { get { return _get_Osinfo ?? (_get_Osinfo = new PVEGet_Osinfo(_client, _node, _vmid)); } }
+                            private PVEGet_Time _get_Time;
+                            public PVEGet_Time Get_Time { get { return _get_Time ?? (_get_Time = new PVEGet_Time(_client, _node, _vmid)); } }
+                            private PVEGet_Timezone _get_Timezone;
+                            public PVEGet_Timezone Get_Timezone { get { return _get_Timezone ?? (_get_Timezone = new PVEGet_Timezone(_client, _node, _vmid)); } }
+                            private PVEGet_Users _get_Users;
+                            public PVEGet_Users Get_Users { get { return _get_Users ?? (_get_Users = new PVEGet_Users(_client, _node, _vmid)); } }
+                            private PVEGet_Vcpus _get_Vcpus;
+                            public PVEGet_Vcpus Get_Vcpus { get { return _get_Vcpus ?? (_get_Vcpus = new PVEGet_Vcpus(_client, _node, _vmid)); } }
+                            private PVEInfo _info;
+                            public PVEInfo Info { get { return _info ?? (_info = new PVEInfo(_client, _node, _vmid)); } }
+                            private PVENetwork_Get_Interfaces _network_Get_Interfaces;
+                            public PVENetwork_Get_Interfaces Network_Get_Interfaces { get { return _network_Get_Interfaces ?? (_network_Get_Interfaces = new PVENetwork_Get_Interfaces(_client, _node, _vmid)); } }
+                            private PVEPing _ping;
+                            public PVEPing Ping { get { return _ping ?? (_ping = new PVEPing(_client, _node, _vmid)); } }
+                            private PVEShutdown _shutdown;
+                            public PVEShutdown Shutdown { get { return _shutdown ?? (_shutdown = new PVEShutdown(_client, _node, _vmid)); } }
+                            private PVESuspend_Disk _suspend_Disk;
+                            public PVESuspend_Disk Suspend_Disk { get { return _suspend_Disk ?? (_suspend_Disk = new PVESuspend_Disk(_client, _node, _vmid)); } }
+                            private PVESuspend_Hybrid _suspend_Hybrid;
+                            public PVESuspend_Hybrid Suspend_Hybrid { get { return _suspend_Hybrid ?? (_suspend_Hybrid = new PVESuspend_Hybrid(_client, _node, _vmid)); } }
+                            private PVESuspend_Ram _suspend_Ram;
+                            public PVESuspend_Ram Suspend_Ram { get { return _suspend_Ram ?? (_suspend_Ram = new PVESuspend_Ram(_client, _node, _vmid)); } }
+                            public class PVEFsfreeze_Freeze : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVEFsfreeze_Freeze(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute fsfreeze-freeze.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result CreateRest()
+                                {
+                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-freeze");
+                                }
+                                /// <summary>
+                                /// Execute fsfreeze-freeze.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Fsfreeze_Freeze() { return CreateRest(); }
+                            }
+                            public class PVEFsfreeze_Status : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVEFsfreeze_Status(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute fsfreeze-status.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result CreateRest()
+                                {
+                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-status");
+                                }
+                                /// <summary>
+                                /// Execute fsfreeze-status.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Fsfreeze_Status() { return CreateRest(); }
+                            }
+                            public class PVEFsfreeze_Thaw : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVEFsfreeze_Thaw(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute fsfreeze-thaw.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result CreateRest()
+                                {
+                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-thaw");
+                                }
+                                /// <summary>
+                                /// Execute fsfreeze-thaw.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Fsfreeze_Thaw() { return CreateRest(); }
+                            }
+                            public class PVEFstrim : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVEFstrim(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute fstrim.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result CreateRest()
+                                {
+                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fstrim");
+                                }
+                                /// <summary>
+                                /// Execute fstrim.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Fstrim() { return CreateRest(); }
+                            }
+                            public class PVEGet_Fsinfo : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVEGet_Fsinfo(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute get-fsinfo.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result GetRest()
+                                {
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-fsinfo");
+                                }
+                                /// <summary>
+                                /// Execute get-fsinfo.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Get_Fsinfo() { return GetRest(); }
+                            }
+                            public class PVEGet_Host_Name : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVEGet_Host_Name(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute get-host-name.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result GetRest()
+                                {
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-host-name");
+                                }
+                                /// <summary>
+                                /// Execute get-host-name.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Get_Host_Name() { return GetRest(); }
+                            }
+                            public class PVEGet_Memory_Block_Info : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVEGet_Memory_Block_Info(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute get-memory-block-info.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result GetRest()
+                                {
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-memory-block-info");
+                                }
+                                /// <summary>
+                                /// Execute get-memory-block-info.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Get_Memory_Block_Info() { return GetRest(); }
+                            }
+                            public class PVEGet_Memory_Blocks : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVEGet_Memory_Blocks(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute get-memory-blocks.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result GetRest()
+                                {
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-memory-blocks");
+                                }
+                                /// <summary>
+                                /// Execute get-memory-blocks.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Get_Memory_Blocks() { return GetRest(); }
+                            }
+                            public class PVEGet_Osinfo : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVEGet_Osinfo(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute get-osinfo.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result GetRest()
+                                {
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-osinfo");
+                                }
+                                /// <summary>
+                                /// Execute get-osinfo.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Get_Osinfo() { return GetRest(); }
+                            }
+                            public class PVEGet_Time : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVEGet_Time(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute get-time.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result GetRest()
+                                {
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-time");
+                                }
+                                /// <summary>
+                                /// Execute get-time.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Get_Time() { return GetRest(); }
+                            }
+                            public class PVEGet_Timezone : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVEGet_Timezone(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute get-timezone.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result GetRest()
+                                {
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-timezone");
+                                }
+                                /// <summary>
+                                /// Execute get-timezone.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Get_Timezone() { return GetRest(); }
+                            }
+                            public class PVEGet_Users : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVEGet_Users(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute get-users.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result GetRest()
+                                {
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-users");
+                                }
+                                /// <summary>
+                                /// Execute get-users.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Get_Users() { return GetRest(); }
+                            }
+                            public class PVEGet_Vcpus : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVEGet_Vcpus(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute get-vcpus.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result GetRest()
+                                {
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-vcpus");
+                                }
+                                /// <summary>
+                                /// Execute get-vcpus.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Get_Vcpus() { return GetRest(); }
+                            }
+                            public class PVEInfo : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVEInfo(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute info.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result GetRest()
+                                {
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/info");
+                                }
+                                /// <summary>
+                                /// Execute info.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Info() { return GetRest(); }
+                            }
+                            public class PVENetwork_Get_Interfaces : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVENetwork_Get_Interfaces(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute network-get-interfaces.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result GetRest()
+                                {
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/network-get-interfaces");
+                                }
+                                /// <summary>
+                                /// Execute network-get-interfaces.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Network_Get_Interfaces() { return GetRest(); }
+                            }
+                            public class PVEPing : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVEPing(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute ping.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result CreateRest()
+                                {
+                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/ping");
+                                }
+                                /// <summary>
+                                /// Execute ping.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Ping() { return CreateRest(); }
+                            }
+                            public class PVEShutdown : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVEShutdown(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute shutdown.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result CreateRest()
+                                {
+                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/shutdown");
+                                }
+                                /// <summary>
+                                /// Execute shutdown.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Shutdown() { return CreateRest(); }
+                            }
+                            public class PVESuspend_Disk : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVESuspend_Disk(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute suspend-disk.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result CreateRest()
+                                {
+                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-disk");
+                                }
+                                /// <summary>
+                                /// Execute suspend-disk.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Suspend_Disk() { return CreateRest(); }
+                            }
+                            public class PVESuspend_Hybrid : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVESuspend_Hybrid(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute suspend-hybrid.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result CreateRest()
+                                {
+                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-hybrid");
+                                }
+                                /// <summary>
+                                /// Execute suspend-hybrid.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Suspend_Hybrid() { return CreateRest(); }
+                            }
+                            public class PVESuspend_Ram : Base
+                            {
+                                private object _node;
+                                private object _vmid;
+                                internal PVESuspend_Ram(Client client, object node, object vmid)
+                                {
+                                    _client = client;
+                                    _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Execute suspend-ram.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result CreateRest()
+                                {
+                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-ram");
+                                }
+                                /// <summary>
+                                /// Execute suspend-ram.
+                                /// </summary>
+                                /// <returns></returns>
+                                public Result Suspend_Ram() { return CreateRest(); }
+                            }
+                            /// <summary>
+                            /// Qemu Agent command index.
+                            /// </summary>
+                            /// <returns></returns>
+                            public Result GetRest()
+                            {
+                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent");
+                            }
+                            /// <summary>
+                            /// Qemu Agent command index.
+                            /// </summary>
+                            /// <returns></returns>
+                            public Result Index() { return GetRest(); }
+                            /// <summary>
+                            /// Execute Qemu Guest Agent commands.
+                            /// </summary>
+                            /// <param name="command">The QGA command.
+                            ///   Enum: fsfreeze-freeze,fsfreeze-status,fsfreeze-thaw,fstrim,get-fsinfo,get-host-name,get-memory-block-info,get-memory-blocks,get-osinfo,get-time,get-timezone,get-users,get-vcpus,info,network-get-interfaces,ping,shutdown,suspend-disk,suspend-hybrid,suspend-ram</param>
+                            /// <returns></returns>
+                            public Result CreateRest(string command)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("command", command);
+                                return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent", parameters);
+                            }
+                            /// <summary>
+                            /// Execute Qemu Guest Agent commands.
+                            /// </summary>
+                            /// <param name="command">The QGA command.
+                            ///   Enum: fsfreeze-freeze,fsfreeze-status,fsfreeze-thaw,fstrim,get-fsinfo,get-host-name,get-memory-block-info,get-memory-blocks,get-osinfo,get-time,get-timezone,get-users,get-vcpus,info,network-get-interfaces,ping,shutdown,suspend-disk,suspend-hybrid,suspend-ram</param>
+                            /// <returns></returns>
+                            public Result Agent(string command) { return CreateRest(command); }
+                        }
                         public class PVERrd : Base
                         {
                             private object _node;
@@ -3112,6 +4014,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="boot">Boot on floppy (a), hard disk (c), CD-ROM (d), or network (n).</param>
                             /// <param name="bootdisk">Enable booting from specified disk.</param>
                             /// <param name="cdrom">This is an alias for option -ide2</param>
+                            /// <param name="cipassword">cloud-init: Password to assign the user. Using this is generally not recommended. Use ssh keys instead. Also note that older cloud-init versions do not support hashed passwords.</param>
+                            /// <param name="citype">Specifies the cloud-init configuration format. The default depends on the configured operating system type (`ostype`. We use the `nocloud` format for Linux, and `configdrive2` for windows.
+                            ///   Enum: configdrive2,nocloud</param>
+                            /// <param name="ciuser">cloud-init: User name to change ssh keys and password for instead of the image's configured default user.</param>
                             /// <param name="cores">The number of cores per socket.</param>
                             /// <param name="cpu">Emulated CPU type.</param>
                             /// <param name="cpulimit">Limit of CPU usage.</param>
@@ -3126,7 +4032,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="hugepages">Enable/disable hugepages memory.
                             ///   Enum: any,2,1024</param>
                             /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3).</param>
-                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.conf' configuration file.
+                            /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
+                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.conf' configuration file.It should not be necessary to set it.
                             ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                             /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
                             /// <param name="localtime">Set the real time clock to local time. This is enabled by default if ostype indicates a Microsoft OS.</param>
@@ -3137,6 +4044,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="migrate_downtime">Set maximum tolerated downtime (in seconds) for migrations.</param>
                             /// <param name="migrate_speed">Set maximum speed (in MB/s) for migrations. Value 0 is no limit.</param>
                             /// <param name="name">Set a name for the VM. Only used on the configuration web interface.</param>
+                            /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                             /// <param name="netN">Specify network devices.</param>
                             /// <param name="numa">Enable/disable NUMA.</param>
                             /// <param name="numaN">NUMA topology.</param>
@@ -3151,12 +4059,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 13).</param>
                             /// <param name="scsihw">SCSI controller model
                             ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
+                            /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                             /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
                             /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                             /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
                             /// <param name="smp">The number of CPUs. Please use option -sockets instead.</param>
                             /// <param name="sockets">The number of CPU sockets.</param>
+                            /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
                             /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                             /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                             /// <param name="tablet">Enable/disable the USB tablet device.</param>
@@ -3171,7 +4081,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result CreateRest(bool? acpi = null, bool? agent = null, string args = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null)
+                            public Result CreateRest(bool? acpi = null, bool? agent = null, string args = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("acpi", acpi);
@@ -3184,6 +4094,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("boot", boot);
                                 parameters.Add("bootdisk", bootdisk);
                                 parameters.Add("cdrom", cdrom);
+                                parameters.Add("cipassword", cipassword);
+                                parameters.Add("citype", citype);
+                                parameters.Add("ciuser", ciuser);
                                 parameters.Add("cores", cores);
                                 parameters.Add("cpu", cpu);
                                 parameters.Add("cpulimit", cpulimit);
@@ -3204,6 +4117,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("migrate_downtime", migrate_downtime);
                                 parameters.Add("migrate_speed", migrate_speed);
                                 parameters.Add("name", name);
+                                parameters.Add("nameserver", nameserver);
                                 parameters.Add("numa", numa);
                                 parameters.Add("onboot", onboot);
                                 parameters.Add("ostype", ostype);
@@ -3211,11 +4125,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("reboot", reboot);
                                 parameters.Add("revert", revert);
                                 parameters.Add("scsihw", scsihw);
+                                parameters.Add("searchdomain", searchdomain);
                                 parameters.Add("shares", shares);
                                 parameters.Add("skiplock", skiplock);
                                 parameters.Add("smbios1", smbios1);
                                 parameters.Add("smp", smp);
                                 parameters.Add("sockets", sockets);
+                                parameters.Add("sshkeys", sshkeys);
                                 parameters.Add("startdate", startdate);
                                 parameters.Add("startup", startup);
                                 parameters.Add("tablet", tablet);
@@ -3227,6 +4143,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("watchdog", watchdog);
                                 AddIndexedParameter(parameters, "hostpci", hostpciN);
                                 AddIndexedParameter(parameters, "ide", ideN);
+                                AddIndexedParameter(parameters, "ipconfig", ipconfigN);
                                 AddIndexedParameter(parameters, "net", netN);
                                 AddIndexedParameter(parameters, "numa", numaN);
                                 AddIndexedParameter(parameters, "parallel", parallelN);
@@ -3252,6 +4169,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="boot">Boot on floppy (a), hard disk (c), CD-ROM (d), or network (n).</param>
                             /// <param name="bootdisk">Enable booting from specified disk.</param>
                             /// <param name="cdrom">This is an alias for option -ide2</param>
+                            /// <param name="cipassword">cloud-init: Password to assign the user. Using this is generally not recommended. Use ssh keys instead. Also note that older cloud-init versions do not support hashed passwords.</param>
+                            /// <param name="citype">Specifies the cloud-init configuration format. The default depends on the configured operating system type (`ostype`. We use the `nocloud` format for Linux, and `configdrive2` for windows.
+                            ///   Enum: configdrive2,nocloud</param>
+                            /// <param name="ciuser">cloud-init: User name to change ssh keys and password for instead of the image's configured default user.</param>
                             /// <param name="cores">The number of cores per socket.</param>
                             /// <param name="cpu">Emulated CPU type.</param>
                             /// <param name="cpulimit">Limit of CPU usage.</param>
@@ -3266,7 +4187,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="hugepages">Enable/disable hugepages memory.
                             ///   Enum: any,2,1024</param>
                             /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3).</param>
-                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.conf' configuration file.
+                            /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
+                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.conf' configuration file.It should not be necessary to set it.
                             ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                             /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
                             /// <param name="localtime">Set the real time clock to local time. This is enabled by default if ostype indicates a Microsoft OS.</param>
@@ -3277,6 +4199,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="migrate_downtime">Set maximum tolerated downtime (in seconds) for migrations.</param>
                             /// <param name="migrate_speed">Set maximum speed (in MB/s) for migrations. Value 0 is no limit.</param>
                             /// <param name="name">Set a name for the VM. Only used on the configuration web interface.</param>
+                            /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                             /// <param name="netN">Specify network devices.</param>
                             /// <param name="numa">Enable/disable NUMA.</param>
                             /// <param name="numaN">NUMA topology.</param>
@@ -3291,12 +4214,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 13).</param>
                             /// <param name="scsihw">SCSI controller model
                             ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
+                            /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                             /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
                             /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                             /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
                             /// <param name="smp">The number of CPUs. Please use option -sockets instead.</param>
                             /// <param name="sockets">The number of CPU sockets.</param>
+                            /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
                             /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                             /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                             /// <param name="tablet">Enable/disable the USB tablet device.</param>
@@ -3311,7 +4236,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result UpdateVmAsync(bool? acpi = null, bool? agent = null, string args = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null) { return CreateRest(acpi, agent, args, autostart, background_delay, balloon, bios, boot, bootdisk, cdrom, cores, cpu, cpulimit, cpuunits, delete, description, digest, force, freeze, hostpciN, hotplug, hugepages, ideN, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, sataN, scsiN, scsihw, serialN, shares, skiplock, smbios1, smp, sockets, startdate, startup, tablet, tdf, template, unusedN, usbN, vcpus, vga, virtioN, vmstatestorage, watchdog); }
+                            public Result UpdateVmAsync(bool? acpi = null, bool? agent = null, string args = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null) { return CreateRest(acpi, agent, args, autostart, background_delay, balloon, bios, boot, bootdisk, cdrom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, delete, description, digest, force, freeze, hostpciN, hotplug, hugepages, ideN, ipconfigN, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, sataN, scsiN, scsihw, searchdomain, serialN, shares, skiplock, smbios1, smp, sockets, sshkeys, startdate, startup, tablet, tdf, template, unusedN, usbN, vcpus, vga, virtioN, vmstatestorage, watchdog); }
                             /// <summary>
                             /// Set virtual machine options (synchrounous API) - You should consider using the POST method instead for any actions involving hotplug or storage allocation.
                             /// </summary>
@@ -3325,6 +4250,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="boot">Boot on floppy (a), hard disk (c), CD-ROM (d), or network (n).</param>
                             /// <param name="bootdisk">Enable booting from specified disk.</param>
                             /// <param name="cdrom">This is an alias for option -ide2</param>
+                            /// <param name="cipassword">cloud-init: Password to assign the user. Using this is generally not recommended. Use ssh keys instead. Also note that older cloud-init versions do not support hashed passwords.</param>
+                            /// <param name="citype">Specifies the cloud-init configuration format. The default depends on the configured operating system type (`ostype`. We use the `nocloud` format for Linux, and `configdrive2` for windows.
+                            ///   Enum: configdrive2,nocloud</param>
+                            /// <param name="ciuser">cloud-init: User name to change ssh keys and password for instead of the image's configured default user.</param>
                             /// <param name="cores">The number of cores per socket.</param>
                             /// <param name="cpu">Emulated CPU type.</param>
                             /// <param name="cpulimit">Limit of CPU usage.</param>
@@ -3339,7 +4268,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="hugepages">Enable/disable hugepages memory.
                             ///   Enum: any,2,1024</param>
                             /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3).</param>
-                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.conf' configuration file.
+                            /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
+                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.conf' configuration file.It should not be necessary to set it.
                             ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                             /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
                             /// <param name="localtime">Set the real time clock to local time. This is enabled by default if ostype indicates a Microsoft OS.</param>
@@ -3350,6 +4280,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="migrate_downtime">Set maximum tolerated downtime (in seconds) for migrations.</param>
                             /// <param name="migrate_speed">Set maximum speed (in MB/s) for migrations. Value 0 is no limit.</param>
                             /// <param name="name">Set a name for the VM. Only used on the configuration web interface.</param>
+                            /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                             /// <param name="netN">Specify network devices.</param>
                             /// <param name="numa">Enable/disable NUMA.</param>
                             /// <param name="numaN">NUMA topology.</param>
@@ -3364,12 +4295,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 13).</param>
                             /// <param name="scsihw">SCSI controller model
                             ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
+                            /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                             /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
                             /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                             /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
                             /// <param name="smp">The number of CPUs. Please use option -sockets instead.</param>
                             /// <param name="sockets">The number of CPU sockets.</param>
+                            /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
                             /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                             /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                             /// <param name="tablet">Enable/disable the USB tablet device.</param>
@@ -3384,7 +4317,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result SetRest(bool? acpi = null, bool? agent = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null)
+                            public Result SetRest(bool? acpi = null, bool? agent = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("acpi", acpi);
@@ -3396,6 +4329,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("boot", boot);
                                 parameters.Add("bootdisk", bootdisk);
                                 parameters.Add("cdrom", cdrom);
+                                parameters.Add("cipassword", cipassword);
+                                parameters.Add("citype", citype);
+                                parameters.Add("ciuser", ciuser);
                                 parameters.Add("cores", cores);
                                 parameters.Add("cpu", cpu);
                                 parameters.Add("cpulimit", cpulimit);
@@ -3416,6 +4352,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("migrate_downtime", migrate_downtime);
                                 parameters.Add("migrate_speed", migrate_speed);
                                 parameters.Add("name", name);
+                                parameters.Add("nameserver", nameserver);
                                 parameters.Add("numa", numa);
                                 parameters.Add("onboot", onboot);
                                 parameters.Add("ostype", ostype);
@@ -3423,11 +4360,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("reboot", reboot);
                                 parameters.Add("revert", revert);
                                 parameters.Add("scsihw", scsihw);
+                                parameters.Add("searchdomain", searchdomain);
                                 parameters.Add("shares", shares);
                                 parameters.Add("skiplock", skiplock);
                                 parameters.Add("smbios1", smbios1);
                                 parameters.Add("smp", smp);
                                 parameters.Add("sockets", sockets);
+                                parameters.Add("sshkeys", sshkeys);
                                 parameters.Add("startdate", startdate);
                                 parameters.Add("startup", startup);
                                 parameters.Add("tablet", tablet);
@@ -3439,6 +4378,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("watchdog", watchdog);
                                 AddIndexedParameter(parameters, "hostpci", hostpciN);
                                 AddIndexedParameter(parameters, "ide", ideN);
+                                AddIndexedParameter(parameters, "ipconfig", ipconfigN);
                                 AddIndexedParameter(parameters, "net", netN);
                                 AddIndexedParameter(parameters, "numa", numaN);
                                 AddIndexedParameter(parameters, "parallel", parallelN);
@@ -3463,6 +4403,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="boot">Boot on floppy (a), hard disk (c), CD-ROM (d), or network (n).</param>
                             /// <param name="bootdisk">Enable booting from specified disk.</param>
                             /// <param name="cdrom">This is an alias for option -ide2</param>
+                            /// <param name="cipassword">cloud-init: Password to assign the user. Using this is generally not recommended. Use ssh keys instead. Also note that older cloud-init versions do not support hashed passwords.</param>
+                            /// <param name="citype">Specifies the cloud-init configuration format. The default depends on the configured operating system type (`ostype`. We use the `nocloud` format for Linux, and `configdrive2` for windows.
+                            ///   Enum: configdrive2,nocloud</param>
+                            /// <param name="ciuser">cloud-init: User name to change ssh keys and password for instead of the image's configured default user.</param>
                             /// <param name="cores">The number of cores per socket.</param>
                             /// <param name="cpu">Emulated CPU type.</param>
                             /// <param name="cpulimit">Limit of CPU usage.</param>
@@ -3477,7 +4421,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="hugepages">Enable/disable hugepages memory.
                             ///   Enum: any,2,1024</param>
                             /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3).</param>
-                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.conf' configuration file.
+                            /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
+                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.conf' configuration file.It should not be necessary to set it.
                             ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                             /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
                             /// <param name="localtime">Set the real time clock to local time. This is enabled by default if ostype indicates a Microsoft OS.</param>
@@ -3488,6 +4433,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="migrate_downtime">Set maximum tolerated downtime (in seconds) for migrations.</param>
                             /// <param name="migrate_speed">Set maximum speed (in MB/s) for migrations. Value 0 is no limit.</param>
                             /// <param name="name">Set a name for the VM. Only used on the configuration web interface.</param>
+                            /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                             /// <param name="netN">Specify network devices.</param>
                             /// <param name="numa">Enable/disable NUMA.</param>
                             /// <param name="numaN">NUMA topology.</param>
@@ -3502,12 +4448,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 13).</param>
                             /// <param name="scsihw">SCSI controller model
                             ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
+                            /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                             /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
                             /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                             /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
                             /// <param name="smp">The number of CPUs. Please use option -sockets instead.</param>
                             /// <param name="sockets">The number of CPU sockets.</param>
+                            /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
                             /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                             /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                             /// <param name="tablet">Enable/disable the USB tablet device.</param>
@@ -3522,7 +4470,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result UpdateVm(bool? acpi = null, bool? agent = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null) { return SetRest(acpi, agent, args, autostart, balloon, bios, boot, bootdisk, cdrom, cores, cpu, cpulimit, cpuunits, delete, description, digest, force, freeze, hostpciN, hotplug, hugepages, ideN, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, sataN, scsiN, scsihw, serialN, shares, skiplock, smbios1, smp, sockets, startdate, startup, tablet, tdf, template, unusedN, usbN, vcpus, vga, virtioN, vmstatestorage, watchdog); }
+                            public Result UpdateVm(bool? acpi = null, bool? agent = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null) { return SetRest(acpi, agent, args, autostart, balloon, bios, boot, bootdisk, cdrom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, delete, description, digest, force, freeze, hostpciN, hotplug, hugepages, ideN, ipconfigN, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, sataN, scsiN, scsihw, searchdomain, serialN, shares, skiplock, smbios1, smp, sockets, sshkeys, startdate, startup, tablet, tdf, template, unusedN, usbN, vcpus, vga, virtioN, vmstatestorage, watchdog); }
                         }
                         public class PVEPending : Base
                         {
@@ -3606,6 +4554,36 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="websocket">starts websockify instead of vncproxy</param>
                             /// <returns></returns>
                             public Result Vncproxy(bool? websocket = null) { return CreateRest(websocket); }
+                        }
+                        public class PVETermproxy : Base
+                        {
+                            private object _node;
+                            private object _vmid;
+                            internal PVETermproxy(Client client, object node, object vmid)
+                            {
+                                _client = client;
+                                _node = node;
+                                _vmid = vmid;
+                            }
+                            /// <summary>
+                            /// Creates a TCP proxy connections.
+                            /// </summary>
+                            /// <param name="serial">opens a serial terminal (defaults to display)
+                            ///   Enum: serial0,serial1,serial2,serial3</param>
+                            /// <returns></returns>
+                            public Result CreateRest(string serial = null)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("serial", serial);
+                                return _client.Create($"/nodes/{_node}/qemu/{_vmid}/termproxy", parameters);
+                            }
+                            /// <summary>
+                            /// Creates a TCP proxy connections.
+                            /// </summary>
+                            /// <param name="serial">opens a serial terminal (defaults to display)
+                            ///   Enum: serial0,serial1,serial2,serial3</param>
+                            /// <returns></returns>
+                            public Result Termproxy(string serial = null) { return CreateRest(serial); }
                         }
                         public class PVEVncwebsocket : Base
                         {
@@ -4016,9 +4994,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="newid">VMID for the clone.</param>
                             /// <param name="description">Description for the new VM.</param>
-                            /// <param name="format">Target format for file storage.
+                            /// <param name="format">Target format for file storage. Only valid for full clone.
                             ///   Enum: raw,qcow2,vmdk</param>
-                            /// <param name="full">Create a full copy of all disk. This is always done when you clone a normal VM. For VM templates, we try to create a linked clone by default.</param>
+                            /// <param name="full">Create a full copy of all disks. This is always done when you clone a normal VM. For VM templates, we try to create a linked clone by default.</param>
                             /// <param name="name">Set a name for the new VM.</param>
                             /// <param name="pool">Add the new VM to the specified pool.</param>
                             /// <param name="snapname">The name of the snapshot.</param>
@@ -4044,9 +5022,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="newid">VMID for the clone.</param>
                             /// <param name="description">Description for the new VM.</param>
-                            /// <param name="format">Target format for file storage.
+                            /// <param name="format">Target format for file storage. Only valid for full clone.
                             ///   Enum: raw,qcow2,vmdk</param>
-                            /// <param name="full">Create a full copy of all disk. This is always done when you clone a normal VM. For VM templates, we try to create a linked clone by default.</param>
+                            /// <param name="full">Create a full copy of all disks. This is always done when you clone a normal VM. For VM templates, we try to create a linked clone by default.</param>
                             /// <param name="name">Set a name for the new VM.</param>
                             /// <param name="pool">Add the new VM to the specified pool.</param>
                             /// <param name="snapname">The name of the snapshot.</param>
@@ -4174,36 +5152,6 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="command">The monitor command.</param>
                             /// <returns></returns>
                             public Result Monitor(string command) { return CreateRest(command); }
-                        }
-                        public class PVEAgent : Base
-                        {
-                            private object _node;
-                            private object _vmid;
-                            internal PVEAgent(Client client, object node, object vmid)
-                            {
-                                _client = client;
-                                _node = node;
-                                _vmid = vmid;
-                            }
-                            /// <summary>
-                            /// Execute Qemu Guest Agent commands.
-                            /// </summary>
-                            /// <param name="command">The QGA command.
-                            ///   Enum: ping,get-time,info,fsfreeze-status,fsfreeze-freeze,fsfreeze-thaw,fstrim,network-get-interfaces,get-vcpus,get-fsinfo,get-memory-blocks,get-memory-block-info,suspend-hybrid,suspend-ram,suspend-disk,shutdown</param>
-                            /// <returns></returns>
-                            public Result CreateRest(string command)
-                            {
-                                var parameters = new Dictionary<string, object>();
-                                parameters.Add("command", command);
-                                return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent", parameters);
-                            }
-                            /// <summary>
-                            /// Execute Qemu Guest Agent commands.
-                            /// </summary>
-                            /// <param name="command">The QGA command.
-                            ///   Enum: ping,get-time,info,fsfreeze-status,fsfreeze-freeze,fsfreeze-thaw,fstrim,network-get-interfaces,get-vcpus,get-fsinfo,get-memory-blocks,get-memory-block-info,suspend-hybrid,suspend-ram,suspend-disk,shutdown</param>
-                            /// <returns></returns>
-                            public Result Agent(string command) { return CreateRest(command); }
                         }
                         public class PVEResize : Base
                         {
@@ -4500,7 +5448,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     ///   Enum: seabios,ovmf</param>
                     /// <param name="boot">Boot on floppy (a), hard disk (c), CD-ROM (d), or network (n).</param>
                     /// <param name="bootdisk">Enable booting from specified disk.</param>
+                    /// <param name="bwlimit">Override i/o bandwidth limit (in KiB/s).</param>
                     /// <param name="cdrom">This is an alias for option -ide2</param>
+                    /// <param name="cipassword">cloud-init: Password to assign the user. Using this is generally not recommended. Use ssh keys instead. Also note that older cloud-init versions do not support hashed passwords.</param>
+                    /// <param name="citype">Specifies the cloud-init configuration format. The default depends on the configured operating system type (`ostype`. We use the `nocloud` format for Linux, and `configdrive2` for windows.
+                    ///   Enum: configdrive2,nocloud</param>
+                    /// <param name="ciuser">cloud-init: User name to change ssh keys and password for instead of the image's configured default user.</param>
                     /// <param name="cores">The number of cores per socket.</param>
                     /// <param name="cpu">Emulated CPU type.</param>
                     /// <param name="cpulimit">Limit of CPU usage.</param>
@@ -4513,7 +5466,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="hugepages">Enable/disable hugepages memory.
                     ///   Enum: any,2,1024</param>
                     /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3).</param>
-                    /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.conf' configuration file.
+                    /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
+                    /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.conf' configuration file.It should not be necessary to set it.
                     ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                     /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
                     /// <param name="localtime">Set the real time clock to local time. This is enabled by default if ostype indicates a Microsoft OS.</param>
@@ -4524,6 +5478,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="migrate_downtime">Set maximum tolerated downtime (in seconds) for migrations.</param>
                     /// <param name="migrate_speed">Set maximum speed (in MB/s) for migrations. Value 0 is no limit.</param>
                     /// <param name="name">Set a name for the VM. Only used on the configuration web interface.</param>
+                    /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                     /// <param name="netN">Specify network devices.</param>
                     /// <param name="numa">Enable/disable NUMA.</param>
                     /// <param name="numaN">NUMA topology.</param>
@@ -4538,11 +5493,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 13).</param>
                     /// <param name="scsihw">SCSI controller model
                     ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
+                    /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                     /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
                     /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning</param>
                     /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
                     /// <param name="smp">The number of CPUs. Please use option -sockets instead.</param>
                     /// <param name="sockets">The number of CPU sockets.</param>
+                    /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
                     /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                     /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                     /// <param name="storage">Default storage.</param>
@@ -4559,7 +5516,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                     /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                     /// <returns></returns>
-                    public Result CreateRest(int vmid, bool? acpi = null, bool? agent = null, string archive = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null)
+                    public Result CreateRest(int vmid, bool? acpi = null, bool? agent = null, string archive = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string sshkeys = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("vmid", vmid);
@@ -4572,7 +5529,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("bios", bios);
                         parameters.Add("boot", boot);
                         parameters.Add("bootdisk", bootdisk);
+                        parameters.Add("bwlimit", bwlimit);
                         parameters.Add("cdrom", cdrom);
+                        parameters.Add("cipassword", cipassword);
+                        parameters.Add("citype", citype);
+                        parameters.Add("ciuser", ciuser);
                         parameters.Add("cores", cores);
                         parameters.Add("cpu", cpu);
                         parameters.Add("cpulimit", cpulimit);
@@ -4591,6 +5552,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("migrate_downtime", migrate_downtime);
                         parameters.Add("migrate_speed", migrate_speed);
                         parameters.Add("name", name);
+                        parameters.Add("nameserver", nameserver);
                         parameters.Add("numa", numa);
                         parameters.Add("onboot", onboot);
                         parameters.Add("ostype", ostype);
@@ -4598,10 +5560,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("protection", protection);
                         parameters.Add("reboot", reboot);
                         parameters.Add("scsihw", scsihw);
+                        parameters.Add("searchdomain", searchdomain);
                         parameters.Add("shares", shares);
                         parameters.Add("smbios1", smbios1);
                         parameters.Add("smp", smp);
                         parameters.Add("sockets", sockets);
+                        parameters.Add("sshkeys", sshkeys);
                         parameters.Add("startdate", startdate);
                         parameters.Add("startup", startup);
                         parameters.Add("storage", storage);
@@ -4615,6 +5579,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("watchdog", watchdog);
                         AddIndexedParameter(parameters, "hostpci", hostpciN);
                         AddIndexedParameter(parameters, "ide", ideN);
+                        AddIndexedParameter(parameters, "ipconfig", ipconfigN);
                         AddIndexedParameter(parameters, "net", netN);
                         AddIndexedParameter(parameters, "numa", numaN);
                         AddIndexedParameter(parameters, "parallel", parallelN);
@@ -4640,7 +5605,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     ///   Enum: seabios,ovmf</param>
                     /// <param name="boot">Boot on floppy (a), hard disk (c), CD-ROM (d), or network (n).</param>
                     /// <param name="bootdisk">Enable booting from specified disk.</param>
+                    /// <param name="bwlimit">Override i/o bandwidth limit (in KiB/s).</param>
                     /// <param name="cdrom">This is an alias for option -ide2</param>
+                    /// <param name="cipassword">cloud-init: Password to assign the user. Using this is generally not recommended. Use ssh keys instead. Also note that older cloud-init versions do not support hashed passwords.</param>
+                    /// <param name="citype">Specifies the cloud-init configuration format. The default depends on the configured operating system type (`ostype`. We use the `nocloud` format for Linux, and `configdrive2` for windows.
+                    ///   Enum: configdrive2,nocloud</param>
+                    /// <param name="ciuser">cloud-init: User name to change ssh keys and password for instead of the image's configured default user.</param>
                     /// <param name="cores">The number of cores per socket.</param>
                     /// <param name="cpu">Emulated CPU type.</param>
                     /// <param name="cpulimit">Limit of CPU usage.</param>
@@ -4653,7 +5623,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="hugepages">Enable/disable hugepages memory.
                     ///   Enum: any,2,1024</param>
                     /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3).</param>
-                    /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.conf' configuration file.
+                    /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
+                    /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.conf' configuration file.It should not be necessary to set it.
                     ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                     /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
                     /// <param name="localtime">Set the real time clock to local time. This is enabled by default if ostype indicates a Microsoft OS.</param>
@@ -4664,6 +5635,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="migrate_downtime">Set maximum tolerated downtime (in seconds) for migrations.</param>
                     /// <param name="migrate_speed">Set maximum speed (in MB/s) for migrations. Value 0 is no limit.</param>
                     /// <param name="name">Set a name for the VM. Only used on the configuration web interface.</param>
+                    /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                     /// <param name="netN">Specify network devices.</param>
                     /// <param name="numa">Enable/disable NUMA.</param>
                     /// <param name="numaN">NUMA topology.</param>
@@ -4678,11 +5650,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 13).</param>
                     /// <param name="scsihw">SCSI controller model
                     ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
+                    /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                     /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
                     /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning</param>
                     /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
                     /// <param name="smp">The number of CPUs. Please use option -sockets instead.</param>
                     /// <param name="sockets">The number of CPU sockets.</param>
+                    /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
                     /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                     /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                     /// <param name="storage">Default storage.</param>
@@ -4699,7 +5673,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                     /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                     /// <returns></returns>
-                    public Result CreateVm(int vmid, bool? acpi = null, bool? agent = null, string archive = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null) { return CreateRest(vmid, acpi, agent, archive, args, autostart, balloon, bios, boot, bootdisk, cdrom, cores, cpu, cpulimit, cpuunits, description, force, freeze, hostpciN, hotplug, hugepages, ideN, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, netN, numa, numaN, onboot, ostype, parallelN, pool, protection, reboot, sataN, scsiN, scsihw, serialN, shares, smbios1, smp, sockets, startdate, startup, storage, tablet, tdf, template, unique, unusedN, usbN, vcpus, vga, virtioN, vmstatestorage, watchdog); }
+                    public Result CreateVm(int vmid, bool? acpi = null, bool? agent = null, string archive = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string sshkeys = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null) { return CreateRest(vmid, acpi, agent, archive, args, autostart, balloon, bios, boot, bootdisk, bwlimit, cdrom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, description, force, freeze, hostpciN, hotplug, hugepages, ideN, ipconfigN, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, pool, protection, reboot, sataN, scsiN, scsihw, searchdomain, serialN, shares, smbios1, smp, sockets, sshkeys, startdate, startup, storage, tablet, tdf, template, unique, unusedN, usbN, vcpus, vga, virtioN, vmstatestorage, watchdog); }
                 }
                 public class PVELxc : Base
                 {
@@ -4734,6 +5708,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         public PVERrddata Rrddata { get { return _rrddata ?? (_rrddata = new PVERrddata(_client, _node, _vmid)); } }
                         private PVEVncproxy _vncproxy;
                         public PVEVncproxy Vncproxy { get { return _vncproxy ?? (_vncproxy = new PVEVncproxy(_client, _node, _vmid)); } }
+                        private PVETermproxy _termproxy;
+                        public PVETermproxy Termproxy { get { return _termproxy ?? (_termproxy = new PVETermproxy(_client, _node, _vmid)); } }
                         private PVEVncwebsocket _vncwebsocket;
                         public PVEVncwebsocket Vncwebsocket { get { return _vncwebsocket ?? (_vncwebsocket = new PVEVncwebsocket(_client, _node, _vmid)); } }
                         private PVESpiceproxy _spiceproxy;
@@ -4748,6 +5724,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         public PVEClone Clone { get { return _clone ?? (_clone = new PVEClone(_client, _node, _vmid)); } }
                         private PVEResize _resize;
                         public PVEResize Resize { get { return _resize ?? (_resize = new PVEResize(_client, _node, _vmid)); } }
+                        private PVEMoveVolume _moveVolume;
+                        public PVEMoveVolume MoveVolume { get { return _moveVolume ?? (_moveVolume = new PVEMoveVolume(_client, _node, _vmid)); } }
                         public class PVEConfig : Base
                         {
                             private object _node;
@@ -5994,6 +6972,30 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Vncproxy(int? height = null, bool? websocket = null, int? width = null) { return CreateRest(height, websocket, width); }
                         }
+                        public class PVETermproxy : Base
+                        {
+                            private object _node;
+                            private object _vmid;
+                            internal PVETermproxy(Client client, object node, object vmid)
+                            {
+                                _client = client;
+                                _node = node;
+                                _vmid = vmid;
+                            }
+                            /// <summary>
+                            /// Creates a TCP proxy connection.
+                            /// </summary>
+                            /// <returns></returns>
+                            public Result CreateRest()
+                            {
+                                return _client.Create($"/nodes/{_node}/lxc/{_vmid}/termproxy");
+                            }
+                            /// <summary>
+                            /// Creates a TCP proxy connection.
+                            /// </summary>
+                            /// <returns></returns>
+                            public Result Termproxy() { return CreateRest(); }
+                        }
                         public class PVEVncwebsocket : Base
                         {
                             private object _node;
@@ -6107,7 +7109,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Check if feature for virtual machine is available.
                             /// </summary>
                             /// <param name="feature">Feature to check.
-                            ///   Enum: snapshot</param>
+                            ///   Enum: snapshot,clone,copy</param>
                             /// <param name="snapname">The name of the snapshot.</param>
                             /// <returns></returns>
                             public Result GetRest(string feature, string snapname = null)
@@ -6121,7 +7123,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// Check if feature for virtual machine is available.
                             /// </summary>
                             /// <param name="feature">Feature to check.
-                            ///   Enum: snapshot</param>
+                            ///   Enum: snapshot,clone,copy</param>
                             /// <param name="snapname">The name of the snapshot.</param>
                             /// <returns></returns>
                             public Result VmFeature(string feature, string snapname = null) { return GetRest(feature, snapname); }
@@ -6139,20 +7141,16 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// Create a Template.
                             /// </summary>
-                            /// <param name="experimental">The template feature is experimental, set this flag if you know what you are doing.</param>
                             /// <returns></returns>
-                            public Result CreateRest(bool experimental)
+                            public Result CreateRest()
                             {
-                                var parameters = new Dictionary<string, object>();
-                                parameters.Add("experimental", experimental);
-                                return _client.Create($"/nodes/{_node}/lxc/{_vmid}/template", parameters);
+                                return _client.Create($"/nodes/{_node}/lxc/{_vmid}/template");
                             }
                             /// <summary>
                             /// Create a Template.
                             /// </summary>
-                            /// <param name="experimental">The template feature is experimental, set this flag if you know what you are doing.</param>
                             /// <returns></returns>
-                            public Result Template(bool experimental) { return CreateRest(experimental); }
+                            public Result Template() { return CreateRest(); }
                         }
                         public class PVEClone : Base
                         {
@@ -6167,19 +7165,18 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <summary>
                             /// Create a container clone/copy
                             /// </summary>
-                            /// <param name="experimental">The clone feature is experimental, set this flag if you know what you are doing.</param>
                             /// <param name="newid">VMID for the clone.</param>
                             /// <param name="description">Description for the new CT.</param>
-                            /// <param name="full">Create a full copy of all disk. This is always done when you clone a normal CT. For CT templates, we try to create a linked clone by default.</param>
+                            /// <param name="full">Create a full copy of all disks. This is always done when you clone a normal CT. For CT templates, we try to create a linked clone by default.</param>
                             /// <param name="hostname">Set a hostname for the new CT.</param>
                             /// <param name="pool">Add the new CT to the specified pool.</param>
                             /// <param name="snapname">The name of the snapshot.</param>
                             /// <param name="storage">Target storage for full clone.</param>
+                            /// <param name="target">Target node. Only allowed if the original VM is on shared storage.</param>
                             /// <returns></returns>
-                            public Result CreateRest(bool experimental, int newid, string description = null, bool? full = null, string hostname = null, string pool = null, string snapname = null, string storage = null)
+                            public Result CreateRest(int newid, string description = null, bool? full = null, string hostname = null, string pool = null, string snapname = null, string storage = null, string target = null)
                             {
                                 var parameters = new Dictionary<string, object>();
-                                parameters.Add("experimental", experimental);
                                 parameters.Add("newid", newid);
                                 parameters.Add("description", description);
                                 parameters.Add("full", full);
@@ -6187,21 +7184,22 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 parameters.Add("pool", pool);
                                 parameters.Add("snapname", snapname);
                                 parameters.Add("storage", storage);
+                                parameters.Add("target", target);
                                 return _client.Create($"/nodes/{_node}/lxc/{_vmid}/clone", parameters);
                             }
                             /// <summary>
                             /// Create a container clone/copy
                             /// </summary>
-                            /// <param name="experimental">The clone feature is experimental, set this flag if you know what you are doing.</param>
                             /// <param name="newid">VMID for the clone.</param>
                             /// <param name="description">Description for the new CT.</param>
-                            /// <param name="full">Create a full copy of all disk. This is always done when you clone a normal CT. For CT templates, we try to create a linked clone by default.</param>
+                            /// <param name="full">Create a full copy of all disks. This is always done when you clone a normal CT. For CT templates, we try to create a linked clone by default.</param>
                             /// <param name="hostname">Set a hostname for the new CT.</param>
                             /// <param name="pool">Add the new CT to the specified pool.</param>
                             /// <param name="snapname">The name of the snapshot.</param>
                             /// <param name="storage">Target storage for full clone.</param>
+                            /// <param name="target">Target node. Only allowed if the original VM is on shared storage.</param>
                             /// <returns></returns>
-                            public Result CloneVm(bool experimental, int newid, string description = null, bool? full = null, string hostname = null, string pool = null, string snapname = null, string storage = null) { return CreateRest(experimental, newid, description, full, hostname, pool, snapname, storage); }
+                            public Result CloneVm(int newid, string description = null, bool? full = null, string hostname = null, string pool = null, string snapname = null, string storage = null, string target = null) { return CreateRest(newid, description, full, hostname, pool, snapname, storage, target); }
                         }
                         public class PVEResize : Base
                         {
@@ -6238,6 +7236,45 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <returns></returns>
                             public Result ResizeVm(string disk, string size, string digest = null) { return SetRest(disk, size, digest); }
+                        }
+                        public class PVEMoveVolume : Base
+                        {
+                            private object _node;
+                            private object _vmid;
+                            internal PVEMoveVolume(Client client, object node, object vmid)
+                            {
+                                _client = client;
+                                _node = node;
+                                _vmid = vmid;
+                            }
+                            /// <summary>
+                            /// Move a rootfs-/mp-volume to a different storage
+                            /// </summary>
+                            /// <param name="storage">Target Storage.</param>
+                            /// <param name="volume">Volume which will be moved.
+                            ///   Enum: rootfs,mp0,mp1,mp2,mp3,mp4,mp5,mp6,mp7,mp8,mp9</param>
+                            /// <param name="delete">Delete the original volume after successful copy. By default the original is kept as an unused volume entry.</param>
+                            /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
+                            /// <returns></returns>
+                            public Result CreateRest(string storage, string volume, bool? delete = null, string digest = null)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("storage", storage);
+                                parameters.Add("volume", volume);
+                                parameters.Add("delete", delete);
+                                parameters.Add("digest", digest);
+                                return _client.Create($"/nodes/{_node}/lxc/{_vmid}/move_volume", parameters);
+                            }
+                            /// <summary>
+                            /// Move a rootfs-/mp-volume to a different storage
+                            /// </summary>
+                            /// <param name="storage">Target Storage.</param>
+                            /// <param name="volume">Volume which will be moved.
+                            ///   Enum: rootfs,mp0,mp1,mp2,mp3,mp4,mp5,mp6,mp7,mp8,mp9</param>
+                            /// <param name="delete">Delete the original volume after successful copy. By default the original is kept as an unused volume entry.</param>
+                            /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
+                            /// <returns></returns>
+                            public Result MoveVolume(string storage, string volume, bool? delete = null, string digest = null) { return CreateRest(storage, volume, delete, digest); }
                         }
                         /// <summary>
                         /// Destroy the container (also delete all uses files).
@@ -6286,6 +7323,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="vmid">The (unique) ID of the VM.</param>
                     /// <param name="arch">OS architecture type.
                     ///   Enum: amd64,i386</param>
+                    /// <param name="bwlimit">Override i/o bandwidth limit (in KiB/s).</param>
                     /// <param name="cmode">Console mode. By default, the console command tries to open a connection to one of the available tty devices. By setting cmode to 'console' it tries to attach to /dev/console instead. If you set cmode to 'shell', it simply invokes a shell inside the container (no login).
                     ///   Enum: shell,console,tty</param>
                     /// <param name="console">Attach a console device (/dev/console) to the container.</param>
@@ -6320,12 +7358,13 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
                     /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string ostemplate, int vmid, string arch = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, string startup = null, string storage = null, int? swap = null, bool? template = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
+                    public Result CreateRest(string ostemplate, int vmid, string arch = null, int? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, string startup = null, string storage = null, int? swap = null, bool? template = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("ostemplate", ostemplate);
                         parameters.Add("vmid", vmid);
                         parameters.Add("arch", arch);
+                        parameters.Add("bwlimit", bwlimit);
                         parameters.Add("cmode", cmode);
                         parameters.Add("console", console);
                         parameters.Add("cores", cores);
@@ -6365,6 +7404,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="vmid">The (unique) ID of the VM.</param>
                     /// <param name="arch">OS architecture type.
                     ///   Enum: amd64,i386</param>
+                    /// <param name="bwlimit">Override i/o bandwidth limit (in KiB/s).</param>
                     /// <param name="cmode">Console mode. By default, the console command tries to open a connection to one of the available tty devices. By setting cmode to 'console' it tries to attach to /dev/console instead. If you set cmode to 'shell', it simply invokes a shell inside the container (no login).
                     ///   Enum: shell,console,tty</param>
                     /// <param name="console">Attach a console device (/dev/console) to the container.</param>
@@ -6399,7 +7439,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
                     /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                     /// <returns></returns>
-                    public Result CreateVm(string ostemplate, int vmid, string arch = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, string startup = null, string storage = null, int? swap = null, bool? template = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null) { return CreateRest(ostemplate, vmid, arch, cmode, console, cores, cpulimit, cpuunits, description, force, hostname, ignore_unpack_errors, lock_, memory, mpN, nameserver, netN, onboot, ostype, password, pool, protection, restore, rootfs, searchdomain, ssh_public_keys, startup, storage, swap, template, tty, unprivileged, unusedN); }
+                    public Result CreateVm(string ostemplate, int vmid, string arch = null, int? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, string startup = null, string storage = null, int? swap = null, bool? template = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null) { return CreateRest(ostemplate, vmid, arch, bwlimit, cmode, console, cores, cpulimit, cpuunits, description, force, hostname, ignore_unpack_errors, lock_, memory, mpN, nameserver, netN, onboot, ostype, password, pool, protection, restore, rootfs, searchdomain, ssh_public_keys, startup, storage, swap, template, tty, unprivileged, unusedN); }
                 }
                 public class PVECeph : Base
                 {
@@ -6543,7 +7583,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Create OSD
                         /// </summary>
                         /// <param name="dev">Block device name.</param>
-                        /// <param name="bluestore">Use bluestore instead of filestore.</param>
+                        /// <param name="bluestore">Use bluestore instead of filestore. This is the default.</param>
                         /// <param name="fstype">File system type (filestore only).
                         ///   Enum: xfs,ext4,btrfs</param>
                         /// <param name="journal_dev">Block device name for journal (filestore) or block.db (bluestore).</param>
@@ -6563,7 +7603,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// Create OSD
                         /// </summary>
                         /// <param name="dev">Block device name.</param>
-                        /// <param name="bluestore">Use bluestore instead of filestore.</param>
+                        /// <param name="bluestore">Use bluestore instead of filestore. This is the default.</param>
                         /// <param name="fstype">File system type (filestore only).
                         ///   Enum: xfs,ext4,btrfs</param>
                         /// <param name="journal_dev">Block device name for journal (filestore) or block.db (bluestore).</param>
@@ -6676,12 +7716,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="exclude_manager">When set, only a monitor will be created.</param>
                         /// <param name="id">The ID for the monitor, when omitted the same as the nodename</param>
+                        /// <param name="mon_address">Overwrites autodetected monitor IP address. Must be in the public network of ceph.</param>
                         /// <returns></returns>
-                        public Result CreateRest(bool? exclude_manager = null, string id = null)
+                        public Result CreateRest(bool? exclude_manager = null, string id = null, string mon_address = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("exclude-manager", exclude_manager);
                             parameters.Add("id", id);
+                            parameters.Add("mon-address", mon_address);
                             return _client.Create($"/nodes/{_node}/ceph/mon", parameters);
                         }
                         /// <summary>
@@ -6689,8 +7731,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="exclude_manager">When set, only a monitor will be created.</param>
                         /// <param name="id">The ID for the monitor, when omitted the same as the nodename</param>
+                        /// <param name="mon_address">Overwrites autodetected monitor IP address. Must be in the public network of ceph.</param>
                         /// <returns></returns>
-                        public Result Createmon(bool? exclude_manager = null, string id = null) { return CreateRest(exclude_manager, id); }
+                        public Result Createmon(bool? exclude_manager = null, string id = null, string mon_address = null) { return CreateRest(exclude_manager, id, mon_address); }
                     }
                     public class PVEInit : Base
                     {
@@ -7847,6 +8890,8 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     public PVEZfs Zfs { get { return _zfs ?? (_zfs = new PVEZfs(_client, _node)); } }
                     private PVENfs _nfs;
                     public PVENfs Nfs { get { return _nfs ?? (_nfs = new PVENfs(_client, _node)); } }
+                    private PVECifs _cifs;
+                    public PVECifs Cifs { get { return _cifs ?? (_cifs = new PVECifs(_client, _node)); } }
                     private PVEGlusterfs _glusterfs;
                     public PVEGlusterfs Glusterfs { get { return _glusterfs ?? (_glusterfs = new PVEGlusterfs(_client, _node)); } }
                     private PVEIscsi _iscsi;
@@ -7904,6 +8949,41 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         /// <param name="server"></param>
                         /// <returns></returns>
                         public Result Nfsscan(string server) { return GetRest(server); }
+                    }
+                    public class PVECifs : Base
+                    {
+                        private object _node;
+                        internal PVECifs(Client client, object node)
+                        {
+                            _client = client;
+                            _node = node;
+                        }
+                        /// <summary>
+                        /// Scan remote CIFS server.
+                        /// </summary>
+                        /// <param name="server"></param>
+                        /// <param name="domain"></param>
+                        /// <param name="password"></param>
+                        /// <param name="username"></param>
+                        /// <returns></returns>
+                        public Result GetRest(string server, string domain = null, string password = null, string username = null)
+                        {
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("server", server);
+                            parameters.Add("domain", domain);
+                            parameters.Add("password", password);
+                            parameters.Add("username", username);
+                            return _client.Get($"/nodes/{_node}/scan/cifs", parameters);
+                        }
+                        /// <summary>
+                        /// Scan remote CIFS server.
+                        /// </summary>
+                        /// <param name="server"></param>
+                        /// <param name="domain"></param>
+                        /// <param name="password"></param>
+                        /// <param name="username"></param>
+                        /// <returns></returns>
+                        public Result Cifsscan(string server, string domain = null, string password = null, string username = null) { return GetRest(server, domain, password, username); }
                     }
                     public class PVEGlusterfs : Base
                     {
@@ -8339,14 +9419,16 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="content">Only list stores which support this content type.</param>
                     /// <param name="enabled">Only list stores which are enabled (not disabled in config).</param>
+                    /// <param name="format">Include information about formats</param>
                     /// <param name="storage">Only list status for  specified storage</param>
                     /// <param name="target">If target is different to 'node', we only lists shared storages which content is accessible on this 'node' and the specified 'target' node.</param>
                     /// <returns></returns>
-                    public Result GetRest(string content = null, bool? enabled = null, string storage = null, string target = null)
+                    public Result GetRest(string content = null, bool? enabled = null, bool? format = null, string storage = null, string target = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("content", content);
                         parameters.Add("enabled", enabled);
+                        parameters.Add("format", format);
                         parameters.Add("storage", storage);
                         parameters.Add("target", target);
                         return _client.Get($"/nodes/{_node}/storage", parameters);
@@ -8356,10 +9438,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="content">Only list stores which support this content type.</param>
                     /// <param name="enabled">Only list stores which are enabled (not disabled in config).</param>
+                    /// <param name="format">Include information about formats</param>
                     /// <param name="storage">Only list status for  specified storage</param>
                     /// <param name="target">If target is different to 'node', we only lists shared storages which content is accessible on this 'node' and the specified 'target' node.</param>
                     /// <returns></returns>
-                    public Result Index(string content = null, bool? enabled = null, string storage = null, string target = null) { return GetRest(content, enabled, storage, target); }
+                    public Result Index(string content = null, bool? enabled = null, bool? format = null, string storage = null, string target = null) { return GetRest(content, enabled, format, storage, target); }
                 }
                 public class PVEDisks : Base
                 {
@@ -9040,6 +10123,236 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result Status(int? guest = null) { return GetRest(guest); }
                 }
+                public class PVECertificates : Base
+                {
+                    private object _node;
+                    internal PVECertificates(Client client, object node)
+                    {
+                        _client = client;
+                        _node = node;
+                    }
+                    private PVEAcme _acme;
+                    public PVEAcme Acme { get { return _acme ?? (_acme = new PVEAcme(_client, _node)); } }
+                    private PVEInfo _info;
+                    public PVEInfo Info { get { return _info ?? (_info = new PVEInfo(_client, _node)); } }
+                    private PVECustom _custom;
+                    public PVECustom Custom { get { return _custom ?? (_custom = new PVECustom(_client, _node)); } }
+                    public class PVEAcme : Base
+                    {
+                        private object _node;
+                        internal PVEAcme(Client client, object node)
+                        {
+                            _client = client;
+                            _node = node;
+                        }
+                        private PVECertificate _certificate;
+                        public PVECertificate Certificate { get { return _certificate ?? (_certificate = new PVECertificate(_client, _node)); } }
+                        public class PVECertificate : Base
+                        {
+                            private object _node;
+                            internal PVECertificate(Client client, object node)
+                            {
+                                _client = client;
+                                _node = node;
+                            }
+                            /// <summary>
+                            /// Revoke existing certificate from CA.
+                            /// </summary>
+                            /// <returns></returns>
+                            public Result DeleteRest()
+                            {
+                                return _client.Delete($"/nodes/{_node}/certificates/acme/certificate");
+                            }
+                            /// <summary>
+                            /// Revoke existing certificate from CA.
+                            /// </summary>
+                            /// <returns></returns>
+                            public Result RevokeCertificate() { return DeleteRest(); }
+                            /// <summary>
+                            /// Order a new certificate from ACME-compatible CA.
+                            /// </summary>
+                            /// <param name="force">Overwrite existing custom certificate.</param>
+                            /// <returns></returns>
+                            public Result CreateRest(bool? force = null)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("force", force);
+                                return _client.Create($"/nodes/{_node}/certificates/acme/certificate", parameters);
+                            }
+                            /// <summary>
+                            /// Order a new certificate from ACME-compatible CA.
+                            /// </summary>
+                            /// <param name="force">Overwrite existing custom certificate.</param>
+                            /// <returns></returns>
+                            public Result NewCertificate(bool? force = null) { return CreateRest(force); }
+                            /// <summary>
+                            /// Renew existing certificate from CA.
+                            /// </summary>
+                            /// <param name="force">Force renewal even if expiry is more than 30 days away.</param>
+                            /// <returns></returns>
+                            public Result SetRest(bool? force = null)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("force", force);
+                                return _client.Set($"/nodes/{_node}/certificates/acme/certificate", parameters);
+                            }
+                            /// <summary>
+                            /// Renew existing certificate from CA.
+                            /// </summary>
+                            /// <param name="force">Force renewal even if expiry is more than 30 days away.</param>
+                            /// <returns></returns>
+                            public Result RenewCertificate(bool? force = null) { return SetRest(force); }
+                        }
+                        /// <summary>
+                        /// ACME index.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result GetRest()
+                        {
+                            return _client.Get($"/nodes/{_node}/certificates/acme");
+                        }
+                        /// <summary>
+                        /// ACME index.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result Index() { return GetRest(); }
+                    }
+                    public class PVEInfo : Base
+                    {
+                        private object _node;
+                        internal PVEInfo(Client client, object node)
+                        {
+                            _client = client;
+                            _node = node;
+                        }
+                        /// <summary>
+                        /// Get information about node's certificates.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result GetRest()
+                        {
+                            return _client.Get($"/nodes/{_node}/certificates/info");
+                        }
+                        /// <summary>
+                        /// Get information about node's certificates.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result Info() { return GetRest(); }
+                    }
+                    public class PVECustom : Base
+                    {
+                        private object _node;
+                        internal PVECustom(Client client, object node)
+                        {
+                            _client = client;
+                            _node = node;
+                        }
+                        /// <summary>
+                        /// DELETE custom certificate chain and key.
+                        /// </summary>
+                        /// <param name="restart">Restart pveproxy.</param>
+                        /// <returns></returns>
+                        public Result DeleteRest(bool? restart = null)
+                        {
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("restart", restart);
+                            return _client.Delete($"/nodes/{_node}/certificates/custom", parameters);
+                        }
+                        /// <summary>
+                        /// DELETE custom certificate chain and key.
+                        /// </summary>
+                        /// <param name="restart">Restart pveproxy.</param>
+                        /// <returns></returns>
+                        public Result RemoveCustomCert(bool? restart = null) { return DeleteRest(restart); }
+                        /// <summary>
+                        /// Upload or update custom certificate chain and key.
+                        /// </summary>
+                        /// <param name="certificates">PEM encoded certificate (chain).</param>
+                        /// <param name="force">Overwrite existing custom or ACME certificate files.</param>
+                        /// <param name="key">PEM encoded private key.</param>
+                        /// <param name="restart">Restart pveproxy.</param>
+                        /// <returns></returns>
+                        public Result CreateRest(string certificates, bool? force = null, string key = null, bool? restart = null)
+                        {
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("certificates", certificates);
+                            parameters.Add("force", force);
+                            parameters.Add("key", key);
+                            parameters.Add("restart", restart);
+                            return _client.Create($"/nodes/{_node}/certificates/custom", parameters);
+                        }
+                        /// <summary>
+                        /// Upload or update custom certificate chain and key.
+                        /// </summary>
+                        /// <param name="certificates">PEM encoded certificate (chain).</param>
+                        /// <param name="force">Overwrite existing custom or ACME certificate files.</param>
+                        /// <param name="key">PEM encoded private key.</param>
+                        /// <param name="restart">Restart pveproxy.</param>
+                        /// <returns></returns>
+                        public Result UploadCustomCert(string certificates, bool? force = null, string key = null, bool? restart = null) { return CreateRest(certificates, force, key, restart); }
+                    }
+                    /// <summary>
+                    /// Node index.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result GetRest()
+                    {
+                        return _client.Get($"/nodes/{_node}/certificates");
+                    }
+                    /// <summary>
+                    /// Node index.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result Index() { return GetRest(); }
+                }
+                public class PVEConfig : Base
+                {
+                    private object _node;
+                    internal PVEConfig(Client client, object node)
+                    {
+                        _client = client;
+                        _node = node;
+                    }
+                    /// <summary>
+                    /// Get node configuration options.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result GetRest()
+                    {
+                        return _client.Get($"/nodes/{_node}/config");
+                    }
+                    /// <summary>
+                    /// Get node configuration options.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result GetConfig() { return GetRest(); }
+                    /// <summary>
+                    /// Set node configuration options.
+                    /// </summary>
+                    /// <param name="acme">Node specific ACME settings.</param>
+                    /// <param name="delete">A list of settings you want to delete.</param>
+                    /// <param name="description">Node description/comment.</param>
+                    /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
+                    /// <returns></returns>
+                    public Result SetRest(string acme = null, string delete = null, string description = null, string digest = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("acme", acme);
+                        parameters.Add("delete", delete);
+                        parameters.Add("description", description);
+                        parameters.Add("digest", digest);
+                        return _client.Set($"/nodes/{_node}/config", parameters);
+                    }
+                    /// <summary>
+                    /// Set node configuration options.
+                    /// </summary>
+                    /// <param name="acme">Node specific ACME settings.</param>
+                    /// <param name="delete">A list of settings you want to delete.</param>
+                    /// <param name="description">Node description/comment.</param>
+                    /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
+                    /// <returns></returns>
+                    public Result SetOptions(string acme = null, string delete = null, string description = null, string digest = null) { return SetRest(acme, delete, description, digest); }
+                }
                 public class PVEVersion : Base
                 {
                     private object _node;
@@ -9232,14 +10545,16 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Read system log
                     /// </summary>
                     /// <param name="limit"></param>
+                    /// <param name="service">Service ID</param>
                     /// <param name="since">Display all log since this date-time string.</param>
                     /// <param name="start"></param>
                     /// <param name="until">Display all log until this date-time string.</param>
                     /// <returns></returns>
-                    public Result GetRest(int? limit = null, string since = null, int? start = null, string until = null)
+                    public Result GetRest(int? limit = null, string service = null, string since = null, int? start = null, string until = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("limit", limit);
+                        parameters.Add("service", service);
                         parameters.Add("since", since);
                         parameters.Add("start", start);
                         parameters.Add("until", until);
@@ -9249,11 +10564,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// Read system log
                     /// </summary>
                     /// <param name="limit"></param>
+                    /// <param name="service">Service ID</param>
                     /// <param name="since">Display all log since this date-time string.</param>
                     /// <param name="start"></param>
                     /// <param name="until">Display all log until this date-time string.</param>
                     /// <returns></returns>
-                    public Result Syslog(int? limit = null, string since = null, int? start = null, string until = null) { return GetRest(limit, since, start, until); }
+                    public Result Syslog(int? limit = null, string service = null, string since = null, int? start = null, string until = null) { return GetRest(limit, service, since, start, until); }
                 }
                 public class PVEVncshell : Base
                 {
@@ -9289,6 +10605,32 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="width">sets the width of the console in pixels.</param>
                     /// <returns></returns>
                     public Result Vncshell(int? height = null, bool? upgrade = null, bool? websocket = null, int? width = null) { return CreateRest(height, upgrade, websocket, width); }
+                }
+                public class PVETermproxy : Base
+                {
+                    private object _node;
+                    internal PVETermproxy(Client client, object node)
+                    {
+                        _client = client;
+                        _node = node;
+                    }
+                    /// <summary>
+                    /// Creates a VNC Shell proxy.
+                    /// </summary>
+                    /// <param name="upgrade">Run 'apt-get dist-upgrade' instead of normal shell.</param>
+                    /// <returns></returns>
+                    public Result CreateRest(bool? upgrade = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("upgrade", upgrade);
+                        return _client.Create($"/nodes/{_node}/termproxy", parameters);
+                    }
+                    /// <summary>
+                    /// Creates a VNC Shell proxy.
+                    /// </summary>
+                    /// <param name="upgrade">Run 'apt-get dist-upgrade' instead of normal shell.</param>
+                    /// <returns></returns>
+                    public Result Termproxy(bool? upgrade = null) { return CreateRest(upgrade); }
                 }
                 public class PVEVncwebsocket : Base
                 {
@@ -9659,12 +11001,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// Update storage configuration.
                 /// </summary>
                 /// <param name="blocksize">block size</param>
+                /// <param name="bwlimit">Set bandwidth/io limits various operations.</param>
                 /// <param name="comstar_hg">host group for comstar views</param>
                 /// <param name="comstar_tg">target group for comstar views</param>
                 /// <param name="content">Allowed content types.  NOTE: the value 'rootdir' is used for Containers, and value 'images' for VMs. </param>
                 /// <param name="delete">A list of settings you want to delete.</param>
                 /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                 /// <param name="disable">Flag to disable the storage.</param>
+                /// <param name="domain">CIFS domain.</param>
                 /// <param name="format">Default image format.</param>
                 /// <param name="is_mountpoint">Assume the given path is an externally managed mountpoint and consider the storage offline if it is not mounted. Using a boolean (yes/no) value serves as a shortcut to using the target path in this field.</param>
                 /// <param name="krbd">Access rbd through krbd kernel module.</param>
@@ -9674,6 +11018,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="nodes">List of cluster node names.</param>
                 /// <param name="nowritecache">disable write caching on the target</param>
                 /// <param name="options">NFS mount options (see 'man nfs')</param>
+                /// <param name="password">Password for CIFS share.</param>
                 /// <param name="pool">Pool.</param>
                 /// <param name="redundancy">The redundancy count specifies the number of nodes to which the resource should be deployed. It must be at least 1 and at most the number of nodes in the cluster.</param>
                 /// <param name="saferemove">Zero-out data when removing LVs.</param>
@@ -9681,22 +11026,25 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="server">Server IP or DNS name.</param>
                 /// <param name="server2">Backup volfile server IP or DNS name.</param>
                 /// <param name="shared">Mark storage as shared.</param>
+                /// <param name="smbversion"></param>
                 /// <param name="sparse">use sparse volumes</param>
                 /// <param name="tagged_only">Only use logical volumes tagged with 'pve-vm-ID'.</param>
                 /// <param name="transport">Gluster transport: tcp or rdma
                 ///   Enum: tcp,rdma,unix</param>
                 /// <param name="username">RBD Id.</param>
                 /// <returns></returns>
-                public Result SetRest(string blocksize = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string format = null, string is_mountpoint = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string pool = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, bool? sparse = null, bool? tagged_only = null, string transport = null, string username = null)
+                public Result SetRest(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string format = null, string is_mountpoint = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, bool? tagged_only = null, string transport = null, string username = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("blocksize", blocksize);
+                    parameters.Add("bwlimit", bwlimit);
                     parameters.Add("comstar_hg", comstar_hg);
                     parameters.Add("comstar_tg", comstar_tg);
                     parameters.Add("content", content);
                     parameters.Add("delete", delete);
                     parameters.Add("digest", digest);
                     parameters.Add("disable", disable);
+                    parameters.Add("domain", domain);
                     parameters.Add("format", format);
                     parameters.Add("is_mountpoint", is_mountpoint);
                     parameters.Add("krbd", krbd);
@@ -9706,6 +11054,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("nodes", nodes);
                     parameters.Add("nowritecache", nowritecache);
                     parameters.Add("options", options);
+                    parameters.Add("password", password);
                     parameters.Add("pool", pool);
                     parameters.Add("redundancy", redundancy);
                     parameters.Add("saferemove", saferemove);
@@ -9713,6 +11062,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("server", server);
                     parameters.Add("server2", server2);
                     parameters.Add("shared", shared);
+                    parameters.Add("smbversion", smbversion);
                     parameters.Add("sparse", sparse);
                     parameters.Add("tagged_only", tagged_only);
                     parameters.Add("transport", transport);
@@ -9723,12 +11073,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// Update storage configuration.
                 /// </summary>
                 /// <param name="blocksize">block size</param>
+                /// <param name="bwlimit">Set bandwidth/io limits various operations.</param>
                 /// <param name="comstar_hg">host group for comstar views</param>
                 /// <param name="comstar_tg">target group for comstar views</param>
                 /// <param name="content">Allowed content types.  NOTE: the value 'rootdir' is used for Containers, and value 'images' for VMs. </param>
                 /// <param name="delete">A list of settings you want to delete.</param>
                 /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                 /// <param name="disable">Flag to disable the storage.</param>
+                /// <param name="domain">CIFS domain.</param>
                 /// <param name="format">Default image format.</param>
                 /// <param name="is_mountpoint">Assume the given path is an externally managed mountpoint and consider the storage offline if it is not mounted. Using a boolean (yes/no) value serves as a shortcut to using the target path in this field.</param>
                 /// <param name="krbd">Access rbd through krbd kernel module.</param>
@@ -9738,6 +11090,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="nodes">List of cluster node names.</param>
                 /// <param name="nowritecache">disable write caching on the target</param>
                 /// <param name="options">NFS mount options (see 'man nfs')</param>
+                /// <param name="password">Password for CIFS share.</param>
                 /// <param name="pool">Pool.</param>
                 /// <param name="redundancy">The redundancy count specifies the number of nodes to which the resource should be deployed. It must be at least 1 and at most the number of nodes in the cluster.</param>
                 /// <param name="saferemove">Zero-out data when removing LVs.</param>
@@ -9745,19 +11098,20 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="server">Server IP or DNS name.</param>
                 /// <param name="server2">Backup volfile server IP or DNS name.</param>
                 /// <param name="shared">Mark storage as shared.</param>
+                /// <param name="smbversion"></param>
                 /// <param name="sparse">use sparse volumes</param>
                 /// <param name="tagged_only">Only use logical volumes tagged with 'pve-vm-ID'.</param>
                 /// <param name="transport">Gluster transport: tcp or rdma
                 ///   Enum: tcp,rdma,unix</param>
                 /// <param name="username">RBD Id.</param>
                 /// <returns></returns>
-                public Result Update(string blocksize = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string format = null, string is_mountpoint = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string pool = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, bool? sparse = null, bool? tagged_only = null, string transport = null, string username = null) { return SetRest(blocksize, comstar_hg, comstar_tg, content, delete, digest, disable, format, is_mountpoint, krbd, maxfiles, mkdir, monhost, nodes, nowritecache, options, pool, redundancy, saferemove, saferemove_throughput, server, server2, shared, sparse, tagged_only, transport, username); }
+                public Result Update(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string format = null, string is_mountpoint = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, bool? tagged_only = null, string transport = null, string username = null) { return SetRest(blocksize, bwlimit, comstar_hg, comstar_tg, content, delete, digest, disable, domain, format, is_mountpoint, krbd, maxfiles, mkdir, monhost, nodes, nowritecache, options, password, pool, redundancy, saferemove, saferemove_throughput, server, server2, shared, smbversion, sparse, tagged_only, transport, username); }
             }
             /// <summary>
             /// Storage index.
             /// </summary>
             /// <param name="type">Only list storage of specific type
-            ///   Enum: dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
+            ///   Enum: cifs,dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
             /// <returns></returns>
             public Result GetRest(string type = null)
             {
@@ -9769,7 +11123,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// Storage index.
             /// </summary>
             /// <param name="type">Only list storage of specific type
-            ///   Enum: dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
+            ///   Enum: cifs,dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
             /// <returns></returns>
             public Result Index(string type = null) { return GetRest(type); }
             /// <summary>
@@ -9777,14 +11131,16 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// </summary>
             /// <param name="storage">The storage identifier.</param>
             /// <param name="type">Storage type.
-            ///   Enum: dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
+            ///   Enum: cifs,dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
             /// <param name="authsupported">Authsupported.</param>
             /// <param name="base_">Base volume. This volume is automatically activated.</param>
             /// <param name="blocksize">block size</param>
+            /// <param name="bwlimit">Set bandwidth/io limits various operations.</param>
             /// <param name="comstar_hg">host group for comstar views</param>
             /// <param name="comstar_tg">target group for comstar views</param>
             /// <param name="content">Allowed content types.  NOTE: the value 'rootdir' is used for Containers, and value 'images' for VMs. </param>
             /// <param name="disable">Flag to disable the storage.</param>
+            /// <param name="domain">CIFS domain.</param>
             /// <param name="export">NFS export path.</param>
             /// <param name="format">Default image format.</param>
             /// <param name="is_mountpoint">Assume the given path is an externally managed mountpoint and consider the storage offline if it is not mounted. Using a boolean (yes/no) value serves as a shortcut to using the target path in this field.</param>
@@ -9796,6 +11152,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <param name="nodes">List of cluster node names.</param>
             /// <param name="nowritecache">disable write caching on the target</param>
             /// <param name="options">NFS mount options (see 'man nfs')</param>
+            /// <param name="password">Password for CIFS share.</param>
             /// <param name="path">File system path.</param>
             /// <param name="pool">Pool.</param>
             /// <param name="portal">iSCSI portal (IP or DNS name with optional port).</param>
@@ -9804,7 +11161,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <param name="saferemove_throughput">Wipe throughput (cstream -t parameter value).</param>
             /// <param name="server">Server IP or DNS name.</param>
             /// <param name="server2">Backup volfile server IP or DNS name.</param>
+            /// <param name="share">CIFS share.</param>
             /// <param name="shared">Mark storage as shared.</param>
+            /// <param name="smbversion"></param>
             /// <param name="sparse">use sparse volumes</param>
             /// <param name="tagged_only">Only use logical volumes tagged with 'pve-vm-ID'.</param>
             /// <param name="target">iSCSI target.</param>
@@ -9815,7 +11174,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <param name="vgname">Volume group name.</param>
             /// <param name="volume">Glusterfs Volume.</param>
             /// <returns></returns>
-            public Result CreateRest(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string comstar_hg = null, string comstar_tg = null, string content = null, bool? disable = null, string export = null, string format = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, bool? sparse = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null)
+            public Result CreateRest(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, bool? disable = null, string domain = null, string export = null, string format = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null)
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("storage", storage);
@@ -9823,10 +11182,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 parameters.Add("authsupported", authsupported);
                 parameters.Add("base", base_);
                 parameters.Add("blocksize", blocksize);
+                parameters.Add("bwlimit", bwlimit);
                 parameters.Add("comstar_hg", comstar_hg);
                 parameters.Add("comstar_tg", comstar_tg);
                 parameters.Add("content", content);
                 parameters.Add("disable", disable);
+                parameters.Add("domain", domain);
                 parameters.Add("export", export);
                 parameters.Add("format", format);
                 parameters.Add("is_mountpoint", is_mountpoint);
@@ -9838,6 +11199,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 parameters.Add("nodes", nodes);
                 parameters.Add("nowritecache", nowritecache);
                 parameters.Add("options", options);
+                parameters.Add("password", password);
                 parameters.Add("path", path);
                 parameters.Add("pool", pool);
                 parameters.Add("portal", portal);
@@ -9846,7 +11208,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 parameters.Add("saferemove_throughput", saferemove_throughput);
                 parameters.Add("server", server);
                 parameters.Add("server2", server2);
+                parameters.Add("share", share);
                 parameters.Add("shared", shared);
+                parameters.Add("smbversion", smbversion);
                 parameters.Add("sparse", sparse);
                 parameters.Add("tagged_only", tagged_only);
                 parameters.Add("target", target);
@@ -9862,14 +11226,16 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// </summary>
             /// <param name="storage">The storage identifier.</param>
             /// <param name="type">Storage type.
-            ///   Enum: dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
+            ///   Enum: cifs,dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
             /// <param name="authsupported">Authsupported.</param>
             /// <param name="base_">Base volume. This volume is automatically activated.</param>
             /// <param name="blocksize">block size</param>
+            /// <param name="bwlimit">Set bandwidth/io limits various operations.</param>
             /// <param name="comstar_hg">host group for comstar views</param>
             /// <param name="comstar_tg">target group for comstar views</param>
             /// <param name="content">Allowed content types.  NOTE: the value 'rootdir' is used for Containers, and value 'images' for VMs. </param>
             /// <param name="disable">Flag to disable the storage.</param>
+            /// <param name="domain">CIFS domain.</param>
             /// <param name="export">NFS export path.</param>
             /// <param name="format">Default image format.</param>
             /// <param name="is_mountpoint">Assume the given path is an externally managed mountpoint and consider the storage offline if it is not mounted. Using a boolean (yes/no) value serves as a shortcut to using the target path in this field.</param>
@@ -9881,6 +11247,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <param name="nodes">List of cluster node names.</param>
             /// <param name="nowritecache">disable write caching on the target</param>
             /// <param name="options">NFS mount options (see 'man nfs')</param>
+            /// <param name="password">Password for CIFS share.</param>
             /// <param name="path">File system path.</param>
             /// <param name="pool">Pool.</param>
             /// <param name="portal">iSCSI portal (IP or DNS name with optional port).</param>
@@ -9889,7 +11256,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <param name="saferemove_throughput">Wipe throughput (cstream -t parameter value).</param>
             /// <param name="server">Server IP or DNS name.</param>
             /// <param name="server2">Backup volfile server IP or DNS name.</param>
+            /// <param name="share">CIFS share.</param>
             /// <param name="shared">Mark storage as shared.</param>
+            /// <param name="smbversion"></param>
             /// <param name="sparse">use sparse volumes</param>
             /// <param name="tagged_only">Only use logical volumes tagged with 'pve-vm-ID'.</param>
             /// <param name="target">iSCSI target.</param>
@@ -9900,7 +11269,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <param name="vgname">Volume group name.</param>
             /// <param name="volume">Glusterfs Volume.</param>
             /// <returns></returns>
-            public Result Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string comstar_hg = null, string comstar_tg = null, string content = null, bool? disable = null, string export = null, string format = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, bool? sparse = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null) { return CreateRest(storage, type, authsupported, base_, blocksize, comstar_hg, comstar_tg, content, disable, export, format, is_mountpoint, iscsiprovider, krbd, maxfiles, mkdir, monhost, nodes, nowritecache, options, path, pool, portal, redundancy, saferemove, saferemove_throughput, server, server2, shared, sparse, tagged_only, target, thinpool, transport, username, vgname, volume); }
+            public Result Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, bool? disable = null, string domain = null, string export = null, string format = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null) { return CreateRest(storage, type, authsupported, base_, blocksize, bwlimit, comstar_hg, comstar_tg, content, disable, domain, export, format, is_mountpoint, iscsiprovider, krbd, maxfiles, mkdir, monhost, nodes, nowritecache, options, password, path, pool, portal, redundancy, saferemove, saferemove_throughput, server, server2, share, shared, smbversion, sparse, tagged_only, target, thinpool, transport, username, vgname, volume); }
         }
         public class PVEAccess : Base
         {
