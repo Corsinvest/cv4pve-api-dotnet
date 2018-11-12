@@ -6,7 +6,9 @@ ProxmoVE Client API .Net
 
 [ProxmoxVE Api](https://pve.proxmox.com/pve-docs/api-viewer/)
 
-[Nuget](https://www.nuget.org/packages/EnterpriseVE.ProxmoxVE.Api)
+[Nuget Api](https://www.nuget.org/packages/EnterpriseVE.ProxmoxVE.Api)
+
+[Nuget Extension](https://www.nuget.org/packages/EnterpriseVE.ProxmoxVE.Api)
 
 [![AppVeyor branch](https://img.shields.io/appveyor/ci/franklupo/eve2pve-api-dotnet/master.svg)](https://ci.appveyor.com/project/franklupo/eve2pve-api-dotnet)
 
@@ -23,7 +25,7 @@ ProxmoVE Client API .Net
 
 ## General
 
-The client is generated from a JSON Api on ProxmoxVE.
+The client is generated from a JSON Api on Proxmox VE.
 
 ## Main features
 
@@ -59,8 +61,8 @@ The client is generated from a JSON Api on ProxmoxVE.
 
 The result is class **Result** and contain properties:
 
-* **Response** returned from ProxmoxVE (data,errors,...) dynamic [ExpandoObject](https://msdn.microsoft.com/en-US/library/system.dynamic.expandoobject(v=vs.110).aspx)
-* **ResponseInError** (bool) : Contains errors from ProxmoxVE.
+* **Response** returned from Proxmox VE (data,errors,...) dynamic [ExpandoObject](https://msdn.microsoft.com/en-US/library/system.dynamic.expandoobject(v=vs.110).aspx)
+* **ResponseInError** (bool) : Contains errors from Proxmox VE.
 * **StatusCode** (System.Net.HttpStatusCode): Status code of the HTTP response.
 * **ReasonPhrase** (string): The reason phrase which typically is sent by servers together with the status code.
 * **IsSuccessStatusCode** (bool) : Gets a value that indicates if the HTTP response was successful.
@@ -94,7 +96,7 @@ Example result:
 
 ## Usage
 
-```c#
+```C#
 var client = new Client("10.92.90.91");
 if (client.Login("root", "password"))
 {
@@ -125,3 +127,11 @@ if (client.Login("root", "password"))
     Console.WriteLine("<img src=\"{dataImg}\" \>");
 }
 ```
+
+## Extension Pack
+
+The extension pack add functionality to API.
+
+See VM.ClientExtension.cs, Storage.ClientExtension.cs, Node.ClientExtension.cs
+
+[Nuget Extension](https://www.nuget.org/packages/EnterpriseVE.ProxmoxVE.Api)

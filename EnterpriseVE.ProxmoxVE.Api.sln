@@ -1,4 +1,4 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
@@ -6,6 +6,8 @@ MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6719F1A5-0108-4DDE-BE5B-50D75DF7DC3A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnterpriseVE.ProxmoxVE.Api", "src\EnterpriseVE.ProxmoxVE.Api\EnterpriseVE.ProxmoxVE.Api.csproj", "{2FB0E7F6-927E-47B2-BF73-3DD29EC7A0F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnterpriseVE.ProxmoxVE.Api.Extension", "src\EnterpriseVE.ProxmoxVE.Api.Extension\EnterpriseVE.ProxmoxVE.Api.Extension.csproj", "{0E746DA1-8683-486A-B520-85A2E46E3DD9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,8 +34,21 @@ Global
 		{2FB0E7F6-927E-47B2-BF73-3DD29EC7A0F6}.Release|x64.Build.0 = Release|x64
 		{2FB0E7F6-927E-47B2-BF73-3DD29EC7A0F6}.Release|x86.ActiveCfg = Release|x86
 		{2FB0E7F6-927E-47B2-BF73-3DD29EC7A0F6}.Release|x86.Build.0 = Release|x86
+		{0E746DA1-8683-486A-B520-85A2E46E3DD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E746DA1-8683-486A-B520-85A2E46E3DD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E746DA1-8683-486A-B520-85A2E46E3DD9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0E746DA1-8683-486A-B520-85A2E46E3DD9}.Debug|x64.Build.0 = Debug|Any CPU
+		{0E746DA1-8683-486A-B520-85A2E46E3DD9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0E746DA1-8683-486A-B520-85A2E46E3DD9}.Debug|x86.Build.0 = Debug|Any CPU
+		{0E746DA1-8683-486A-B520-85A2E46E3DD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E746DA1-8683-486A-B520-85A2E46E3DD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E746DA1-8683-486A-B520-85A2E46E3DD9}.Release|x64.ActiveCfg = Release|Any CPU
+		{0E746DA1-8683-486A-B520-85A2E46E3DD9}.Release|x64.Build.0 = Release|Any CPU
+		{0E746DA1-8683-486A-B520-85A2E46E3DD9}.Release|x86.ActiveCfg = Release|Any CPU
+		{0E746DA1-8683-486A-B520-85A2E46E3DD9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{2FB0E7F6-927E-47B2-BF73-3DD29EC7A0F6} = {6719F1A5-0108-4DDE-BE5B-50D75DF7DC3A}
+		{0E746DA1-8683-486A-B520-85A2E46E3DD9} = {6719F1A5-0108-4DDE-BE5B-50D75DF7DC3A}
 	EndGlobalSection
 EndGlobal

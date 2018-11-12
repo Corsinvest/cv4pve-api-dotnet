@@ -3,14 +3,14 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
-    <Version>1.0.15</Version>
+    <Version>1.0.16</Version>
     <Company>Enterprise VE</Company>
     <Authors>Daniele Corsini</Authors>
     <Copyright>Enterprise VE</Copyright>
-    <Product>EnterpriseVE for ProxmoxVE Api Client</Product>
+    <Product>EnterpriseVE for Proxmox VE Api Client</Product>
 
-    <AssemblyTitle>EnterpriseVE for ProxmoxVE Api Client</AssemblyTitle>
-    <Description>Api Client for ProxmoxVE.</Description>
+    <AssemblyTitle>EnterpriseVE for Proxmox VE Api Client</AssemblyTitle>
+    <Description>Api Client for Proxmox VE.</Description>
 
     <PackageLicenseUrl>https://raw.githubusercontent.com/EnterpriseVE/eve2pve-api-dotnet/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/EnterpriseVE/eve2pve-api-dotnet</PackageProjectUrl>

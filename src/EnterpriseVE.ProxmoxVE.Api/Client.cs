@@ -265,17 +265,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
             return (timeStart - DateTime.Now).Milliseconds < timeOut ? 0 : 1;
         }
         private PVECluster _cluster;
-        public PVECluster Cluster { get { return _cluster ?? (_cluster = new PVECluster(_client)); } }
+        public PVECluster Cluster => _cluster ?? (_cluster = new PVECluster(_client));
         private PVENodes _nodes;
-        public PVENodes Nodes { get { return _nodes ?? (_nodes = new PVENodes(_client)); } }
+        public PVENodes Nodes => _nodes ?? (_nodes = new PVENodes(_client));
         private PVEStorage _storage;
-        public PVEStorage Storage { get { return _storage ?? (_storage = new PVEStorage(_client)); } }
+        public PVEStorage Storage => _storage ?? (_storage = new PVEStorage(_client));
         private PVEAccess _access;
-        public PVEAccess Access { get { return _access ?? (_access = new PVEAccess(_client)); } }
+        public PVEAccess Access => _access ?? (_access = new PVEAccess(_client));
         private PVEPools _pools;
-        public PVEPools Pools { get { return _pools ?? (_pools = new PVEPools(_client)); } }
+        public PVEPools Pools => _pools ?? (_pools = new PVEPools(_client));
         private PVEVersion _version;
-        public PVEVersion Version { get { return _version ?? (_version = new PVEVersion(_client)); } }
+        public PVEVersion Version => _version ?? (_version = new PVEVersion(_client));
 
         public class PVECluster : Base
         {
@@ -284,36 +284,36 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 _client = client;
             }
             private PVEReplication _replication;
-            public PVEReplication Replication { get { return _replication ?? (_replication = new PVEReplication(_client)); } }
+            public PVEReplication Replication => _replication ?? (_replication = new PVEReplication(_client));
             private PVEConfig _config;
-            public PVEConfig Config { get { return _config ?? (_config = new PVEConfig(_client)); } }
+            public PVEConfig Config => _config ?? (_config = new PVEConfig(_client));
             private PVEFirewall _firewall;
-            public PVEFirewall Firewall { get { return _firewall ?? (_firewall = new PVEFirewall(_client)); } }
+            public PVEFirewall Firewall => _firewall ?? (_firewall = new PVEFirewall(_client));
             private PVEBackup _backup;
-            public PVEBackup Backup { get { return _backup ?? (_backup = new PVEBackup(_client)); } }
+            public PVEBackup Backup => _backup ?? (_backup = new PVEBackup(_client));
             private PVEHa _ha;
-            public PVEHa Ha { get { return _ha ?? (_ha = new PVEHa(_client)); } }
+            public PVEHa Ha => _ha ?? (_ha = new PVEHa(_client));
             private PVEAcme _acme;
-            public PVEAcme Acme { get { return _acme ?? (_acme = new PVEAcme(_client)); } }
+            public PVEAcme Acme => _acme ?? (_acme = new PVEAcme(_client));
             private PVELog _log;
-            public PVELog Log { get { return _log ?? (_log = new PVELog(_client)); } }
+            public PVELog Log => _log ?? (_log = new PVELog(_client));
             private PVEResources _resources;
-            public PVEResources Resources { get { return _resources ?? (_resources = new PVEResources(_client)); } }
+            public PVEResources Resources => _resources ?? (_resources = new PVEResources(_client));
             private PVETasks _tasks;
-            public PVETasks Tasks { get { return _tasks ?? (_tasks = new PVETasks(_client)); } }
+            public PVETasks Tasks => _tasks ?? (_tasks = new PVETasks(_client));
             private PVEOptions _options;
-            public PVEOptions Options { get { return _options ?? (_options = new PVEOptions(_client)); } }
+            public PVEOptions Options => _options ?? (_options = new PVEOptions(_client));
             private PVEStatus _status;
-            public PVEStatus Status { get { return _status ?? (_status = new PVEStatus(_client)); } }
+            public PVEStatus Status => _status ?? (_status = new PVEStatus(_client));
             private PVENextid _nextid;
-            public PVENextid Nextid { get { return _nextid ?? (_nextid = new PVENextid(_client)); } }
+            public PVENextid Nextid => _nextid ?? (_nextid = new PVENextid(_client));
             public class PVEReplication : Base
             {
                 internal PVEReplication(Client client)
                 {
                     _client = client;
                 }
-                public PVEItemId this[object id] { get { return new PVEItemId(_client, id); } }
+                public PVEItemId this[object id] => new PVEItemId(_client, id);
                 public class PVEItemId : Base
                 {
                     private object _id;
@@ -462,18 +462,18 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     _client = client;
                 }
                 private PVENodes _nodes;
-                public PVENodes Nodes { get { return _nodes ?? (_nodes = new PVENodes(_client)); } }
+                public PVENodes Nodes => _nodes ?? (_nodes = new PVENodes(_client));
                 private PVEJoin _join;
-                public PVEJoin Join { get { return _join ?? (_join = new PVEJoin(_client)); } }
+                public PVEJoin Join => _join ?? (_join = new PVEJoin(_client));
                 private PVETotem _totem;
-                public PVETotem Totem { get { return _totem ?? (_totem = new PVETotem(_client)); } }
+                public PVETotem Totem => _totem ?? (_totem = new PVETotem(_client));
                 public class PVENodes : Base
                 {
                     internal PVENodes(Client client)
                     {
                         _client = client;
                     }
-                    public PVEItemNode this[object node] { get { return new PVEItemNode(_client, node); } }
+                    public PVEItemNode this[object node] => new PVEItemNode(_client, node);
                     public class PVEItemNode : Base
                     {
                         private object _node;
@@ -677,26 +677,26 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     _client = client;
                 }
                 private PVEGroups _groups;
-                public PVEGroups Groups { get { return _groups ?? (_groups = new PVEGroups(_client)); } }
+                public PVEGroups Groups => _groups ?? (_groups = new PVEGroups(_client));
                 private PVERules _rules;
-                public PVERules Rules { get { return _rules ?? (_rules = new PVERules(_client)); } }
+                public PVERules Rules => _rules ?? (_rules = new PVERules(_client));
                 private PVEIpset _ipset;
-                public PVEIpset Ipset { get { return _ipset ?? (_ipset = new PVEIpset(_client)); } }
+                public PVEIpset Ipset => _ipset ?? (_ipset = new PVEIpset(_client));
                 private PVEAliases _aliases;
-                public PVEAliases Aliases { get { return _aliases ?? (_aliases = new PVEAliases(_client)); } }
+                public PVEAliases Aliases => _aliases ?? (_aliases = new PVEAliases(_client));
                 private PVEOptions _options;
-                public PVEOptions Options { get { return _options ?? (_options = new PVEOptions(_client)); } }
+                public PVEOptions Options => _options ?? (_options = new PVEOptions(_client));
                 private PVEMacros _macros;
-                public PVEMacros Macros { get { return _macros ?? (_macros = new PVEMacros(_client)); } }
+                public PVEMacros Macros => _macros ?? (_macros = new PVEMacros(_client));
                 private PVERefs _refs;
-                public PVERefs Refs { get { return _refs ?? (_refs = new PVERefs(_client)); } }
+                public PVERefs Refs => _refs ?? (_refs = new PVERefs(_client));
                 public class PVEGroups : Base
                 {
                     internal PVEGroups(Client client)
                     {
                         _client = client;
                     }
-                    public PVEItemGroup this[object group] { get { return new PVEItemGroup(_client, group); } }
+                    public PVEItemGroup this[object group] => new PVEItemGroup(_client, group);
                     public class PVEItemGroup : Base
                     {
                         private object _group;
@@ -705,7 +705,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             _client = client;
                             _group = group;
                         }
-                        public PVEItemPos this[object pos] { get { return new PVEItemPos(_client, _group, pos); } }
+                        public PVEItemPos this[object pos] => new PVEItemPos(_client, _group, pos);
                         public class PVEItemPos : Base
                         {
                             private object _group;
@@ -933,7 +933,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         _client = client;
                     }
-                    public PVEItemPos this[object pos] { get { return new PVEItemPos(_client, pos); } }
+                    public PVEItemPos this[object pos] => new PVEItemPos(_client, pos);
                     public class PVEItemPos : Base
                     {
                         private object _pos;
@@ -1106,7 +1106,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         _client = client;
                     }
-                    public PVEItemName this[object name] { get { return new PVEItemName(_client, name); } }
+                    public PVEItemName this[object name] => new PVEItemName(_client, name);
                     public class PVEItemName : Base
                     {
                         private object _name;
@@ -1115,7 +1115,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             _client = client;
                             _name = name;
                         }
-                        public PVEItemCidr this[object cidr] { get { return new PVEItemCidr(_client, _name, cidr); } }
+                        public PVEItemCidr this[object cidr] => new PVEItemCidr(_client, _name, cidr);
                         public class PVEItemCidr : Base
                         {
                             private object _name;
@@ -1276,7 +1276,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         _client = client;
                     }
-                    public PVEItemName this[object name] { get { return new PVEItemName(_client, name); } }
+                    public PVEItemName this[object name] => new PVEItemName(_client, name);
                     public class PVEItemName : Base
                     {
                         private object _name;
@@ -1403,17 +1403,19 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="delete">A list of settings you want to delete.</param>
                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
+                    /// <param name="ebtables">Enable ebtables rules cluster wide.</param>
                     /// <param name="enable">Enable or disable the firewall cluster wide.</param>
                     /// <param name="policy_in">Input policy.
                     ///   Enum: ACCEPT,REJECT,DROP</param>
                     /// <param name="policy_out">Output policy.
                     ///   Enum: ACCEPT,REJECT,DROP</param>
                     /// <returns></returns>
-                    public Result SetRest(string delete = null, string digest = null, int? enable = null, string policy_in = null, string policy_out = null)
+                    public Result SetRest(string delete = null, string digest = null, bool? ebtables = null, int? enable = null, string policy_in = null, string policy_out = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("delete", delete);
                         parameters.Add("digest", digest);
+                        parameters.Add("ebtables", ebtables);
                         parameters.Add("enable", enable);
                         parameters.Add("policy_in", policy_in);
                         parameters.Add("policy_out", policy_out);
@@ -1424,13 +1426,14 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="delete">A list of settings you want to delete.</param>
                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
+                    /// <param name="ebtables">Enable ebtables rules cluster wide.</param>
                     /// <param name="enable">Enable or disable the firewall cluster wide.</param>
                     /// <param name="policy_in">Input policy.
                     ///   Enum: ACCEPT,REJECT,DROP</param>
                     /// <param name="policy_out">Output policy.
                     ///   Enum: ACCEPT,REJECT,DROP</param>
                     /// <returns></returns>
-                    public Result SetOptions(string delete = null, string digest = null, int? enable = null, string policy_in = null, string policy_out = null) { return SetRest(delete, digest, enable, policy_in, policy_out); }
+                    public Result SetOptions(string delete = null, string digest = null, bool? ebtables = null, int? enable = null, string policy_in = null, string policy_out = null) { return SetRest(delete, digest, ebtables, enable, policy_in, policy_out); }
                 }
                 public class PVEMacros : Base
                 {
@@ -1498,7 +1501,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 {
                     _client = client;
                 }
-                public PVEItemId this[object id] { get { return new PVEItemId(_client, id); } }
+                public PVEItemId this[object id] => new PVEItemId(_client, id);
                 public class PVEItemId : Base
                 {
                     private object _id;
@@ -1760,18 +1763,18 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     _client = client;
                 }
                 private PVEResources _resources;
-                public PVEResources Resources { get { return _resources ?? (_resources = new PVEResources(_client)); } }
+                public PVEResources Resources => _resources ?? (_resources = new PVEResources(_client));
                 private PVEGroups _groups;
-                public PVEGroups Groups { get { return _groups ?? (_groups = new PVEGroups(_client)); } }
+                public PVEGroups Groups => _groups ?? (_groups = new PVEGroups(_client));
                 private PVEStatus _status;
-                public PVEStatus Status { get { return _status ?? (_status = new PVEStatus(_client)); } }
+                public PVEStatus Status => _status ?? (_status = new PVEStatus(_client));
                 public class PVEResources : Base
                 {
                     internal PVEResources(Client client)
                     {
                         _client = client;
                     }
-                    public PVEItemSid this[object sid] { get { return new PVEItemSid(_client, sid); } }
+                    public PVEItemSid this[object sid] => new PVEItemSid(_client, sid);
                     public class PVEItemSid : Base
                     {
                         private object _sid;
@@ -1781,9 +1784,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             _sid = sid;
                         }
                         private PVEMigrate _migrate;
-                        public PVEMigrate Migrate { get { return _migrate ?? (_migrate = new PVEMigrate(_client, _sid)); } }
+                        public PVEMigrate Migrate => _migrate ?? (_migrate = new PVEMigrate(_client, _sid));
                         private PVERelocate _relocate;
-                        public PVERelocate Relocate { get { return _relocate ?? (_relocate = new PVERelocate(_client, _sid)); } }
+                        public PVERelocate Relocate => _relocate ?? (_relocate = new PVERelocate(_client, _sid));
                         public class PVEMigrate : Base
                         {
                             private object _sid;
@@ -1965,7 +1968,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     {
                         _client = client;
                     }
-                    public PVEItemGroup this[object group] { get { return new PVEItemGroup(_client, group); } }
+                    public PVEItemGroup this[object group] => new PVEItemGroup(_client, group);
                     public class PVEItemGroup : Base
                     {
                         private object _group;
@@ -2088,9 +2091,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         _client = client;
                     }
                     private PVECurrent _current;
-                    public PVECurrent Current { get { return _current ?? (_current = new PVECurrent(_client)); } }
+                    public PVECurrent Current => _current ?? (_current = new PVECurrent(_client));
                     private PVEManagerStatus _managerStatus;
-                    public PVEManagerStatus ManagerStatus { get { return _managerStatus ?? (_managerStatus = new PVEManagerStatus(_client)); } }
+                    public PVEManagerStatus ManagerStatus => _managerStatus ?? (_managerStatus = new PVEManagerStatus(_client));
                     public class PVECurrent : Base
                     {
                         internal PVECurrent(Client client)
@@ -2166,18 +2169,18 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     _client = client;
                 }
                 private PVEAccount _account;
-                public PVEAccount Account { get { return _account ?? (_account = new PVEAccount(_client)); } }
+                public PVEAccount Account => _account ?? (_account = new PVEAccount(_client));
                 private PVETos _tos;
-                public PVETos Tos { get { return _tos ?? (_tos = new PVETos(_client)); } }
+                public PVETos Tos => _tos ?? (_tos = new PVETos(_client));
                 private PVEDirectories _directories;
-                public PVEDirectories Directories { get { return _directories ?? (_directories = new PVEDirectories(_client)); } }
+                public PVEDirectories Directories => _directories ?? (_directories = new PVEDirectories(_client));
                 public class PVEAccount : Base
                 {
                     internal PVEAccount(Client client)
                     {
                         _client = client;
                     }
-                    public PVEItemName this[object name] { get { return new PVEItemName(_client, name); } }
+                    public PVEItemName this[object name] => new PVEItemName(_client, name);
                     public class PVEItemName : Base
                     {
                         private object _name;
@@ -2540,7 +2543,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             {
                 _client = client;
             }
-            public PVEItemNode this[object node] { get { return new PVEItemNode(_client, node); } }
+            public PVEItemNode this[object node] => new PVEItemNode(_client, node);
             public class PVEItemNode : Base
             {
                 private object _node;
@@ -2550,73 +2553,73 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     _node = node;
                 }
                 private PVEQemu _qemu;
-                public PVEQemu Qemu { get { return _qemu ?? (_qemu = new PVEQemu(_client, _node)); } }
+                public PVEQemu Qemu => _qemu ?? (_qemu = new PVEQemu(_client, _node));
                 private PVELxc _lxc;
-                public PVELxc Lxc { get { return _lxc ?? (_lxc = new PVELxc(_client, _node)); } }
+                public PVELxc Lxc => _lxc ?? (_lxc = new PVELxc(_client, _node));
                 private PVECeph _ceph;
-                public PVECeph Ceph { get { return _ceph ?? (_ceph = new PVECeph(_client, _node)); } }
+                public PVECeph Ceph => _ceph ?? (_ceph = new PVECeph(_client, _node));
                 private PVEVzdump _vzdump;
-                public PVEVzdump Vzdump { get { return _vzdump ?? (_vzdump = new PVEVzdump(_client, _node)); } }
+                public PVEVzdump Vzdump => _vzdump ?? (_vzdump = new PVEVzdump(_client, _node));
                 private PVEServices _services;
-                public PVEServices Services { get { return _services ?? (_services = new PVEServices(_client, _node)); } }
+                public PVEServices Services => _services ?? (_services = new PVEServices(_client, _node));
                 private PVESubscription _subscription;
-                public PVESubscription Subscription { get { return _subscription ?? (_subscription = new PVESubscription(_client, _node)); } }
+                public PVESubscription Subscription => _subscription ?? (_subscription = new PVESubscription(_client, _node));
                 private PVENetwork _network;
-                public PVENetwork Network { get { return _network ?? (_network = new PVENetwork(_client, _node)); } }
+                public PVENetwork Network => _network ?? (_network = new PVENetwork(_client, _node));
                 private PVETasks _tasks;
-                public PVETasks Tasks { get { return _tasks ?? (_tasks = new PVETasks(_client, _node)); } }
+                public PVETasks Tasks => _tasks ?? (_tasks = new PVETasks(_client, _node));
                 private PVEScan _scan;
-                public PVEScan Scan { get { return _scan ?? (_scan = new PVEScan(_client, _node)); } }
+                public PVEScan Scan => _scan ?? (_scan = new PVEScan(_client, _node));
                 private PVEStorage _storage;
-                public PVEStorage Storage { get { return _storage ?? (_storage = new PVEStorage(_client, _node)); } }
+                public PVEStorage Storage => _storage ?? (_storage = new PVEStorage(_client, _node));
                 private PVEDisks _disks;
-                public PVEDisks Disks { get { return _disks ?? (_disks = new PVEDisks(_client, _node)); } }
+                public PVEDisks Disks => _disks ?? (_disks = new PVEDisks(_client, _node));
                 private PVEApt _apt;
-                public PVEApt Apt { get { return _apt ?? (_apt = new PVEApt(_client, _node)); } }
+                public PVEApt Apt => _apt ?? (_apt = new PVEApt(_client, _node));
                 private PVEFirewall _firewall;
-                public PVEFirewall Firewall { get { return _firewall ?? (_firewall = new PVEFirewall(_client, _node)); } }
+                public PVEFirewall Firewall => _firewall ?? (_firewall = new PVEFirewall(_client, _node));
                 private PVEReplication _replication;
-                public PVEReplication Replication { get { return _replication ?? (_replication = new PVEReplication(_client, _node)); } }
+                public PVEReplication Replication => _replication ?? (_replication = new PVEReplication(_client, _node));
                 private PVECertificates _certificates;
-                public PVECertificates Certificates { get { return _certificates ?? (_certificates = new PVECertificates(_client, _node)); } }
+                public PVECertificates Certificates => _certificates ?? (_certificates = new PVECertificates(_client, _node));
                 private PVEConfig _config;
-                public PVEConfig Config { get { return _config ?? (_config = new PVEConfig(_client, _node)); } }
+                public PVEConfig Config => _config ?? (_config = new PVEConfig(_client, _node));
                 private PVEVersion _version;
-                public PVEVersion Version { get { return _version ?? (_version = new PVEVersion(_client, _node)); } }
+                public PVEVersion Version => _version ?? (_version = new PVEVersion(_client, _node));
                 private PVEStatus _status;
-                public PVEStatus Status { get { return _status ?? (_status = new PVEStatus(_client, _node)); } }
+                public PVEStatus Status => _status ?? (_status = new PVEStatus(_client, _node));
                 private PVENetstat _netstat;
-                public PVENetstat Netstat { get { return _netstat ?? (_netstat = new PVENetstat(_client, _node)); } }
+                public PVENetstat Netstat => _netstat ?? (_netstat = new PVENetstat(_client, _node));
                 private PVEExecute _execute;
-                public PVEExecute Execute { get { return _execute ?? (_execute = new PVEExecute(_client, _node)); } }
+                public PVEExecute Execute => _execute ?? (_execute = new PVEExecute(_client, _node));
                 private PVERrd _rrd;
-                public PVERrd Rrd { get { return _rrd ?? (_rrd = new PVERrd(_client, _node)); } }
+                public PVERrd Rrd => _rrd ?? (_rrd = new PVERrd(_client, _node));
                 private PVERrddata _rrddata;
-                public PVERrddata Rrddata { get { return _rrddata ?? (_rrddata = new PVERrddata(_client, _node)); } }
+                public PVERrddata Rrddata => _rrddata ?? (_rrddata = new PVERrddata(_client, _node));
                 private PVESyslog _syslog;
-                public PVESyslog Syslog { get { return _syslog ?? (_syslog = new PVESyslog(_client, _node)); } }
+                public PVESyslog Syslog => _syslog ?? (_syslog = new PVESyslog(_client, _node));
                 private PVEVncshell _vncshell;
-                public PVEVncshell Vncshell { get { return _vncshell ?? (_vncshell = new PVEVncshell(_client, _node)); } }
+                public PVEVncshell Vncshell => _vncshell ?? (_vncshell = new PVEVncshell(_client, _node));
                 private PVETermproxy _termproxy;
-                public PVETermproxy Termproxy { get { return _termproxy ?? (_termproxy = new PVETermproxy(_client, _node)); } }
+                public PVETermproxy Termproxy => _termproxy ?? (_termproxy = new PVETermproxy(_client, _node));
                 private PVEVncwebsocket _vncwebsocket;
-                public PVEVncwebsocket Vncwebsocket { get { return _vncwebsocket ?? (_vncwebsocket = new PVEVncwebsocket(_client, _node)); } }
+                public PVEVncwebsocket Vncwebsocket => _vncwebsocket ?? (_vncwebsocket = new PVEVncwebsocket(_client, _node));
                 private PVESpiceshell _spiceshell;
-                public PVESpiceshell Spiceshell { get { return _spiceshell ?? (_spiceshell = new PVESpiceshell(_client, _node)); } }
+                public PVESpiceshell Spiceshell => _spiceshell ?? (_spiceshell = new PVESpiceshell(_client, _node));
                 private PVEDns _dns;
-                public PVEDns Dns { get { return _dns ?? (_dns = new PVEDns(_client, _node)); } }
+                public PVEDns Dns => _dns ?? (_dns = new PVEDns(_client, _node));
                 private PVETime _time;
-                public PVETime Time { get { return _time ?? (_time = new PVETime(_client, _node)); } }
+                public PVETime Time => _time ?? (_time = new PVETime(_client, _node));
                 private PVEAplinfo _aplinfo;
-                public PVEAplinfo Aplinfo { get { return _aplinfo ?? (_aplinfo = new PVEAplinfo(_client, _node)); } }
+                public PVEAplinfo Aplinfo => _aplinfo ?? (_aplinfo = new PVEAplinfo(_client, _node));
                 private PVEReport _report;
-                public PVEReport Report { get { return _report ?? (_report = new PVEReport(_client, _node)); } }
+                public PVEReport Report => _report ?? (_report = new PVEReport(_client, _node));
                 private PVEStartall _startall;
-                public PVEStartall Startall { get { return _startall ?? (_startall = new PVEStartall(_client, _node)); } }
+                public PVEStartall Startall => _startall ?? (_startall = new PVEStartall(_client, _node));
                 private PVEStopall _stopall;
-                public PVEStopall Stopall { get { return _stopall ?? (_stopall = new PVEStopall(_client, _node)); } }
+                public PVEStopall Stopall => _stopall ?? (_stopall = new PVEStopall(_client, _node));
                 private PVEMigrateall _migrateall;
-                public PVEMigrateall Migrateall { get { return _migrateall ?? (_migrateall = new PVEMigrateall(_client, _node)); } }
+                public PVEMigrateall Migrateall => _migrateall ?? (_migrateall = new PVEMigrateall(_client, _node));
                 public class PVEQemu : Base
                 {
                     private object _node;
@@ -2625,7 +2628,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         _client = client;
                         _node = node;
                     }
-                    public PVEItemVmid this[object vmid] { get { return new PVEItemVmid(_client, _node, vmid); } }
+                    public PVEItemVmid this[object vmid] => new PVEItemVmid(_client, _node, vmid);
                     public class PVEItemVmid : Base
                     {
                         private object _node;
@@ -2637,47 +2640,47 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             _vmid = vmid;
                         }
                         private PVEFirewall _firewall;
-                        public PVEFirewall Firewall { get { return _firewall ?? (_firewall = new PVEFirewall(_client, _node, _vmid)); } }
+                        public PVEFirewall Firewall => _firewall ?? (_firewall = new PVEFirewall(_client, _node, _vmid));
                         private PVEAgent _agent;
-                        public PVEAgent Agent { get { return _agent ?? (_agent = new PVEAgent(_client, _node, _vmid)); } }
+                        public PVEAgent Agent => _agent ?? (_agent = new PVEAgent(_client, _node, _vmid));
                         private PVERrd _rrd;
-                        public PVERrd Rrd { get { return _rrd ?? (_rrd = new PVERrd(_client, _node, _vmid)); } }
+                        public PVERrd Rrd => _rrd ?? (_rrd = new PVERrd(_client, _node, _vmid));
                         private PVERrddata _rrddata;
-                        public PVERrddata Rrddata { get { return _rrddata ?? (_rrddata = new PVERrddata(_client, _node, _vmid)); } }
+                        public PVERrddata Rrddata => _rrddata ?? (_rrddata = new PVERrddata(_client, _node, _vmid));
                         private PVEConfig _config;
-                        public PVEConfig Config { get { return _config ?? (_config = new PVEConfig(_client, _node, _vmid)); } }
+                        public PVEConfig Config => _config ?? (_config = new PVEConfig(_client, _node, _vmid));
                         private PVEPending _pending;
-                        public PVEPending Pending { get { return _pending ?? (_pending = new PVEPending(_client, _node, _vmid)); } }
+                        public PVEPending Pending => _pending ?? (_pending = new PVEPending(_client, _node, _vmid));
                         private PVEUnlink _unlink;
-                        public PVEUnlink Unlink { get { return _unlink ?? (_unlink = new PVEUnlink(_client, _node, _vmid)); } }
+                        public PVEUnlink Unlink => _unlink ?? (_unlink = new PVEUnlink(_client, _node, _vmid));
                         private PVEVncproxy _vncproxy;
-                        public PVEVncproxy Vncproxy { get { return _vncproxy ?? (_vncproxy = new PVEVncproxy(_client, _node, _vmid)); } }
+                        public PVEVncproxy Vncproxy => _vncproxy ?? (_vncproxy = new PVEVncproxy(_client, _node, _vmid));
                         private PVETermproxy _termproxy;
-                        public PVETermproxy Termproxy { get { return _termproxy ?? (_termproxy = new PVETermproxy(_client, _node, _vmid)); } }
+                        public PVETermproxy Termproxy => _termproxy ?? (_termproxy = new PVETermproxy(_client, _node, _vmid));
                         private PVEVncwebsocket _vncwebsocket;
-                        public PVEVncwebsocket Vncwebsocket { get { return _vncwebsocket ?? (_vncwebsocket = new PVEVncwebsocket(_client, _node, _vmid)); } }
+                        public PVEVncwebsocket Vncwebsocket => _vncwebsocket ?? (_vncwebsocket = new PVEVncwebsocket(_client, _node, _vmid));
                         private PVESpiceproxy _spiceproxy;
-                        public PVESpiceproxy Spiceproxy { get { return _spiceproxy ?? (_spiceproxy = new PVESpiceproxy(_client, _node, _vmid)); } }
+                        public PVESpiceproxy Spiceproxy => _spiceproxy ?? (_spiceproxy = new PVESpiceproxy(_client, _node, _vmid));
                         private PVEStatus _status;
-                        public PVEStatus Status { get { return _status ?? (_status = new PVEStatus(_client, _node, _vmid)); } }
+                        public PVEStatus Status => _status ?? (_status = new PVEStatus(_client, _node, _vmid));
                         private PVESendkey _sendkey;
-                        public PVESendkey Sendkey { get { return _sendkey ?? (_sendkey = new PVESendkey(_client, _node, _vmid)); } }
+                        public PVESendkey Sendkey => _sendkey ?? (_sendkey = new PVESendkey(_client, _node, _vmid));
                         private PVEFeature _feature;
-                        public PVEFeature Feature { get { return _feature ?? (_feature = new PVEFeature(_client, _node, _vmid)); } }
+                        public PVEFeature Feature => _feature ?? (_feature = new PVEFeature(_client, _node, _vmid));
                         private PVEClone _clone;
-                        public PVEClone Clone { get { return _clone ?? (_clone = new PVEClone(_client, _node, _vmid)); } }
+                        public PVEClone Clone => _clone ?? (_clone = new PVEClone(_client, _node, _vmid));
                         private PVEMoveDisk _moveDisk;
-                        public PVEMoveDisk MoveDisk { get { return _moveDisk ?? (_moveDisk = new PVEMoveDisk(_client, _node, _vmid)); } }
+                        public PVEMoveDisk MoveDisk => _moveDisk ?? (_moveDisk = new PVEMoveDisk(_client, _node, _vmid));
                         private PVEMigrate _migrate;
-                        public PVEMigrate Migrate { get { return _migrate ?? (_migrate = new PVEMigrate(_client, _node, _vmid)); } }
+                        public PVEMigrate Migrate => _migrate ?? (_migrate = new PVEMigrate(_client, _node, _vmid));
                         private PVEMonitor _monitor;
-                        public PVEMonitor Monitor { get { return _monitor ?? (_monitor = new PVEMonitor(_client, _node, _vmid)); } }
+                        public PVEMonitor Monitor => _monitor ?? (_monitor = new PVEMonitor(_client, _node, _vmid));
                         private PVEResize _resize;
-                        public PVEResize Resize { get { return _resize ?? (_resize = new PVEResize(_client, _node, _vmid)); } }
+                        public PVEResize Resize => _resize ?? (_resize = new PVEResize(_client, _node, _vmid));
                         private PVESnapshot _snapshot;
-                        public PVESnapshot Snapshot { get { return _snapshot ?? (_snapshot = new PVESnapshot(_client, _node, _vmid)); } }
+                        public PVESnapshot Snapshot => _snapshot ?? (_snapshot = new PVESnapshot(_client, _node, _vmid));
                         private PVETemplate _template;
-                        public PVETemplate Template { get { return _template ?? (_template = new PVETemplate(_client, _node, _vmid)); } }
+                        public PVETemplate Template => _template ?? (_template = new PVETemplate(_client, _node, _vmid));
                         public class PVEFirewall : Base
                         {
                             private object _node;
@@ -2689,17 +2692,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 _vmid = vmid;
                             }
                             private PVERules _rules;
-                            public PVERules Rules { get { return _rules ?? (_rules = new PVERules(_client, _node, _vmid)); } }
+                            public PVERules Rules => _rules ?? (_rules = new PVERules(_client, _node, _vmid));
                             private PVEAliases _aliases;
-                            public PVEAliases Aliases { get { return _aliases ?? (_aliases = new PVEAliases(_client, _node, _vmid)); } }
+                            public PVEAliases Aliases => _aliases ?? (_aliases = new PVEAliases(_client, _node, _vmid));
                             private PVEIpset _ipset;
-                            public PVEIpset Ipset { get { return _ipset ?? (_ipset = new PVEIpset(_client, _node, _vmid)); } }
+                            public PVEIpset Ipset => _ipset ?? (_ipset = new PVEIpset(_client, _node, _vmid));
                             private PVEOptions _options;
-                            public PVEOptions Options { get { return _options ?? (_options = new PVEOptions(_client, _node, _vmid)); } }
+                            public PVEOptions Options => _options ?? (_options = new PVEOptions(_client, _node, _vmid));
                             private PVELog _log;
-                            public PVELog Log { get { return _log ?? (_log = new PVELog(_client, _node, _vmid)); } }
+                            public PVELog Log => _log ?? (_log = new PVELog(_client, _node, _vmid));
                             private PVERefs _refs;
-                            public PVERefs Refs { get { return _refs ?? (_refs = new PVERefs(_client, _node, _vmid)); } }
+                            public PVERefs Refs => _refs ?? (_refs = new PVERefs(_client, _node, _vmid));
                             public class PVERules : Base
                             {
                                 private object _node;
@@ -2710,7 +2713,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     _node = node;
                                     _vmid = vmid;
                                 }
-                                public PVEItemPos this[object pos] { get { return new PVEItemPos(_client, _node, _vmid, pos); } }
+                                public PVEItemPos this[object pos] => new PVEItemPos(_client, _node, _vmid, pos);
                                 public class PVEItemPos : Base
                                 {
                                     private object _node;
@@ -2891,7 +2894,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     _node = node;
                                     _vmid = vmid;
                                 }
-                                public PVEItemName this[object name] { get { return new PVEItemName(_client, _node, _vmid, name); } }
+                                public PVEItemName this[object name] => new PVEItemName(_client, _node, _vmid, name);
                                 public class PVEItemName : Base
                                 {
                                     private object _node;
@@ -3008,7 +3011,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     _node = node;
                                     _vmid = vmid;
                                 }
-                                public PVEItemName this[object name] { get { return new PVEItemName(_client, _node, _vmid, name); } }
+                                public PVEItemName this[object name] => new PVEItemName(_client, _node, _vmid, name);
                                 public class PVEItemName : Base
                                 {
                                     private object _node;
@@ -3021,7 +3024,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         _vmid = vmid;
                                         _name = name;
                                     }
-                                    public PVEItemCidr this[object cidr] { get { return new PVEItemCidr(_client, _node, _vmid, _name, cidr); } }
+                                    public PVEItemCidr this[object cidr] => new PVEItemCidr(_client, _node, _vmid, _name, cidr);
                                     public class PVEItemCidr : Base
                                     {
                                         private object _node;
@@ -3348,45 +3351,45 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 _vmid = vmid;
                             }
                             private PVEFsfreeze_Freeze _fsfreeze_Freeze;
-                            public PVEFsfreeze_Freeze Fsfreeze_Freeze { get { return _fsfreeze_Freeze ?? (_fsfreeze_Freeze = new PVEFsfreeze_Freeze(_client, _node, _vmid)); } }
+                            public PVEFsfreeze_Freeze Fsfreeze_Freeze => _fsfreeze_Freeze ?? (_fsfreeze_Freeze = new PVEFsfreeze_Freeze(_client, _node, _vmid));
                             private PVEFsfreeze_Status _fsfreeze_Status;
-                            public PVEFsfreeze_Status Fsfreeze_Status { get { return _fsfreeze_Status ?? (_fsfreeze_Status = new PVEFsfreeze_Status(_client, _node, _vmid)); } }
+                            public PVEFsfreeze_Status Fsfreeze_Status => _fsfreeze_Status ?? (_fsfreeze_Status = new PVEFsfreeze_Status(_client, _node, _vmid));
                             private PVEFsfreeze_Thaw _fsfreeze_Thaw;
-                            public PVEFsfreeze_Thaw Fsfreeze_Thaw { get { return _fsfreeze_Thaw ?? (_fsfreeze_Thaw = new PVEFsfreeze_Thaw(_client, _node, _vmid)); } }
+                            public PVEFsfreeze_Thaw Fsfreeze_Thaw => _fsfreeze_Thaw ?? (_fsfreeze_Thaw = new PVEFsfreeze_Thaw(_client, _node, _vmid));
                             private PVEFstrim _fstrim;
-                            public PVEFstrim Fstrim { get { return _fstrim ?? (_fstrim = new PVEFstrim(_client, _node, _vmid)); } }
+                            public PVEFstrim Fstrim => _fstrim ?? (_fstrim = new PVEFstrim(_client, _node, _vmid));
                             private PVEGet_Fsinfo _get_Fsinfo;
-                            public PVEGet_Fsinfo Get_Fsinfo { get { return _get_Fsinfo ?? (_get_Fsinfo = new PVEGet_Fsinfo(_client, _node, _vmid)); } }
+                            public PVEGet_Fsinfo Get_Fsinfo => _get_Fsinfo ?? (_get_Fsinfo = new PVEGet_Fsinfo(_client, _node, _vmid));
                             private PVEGet_Host_Name _get_Host_Name;
-                            public PVEGet_Host_Name Get_Host_Name { get { return _get_Host_Name ?? (_get_Host_Name = new PVEGet_Host_Name(_client, _node, _vmid)); } }
+                            public PVEGet_Host_Name Get_Host_Name => _get_Host_Name ?? (_get_Host_Name = new PVEGet_Host_Name(_client, _node, _vmid));
                             private PVEGet_Memory_Block_Info _get_Memory_Block_Info;
-                            public PVEGet_Memory_Block_Info Get_Memory_Block_Info { get { return _get_Memory_Block_Info ?? (_get_Memory_Block_Info = new PVEGet_Memory_Block_Info(_client, _node, _vmid)); } }
+                            public PVEGet_Memory_Block_Info Get_Memory_Block_Info => _get_Memory_Block_Info ?? (_get_Memory_Block_Info = new PVEGet_Memory_Block_Info(_client, _node, _vmid));
                             private PVEGet_Memory_Blocks _get_Memory_Blocks;
-                            public PVEGet_Memory_Blocks Get_Memory_Blocks { get { return _get_Memory_Blocks ?? (_get_Memory_Blocks = new PVEGet_Memory_Blocks(_client, _node, _vmid)); } }
+                            public PVEGet_Memory_Blocks Get_Memory_Blocks => _get_Memory_Blocks ?? (_get_Memory_Blocks = new PVEGet_Memory_Blocks(_client, _node, _vmid));
                             private PVEGet_Osinfo _get_Osinfo;
-                            public PVEGet_Osinfo Get_Osinfo { get { return _get_Osinfo ?? (_get_Osinfo = new PVEGet_Osinfo(_client, _node, _vmid)); } }
+                            public PVEGet_Osinfo Get_Osinfo => _get_Osinfo ?? (_get_Osinfo = new PVEGet_Osinfo(_client, _node, _vmid));
                             private PVEGet_Time _get_Time;
-                            public PVEGet_Time Get_Time { get { return _get_Time ?? (_get_Time = new PVEGet_Time(_client, _node, _vmid)); } }
+                            public PVEGet_Time Get_Time => _get_Time ?? (_get_Time = new PVEGet_Time(_client, _node, _vmid));
                             private PVEGet_Timezone _get_Timezone;
-                            public PVEGet_Timezone Get_Timezone { get { return _get_Timezone ?? (_get_Timezone = new PVEGet_Timezone(_client, _node, _vmid)); } }
+                            public PVEGet_Timezone Get_Timezone => _get_Timezone ?? (_get_Timezone = new PVEGet_Timezone(_client, _node, _vmid));
                             private PVEGet_Users _get_Users;
-                            public PVEGet_Users Get_Users { get { return _get_Users ?? (_get_Users = new PVEGet_Users(_client, _node, _vmid)); } }
+                            public PVEGet_Users Get_Users => _get_Users ?? (_get_Users = new PVEGet_Users(_client, _node, _vmid));
                             private PVEGet_Vcpus _get_Vcpus;
-                            public PVEGet_Vcpus Get_Vcpus { get { return _get_Vcpus ?? (_get_Vcpus = new PVEGet_Vcpus(_client, _node, _vmid)); } }
+                            public PVEGet_Vcpus Get_Vcpus => _get_Vcpus ?? (_get_Vcpus = new PVEGet_Vcpus(_client, _node, _vmid));
                             private PVEInfo _info;
-                            public PVEInfo Info { get { return _info ?? (_info = new PVEInfo(_client, _node, _vmid)); } }
+                            public PVEInfo Info => _info ?? (_info = new PVEInfo(_client, _node, _vmid));
                             private PVENetwork_Get_Interfaces _network_Get_Interfaces;
-                            public PVENetwork_Get_Interfaces Network_Get_Interfaces { get { return _network_Get_Interfaces ?? (_network_Get_Interfaces = new PVENetwork_Get_Interfaces(_client, _node, _vmid)); } }
+                            public PVENetwork_Get_Interfaces Network_Get_Interfaces => _network_Get_Interfaces ?? (_network_Get_Interfaces = new PVENetwork_Get_Interfaces(_client, _node, _vmid));
                             private PVEPing _ping;
-                            public PVEPing Ping { get { return _ping ?? (_ping = new PVEPing(_client, _node, _vmid)); } }
+                            public PVEPing Ping => _ping ?? (_ping = new PVEPing(_client, _node, _vmid));
                             private PVEShutdown _shutdown;
-                            public PVEShutdown Shutdown { get { return _shutdown ?? (_shutdown = new PVEShutdown(_client, _node, _vmid)); } }
+                            public PVEShutdown Shutdown => _shutdown ?? (_shutdown = new PVEShutdown(_client, _node, _vmid));
                             private PVESuspend_Disk _suspend_Disk;
-                            public PVESuspend_Disk Suspend_Disk { get { return _suspend_Disk ?? (_suspend_Disk = new PVESuspend_Disk(_client, _node, _vmid)); } }
+                            public PVESuspend_Disk Suspend_Disk => _suspend_Disk ?? (_suspend_Disk = new PVESuspend_Disk(_client, _node, _vmid));
                             private PVESuspend_Hybrid _suspend_Hybrid;
-                            public PVESuspend_Hybrid Suspend_Hybrid { get { return _suspend_Hybrid ?? (_suspend_Hybrid = new PVESuspend_Hybrid(_client, _node, _vmid)); } }
+                            public PVESuspend_Hybrid Suspend_Hybrid => _suspend_Hybrid ?? (_suspend_Hybrid = new PVESuspend_Hybrid(_client, _node, _vmid));
                             private PVESuspend_Ram _suspend_Ram;
-                            public PVESuspend_Ram Suspend_Ram { get { return _suspend_Ram ?? (_suspend_Ram = new PVESuspend_Ram(_client, _node, _vmid)); } }
+                            public PVESuspend_Ram Suspend_Ram => _suspend_Ram ?? (_suspend_Ram = new PVESuspend_Ram(_client, _node, _vmid));
                             public class PVEFsfreeze_Freeze : Base
                             {
                                 private object _node;
@@ -4033,7 +4036,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             ///   Enum: any,2,1024</param>
                             /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3).</param>
                             /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
-                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.conf' configuration file.It should not be necessary to set it.
+                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.cfg' configuration file.It should not be necessary to set it.
                             ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                             /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
                             /// <param name="localtime">Set the real time clock to local time. This is enabled by default if ostype indicates a Microsoft OS.</param>
@@ -4061,7 +4064,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
                             /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                             /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
-                            /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning</param>
+                            /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning. Auto-ballooning is done by pvestatd.</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                             /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
                             /// <param name="smp">The number of CPUs. Please use option -sockets instead.</param>
@@ -4188,7 +4191,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             ///   Enum: any,2,1024</param>
                             /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3).</param>
                             /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
-                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.conf' configuration file.It should not be necessary to set it.
+                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.cfg' configuration file.It should not be necessary to set it.
                             ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                             /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
                             /// <param name="localtime">Set the real time clock to local time. This is enabled by default if ostype indicates a Microsoft OS.</param>
@@ -4216,7 +4219,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
                             /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                             /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
-                            /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning</param>
+                            /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning. Auto-ballooning is done by pvestatd.</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                             /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
                             /// <param name="smp">The number of CPUs. Please use option -sockets instead.</param>
@@ -4269,7 +4272,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             ///   Enum: any,2,1024</param>
                             /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3).</param>
                             /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
-                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.conf' configuration file.It should not be necessary to set it.
+                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.cfg' configuration file.It should not be necessary to set it.
                             ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                             /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
                             /// <param name="localtime">Set the real time clock to local time. This is enabled by default if ostype indicates a Microsoft OS.</param>
@@ -4297,7 +4300,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
                             /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                             /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
-                            /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning</param>
+                            /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning. Auto-ballooning is done by pvestatd.</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                             /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
                             /// <param name="smp">The number of CPUs. Please use option -sockets instead.</param>
@@ -4422,7 +4425,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             ///   Enum: any,2,1024</param>
                             /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3).</param>
                             /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
-                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.conf' configuration file.It should not be necessary to set it.
+                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.cfg' configuration file.It should not be necessary to set it.
                             ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                             /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
                             /// <param name="localtime">Set the real time clock to local time. This is enabled by default if ostype indicates a Microsoft OS.</param>
@@ -4450,7 +4453,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
                             /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                             /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
-                            /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning</param>
+                            /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning. Auto-ballooning is done by pvestatd.</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                             /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
                             /// <param name="smp">The number of CPUs. Please use option -sockets instead.</param>
@@ -4655,19 +4658,19 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 _vmid = vmid;
                             }
                             private PVECurrent _current;
-                            public PVECurrent Current { get { return _current ?? (_current = new PVECurrent(_client, _node, _vmid)); } }
+                            public PVECurrent Current => _current ?? (_current = new PVECurrent(_client, _node, _vmid));
                             private PVEStart _start;
-                            public PVEStart Start { get { return _start ?? (_start = new PVEStart(_client, _node, _vmid)); } }
+                            public PVEStart Start => _start ?? (_start = new PVEStart(_client, _node, _vmid));
                             private PVEStop _stop;
-                            public PVEStop Stop { get { return _stop ?? (_stop = new PVEStop(_client, _node, _vmid)); } }
+                            public PVEStop Stop => _stop ?? (_stop = new PVEStop(_client, _node, _vmid));
                             private PVEReset _reset;
-                            public PVEReset Reset { get { return _reset ?? (_reset = new PVEReset(_client, _node, _vmid)); } }
+                            public PVEReset Reset => _reset ?? (_reset = new PVEReset(_client, _node, _vmid));
                             private PVEShutdown _shutdown;
-                            public PVEShutdown Shutdown { get { return _shutdown ?? (_shutdown = new PVEShutdown(_client, _node, _vmid)); } }
+                            public PVEShutdown Shutdown => _shutdown ?? (_shutdown = new PVEShutdown(_client, _node, _vmid));
                             private PVESuspend _suspend;
-                            public PVESuspend Suspend { get { return _suspend ?? (_suspend = new PVESuspend(_client, _node, _vmid)); } }
+                            public PVESuspend Suspend => _suspend ?? (_suspend = new PVESuspend(_client, _node, _vmid));
                             private PVEResume _resume;
-                            public PVEResume Resume { get { return _resume ?? (_resume = new PVEResume(_client, _node, _vmid)); } }
+                            public PVEResume Resume => _resume ?? (_resume = new PVEResume(_client, _node, _vmid));
                             public class PVECurrent : Base
                             {
                                 private object _node;
@@ -5202,7 +5205,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 _node = node;
                                 _vmid = vmid;
                             }
-                            public PVEItemSnapname this[object snapname] { get { return new PVEItemSnapname(_client, _node, _vmid, snapname); } }
+                            public PVEItemSnapname this[object snapname] => new PVEItemSnapname(_client, _node, _vmid, snapname);
                             public class PVEItemSnapname : Base
                             {
                                 private object _node;
@@ -5216,9 +5219,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     _snapname = snapname;
                                 }
                                 private PVEConfig _config;
-                                public PVEConfig Config { get { return _config ?? (_config = new PVEConfig(_client, _node, _vmid, _snapname)); } }
+                                public PVEConfig Config => _config ?? (_config = new PVEConfig(_client, _node, _vmid, _snapname));
                                 private PVERollback _rollback;
-                                public PVERollback Rollback { get { return _rollback ?? (_rollback = new PVERollback(_client, _node, _vmid, _snapname)); } }
+                                public PVERollback Rollback => _rollback ?? (_rollback = new PVERollback(_client, _node, _vmid, _snapname));
                                 public class PVEConfig : Base
                                 {
                                     private object _node;
@@ -5467,7 +5470,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     ///   Enum: any,2,1024</param>
                     /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3).</param>
                     /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
-                    /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.conf' configuration file.It should not be necessary to set it.
+                    /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.cfg' configuration file.It should not be necessary to set it.
                     ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                     /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
                     /// <param name="localtime">Set the real time clock to local time. This is enabled by default if ostype indicates a Microsoft OS.</param>
@@ -5495,11 +5498,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
                     /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                     /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
-                    /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning</param>
+                    /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning. Auto-ballooning is done by pvestatd.</param>
                     /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
                     /// <param name="smp">The number of CPUs. Please use option -sockets instead.</param>
                     /// <param name="sockets">The number of CPU sockets.</param>
                     /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
+                    /// <param name="start">Start VM after it was created successfully.</param>
                     /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                     /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                     /// <param name="storage">Default storage.</param>
@@ -5516,7 +5520,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                     /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                     /// <returns></returns>
-                    public Result CreateRest(int vmid, bool? acpi = null, bool? agent = null, string archive = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string sshkeys = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null)
+                    public Result CreateRest(int vmid, bool? acpi = null, bool? agent = null, string archive = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("vmid", vmid);
@@ -5566,6 +5570,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("smp", smp);
                         parameters.Add("sockets", sockets);
                         parameters.Add("sshkeys", sshkeys);
+                        parameters.Add("start", start);
                         parameters.Add("startdate", startdate);
                         parameters.Add("startup", startup);
                         parameters.Add("storage", storage);
@@ -5624,7 +5629,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     ///   Enum: any,2,1024</param>
                     /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3).</param>
                     /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
-                    /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.conf' configuration file.It should not be necessary to set it.
+                    /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.cfg' configuration file.It should not be necessary to set it.
                     ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                     /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
                     /// <param name="localtime">Set the real time clock to local time. This is enabled by default if ostype indicates a Microsoft OS.</param>
@@ -5652,11 +5657,12 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
                     /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                     /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
-                    /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning</param>
+                    /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning. Auto-ballooning is done by pvestatd.</param>
                     /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
                     /// <param name="smp">The number of CPUs. Please use option -sockets instead.</param>
                     /// <param name="sockets">The number of CPU sockets.</param>
                     /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
+                    /// <param name="start">Start VM after it was created successfully.</param>
                     /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                     /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                     /// <param name="storage">Default storage.</param>
@@ -5673,7 +5679,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                     /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                     /// <returns></returns>
-                    public Result CreateVm(int vmid, bool? acpi = null, bool? agent = null, string archive = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string sshkeys = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null) { return CreateRest(vmid, acpi, agent, archive, args, autostart, balloon, bios, boot, bootdisk, bwlimit, cdrom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, description, force, freeze, hostpciN, hotplug, hugepages, ideN, ipconfigN, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, pool, protection, reboot, sataN, scsiN, scsihw, searchdomain, serialN, shares, smbios1, smp, sockets, sshkeys, startdate, startup, storage, tablet, tdf, template, unique, unusedN, usbN, vcpus, vga, virtioN, vmstatestorage, watchdog); }
+                    public Result CreateVm(int vmid, bool? acpi = null, bool? agent = null, string archive = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, bool? freeze = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmstatestorage = null, string watchdog = null) { return CreateRest(vmid, acpi, agent, archive, args, autostart, balloon, bios, boot, bootdisk, bwlimit, cdrom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, description, force, freeze, hostpciN, hotplug, hugepages, ideN, ipconfigN, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, pool, protection, reboot, sataN, scsiN, scsihw, searchdomain, serialN, shares, smbios1, smp, sockets, sshkeys, start, startdate, startup, storage, tablet, tdf, template, unique, unusedN, usbN, vcpus, vga, virtioN, vmstatestorage, watchdog); }
                 }
                 public class PVELxc : Base
                 {
@@ -5683,7 +5689,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         _client = client;
                         _node = node;
                     }
-                    public PVEItemVmid this[object vmid] { get { return new PVEItemVmid(_client, _node, vmid); } }
+                    public PVEItemVmid this[object vmid] => new PVEItemVmid(_client, _node, vmid);
                     public class PVEItemVmid : Base
                     {
                         private object _node;
@@ -5695,37 +5701,37 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             _vmid = vmid;
                         }
                         private PVEConfig _config;
-                        public PVEConfig Config { get { return _config ?? (_config = new PVEConfig(_client, _node, _vmid)); } }
+                        public PVEConfig Config => _config ?? (_config = new PVEConfig(_client, _node, _vmid));
                         private PVEStatus _status;
-                        public PVEStatus Status { get { return _status ?? (_status = new PVEStatus(_client, _node, _vmid)); } }
+                        public PVEStatus Status => _status ?? (_status = new PVEStatus(_client, _node, _vmid));
                         private PVESnapshot _snapshot;
-                        public PVESnapshot Snapshot { get { return _snapshot ?? (_snapshot = new PVESnapshot(_client, _node, _vmid)); } }
+                        public PVESnapshot Snapshot => _snapshot ?? (_snapshot = new PVESnapshot(_client, _node, _vmid));
                         private PVEFirewall _firewall;
-                        public PVEFirewall Firewall { get { return _firewall ?? (_firewall = new PVEFirewall(_client, _node, _vmid)); } }
+                        public PVEFirewall Firewall => _firewall ?? (_firewall = new PVEFirewall(_client, _node, _vmid));
                         private PVERrd _rrd;
-                        public PVERrd Rrd { get { return _rrd ?? (_rrd = new PVERrd(_client, _node, _vmid)); } }
+                        public PVERrd Rrd => _rrd ?? (_rrd = new PVERrd(_client, _node, _vmid));
                         private PVERrddata _rrddata;
-                        public PVERrddata Rrddata { get { return _rrddata ?? (_rrddata = new PVERrddata(_client, _node, _vmid)); } }
+                        public PVERrddata Rrddata => _rrddata ?? (_rrddata = new PVERrddata(_client, _node, _vmid));
                         private PVEVncproxy _vncproxy;
-                        public PVEVncproxy Vncproxy { get { return _vncproxy ?? (_vncproxy = new PVEVncproxy(_client, _node, _vmid)); } }
+                        public PVEVncproxy Vncproxy => _vncproxy ?? (_vncproxy = new PVEVncproxy(_client, _node, _vmid));
                         private PVETermproxy _termproxy;
-                        public PVETermproxy Termproxy { get { return _termproxy ?? (_termproxy = new PVETermproxy(_client, _node, _vmid)); } }
+                        public PVETermproxy Termproxy => _termproxy ?? (_termproxy = new PVETermproxy(_client, _node, _vmid));
                         private PVEVncwebsocket _vncwebsocket;
-                        public PVEVncwebsocket Vncwebsocket { get { return _vncwebsocket ?? (_vncwebsocket = new PVEVncwebsocket(_client, _node, _vmid)); } }
+                        public PVEVncwebsocket Vncwebsocket => _vncwebsocket ?? (_vncwebsocket = new PVEVncwebsocket(_client, _node, _vmid));
                         private PVESpiceproxy _spiceproxy;
-                        public PVESpiceproxy Spiceproxy { get { return _spiceproxy ?? (_spiceproxy = new PVESpiceproxy(_client, _node, _vmid)); } }
+                        public PVESpiceproxy Spiceproxy => _spiceproxy ?? (_spiceproxy = new PVESpiceproxy(_client, _node, _vmid));
                         private PVEMigrate _migrate;
-                        public PVEMigrate Migrate { get { return _migrate ?? (_migrate = new PVEMigrate(_client, _node, _vmid)); } }
+                        public PVEMigrate Migrate => _migrate ?? (_migrate = new PVEMigrate(_client, _node, _vmid));
                         private PVEFeature _feature;
-                        public PVEFeature Feature { get { return _feature ?? (_feature = new PVEFeature(_client, _node, _vmid)); } }
+                        public PVEFeature Feature => _feature ?? (_feature = new PVEFeature(_client, _node, _vmid));
                         private PVETemplate _template;
-                        public PVETemplate Template { get { return _template ?? (_template = new PVETemplate(_client, _node, _vmid)); } }
+                        public PVETemplate Template => _template ?? (_template = new PVETemplate(_client, _node, _vmid));
                         private PVEClone _clone;
-                        public PVEClone Clone { get { return _clone ?? (_clone = new PVEClone(_client, _node, _vmid)); } }
+                        public PVEClone Clone => _clone ?? (_clone = new PVEClone(_client, _node, _vmid));
                         private PVEResize _resize;
-                        public PVEResize Resize { get { return _resize ?? (_resize = new PVEResize(_client, _node, _vmid)); } }
+                        public PVEResize Resize => _resize ?? (_resize = new PVEResize(_client, _node, _vmid));
                         private PVEMoveVolume _moveVolume;
-                        public PVEMoveVolume MoveVolume { get { return _moveVolume ?? (_moveVolume = new PVEMoveVolume(_client, _node, _vmid)); } }
+                        public PVEMoveVolume MoveVolume => _moveVolume ?? (_moveVolume = new PVEMoveVolume(_client, _node, _vmid));
                         public class PVEConfig : Base
                         {
                             private object _node;
@@ -5861,17 +5867,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 _vmid = vmid;
                             }
                             private PVECurrent _current;
-                            public PVECurrent Current { get { return _current ?? (_current = new PVECurrent(_client, _node, _vmid)); } }
+                            public PVECurrent Current => _current ?? (_current = new PVECurrent(_client, _node, _vmid));
                             private PVEStart _start;
-                            public PVEStart Start { get { return _start ?? (_start = new PVEStart(_client, _node, _vmid)); } }
+                            public PVEStart Start => _start ?? (_start = new PVEStart(_client, _node, _vmid));
                             private PVEStop _stop;
-                            public PVEStop Stop { get { return _stop ?? (_stop = new PVEStop(_client, _node, _vmid)); } }
+                            public PVEStop Stop => _stop ?? (_stop = new PVEStop(_client, _node, _vmid));
                             private PVEShutdown _shutdown;
-                            public PVEShutdown Shutdown { get { return _shutdown ?? (_shutdown = new PVEShutdown(_client, _node, _vmid)); } }
+                            public PVEShutdown Shutdown => _shutdown ?? (_shutdown = new PVEShutdown(_client, _node, _vmid));
                             private PVESuspend _suspend;
-                            public PVESuspend Suspend { get { return _suspend ?? (_suspend = new PVESuspend(_client, _node, _vmid)); } }
+                            public PVESuspend Suspend => _suspend ?? (_suspend = new PVESuspend(_client, _node, _vmid));
                             private PVEResume _resume;
-                            public PVEResume Resume { get { return _resume ?? (_resume = new PVEResume(_client, _node, _vmid)); } }
+                            public PVEResume Resume => _resume ?? (_resume = new PVEResume(_client, _node, _vmid));
                             public class PVECurrent : Base
                             {
                                 private object _node;
@@ -6055,7 +6061,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 _node = node;
                                 _vmid = vmid;
                             }
-                            public PVEItemSnapname this[object snapname] { get { return new PVEItemSnapname(_client, _node, _vmid, snapname); } }
+                            public PVEItemSnapname this[object snapname] => new PVEItemSnapname(_client, _node, _vmid, snapname);
                             public class PVEItemSnapname : Base
                             {
                                 private object _node;
@@ -6069,9 +6075,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     _snapname = snapname;
                                 }
                                 private PVERollback _rollback;
-                                public PVERollback Rollback { get { return _rollback ?? (_rollback = new PVERollback(_client, _node, _vmid, _snapname)); } }
+                                public PVERollback Rollback => _rollback ?? (_rollback = new PVERollback(_client, _node, _vmid, _snapname));
                                 private PVEConfig _config;
-                                public PVEConfig Config { get { return _config ?? (_config = new PVEConfig(_client, _node, _vmid, _snapname)); } }
+                                public PVEConfig Config => _config ?? (_config = new PVEConfig(_client, _node, _vmid, _snapname));
                                 public class PVERollback : Base
                                 {
                                     private object _node;
@@ -6217,17 +6223,17 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 _vmid = vmid;
                             }
                             private PVERules _rules;
-                            public PVERules Rules { get { return _rules ?? (_rules = new PVERules(_client, _node, _vmid)); } }
+                            public PVERules Rules => _rules ?? (_rules = new PVERules(_client, _node, _vmid));
                             private PVEAliases _aliases;
-                            public PVEAliases Aliases { get { return _aliases ?? (_aliases = new PVEAliases(_client, _node, _vmid)); } }
+                            public PVEAliases Aliases => _aliases ?? (_aliases = new PVEAliases(_client, _node, _vmid));
                             private PVEIpset _ipset;
-                            public PVEIpset Ipset { get { return _ipset ?? (_ipset = new PVEIpset(_client, _node, _vmid)); } }
+                            public PVEIpset Ipset => _ipset ?? (_ipset = new PVEIpset(_client, _node, _vmid));
                             private PVEOptions _options;
-                            public PVEOptions Options { get { return _options ?? (_options = new PVEOptions(_client, _node, _vmid)); } }
+                            public PVEOptions Options => _options ?? (_options = new PVEOptions(_client, _node, _vmid));
                             private PVELog _log;
-                            public PVELog Log { get { return _log ?? (_log = new PVELog(_client, _node, _vmid)); } }
+                            public PVELog Log => _log ?? (_log = new PVELog(_client, _node, _vmid));
                             private PVERefs _refs;
-                            public PVERefs Refs { get { return _refs ?? (_refs = new PVERefs(_client, _node, _vmid)); } }
+                            public PVERefs Refs => _refs ?? (_refs = new PVERefs(_client, _node, _vmid));
                             public class PVERules : Base
                             {
                                 private object _node;
@@ -6238,7 +6244,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     _node = node;
                                     _vmid = vmid;
                                 }
-                                public PVEItemPos this[object pos] { get { return new PVEItemPos(_client, _node, _vmid, pos); } }
+                                public PVEItemPos this[object pos] => new PVEItemPos(_client, _node, _vmid, pos);
                                 public class PVEItemPos : Base
                                 {
                                     private object _node;
@@ -6419,7 +6425,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     _node = node;
                                     _vmid = vmid;
                                 }
-                                public PVEItemName this[object name] { get { return new PVEItemName(_client, _node, _vmid, name); } }
+                                public PVEItemName this[object name] => new PVEItemName(_client, _node, _vmid, name);
                                 public class PVEItemName : Base
                                 {
                                     private object _node;
@@ -6536,7 +6542,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                     _node = node;
                                     _vmid = vmid;
                                 }
-                                public PVEItemName this[object name] { get { return new PVEItemName(_client, _node, _vmid, name); } }
+                                public PVEItemName this[object name] => new PVEItemName(_client, _node, _vmid, name);
                                 public class PVEItemName : Base
                                 {
                                     private object _node;
@@ -6549,7 +6555,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                         _vmid = vmid;
                                         _name = name;
                                     }
-                                    public PVEItemCidr this[object cidr] { get { return new PVEItemCidr(_client, _node, _vmid, _name, cidr); } }
+                                    public PVEItemCidr this[object cidr] => new PVEItemCidr(_client, _node, _vmid, _name, cidr);
                                     public class PVEItemCidr : Base
                                     {
                                         private object _node;
@@ -7350,6 +7356,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="rootfs">Use volume as container root.</param>
                     /// <param name="searchdomain">Sets DNS search domains for a container. Create will automatically use the setting from the host if you neither set searchdomain nor nameserver.</param>
                     /// <param name="ssh_public_keys">Setup public SSH keys (one key per line, OpenSSH format).</param>
+                    /// <param name="start">Start the CT after its creation finished successfully.</param>
                     /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                     /// <param name="storage">Default Storage.</param>
                     /// <param name="swap">Amount of SWAP for the VM in MB.</param>
@@ -7358,7 +7365,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
                     /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string ostemplate, int vmid, string arch = null, int? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, string startup = null, string storage = null, int? swap = null, bool? template = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
+                    public Result CreateRest(string ostemplate, int vmid, string arch = null, int? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, bool? start = null, string startup = null, string storage = null, int? swap = null, bool? template = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("ostemplate", ostemplate);
@@ -7386,6 +7393,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         parameters.Add("rootfs", rootfs);
                         parameters.Add("searchdomain", searchdomain);
                         parameters.Add("ssh-public-keys", ssh_public_keys);
+                        parameters.Add("start", start);
                         parameters.Add("startup", startup);
                         parameters.Add("storage", storage);
                         parameters.Add("swap", swap);
@@ -7431,6 +7439,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="rootfs">Use volume as container root.</param>
                     /// <param name="searchdomain">Sets DNS search domains for a container. Create will automatically use the setting from the host if you neither set searchdomain nor nameserver.</param>
                     /// <param name="ssh_public_keys">Setup public SSH keys (one key per line, OpenSSH format).</param>
+                    /// <param name="start">Start the CT after its creation finished successfully.</param>
                     /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                     /// <param name="storage">Default Storage.</param>
                     /// <param name="swap">Amount of SWAP for the VM in MB.</param>
@@ -7439,7 +7448,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
                     /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                     /// <returns></returns>
-                    public Result CreateVm(string ostemplate, int vmid, string arch = null, int? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, string startup = null, string storage = null, int? swap = null, bool? template = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null) { return CreateRest(ostemplate, vmid, arch, bwlimit, cmode, console, cores, cpulimit, cpuunits, description, force, hostname, ignore_unpack_errors, lock_, memory, mpN, nameserver, netN, onboot, ostype, password, pool, protection, restore, rootfs, searchdomain, ssh_public_keys, startup, storage, swap, template, tty, unprivileged, unusedN); }
+                    public Result CreateVm(string ostemplate, int vmid, string arch = null, int? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string description = null, bool? force = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, bool? start = null, string startup = null, string storage = null, int? swap = null, bool? template = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null) { return CreateRest(ostemplate, vmid, arch, bwlimit, cmode, console, cores, cpulimit, cpuunits, description, force, hostname, ignore_unpack_errors, lock_, memory, mpN, nameserver, netN, onboot, ostype, password, pool, protection, restore, rootfs, searchdomain, ssh_public_keys, start, startup, storage, swap, template, tty, unprivileged, unusedN); }
                 }
                 public class PVECeph : Base
                 {
@@ -7450,33 +7459,33 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         _node = node;
                     }
                     private PVEOsd _osd;
-                    public PVEOsd Osd { get { return _osd ?? (_osd = new PVEOsd(_client, _node)); } }
+                    public PVEOsd Osd => _osd ?? (_osd = new PVEOsd(_client, _node));
                     private PVEDisks _disks;
-                    public PVEDisks Disks { get { return _disks ?? (_disks = new PVEDisks(_client, _node)); } }
+                    public PVEDisks Disks => _disks ?? (_disks = new PVEDisks(_client, _node));
                     private PVEConfig _config;
-                    public PVEConfig Config { get { return _config ?? (_config = new PVEConfig(_client, _node)); } }
+                    public PVEConfig Config => _config ?? (_config = new PVEConfig(_client, _node));
                     private PVEMon _mon;
-                    public PVEMon Mon { get { return _mon ?? (_mon = new PVEMon(_client, _node)); } }
+                    public PVEMon Mon => _mon ?? (_mon = new PVEMon(_client, _node));
                     private PVEInit _init;
-                    public PVEInit Init { get { return _init ?? (_init = new PVEInit(_client, _node)); } }
+                    public PVEInit Init => _init ?? (_init = new PVEInit(_client, _node));
                     private PVEMgr _mgr;
-                    public PVEMgr Mgr { get { return _mgr ?? (_mgr = new PVEMgr(_client, _node)); } }
+                    public PVEMgr Mgr => _mgr ?? (_mgr = new PVEMgr(_client, _node));
                     private PVEStop _stop;
-                    public PVEStop Stop { get { return _stop ?? (_stop = new PVEStop(_client, _node)); } }
+                    public PVEStop Stop => _stop ?? (_stop = new PVEStop(_client, _node));
                     private PVEStart _start;
-                    public PVEStart Start { get { return _start ?? (_start = new PVEStart(_client, _node)); } }
+                    public PVEStart Start => _start ?? (_start = new PVEStart(_client, _node));
                     private PVEStatus _status;
-                    public PVEStatus Status { get { return _status ?? (_status = new PVEStatus(_client, _node)); } }
+                    public PVEStatus Status => _status ?? (_status = new PVEStatus(_client, _node));
                     private PVEPools _pools;
-                    public PVEPools Pools { get { return _pools ?? (_pools = new PVEPools(_client, _node)); } }
+                    public PVEPools Pools => _pools ?? (_pools = new PVEPools(_client, _node));
                     private PVEFlags _flags;
-                    public PVEFlags Flags { get { return _flags ?? (_flags = new PVEFlags(_client, _node)); } }
+                    public PVEFlags Flags => _flags ?? (_flags = new PVEFlags(_client, _node));
                     private PVECrush _crush;
-                    public PVECrush Crush { get { return _crush ?? (_crush = new PVECrush(_client, _node)); } }
+                    public PVECrush Crush => _crush ?? (_crush = new PVECrush(_client, _node));
                     private PVELog _log;
-                    public PVELog Log { get { return _log ?? (_log = new PVELog(_client, _node)); } }
+                    public PVELog Log => _log ?? (_log = new PVELog(_client, _node));
                     private PVERules _rules;
-                    public PVERules Rules { get { return _rules ?? (_rules = new PVERules(_client, _node)); } }
+                    public PVERules Rules => _rules ?? (_rules = new PVERules(_client, _node));
                     public class PVEOsd : Base
                     {
                         private object _node;
@@ -7485,7 +7494,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             _client = client;
                             _node = node;
                         }
-                        public PVEItemOsdid this[object osdid] { get { return new PVEItemOsdid(_client, _node, osdid); } }
+                        public PVEItemOsdid this[object osdid] => new PVEItemOsdid(_client, _node, osdid);
                         public class PVEItemOsdid : Base
                         {
                             private object _node;
@@ -7497,9 +7506,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 _osdid = osdid;
                             }
                             private PVEIn _in;
-                            public PVEIn In { get { return _in ?? (_in = new PVEIn(_client, _node, _osdid)); } }
+                            public PVEIn In => _in ?? (_in = new PVEIn(_client, _node, _osdid));
                             private PVEOut _out;
-                            public PVEOut Out { get { return _out ?? (_out = new PVEOut(_client, _node, _osdid)); } }
+                            public PVEOut Out => _out ?? (_out = new PVEOut(_client, _node, _osdid));
                             public class PVEIn : Base
                             {
                                 private object _node;
@@ -7669,7 +7678,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             _client = client;
                             _node = node;
                         }
-                        public PVEItemMonid this[object monid] { get { return new PVEItemMonid(_client, _node, monid); } }
+                        public PVEItemMonid this[object monid] => new PVEItemMonid(_client, _node, monid);
                         public class PVEItemMonid : Base
                         {
                             private object _node;
@@ -7781,7 +7790,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             _client = client;
                             _node = node;
                         }
-                        public PVEItemId this[object id] { get { return new PVEItemId(_client, _node, id); } }
+                        public PVEItemId this[object id] => new PVEItemId(_client, _node, id);
                         public class PVEItemId : Base
                         {
                             private object _node;
@@ -7906,7 +7915,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             _client = client;
                             _node = node;
                         }
-                        public PVEItemName this[object name] { get { return new PVEItemName(_client, _node, name); } }
+                        public PVEItemName this[object name] => new PVEItemName(_client, _node, name);
                         public class PVEItemName : Base
                         {
                             private object _node;
@@ -7997,7 +8006,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             _client = client;
                             _node = node;
                         }
-                        public PVEItemFlag this[object flag] { get { return new PVEItemFlag(_client, _node, flag); } }
+                        public PVEItemFlag this[object flag] => new PVEItemFlag(_client, _node, flag);
                         public class PVEItemFlag : Base
                         {
                             private object _node;
@@ -8145,7 +8154,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         _node = node;
                     }
                     private PVEExtractconfig _extractconfig;
-                    public PVEExtractconfig Extractconfig { get { return _extractconfig ?? (_extractconfig = new PVEExtractconfig(_client, _node)); } }
+                    public PVEExtractconfig Extractconfig => _extractconfig ?? (_extractconfig = new PVEExtractconfig(_client, _node));
                     public class PVEExtractconfig : Base
                     {
                         private object _node;
@@ -8273,7 +8282,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         _client = client;
                         _node = node;
                     }
-                    public PVEItemService this[object service] { get { return new PVEItemService(_client, _node, service); } }
+                    public PVEItemService this[object service] => new PVEItemService(_client, _node, service);
                     public class PVEItemService : Base
                     {
                         private object _node;
@@ -8285,15 +8294,15 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             _service = service;
                         }
                         private PVEState _state;
-                        public PVEState State { get { return _state ?? (_state = new PVEState(_client, _node, _service)); } }
+                        public PVEState State => _state ?? (_state = new PVEState(_client, _node, _service));
                         private PVEStart _start;
-                        public PVEStart Start { get { return _start ?? (_start = new PVEStart(_client, _node, _service)); } }
+                        public PVEStart Start => _start ?? (_start = new PVEStart(_client, _node, _service));
                         private PVEStop _stop;
-                        public PVEStop Stop { get { return _stop ?? (_stop = new PVEStop(_client, _node, _service)); } }
+                        public PVEStop Stop => _stop ?? (_stop = new PVEStop(_client, _node, _service));
                         private PVERestart _restart;
-                        public PVERestart Restart { get { return _restart ?? (_restart = new PVERestart(_client, _node, _service)); } }
+                        public PVERestart Restart => _restart ?? (_restart = new PVERestart(_client, _node, _service));
                         private PVEReload _reload;
-                        public PVEReload Reload { get { return _reload ?? (_reload = new PVEReload(_client, _node, _service)); } }
+                        public PVEReload Reload => _reload ?? (_reload = new PVEReload(_client, _node, _service));
                         public class PVEState : Base
                         {
                             private object _node;
@@ -8506,7 +8515,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         _client = client;
                         _node = node;
                     }
-                    public PVEItemIface this[object iface] { get { return new PVEItemIface(_client, _node, iface); } }
+                    public PVEItemIface this[object iface] => new PVEItemIface(_client, _node, iface);
                     public class PVEItemIface : Base
                     {
                         private object _node;
@@ -8751,7 +8760,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         _client = client;
                         _node = node;
                     }
-                    public PVEItemUpid this[object upid] { get { return new PVEItemUpid(_client, _node, upid); } }
+                    public PVEItemUpid this[object upid] => new PVEItemUpid(_client, _node, upid);
                     public class PVEItemUpid : Base
                     {
                         private object _node;
@@ -8763,9 +8772,9 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             _upid = upid;
                         }
                         private PVELog _log;
-                        public PVELog Log { get { return _log ?? (_log = new PVELog(_client, _node, _upid)); } }
+                        public PVELog Log => _log ?? (_log = new PVELog(_client, _node, _upid));
                         private PVEStatus _status;
-                        public PVEStatus Status { get { return _status ?? (_status = new PVEStatus(_client, _node, _upid)); } }
+                        public PVEStatus Status => _status ?? (_status = new PVEStatus(_client, _node, _upid));
                         public class PVELog : Base
                         {
                             private object _node;
@@ -8887,21 +8896,21 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         _node = node;
                     }
                     private PVEZfs _zfs;
-                    public PVEZfs Zfs { get { return _zfs ?? (_zfs = new PVEZfs(_client, _node)); } }
+                    public PVEZfs Zfs => _zfs ?? (_zfs = new PVEZfs(_client, _node));
                     private PVENfs _nfs;
-                    public PVENfs Nfs { get { return _nfs ?? (_nfs = new PVENfs(_client, _node)); } }
+                    public PVENfs Nfs => _nfs ?? (_nfs = new PVENfs(_client, _node));
                     private PVECifs _cifs;
-                    public PVECifs Cifs { get { return _cifs ?? (_cifs = new PVECifs(_client, _node)); } }
+                    public PVECifs Cifs => _cifs ?? (_cifs = new PVECifs(_client, _node));
                     private PVEGlusterfs _glusterfs;
-                    public PVEGlusterfs Glusterfs { get { return _glusterfs ?? (_glusterfs = new PVEGlusterfs(_client, _node)); } }
+                    public PVEGlusterfs Glusterfs => _glusterfs ?? (_glusterfs = new PVEGlusterfs(_client, _node));
                     private PVEIscsi _iscsi;
-                    public PVEIscsi Iscsi { get { return _iscsi ?? (_iscsi = new PVEIscsi(_client, _node)); } }
+                    public PVEIscsi Iscsi => _iscsi ?? (_iscsi = new PVEIscsi(_client, _node));
                     private PVELvm _lvm;
-                    public PVELvm Lvm { get { return _lvm ?? (_lvm = new PVELvm(_client, _node)); } }
+                    public PVELvm Lvm => _lvm ?? (_lvm = new PVELvm(_client, _node));
                     private PVELvmthin _lvmthin;
-                    public PVELvmthin Lvmthin { get { return _lvmthin ?? (_lvmthin = new PVELvmthin(_client, _node)); } }
+                    public PVELvmthin Lvmthin => _lvmthin ?? (_lvmthin = new PVELvmthin(_client, _node));
                     private PVEUsb _usb;
-                    public PVEUsb Usb { get { return _usb ?? (_usb = new PVEUsb(_client, _node)); } }
+                    public PVEUsb Usb => _usb ?? (_usb = new PVEUsb(_client, _node));
                     public class PVEZfs : Base
                     {
                         private object _node;
@@ -9129,7 +9138,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         _client = client;
                         _node = node;
                     }
-                    public PVEItemStorage this[object storage] { get { return new PVEItemStorage(_client, _node, storage); } }
+                    public PVEItemStorage this[object storage] => new PVEItemStorage(_client, _node, storage);
                     public class PVEItemStorage : Base
                     {
                         private object _node;
@@ -9141,15 +9150,15 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             _storage = storage;
                         }
                         private PVEContent _content;
-                        public PVEContent Content { get { return _content ?? (_content = new PVEContent(_client, _node, _storage)); } }
+                        public PVEContent Content => _content ?? (_content = new PVEContent(_client, _node, _storage));
                         private PVEStatus _status;
-                        public PVEStatus Status { get { return _status ?? (_status = new PVEStatus(_client, _node, _storage)); } }
+                        public PVEStatus Status => _status ?? (_status = new PVEStatus(_client, _node, _storage));
                         private PVERrd _rrd;
-                        public PVERrd Rrd { get { return _rrd ?? (_rrd = new PVERrd(_client, _node, _storage)); } }
+                        public PVERrd Rrd => _rrd ?? (_rrd = new PVERrd(_client, _node, _storage));
                         private PVERrddata _rrddata;
-                        public PVERrddata Rrddata { get { return _rrddata ?? (_rrddata = new PVERrddata(_client, _node, _storage)); } }
+                        public PVERrddata Rrddata => _rrddata ?? (_rrddata = new PVERrddata(_client, _node, _storage));
                         private PVEUpload _upload;
-                        public PVEUpload Upload { get { return _upload ?? (_upload = new PVEUpload(_client, _node, _storage)); } }
+                        public PVEUpload Upload => _upload ?? (_upload = new PVEUpload(_client, _node, _storage));
                         public class PVEContent : Base
                         {
                             private object _node;
@@ -9160,7 +9169,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                                 _node = node;
                                 _storage = storage;
                             }
-                            public PVEItemVolume this[object volume] { get { return new PVEItemVolume(_client, _node, _storage, volume); } }
+                            public PVEItemVolume this[object volume] => new PVEItemVolume(_client, _node, _storage, volume);
                             public class PVEItemVolume : Base
                             {
                                 private object _node;
@@ -9453,11 +9462,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         _node = node;
                     }
                     private PVEList _list;
-                    public PVEList List { get { return _list ?? (_list = new PVEList(_client, _node)); } }
+                    public PVEList List => _list ?? (_list = new PVEList(_client, _node));
                     private PVESmart _smart;
-                    public PVESmart Smart { get { return _smart ?? (_smart = new PVESmart(_client, _node)); } }
+                    public PVESmart Smart => _smart ?? (_smart = new PVESmart(_client, _node));
                     private PVEInitgpt _initgpt;
-                    public PVEInitgpt Initgpt { get { return _initgpt ?? (_initgpt = new PVEInitgpt(_client, _node)); } }
+                    public PVEInitgpt Initgpt => _initgpt ?? (_initgpt = new PVEInitgpt(_client, _node));
                     public class PVEList : Base
                     {
                         private object _node;
@@ -9561,11 +9570,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         _node = node;
                     }
                     private PVEUpdate _update;
-                    public PVEUpdate Update { get { return _update ?? (_update = new PVEUpdate(_client, _node)); } }
+                    public PVEUpdate Update => _update ?? (_update = new PVEUpdate(_client, _node));
                     private PVEChangelog _changelog;
-                    public PVEChangelog Changelog { get { return _changelog ?? (_changelog = new PVEChangelog(_client, _node)); } }
+                    public PVEChangelog Changelog => _changelog ?? (_changelog = new PVEChangelog(_client, _node));
                     private PVEVersions _versions;
-                    public PVEVersions Versions { get { return _versions ?? (_versions = new PVEVersions(_client, _node)); } }
+                    public PVEVersions Versions => _versions ?? (_versions = new PVEVersions(_client, _node));
                     public class PVEUpdate : Base
                     {
                         private object _node;
@@ -9682,11 +9691,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         _node = node;
                     }
                     private PVERules _rules;
-                    public PVERules Rules { get { return _rules ?? (_rules = new PVERules(_client, _node)); } }
+                    public PVERules Rules => _rules ?? (_rules = new PVERules(_client, _node));
                     private PVEOptions _options;
-                    public PVEOptions Options { get { return _options ?? (_options = new PVEOptions(_client, _node)); } }
+                    public PVEOptions Options => _options ?? (_options = new PVEOptions(_client, _node));
                     private PVELog _log;
-                    public PVELog Log { get { return _log ?? (_log = new PVELog(_client, _node)); } }
+                    public PVELog Log => _log ?? (_log = new PVELog(_client, _node));
                     public class PVERules : Base
                     {
                         private object _node;
@@ -9695,7 +9704,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             _client = client;
                             _node = node;
                         }
-                        public PVEItemPos this[object pos] { get { return new PVEItemPos(_client, _node, pos); } }
+                        public PVEItemPos this[object pos] => new PVEItemPos(_client, _node, pos);
                         public class PVEItemPos : Base
                         {
                             private object _node;
@@ -9995,7 +10004,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         _client = client;
                         _node = node;
                     }
-                    public PVEItemId this[object id] { get { return new PVEItemId(_client, _node, id); } }
+                    public PVEItemId this[object id] => new PVEItemId(_client, _node, id);
                     public class PVEItemId : Base
                     {
                         private object _node;
@@ -10007,11 +10016,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             _id = id;
                         }
                         private PVEStatus _status;
-                        public PVEStatus Status { get { return _status ?? (_status = new PVEStatus(_client, _node, _id)); } }
+                        public PVEStatus Status => _status ?? (_status = new PVEStatus(_client, _node, _id));
                         private PVELog _log;
-                        public PVELog Log { get { return _log ?? (_log = new PVELog(_client, _node, _id)); } }
+                        public PVELog Log => _log ?? (_log = new PVELog(_client, _node, _id));
                         private PVEScheduleNow _scheduleNow;
-                        public PVEScheduleNow ScheduleNow { get { return _scheduleNow ?? (_scheduleNow = new PVEScheduleNow(_client, _node, _id)); } }
+                        public PVEScheduleNow ScheduleNow => _scheduleNow ?? (_scheduleNow = new PVEScheduleNow(_client, _node, _id));
                         public class PVEStatus : Base
                         {
                             private object _node;
@@ -10132,11 +10141,11 @@ namespace EnterpriseVE.ProxmoxVE.Api
                         _node = node;
                     }
                     private PVEAcme _acme;
-                    public PVEAcme Acme { get { return _acme ?? (_acme = new PVEAcme(_client, _node)); } }
+                    public PVEAcme Acme => _acme ?? (_acme = new PVEAcme(_client, _node));
                     private PVEInfo _info;
-                    public PVEInfo Info { get { return _info ?? (_info = new PVEInfo(_client, _node)); } }
+                    public PVEInfo Info => _info ?? (_info = new PVEInfo(_client, _node));
                     private PVECustom _custom;
-                    public PVECustom Custom { get { return _custom ?? (_custom = new PVECustom(_client, _node)); } }
+                    public PVECustom Custom => _custom ?? (_custom = new PVECustom(_client, _node));
                     public class PVEAcme : Base
                     {
                         private object _node;
@@ -10146,7 +10155,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                             _node = node;
                         }
                         private PVECertificate _certificate;
-                        public PVECertificate Certificate { get { return _certificate ?? (_certificate = new PVECertificate(_client, _node)); } }
+                        public PVECertificate Certificate => _certificate ?? (_certificate = new PVECertificate(_client, _node));
                         public class PVECertificate : Base
                         {
                             private object _node;
@@ -10962,7 +10971,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             {
                 _client = client;
             }
-            public PVEItemStorage this[object storage] { get { return new PVEItemStorage(_client, storage); } }
+            public PVEItemStorage this[object storage] => new PVEItemStorage(_client, storage);
             public class PVEItemStorage : Base
             {
                 private object _storage;
@@ -11010,6 +11019,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="disable">Flag to disable the storage.</param>
                 /// <param name="domain">CIFS domain.</param>
                 /// <param name="format">Default image format.</param>
+                /// <param name="fuse">Mount CephFS through FUSE.</param>
                 /// <param name="is_mountpoint">Assume the given path is an externally managed mountpoint and consider the storage offline if it is not mounted. Using a boolean (yes/no) value serves as a shortcut to using the target path in this field.</param>
                 /// <param name="krbd">Access rbd through krbd kernel module.</param>
                 /// <param name="maxfiles">Maximal number of backup files per VM. Use '0' for unlimted.</param>
@@ -11026,14 +11036,16 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="server">Server IP or DNS name.</param>
                 /// <param name="server2">Backup volfile server IP or DNS name.</param>
                 /// <param name="shared">Mark storage as shared.</param>
-                /// <param name="smbversion"></param>
+                /// <param name="smbversion">SMB protocol version
+                ///   Enum: 2.0,2.1,3.0</param>
                 /// <param name="sparse">use sparse volumes</param>
+                /// <param name="subdir">Subdir to mount.</param>
                 /// <param name="tagged_only">Only use logical volumes tagged with 'pve-vm-ID'.</param>
                 /// <param name="transport">Gluster transport: tcp or rdma
                 ///   Enum: tcp,rdma,unix</param>
                 /// <param name="username">RBD Id.</param>
                 /// <returns></returns>
-                public Result SetRest(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string format = null, string is_mountpoint = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, bool? tagged_only = null, string transport = null, string username = null)
+                public Result SetRest(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string format = null, bool? fuse = null, string is_mountpoint = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("blocksize", blocksize);
@@ -11046,6 +11058,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("disable", disable);
                     parameters.Add("domain", domain);
                     parameters.Add("format", format);
+                    parameters.Add("fuse", fuse);
                     parameters.Add("is_mountpoint", is_mountpoint);
                     parameters.Add("krbd", krbd);
                     parameters.Add("maxfiles", maxfiles);
@@ -11064,6 +11077,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                     parameters.Add("shared", shared);
                     parameters.Add("smbversion", smbversion);
                     parameters.Add("sparse", sparse);
+                    parameters.Add("subdir", subdir);
                     parameters.Add("tagged_only", tagged_only);
                     parameters.Add("transport", transport);
                     parameters.Add("username", username);
@@ -11082,6 +11096,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="disable">Flag to disable the storage.</param>
                 /// <param name="domain">CIFS domain.</param>
                 /// <param name="format">Default image format.</param>
+                /// <param name="fuse">Mount CephFS through FUSE.</param>
                 /// <param name="is_mountpoint">Assume the given path is an externally managed mountpoint and consider the storage offline if it is not mounted. Using a boolean (yes/no) value serves as a shortcut to using the target path in this field.</param>
                 /// <param name="krbd">Access rbd through krbd kernel module.</param>
                 /// <param name="maxfiles">Maximal number of backup files per VM. Use '0' for unlimted.</param>
@@ -11098,20 +11113,22 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 /// <param name="server">Server IP or DNS name.</param>
                 /// <param name="server2">Backup volfile server IP or DNS name.</param>
                 /// <param name="shared">Mark storage as shared.</param>
-                /// <param name="smbversion"></param>
+                /// <param name="smbversion">SMB protocol version
+                ///   Enum: 2.0,2.1,3.0</param>
                 /// <param name="sparse">use sparse volumes</param>
+                /// <param name="subdir">Subdir to mount.</param>
                 /// <param name="tagged_only">Only use logical volumes tagged with 'pve-vm-ID'.</param>
                 /// <param name="transport">Gluster transport: tcp or rdma
                 ///   Enum: tcp,rdma,unix</param>
                 /// <param name="username">RBD Id.</param>
                 /// <returns></returns>
-                public Result Update(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string format = null, string is_mountpoint = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, bool? tagged_only = null, string transport = null, string username = null) { return SetRest(blocksize, bwlimit, comstar_hg, comstar_tg, content, delete, digest, disable, domain, format, is_mountpoint, krbd, maxfiles, mkdir, monhost, nodes, nowritecache, options, password, pool, redundancy, saferemove, saferemove_throughput, server, server2, shared, smbversion, sparse, tagged_only, transport, username); }
+                public Result Update(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string format = null, bool? fuse = null, string is_mountpoint = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null) { return SetRest(blocksize, bwlimit, comstar_hg, comstar_tg, content, delete, digest, disable, domain, format, fuse, is_mountpoint, krbd, maxfiles, mkdir, monhost, nodes, nowritecache, options, password, pool, redundancy, saferemove, saferemove_throughput, server, server2, shared, smbversion, sparse, subdir, tagged_only, transport, username); }
             }
             /// <summary>
             /// Storage index.
             /// </summary>
             /// <param name="type">Only list storage of specific type
-            ///   Enum: cifs,dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
+            ///   Enum: cephfs,cifs,dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
             /// <returns></returns>
             public Result GetRest(string type = null)
             {
@@ -11123,7 +11140,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// Storage index.
             /// </summary>
             /// <param name="type">Only list storage of specific type
-            ///   Enum: cifs,dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
+            ///   Enum: cephfs,cifs,dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
             /// <returns></returns>
             public Result Index(string type = null) { return GetRest(type); }
             /// <summary>
@@ -11131,7 +11148,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// </summary>
             /// <param name="storage">The storage identifier.</param>
             /// <param name="type">Storage type.
-            ///   Enum: cifs,dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
+            ///   Enum: cephfs,cifs,dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
             /// <param name="authsupported">Authsupported.</param>
             /// <param name="base_">Base volume. This volume is automatically activated.</param>
             /// <param name="blocksize">block size</param>
@@ -11143,6 +11160,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <param name="domain">CIFS domain.</param>
             /// <param name="export">NFS export path.</param>
             /// <param name="format">Default image format.</param>
+            /// <param name="fuse">Mount CephFS through FUSE.</param>
             /// <param name="is_mountpoint">Assume the given path is an externally managed mountpoint and consider the storage offline if it is not mounted. Using a boolean (yes/no) value serves as a shortcut to using the target path in this field.</param>
             /// <param name="iscsiprovider">iscsi provider</param>
             /// <param name="krbd">Access rbd through krbd kernel module.</param>
@@ -11163,8 +11181,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <param name="server2">Backup volfile server IP or DNS name.</param>
             /// <param name="share">CIFS share.</param>
             /// <param name="shared">Mark storage as shared.</param>
-            /// <param name="smbversion"></param>
+            /// <param name="smbversion">SMB protocol version
+            ///   Enum: 2.0,2.1,3.0</param>
             /// <param name="sparse">use sparse volumes</param>
+            /// <param name="subdir">Subdir to mount.</param>
             /// <param name="tagged_only">Only use logical volumes tagged with 'pve-vm-ID'.</param>
             /// <param name="target">iSCSI target.</param>
             /// <param name="thinpool">LVM thin pool LV name.</param>
@@ -11174,7 +11194,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <param name="vgname">Volume group name.</param>
             /// <param name="volume">Glusterfs Volume.</param>
             /// <returns></returns>
-            public Result CreateRest(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, bool? disable = null, string domain = null, string export = null, string format = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null)
+            public Result CreateRest(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, bool? disable = null, string domain = null, string export = null, string format = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null)
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("storage", storage);
@@ -11190,6 +11210,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 parameters.Add("domain", domain);
                 parameters.Add("export", export);
                 parameters.Add("format", format);
+                parameters.Add("fuse", fuse);
                 parameters.Add("is_mountpoint", is_mountpoint);
                 parameters.Add("iscsiprovider", iscsiprovider);
                 parameters.Add("krbd", krbd);
@@ -11212,6 +11233,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 parameters.Add("shared", shared);
                 parameters.Add("smbversion", smbversion);
                 parameters.Add("sparse", sparse);
+                parameters.Add("subdir", subdir);
                 parameters.Add("tagged_only", tagged_only);
                 parameters.Add("target", target);
                 parameters.Add("thinpool", thinpool);
@@ -11226,7 +11248,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// </summary>
             /// <param name="storage">The storage identifier.</param>
             /// <param name="type">Storage type.
-            ///   Enum: cifs,dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
+            ///   Enum: cephfs,cifs,dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
             /// <param name="authsupported">Authsupported.</param>
             /// <param name="base_">Base volume. This volume is automatically activated.</param>
             /// <param name="blocksize">block size</param>
@@ -11238,6 +11260,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <param name="domain">CIFS domain.</param>
             /// <param name="export">NFS export path.</param>
             /// <param name="format">Default image format.</param>
+            /// <param name="fuse">Mount CephFS through FUSE.</param>
             /// <param name="is_mountpoint">Assume the given path is an externally managed mountpoint and consider the storage offline if it is not mounted. Using a boolean (yes/no) value serves as a shortcut to using the target path in this field.</param>
             /// <param name="iscsiprovider">iscsi provider</param>
             /// <param name="krbd">Access rbd through krbd kernel module.</param>
@@ -11258,8 +11281,10 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <param name="server2">Backup volfile server IP or DNS name.</param>
             /// <param name="share">CIFS share.</param>
             /// <param name="shared">Mark storage as shared.</param>
-            /// <param name="smbversion"></param>
+            /// <param name="smbversion">SMB protocol version
+            ///   Enum: 2.0,2.1,3.0</param>
             /// <param name="sparse">use sparse volumes</param>
+            /// <param name="subdir">Subdir to mount.</param>
             /// <param name="tagged_only">Only use logical volumes tagged with 'pve-vm-ID'.</param>
             /// <param name="target">iSCSI target.</param>
             /// <param name="thinpool">LVM thin pool LV name.</param>
@@ -11269,7 +11294,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             /// <param name="vgname">Volume group name.</param>
             /// <param name="volume">Glusterfs Volume.</param>
             /// <returns></returns>
-            public Result Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, bool? disable = null, string domain = null, string export = null, string format = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null) { return CreateRest(storage, type, authsupported, base_, blocksize, bwlimit, comstar_hg, comstar_tg, content, disable, domain, export, format, is_mountpoint, iscsiprovider, krbd, maxfiles, mkdir, monhost, nodes, nowritecache, options, password, path, pool, portal, redundancy, saferemove, saferemove_throughput, server, server2, share, shared, smbversion, sparse, tagged_only, target, thinpool, transport, username, vgname, volume); }
+            public Result Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, bool? disable = null, string domain = null, string export = null, string format = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null) { return CreateRest(storage, type, authsupported, base_, blocksize, bwlimit, comstar_hg, comstar_tg, content, disable, domain, export, format, fuse, is_mountpoint, iscsiprovider, krbd, maxfiles, mkdir, monhost, nodes, nowritecache, options, password, path, pool, portal, redundancy, saferemove, saferemove_throughput, server, server2, share, shared, smbversion, sparse, subdir, tagged_only, target, thinpool, transport, username, vgname, volume); }
         }
         public class PVEAccess : Base
         {
@@ -11278,26 +11303,26 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 _client = client;
             }
             private PVEUsers _users;
-            public PVEUsers Users { get { return _users ?? (_users = new PVEUsers(_client)); } }
+            public PVEUsers Users => _users ?? (_users = new PVEUsers(_client));
             private PVEGroups _groups;
-            public PVEGroups Groups { get { return _groups ?? (_groups = new PVEGroups(_client)); } }
+            public PVEGroups Groups => _groups ?? (_groups = new PVEGroups(_client));
             private PVERoles _roles;
-            public PVERoles Roles { get { return _roles ?? (_roles = new PVERoles(_client)); } }
+            public PVERoles Roles => _roles ?? (_roles = new PVERoles(_client));
             private PVEAcl _acl;
-            public PVEAcl Acl { get { return _acl ?? (_acl = new PVEAcl(_client)); } }
+            public PVEAcl Acl => _acl ?? (_acl = new PVEAcl(_client));
             private PVEDomains _domains;
-            public PVEDomains Domains { get { return _domains ?? (_domains = new PVEDomains(_client)); } }
+            public PVEDomains Domains => _domains ?? (_domains = new PVEDomains(_client));
             private PVETicket _ticket;
-            public PVETicket Ticket { get { return _ticket ?? (_ticket = new PVETicket(_client)); } }
+            public PVETicket Ticket => _ticket ?? (_ticket = new PVETicket(_client));
             private PVEPassword _password;
-            public PVEPassword Password { get { return _password ?? (_password = new PVEPassword(_client)); } }
+            public PVEPassword Password => _password ?? (_password = new PVEPassword(_client));
             public class PVEUsers : Base
             {
                 internal PVEUsers(Client client)
                 {
                     _client = client;
                 }
-                public PVEItemUserid this[object userid] { get { return new PVEItemUserid(_client, userid); } }
+                public PVEItemUserid this[object userid] => new PVEItemUserid(_client, userid);
                 public class PVEItemUserid : Base
                 {
                     private object _userid;
@@ -11442,7 +11467,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 {
                     _client = client;
                 }
-                public PVEItemGroupid this[object groupid] { get { return new PVEItemGroupid(_client, groupid); } }
+                public PVEItemGroupid this[object groupid] => new PVEItemGroupid(_client, groupid);
                 public class PVEItemGroupid : Base
                 {
                     private object _groupid;
@@ -11535,7 +11560,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 {
                     _client = client;
                 }
-                public PVEItemRoleid this[object roleid] { get { return new PVEItemRoleid(_client, roleid); } }
+                public PVEItemRoleid this[object roleid] => new PVEItemRoleid(_client, roleid);
                 public class PVEItemRoleid : Base
                 {
                     private object _roleid;
@@ -11683,7 +11708,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
                 {
                     _client = client;
                 }
-                public PVEItemRealm this[object realm] { get { return new PVEItemRealm(_client, realm); } }
+                public PVEItemRealm this[object realm] => new PVEItemRealm(_client, realm);
                 public class PVEItemRealm : Base
                 {
                     private object _realm;
@@ -11964,7 +11989,7 @@ namespace EnterpriseVE.ProxmoxVE.Api
             {
                 _client = client;
             }
-            public PVEItemPoolid this[object poolid] { get { return new PVEItemPoolid(_client, poolid); } }
+            public PVEItemPoolid this[object poolid] => new PVEItemPoolid(_client, poolid);
             public class PVEItemPoolid : Base
             {
                 private object _poolid;
