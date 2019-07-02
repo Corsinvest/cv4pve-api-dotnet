@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+
+    <Version>1.1.0</Version>
+    <Company>Corsinvest Srl</Company>
+    <Authors>Daniele Corsini</Authors>
+    <Copyright>Corsinvest Srl</Copyright>
+    <Product>Corsinvest for Proxmox VE Api Client Extension</Product>
+    <AssemblyTitle>Corsinvest for Proxmox VE Api Client Extension</AssemblyTitle>
+    <Description>Corsinvest for Proxmox VE Api Client Extension</Description>
+
+    <License>https://raw.githubusercontent.com/Corsinvest/cv4pve-api-dotnet/master/LICENSE</License>
+    <PackageProjectUrl>https://github.com/Corsinvest/cv4pve-api-dotnet</PackageProjectUrl>
+    <PackageTags>ProxmoxVE;Api,Client;Rest;Corsinvest;</PackageTags>
+    <PackageIconUrl>http://www.corsinvest.com/wp-content/uploads/2017/11/EVE-logo.png</PackageIconUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api\Corsinvest.ProxmoxVE.Api.csproj" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.3.4" />
+  </ItemGroup>
+</Project>

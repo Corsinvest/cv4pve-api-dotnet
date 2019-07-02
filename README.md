@@ -1,26 +1,25 @@
-# EnterpriseVE.ProxmoxVE.Api
+# Corsinvest.ProxmoxVE.Api
 
-[![License](https://img.shields.io/github/license/EnterpriseVE/EnterpriseVE.ProxmoxVE.Api.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+[![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 ProxmoVE Client API .Net
 
 [ProxmoxVE Api](https://pve.proxmox.com/pve-docs/api-viewer/)
 
-[Nuget Api](https://www.nuget.org/packages/EnterpriseVE.ProxmoxVE.Api)
+[Nuget Api](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api)
 
-[Nuget Extension](https://www.nuget.org/packages/EnterpriseVE.ProxmoxVE.Api)
+[Nuget Extension](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Extension)
 
-[![AppVeyor branch](https://img.shields.io/appveyor/ci/franklupo/eve2pve-api-dotnet/master.svg)](https://ci.appveyor.com/project/franklupo/eve2pve-api-dotnet)
+[![AppVeyor branch](https://img.shields.io/appveyor/ci/franklupo/cv4pve-api-dotnet/master.svg)](https://ci.appveyor.com/project/franklupo/cv4pve-api-dotnet)
 
 ```text
-    ______      __                       _              _    ________
-   / ____/___  / /____  _________  _____(_)_______     | |  / / ____/
-  / __/ / __ \/ __/ _ \/ ___/ __ \/ ___/ / ___/ _ \    | | / / __/
- / /___/ / / / /_/  __/ /  / /_/ / /  / (__  )  __/    | |/ / /___
-/_____/_/ /_/\__/\___/_/  / .___/_/  /_/____/\___/     |___/_____/
-                         /_/
+   ______                _                      __
+  / ____/___  __________(_)___ _   _____  _____/ /_
+ / /   / __ \/ ___/ ___/ / __ \ | / / _ \/ ___/ __/
+/ /___/ /_/ / /  (__  ) / / / / |/ /  __(__  ) /_
+\____/\____/_/  /____/_/_/ /_/|___/\___/____/\__/
 
-                                                       (Made in Italy)
+Corsinvest for Proxmox VE Api Client  (Made in Italy)
 ```
 
 ## General
@@ -37,18 +36,21 @@ The client is generated from a JSON Api on Proxmox VE.
   * SetRest (Put)
   * DeleteRest
 * Set ResponseType json, png
-* Full method generated from documentation
+* Full class and method generated from documentation (about client)
 * Comment any method and parameters
 * Parameters indexed eg [n] is structured in array index and value
 * Tree structure
   * client.Nodes["pve1"].Qemu[100].Snapshot().snapshotList().Response.data
 * Return data Proxmox VE
+* Debug Level show to console information REST call
 * Return result status
   * StatusCode
   * ReasonPhrase
   * IsSuccessStatusCode
-* Wait task finish task
+* Task utility
   * WaitForTaskToFinish
+  * TaskIsRunning
+  * GetExitStatusTask
 * Method directry access
   * Get
   * Create (Post)
@@ -62,6 +64,7 @@ The client is generated from a JSON Api on Proxmox VE.
 The result is class **Result** and contain properties:
 
 * **Response** returned from Proxmox VE (data,errors,...) dynamic [ExpandoObject](https://msdn.microsoft.com/en-US/library/system.dynamic.expandoobject(v=vs.110).aspx)
+* **ResponseToDictionary** return response to dictionary ```IDictionary<String, object>```
 * **ResponseInError** (bool) : Contains errors from Proxmox VE.
 * **StatusCode** (System.Net.HttpStatusCode): Status code of the HTTP response.
 * **ReasonPhrase** (string): The reason phrase which typically is sent by servers together with the status code.
@@ -122,6 +125,7 @@ if (client.Login("root", "password"))
         Console.WriteLine(snapshot.name);
     }
 
+    //change reposnde type from json to png
     client.ResponseType = "png";
     var dataImg = client.Nodes["pve1"].Rrd.Rrd("cpu", "day").Response;
     Console.WriteLine("<img src=\"{dataImg}\" \>");
@@ -130,8 +134,4 @@ if (client.Login("root", "password"))
 
 ## Extension Pack
 
-The extension pack add functionality to API.
-
-See VM.ClientExtension.cs, Storage.ClientExtension.cs, Node.ClientExtension.cs
-
-[Nuget Extension](https://www.nuget.org/packages/EnterpriseVE.ProxmoxVE.Api)
+The extension pack add functionality to Client API.
