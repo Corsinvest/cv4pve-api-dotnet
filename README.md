@@ -1,6 +1,6 @@
 # Corsinvest.ProxmoxVE.Api
 
-[![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+[![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html) [![AppVeyor branch](https://img.shields.io/appveyor/ci/franklupo/cv4pve-api-dotnet/master.svg)](https://ci.appveyor.com/project/franklupo/cv4pve-api-dotnet)
 
 ProxmoVE Client API .Net
 
@@ -9,8 +9,6 @@ ProxmoVE Client API .Net
 [Nuget Api](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api)
 
 [Nuget Extension](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Extension)
-
-[![AppVeyor branch](https://img.shields.io/appveyor/ci/franklupo/cv4pve-api-dotnet/master.svg)](https://ci.appveyor.com/project/franklupo/cv4pve-api-dotnet)
 
 ```text
    ______                _                      __
