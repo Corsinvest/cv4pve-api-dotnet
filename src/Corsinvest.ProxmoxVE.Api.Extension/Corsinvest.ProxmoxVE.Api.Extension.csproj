@@ -11,10 +11,11 @@
     <AssemblyTitle>Corsinvest for Proxmox VE Api Client Extension</AssemblyTitle>
     <Description>Corsinvest for Proxmox VE Api Client Extension</Description>
 
-    <License>https://raw.githubusercontent.com/Corsinvest/cv4pve-api-dotnet/master/LICENSE</License>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Corsinvest/cv4pve-api-dotnet</PackageProjectUrl>
     <PackageTags>ProxmoxVE;Api,Client;Rest;Corsinvest;</PackageTags>
-    <PackageIconUrl>http://www.corsinvest.com/wp-content/uploads/2017/11/EVE-logo.png</PackageIconUrl>
+    <PackageIconUrl>https://www.corsinvest.it/wp-content/uploads/2016/08/Corsinvest.ico</PackageIconUrl>
+    <PackageReleaseNotes></PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
