@@ -7,11 +7,25 @@ using McMaster.Extensions.CommandLineUtils;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
 {
+    /// <summary>
+    /// Shell Helper
+    /// </summary>
     public static class ShellHelper
     {
+        /// <summary>
+        /// Email support.
+        /// </summary>
         public const string EMAIL_SUPPORT = "support@corsinvest.it";
+
+        /// <summary>
+        /// Row shell for support.
+        /// </summary>
         public const string REPORT_BUGS = "Report bugs to " + EMAIL_SUPPORT;
 
+        /// <summary>
+        /// Logo Corsinvest art ascii.
+        /// </summary>
+        /// <returns></returns>
         public const string LOGO = @"
     ______                _                      __
    / ____/___  __________(_)___ _   _____  _____/ /_
@@ -20,6 +34,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
  \____/\____/_/  /____/_/_/ /_/|___/\___/____/\__/
 ";
 
+        /// <summary>
+        /// Make string logo and title.
+        /// </summary>
+        /// <param name="title"></param>
+        /// <returns></returns>
         public static string MakeLogoAndTitle(string title)
         {
             title += new string(' ', (47 - title.Length));
@@ -29,6 +48,16 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
 {title}(Made in Italy)";
         }
 
+        /// <summary>
+        /// Execute shell command
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <param name="redirectStandardOutput"></param>
+        /// <param name="environmentVariables"></param>
+        /// <param name="stdOut"></param>
+        /// <param name="dryRun"></param>
+        /// <param name="debug"></param>
+        /// <returns></returns>
         public static (string StandardOutput, int ExitCode) Execute(string cmd,
                                                                     bool redirectStandardOutput,
                                                                     IDictionary<string, string> environmentVariables,
@@ -87,6 +116,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
             }
         }
 
+        /// <summary>
+        /// Create console application.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        /// <returns></returns>
         public static CommandLineApplication CreateConsoleApp(string name, string description)
         {
             var app = new CommandLineApplication();
@@ -101,6 +136,13 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
             return app;
         }
 
+        /// <summary>
+        /// Execute console application.
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="stdOut"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static int ExecuteConsoleApp(this CommandLineApplication app, TextWriter stdOut, string[] args)
         {
             //execute this

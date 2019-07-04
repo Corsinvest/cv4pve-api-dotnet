@@ -4,6 +4,9 @@ using Corsinvest.ProxmoxVE.Api.Extension.Utils;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
 {
+    /// <summary>
+    /// Snapshot
+    /// </summary>
     public class Snapshot
     {
         private const string FORMAT = "{0,-17} {1,-25} {2,-25} {3,-25} {4,-1}";
@@ -27,6 +30,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                    DateTimeOffset.FromUnixTimeSeconds(_apiData.snaptime).DateTime;
         }
 
+        /// <summary>
+        /// Config
+        /// </summary>
+        /// <value></value>
         public Result Config
         {
             get
@@ -40,6 +47,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
             }
         }
 
+        /// <summary>
+        /// Update
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        /// <returns></returns>
         public Result Update(string name, string description)
         {
             switch (_vm.Type)
@@ -50,6 +63,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
             }
         }
 
+        /// <summary>
+        /// Rollback
+        /// </summary>
+        /// <param name="wait"></param>
+        /// <returns></returns>
         public Result Rollback(bool wait)
         {
             Result result = null;
@@ -62,12 +80,37 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
             return result;
         }
 
+        /// <summary>
+        /// Date
+        /// </summary>
+        /// <value></value>
         public DateTime Date { get; }
+
+        /// <summary>
+        /// Parent
+        /// </summary>
         public string Parent => _apiData.parent;
+
+        /// <summary>
+        /// Name
+        /// </summary>
         public string Name => _apiData.name;
+
+        /// <summary>
+        /// Description
+        /// </summary>
         public string Description => (_apiData.description as string).TrimEnd();
+
+        /// <summary>
+        /// Ram used
+        /// </summary>
         public bool Ram => !(_apiData.vmstate == 0);
 
+        /// <summary>
+        /// Header info
+        /// </summary>
+        /// <param name="showNodeAndVm"></param>
+        /// <returns></returns>
         public static string HeaderInfo(bool showNodeAndVm)
         {
             var data = new List<string>();
@@ -76,8 +119,17 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
             return string.Format(showNodeAndVm ? FORMATEX : FORMAT, data.ToArray());
         }
 
+        /// <summary>
+        /// Info snapshot
+        /// </summary>
+        /// <returns></returns>
         public override string ToString() => RowInfo(true);
 
+        /// <summary>
+        /// Row info
+        /// </summary>
+        /// <param name="showNodeAndVm"></param>
+        /// <returns></returns>
         public string RowInfo(bool showNodeAndVm)
         {
             var data = new List<string>();

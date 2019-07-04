@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
 {
+    /// <summary>
+    /// Snapshots
+    /// </summary>
     public class Snapshots : IReadOnlyList<Snapshot>
     {
         private VMInfo _vm;
@@ -30,12 +33,38 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
             _snapshots = snapshots.OrderBy(a => a.Date).ToList();
         }
 
+        /// <summary>
+        /// Get from name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public Snapshot this[string name] => _snapshots.Where(a => a.Name == name).FirstOrDefault();
+
+        /// <summary>
+        /// Get from index
+        /// </summary>
         public Snapshot this[int index] => _snapshots[index];
+
+        /// <summary>
+        /// Count
+        /// </summary>
         public int Count => _snapshots.Count;
+
+        /// <summary>
+        /// Enumerator
+        /// </summary>
+        /// <returns></returns>
         public IEnumerator<Snapshot> GetEnumerator() => _snapshots.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_snapshots).GetEnumerator();
 
+        /// <summary>
+        /// Create new snapshot
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        /// <param name="state"></param>
+        /// <param name="wait"></param>
+        /// <returns></returns>
         public Result Create(string name, string description, bool state, bool wait)
         {
             Result result = null;

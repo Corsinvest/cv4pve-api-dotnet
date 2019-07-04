@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
 {
+    /// <summary>
+    /// VM Extension
+    /// </summary>
     public static class VMExtension
     {
         /// <summary>
@@ -17,6 +20,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
             return ret.ToArray();
         }
 
+        /// <summary>
+        /// Info snapshots
+        /// </summary>
+        /// <param name="snapshots"></param>
+        /// <param name="showNodeAndVm"></param>
+        /// <returns></returns>
         public static string[] Info(this IEnumerable<Snapshot> snapshots, bool showNodeAndVm)
         {
             var ret = new List<string>();

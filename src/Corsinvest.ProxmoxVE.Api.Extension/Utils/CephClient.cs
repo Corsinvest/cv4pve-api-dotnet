@@ -5,17 +5,70 @@ using Corsinvest.ProxmoxVE.Api.Extension.Storage;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
 {
+    /// <summary>
+    /// Ceph client.
+    /// </summary>
     public class CephClient
     {
+        /// <summary>
+        /// Standard Outout
+        /// </summary>
+        /// <value></value>
         public TextWriter StdOut { get; }
+
+        /// <summary>
+        /// Dry run
+        /// </summary>
+        /// <value></value>
         public bool DryRun { get; }
+
+        /// <summary>
+        /// DEbug
+        /// </summary>
+        /// <value></value>
         public bool Debug { get; }
+
+        /// <summary>
+        /// Ceph Config Directory
+        /// </summary>
+        /// <value></value>
         public string CephConfigDirectory { get; }
+
+        /// <summary>
+        /// Monitors hosts
+        /// </summary>
+        /// <value></value>
         public string MonitorHosts { get; }
+
+        /// <summary>
+        /// Pool
+        /// </summary>
+        /// <value></value>
         public string Pool { get; }
+
+        /// <summary>
+        /// StoreId
+        /// </summary>
+        /// <value></value>
         public string StoreId { get; }
+
+        /// <summary>
+        /// Username
+        /// </summary>
+        /// <value></value>
         public string Username { get; }
 
+        /// <summary>
+        /// ICostructor
+        /// </summary>
+        /// <param name="stdOut"></param>
+        /// <param name="dryRun"></param>
+        /// <param name="debug"></param>
+        /// <param name="cephConfigDirectory"></param>
+        /// <param name="monHosts"></param>
+        /// <param name="pool"></param>
+        /// <param name="storeId"></param>
+        /// <param name="username"></param>
         public CephClient(TextWriter stdOut,
                           bool dryRun,
                           bool debug,
@@ -36,6 +89,15 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
             if (string.IsNullOrWhiteSpace(Username)) { Username = "admin"; }
         }
 
+        /// <summary>
+        /// Get Client from info
+        /// </summary>
+        /// <param name="stdOut"></param>
+        /// <param name="dryRun"></param>
+        /// <param name="debug"></param>
+        /// <param name="cephConfigDirectory"></param>
+        /// <param name="cephInfo"></param>
+        /// <returns></returns>
         public static CephClient From(TextWriter stdOut, bool dryRun, bool debug, string cephConfigDirectory, Ceph cephInfo)
             => new CephClient(stdOut,
                               dryRun,
@@ -99,6 +161,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
             }
         }
 
+        /// <summary>
+        /// Get pools
+        /// </summary>
+        /// <returns></returns>
         public string[] GetPools()
         {
             var ret = Shell($"rados {BaseArgs()} lspools", true);
@@ -125,6 +191,14 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
         //     return Shell(cmd, false).ExitCode == 0;
         // }
 
+        /// <summary>
+        /// Export diff
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="fromSnap"></param>
+        /// <param name="toSnap"></param>
+        /// <param name="destFile"></param>
+        /// <returns></returns>
         public bool ExportDiff(string image, string fromSnap, string toSnap, string destFile)
         {
             var cmd = $"{BaseArgs()} export-diff";
@@ -133,18 +207,50 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
             return Shell(cmd, false).ExitCode == 0;
         }
 
+        /// <summary>
+        /// Import diff
+        /// </summary>
+        /// <param name="fileNameImport"></param>
+        /// <param name="pool"></param>
+        /// <param name="image"></param>
+        /// <returns></returns>
         public bool ImportDiff(string fileNameImport, string pool, string image)
             => Shell($"{BaseArgs()} import-diff '{fileNameImport}' {image}", false).ExitCode == 0;
 
+        /// <summary>
+        /// Create snapshot
+        /// </summary>
+        /// <param name="pool"></param>
+        /// <param name="image"></param>
+        /// <param name="snapName"></param>
+        /// <returns></returns>
         public bool SnapshotCreate(string pool, string image, string snapName)
             => Shell($"{BaseArgs()}  snap create {image}@{snapName}", false).ExitCode == 0;
 
+        /// <summary>
+        /// Delete snapshot
+        /// </summary>
+        /// <param name="pool"></param>
+        /// <param name="image"></param>
+        /// <param name="snapName"></param>
+        /// <returns></returns>
         public bool SnapshotDelete(string pool, string image, string snapName)
             => Shell($"{BaseArgs()} snap rm {image}@{snapName}", false).ExitCode == 0;
 
+        /// <summary>
+        /// Purge snaposhots
+        /// </summary>
+        /// <param name="pool"></param>
+        /// <param name="image"></param>
+        /// <returns></returns>
         public bool SnapshotsPurge(string pool, string image)
             => Shell($"{BaseArgs()} purge {image}", false).ExitCode == 0;
 
+        /// <summary>
+        /// Get images
+        /// </summary>
+        /// <param name="pool"></param>
+        /// <returns></returns>
         public string[] GetImages(string pool)
         {
             var ret = Shell($"{BaseArgs()} list", true);

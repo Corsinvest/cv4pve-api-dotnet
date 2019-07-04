@@ -5,6 +5,9 @@ using System.Text.RegularExpressions;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
 {
+    /// <summary>
+    /// Configuration
+    /// </summary>
     public abstract class Config
     {
         internal Config(VMInfo vm, object apiData)
@@ -13,12 +16,37 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
             VM = vm;
         }
 
+        /// <summary>
+        /// Info VM
+        /// </summary>
+        /// <value></value>
         public VMInfo VM { get; }
+
+        /// <summary>
+        /// Data Json API.
+        /// </summary>
+        /// <value></value>
         protected dynamic ApiData { get; }
+
+        /// <summary>
+        /// Cores assigned.
+        /// </summary>
         public int Cores => ApiData.cores;
+
+        /// <summary>
+        /// Memory
+        /// </summary>
         public int Memory => ApiData.memory;
+
+        /// <summary>
+        /// Os type
+        /// </summary>
         public string OsType => ApiData.ostype;
 
+        /// <summary>
+        /// Get disks.
+        /// </summary>
+        /// <value></value>
         public IReadOnlyList<Disk> Disks
         {
             get
@@ -72,6 +100,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
             return ret;
         }
 
+        /// <summary>
+        /// Get all configuration 
+        /// </summary>
+        /// <returns></returns>
         public string GetAllConfigs()
         {
             var ret = new List<string>();

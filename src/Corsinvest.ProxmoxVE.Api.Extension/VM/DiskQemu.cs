@@ -2,6 +2,9 @@
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
 {
+    /// <summary>
+    /// Disck QEMU
+    /// </summary>
     public class DiskQemu : Disk
     {
         internal DiskQemu(Client client, string id, string definition) : base(client, id, definition)
