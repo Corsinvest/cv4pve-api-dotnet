@@ -7,7 +7,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
 {
     public class CephClient
     {
-        public TextWriter Output { get; }
+        public TextWriter StdOut { get; }
         public bool DryRun { get; }
         public bool Debug { get; }
         public string CephConfigDirectory { get; }
@@ -16,7 +16,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
         public string StoreId { get; }
         public string Username { get; }
 
-        public CephClient(TextWriter output,
+        public CephClient(TextWriter stdOut,
                           bool dryRun,
                           bool debug,
                           string cephConfigDirectory,
@@ -25,7 +25,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
                           string storeId,
                           string username)
         {
-            Output = output;
+            StdOut = stdOut;
             DryRun = dryRun;
             Debug = debug;
             CephConfigDirectory = cephConfigDirectory;
@@ -36,8 +36,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
             if (string.IsNullOrWhiteSpace(Username)) { Username = "admin"; }
         }
 
-        public static CephClient From(TextWriter output, bool dryRun, bool debug, string cephConfigDirectory, Ceph cephInfo)
-            => new CephClient(output,
+        public static CephClient From(TextWriter stdOut, bool dryRun, bool debug, string cephConfigDirectory, Ceph cephInfo)
+            => new CephClient(stdOut,
                               dryRun,
                               debug,
                               cephConfigDirectory,
@@ -84,7 +84,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
                 StartInfo = startInfo
             };
 
-            if (Debug) { Output.WriteLine($"Run command: {cmd}"); }
+            if (Debug) { StdOut.WriteLine($"Run command: {cmd}"); }
             if (DryRun)
             {
                 return ("", 0);

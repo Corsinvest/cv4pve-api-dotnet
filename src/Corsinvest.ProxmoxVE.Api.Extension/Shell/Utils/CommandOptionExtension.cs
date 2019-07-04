@@ -132,8 +132,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
 
         public static CommandOption<int> KeepOption(this CommandLineApplication command)
             => command.Option<int>("--keep", "Specify the number which should will keep", CommandOptionType.SingleValue)
-                      .IsRequired();
-
+                      .IsRequired(); 
+                              
         public static CommandOption MailToOption(this CommandLineApplication command)
             => command.Option("--mailto",
                                   "Comma-separated list of email addresses that should receive email notifications",

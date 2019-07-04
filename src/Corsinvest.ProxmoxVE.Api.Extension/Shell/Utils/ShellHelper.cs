@@ -9,7 +9,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
 {
     public static class ShellHelper
     {
-        public const string EMAIL_SUPPORT = "support@corsinvest.com";
+        public const string EMAIL_SUPPORT = "support@corsinvest.it";
         public const string REPORT_BUGS = "Report bugs to " + EMAIL_SUPPORT;
 
         public const string LOGO = @"
@@ -32,7 +32,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
         public static (string StandardOutput, int ExitCode) Execute(string cmd,
                                                                     bool redirectStandardOutput,
                                                                     IDictionary<string, string> environmentVariables,
-                                                                    TextWriter output,
+                                                                    TextWriter stdOut,
                                                                     bool dryRun,
                                                                     bool debug)
         {
@@ -62,16 +62,16 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
             //addiotional variable
             if (environmentVariables != null)
             {
-                if (debug) { output.WriteLine("-------------------------------------------------------"); }
+                if (debug) { stdOut.WriteLine("-------------------------------------------------------"); }
                 foreach (var variable in environmentVariables)
                 {
-                    if (debug) { output.WriteLine($"{variable.Key}: {variable.Value}"); }
+                    if (debug) { stdOut.WriteLine($"{variable.Key}: {variable.Value}"); }
                     process.StartInfo.EnvironmentVariables.Add(variable.Key, variable.Value);
                 }
-                if (debug) { output.WriteLine("-------------------------------------------------------"); }
+                if (debug) { stdOut.WriteLine("-------------------------------------------------------"); }
             }
 
-            if (debug) { output.WriteLine($"Run command: {cmd}"); }
+            if (debug) { stdOut.WriteLine($"Run command: {cmd}"); }
 
             if (dryRun)
             {
@@ -101,7 +101,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
             return app;
         }
 
-        public static int ExecuteConsoleApp(this CommandLineApplication app, TextWriter output,string[] args)
+        public static int ExecuteConsoleApp(this CommandLineApplication app, TextWriter stdOut, string[] args)
         {
             //execute this
             app.OnExecute(() =>
@@ -115,15 +115,17 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
             {
                 return app.Execute(args);
             }
-            catch (UnrecognizedCommandParsingException ex)
+            catch (CommandParsingException ex)
             {
-                output.WriteLine(ex.Message);
+                stdOut.WriteLine(ex.Message);
                 return 1;
             }
             catch (Exception ex)
             {
-                output.WriteLine(ex.GetType().FullName);
-                output.WriteLine(ex.Message);
+                stdOut.WriteLine("================ EXCEPTION ================ ");
+                stdOut.WriteLine(ex.GetType().FullName);
+                stdOut.WriteLine(ex.Message);
+                stdOut.WriteLine(ex.StackTrace);
                 return 1;
             }
         }

@@ -8,11 +8,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
     {
         public static bool InError(this Result result) => result != null && result.ResponseInError;
 
-        public static bool LogInError(this Result result, TextWriter output)
+        public static bool LogInError(this Result result, TextWriter stdOut)
         {
             if (result.InError())
             {
-                output.WriteLine(result.GetError());
+                stdOut.WriteLine(result.GetError());
                 return true;
             }
             return false;
