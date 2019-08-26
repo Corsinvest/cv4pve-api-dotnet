@@ -3,11 +3,11 @@
 namespace Corsinvest.ProxmoxVE.Api.Extension.Storage
 {
     /// <summary>
-    /// Ceph storage
+    /// Rbd storage
     /// </summary>
-    public class Ceph : StorageInfo
+    public class Rbd : StorageInfo
     {
-        internal Ceph(Client client, object apiData) : base(client, apiData, StorageTypeEnum.Ceph)
+        internal Rbd(Client client, object apiData) : base(client, apiData, StorageTypeEnum.Rbd)
         {
             JsonHelper.GetValueOrCreate(apiData, "monhost", "");
         }
@@ -30,6 +30,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Storage
         /// <summary>
         /// Krbf
         /// </summary>
-        public bool Krbd => ApiData.krbd == 1;
+        public bool Krbd => ApiData.krbd == "1";
     }
 }

@@ -1,7 +1,7 @@
 ﻿namespace Corsinvest.ProxmoxVE.Api.Extension.VM
 {
     /// <summary>
-    /// Disck LXC
+    /// Disk LXC
     /// </summary>
     public class DiskLxc : Disk
     {

@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using BetterConsoleTables;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
 {
@@ -12,12 +15,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// </summary>
         /// <param name="vms"></param>
         /// <returns></returns>
-        public static string[] Info(this IReadOnlyList<VMInfo> vms)
+        public static string Info(this IReadOnlyList<VMInfo> vms)
         {
-            var ret = new List<string>();
-            ret.Add(VMInfo.HeaderInfo());
-            foreach (var vm in vms) { ret.Add(vm.RowInfo()); }
-            return ret.ToArray();
+            var table = new Table(TableConfiguration.Unicode());
+            table.AddColumns(VMInfo.GetTitlesInfo());
+            foreach (var vm in vms) { table.AddRow(vm.GetRowInfo()); }
+            return table.ToString();
         }
 
         /// <summary>
@@ -26,12 +29,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <param name="snapshots"></param>
         /// <param name="showNodeAndVm"></param>
         /// <returns></returns>
-        public static string[] Info(this IEnumerable<Snapshot> snapshots, bool showNodeAndVm)
+        public static string Info(this IEnumerable<Snapshot> snapshots, bool showNodeAndVm)
         {
-            var ret = new List<string>();
-            ret.Add(Snapshot.HeaderInfo(showNodeAndVm));
-            foreach (var snapshot in snapshots) { ret.Add(snapshot.RowInfo(showNodeAndVm)); }
-            return ret.ToArray();
+            var table = new Table(TableConfiguration.Unicode());
+            table.AddColumns(Snapshot.GetTitlesInfo(showNodeAndVm));
+            foreach (var snapshot in snapshots) { table.AddRow(snapshot.GetRowInfo(showNodeAndVm)); }
+            return table.ToString();
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BetterConsoleTables;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Node
 {
@@ -14,24 +15,24 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         /// </summary>
         /// <param name="nodes"></param>
         /// <returns></returns>
-        public static string[] Info(this IReadOnlyList<NodeInfo> nodes)
+        public static string Info(this IReadOnlyList<NodeInfo> nodes)
         {
-            var ret = new List<string>();
-            ret.Add(NodeInfo.HeaderInfo());
-            foreach (var node in nodes) { ret.Add(node.RowInfo()); }
-            return ret.ToArray();
+            var table = new Table(TableConfiguration.Unicode());
+            table.AddColumns(NodeInfo.GetTitlesInfo());
+            foreach (var node in nodes) { table.AddRow(node.GetRowInfo()); }
+            return table.ToString();
         }
 
         /// <summary>
         /// Return node info from id.
         /// </summary>
         /// <param name="client"></param>
-        /// <param name="id"></param>
+        /// <param name="name"></param>
         /// <returns></returns>
-        public static NodeInfo GetNode(this Client client, string id)
+        public static NodeInfo GetNode(this Client client, string name)
         {
-            var node = GetNodes(client).Where(a => a.Id == id).FirstOrDefault();
-            if (node == null) { throw new ArgumentException($"Node {id} not found!"); }
+            var node = GetNodes(client).Where(a => a.Node == name).FirstOrDefault();
+            if (node == null) { throw new ArgumentException($"Node {name} not found!"); }
             return node;
         }
 

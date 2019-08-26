@@ -1,288 +1,26 @@
-using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
-using Newtonsoft.Json;
-using System.Linq;
-using System.Dynamic;
-using System.Web;
+
 namespace Corsinvest.ProxmoxVE.Api
 {
-#pragma warning disable 1591
-    public abstract class Base
-    {
-        protected Client _client;
-    }
-    /// <summary>
-    /// Result request API
-    /// </summary>
-    public class Result
-    {
-        internal Result(dynamic response, HttpStatusCode statusCode, string reasonPhrase, bool isSuccessStatusCode)
-        {
-            Response = response;
-            StatusCode = statusCode;
-            ReasonPhrase = reasonPhrase;
-            IsSuccessStatusCode = isSuccessStatusCode;
-        }
-        /// <summary>
-        /// Get if response Proxmox VE contain errors
-        /// </summary>
-        /// <returns></returns>
-        public bool ResponseInError => ResponseToDictionary.ContainsKey("errors");
-        /// <summary>
-        /// Proxmox VE response.
-        /// </summary>
-        /// <returns></returns>    
-        public dynamic Response { get; }
-        /// <summary>
-        /// Proxmox VE response to dictionary.
-        /// </summary>
-        /// <returns></returns>    
-        public IDictionary<String, object> ResponseToDictionary => (IDictionary<String, object>)Response;
-        /// <summary>
-        /// Contains the values of status codes defined for HTTP.
-        /// </summary>
-        /// <returns></returns>    
-        public HttpStatusCode StatusCode { get; }
-        /// <summary>
-        /// Gets the reason phrase which typically is sent by servers together with the status code.
-        /// </summary>
-        /// <returns></returns>
-        public string ReasonPhrase { get; }
-        /// <summary>
-        /// Gets a value that indicates if the HTTP response was successful.
-        /// </summary>
-        /// <returns></returns>
-        public bool IsSuccessStatusCode { get; }
-        /// <summary>
-        /// Get error
-        /// </summary>
-        /// <returns></returns>
-        public string GetError()
-        {
-            var ret = "";
-            if (ResponseInError)
-            {
-                foreach (var item in (IDictionary<string, object>)Response.errors)
-                {
-                    if (!string.IsNullOrWhiteSpace(ret)) { ret += Environment.NewLine; }
-                    ret += $"{item.Key} : {item.Value}";
-                }
-            }
-            return ret;
-        }
-    }
     /// <summary>
     /// Proxmox VE Client
     /// </summary>
-    public class Client : Base
+    public class Client : ClientBase
     {
-        private string _ticketCSRFPreventionToken;
-        private string _ticketPVEAuthCookie;
-        public Client(string hostname, int port = 8006)
+#pragma warning disable 1591
+        private readonly Client _client;
+
+        /// <summary>
+        /// Costructor
+        /// </summary>
+        /// <param name="hostname"></param>
+        /// <param name="port"></param>
+        /// <returns></returns>
+        public Client(string hostname, int port = 8006) : base(hostname, port)
         {
             _client = this;
-            Hostname = hostname;
-            Port = port;
         }
-        /// <summary>
-        /// Get hostname configured. 
-        /// </summary>
-        public string Hostname { get; }
-        /// <summary>
-        /// Get port configured. 
-        /// </summary>
-        public int Port { get; }
-        /// <summary>
-        /// Get/Set the response type that is going to be returned when doing requests (json, png). 
-        /// </summary>
-        public string ResponseType { get; set; } = "json";
-        /// <summary>
-        /// Get/Set level console output debug. 
-        /// 0 - nothing
-        /// 1 - Url and method
-        /// 2 - Url and method and result
-        /// </summary>
-        public int DebugLevel { get; set; } = 0;
-        /// <summary>
-        /// Returns the base URL used to interact with the Proxmox VE API. 
-        /// </summary>
-        public string GetApiUrl() => $"https://{Hostname}:{Port}/api2/{ResponseType}";
-        /// <summary>
-        /// Convert object to JSON.
-        /// </summary>
-        /// <param name="obj"></param>
-        public static string ObjectToJson(object obj) => JsonConvert.SerializeObject(obj, Formatting.Indented);
-        /// <summary>
-        /// Creation ticket from login.
-        /// </summary>
-        /// <param name="userName"></param>
-        /// <param name="password"></param>
-        /// <param name="realm"></param>
-        public bool Login(string userName, string password, string realm = "pam")
-        {
-            var ticket = Access.Ticket.CreateRest(username: userName, password: password, realm: realm);
-            if (ticket.IsSuccessStatusCode)
-            {
-                _ticketCSRFPreventionToken = ticket.Response.data.CSRFPreventionToken;
-                _ticketPVEAuthCookie = ticket.Response.data.ticket;
-            }
-            return ticket.IsSuccessStatusCode;
-        }
-        /// <summary>
-        /// Creation ticket from login split username &lt;username&gt;@&lt;realm&gt;.
-        /// </summary>
-        /// <param name="userName"></param>
-        /// <param name="password"></param>
-        public bool Login(string userName, string password)
-        {
-            var realm = "pam";
-            //check username
-            var uData = userName.Split('@');
-            if (uData.Length > 1)
-            {
-                userName = uData[0];
-                realm = uData[1];
-            }
-            return Login(userName, password, realm);
-        }
-        /// <summary>
-        /// Execute Execute method GET
-        /// </summary>
-        /// <param name="resource">Url request</param>
-        /// <param name="parameters">Additional parameters</param>
-        /// <returns>Result</returns>
-        public Result Get(string resource, IDictionary<string, object> parameters = null) => ExecuteAction(resource, HttpMethod.Get, parameters);
-        /// <summary>
-        /// Execute Execute method POST
-        /// </summary>
-        /// <param name="resource">Url request</param>
-        /// <param name="parameters">Additional parameters</param>
-        /// <returns>Result</returns>
-        public Result Create(string resource, IDictionary<string, object> parameters = null) => ExecuteAction(resource, HttpMethod.Post, parameters);
-        /// <summary>
-        /// Execute Execute method PUT
-        /// </summary>
-        /// <param name="resource">Url request</param>
-        /// <param name="parameters">Additional parameters</param>
-        /// <returns>Result</returns>
-        public Result Set(string resource, IDictionary<string, object> parameters = null) => ExecuteAction(resource, HttpMethod.Put, parameters);
-        /// <summary>
-        /// Execute Execute method DELETE
-        /// </summary>
-        /// <param name="resource">Url request</param>
-        /// <param name="parameters">Additional parameters</param>
-        /// <returns>Result</returns>
-        public Result Delete(string resource, IDictionary<string, object> parameters = null) => ExecuteAction(resource, HttpMethod.Delete, parameters);
-        private Result ExecuteAction(string resource, HttpMethod method, IDictionary<string, object> parameters = null)
-        {
-            using (var handler = new HttpClientHandler()
-            {
-                CookieContainer = new CookieContainer(),
-                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; }
-            })
-            using (var client = new HttpClient(handler))
-            {
-                client.BaseAddress = new Uri(GetApiUrl());
-                //load parameters
-                var @params = new Dictionary<string, string>();
-                if (parameters != null)
-                {
-                    foreach (var parameter in parameters.Where(a => a.Value != null))
-                    {
-                        var value = parameter.Value;
-                        if (value is bool) { value = ((bool)value) ? 1 : 0; }
-                        @params.Add(parameter.Key, HttpUtility.UrlEncode(value.ToString()));
-                    }
-                }
-                var uriString = GetApiUrl() + resource;
-                if (method == HttpMethod.Get && @params.Count > 0)
-                {
-                    uriString += "?" + string.Join("&", @params.Select(a => $"{a.Key}={a.Value}"));
-                }
-                if (DebugLevel >= 1)
-                {
-                    Console.Out.WriteLine($"Method: {method}, Url: {uriString}");
-                    if (method != HttpMethod.Get)
-                    {
-                        Console.Out.WriteLine("Parameters:");
-                        Console.Out.WriteLine(string.Join(Environment.NewLine,
-                                                          @params.Select(a => $"{a.Key} : {a.Value}")));
-                    }
-                }
-                var request = new HttpRequestMessage(method, new Uri(uriString));
-                if (method != HttpMethod.Get) { request.Content = new FormUrlEncodedContent(@params); }
-                //tiket login
-                if (_ticketCSRFPreventionToken != null)
-                {
-                    handler.CookieContainer.Add(request.RequestUri, new Cookie("PVEAuthCookie", _ticketPVEAuthCookie));
-                    request.Headers.Add("CSRFPreventionToken", _ticketCSRFPreventionToken);
-                }
 
-                var response = client.SendAsync(request).Result;
-                dynamic result = null;
-                if (DebugLevel >= 2)
-                {
-                    Console.Out.WriteLine($"StatusCode:          {response.StatusCode}");
-                    Console.Out.WriteLine($"ReasonPhrase:        {response.ReasonPhrase}");
-                    Console.Out.WriteLine($"IsSuccessStatusCode: {response.IsSuccessStatusCode}");
-                }
-                if (ResponseType == "json")
-                {
-                    var stringContent = response.Content.ReadAsStringAsync().Result;
-                    result = JsonConvert.DeserializeObject<ExpandoObject>(stringContent);
-                    if (DebugLevel >= 2) { Console.Out.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented)); }
-                }
-                else if (ResponseType == "png")
-                {
-                    result = "data:image/png;base64," +
-                             Convert.ToBase64String(response.Content.ReadAsByteArrayAsync().Result);
-                    if (DebugLevel >= 2) { Console.Out.WriteLine(result); }
-                }
-                if (result == null) { result = new ExpandoObject(); }
-                if (DebugLevel > 0) { Console.Out.WriteLine("============================="); }
-                return new Result(result,
-                                  response.StatusCode,
-                                  response.ReasonPhrase,
-                                  response.IsSuccessStatusCode);
-            }
-        }
-        private static void AddIndexedParameter(Dictionary<string, object> parameters, string name, IDictionary<int, string> value)
-        {
-            if (value == null) { return; }
-            foreach (var item in value) { parameters.Add(name + item.Key, item.Value); }
-        }
-        /// <summary>
-        /// Wait for task to finish
-        /// </summary>
-        /// <param name="node">Node identifier</param>
-        /// <param name="task">Task identifier</param>
-        /// <param name="wait">Millisecond wait next check</param>
-        /// <param name="timeOut">Millisecond timeout</param>
-        /// <return>O Success</return>
-        public int WaitForTaskToFinish(string node, string task, long wait = 500, long timeOut = 10000)
-        {
-            var isRunning = true;
-            if (wait <= 0) { wait = 500; }
-            if (timeOut < wait) { timeOut = wait + 5000; }
-            var timeStart = DateTime.Now;
-            var waitTime = DateTime.Now;
-            while (isRunning && (timeStart - DateTime.Now).Milliseconds < timeOut)
-            {
-                if ((DateTime.Now - waitTime).TotalMilliseconds >= wait)
-                {
-                    waitTime = DateTime.Now;
-                    isRunning = TaskIsRunning(node, task);
-                }
-            }
-            //check timeout
-            return (timeStart - DateTime.Now).Milliseconds < timeOut ? 0 : 1;
-        }
-        public bool TaskIsRunning(string node, string task)
-            => Nodes[node].Tasks[task].Status.GetRest().Response.data.status == "running";
-        public string GetExitStatusTask(string node, string task)
-            => Nodes[node].Tasks[task].Status.GetRest().Response.data.exitstatus;
         private PVECluster _cluster;
         public PVECluster Cluster => _cluster ?? (_cluster = new PVECluster(_client));
         private PVENodes _nodes;
@@ -295,13 +33,11 @@ namespace Corsinvest.ProxmoxVE.Api
         public PVEPools Pools => _pools ?? (_pools = new PVEPools(_client));
         private PVEVersion _version;
         public PVEVersion Version => _version ?? (_version = new PVEVersion(_client));
-
-        public class PVECluster : Base
+        public class PVECluster
         {
-            internal PVECluster(Client client)
-            {
-                _client = client;
-            }
+            private readonly Client _client;
+
+            internal PVECluster(Client client) { _client = client; }
             private PVEReplication _replication;
             public PVEReplication Replication => _replication ?? (_replication = new PVEReplication(_client));
             private PVEConfig _config;
@@ -326,21 +62,19 @@ namespace Corsinvest.ProxmoxVE.Api
             public PVEStatus Status => _status ?? (_status = new PVEStatus(_client));
             private PVENextid _nextid;
             public PVENextid Nextid => _nextid ?? (_nextid = new PVENextid(_client));
-            public class PVEReplication : Base
+            private PVECeph _ceph;
+            public PVECeph Ceph => _ceph ?? (_ceph = new PVECeph(_client));
+            public class PVEReplication
             {
-                internal PVEReplication(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVEReplication(Client client) { _client = client; }
                 public PVEItemId this[object id] => new PVEItemId(_client, id);
-                public class PVEItemId : Base
+                public class PVEItemId
                 {
-                    private object _id;
-                    internal PVEItemId(Client client, object id)
-                    {
-                        _client = client;
-                        _id = id;
-                    }
+                    private readonly Client _client;
+                    private readonly object _id;
+                    internal PVEItemId(Client client, object id) { _client = client; _id = id; }
                     /// <summary>
                     /// Mark replication job for removal.
                     /// </summary>
@@ -354,6 +88,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("keep", keep);
                         return _client.Delete($"/cluster/replication/{_id}", parameters);
                     }
+
                     /// <summary>
                     /// Mark replication job for removal.
                     /// </summary>
@@ -365,10 +100,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Read replication job configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/cluster/replication/{_id}");
-                    }
+                    public Result GetRest() { return _client.Get($"/cluster/replication/{_id}"); }
+
                     /// <summary>
                     /// Read replication job configuration.
                     /// </summary>
@@ -400,6 +133,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("source", source);
                         return _client.Set($"/cluster/replication/{_id}", parameters);
                     }
+
                     /// <summary>
                     /// Update replication job configuration.
                     /// </summary>
@@ -419,10 +153,8 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// List replication jobs.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest()
-                {
-                    return _client.Get($"/cluster/replication");
-                }
+                public Result GetRest() { return _client.Get($"/cluster/replication"); }
+
                 /// <summary>
                 /// List replication jobs.
                 /// </summary>
@@ -457,6 +189,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("source", source);
                     return _client.Create($"/cluster/replication", parameters);
                 }
+
                 /// <summary>
                 /// Create a new replication job
                 /// </summary>
@@ -474,41 +207,36 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <returns></returns>
                 public Result Create(string id, string target, string type, string comment = null, bool? disable = null, int? rate = null, string remove_job = null, string schedule = null, string source = null) => CreateRest(id, target, type, comment, disable, rate, remove_job, schedule, source);
             }
-            public class PVEConfig : Base
+            public class PVEConfig
             {
-                internal PVEConfig(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVEConfig(Client client) { _client = client; }
                 private PVENodes _nodes;
                 public PVENodes Nodes => _nodes ?? (_nodes = new PVENodes(_client));
                 private PVEJoin _join;
                 public PVEJoin Join => _join ?? (_join = new PVEJoin(_client));
                 private PVETotem _totem;
                 public PVETotem Totem => _totem ?? (_totem = new PVETotem(_client));
-                public class PVENodes : Base
+                private PVEQdevice _qdevice;
+                public PVEQdevice Qdevice => _qdevice ?? (_qdevice = new PVEQdevice(_client));
+                public class PVENodes
                 {
-                    internal PVENodes(Client client)
-                    {
-                        _client = client;
-                    }
+                    private readonly Client _client;
+
+                    internal PVENodes(Client client) { _client = client; }
                     public PVEItemNode this[object node] => new PVEItemNode(_client, node);
-                    public class PVEItemNode : Base
+                    public class PVEItemNode
                     {
-                        private object _node;
-                        internal PVEItemNode(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEItemNode(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Removes a node from the cluster configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest()
-                        {
-                            return _client.Delete($"/cluster/config/nodes/{_node}");
-                        }
+                        public Result DeleteRest() { return _client.Delete($"/cluster/config/nodes/{_node}"); }
+
                         /// <summary>
                         /// Removes a node from the cluster configuration.
                         /// </summary>
@@ -518,52 +246,47 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Adds a node to the cluster configuration. This call is for internal use.
                         /// </summary>
                         /// <param name="force">Do not throw error if node already exists.</param>
+                        /// <param name="linkN">Address and priority information of a single corosync link.</param>
                         /// <param name="nodeid">Node id for this node.</param>
-                        /// <param name="ring0_addr">Hostname (or IP) of the corosync ring0 address of this node.</param>
-                        /// <param name="ring1_addr">Hostname (or IP) of the corosync ring1 address of this node. Requires a valid configured ring 1 (bindnet1_addr) in the cluster.</param>
                         /// <param name="votes">Number of votes for this node</param>
                         /// <returns></returns>
-                        public Result CreateRest(bool? force = null, int? nodeid = null, string ring0_addr = null, string ring1_addr = null, int? votes = null)
+                        public Result CreateRest(bool? force = null, IDictionary<int, string> linkN = null, int? nodeid = null, int? votes = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("force", force);
                             parameters.Add("nodeid", nodeid);
-                            parameters.Add("ring0_addr", ring0_addr);
-                            parameters.Add("ring1_addr", ring1_addr);
                             parameters.Add("votes", votes);
+                            AddIndexedParameter(parameters, "link", linkN);
                             return _client.Create($"/cluster/config/nodes/{_node}", parameters);
                         }
+
                         /// <summary>
                         /// Adds a node to the cluster configuration. This call is for internal use.
                         /// </summary>
                         /// <param name="force">Do not throw error if node already exists.</param>
+                        /// <param name="linkN">Address and priority information of a single corosync link.</param>
                         /// <param name="nodeid">Node id for this node.</param>
-                        /// <param name="ring0_addr">Hostname (or IP) of the corosync ring0 address of this node.</param>
-                        /// <param name="ring1_addr">Hostname (or IP) of the corosync ring1 address of this node. Requires a valid configured ring 1 (bindnet1_addr) in the cluster.</param>
                         /// <param name="votes">Number of votes for this node</param>
                         /// <returns></returns>
-                        public Result Addnode(bool? force = null, int? nodeid = null, string ring0_addr = null, string ring1_addr = null, int? votes = null) => CreateRest(force, nodeid, ring0_addr, ring1_addr, votes);
+                        public Result Addnode(bool? force = null, IDictionary<int, string> linkN = null, int? nodeid = null, int? votes = null) => CreateRest(force, linkN, nodeid, votes);
                     }
                     /// <summary>
                     /// Corosync node list.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/cluster/config/nodes");
-                    }
+                    public Result GetRest() { return _client.Get($"/cluster/config/nodes"); }
+
                     /// <summary>
                     /// Corosync node list.
                     /// </summary>
                     /// <returns></returns>
                     public Result Nodes() => GetRest();
                 }
-                public class PVEJoin : Base
+                public class PVEJoin
                 {
-                    internal PVEJoin(Client client)
-                    {
-                        _client = client;
-                    }
+                    private readonly Client _client;
+
+                    internal PVEJoin(Client client) { _client = client; }
                     /// <summary>
                     /// Get information needed to join this cluster over the connected node.
                     /// </summary>
@@ -575,6 +298,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("node", node);
                         return _client.Get($"/cluster/config/join", parameters);
                     }
+
                     /// <summary>
                     /// Get information needed to join this cluster over the connected node.
                     /// </summary>
@@ -588,12 +312,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="hostname">Hostname (or IP) of an existing cluster member.</param>
                     /// <param name="password">Superuser (root) password of peer node.</param>
                     /// <param name="force">Do not throw error if node already exists.</param>
+                    /// <param name="linkN">Address and priority information of a single corosync link.</param>
                     /// <param name="nodeid">Node id for this node.</param>
-                    /// <param name="ring0_addr">Hostname (or IP) of the corosync ring0 address of this node.</param>
-                    /// <param name="ring1_addr">Hostname (or IP) of the corosync ring1 address of this node. Requires a valid configured ring 1 (bindnet1_addr) in the cluster.</param>
                     /// <param name="votes">Number of votes for this node</param>
                     /// <returns></returns>
-                    public Result CreateRest(string fingerprint, string hostname, string password, bool? force = null, int? nodeid = null, string ring0_addr = null, string ring1_addr = null, int? votes = null)
+                    public Result CreateRest(string fingerprint, string hostname, string password, bool? force = null, IDictionary<int, string> linkN = null, int? nodeid = null, int? votes = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("fingerprint", fingerprint);
@@ -601,11 +324,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("password", password);
                         parameters.Add("force", force);
                         parameters.Add("nodeid", nodeid);
-                        parameters.Add("ring0_addr", ring0_addr);
-                        parameters.Add("ring1_addr", ring1_addr);
                         parameters.Add("votes", votes);
+                        AddIndexedParameter(parameters, "link", linkN);
                         return _client.Create($"/cluster/config/join", parameters);
                     }
+
                     /// <summary>
                     /// Joins this node into an existing cluster.
                     /// </summary>
@@ -613,41 +336,52 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="hostname">Hostname (or IP) of an existing cluster member.</param>
                     /// <param name="password">Superuser (root) password of peer node.</param>
                     /// <param name="force">Do not throw error if node already exists.</param>
+                    /// <param name="linkN">Address and priority information of a single corosync link.</param>
                     /// <param name="nodeid">Node id for this node.</param>
-                    /// <param name="ring0_addr">Hostname (or IP) of the corosync ring0 address of this node.</param>
-                    /// <param name="ring1_addr">Hostname (or IP) of the corosync ring1 address of this node. Requires a valid configured ring 1 (bindnet1_addr) in the cluster.</param>
                     /// <param name="votes">Number of votes for this node</param>
                     /// <returns></returns>
-                    public Result Join(string fingerprint, string hostname, string password, bool? force = null, int? nodeid = null, string ring0_addr = null, string ring1_addr = null, int? votes = null) => CreateRest(fingerprint, hostname, password, force, nodeid, ring0_addr, ring1_addr, votes);
+                    public Result Join(string fingerprint, string hostname, string password, bool? force = null, IDictionary<int, string> linkN = null, int? nodeid = null, int? votes = null) => CreateRest(fingerprint, hostname, password, force, linkN, nodeid, votes);
                 }
-                public class PVETotem : Base
+                public class PVETotem
                 {
-                    internal PVETotem(Client client)
-                    {
-                        _client = client;
-                    }
+                    private readonly Client _client;
+
+                    internal PVETotem(Client client) { _client = client; }
                     /// <summary>
                     /// Get corosync totem protocol settings.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/cluster/config/totem");
-                    }
+                    public Result GetRest() { return _client.Get($"/cluster/config/totem"); }
+
                     /// <summary>
                     /// Get corosync totem protocol settings.
                     /// </summary>
                     /// <returns></returns>
                     public Result Totem() => GetRest();
                 }
+                public class PVEQdevice
+                {
+                    private readonly Client _client;
+
+                    internal PVEQdevice(Client client) { _client = client; }
+                    /// <summary>
+                    /// Get QDevice status
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result GetRest() { return _client.Get($"/cluster/config/qdevice"); }
+
+                    /// <summary>
+                    /// Get QDevice status
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result Status() => GetRest();
+                }
                 /// <summary>
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest()
-                {
-                    return _client.Get($"/cluster/config");
-                }
+                public Result GetRest() { return _client.Get($"/cluster/config"); }
+
                 /// <summary>
                 /// Directory index.
                 /// </summary>
@@ -657,44 +391,35 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// Generate new cluster configuration.
                 /// </summary>
                 /// <param name="clustername">The name of the cluster.</param>
-                /// <param name="bindnet0_addr">This specifies the network address the corosync ring 0 executive should bind to and defaults to the local IP address of the node.</param>
-                /// <param name="bindnet1_addr">This specifies the network address the corosync ring 1 executive should bind to and is optional.</param>
+                /// <param name="linkN">Address and priority information of a single corosync link.</param>
                 /// <param name="nodeid">Node id for this node.</param>
-                /// <param name="ring0_addr">Hostname (or IP) of the corosync ring0 address of this node.</param>
-                /// <param name="ring1_addr">Hostname (or IP) of the corosync ring1 address of this node. Requires a valid configured ring 1 (bindnet1_addr) in the cluster.</param>
                 /// <param name="votes">Number of votes for this node.</param>
                 /// <returns></returns>
-                public Result CreateRest(string clustername, string bindnet0_addr = null, string bindnet1_addr = null, int? nodeid = null, string ring0_addr = null, string ring1_addr = null, int? votes = null)
+                public Result CreateRest(string clustername, IDictionary<int, string> linkN = null, int? nodeid = null, int? votes = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("clustername", clustername);
-                    parameters.Add("bindnet0_addr", bindnet0_addr);
-                    parameters.Add("bindnet1_addr", bindnet1_addr);
                     parameters.Add("nodeid", nodeid);
-                    parameters.Add("ring0_addr", ring0_addr);
-                    parameters.Add("ring1_addr", ring1_addr);
                     parameters.Add("votes", votes);
+                    AddIndexedParameter(parameters, "link", linkN);
                     return _client.Create($"/cluster/config", parameters);
                 }
+
                 /// <summary>
                 /// Generate new cluster configuration.
                 /// </summary>
                 /// <param name="clustername">The name of the cluster.</param>
-                /// <param name="bindnet0_addr">This specifies the network address the corosync ring 0 executive should bind to and defaults to the local IP address of the node.</param>
-                /// <param name="bindnet1_addr">This specifies the network address the corosync ring 1 executive should bind to and is optional.</param>
+                /// <param name="linkN">Address and priority information of a single corosync link.</param>
                 /// <param name="nodeid">Node id for this node.</param>
-                /// <param name="ring0_addr">Hostname (or IP) of the corosync ring0 address of this node.</param>
-                /// <param name="ring1_addr">Hostname (or IP) of the corosync ring1 address of this node. Requires a valid configured ring 1 (bindnet1_addr) in the cluster.</param>
                 /// <param name="votes">Number of votes for this node.</param>
                 /// <returns></returns>
-                public Result Create(string clustername, string bindnet0_addr = null, string bindnet1_addr = null, int? nodeid = null, string ring0_addr = null, string ring1_addr = null, int? votes = null) => CreateRest(clustername, bindnet0_addr, bindnet1_addr, nodeid, ring0_addr, ring1_addr, votes);
+                public Result Create(string clustername, IDictionary<int, string> linkN = null, int? nodeid = null, int? votes = null) => CreateRest(clustername, linkN, nodeid, votes);
             }
-            public class PVEFirewall : Base
+            public class PVEFirewall
             {
-                internal PVEFirewall(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVEFirewall(Client client) { _client = client; }
                 private PVEGroups _groups;
                 public PVEGroups Groups => _groups ?? (_groups = new PVEGroups(_client));
                 private PVERules _rules;
@@ -709,30 +434,26 @@ namespace Corsinvest.ProxmoxVE.Api
                 public PVEMacros Macros => _macros ?? (_macros = new PVEMacros(_client));
                 private PVERefs _refs;
                 public PVERefs Refs => _refs ?? (_refs = new PVERefs(_client));
-                public class PVEGroups : Base
+                public class PVEGroups
                 {
-                    internal PVEGroups(Client client)
-                    {
-                        _client = client;
-                    }
+                    private readonly Client _client;
+
+                    internal PVEGroups(Client client) { _client = client; }
                     public PVEItemGroup this[object group] => new PVEItemGroup(_client, group);
-                    public class PVEItemGroup : Base
+                    public class PVEItemGroup
                     {
-                        private object _group;
-                        internal PVEItemGroup(Client client, object group)
-                        {
-                            _client = client;
-                            _group = group;
-                        }
+                        private readonly Client _client;
+                        private readonly object _group;
+                        internal PVEItemGroup(Client client, object group) { _client = client; _group = group; }
                         public PVEItemPos this[object pos] => new PVEItemPos(_client, _group, pos);
-                        public class PVEItemPos : Base
+                        public class PVEItemPos
                         {
-                            private object _group;
-                            private object _pos;
+                            private readonly Client _client;
+                            private readonly object _group;
+                            private readonly object _pos;
                             internal PVEItemPos(Client client, object group, object pos)
                             {
-                                _client = client;
-                                _group = group;
+                                _client = client; _group = group;
                                 _pos = pos;
                             }
                             /// <summary>
@@ -746,6 +467,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("digest", digest);
                                 return _client.Delete($"/cluster/firewall/groups/{_group}/{_pos}", parameters);
                             }
+
                             /// <summary>
                             /// Delete rule.
                             /// </summary>
@@ -756,10 +478,8 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Get single rule data.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest()
-                            {
-                                return _client.Get($"/cluster/firewall/groups/{_group}/{_pos}");
-                            }
+                            public Result GetRest() { return _client.Get($"/cluster/firewall/groups/{_group}/{_pos}"); }
+
                             /// <summary>
                             /// Get single rule data.
                             /// </summary>
@@ -806,6 +526,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("type", type);
                                 return _client.Set($"/cluster/firewall/groups/{_group}/{_pos}", parameters);
                             }
+
                             /// <summary>
                             /// Modify rule data.
                             /// </summary>
@@ -833,10 +554,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Delete security group.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest()
-                        {
-                            return _client.Delete($"/cluster/firewall/groups/{_group}");
-                        }
+                        public Result DeleteRest() { return _client.Delete($"/cluster/firewall/groups/{_group}"); }
+
                         /// <summary>
                         /// Delete security group.
                         /// </summary>
@@ -846,10 +565,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// List rules.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/cluster/firewall/groups/{_group}");
-                        }
+                        public Result GetRest() { return _client.Get($"/cluster/firewall/groups/{_group}"); }
+
                         /// <summary>
                         /// List rules.
                         /// </summary>
@@ -894,6 +611,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("sport", sport);
                             return _client.Create($"/cluster/firewall/groups/{_group}", parameters);
                         }
+
                         /// <summary>
                         /// Create new rule.
                         /// </summary>
@@ -920,10 +638,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// List security groups.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/cluster/firewall/groups");
-                    }
+                    public Result GetRest() { return _client.Get($"/cluster/firewall/groups"); }
+
                     /// <summary>
                     /// List security groups.
                     /// </summary>
@@ -946,6 +662,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("rename", rename);
                         return _client.Create($"/cluster/firewall/groups", parameters);
                     }
+
                     /// <summary>
                     /// Create new security group.
                     /// </summary>
@@ -956,21 +673,17 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result CreateSecurityGroup(string group, string comment = null, string digest = null, string rename = null) => CreateRest(group, comment, digest, rename);
                 }
-                public class PVERules : Base
+                public class PVERules
                 {
-                    internal PVERules(Client client)
-                    {
-                        _client = client;
-                    }
+                    private readonly Client _client;
+
+                    internal PVERules(Client client) { _client = client; }
                     public PVEItemPos this[object pos] => new PVEItemPos(_client, pos);
-                    public class PVEItemPos : Base
+                    public class PVEItemPos
                     {
-                        private object _pos;
-                        internal PVEItemPos(Client client, object pos)
-                        {
-                            _client = client;
-                            _pos = pos;
-                        }
+                        private readonly Client _client;
+                        private readonly object _pos;
+                        internal PVEItemPos(Client client, object pos) { _client = client; _pos = pos; }
                         /// <summary>
                         /// Delete rule.
                         /// </summary>
@@ -982,6 +695,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("digest", digest);
                             return _client.Delete($"/cluster/firewall/rules/{_pos}", parameters);
                         }
+
                         /// <summary>
                         /// Delete rule.
                         /// </summary>
@@ -992,10 +706,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Get single rule data.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/cluster/firewall/rules/{_pos}");
-                        }
+                        public Result GetRest() { return _client.Get($"/cluster/firewall/rules/{_pos}"); }
+
                         /// <summary>
                         /// Get single rule data.
                         /// </summary>
@@ -1042,6 +754,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("type", type);
                             return _client.Set($"/cluster/firewall/rules/{_pos}", parameters);
                         }
+
                         /// <summary>
                         /// Modify rule data.
                         /// </summary>
@@ -1069,10 +782,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// List rules.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/cluster/firewall/rules");
-                    }
+                    public Result GetRest() { return _client.Get($"/cluster/firewall/rules"); }
+
                     /// <summary>
                     /// List rules.
                     /// </summary>
@@ -1117,6 +828,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("sport", sport);
                         return _client.Create($"/cluster/firewall/rules", parameters);
                     }
+
                     /// <summary>
                     /// Create new rule.
                     /// </summary>
@@ -1139,30 +851,26 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => CreateRest(action, type, comment, dest, digest, dport, enable, iface, log, macro, pos, proto, source, sport);
                 }
-                public class PVEIpset : Base
+                public class PVEIpset
                 {
-                    internal PVEIpset(Client client)
-                    {
-                        _client = client;
-                    }
+                    private readonly Client _client;
+
+                    internal PVEIpset(Client client) { _client = client; }
                     public PVEItemName this[object name] => new PVEItemName(_client, name);
-                    public class PVEItemName : Base
+                    public class PVEItemName
                     {
-                        private object _name;
-                        internal PVEItemName(Client client, object name)
-                        {
-                            _client = client;
-                            _name = name;
-                        }
+                        private readonly Client _client;
+                        private readonly object _name;
+                        internal PVEItemName(Client client, object name) { _client = client; _name = name; }
                         public PVEItemCidr this[object cidr] => new PVEItemCidr(_client, _name, cidr);
-                        public class PVEItemCidr : Base
+                        public class PVEItemCidr
                         {
-                            private object _name;
-                            private object _cidr;
+                            private readonly Client _client;
+                            private readonly object _name;
+                            private readonly object _cidr;
                             internal PVEItemCidr(Client client, object name, object cidr)
                             {
-                                _client = client;
-                                _name = name;
+                                _client = client; _name = name;
                                 _cidr = cidr;
                             }
                             /// <summary>
@@ -1176,6 +884,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("digest", digest);
                                 return _client.Delete($"/cluster/firewall/ipset/{_name}/{_cidr}", parameters);
                             }
+
                             /// <summary>
                             /// Remove IP or Network from IPSet.
                             /// </summary>
@@ -1186,10 +895,8 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Read IP or Network settings from IPSet.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest()
-                            {
-                                return _client.Get($"/cluster/firewall/ipset/{_name}/{_cidr}");
-                            }
+                            public Result GetRest() { return _client.Get($"/cluster/firewall/ipset/{_name}/{_cidr}"); }
+
                             /// <summary>
                             /// Read IP or Network settings from IPSet.
                             /// </summary>
@@ -1210,6 +917,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("nomatch", nomatch);
                                 return _client.Set($"/cluster/firewall/ipset/{_name}/{_cidr}", parameters);
                             }
+
                             /// <summary>
                             /// Update IP or Network settings
                             /// </summary>
@@ -1223,10 +931,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Delete IPSet
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest()
-                        {
-                            return _client.Delete($"/cluster/firewall/ipset/{_name}");
-                        }
+                        public Result DeleteRest() { return _client.Delete($"/cluster/firewall/ipset/{_name}"); }
+
                         /// <summary>
                         /// Delete IPSet
                         /// </summary>
@@ -1236,10 +942,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// List IPSet content
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/cluster/firewall/ipset/{_name}");
-                        }
+                        public Result GetRest() { return _client.Get($"/cluster/firewall/ipset/{_name}"); }
+
                         /// <summary>
                         /// List IPSet content
                         /// </summary>
@@ -1260,6 +964,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("nomatch", nomatch);
                             return _client.Create($"/cluster/firewall/ipset/{_name}", parameters);
                         }
+
                         /// <summary>
                         /// Add IP or Network to IPSet.
                         /// </summary>
@@ -1273,10 +978,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// List IPSets
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/cluster/firewall/ipset");
-                    }
+                    public Result GetRest() { return _client.Get($"/cluster/firewall/ipset"); }
+
                     /// <summary>
                     /// List IPSets
                     /// </summary>
@@ -1299,6 +1002,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("rename", rename);
                         return _client.Create($"/cluster/firewall/ipset", parameters);
                     }
+
                     /// <summary>
                     /// Create new IPSet
                     /// </summary>
@@ -1309,21 +1013,17 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result CreateIpset(string name, string comment = null, string digest = null, string rename = null) => CreateRest(name, comment, digest, rename);
                 }
-                public class PVEAliases : Base
+                public class PVEAliases
                 {
-                    internal PVEAliases(Client client)
-                    {
-                        _client = client;
-                    }
+                    private readonly Client _client;
+
+                    internal PVEAliases(Client client) { _client = client; }
                     public PVEItemName this[object name] => new PVEItemName(_client, name);
-                    public class PVEItemName : Base
+                    public class PVEItemName
                     {
-                        private object _name;
-                        internal PVEItemName(Client client, object name)
-                        {
-                            _client = client;
-                            _name = name;
-                        }
+                        private readonly Client _client;
+                        private readonly object _name;
+                        internal PVEItemName(Client client, object name) { _client = client; _name = name; }
                         /// <summary>
                         /// Remove IP or Network alias.
                         /// </summary>
@@ -1335,6 +1035,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("digest", digest);
                             return _client.Delete($"/cluster/firewall/aliases/{_name}", parameters);
                         }
+
                         /// <summary>
                         /// Remove IP or Network alias.
                         /// </summary>
@@ -1345,10 +1046,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Read alias.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/cluster/firewall/aliases/{_name}");
-                        }
+                        public Result GetRest() { return _client.Get($"/cluster/firewall/aliases/{_name}"); }
+
                         /// <summary>
                         /// Read alias.
                         /// </summary>
@@ -1371,6 +1070,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("rename", rename);
                             return _client.Set($"/cluster/firewall/aliases/{_name}", parameters);
                         }
+
                         /// <summary>
                         /// Update IP or Network alias.
                         /// </summary>
@@ -1385,10 +1085,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// List aliases
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/cluster/firewall/aliases");
-                    }
+                    public Result GetRest() { return _client.Get($"/cluster/firewall/aliases"); }
+
                     /// <summary>
                     /// List aliases
                     /// </summary>
@@ -1409,6 +1107,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("comment", comment);
                         return _client.Create($"/cluster/firewall/aliases", parameters);
                     }
+
                     /// <summary>
                     /// Create IP or Network Alias.
                     /// </summary>
@@ -1418,20 +1117,17 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result CreateAlias(string cidr, string name, string comment = null) => CreateRest(cidr, name, comment);
                 }
-                public class PVEOptions : Base
+                public class PVEOptions
                 {
-                    internal PVEOptions(Client client)
-                    {
-                        _client = client;
-                    }
+                    private readonly Client _client;
+
+                    internal PVEOptions(Client client) { _client = client; }
                     /// <summary>
                     /// Get Firewall options.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/cluster/firewall/options");
-                    }
+                    public Result GetRest() { return _client.Get($"/cluster/firewall/options"); }
+
                     /// <summary>
                     /// Get Firewall options.
                     /// </summary>
@@ -1462,6 +1158,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("policy_out", policy_out);
                         return _client.Set($"/cluster/firewall/options", parameters);
                     }
+
                     /// <summary>
                     /// Set Firewall options.
                     /// </summary>
@@ -1477,32 +1174,28 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result SetOptions(string delete = null, string digest = null, bool? ebtables = null, int? enable = null, string log_ratelimit = null, string policy_in = null, string policy_out = null) => SetRest(delete, digest, ebtables, enable, log_ratelimit, policy_in, policy_out);
                 }
-                public class PVEMacros : Base
+                public class PVEMacros
                 {
-                    internal PVEMacros(Client client)
-                    {
-                        _client = client;
-                    }
+                    private readonly Client _client;
+
+                    internal PVEMacros(Client client) { _client = client; }
                     /// <summary>
                     /// List available macros
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/cluster/firewall/macros");
-                    }
+                    public Result GetRest() { return _client.Get($"/cluster/firewall/macros"); }
+
                     /// <summary>
                     /// List available macros
                     /// </summary>
                     /// <returns></returns>
                     public Result GetMacros() => GetRest();
                 }
-                public class PVERefs : Base
+                public class PVERefs
                 {
-                    internal PVERefs(Client client)
-                    {
-                        _client = client;
-                    }
+                    private readonly Client _client;
+
+                    internal PVERefs(Client client) { _client = client; }
                     /// <summary>
                     /// Lists possible IPSet/Alias reference which are allowed in source/dest properties.
                     /// </summary>
@@ -1515,6 +1208,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("type", type);
                         return _client.Get($"/cluster/firewall/refs", parameters);
                     }
+
                     /// <summary>
                     /// Lists possible IPSet/Alias reference which are allowed in source/dest properties.
                     /// </summary>
@@ -1527,39 +1221,31 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest()
-                {
-                    return _client.Get($"/cluster/firewall");
-                }
+                public Result GetRest() { return _client.Get($"/cluster/firewall"); }
+
                 /// <summary>
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
                 public Result Index() => GetRest();
             }
-            public class PVEBackup : Base
+            public class PVEBackup
             {
-                internal PVEBackup(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVEBackup(Client client) { _client = client; }
                 public PVEItemId this[object id] => new PVEItemId(_client, id);
-                public class PVEItemId : Base
+                public class PVEItemId
                 {
-                    private object _id;
-                    internal PVEItemId(Client client, object id)
-                    {
-                        _client = client;
-                        _id = id;
-                    }
+                    private readonly Client _client;
+                    private readonly object _id;
+                    internal PVEItemId(Client client, object id) { _client = client; _id = id; }
                     /// <summary>
                     /// Delete vzdump backup job definition.
                     /// </summary>
                     /// <returns></returns>
-                    public Result DeleteRest()
-                    {
-                        return _client.Delete($"/cluster/backup/{_id}");
-                    }
+                    public Result DeleteRest() { return _client.Delete($"/cluster/backup/{_id}"); }
+
                     /// <summary>
                     /// Delete vzdump backup job definition.
                     /// </summary>
@@ -1569,10 +1255,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Read vzdump backup job definition.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/cluster/backup/{_id}");
-                    }
+                    public Result GetRest() { return _client.Get($"/cluster/backup/{_id}"); }
+
                     /// <summary>
                     /// Read vzdump backup job definition.
                     /// </summary>
@@ -1602,18 +1286,19 @@ namespace Corsinvest.ProxmoxVE.Api
                     ///   Enum: snapshot,suspend,stop</param>
                     /// <param name="node">Only run if executed on this node.</param>
                     /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
+                    /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
                     /// <param name="quiet">Be quiet.</param>
                     /// <param name="remove">Remove old backup files if there are more than 'maxfiles' backup files.</param>
                     /// <param name="script">Use specified hook script.</param>
                     /// <param name="size">Unused, will be removed in a future release.</param>
                     /// <param name="stdexcludes">Exclude temporary files and logs.</param>
-                    /// <param name="stop">Stop runnig backup jobs on this host.</param>
+                    /// <param name="stop">Stop running backup jobs on this host.</param>
                     /// <param name="stopwait">Maximal time to wait until a guest system is stopped (minutes).</param>
                     /// <param name="storage">Store resulting file to this storage.</param>
                     /// <param name="tmpdir">Store temporary files to specified directory.</param>
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
                     /// <returns></returns>
-                    public Result SetRest(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null)
+                    public Result SetRest(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("starttime", starttime);
@@ -1634,6 +1319,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("mode", mode);
                         parameters.Add("node", node);
                         parameters.Add("pigz", pigz);
+                        parameters.Add("pool", pool);
                         parameters.Add("quiet", quiet);
                         parameters.Add("remove", remove);
                         parameters.Add("script", script);
@@ -1646,6 +1332,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("vmid", vmid);
                         return _client.Set($"/cluster/backup/{_id}", parameters);
                     }
+
                     /// <summary>
                     /// Update vzdump backup job definition.
                     /// </summary>
@@ -1670,27 +1357,26 @@ namespace Corsinvest.ProxmoxVE.Api
                     ///   Enum: snapshot,suspend,stop</param>
                     /// <param name="node">Only run if executed on this node.</param>
                     /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
+                    /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
                     /// <param name="quiet">Be quiet.</param>
                     /// <param name="remove">Remove old backup files if there are more than 'maxfiles' backup files.</param>
                     /// <param name="script">Use specified hook script.</param>
                     /// <param name="size">Unused, will be removed in a future release.</param>
                     /// <param name="stdexcludes">Exclude temporary files and logs.</param>
-                    /// <param name="stop">Stop runnig backup jobs on this host.</param>
+                    /// <param name="stop">Stop running backup jobs on this host.</param>
                     /// <param name="stopwait">Maximal time to wait until a guest system is stopped (minutes).</param>
                     /// <param name="storage">Store resulting file to this storage.</param>
                     /// <param name="tmpdir">Store temporary files to specified directory.</param>
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
                     /// <returns></returns>
-                    public Result UpdateJob(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null) => SetRest(starttime, all, bwlimit, compress, delete, dow, dumpdir, enabled, exclude, exclude_path, ionice, lockwait, mailnotification, mailto, maxfiles, mode, node, pigz, quiet, remove, script, size, stdexcludes, stop, stopwait, storage, tmpdir, vmid);
+                    public Result UpdateJob(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null) => SetRest(starttime, all, bwlimit, compress, delete, dow, dumpdir, enabled, exclude, exclude_path, ionice, lockwait, mailnotification, mailto, maxfiles, mode, node, pigz, pool, quiet, remove, script, size, stdexcludes, stop, stopwait, storage, tmpdir, vmid);
                 }
                 /// <summary>
                 /// List vzdump backup schedule.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest()
-                {
-                    return _client.Get($"/cluster/backup");
-                }
+                public Result GetRest() { return _client.Get($"/cluster/backup"); }
+
                 /// <summary>
                 /// List vzdump backup schedule.
                 /// </summary>
@@ -1719,18 +1405,19 @@ namespace Corsinvest.ProxmoxVE.Api
                 ///   Enum: snapshot,suspend,stop</param>
                 /// <param name="node">Only run if executed on this node.</param>
                 /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
+                /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
                 /// <param name="quiet">Be quiet.</param>
                 /// <param name="remove">Remove old backup files if there are more than 'maxfiles' backup files.</param>
                 /// <param name="script">Use specified hook script.</param>
                 /// <param name="size">Unused, will be removed in a future release.</param>
                 /// <param name="stdexcludes">Exclude temporary files and logs.</param>
-                /// <param name="stop">Stop runnig backup jobs on this host.</param>
+                /// <param name="stop">Stop running backup jobs on this host.</param>
                 /// <param name="stopwait">Maximal time to wait until a guest system is stopped (minutes).</param>
                 /// <param name="storage">Store resulting file to this storage.</param>
                 /// <param name="tmpdir">Store temporary files to specified directory.</param>
                 /// <param name="vmid">The ID of the guest system you want to backup.</param>
                 /// <returns></returns>
-                public Result CreateRest(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null)
+                public Result CreateRest(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("starttime", starttime);
@@ -1750,6 +1437,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("mode", mode);
                     parameters.Add("node", node);
                     parameters.Add("pigz", pigz);
+                    parameters.Add("pool", pool);
                     parameters.Add("quiet", quiet);
                     parameters.Add("remove", remove);
                     parameters.Add("script", script);
@@ -1762,6 +1450,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("vmid", vmid);
                     return _client.Create($"/cluster/backup", parameters);
                 }
+
                 /// <summary>
                 /// Create new vzdump backup job.
                 /// </summary>
@@ -1785,58 +1474,51 @@ namespace Corsinvest.ProxmoxVE.Api
                 ///   Enum: snapshot,suspend,stop</param>
                 /// <param name="node">Only run if executed on this node.</param>
                 /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
+                /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
                 /// <param name="quiet">Be quiet.</param>
                 /// <param name="remove">Remove old backup files if there are more than 'maxfiles' backup files.</param>
                 /// <param name="script">Use specified hook script.</param>
                 /// <param name="size">Unused, will be removed in a future release.</param>
                 /// <param name="stdexcludes">Exclude temporary files and logs.</param>
-                /// <param name="stop">Stop runnig backup jobs on this host.</param>
+                /// <param name="stop">Stop running backup jobs on this host.</param>
                 /// <param name="stopwait">Maximal time to wait until a guest system is stopped (minutes).</param>
                 /// <param name="storage">Store resulting file to this storage.</param>
                 /// <param name="tmpdir">Store temporary files to specified directory.</param>
                 /// <param name="vmid">The ID of the guest system you want to backup.</param>
                 /// <returns></returns>
-                public Result CreateJob(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null) => CreateRest(starttime, all, bwlimit, compress, dow, dumpdir, enabled, exclude, exclude_path, ionice, lockwait, mailnotification, mailto, maxfiles, mode, node, pigz, quiet, remove, script, size, stdexcludes, stop, stopwait, storage, tmpdir, vmid);
+                public Result CreateJob(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null) => CreateRest(starttime, all, bwlimit, compress, dow, dumpdir, enabled, exclude, exclude_path, ionice, lockwait, mailnotification, mailto, maxfiles, mode, node, pigz, pool, quiet, remove, script, size, stdexcludes, stop, stopwait, storage, tmpdir, vmid);
             }
-            public class PVEHa : Base
+            public class PVEHa
             {
-                internal PVEHa(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVEHa(Client client) { _client = client; }
                 private PVEResources _resources;
                 public PVEResources Resources => _resources ?? (_resources = new PVEResources(_client));
                 private PVEGroups _groups;
                 public PVEGroups Groups => _groups ?? (_groups = new PVEGroups(_client));
                 private PVEStatus _status;
                 public PVEStatus Status => _status ?? (_status = new PVEStatus(_client));
-                public class PVEResources : Base
+                public class PVEResources
                 {
-                    internal PVEResources(Client client)
-                    {
-                        _client = client;
-                    }
+                    private readonly Client _client;
+
+                    internal PVEResources(Client client) { _client = client; }
                     public PVEItemSid this[object sid] => new PVEItemSid(_client, sid);
-                    public class PVEItemSid : Base
+                    public class PVEItemSid
                     {
-                        private object _sid;
-                        internal PVEItemSid(Client client, object sid)
-                        {
-                            _client = client;
-                            _sid = sid;
-                        }
+                        private readonly Client _client;
+                        private readonly object _sid;
+                        internal PVEItemSid(Client client, object sid) { _client = client; _sid = sid; }
                         private PVEMigrate _migrate;
                         public PVEMigrate Migrate => _migrate ?? (_migrate = new PVEMigrate(_client, _sid));
                         private PVERelocate _relocate;
                         public PVERelocate Relocate => _relocate ?? (_relocate = new PVERelocate(_client, _sid));
-                        public class PVEMigrate : Base
+                        public class PVEMigrate
                         {
-                            private object _sid;
-                            internal PVEMigrate(Client client, object sid)
-                            {
-                                _client = client;
-                                _sid = sid;
-                            }
+                            private readonly Client _client;
+                            private readonly object _sid;
+                            internal PVEMigrate(Client client, object sid) { _client = client; _sid = sid; }
                             /// <summary>
                             /// Request resource migration (online) to another node.
                             /// </summary>
@@ -1848,6 +1530,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("node", node);
                                 return _client.Create($"/cluster/ha/resources/{_sid}/migrate", parameters);
                             }
+
                             /// <summary>
                             /// Request resource migration (online) to another node.
                             /// </summary>
@@ -1855,14 +1538,11 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Migrate(string node) => CreateRest(node);
                         }
-                        public class PVERelocate : Base
+                        public class PVERelocate
                         {
-                            private object _sid;
-                            internal PVERelocate(Client client, object sid)
-                            {
-                                _client = client;
-                                _sid = sid;
-                            }
+                            private readonly Client _client;
+                            private readonly object _sid;
+                            internal PVERelocate(Client client, object sid) { _client = client; _sid = sid; }
                             /// <summary>
                             /// Request resource relocatzion to another node. This stops the service on the old node, and restarts it on the target node.
                             /// </summary>
@@ -1874,6 +1554,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("node", node);
                                 return _client.Create($"/cluster/ha/resources/{_sid}/relocate", parameters);
                             }
+
                             /// <summary>
                             /// Request resource relocatzion to another node. This stops the service on the old node, and restarts it on the target node.
                             /// </summary>
@@ -1885,10 +1566,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Delete resource configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest()
-                        {
-                            return _client.Delete($"/cluster/ha/resources/{_sid}");
-                        }
+                        public Result DeleteRest() { return _client.Delete($"/cluster/ha/resources/{_sid}"); }
+
                         /// <summary>
                         /// Delete resource configuration.
                         /// </summary>
@@ -1898,10 +1577,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Read resource configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/cluster/ha/resources/{_sid}");
-                        }
+                        public Result GetRest() { return _client.Get($"/cluster/ha/resources/{_sid}"); }
+
                         /// <summary>
                         /// Read resource configuration.
                         /// </summary>
@@ -1931,6 +1608,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("state", state);
                             return _client.Set($"/cluster/ha/resources/{_sid}", parameters);
                         }
+
                         /// <summary>
                         /// Update resource configuration.
                         /// </summary>
@@ -1957,6 +1635,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("type", type);
                         return _client.Get($"/cluster/ha/resources", parameters);
                     }
+
                     /// <summary>
                     /// List HA resources.
                     /// </summary>
@@ -1989,6 +1668,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("type", type);
                         return _client.Create($"/cluster/ha/resources", parameters);
                     }
+
                     /// <summary>
                     /// Create a new HA resource.
                     /// </summary>
@@ -2004,29 +1684,23 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result Create(string sid, string comment = null, string group = null, int? max_relocate = null, int? max_restart = null, string state = null, string type = null) => CreateRest(sid, comment, group, max_relocate, max_restart, state, type);
                 }
-                public class PVEGroups : Base
+                public class PVEGroups
                 {
-                    internal PVEGroups(Client client)
-                    {
-                        _client = client;
-                    }
+                    private readonly Client _client;
+
+                    internal PVEGroups(Client client) { _client = client; }
                     public PVEItemGroup this[object group] => new PVEItemGroup(_client, group);
-                    public class PVEItemGroup : Base
+                    public class PVEItemGroup
                     {
-                        private object _group;
-                        internal PVEItemGroup(Client client, object group)
-                        {
-                            _client = client;
-                            _group = group;
-                        }
+                        private readonly Client _client;
+                        private readonly object _group;
+                        internal PVEItemGroup(Client client, object group) { _client = client; _group = group; }
                         /// <summary>
                         /// Delete ha group configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest()
-                        {
-                            return _client.Delete($"/cluster/ha/groups/{_group}");
-                        }
+                        public Result DeleteRest() { return _client.Delete($"/cluster/ha/groups/{_group}"); }
+
                         /// <summary>
                         /// Delete ha group configuration.
                         /// </summary>
@@ -2036,10 +1710,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Read ha group configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/cluster/ha/groups/{_group}");
-                        }
+                        public Result GetRest() { return _client.Get($"/cluster/ha/groups/{_group}"); }
+
                         /// <summary>
                         /// Read ha group configuration.
                         /// </summary>
@@ -2066,6 +1738,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("restricted", restricted);
                             return _client.Set($"/cluster/ha/groups/{_group}", parameters);
                         }
+
                         /// <summary>
                         /// Update ha group configuration.
                         /// </summary>
@@ -2082,10 +1755,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Get HA groups.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/cluster/ha/groups");
-                    }
+                    public Result GetRest() { return _client.Get($"/cluster/ha/groups"); }
+
                     /// <summary>
                     /// Get HA groups.
                     /// </summary>
@@ -2113,6 +1784,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("type", type);
                         return _client.Create($"/cluster/ha/groups", parameters);
                     }
+
                     /// <summary>
                     /// Create a new HA group.
                     /// </summary>
@@ -2126,50 +1798,43 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result Create(string group, string nodes, string comment = null, bool? nofailback = null, bool? restricted = null, string type = null) => CreateRest(group, nodes, comment, nofailback, restricted, type);
                 }
-                public class PVEStatus : Base
+                public class PVEStatus
                 {
-                    internal PVEStatus(Client client)
-                    {
-                        _client = client;
-                    }
+                    private readonly Client _client;
+
+                    internal PVEStatus(Client client) { _client = client; }
                     private PVECurrent _current;
                     public PVECurrent Current => _current ?? (_current = new PVECurrent(_client));
                     private PVEManagerStatus _managerStatus;
                     public PVEManagerStatus ManagerStatus => _managerStatus ?? (_managerStatus = new PVEManagerStatus(_client));
-                    public class PVECurrent : Base
+                    public class PVECurrent
                     {
-                        internal PVECurrent(Client client)
-                        {
-                            _client = client;
-                        }
+                        private readonly Client _client;
+
+                        internal PVECurrent(Client client) { _client = client; }
                         /// <summary>
                         /// Get HA manger status.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/cluster/ha/status/current");
-                        }
+                        public Result GetRest() { return _client.Get($"/cluster/ha/status/current"); }
+
                         /// <summary>
                         /// Get HA manger status.
                         /// </summary>
                         /// <returns></returns>
                         public Result Status() => GetRest();
                     }
-                    public class PVEManagerStatus : Base
+                    public class PVEManagerStatus
                     {
-                        internal PVEManagerStatus(Client client)
-                        {
-                            _client = client;
-                        }
+                        private readonly Client _client;
+
+                        internal PVEManagerStatus(Client client) { _client = client; }
                         /// <summary>
                         /// Get full HA manger status, including LRM status.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/cluster/ha/status/manager_status");
-                        }
+                        public Result GetRest() { return _client.Get($"/cluster/ha/status/manager_status"); }
+
                         /// <summary>
                         /// Get full HA manger status, including LRM status.
                         /// </summary>
@@ -2180,10 +1845,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Directory index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/cluster/ha/status");
-                    }
+                    public Result GetRest() { return _client.Get($"/cluster/ha/status"); }
+
                     /// <summary>
                     /// Directory index.
                     /// </summary>
@@ -2194,51 +1857,42 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest()
-                {
-                    return _client.Get($"/cluster/ha");
-                }
+                public Result GetRest() { return _client.Get($"/cluster/ha"); }
+
                 /// <summary>
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
                 public Result Index() => GetRest();
             }
-            public class PVEAcme : Base
+            public class PVEAcme
             {
-                internal PVEAcme(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVEAcme(Client client) { _client = client; }
                 private PVEAccount _account;
                 public PVEAccount Account => _account ?? (_account = new PVEAccount(_client));
                 private PVETos _tos;
                 public PVETos Tos => _tos ?? (_tos = new PVETos(_client));
                 private PVEDirectories _directories;
                 public PVEDirectories Directories => _directories ?? (_directories = new PVEDirectories(_client));
-                public class PVEAccount : Base
+                public class PVEAccount
                 {
-                    internal PVEAccount(Client client)
-                    {
-                        _client = client;
-                    }
+                    private readonly Client _client;
+
+                    internal PVEAccount(Client client) { _client = client; }
                     public PVEItemName this[object name] => new PVEItemName(_client, name);
-                    public class PVEItemName : Base
+                    public class PVEItemName
                     {
-                        private object _name;
-                        internal PVEItemName(Client client, object name)
-                        {
-                            _client = client;
-                            _name = name;
-                        }
+                        private readonly Client _client;
+                        private readonly object _name;
+                        internal PVEItemName(Client client, object name) { _client = client; _name = name; }
                         /// <summary>
                         /// Deactivate existing ACME account at CA.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest()
-                        {
-                            return _client.Delete($"/cluster/acme/account/{_name}");
-                        }
+                        public Result DeleteRest() { return _client.Delete($"/cluster/acme/account/{_name}"); }
+
                         /// <summary>
                         /// Deactivate existing ACME account at CA.
                         /// </summary>
@@ -2248,10 +1902,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Return existing ACME account information.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/cluster/acme/account/{_name}");
-                        }
+                        public Result GetRest() { return _client.Get($"/cluster/acme/account/{_name}"); }
+
                         /// <summary>
                         /// Return existing ACME account information.
                         /// </summary>
@@ -2268,6 +1920,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("contact", contact);
                             return _client.Set($"/cluster/acme/account/{_name}", parameters);
                         }
+
                         /// <summary>
                         /// Update existing ACME account information with CA. Note: not specifying any new account information triggers a refresh.
                         /// </summary>
@@ -2279,10 +1932,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// ACMEAccount index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/cluster/acme/account");
-                    }
+                    public Result GetRest() { return _client.Get($"/cluster/acme/account"); }
+
                     /// <summary>
                     /// ACMEAccount index.
                     /// </summary>
@@ -2305,6 +1956,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("tos_url", tos_url);
                         return _client.Create($"/cluster/acme/account", parameters);
                     }
+
                     /// <summary>
                     /// Register a new ACME account with CA.
                     /// </summary>
@@ -2315,12 +1967,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result RegisterAccount(string contact, string directory = null, string name = null, string tos_url = null) => CreateRest(contact, directory, name, tos_url);
                 }
-                public class PVETos : Base
+                public class PVETos
                 {
-                    internal PVETos(Client client)
-                    {
-                        _client = client;
-                    }
+                    private readonly Client _client;
+
+                    internal PVETos(Client client) { _client = client; }
                     /// <summary>
                     /// Retrieve ACME TermsOfService URL from CA.
                     /// </summary>
@@ -2332,6 +1983,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("directory", directory);
                         return _client.Get($"/cluster/acme/tos", parameters);
                     }
+
                     /// <summary>
                     /// Retrieve ACME TermsOfService URL from CA.
                     /// </summary>
@@ -2339,20 +1991,17 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result GetTos(string directory = null) => GetRest(directory);
                 }
-                public class PVEDirectories : Base
+                public class PVEDirectories
                 {
-                    internal PVEDirectories(Client client)
-                    {
-                        _client = client;
-                    }
+                    private readonly Client _client;
+
+                    internal PVEDirectories(Client client) { _client = client; }
                     /// <summary>
                     /// Get named known ACME directory endpoints.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/cluster/acme/directories");
-                    }
+                    public Result GetRest() { return _client.Get($"/cluster/acme/directories"); }
+
                     /// <summary>
                     /// Get named known ACME directory endpoints.
                     /// </summary>
@@ -2363,22 +2012,19 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// ACMEAccount index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest()
-                {
-                    return _client.Get($"/cluster/acme");
-                }
+                public Result GetRest() { return _client.Get($"/cluster/acme"); }
+
                 /// <summary>
                 /// ACMEAccount index.
                 /// </summary>
                 /// <returns></returns>
                 public Result Index() => GetRest();
             }
-            public class PVELog : Base
+            public class PVELog
             {
-                internal PVELog(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVELog(Client client) { _client = client; }
                 /// <summary>
                 /// Read cluster log
                 /// </summary>
@@ -2390,6 +2036,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("max", max);
                     return _client.Get($"/cluster/log", parameters);
                 }
+
                 /// <summary>
                 /// Read cluster log
                 /// </summary>
@@ -2397,12 +2044,11 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <returns></returns>
                 public Result Log(int? max = null) => GetRest(max);
             }
-            public class PVEResources : Base
+            public class PVEResources
             {
-                internal PVEResources(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVEResources(Client client) { _client = client; }
                 /// <summary>
                 /// Resources index (cluster wide).
                 /// </summary>
@@ -2415,6 +2061,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("type", type);
                     return _client.Get($"/cluster/resources", parameters);
                 }
+
                 /// <summary>
                 /// Resources index (cluster wide).
                 /// </summary>
@@ -2423,40 +2070,34 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <returns></returns>
                 public Result Resources(string type = null) => GetRest(type);
             }
-            public class PVETasks : Base
+            public class PVETasks
             {
-                internal PVETasks(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVETasks(Client client) { _client = client; }
                 /// <summary>
                 /// List recent tasks (cluster wide).
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest()
-                {
-                    return _client.Get($"/cluster/tasks");
-                }
+                public Result GetRest() { return _client.Get($"/cluster/tasks"); }
+
                 /// <summary>
                 /// List recent tasks (cluster wide).
                 /// </summary>
                 /// <returns></returns>
                 public Result Tasks() => GetRest();
             }
-            public class PVEOptions : Base
+            public class PVEOptions
             {
-                internal PVEOptions(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVEOptions(Client client) { _client = client; }
                 /// <summary>
                 /// Get datacenter options.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest()
-                {
-                    return _client.Get($"/cluster/options");
-                }
+                public Result GetRest() { return _client.Get($"/cluster/options"); }
+
                 /// <summary>
                 /// Get datacenter options.
                 /// </summary>
@@ -2503,6 +2144,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("u2f", u2f);
                     return _client.Set($"/cluster/options", parameters);
                 }
+
                 /// <summary>
                 /// Set datacenter options.
                 /// </summary>
@@ -2527,32 +2169,28 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <returns></returns>
                 public Result SetOptions(string bwlimit = null, string console = null, string delete = null, string email_from = null, string fencing = null, string ha = null, string http_proxy = null, string keyboard = null, string language = null, string mac_prefix = null, int? max_workers = null, string migration = null, bool? migration_unsecure = null, string u2f = null) => SetRest(bwlimit, console, delete, email_from, fencing, ha, http_proxy, keyboard, language, mac_prefix, max_workers, migration, migration_unsecure, u2f);
             }
-            public class PVEStatus : Base
+            public class PVEStatus
             {
-                internal PVEStatus(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVEStatus(Client client) { _client = client; }
                 /// <summary>
-                /// Get cluster status informations.
+                /// Get cluster status information.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest()
-                {
-                    return _client.Get($"/cluster/status");
-                }
+                public Result GetRest() { return _client.Get($"/cluster/status"); }
+
                 /// <summary>
-                /// Get cluster status informations.
+                /// Get cluster status information.
                 /// </summary>
                 /// <returns></returns>
                 public Result GetStatus() => GetRest();
             }
-            public class PVENextid : Base
+            public class PVENextid
             {
-                internal PVENextid(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVENextid(Client client) { _client = client; }
                 /// <summary>
                 /// Get next free VMID. If you pass an VMID it will raise an error if the ID is already used.
                 /// </summary>
@@ -2564,6 +2202,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("vmid", vmid);
                     return _client.Get($"/cluster/nextid", parameters);
                 }
+
                 /// <summary>
                 /// Get next free VMID. If you pass an VMID it will raise an error if the ID is already used.
                 /// </summary>
@@ -2571,35 +2210,84 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <returns></returns>
                 public Result Nextid(int? vmid = null) => GetRest(vmid);
             }
+            public class PVECeph
+            {
+                private readonly Client _client;
+
+                internal PVECeph(Client client) { _client = client; }
+                private PVEMetadata _metadata;
+                public PVEMetadata Metadata => _metadata ?? (_metadata = new PVEMetadata(_client));
+                private PVEStatus _status;
+                public PVEStatus Status => _status ?? (_status = new PVEStatus(_client));
+                public class PVEMetadata
+                {
+                    private readonly Client _client;
+
+                    internal PVEMetadata(Client client) { _client = client; }
+                    /// <summary>
+                    /// Get ceph metadata.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result GetRest() { return _client.Get($"/cluster/ceph/metadata"); }
+
+                    /// <summary>
+                    /// Get ceph metadata.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result CephMetadata() => GetRest();
+                }
+                public class PVEStatus
+                {
+                    private readonly Client _client;
+
+                    internal PVEStatus(Client client) { _client = client; }
+                    /// <summary>
+                    /// Get ceph status.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result GetRest() { return _client.Get($"/cluster/ceph/status"); }
+
+                    /// <summary>
+                    /// Get ceph status.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result Cephstatus() => GetRest();
+                }
+                /// <summary>
+                /// Cluster ceph index.
+                /// </summary>
+                /// <returns></returns>
+                public Result GetRest() { return _client.Get($"/cluster/ceph"); }
+
+                /// <summary>
+                /// Cluster ceph index.
+                /// </summary>
+                /// <returns></returns>
+                public Result Cephindex() => GetRest();
+            }
             /// <summary>
             /// Cluster index.
             /// </summary>
             /// <returns></returns>
-            public Result GetRest()
-            {
-                return _client.Get($"/cluster");
-            }
+            public Result GetRest() { return _client.Get($"/cluster"); }
+
             /// <summary>
             /// Cluster index.
             /// </summary>
             /// <returns></returns>
             public Result Index() => GetRest();
         }
-        public class PVENodes : Base
+        public class PVENodes
         {
-            internal PVENodes(Client client)
-            {
-                _client = client;
-            }
+            private readonly Client _client;
+
+            internal PVENodes(Client client) { _client = client; }
             public PVEItemNode this[object node] => new PVEItemNode(_client, node);
-            public class PVEItemNode : Base
+            public class PVEItemNode
             {
-                private object _node;
-                internal PVEItemNode(Client client, object node)
-                {
-                    _client = client;
-                    _node = node;
-                }
+                private readonly Client _client;
+                private readonly object _node;
+                internal PVEItemNode(Client client, object node) { _client = client; _node = node; }
                 private PVEQemu _qemu;
                 public PVEQemu Qemu => _qemu ?? (_qemu = new PVEQemu(_client, _node));
                 private PVELxc _lxc;
@@ -2650,6 +2338,8 @@ namespace Corsinvest.ProxmoxVE.Api
                 public PVERrddata Rrddata => _rrddata ?? (_rrddata = new PVERrddata(_client, _node));
                 private PVESyslog _syslog;
                 public PVESyslog Syslog => _syslog ?? (_syslog = new PVESyslog(_client, _node));
+                private PVEJournal _journal;
+                public PVEJournal Journal => _journal ?? (_journal = new PVEJournal(_client, _node));
                 private PVEVncshell _vncshell;
                 public PVEVncshell Vncshell => _vncshell ?? (_vncshell = new PVEVncshell(_client, _node));
                 private PVETermproxy _termproxy;
@@ -2674,23 +2364,20 @@ namespace Corsinvest.ProxmoxVE.Api
                 public PVEMigrateall Migrateall => _migrateall ?? (_migrateall = new PVEMigrateall(_client, _node));
                 private PVEHosts _hosts;
                 public PVEHosts Hosts => _hosts ?? (_hosts = new PVEHosts(_client, _node));
-                public class PVEQemu : Base
+                public class PVEQemu
                 {
-                    private object _node;
-                    internal PVEQemu(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEQemu(Client client, object node) { _client = client; _node = node; }
                     public PVEItemVmid this[object vmid] => new PVEItemVmid(_client, _node, vmid);
-                    public class PVEItemVmid : Base
+                    public class PVEItemVmid
                     {
-                        private object _node;
-                        private object _vmid;
+                        private readonly Client _client;
+                        private readonly object _node;
+                        private readonly object _vmid;
                         internal PVEItemVmid(Client client, object node, object vmid)
                         {
-                            _client = client;
-                            _node = node;
+                            _client = client; _node = node;
                             _vmid = vmid;
                         }
                         private PVEFirewall _firewall;
@@ -2735,14 +2422,16 @@ namespace Corsinvest.ProxmoxVE.Api
                         public PVESnapshot Snapshot => _snapshot ?? (_snapshot = new PVESnapshot(_client, _node, _vmid));
                         private PVETemplate _template;
                         public PVETemplate Template => _template ?? (_template = new PVETemplate(_client, _node, _vmid));
-                        public class PVEFirewall : Base
+                        private PVECloudinit _cloudinit;
+                        public PVECloudinit Cloudinit => _cloudinit ?? (_cloudinit = new PVECloudinit(_client, _node, _vmid));
+                        public class PVEFirewall
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEFirewall(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             private PVERules _rules;
@@ -2757,26 +2446,26 @@ namespace Corsinvest.ProxmoxVE.Api
                             public PVELog Log => _log ?? (_log = new PVELog(_client, _node, _vmid));
                             private PVERefs _refs;
                             public PVERefs Refs => _refs ?? (_refs = new PVERefs(_client, _node, _vmid));
-                            public class PVERules : Base
+                            public class PVERules
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVERules(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 public PVEItemPos this[object pos] => new PVEItemPos(_client, _node, _vmid, pos);
-                                public class PVEItemPos : Base
+                                public class PVEItemPos
                                 {
-                                    private object _node;
-                                    private object _vmid;
-                                    private object _pos;
+                                    private readonly Client _client;
+                                    private readonly object _node;
+                                    private readonly object _vmid;
+                                    private readonly object _pos;
                                     internal PVEItemPos(Client client, object node, object vmid, object pos)
                                     {
-                                        _client = client;
-                                        _node = node;
+                                        _client = client; _node = node;
                                         _vmid = vmid;
                                         _pos = pos;
                                     }
@@ -2791,6 +2480,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                         parameters.Add("digest", digest);
                                         return _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", parameters);
                                     }
+
                                     /// <summary>
                                     /// Delete rule.
                                     /// </summary>
@@ -2801,10 +2491,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// Get single rule data.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetRest()
-                                    {
-                                        return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}");
-                                    }
+                                    public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}"); }
+
                                     /// <summary>
                                     /// Get single rule data.
                                     /// </summary>
@@ -2851,6 +2539,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                         parameters.Add("type", type);
                                         return _client.Set($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", parameters);
                                     }
+
                                     /// <summary>
                                     /// Modify rule data.
                                     /// </summary>
@@ -2878,10 +2567,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// List rules.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/rules");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/rules"); }
+
                                 /// <summary>
                                 /// List rules.
                                 /// </summary>
@@ -2926,6 +2613,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("sport", sport);
                                     return _client.Create($"/nodes/{_node}/qemu/{_vmid}/firewall/rules", parameters);
                                 }
+
                                 /// <summary>
                                 /// Create new rule.
                                 /// </summary>
@@ -2948,26 +2636,26 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => CreateRest(action, type, comment, dest, digest, dport, enable, iface, log, macro, pos, proto, source, sport);
                             }
-                            public class PVEAliases : Base
+                            public class PVEAliases
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEAliases(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 public PVEItemName this[object name] => new PVEItemName(_client, _node, _vmid, name);
-                                public class PVEItemName : Base
+                                public class PVEItemName
                                 {
-                                    private object _node;
-                                    private object _vmid;
-                                    private object _name;
+                                    private readonly Client _client;
+                                    private readonly object _node;
+                                    private readonly object _vmid;
+                                    private readonly object _name;
                                     internal PVEItemName(Client client, object node, object vmid, object name)
                                     {
-                                        _client = client;
-                                        _node = node;
+                                        _client = client; _node = node;
                                         _vmid = vmid;
                                         _name = name;
                                     }
@@ -2982,6 +2670,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                         parameters.Add("digest", digest);
                                         return _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", parameters);
                                     }
+
                                     /// <summary>
                                     /// Remove IP or Network alias.
                                     /// </summary>
@@ -2992,10 +2681,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// Read alias.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetRest()
-                                    {
-                                        return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}");
-                                    }
+                                    public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}"); }
+
                                     /// <summary>
                                     /// Read alias.
                                     /// </summary>
@@ -3018,6 +2705,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                         parameters.Add("rename", rename);
                                         return _client.Set($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", parameters);
                                     }
+
                                     /// <summary>
                                     /// Update IP or Network alias.
                                     /// </summary>
@@ -3032,10 +2720,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// List aliases
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases"); }
+
                                 /// <summary>
                                 /// List aliases
                                 /// </summary>
@@ -3056,6 +2742,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("comment", comment);
                                     return _client.Create($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases", parameters);
                                 }
+
                                 /// <summary>
                                 /// Create IP or Network Alias.
                                 /// </summary>
@@ -3065,40 +2752,40 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result CreateAlias(string cidr, string name, string comment = null) => CreateRest(cidr, name, comment);
                             }
-                            public class PVEIpset : Base
+                            public class PVEIpset
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEIpset(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 public PVEItemName this[object name] => new PVEItemName(_client, _node, _vmid, name);
-                                public class PVEItemName : Base
+                                public class PVEItemName
                                 {
-                                    private object _node;
-                                    private object _vmid;
-                                    private object _name;
+                                    private readonly Client _client;
+                                    private readonly object _node;
+                                    private readonly object _vmid;
+                                    private readonly object _name;
                                     internal PVEItemName(Client client, object node, object vmid, object name)
                                     {
-                                        _client = client;
-                                        _node = node;
+                                        _client = client; _node = node;
                                         _vmid = vmid;
                                         _name = name;
                                     }
                                     public PVEItemCidr this[object cidr] => new PVEItemCidr(_client, _node, _vmid, _name, cidr);
-                                    public class PVEItemCidr : Base
+                                    public class PVEItemCidr
                                     {
-                                        private object _node;
-                                        private object _vmid;
-                                        private object _name;
-                                        private object _cidr;
+                                        private readonly Client _client;
+                                        private readonly object _node;
+                                        private readonly object _vmid;
+                                        private readonly object _name;
+                                        private readonly object _cidr;
                                         internal PVEItemCidr(Client client, object node, object vmid, object name, object cidr)
                                         {
-                                            _client = client;
-                                            _node = node;
+                                            _client = client; _node = node;
                                             _vmid = vmid;
                                             _name = name;
                                             _cidr = cidr;
@@ -3114,6 +2801,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                             parameters.Add("digest", digest);
                                             return _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
                                         }
+
                                         /// <summary>
                                         /// Remove IP or Network from IPSet.
                                         /// </summary>
@@ -3124,10 +2812,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                         /// Read IP or Network settings from IPSet.
                                         /// </summary>
                                         /// <returns></returns>
-                                        public Result GetRest()
-                                        {
-                                            return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}");
-                                        }
+                                        public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}"); }
+
                                         /// <summary>
                                         /// Read IP or Network settings from IPSet.
                                         /// </summary>
@@ -3148,6 +2834,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                             parameters.Add("nomatch", nomatch);
                                             return _client.Set($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
                                         }
+
                                         /// <summary>
                                         /// Update IP or Network settings
                                         /// </summary>
@@ -3161,10 +2848,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// Delete IPSet
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result DeleteRest()
-                                    {
-                                        return _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}");
-                                    }
+                                    public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}"); }
+
                                     /// <summary>
                                     /// Delete IPSet
                                     /// </summary>
@@ -3174,10 +2859,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// List IPSet content
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetRest()
-                                    {
-                                        return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}");
-                                    }
+                                    public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}"); }
+
                                     /// <summary>
                                     /// List IPSet content
                                     /// </summary>
@@ -3198,6 +2881,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                         parameters.Add("nomatch", nomatch);
                                         return _client.Create($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}", parameters);
                                     }
+
                                     /// <summary>
                                     /// Add IP or Network to IPSet.
                                     /// </summary>
@@ -3211,10 +2895,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// List IPSets
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset"); }
+
                                 /// <summary>
                                 /// List IPSets
                                 /// </summary>
@@ -3237,6 +2919,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("rename", rename);
                                     return _client.Create($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset", parameters);
                                 }
+
                                 /// <summary>
                                 /// Create new IPSet
                                 /// </summary>
@@ -3247,24 +2930,22 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result CreateIpset(string name, string comment = null, string digest = null, string rename = null) => CreateRest(name, comment, digest, rename);
                             }
-                            public class PVEOptions : Base
+                            public class PVEOptions
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEOptions(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Get VM firewall options.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/options");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/options"); }
+
                                 /// <summary>
                                 /// Get VM firewall options.
                                 /// </summary>
@@ -3307,6 +2988,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("radv", radv);
                                     return _client.Set($"/nodes/{_node}/qemu/{_vmid}/firewall/options", parameters);
                                 }
+
                                 /// <summary>
                                 /// Set Firewall options.
                                 /// </summary>
@@ -3329,14 +3011,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result SetOptions(string delete = null, bool? dhcp = null, string digest = null, bool? enable = null, bool? ipfilter = null, string log_level_in = null, string log_level_out = null, bool? macfilter = null, bool? ndp = null, string policy_in = null, string policy_out = null, bool? radv = null) => SetRest(delete, dhcp, digest, enable, ipfilter, log_level_in, log_level_out, macfilter, ndp, policy_in, policy_out, radv);
                             }
-                            public class PVELog : Base
+                            public class PVELog
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVELog(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
@@ -3352,6 +3034,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("start", start);
                                     return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/log", parameters);
                                 }
+
                                 /// <summary>
                                 /// Read firewall log
                                 /// </summary>
@@ -3360,14 +3043,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result Log(int? limit = null, int? start = null) => GetRest(limit, start);
                             }
-                            public class PVERefs : Base
+                            public class PVERefs
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVERefs(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
@@ -3382,6 +3065,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("type", type);
                                     return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/refs", parameters);
                                 }
+
                                 /// <summary>
                                 /// Lists possible IPSet/Alias reference which are allowed in source/dest properties.
                                 /// </summary>
@@ -3394,24 +3078,22 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Directory index.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest()
-                            {
-                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall");
-                            }
+                            public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall"); }
+
                             /// <summary>
                             /// Directory index.
                             /// </summary>
                             /// <returns></returns>
                             public Result Index() => GetRest();
                         }
-                        public class PVEAgent : Base
+                        public class PVEAgent
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEAgent(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             private PVEFsfreeze_Freeze _fsfreeze_Freeze;
@@ -3464,494 +3146,454 @@ namespace Corsinvest.ProxmoxVE.Api
                             public PVEFile_Read File_Read => _file_Read ?? (_file_Read = new PVEFile_Read(_client, _node, _vmid));
                             private PVEFile_Write _file_Write;
                             public PVEFile_Write File_Write => _file_Write ?? (_file_Write = new PVEFile_Write(_client, _node, _vmid));
-                            public class PVEFsfreeze_Freeze : Base
+                            public class PVEFsfreeze_Freeze
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEFsfreeze_Freeze(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute fsfreeze-freeze.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest()
-                                {
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-freeze");
-                                }
+                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-freeze"); }
+
                                 /// <summary>
                                 /// Execute fsfreeze-freeze.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Fsfreeze_Freeze() => CreateRest();
                             }
-                            public class PVEFsfreeze_Status : Base
+                            public class PVEFsfreeze_Status
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEFsfreeze_Status(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute fsfreeze-status.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest()
-                                {
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-status");
-                                }
+                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-status"); }
+
                                 /// <summary>
                                 /// Execute fsfreeze-status.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Fsfreeze_Status() => CreateRest();
                             }
-                            public class PVEFsfreeze_Thaw : Base
+                            public class PVEFsfreeze_Thaw
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEFsfreeze_Thaw(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute fsfreeze-thaw.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest()
-                                {
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-thaw");
-                                }
+                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-thaw"); }
+
                                 /// <summary>
                                 /// Execute fsfreeze-thaw.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Fsfreeze_Thaw() => CreateRest();
                             }
-                            public class PVEFstrim : Base
+                            public class PVEFstrim
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEFstrim(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute fstrim.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest()
-                                {
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fstrim");
-                                }
+                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fstrim"); }
+
                                 /// <summary>
                                 /// Execute fstrim.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Fstrim() => CreateRest();
                             }
-                            public class PVEGet_Fsinfo : Base
+                            public class PVEGet_Fsinfo
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEGet_Fsinfo(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute get-fsinfo.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-fsinfo");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-fsinfo"); }
+
                                 /// <summary>
                                 /// Execute get-fsinfo.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Get_Fsinfo() => GetRest();
                             }
-                            public class PVEGet_Host_Name : Base
+                            public class PVEGet_Host_Name
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEGet_Host_Name(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute get-host-name.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-host-name");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-host-name"); }
+
                                 /// <summary>
                                 /// Execute get-host-name.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Get_Host_Name() => GetRest();
                             }
-                            public class PVEGet_Memory_Block_Info : Base
+                            public class PVEGet_Memory_Block_Info
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEGet_Memory_Block_Info(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute get-memory-block-info.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-memory-block-info");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-memory-block-info"); }
+
                                 /// <summary>
                                 /// Execute get-memory-block-info.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Get_Memory_Block_Info() => GetRest();
                             }
-                            public class PVEGet_Memory_Blocks : Base
+                            public class PVEGet_Memory_Blocks
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEGet_Memory_Blocks(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute get-memory-blocks.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-memory-blocks");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-memory-blocks"); }
+
                                 /// <summary>
                                 /// Execute get-memory-blocks.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Get_Memory_Blocks() => GetRest();
                             }
-                            public class PVEGet_Osinfo : Base
+                            public class PVEGet_Osinfo
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEGet_Osinfo(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute get-osinfo.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-osinfo");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-osinfo"); }
+
                                 /// <summary>
                                 /// Execute get-osinfo.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Get_Osinfo() => GetRest();
                             }
-                            public class PVEGet_Time : Base
+                            public class PVEGet_Time
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEGet_Time(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute get-time.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-time");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-time"); }
+
                                 /// <summary>
                                 /// Execute get-time.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Get_Time() => GetRest();
                             }
-                            public class PVEGet_Timezone : Base
+                            public class PVEGet_Timezone
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEGet_Timezone(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute get-timezone.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-timezone");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-timezone"); }
+
                                 /// <summary>
                                 /// Execute get-timezone.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Get_Timezone() => GetRest();
                             }
-                            public class PVEGet_Users : Base
+                            public class PVEGet_Users
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEGet_Users(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute get-users.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-users");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-users"); }
+
                                 /// <summary>
                                 /// Execute get-users.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Get_Users() => GetRest();
                             }
-                            public class PVEGet_Vcpus : Base
+                            public class PVEGet_Vcpus
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEGet_Vcpus(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute get-vcpus.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-vcpus");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-vcpus"); }
+
                                 /// <summary>
                                 /// Execute get-vcpus.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Get_Vcpus() => GetRest();
                             }
-                            public class PVEInfo : Base
+                            public class PVEInfo
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEInfo(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute info.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/info");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/info"); }
+
                                 /// <summary>
                                 /// Execute info.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Info() => GetRest();
                             }
-                            public class PVENetwork_Get_Interfaces : Base
+                            public class PVENetwork_Get_Interfaces
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVENetwork_Get_Interfaces(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute network-get-interfaces.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/network-get-interfaces");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/network-get-interfaces"); }
+
                                 /// <summary>
                                 /// Execute network-get-interfaces.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Network_Get_Interfaces() => GetRest();
                             }
-                            public class PVEPing : Base
+                            public class PVEPing
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEPing(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute ping.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest()
-                                {
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/ping");
-                                }
+                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/ping"); }
+
                                 /// <summary>
                                 /// Execute ping.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Ping() => CreateRest();
                             }
-                            public class PVEShutdown : Base
+                            public class PVEShutdown
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEShutdown(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute shutdown.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest()
-                                {
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/shutdown");
-                                }
+                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/shutdown"); }
+
                                 /// <summary>
                                 /// Execute shutdown.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Shutdown() => CreateRest();
                             }
-                            public class PVESuspend_Disk : Base
+                            public class PVESuspend_Disk
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVESuspend_Disk(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute suspend-disk.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest()
-                                {
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-disk");
-                                }
+                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-disk"); }
+
                                 /// <summary>
                                 /// Execute suspend-disk.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Suspend_Disk() => CreateRest();
                             }
-                            public class PVESuspend_Hybrid : Base
+                            public class PVESuspend_Hybrid
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVESuspend_Hybrid(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute suspend-hybrid.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest()
-                                {
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-hybrid");
-                                }
+                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-hybrid"); }
+
                                 /// <summary>
                                 /// Execute suspend-hybrid.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Suspend_Hybrid() => CreateRest();
                             }
-                            public class PVESuspend_Ram : Base
+                            public class PVESuspend_Ram
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVESuspend_Ram(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Execute suspend-ram.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest()
-                                {
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-ram");
-                                }
+                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-ram"); }
+
                                 /// <summary>
                                 /// Execute suspend-ram.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Suspend_Ram() => CreateRest();
                             }
-                            public class PVESet_User_Password : Base
+                            public class PVESet_User_Password
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVESet_User_Password(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
@@ -3969,6 +3611,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("crypted", crypted);
                                     return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/set-user-password", parameters);
                                 }
+
                                 /// <summary>
                                 /// Sets the password for the given user to the given password
                                 /// </summary>
@@ -3978,14 +3621,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result Set_User_Password(string password, string username, bool? crypted = null) => CreateRest(password, username, crypted);
                             }
-                            public class PVEExec : Base
+                            public class PVEExec
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEExec(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
@@ -3999,6 +3642,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("command", command);
                                     return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/exec", parameters);
                                 }
+
                                 /// <summary>
                                 /// Executes the given command in the vm via the guest-agent and returns an object with the pid.
                                 /// </summary>
@@ -4006,14 +3650,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result Exec(string command) => CreateRest(command);
                             }
-                            public class PVEExec_Status : Base
+                            public class PVEExec_Status
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEExec_Status(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
@@ -4027,6 +3671,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("pid", pid);
                                     return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/exec-status", parameters);
                                 }
+
                                 /// <summary>
                                 /// Gets the status of the given pid started by the guest-agent
                                 /// </summary>
@@ -4034,14 +3679,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result Exec_Status(int pid) => GetRest(pid);
                             }
-                            public class PVEFile_Read : Base
+                            public class PVEFile_Read
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEFile_Read(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
@@ -4055,6 +3700,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("file", file);
                                     return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/file-read", parameters);
                                 }
+
                                 /// <summary>
                                 /// Reads the given file via guest agent. Is limited to 16777216 bytes.
                                 /// </summary>
@@ -4062,14 +3708,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result File_Read(string file) => GetRest(file);
                             }
-                            public class PVEFile_Write : Base
+                            public class PVEFile_Write
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEFile_Write(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
@@ -4085,6 +3731,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("file", file);
                                     return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/file-write", parameters);
                                 }
+
                                 /// <summary>
                                 /// Writes the given file via guest agent.
                                 /// </summary>
@@ -4097,10 +3744,8 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Qemu Agent command index.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest()
-                            {
-                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent");
-                            }
+                            public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent"); }
+
                             /// <summary>
                             /// Qemu Agent command index.
                             /// </summary>
@@ -4118,6 +3763,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("command", command);
                                 return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent", parameters);
                             }
+
                             /// <summary>
                             /// Execute Qemu Guest Agent commands.
                             /// </summary>
@@ -4126,14 +3772,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Agent(string command) => CreateRest(command);
                         }
-                        public class PVERrd : Base
+                        public class PVERrd
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVERrd(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -4153,6 +3799,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("cf", cf);
                                 return _client.Get($"/nodes/{_node}/qemu/{_vmid}/rrd", parameters);
                             }
+
                             /// <summary>
                             /// Read VM RRD statistics (returns PNG)
                             /// </summary>
@@ -4164,14 +3811,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Rrd(string ds, string timeframe, string cf = null) => GetRest(ds, timeframe, cf);
                         }
-                        public class PVERrddata : Base
+                        public class PVERrddata
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVERrddata(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -4189,6 +3836,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("cf", cf);
                                 return _client.Get($"/nodes/{_node}/qemu/{_vmid}/rrddata", parameters);
                             }
+
                             /// <summary>
                             /// Read VM RRD statistics
                             /// </summary>
@@ -4199,14 +3847,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Rrddata(string timeframe, string cf = null) => GetRest(timeframe, cf);
                         }
-                        public class PVEConfig : Base
+                        public class PVEConfig
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEConfig(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -4222,6 +3870,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("snapshot", snapshot);
                                 return _client.Get($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
                             }
+
                             /// <summary>
                             /// Get current virtual machine configuration. This does not include pending configuration changes (see 'pending' API).
                             /// </summary>
@@ -4396,6 +4045,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 AddIndexedParameter(parameters, "virtio", virtioN);
                                 return _client.Create($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
                             }
+
                             /// <summary>
                             /// Set virtual machine options (asynchrounous API).
                             /// </summary>
@@ -4649,6 +4299,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 AddIndexedParameter(parameters, "virtio", virtioN);
                                 return _client.Set($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
                             }
+
                             /// <summary>
                             /// Set virtual machine options (synchrounous API) - You should consider using the POST method instead for any actions involving hotplug or storage allocation.
                             /// </summary>
@@ -4737,38 +4388,36 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result UpdateVm(bool? acpi = null, string agent = null, string arch = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => SetRest(acpi, agent, arch, args, autostart, balloon, bios, boot, bootdisk, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, delete, description, digest, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, sataN, scsiN, scsihw, searchdomain, serialN, shares, skiplock, smbios1, smp, sockets, sshkeys, startdate, startup, tablet, tdf, template, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
                         }
-                        public class PVEPending : Base
+                        public class PVEPending
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEPending(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
                             /// Get virtual machine configuration, including pending changes.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest()
-                            {
-                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/pending");
-                            }
+                            public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/pending"); }
+
                             /// <summary>
                             /// Get virtual machine configuration, including pending changes.
                             /// </summary>
                             /// <returns></returns>
                             public Result VmPending() => GetRest();
                         }
-                        public class PVEUnlink : Base
+                        public class PVEUnlink
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEUnlink(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -4784,6 +4433,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("force", force);
                                 return _client.Set($"/nodes/{_node}/qemu/{_vmid}/unlink", parameters);
                             }
+
                             /// <summary>
                             /// Unlink/delete disk images.
                             /// </summary>
@@ -4792,14 +4442,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Unlink(string idlist, bool? force = null) => SetRest(idlist, force);
                         }
-                        public class PVEVncproxy : Base
+                        public class PVEVncproxy
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEVncproxy(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -4813,6 +4463,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("websocket", websocket);
                                 return _client.Create($"/nodes/{_node}/qemu/{_vmid}/vncproxy", parameters);
                             }
+
                             /// <summary>
                             /// Creates a TCP VNC proxy connections.
                             /// </summary>
@@ -4820,14 +4471,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Vncproxy(bool? websocket = null) => CreateRest(websocket);
                         }
-                        public class PVETermproxy : Base
+                        public class PVETermproxy
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVETermproxy(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -4842,6 +4493,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("serial", serial);
                                 return _client.Create($"/nodes/{_node}/qemu/{_vmid}/termproxy", parameters);
                             }
+
                             /// <summary>
                             /// Creates a TCP proxy connections.
                             /// </summary>
@@ -4850,14 +4502,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Termproxy(string serial = null) => CreateRest(serial);
                         }
-                        public class PVEVncwebsocket : Base
+                        public class PVEVncwebsocket
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEVncwebsocket(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -4873,6 +4525,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("vncticket", vncticket);
                                 return _client.Get($"/nodes/{_node}/qemu/{_vmid}/vncwebsocket", parameters);
                             }
+
                             /// <summary>
                             /// Opens a weksocket for VNC traffic.
                             /// </summary>
@@ -4881,14 +4534,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Vncwebsocket(int port, string vncticket) => GetRest(port, vncticket);
                         }
-                        public class PVESpiceproxy : Base
+                        public class PVESpiceproxy
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVESpiceproxy(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -4902,6 +4555,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("proxy", proxy);
                                 return _client.Create($"/nodes/{_node}/qemu/{_vmid}/spiceproxy", parameters);
                             }
+
                             /// <summary>
                             /// Returns a SPICE configuration to connect to the VM.
                             /// </summary>
@@ -4909,14 +4563,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Spiceproxy(string proxy = null) => CreateRest(proxy);
                         }
-                        public class PVEStatus : Base
+                        public class PVEStatus
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEStatus(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             private PVECurrent _current;
@@ -4933,38 +4587,36 @@ namespace Corsinvest.ProxmoxVE.Api
                             public PVESuspend Suspend => _suspend ?? (_suspend = new PVESuspend(_client, _node, _vmid));
                             private PVEResume _resume;
                             public PVEResume Resume => _resume ?? (_resume = new PVEResume(_client, _node, _vmid));
-                            public class PVECurrent : Base
+                            public class PVECurrent
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVECurrent(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Get virtual machine status.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/status/current");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/status/current"); }
+
                                 /// <summary>
                                 /// Get virtual machine status.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result VmStatus() => GetRest();
                             }
-                            public class PVEStart : Base
+                            public class PVEStart
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEStart(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
@@ -4991,6 +4643,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("targetstorage", targetstorage);
                                     return _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/start", parameters);
                                 }
+
                                 /// <summary>
                                 /// Start virtual machine.
                                 /// </summary>
@@ -5005,14 +4658,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result VmStart(string machine = null, string migratedfrom = null, string migration_network = null, string migration_type = null, bool? skiplock = null, string stateuri = null, string targetstorage = null) => CreateRest(machine, migratedfrom, migration_network, migration_type, skiplock, stateuri, targetstorage);
                             }
-                            public class PVEStop : Base
+                            public class PVEStop
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEStop(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
@@ -5032,6 +4685,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("timeout", timeout);
                                     return _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/stop", parameters);
                                 }
+
                                 /// <summary>
                                 /// Stop virtual machine. The qemu process will exit immediately. Thisis akin to pulling the power plug of a running computer and may damage the VM data
                                 /// </summary>
@@ -5042,14 +4696,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result VmStop(bool? keepActive = null, string migratedfrom = null, bool? skiplock = null, int? timeout = null) => CreateRest(keepActive, migratedfrom, skiplock, timeout);
                             }
-                            public class PVEReset : Base
+                            public class PVEReset
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEReset(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
@@ -5063,6 +4717,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("skiplock", skiplock);
                                     return _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/reset", parameters);
                                 }
+
                                 /// <summary>
                                 /// Reset virtual machine.
                                 /// </summary>
@@ -5070,14 +4725,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result VmReset(bool? skiplock = null) => CreateRest(skiplock);
                             }
-                            public class PVEShutdown : Base
+                            public class PVEShutdown
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEShutdown(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
@@ -5097,6 +4752,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("timeout", timeout);
                                     return _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/shutdown", parameters);
                                 }
+
                                 /// <summary>
                                 /// Shutdown virtual machine. This is similar to pressing the power button on a physical machine.This will send an ACPI event for the guest OS, which should then proceed to a clean shutdown.
                                 /// </summary>
@@ -5107,14 +4763,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result VmShutdown(bool? forceStop = null, bool? keepActive = null, bool? skiplock = null, int? timeout = null) => CreateRest(forceStop, keepActive, skiplock, timeout);
                             }
-                            public class PVESuspend : Base
+                            public class PVESuspend
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVESuspend(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
@@ -5132,6 +4788,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("todisk", todisk);
                                     return _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/suspend", parameters);
                                 }
+
                                 /// <summary>
                                 /// Suspend virtual machine.
                                 /// </summary>
@@ -5141,14 +4798,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result VmSuspend(bool? skiplock = null, string statestorage = null, bool? todisk = null) => CreateRest(skiplock, statestorage, todisk);
                             }
-                            public class PVEResume : Base
+                            public class PVEResume
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEResume(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
@@ -5164,6 +4821,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("skiplock", skiplock);
                                     return _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/resume", parameters);
                                 }
+
                                 /// <summary>
                                 /// Resume virtual machine.
                                 /// </summary>
@@ -5176,24 +4834,22 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Directory index
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest()
-                            {
-                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/status");
-                            }
+                            public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/status"); }
+
                             /// <summary>
                             /// Directory index
                             /// </summary>
                             /// <returns></returns>
                             public Result Vmcmdidx() => GetRest();
                         }
-                        public class PVESendkey : Base
+                        public class PVESendkey
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVESendkey(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -5209,6 +4865,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("skiplock", skiplock);
                                 return _client.Set($"/nodes/{_node}/qemu/{_vmid}/sendkey", parameters);
                             }
+
                             /// <summary>
                             /// Send key event to virtual machine.
                             /// </summary>
@@ -5217,14 +4874,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result VmSendkey(string key, bool? skiplock = null) => SetRest(key, skiplock);
                         }
-                        public class PVEFeature : Base
+                        public class PVEFeature
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEFeature(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -5241,6 +4898,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("snapname", snapname);
                                 return _client.Get($"/nodes/{_node}/qemu/{_vmid}/feature", parameters);
                             }
+
                             /// <summary>
                             /// Check if feature for virtual machine is available.
                             /// </summary>
@@ -5250,14 +4908,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result VmFeature(string feature, string snapname = null) => GetRest(feature, snapname);
                         }
-                        public class PVEClone : Base
+                        public class PVEClone
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEClone(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -5290,6 +4948,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("target", target);
                                 return _client.Create($"/nodes/{_node}/qemu/{_vmid}/clone", parameters);
                             }
+
                             /// <summary>
                             /// Create a copy of virtual machine/template.
                             /// </summary>
@@ -5307,14 +4966,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result CloneVm(int newid, int? bwlimit = null, string description = null, string format = null, bool? full = null, string name = null, string pool = null, string snapname = null, string storage = null, string target = null) => CreateRest(newid, bwlimit, description, format, full, name, pool, snapname, storage, target);
                         }
-                        public class PVEMoveDisk : Base
+                        public class PVEMoveDisk
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEMoveDisk(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -5340,6 +4999,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("format", format);
                                 return _client.Create($"/nodes/{_node}/qemu/{_vmid}/move_disk", parameters);
                             }
+
                             /// <summary>
                             /// Move volume to different storage.
                             /// </summary>
@@ -5354,16 +5014,34 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result MoveVmDisk(string disk, string storage, int? bwlimit = null, bool? delete = null, string digest = null, string format = null) => CreateRest(disk, storage, bwlimit, delete, digest, format);
                         }
-                        public class PVEMigrate : Base
+                        public class PVEMigrate
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEMigrate(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
+                            /// <summary>
+                            /// Get preconditions for migration.
+                            /// </summary>
+                            /// <param name="target">Target node.</param>
+                            /// <returns></returns>
+                            public Result GetRest(string target = null)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("target", target);
+                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/migrate", parameters);
+                            }
+
+                            /// <summary>
+                            /// Get preconditions for migration.
+                            /// </summary>
+                            /// <param name="target">Target node.</param>
+                            /// <returns></returns>
+                            public Result MigrateVmPrecondition(string target = null) => GetRest(target);
                             /// <summary>
                             /// Migrate virtual machine. Creates a new migration task.
                             /// </summary>
@@ -5390,6 +5068,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("with-local-disks", with_local_disks);
                                 return _client.Create($"/nodes/{_node}/qemu/{_vmid}/migrate", parameters);
                             }
+
                             /// <summary>
                             /// Migrate virtual machine. Creates a new migration task.
                             /// </summary>
@@ -5405,14 +5084,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result MigrateVm(string target, int? bwlimit = null, bool? force = null, string migration_network = null, string migration_type = null, bool? online = null, string targetstorage = null, bool? with_local_disks = null) => CreateRest(target, bwlimit, force, migration_network, migration_type, online, targetstorage, with_local_disks);
                         }
-                        public class PVEMonitor : Base
+                        public class PVEMonitor
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEMonitor(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -5426,6 +5105,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("command", command);
                                 return _client.Create($"/nodes/{_node}/qemu/{_vmid}/monitor", parameters);
                             }
+
                             /// <summary>
                             /// Execute Qemu monitor commands.
                             /// </summary>
@@ -5433,14 +5113,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Monitor(string command) => CreateRest(command);
                         }
-                        public class PVEResize : Base
+                        public class PVEResize
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEResize(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -5461,6 +5141,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("skiplock", skiplock);
                                 return _client.Set($"/nodes/{_node}/qemu/{_vmid}/resize", parameters);
                             }
+
                             /// <summary>
                             /// Extend volume size.
                             /// </summary>
@@ -5472,26 +5153,26 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result ResizeVm(string disk, string size, string digest = null, bool? skiplock = null) => SetRest(disk, size, digest, skiplock);
                         }
-                        public class PVESnapshot : Base
+                        public class PVESnapshot
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVESnapshot(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             public PVEItemSnapname this[object snapname] => new PVEItemSnapname(_client, _node, _vmid, snapname);
-                            public class PVEItemSnapname : Base
+                            public class PVEItemSnapname
                             {
-                                private object _node;
-                                private object _vmid;
-                                private object _snapname;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
+                                private readonly object _snapname;
                                 internal PVEItemSnapname(Client client, object node, object vmid, object snapname)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                     _snapname = snapname;
                                 }
@@ -5499,15 +5180,15 @@ namespace Corsinvest.ProxmoxVE.Api
                                 public PVEConfig Config => _config ?? (_config = new PVEConfig(_client, _node, _vmid, _snapname));
                                 private PVERollback _rollback;
                                 public PVERollback Rollback => _rollback ?? (_rollback = new PVERollback(_client, _node, _vmid, _snapname));
-                                public class PVEConfig : Base
+                                public class PVEConfig
                                 {
-                                    private object _node;
-                                    private object _vmid;
-                                    private object _snapname;
+                                    private readonly Client _client;
+                                    private readonly object _node;
+                                    private readonly object _vmid;
+                                    private readonly object _snapname;
                                     internal PVEConfig(Client client, object node, object vmid, object snapname)
                                     {
-                                        _client = client;
-                                        _node = node;
+                                        _client = client; _node = node;
                                         _vmid = vmid;
                                         _snapname = snapname;
                                     }
@@ -5515,10 +5196,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// Get snapshot configuration
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetRest()
-                                    {
-                                        return _client.Get($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config");
-                                    }
+                                    public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config"); }
+
                                     /// <summary>
                                     /// Get snapshot configuration
                                     /// </summary>
@@ -5535,6 +5214,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                         parameters.Add("description", description);
                                         return _client.Set($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config", parameters);
                                     }
+
                                     /// <summary>
                                     /// Update snapshot metadata.
                                     /// </summary>
@@ -5542,15 +5222,15 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <returns></returns>
                                     public Result UpdateSnapshotConfig(string description = null) => SetRest(description);
                                 }
-                                public class PVERollback : Base
+                                public class PVERollback
                                 {
-                                    private object _node;
-                                    private object _vmid;
-                                    private object _snapname;
+                                    private readonly Client _client;
+                                    private readonly object _node;
+                                    private readonly object _vmid;
+                                    private readonly object _snapname;
                                     internal PVERollback(Client client, object node, object vmid, object snapname)
                                     {
-                                        _client = client;
-                                        _node = node;
+                                        _client = client; _node = node;
                                         _vmid = vmid;
                                         _snapname = snapname;
                                     }
@@ -5558,10 +5238,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// Rollback VM state to specified snapshot.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result CreateRest()
-                                    {
-                                        return _client.Create($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/rollback");
-                                    }
+                                    public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/rollback"); }
+
                                     /// <summary>
                                     /// Rollback VM state to specified snapshot.
                                     /// </summary>
@@ -5579,6 +5257,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("force", force);
                                     return _client.Delete($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}", parameters);
                                 }
+
                                 /// <summary>
                                 /// Delete a VM snapshot.
                                 /// </summary>
@@ -5589,10 +5268,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// 
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}"); }
+
                                 /// <summary>
                                 /// 
                                 /// </summary>
@@ -5603,10 +5280,8 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// List all snapshots.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest()
-                            {
-                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/snapshot");
-                            }
+                            public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/snapshot"); }
+
                             /// <summary>
                             /// List all snapshots.
                             /// </summary>
@@ -5627,6 +5302,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("vmstate", vmstate);
                                 return _client.Create($"/nodes/{_node}/qemu/{_vmid}/snapshot", parameters);
                             }
+
                             /// <summary>
                             /// Snapshot a VM.
                             /// </summary>
@@ -5636,14 +5312,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Snapshot(string snapname, string description = null, bool? vmstate = null) => CreateRest(snapname, description, vmstate);
                         }
-                        public class PVETemplate : Base
+                        public class PVETemplate
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVETemplate(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -5658,6 +5334,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("disk", disk);
                                 return _client.Create($"/nodes/{_node}/qemu/{_vmid}/template", parameters);
                             }
+
                             /// <summary>
                             /// Create a Template.
                             /// </summary>
@@ -5665,6 +5342,50 @@ namespace Corsinvest.ProxmoxVE.Api
                             ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
                             /// <returns></returns>
                             public Result Template(string disk = null) => CreateRest(disk);
+                        }
+                        public class PVECloudinit
+                        {
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
+                            internal PVECloudinit(Client client, object node, object vmid)
+                            {
+                                _client = client; _node = node;
+                                _vmid = vmid;
+                            }
+                            private PVEDump _dump;
+                            public PVEDump Dump => _dump ?? (_dump = new PVEDump(_client, _node, _vmid));
+                            public class PVEDump
+                            {
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
+                                internal PVEDump(Client client, object node, object vmid)
+                                {
+                                    _client = client; _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Get automatically generated cloudinit config.
+                                /// </summary>
+                                /// <param name="type">Config type.
+                                ///   Enum: user,network,meta</param>
+                                /// <returns></returns>
+                                public Result GetRest(string type)
+                                {
+                                    var parameters = new Dictionary<string, object>();
+                                    parameters.Add("type", type);
+                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/cloudinit/dump", parameters);
+                                }
+
+                                /// <summary>
+                                /// Get automatically generated cloudinit config.
+                                /// </summary>
+                                /// <param name="type">Config type.
+                                ///   Enum: user,network,meta</param>
+                                /// <returns></returns>
+                                public Result CloudinitGeneratedConfigDump(string type) => GetRest(type);
+                            }
                         }
                         /// <summary>
                         /// Destroy the vm (also delete all used/owned volumes).
@@ -5677,6 +5398,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("skiplock", skiplock);
                             return _client.Delete($"/nodes/{_node}/qemu/{_vmid}", parameters);
                         }
+
                         /// <summary>
                         /// Destroy the vm (also delete all used/owned volumes).
                         /// </summary>
@@ -5687,10 +5409,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Directory index
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/qemu/{_vmid}");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}"); }
+
                         /// <summary>
                         /// Directory index
                         /// </summary>
@@ -5708,6 +5428,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("full", full);
                         return _client.Get($"/nodes/{_node}/qemu", parameters);
                     }
+
                     /// <summary>
                     /// Virtual machine index (per node).
                     /// </summary>
@@ -5885,6 +5606,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         AddIndexedParameter(parameters, "virtio", virtioN);
                         return _client.Create($"/nodes/{_node}/qemu", parameters);
                     }
+
                     /// <summary>
                     /// Create or restore a virtual machine.
                     /// </summary>
@@ -5976,23 +5698,20 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result CreateVm(int vmid, bool? acpi = null, string agent = null, string arch = null, string archive = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => CreateRest(vmid, acpi, agent, arch, archive, args, autostart, balloon, bios, boot, bootdisk, bwlimit, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, description, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, pool, protection, reboot, sataN, scsiN, scsihw, searchdomain, serialN, shares, smbios1, smp, sockets, sshkeys, start, startdate, startup, storage, tablet, tdf, template, unique, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
                 }
-                public class PVELxc : Base
+                public class PVELxc
                 {
-                    private object _node;
-                    internal PVELxc(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVELxc(Client client, object node) { _client = client; _node = node; }
                     public PVEItemVmid this[object vmid] => new PVEItemVmid(_client, _node, vmid);
-                    public class PVEItemVmid : Base
+                    public class PVEItemVmid
                     {
-                        private object _node;
-                        private object _vmid;
+                        private readonly Client _client;
+                        private readonly object _node;
+                        private readonly object _vmid;
                         internal PVEItemVmid(Client client, object node, object vmid)
                         {
-                            _client = client;
-                            _node = node;
+                            _client = client; _node = node;
                             _vmid = vmid;
                         }
                         private PVEConfig _config;
@@ -6027,14 +5746,14 @@ namespace Corsinvest.ProxmoxVE.Api
                         public PVEResize Resize => _resize ?? (_resize = new PVEResize(_client, _node, _vmid));
                         private PVEMoveVolume _moveVolume;
                         public PVEMoveVolume MoveVolume => _moveVolume ?? (_moveVolume = new PVEMoveVolume(_client, _node, _vmid));
-                        public class PVEConfig : Base
+                        public class PVEConfig
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEConfig(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -6048,6 +5767,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("snapshot", snapshot);
                                 return _client.Get($"/nodes/{_node}/lxc/{_vmid}/config", parameters);
                             }
+
                             /// <summary>
                             /// Get container configuration.
                             /// </summary>
@@ -6072,7 +5792,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="hookscript">Script that will be exectued during various steps in the containers lifetime.</param>
                             /// <param name="hostname">Set a host name for the container.</param>
                             /// <param name="lock_">Lock/unlock the VM.
-                            ///   Enum: backup,disk,migrate,mounted,rollback,snapshot,snapshot-delete</param>
+                            ///   Enum: backup,create,disk,fstrim,migrate,mounted,rollback,snapshot,snapshot-delete</param>
                             /// <param name="memory">Amount of RAM for the VM in MB.</param>
                             /// <param name="mpN">Use volume as container mount point.</param>
                             /// <param name="nameserver">Sets DNS server IP address for a container. Create will automatically use the setting from the host if you neither set searchdomain nor nameserver.</param>
@@ -6123,6 +5843,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 AddIndexedParameter(parameters, "unused", unusedN);
                                 return _client.Set($"/nodes/{_node}/lxc/{_vmid}/config", parameters);
                             }
+
                             /// <summary>
                             /// Set container options.
                             /// </summary>
@@ -6141,7 +5862,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="hookscript">Script that will be exectued during various steps in the containers lifetime.</param>
                             /// <param name="hostname">Set a host name for the container.</param>
                             /// <param name="lock_">Lock/unlock the VM.
-                            ///   Enum: backup,disk,migrate,mounted,rollback,snapshot,snapshot-delete</param>
+                            ///   Enum: backup,create,disk,fstrim,migrate,mounted,rollback,snapshot,snapshot-delete</param>
                             /// <param name="memory">Amount of RAM for the VM in MB.</param>
                             /// <param name="mpN">Use volume as container mount point.</param>
                             /// <param name="nameserver">Sets DNS server IP address for a container. Create will automatically use the setting from the host if you neither set searchdomain nor nameserver.</param>
@@ -6161,14 +5882,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result UpdateVm(string arch = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string features = null, string hookscript = null, string hostname = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, bool? protection = null, string rootfs = null, string searchdomain = null, string startup = null, int? swap = null, bool? template = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null) => SetRest(arch, cmode, console, cores, cpulimit, cpuunits, delete, description, digest, features, hookscript, hostname, lock_, memory, mpN, nameserver, netN, onboot, ostype, protection, rootfs, searchdomain, startup, swap, template, tty, unprivileged, unusedN);
                         }
-                        public class PVEStatus : Base
+                        public class PVEStatus
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEStatus(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             private PVECurrent _current;
@@ -6183,38 +5904,36 @@ namespace Corsinvest.ProxmoxVE.Api
                             public PVESuspend Suspend => _suspend ?? (_suspend = new PVESuspend(_client, _node, _vmid));
                             private PVEResume _resume;
                             public PVEResume Resume => _resume ?? (_resume = new PVEResume(_client, _node, _vmid));
-                            public class PVECurrent : Base
+                            public class PVECurrent
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVECurrent(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Get virtual machine status.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/lxc/{_vmid}/status/current");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/status/current"); }
+
                                 /// <summary>
                                 /// Get virtual machine status.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result VmStatus() => GetRest();
                             }
-                            public class PVEStart : Base
+                            public class PVEStart
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEStart(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
@@ -6228,6 +5947,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("skiplock", skiplock);
                                     return _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/start", parameters);
                                 }
+
                                 /// <summary>
                                 /// Start the container.
                                 /// </summary>
@@ -6235,14 +5955,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result VmStart(bool? skiplock = null) => CreateRest(skiplock);
                             }
-                            public class PVEStop : Base
+                            public class PVEStop
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEStop(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
@@ -6256,6 +5976,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("skiplock", skiplock);
                                     return _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/stop", parameters);
                                 }
+
                                 /// <summary>
                                 /// Stop the container. This will abruptly stop all processes running in the container.
                                 /// </summary>
@@ -6263,14 +5984,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result VmStop(bool? skiplock = null) => CreateRest(skiplock);
                             }
-                            public class PVEShutdown : Base
+                            public class PVEShutdown
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEShutdown(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
@@ -6286,6 +6007,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("timeout", timeout);
                                     return _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/shutdown", parameters);
                                 }
+
                                 /// <summary>
                                 /// Shutdown the container. This will trigger a clean shutdown of the container, see lxc-stop(1) for details.
                                 /// </summary>
@@ -6294,48 +6016,44 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result VmShutdown(bool? forceStop = null, int? timeout = null) => CreateRest(forceStop, timeout);
                             }
-                            public class PVESuspend : Base
+                            public class PVESuspend
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVESuspend(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Suspend the container.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest()
-                                {
-                                    return _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/suspend");
-                                }
+                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/suspend"); }
+
                                 /// <summary>
                                 /// Suspend the container.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result VmSuspend() => CreateRest();
                             }
-                            public class PVEResume : Base
+                            public class PVEResume
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEResume(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Resume the container.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest()
-                                {
-                                    return _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/resume");
-                                }
+                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/resume"); }
+
                                 /// <summary>
                                 /// Resume the container.
                                 /// </summary>
@@ -6346,36 +6064,34 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Directory index
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest()
-                            {
-                                return _client.Get($"/nodes/{_node}/lxc/{_vmid}/status");
-                            }
+                            public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/status"); }
+
                             /// <summary>
                             /// Directory index
                             /// </summary>
                             /// <returns></returns>
                             public Result Vmcmdidx() => GetRest();
                         }
-                        public class PVESnapshot : Base
+                        public class PVESnapshot
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVESnapshot(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             public PVEItemSnapname this[object snapname] => new PVEItemSnapname(_client, _node, _vmid, snapname);
-                            public class PVEItemSnapname : Base
+                            public class PVEItemSnapname
                             {
-                                private object _node;
-                                private object _vmid;
-                                private object _snapname;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
+                                private readonly object _snapname;
                                 internal PVEItemSnapname(Client client, object node, object vmid, object snapname)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                     _snapname = snapname;
                                 }
@@ -6383,15 +6099,15 @@ namespace Corsinvest.ProxmoxVE.Api
                                 public PVERollback Rollback => _rollback ?? (_rollback = new PVERollback(_client, _node, _vmid, _snapname));
                                 private PVEConfig _config;
                                 public PVEConfig Config => _config ?? (_config = new PVEConfig(_client, _node, _vmid, _snapname));
-                                public class PVERollback : Base
+                                public class PVERollback
                                 {
-                                    private object _node;
-                                    private object _vmid;
-                                    private object _snapname;
+                                    private readonly Client _client;
+                                    private readonly object _node;
+                                    private readonly object _vmid;
+                                    private readonly object _snapname;
                                     internal PVERollback(Client client, object node, object vmid, object snapname)
                                     {
-                                        _client = client;
-                                        _node = node;
+                                        _client = client; _node = node;
                                         _vmid = vmid;
                                         _snapname = snapname;
                                     }
@@ -6399,25 +6115,23 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// Rollback LXC state to specified snapshot.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result CreateRest()
-                                    {
-                                        return _client.Create($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/rollback");
-                                    }
+                                    public Result CreateRest() { return _client.Create($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/rollback"); }
+
                                     /// <summary>
                                     /// Rollback LXC state to specified snapshot.
                                     /// </summary>
                                     /// <returns></returns>
                                     public Result Rollback() => CreateRest();
                                 }
-                                public class PVEConfig : Base
+                                public class PVEConfig
                                 {
-                                    private object _node;
-                                    private object _vmid;
-                                    private object _snapname;
+                                    private readonly Client _client;
+                                    private readonly object _node;
+                                    private readonly object _vmid;
+                                    private readonly object _snapname;
                                     internal PVEConfig(Client client, object node, object vmid, object snapname)
                                     {
-                                        _client = client;
-                                        _node = node;
+                                        _client = client; _node = node;
                                         _vmid = vmid;
                                         _snapname = snapname;
                                     }
@@ -6425,10 +6139,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// Get snapshot configuration
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetRest()
-                                    {
-                                        return _client.Get($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config");
-                                    }
+                                    public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config"); }
+
                                     /// <summary>
                                     /// Get snapshot configuration
                                     /// </summary>
@@ -6445,6 +6157,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                         parameters.Add("description", description);
                                         return _client.Set($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config", parameters);
                                     }
+
                                     /// <summary>
                                     /// Update snapshot metadata.
                                     /// </summary>
@@ -6463,6 +6176,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("force", force);
                                     return _client.Delete($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}", parameters);
                                 }
+
                                 /// <summary>
                                 /// Delete a LXC snapshot.
                                 /// </summary>
@@ -6473,10 +6187,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// 
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}"); }
+
                                 /// <summary>
                                 /// 
                                 /// </summary>
@@ -6487,10 +6199,8 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// List all snapshots.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest()
-                            {
-                                return _client.Get($"/nodes/{_node}/lxc/{_vmid}/snapshot");
-                            }
+                            public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/snapshot"); }
+
                             /// <summary>
                             /// List all snapshots.
                             /// </summary>
@@ -6509,6 +6219,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("description", description);
                                 return _client.Create($"/nodes/{_node}/lxc/{_vmid}/snapshot", parameters);
                             }
+
                             /// <summary>
                             /// Snapshot a container.
                             /// </summary>
@@ -6517,14 +6228,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Snapshot(string snapname, string description = null) => CreateRest(snapname, description);
                         }
-                        public class PVEFirewall : Base
+                        public class PVEFirewall
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEFirewall(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             private PVERules _rules;
@@ -6539,26 +6250,26 @@ namespace Corsinvest.ProxmoxVE.Api
                             public PVELog Log => _log ?? (_log = new PVELog(_client, _node, _vmid));
                             private PVERefs _refs;
                             public PVERefs Refs => _refs ?? (_refs = new PVERefs(_client, _node, _vmid));
-                            public class PVERules : Base
+                            public class PVERules
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVERules(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 public PVEItemPos this[object pos] => new PVEItemPos(_client, _node, _vmid, pos);
-                                public class PVEItemPos : Base
+                                public class PVEItemPos
                                 {
-                                    private object _node;
-                                    private object _vmid;
-                                    private object _pos;
+                                    private readonly Client _client;
+                                    private readonly object _node;
+                                    private readonly object _vmid;
+                                    private readonly object _pos;
                                     internal PVEItemPos(Client client, object node, object vmid, object pos)
                                     {
-                                        _client = client;
-                                        _node = node;
+                                        _client = client; _node = node;
                                         _vmid = vmid;
                                         _pos = pos;
                                     }
@@ -6573,6 +6284,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                         parameters.Add("digest", digest);
                                         return _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", parameters);
                                     }
+
                                     /// <summary>
                                     /// Delete rule.
                                     /// </summary>
@@ -6583,10 +6295,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// Get single rule data.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetRest()
-                                    {
-                                        return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}");
-                                    }
+                                    public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}"); }
+
                                     /// <summary>
                                     /// Get single rule data.
                                     /// </summary>
@@ -6633,6 +6343,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                         parameters.Add("type", type);
                                         return _client.Set($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", parameters);
                                     }
+
                                     /// <summary>
                                     /// Modify rule data.
                                     /// </summary>
@@ -6660,10 +6371,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// List rules.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/rules");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/rules"); }
+
                                 /// <summary>
                                 /// List rules.
                                 /// </summary>
@@ -6708,6 +6417,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("sport", sport);
                                     return _client.Create($"/nodes/{_node}/lxc/{_vmid}/firewall/rules", parameters);
                                 }
+
                                 /// <summary>
                                 /// Create new rule.
                                 /// </summary>
@@ -6730,26 +6440,26 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => CreateRest(action, type, comment, dest, digest, dport, enable, iface, log, macro, pos, proto, source, sport);
                             }
-                            public class PVEAliases : Base
+                            public class PVEAliases
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEAliases(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 public PVEItemName this[object name] => new PVEItemName(_client, _node, _vmid, name);
-                                public class PVEItemName : Base
+                                public class PVEItemName
                                 {
-                                    private object _node;
-                                    private object _vmid;
-                                    private object _name;
+                                    private readonly Client _client;
+                                    private readonly object _node;
+                                    private readonly object _vmid;
+                                    private readonly object _name;
                                     internal PVEItemName(Client client, object node, object vmid, object name)
                                     {
-                                        _client = client;
-                                        _node = node;
+                                        _client = client; _node = node;
                                         _vmid = vmid;
                                         _name = name;
                                     }
@@ -6764,6 +6474,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                         parameters.Add("digest", digest);
                                         return _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", parameters);
                                     }
+
                                     /// <summary>
                                     /// Remove IP or Network alias.
                                     /// </summary>
@@ -6774,10 +6485,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// Read alias.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetRest()
-                                    {
-                                        return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}");
-                                    }
+                                    public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}"); }
+
                                     /// <summary>
                                     /// Read alias.
                                     /// </summary>
@@ -6800,6 +6509,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                         parameters.Add("rename", rename);
                                         return _client.Set($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", parameters);
                                     }
+
                                     /// <summary>
                                     /// Update IP or Network alias.
                                     /// </summary>
@@ -6814,10 +6524,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// List aliases
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases"); }
+
                                 /// <summary>
                                 /// List aliases
                                 /// </summary>
@@ -6838,6 +6546,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("comment", comment);
                                     return _client.Create($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases", parameters);
                                 }
+
                                 /// <summary>
                                 /// Create IP or Network Alias.
                                 /// </summary>
@@ -6847,40 +6556,40 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result CreateAlias(string cidr, string name, string comment = null) => CreateRest(cidr, name, comment);
                             }
-                            public class PVEIpset : Base
+                            public class PVEIpset
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEIpset(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 public PVEItemName this[object name] => new PVEItemName(_client, _node, _vmid, name);
-                                public class PVEItemName : Base
+                                public class PVEItemName
                                 {
-                                    private object _node;
-                                    private object _vmid;
-                                    private object _name;
+                                    private readonly Client _client;
+                                    private readonly object _node;
+                                    private readonly object _vmid;
+                                    private readonly object _name;
                                     internal PVEItemName(Client client, object node, object vmid, object name)
                                     {
-                                        _client = client;
-                                        _node = node;
+                                        _client = client; _node = node;
                                         _vmid = vmid;
                                         _name = name;
                                     }
                                     public PVEItemCidr this[object cidr] => new PVEItemCidr(_client, _node, _vmid, _name, cidr);
-                                    public class PVEItemCidr : Base
+                                    public class PVEItemCidr
                                     {
-                                        private object _node;
-                                        private object _vmid;
-                                        private object _name;
-                                        private object _cidr;
+                                        private readonly Client _client;
+                                        private readonly object _node;
+                                        private readonly object _vmid;
+                                        private readonly object _name;
+                                        private readonly object _cidr;
                                         internal PVEItemCidr(Client client, object node, object vmid, object name, object cidr)
                                         {
-                                            _client = client;
-                                            _node = node;
+                                            _client = client; _node = node;
                                             _vmid = vmid;
                                             _name = name;
                                             _cidr = cidr;
@@ -6896,6 +6605,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                             parameters.Add("digest", digest);
                                             return _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
                                         }
+
                                         /// <summary>
                                         /// Remove IP or Network from IPSet.
                                         /// </summary>
@@ -6906,10 +6616,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                         /// Read IP or Network settings from IPSet.
                                         /// </summary>
                                         /// <returns></returns>
-                                        public Result GetRest()
-                                        {
-                                            return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}");
-                                        }
+                                        public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}"); }
+
                                         /// <summary>
                                         /// Read IP or Network settings from IPSet.
                                         /// </summary>
@@ -6930,6 +6638,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                             parameters.Add("nomatch", nomatch);
                                             return _client.Set($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
                                         }
+
                                         /// <summary>
                                         /// Update IP or Network settings
                                         /// </summary>
@@ -6943,10 +6652,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// Delete IPSet
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result DeleteRest()
-                                    {
-                                        return _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}");
-                                    }
+                                    public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}"); }
+
                                     /// <summary>
                                     /// Delete IPSet
                                     /// </summary>
@@ -6956,10 +6663,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// List IPSet content
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetRest()
-                                    {
-                                        return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}");
-                                    }
+                                    public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}"); }
+
                                     /// <summary>
                                     /// List IPSet content
                                     /// </summary>
@@ -6980,6 +6685,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                         parameters.Add("nomatch", nomatch);
                                         return _client.Create($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}", parameters);
                                     }
+
                                     /// <summary>
                                     /// Add IP or Network to IPSet.
                                     /// </summary>
@@ -6993,10 +6699,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// List IPSets
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset"); }
+
                                 /// <summary>
                                 /// List IPSets
                                 /// </summary>
@@ -7019,6 +6723,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("rename", rename);
                                     return _client.Create($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset", parameters);
                                 }
+
                                 /// <summary>
                                 /// Create new IPSet
                                 /// </summary>
@@ -7029,24 +6734,22 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result CreateIpset(string name, string comment = null, string digest = null, string rename = null) => CreateRest(name, comment, digest, rename);
                             }
-                            public class PVEOptions : Base
+                            public class PVEOptions
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVEOptions(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
                                 /// Get VM firewall options.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/options");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/options"); }
+
                                 /// <summary>
                                 /// Get VM firewall options.
                                 /// </summary>
@@ -7089,6 +6792,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("radv", radv);
                                     return _client.Set($"/nodes/{_node}/lxc/{_vmid}/firewall/options", parameters);
                                 }
+
                                 /// <summary>
                                 /// Set Firewall options.
                                 /// </summary>
@@ -7111,14 +6815,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result SetOptions(string delete = null, bool? dhcp = null, string digest = null, bool? enable = null, bool? ipfilter = null, string log_level_in = null, string log_level_out = null, bool? macfilter = null, bool? ndp = null, string policy_in = null, string policy_out = null, bool? radv = null) => SetRest(delete, dhcp, digest, enable, ipfilter, log_level_in, log_level_out, macfilter, ndp, policy_in, policy_out, radv);
                             }
-                            public class PVELog : Base
+                            public class PVELog
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVELog(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
@@ -7134,6 +6838,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("start", start);
                                     return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/log", parameters);
                                 }
+
                                 /// <summary>
                                 /// Read firewall log
                                 /// </summary>
@@ -7142,14 +6847,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result Log(int? limit = null, int? start = null) => GetRest(limit, start);
                             }
-                            public class PVERefs : Base
+                            public class PVERefs
                             {
-                                private object _node;
-                                private object _vmid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
                                 internal PVERefs(Client client, object node, object vmid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _vmid = vmid;
                                 }
                                 /// <summary>
@@ -7164,6 +6869,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("type", type);
                                     return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/refs", parameters);
                                 }
+
                                 /// <summary>
                                 /// Lists possible IPSet/Alias reference which are allowed in source/dest properties.
                                 /// </summary>
@@ -7176,24 +6882,22 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Directory index.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest()
-                            {
-                                return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall");
-                            }
+                            public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall"); }
+
                             /// <summary>
                             /// Directory index.
                             /// </summary>
                             /// <returns></returns>
                             public Result Index() => GetRest();
                         }
-                        public class PVERrd : Base
+                        public class PVERrd
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVERrd(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -7213,6 +6917,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("cf", cf);
                                 return _client.Get($"/nodes/{_node}/lxc/{_vmid}/rrd", parameters);
                             }
+
                             /// <summary>
                             /// Read VM RRD statistics (returns PNG)
                             /// </summary>
@@ -7224,14 +6929,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Rrd(string ds, string timeframe, string cf = null) => GetRest(ds, timeframe, cf);
                         }
-                        public class PVERrddata : Base
+                        public class PVERrddata
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVERrddata(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -7249,6 +6954,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("cf", cf);
                                 return _client.Get($"/nodes/{_node}/lxc/{_vmid}/rrddata", parameters);
                             }
+
                             /// <summary>
                             /// Read VM RRD statistics
                             /// </summary>
@@ -7259,14 +6965,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Rrddata(string timeframe, string cf = null) => GetRest(timeframe, cf);
                         }
-                        public class PVEVncproxy : Base
+                        public class PVEVncproxy
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEVncproxy(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -7284,6 +6990,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("width", width);
                                 return _client.Create($"/nodes/{_node}/lxc/{_vmid}/vncproxy", parameters);
                             }
+
                             /// <summary>
                             /// Creates a TCP VNC proxy connections.
                             /// </summary>
@@ -7293,38 +7000,36 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Vncproxy(int? height = null, bool? websocket = null, int? width = null) => CreateRest(height, websocket, width);
                         }
-                        public class PVETermproxy : Base
+                        public class PVETermproxy
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVETermproxy(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
                             /// Creates a TCP proxy connection.
                             /// </summary>
                             /// <returns></returns>
-                            public Result CreateRest()
-                            {
-                                return _client.Create($"/nodes/{_node}/lxc/{_vmid}/termproxy");
-                            }
+                            public Result CreateRest() { return _client.Create($"/nodes/{_node}/lxc/{_vmid}/termproxy"); }
+
                             /// <summary>
                             /// Creates a TCP proxy connection.
                             /// </summary>
                             /// <returns></returns>
                             public Result Termproxy() => CreateRest();
                         }
-                        public class PVEVncwebsocket : Base
+                        public class PVEVncwebsocket
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEVncwebsocket(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -7340,6 +7045,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("vncticket", vncticket);
                                 return _client.Get($"/nodes/{_node}/lxc/{_vmid}/vncwebsocket", parameters);
                             }
+
                             /// <summary>
                             /// Opens a weksocket for VNC traffic.
                             /// </summary>
@@ -7348,14 +7054,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Vncwebsocket(int port, string vncticket) => GetRest(port, vncticket);
                         }
-                        public class PVESpiceproxy : Base
+                        public class PVESpiceproxy
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVESpiceproxy(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -7369,6 +7075,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("proxy", proxy);
                                 return _client.Create($"/nodes/{_node}/lxc/{_vmid}/spiceproxy", parameters);
                             }
+
                             /// <summary>
                             /// Returns a SPICE configuration to connect to the CT.
                             /// </summary>
@@ -7376,14 +7083,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Spiceproxy(string proxy = null) => CreateRest(proxy);
                         }
-                        public class PVEMigrate : Base
+                        public class PVEMigrate
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEMigrate(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -7407,6 +7114,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("timeout", timeout);
                                 return _client.Create($"/nodes/{_node}/lxc/{_vmid}/migrate", parameters);
                             }
+
                             /// <summary>
                             /// Migrate the container to another node. Creates a new migration task.
                             /// </summary>
@@ -7419,14 +7127,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result MigrateVm(string target, int? bwlimit = null, bool? force = null, bool? online = null, bool? restart = null, int? timeout = null) => CreateRest(target, bwlimit, force, online, restart, timeout);
                         }
-                        public class PVEFeature : Base
+                        public class PVEFeature
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEFeature(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -7443,6 +7151,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("snapname", snapname);
                                 return _client.Get($"/nodes/{_node}/lxc/{_vmid}/feature", parameters);
                             }
+
                             /// <summary>
                             /// Check if feature for virtual machine is available.
                             /// </summary>
@@ -7452,38 +7161,36 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result VmFeature(string feature, string snapname = null) => GetRest(feature, snapname);
                         }
-                        public class PVETemplate : Base
+                        public class PVETemplate
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVETemplate(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
                             /// Create a Template.
                             /// </summary>
                             /// <returns></returns>
-                            public Result CreateRest()
-                            {
-                                return _client.Create($"/nodes/{_node}/lxc/{_vmid}/template");
-                            }
+                            public Result CreateRest() { return _client.Create($"/nodes/{_node}/lxc/{_vmid}/template"); }
+
                             /// <summary>
                             /// Create a Template.
                             /// </summary>
                             /// <returns></returns>
                             public Result Template() => CreateRest();
                         }
-                        public class PVEClone : Base
+                        public class PVEClone
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEClone(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -7513,6 +7220,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("target", target);
                                 return _client.Create($"/nodes/{_node}/lxc/{_vmid}/clone", parameters);
                             }
+
                             /// <summary>
                             /// Create a container clone/copy
                             /// </summary>
@@ -7528,14 +7236,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result CloneVm(int newid, int? bwlimit = null, string description = null, bool? full = null, string hostname = null, string pool = null, string snapname = null, string storage = null, string target = null) => CreateRest(newid, bwlimit, description, full, hostname, pool, snapname, storage, target);
                         }
-                        public class PVEResize : Base
+                        public class PVEResize
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEResize(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -7554,6 +7262,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("digest", digest);
                                 return _client.Set($"/nodes/{_node}/lxc/{_vmid}/resize", parameters);
                             }
+
                             /// <summary>
                             /// Resize a container mount point.
                             /// </summary>
@@ -7564,14 +7273,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result ResizeVm(string disk, string size, string digest = null) => SetRest(disk, size, digest);
                         }
-                        public class PVEMoveVolume : Base
+                        public class PVEMoveVolume
                         {
-                            private object _node;
-                            private object _vmid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
                             internal PVEMoveVolume(Client client, object node, object vmid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _vmid = vmid;
                             }
                             /// <summary>
@@ -7594,6 +7303,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("digest", digest);
                                 return _client.Create($"/nodes/{_node}/lxc/{_vmid}/move_volume", parameters);
                             }
+
                             /// <summary>
                             /// Move a rootfs-/mp-volume to a different storage
                             /// </summary>
@@ -7610,10 +7320,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Destroy the container (also delete all uses files).
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest()
-                        {
-                            return _client.Delete($"/nodes/{_node}/lxc/{_vmid}");
-                        }
+                        public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/lxc/{_vmid}"); }
+
                         /// <summary>
                         /// Destroy the container (also delete all uses files).
                         /// </summary>
@@ -7623,10 +7331,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Directory index
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/lxc/{_vmid}");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}"); }
+
                         /// <summary>
                         /// Directory index
                         /// </summary>
@@ -7637,10 +7343,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// LXC container index (per node).
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/nodes/{_node}/lxc");
-                    }
+                    public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc"); }
+
                     /// <summary>
                     /// LXC container index (per node).
                     /// </summary>
@@ -7667,7 +7371,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="hostname">Set a host name for the container.</param>
                     /// <param name="ignore_unpack_errors">Ignore errors when extracting the template.</param>
                     /// <param name="lock_">Lock/unlock the VM.
-                    ///   Enum: backup,disk,migrate,mounted,rollback,snapshot,snapshot-delete</param>
+                    ///   Enum: backup,create,disk,fstrim,migrate,mounted,rollback,snapshot,snapshot-delete</param>
                     /// <param name="memory">Amount of RAM for the VM in MB.</param>
                     /// <param name="mpN">Use volume as container mount point.</param>
                     /// <param name="nameserver">Sets DNS server IP address for a container. Create will automatically use the setting from the host if you neither set searchdomain nor nameserver.</param>
@@ -7735,6 +7439,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         AddIndexedParameter(parameters, "unused", unusedN);
                         return _client.Create($"/nodes/{_node}/lxc", parameters);
                     }
+
                     /// <summary>
                     /// Create or restore a container.
                     /// </summary>
@@ -7756,7 +7461,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="hostname">Set a host name for the container.</param>
                     /// <param name="ignore_unpack_errors">Ignore errors when extracting the template.</param>
                     /// <param name="lock_">Lock/unlock the VM.
-                    ///   Enum: backup,disk,migrate,mounted,rollback,snapshot,snapshot-delete</param>
+                    ///   Enum: backup,create,disk,fstrim,migrate,mounted,rollback,snapshot,snapshot-delete</param>
                     /// <param name="memory">Amount of RAM for the VM in MB.</param>
                     /// <param name="mpN">Use volume as container mount point.</param>
                     /// <param name="nameserver">Sets DNS server IP address for a container. Create will automatically use the setting from the host if you neither set searchdomain nor nameserver.</param>
@@ -7783,14 +7488,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result CreateVm(string ostemplate, int vmid, string arch = null, int? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string description = null, string features = null, bool? force = null, string hookscript = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, bool? start = null, string startup = null, string storage = null, int? swap = null, bool? template = null, int? tty = null, bool? unique = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null) => CreateRest(ostemplate, vmid, arch, bwlimit, cmode, console, cores, cpulimit, cpuunits, description, features, force, hookscript, hostname, ignore_unpack_errors, lock_, memory, mpN, nameserver, netN, onboot, ostype, password, pool, protection, restore, rootfs, searchdomain, ssh_public_keys, start, startup, storage, swap, template, tty, unique, unprivileged, unusedN);
                 }
-                public class PVECeph : Base
+                public class PVECeph
                 {
-                    private object _node;
-                    internal PVECeph(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVECeph(Client client, object node) { _client = client; _node = node; }
                     private PVEOsd _osd;
                     public PVEOsd Osd => _osd ?? (_osd = new PVEOsd(_client, _node));
                     private PVEMds _mds;
@@ -7805,6 +7507,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     public PVEDisks Disks => _disks ?? (_disks = new PVEDisks(_client, _node));
                     private PVEConfig _config;
                     public PVEConfig Config => _config ?? (_config = new PVEConfig(_client, _node));
+                    private PVEConfigdb _configdb;
+                    public PVEConfigdb Configdb => _configdb ?? (_configdb = new PVEConfigdb(_client, _node));
                     private PVEInit _init;
                     public PVEInit Init => _init ?? (_init = new PVEInit(_client, _node));
                     private PVEStop _stop;
@@ -7825,76 +7529,100 @@ namespace Corsinvest.ProxmoxVE.Api
                     public PVELog Log => _log ?? (_log = new PVELog(_client, _node));
                     private PVERules _rules;
                     public PVERules Rules => _rules ?? (_rules = new PVERules(_client, _node));
-                    public class PVEOsd : Base
+                    public class PVEOsd
                     {
-                        private object _node;
-                        internal PVEOsd(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEOsd(Client client, object node) { _client = client; _node = node; }
                         public PVEItemOsdid this[object osdid] => new PVEItemOsdid(_client, _node, osdid);
-                        public class PVEItemOsdid : Base
+                        public class PVEItemOsdid
                         {
-                            private object _node;
-                            private object _osdid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _osdid;
                             internal PVEItemOsdid(Client client, object node, object osdid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _osdid = osdid;
                             }
                             private PVEIn _in;
                             public PVEIn In => _in ?? (_in = new PVEIn(_client, _node, _osdid));
                             private PVEOut _out;
                             public PVEOut Out => _out ?? (_out = new PVEOut(_client, _node, _osdid));
-                            public class PVEIn : Base
+                            private PVEScrub _scrub;
+                            public PVEScrub Scrub => _scrub ?? (_scrub = new PVEScrub(_client, _node, _osdid));
+                            public class PVEIn
                             {
-                                private object _node;
-                                private object _osdid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _osdid;
                                 internal PVEIn(Client client, object node, object osdid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _osdid = osdid;
                                 }
                                 /// <summary>
                                 /// ceph osd in
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest()
-                                {
-                                    return _client.Create($"/nodes/{_node}/ceph/osd/{_osdid}/in");
-                                }
+                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/ceph/osd/{_osdid}/in"); }
+
                                 /// <summary>
                                 /// ceph osd in
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result In() => CreateRest();
                             }
-                            public class PVEOut : Base
+                            public class PVEOut
                             {
-                                private object _node;
-                                private object _osdid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _osdid;
                                 internal PVEOut(Client client, object node, object osdid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _osdid = osdid;
                                 }
                                 /// <summary>
                                 /// ceph osd out
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest()
-                                {
-                                    return _client.Create($"/nodes/{_node}/ceph/osd/{_osdid}/out");
-                                }
+                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/ceph/osd/{_osdid}/out"); }
+
                                 /// <summary>
                                 /// ceph osd out
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result Out() => CreateRest();
+                            }
+                            public class PVEScrub
+                            {
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _osdid;
+                                internal PVEScrub(Client client, object node, object osdid)
+                                {
+                                    _client = client; _node = node;
+                                    _osdid = osdid;
+                                }
+                                /// <summary>
+                                /// Instruct the OSD to scrub.
+                                /// </summary>
+                                /// <param name="deep">If set, instructs a deep scrub instead of a normal one.</param>
+                                /// <returns></returns>
+                                public Result CreateRest(bool? deep = null)
+                                {
+                                    var parameters = new Dictionary<string, object>();
+                                    parameters.Add("deep", deep);
+                                    return _client.Create($"/nodes/{_node}/ceph/osd/{_osdid}/scrub", parameters);
+                                }
+
+                                /// <summary>
+                                /// Instruct the OSD to scrub.
+                                /// </summary>
+                                /// <param name="deep">If set, instructs a deep scrub instead of a normal one.</param>
+                                /// <returns></returns>
+                                public Result Scrub(bool? deep = null) => CreateRest(deep);
                             }
                             /// <summary>
                             /// Destroy OSD
@@ -7907,6 +7635,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("cleanup", cleanup);
                                 return _client.Delete($"/nodes/{_node}/ceph/osd/{_osdid}", parameters);
                             }
+
                             /// <summary>
                             /// Destroy OSD
                             /// </summary>
@@ -7918,10 +7647,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Get Ceph osd list/tree.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/ceph/osd");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/osd"); }
+
                         /// <summary>
                         /// Get Ceph osd list/tree.
                         /// </summary>
@@ -7931,61 +7658,58 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Create OSD
                         /// </summary>
                         /// <param name="dev">Block device name.</param>
-                        /// <param name="bluestore">Use bluestore instead of filestore. This is the default.</param>
-                        /// <param name="fstype">File system type (filestore only).
-                        ///   Enum: xfs,ext4</param>
-                        /// <param name="journal_dev">Block device name for journal (filestore) or block.db (bluestore).</param>
-                        /// <param name="wal_dev">Block device name for block.wal (bluestore only).</param>
+                        /// <param name="db_dev">Block device name for block.db.</param>
+                        /// <param name="db_size">Size in GiB for block.db.</param>
+                        /// <param name="encrypted">Enables encryption of the OSD.</param>
+                        /// <param name="wal_dev">Block device name for block.wal.</param>
+                        /// <param name="wal_size">Size in GiB for block.wal.</param>
                         /// <returns></returns>
-                        public Result CreateRest(string dev, bool? bluestore = null, string fstype = null, string journal_dev = null, string wal_dev = null)
+                        public Result CreateRest(string dev, string db_dev = null, int? db_size = null, bool? encrypted = null, string wal_dev = null, int? wal_size = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("dev", dev);
-                            parameters.Add("bluestore", bluestore);
-                            parameters.Add("fstype", fstype);
-                            parameters.Add("journal_dev", journal_dev);
+                            parameters.Add("db_dev", db_dev);
+                            parameters.Add("db_size", db_size);
+                            parameters.Add("encrypted", encrypted);
                             parameters.Add("wal_dev", wal_dev);
+                            parameters.Add("wal_size", wal_size);
                             return _client.Create($"/nodes/{_node}/ceph/osd", parameters);
                         }
+
                         /// <summary>
                         /// Create OSD
                         /// </summary>
                         /// <param name="dev">Block device name.</param>
-                        /// <param name="bluestore">Use bluestore instead of filestore. This is the default.</param>
-                        /// <param name="fstype">File system type (filestore only).
-                        ///   Enum: xfs,ext4</param>
-                        /// <param name="journal_dev">Block device name for journal (filestore) or block.db (bluestore).</param>
-                        /// <param name="wal_dev">Block device name for block.wal (bluestore only).</param>
+                        /// <param name="db_dev">Block device name for block.db.</param>
+                        /// <param name="db_size">Size in GiB for block.db.</param>
+                        /// <param name="encrypted">Enables encryption of the OSD.</param>
+                        /// <param name="wal_dev">Block device name for block.wal.</param>
+                        /// <param name="wal_size">Size in GiB for block.wal.</param>
                         /// <returns></returns>
-                        public Result Createosd(string dev, bool? bluestore = null, string fstype = null, string journal_dev = null, string wal_dev = null) => CreateRest(dev, bluestore, fstype, journal_dev, wal_dev);
+                        public Result Createosd(string dev, string db_dev = null, int? db_size = null, bool? encrypted = null, string wal_dev = null, int? wal_size = null) => CreateRest(dev, db_dev, db_size, encrypted, wal_dev, wal_size);
                     }
-                    public class PVEMds : Base
+                    public class PVEMds
                     {
-                        private object _node;
-                        internal PVEMds(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEMds(Client client, object node) { _client = client; _node = node; }
                         public PVEItemName this[object name] => new PVEItemName(_client, _node, name);
-                        public class PVEItemName : Base
+                        public class PVEItemName
                         {
-                            private object _node;
-                            private object _name;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _name;
                             internal PVEItemName(Client client, object node, object name)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _name = name;
                             }
                             /// <summary>
                             /// Destroy Ceph Metadata Server
                             /// </summary>
                             /// <returns></returns>
-                            public Result DeleteRest()
-                            {
-                                return _client.Delete($"/nodes/{_node}/ceph/mds/{_name}");
-                            }
+                            public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/ceph/mds/{_name}"); }
+
                             /// <summary>
                             /// Destroy Ceph Metadata Server
                             /// </summary>
@@ -8002,6 +7726,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("hotstandby", hotstandby);
                                 return _client.Create($"/nodes/{_node}/ceph/mds/{_name}", parameters);
                             }
+
                             /// <summary>
                             /// Create Ceph Metadata Server (MDS)
                             /// </summary>
@@ -8013,158 +7738,137 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// MDS directory index.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/ceph/mds");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/mds"); }
+
                         /// <summary>
                         /// MDS directory index.
                         /// </summary>
                         /// <returns></returns>
                         public Result Index() => GetRest();
                     }
-                    public class PVEMgr : Base
+                    public class PVEMgr
                     {
-                        private object _node;
-                        internal PVEMgr(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEMgr(Client client, object node) { _client = client; _node = node; }
                         public PVEItemId this[object id] => new PVEItemId(_client, _node, id);
-                        public class PVEItemId : Base
+                        public class PVEItemId
                         {
-                            private object _node;
-                            private object _id;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _id;
                             internal PVEItemId(Client client, object node, object id)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _id = id;
                             }
                             /// <summary>
                             /// Destroy Ceph Manager.
                             /// </summary>
                             /// <returns></returns>
-                            public Result DeleteRest()
-                            {
-                                return _client.Delete($"/nodes/{_node}/ceph/mgr/{_id}");
-                            }
+                            public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/ceph/mgr/{_id}"); }
+
                             /// <summary>
                             /// Destroy Ceph Manager.
                             /// </summary>
                             /// <returns></returns>
                             public Result Destroymgr() => DeleteRest();
+                            /// <summary>
+                            /// Create Ceph Manager
+                            /// </summary>
+                            /// <returns></returns>
+                            public Result CreateRest() { return _client.Create($"/nodes/{_node}/ceph/mgr/{_id}"); }
+
+                            /// <summary>
+                            /// Create Ceph Manager
+                            /// </summary>
+                            /// <returns></returns>
+                            public Result Createmgr() => CreateRest();
                         }
                         /// <summary>
-                        /// Create Ceph Manager
+                        /// MGR directory index.
                         /// </summary>
-                        /// <param name="id">The ID for the manager, when omitted the same as the nodename</param>
                         /// <returns></returns>
-                        public Result CreateRest(string id = null)
-                        {
-                            var parameters = new Dictionary<string, object>();
-                            parameters.Add("id", id);
-                            return _client.Create($"/nodes/{_node}/ceph/mgr", parameters);
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/mgr"); }
+
                         /// <summary>
-                        /// Create Ceph Manager
+                        /// MGR directory index.
                         /// </summary>
-                        /// <param name="id">The ID for the manager, when omitted the same as the nodename</param>
                         /// <returns></returns>
-                        public Result Createmgr(string id = null) => CreateRest(id);
+                        public Result Index() => GetRest();
                     }
-                    public class PVEMon : Base
+                    public class PVEMon
                     {
-                        private object _node;
-                        internal PVEMon(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEMon(Client client, object node) { _client = client; _node = node; }
                         public PVEItemMonid this[object monid] => new PVEItemMonid(_client, _node, monid);
-                        public class PVEItemMonid : Base
+                        public class PVEItemMonid
                         {
-                            private object _node;
-                            private object _monid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _monid;
                             internal PVEItemMonid(Client client, object node, object monid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _monid = monid;
                             }
                             /// <summary>
                             /// Destroy Ceph Monitor and Manager.
                             /// </summary>
-                            /// <param name="exclude_manager">When set, removes only the monitor, not the manager</param>
                             /// <returns></returns>
-                            public Result DeleteRest(bool? exclude_manager = null)
-                            {
-                                var parameters = new Dictionary<string, object>();
-                                parameters.Add("exclude-manager", exclude_manager);
-                                return _client.Delete($"/nodes/{_node}/ceph/mon/{_monid}", parameters);
-                            }
+                            public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/ceph/mon/{_monid}"); }
+
                             /// <summary>
                             /// Destroy Ceph Monitor and Manager.
                             /// </summary>
-                            /// <param name="exclude_manager">When set, removes only the monitor, not the manager</param>
                             /// <returns></returns>
-                            public Result Destroymon(bool? exclude_manager = null) => DeleteRest(exclude_manager);
+                            public Result Destroymon() => DeleteRest();
+                            /// <summary>
+                            /// Create Ceph Monitor and Manager
+                            /// </summary>
+                            /// <param name="mon_address">Overwrites autodetected monitor IP address. Must be in the public network of ceph.</param>
+                            /// <returns></returns>
+                            public Result CreateRest(string mon_address = null)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("mon-address", mon_address);
+                                return _client.Create($"/nodes/{_node}/ceph/mon/{_monid}", parameters);
+                            }
+
+                            /// <summary>
+                            /// Create Ceph Monitor and Manager
+                            /// </summary>
+                            /// <param name="mon_address">Overwrites autodetected monitor IP address. Must be in the public network of ceph.</param>
+                            /// <returns></returns>
+                            public Result Createmon(string mon_address = null) => CreateRest(mon_address);
                         }
                         /// <summary>
                         /// Get Ceph monitor list.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/ceph/mon");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/mon"); }
+
                         /// <summary>
                         /// Get Ceph monitor list.
                         /// </summary>
                         /// <returns></returns>
                         public Result Listmon() => GetRest();
-                        /// <summary>
-                        /// Create Ceph Monitor and Manager
-                        /// </summary>
-                        /// <param name="exclude_manager">When set, only a monitor will be created.</param>
-                        /// <param name="id">The ID for the monitor, when omitted the same as the nodename</param>
-                        /// <param name="mon_address">Overwrites autodetected monitor IP address. Must be in the public network of ceph.</param>
-                        /// <returns></returns>
-                        public Result CreateRest(bool? exclude_manager = null, string id = null, string mon_address = null)
-                        {
-                            var parameters = new Dictionary<string, object>();
-                            parameters.Add("exclude-manager", exclude_manager);
-                            parameters.Add("id", id);
-                            parameters.Add("mon-address", mon_address);
-                            return _client.Create($"/nodes/{_node}/ceph/mon", parameters);
-                        }
-                        /// <summary>
-                        /// Create Ceph Monitor and Manager
-                        /// </summary>
-                        /// <param name="exclude_manager">When set, only a monitor will be created.</param>
-                        /// <param name="id">The ID for the monitor, when omitted the same as the nodename</param>
-                        /// <param name="mon_address">Overwrites autodetected monitor IP address. Must be in the public network of ceph.</param>
-                        /// <returns></returns>
-                        public Result Createmon(bool? exclude_manager = null, string id = null, string mon_address = null) => CreateRest(exclude_manager, id, mon_address);
                     }
-                    public class PVEFs : Base
+                    public class PVEFs
                     {
-                        private object _node;
-                        internal PVEFs(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEFs(Client client, object node) { _client = client; _node = node; }
                         public PVEItemName this[object name] => new PVEItemName(_client, _node, name);
-                        public class PVEItemName : Base
+                        public class PVEItemName
                         {
-                            private object _node;
-                            private object _name;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _name;
                             internal PVEItemName(Client client, object node, object name)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _name = name;
                             }
                             /// <summary>
@@ -8180,6 +7884,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("pg_num", pg_num);
                                 return _client.Create($"/nodes/{_node}/ceph/fs/{_name}", parameters);
                             }
+
                             /// <summary>
                             /// Create a Ceph filesystem
                             /// </summary>
@@ -8192,24 +7897,19 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Directory index.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/ceph/fs");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/fs"); }
+
                         /// <summary>
                         /// Directory index.
                         /// </summary>
                         /// <returns></returns>
                         public Result Index() => GetRest();
                     }
-                    public class PVEDisks : Base
+                    public class PVEDisks
                     {
-                        private object _node;
-                        internal PVEDisks(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEDisks(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// List local disks.
                         /// </summary>
@@ -8222,6 +7922,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("type", type);
                             return _client.Get($"/nodes/{_node}/ceph/disks", parameters);
                         }
+
                         /// <summary>
                         /// List local disks.
                         /// </summary>
@@ -8230,41 +7931,50 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result Disks(string type = null) => GetRest(type);
                     }
-                    public class PVEConfig : Base
+                    public class PVEConfig
                     {
-                        private object _node;
-                        internal PVEConfig(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEConfig(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Get Ceph configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/ceph/config");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/config"); }
+
                         /// <summary>
                         /// Get Ceph configuration.
                         /// </summary>
                         /// <returns></returns>
                         public Result Config() => GetRest();
                     }
-                    public class PVEInit : Base
+                    public class PVEConfigdb
                     {
-                        private object _node;
-                        internal PVEInit(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEConfigdb(Client client, object node) { _client = client; _node = node; }
+                        /// <summary>
+                        /// Get Ceph configuration database.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/configdb"); }
+
+                        /// <summary>
+                        /// Get Ceph configuration database.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result Configdb() => GetRest();
+                    }
+                    public class PVEInit
+                    {
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEInit(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Create initial ceph default configuration and setup symlinks.
                         /// </summary>
                         /// <param name="cluster_network">Declare a separate cluster network, OSDs will routeheartbeat, object replication and recovery traffic over it</param>
-                        /// <param name="disable_cephx">Disable cephx authentification.  WARNING: cephx is a security feature protecting against man-in-the-middle attacks. Only consider disabling cephx if your network is private!</param>
+                        /// <param name="disable_cephx">Disable cephx authentication.  WARNING: cephx is a security feature protecting against man-in-the-middle attacks. Only consider disabling cephx if your network is private!</param>
                         /// <param name="min_size">Minimum number of available replicas per object to allow I/O</param>
                         /// <param name="network">Use specific network for all ceph related traffic</param>
                         /// <param name="pg_bits">Placement group bits, used to specify the default number of placement groups.  NOTE: 'osd pool default pg num' does not work for default pools.</param>
@@ -8281,11 +7991,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("size", size);
                             return _client.Create($"/nodes/{_node}/ceph/init", parameters);
                         }
+
                         /// <summary>
                         /// Create initial ceph default configuration and setup symlinks.
                         /// </summary>
                         /// <param name="cluster_network">Declare a separate cluster network, OSDs will routeheartbeat, object replication and recovery traffic over it</param>
-                        /// <param name="disable_cephx">Disable cephx authentification.  WARNING: cephx is a security feature protecting against man-in-the-middle attacks. Only consider disabling cephx if your network is private!</param>
+                        /// <param name="disable_cephx">Disable cephx authentication.  WARNING: cephx is a security feature protecting against man-in-the-middle attacks. Only consider disabling cephx if your network is private!</param>
                         /// <param name="min_size">Minimum number of available replicas per object to allow I/O</param>
                         /// <param name="network">Use specific network for all ceph related traffic</param>
                         /// <param name="pg_bits">Placement group bits, used to specify the default number of placement groups.  NOTE: 'osd pool default pg num' does not work for default pools.</param>
@@ -8293,14 +8004,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result Init(string cluster_network = null, bool? disable_cephx = null, int? min_size = null, string network = null, int? pg_bits = null, int? size = null) => CreateRest(cluster_network, disable_cephx, min_size, network, pg_bits, size);
                     }
-                    public class PVEStop : Base
+                    public class PVEStop
                     {
-                        private object _node;
-                        internal PVEStop(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEStop(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Stop ceph services.
                         /// </summary>
@@ -8312,6 +8020,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("service", service);
                             return _client.Create($"/nodes/{_node}/ceph/stop", parameters);
                         }
+
                         /// <summary>
                         /// Stop ceph services.
                         /// </summary>
@@ -8319,14 +8028,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result Stop(string service = null) => CreateRest(service);
                     }
-                    public class PVEStart : Base
+                    public class PVEStart
                     {
-                        private object _node;
-                        internal PVEStart(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEStart(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Start ceph services.
                         /// </summary>
@@ -8338,6 +8044,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("service", service);
                             return _client.Create($"/nodes/{_node}/ceph/start", parameters);
                         }
+
                         /// <summary>
                         /// Start ceph services.
                         /// </summary>
@@ -8345,14 +8052,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result Start(string service = null) => CreateRest(service);
                     }
-                    public class PVERestart : Base
+                    public class PVERestart
                     {
-                        private object _node;
-                        internal PVERestart(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVERestart(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Restart ceph services.
                         /// </summary>
@@ -8364,6 +8068,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("service", service);
                             return _client.Create($"/nodes/{_node}/ceph/restart", parameters);
                         }
+
                         /// <summary>
                         /// Restart ceph services.
                         /// </summary>
@@ -8371,45 +8076,37 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result Restart(string service = null) => CreateRest(service);
                     }
-                    public class PVEStatus : Base
+                    public class PVEStatus
                     {
-                        private object _node;
-                        internal PVEStatus(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEStatus(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Get ceph status.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/ceph/status");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/status"); }
+
                         /// <summary>
                         /// Get ceph status.
                         /// </summary>
                         /// <returns></returns>
                         public Result Status() => GetRest();
                     }
-                    public class PVEPools : Base
+                    public class PVEPools
                     {
-                        private object _node;
-                        internal PVEPools(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEPools(Client client, object node) { _client = client; _node = node; }
                         public PVEItemName this[object name] => new PVEItemName(_client, _node, name);
-                        public class PVEItemName : Base
+                        public class PVEItemName
                         {
-                            private object _node;
-                            private object _name;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _name;
                             internal PVEItemName(Client client, object node, object name)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _name = name;
                             }
                             /// <summary>
@@ -8425,6 +8122,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("remove_storages", remove_storages);
                                 return _client.Delete($"/nodes/{_node}/ceph/pools/{_name}", parameters);
                             }
+
                             /// <summary>
                             /// Destroy pool
                             /// </summary>
@@ -8437,10 +8135,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// List all pools.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/ceph/pools");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/pools"); }
+
                         /// <summary>
                         /// List all pools.
                         /// </summary>
@@ -8470,6 +8166,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("size", size);
                             return _client.Create($"/nodes/{_node}/ceph/pools", parameters);
                         }
+
                         /// <summary>
                         /// Create POOL
                         /// </summary>
@@ -8484,33 +8181,28 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result Createpool(string name, bool? add_storages = null, string application = null, string crush_rule = null, int? min_size = null, int? pg_num = null, int? size = null) => CreateRest(name, add_storages, application, crush_rule, min_size, pg_num, size);
                     }
-                    public class PVEFlags : Base
+                    public class PVEFlags
                     {
-                        private object _node;
-                        internal PVEFlags(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEFlags(Client client, object node) { _client = client; _node = node; }
                         public PVEItemFlag this[object flag] => new PVEItemFlag(_client, _node, flag);
-                        public class PVEItemFlag : Base
+                        public class PVEItemFlag
                         {
-                            private object _node;
-                            private object _flag;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _flag;
                             internal PVEItemFlag(Client client, object node, object flag)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _flag = flag;
                             }
                             /// <summary>
                             /// Unset a ceph flag
                             /// </summary>
                             /// <returns></returns>
-                            public Result DeleteRest()
-                            {
-                                return _client.Delete($"/nodes/{_node}/ceph/flags/{_flag}");
-                            }
+                            public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/ceph/flags/{_flag}"); }
+
                             /// <summary>
                             /// Unset a ceph flag
                             /// </summary>
@@ -8520,10 +8212,8 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Set a ceph flag
                             /// </summary>
                             /// <returns></returns>
-                            public Result CreateRest()
-                            {
-                                return _client.Create($"/nodes/{_node}/ceph/flags/{_flag}");
-                            }
+                            public Result CreateRest() { return _client.Create($"/nodes/{_node}/ceph/flags/{_flag}"); }
+
                             /// <summary>
                             /// Set a ceph flag
                             /// </summary>
@@ -8534,46 +8224,36 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// get all set ceph flags
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/ceph/flags");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/flags"); }
+
                         /// <summary>
                         /// get all set ceph flags
                         /// </summary>
                         /// <returns></returns>
                         public Result GetFlags() => GetRest();
                     }
-                    public class PVECrush : Base
+                    public class PVECrush
                     {
-                        private object _node;
-                        internal PVECrush(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVECrush(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Get OSD crush map
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/ceph/crush");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/crush"); }
+
                         /// <summary>
                         /// Get OSD crush map
                         /// </summary>
                         /// <returns></returns>
                         public Result Crush() => GetRest();
                     }
-                    public class PVELog : Base
+                    public class PVELog
                     {
-                        private object _node;
-                        internal PVELog(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVELog(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Read ceph log
                         /// </summary>
@@ -8587,6 +8267,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("start", start);
                             return _client.Get($"/nodes/{_node}/ceph/log", parameters);
                         }
+
                         /// <summary>
                         /// Read ceph log
                         /// </summary>
@@ -8595,22 +8276,17 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result Log(int? limit = null, int? start = null) => GetRest(limit, start);
                     }
-                    public class PVERules : Base
+                    public class PVERules
                     {
-                        private object _node;
-                        internal PVERules(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVERules(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// List ceph rules.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/ceph/rules");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/rules"); }
+
                         /// <summary>
                         /// List ceph rules.
                         /// </summary>
@@ -8621,34 +8297,26 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Directory index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/nodes/{_node}/ceph");
-                    }
+                    public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph"); }
+
                     /// <summary>
                     /// Directory index.
                     /// </summary>
                     /// <returns></returns>
                     public Result Index() => GetRest();
                 }
-                public class PVEVzdump : Base
+                public class PVEVzdump
                 {
-                    private object _node;
-                    internal PVEVzdump(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEVzdump(Client client, object node) { _client = client; _node = node; }
                     private PVEExtractconfig _extractconfig;
                     public PVEExtractconfig Extractconfig => _extractconfig ?? (_extractconfig = new PVEExtractconfig(_client, _node));
-                    public class PVEExtractconfig : Base
+                    public class PVEExtractconfig
                     {
-                        private object _node;
-                        internal PVEExtractconfig(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEExtractconfig(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Extract configuration from vzdump backup archive.
                         /// </summary>
@@ -8660,6 +8328,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("volume", volume);
                             return _client.Get($"/nodes/{_node}/vzdump/extractconfig", parameters);
                         }
+
                         /// <summary>
                         /// Extract configuration from vzdump backup archive.
                         /// </summary>
@@ -8686,19 +8355,20 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="mode">Backup mode.
                     ///   Enum: snapshot,suspend,stop</param>
                     /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
+                    /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
                     /// <param name="quiet">Be quiet.</param>
                     /// <param name="remove">Remove old backup files if there are more than 'maxfiles' backup files.</param>
                     /// <param name="script">Use specified hook script.</param>
                     /// <param name="size">Unused, will be removed in a future release.</param>
                     /// <param name="stdexcludes">Exclude temporary files and logs.</param>
                     /// <param name="stdout">Write tar to stdout, not to a file.</param>
-                    /// <param name="stop">Stop runnig backup jobs on this host.</param>
+                    /// <param name="stop">Stop running backup jobs on this host.</param>
                     /// <param name="stopwait">Maximal time to wait until a guest system is stopped (minutes).</param>
                     /// <param name="storage">Store resulting file to this storage.</param>
                     /// <param name="tmpdir">Store temporary files to specified directory.</param>
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
                     /// <returns></returns>
-                    public Result CreateRest(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, int? pigz = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null)
+                    public Result CreateRest(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, int? pigz = null, string pool = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("all", all);
@@ -8714,6 +8384,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("maxfiles", maxfiles);
                         parameters.Add("mode", mode);
                         parameters.Add("pigz", pigz);
+                        parameters.Add("pool", pool);
                         parameters.Add("quiet", quiet);
                         parameters.Add("remove", remove);
                         parameters.Add("script", script);
@@ -8727,6 +8398,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("vmid", vmid);
                         return _client.Create($"/nodes/{_node}/vzdump", parameters);
                     }
+
                     /// <summary>
                     /// Create backup.
                     /// </summary>
@@ -8746,37 +8418,35 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="mode">Backup mode.
                     ///   Enum: snapshot,suspend,stop</param>
                     /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
+                    /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
                     /// <param name="quiet">Be quiet.</param>
                     /// <param name="remove">Remove old backup files if there are more than 'maxfiles' backup files.</param>
                     /// <param name="script">Use specified hook script.</param>
                     /// <param name="size">Unused, will be removed in a future release.</param>
                     /// <param name="stdexcludes">Exclude temporary files and logs.</param>
                     /// <param name="stdout">Write tar to stdout, not to a file.</param>
-                    /// <param name="stop">Stop runnig backup jobs on this host.</param>
+                    /// <param name="stop">Stop running backup jobs on this host.</param>
                     /// <param name="stopwait">Maximal time to wait until a guest system is stopped (minutes).</param>
                     /// <param name="storage">Store resulting file to this storage.</param>
                     /// <param name="tmpdir">Store temporary files to specified directory.</param>
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
                     /// <returns></returns>
-                    public Result Vzdump(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, int? pigz = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null) => CreateRest(all, bwlimit, compress, dumpdir, exclude, exclude_path, ionice, lockwait, mailnotification, mailto, maxfiles, mode, pigz, quiet, remove, script, size, stdexcludes, stdout, stop, stopwait, storage, tmpdir, vmid);
+                    public Result Vzdump(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, int? pigz = null, string pool = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null) => CreateRest(all, bwlimit, compress, dumpdir, exclude, exclude_path, ionice, lockwait, mailnotification, mailto, maxfiles, mode, pigz, pool, quiet, remove, script, size, stdexcludes, stdout, stop, stopwait, storage, tmpdir, vmid);
                 }
-                public class PVEServices : Base
+                public class PVEServices
                 {
-                    private object _node;
-                    internal PVEServices(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEServices(Client client, object node) { _client = client; _node = node; }
                     public PVEItemService this[object service] => new PVEItemService(_client, _node, service);
-                    public class PVEItemService : Base
+                    public class PVEItemService
                     {
-                        private object _node;
-                        private object _service;
+                        private readonly Client _client;
+                        private readonly object _node;
+                        private readonly object _service;
                         internal PVEItemService(Client client, object node, object service)
                         {
-                            _client = client;
-                            _node = node;
+                            _client = client; _node = node;
                             _service = service;
                         }
                         private PVEState _state;
@@ -8789,120 +8459,110 @@ namespace Corsinvest.ProxmoxVE.Api
                         public PVERestart Restart => _restart ?? (_restart = new PVERestart(_client, _node, _service));
                         private PVEReload _reload;
                         public PVEReload Reload => _reload ?? (_reload = new PVEReload(_client, _node, _service));
-                        public class PVEState : Base
+                        public class PVEState
                         {
-                            private object _node;
-                            private object _service;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _service;
                             internal PVEState(Client client, object node, object service)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _service = service;
                             }
                             /// <summary>
                             /// Read service properties
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest()
-                            {
-                                return _client.Get($"/nodes/{_node}/services/{_service}/state");
-                            }
+                            public Result GetRest() { return _client.Get($"/nodes/{_node}/services/{_service}/state"); }
+
                             /// <summary>
                             /// Read service properties
                             /// </summary>
                             /// <returns></returns>
                             public Result ServiceState() => GetRest();
                         }
-                        public class PVEStart : Base
+                        public class PVEStart
                         {
-                            private object _node;
-                            private object _service;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _service;
                             internal PVEStart(Client client, object node, object service)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _service = service;
                             }
                             /// <summary>
                             /// Start service.
                             /// </summary>
                             /// <returns></returns>
-                            public Result CreateRest()
-                            {
-                                return _client.Create($"/nodes/{_node}/services/{_service}/start");
-                            }
+                            public Result CreateRest() { return _client.Create($"/nodes/{_node}/services/{_service}/start"); }
+
                             /// <summary>
                             /// Start service.
                             /// </summary>
                             /// <returns></returns>
                             public Result ServiceStart() => CreateRest();
                         }
-                        public class PVEStop : Base
+                        public class PVEStop
                         {
-                            private object _node;
-                            private object _service;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _service;
                             internal PVEStop(Client client, object node, object service)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _service = service;
                             }
                             /// <summary>
                             /// Stop service.
                             /// </summary>
                             /// <returns></returns>
-                            public Result CreateRest()
-                            {
-                                return _client.Create($"/nodes/{_node}/services/{_service}/stop");
-                            }
+                            public Result CreateRest() { return _client.Create($"/nodes/{_node}/services/{_service}/stop"); }
+
                             /// <summary>
                             /// Stop service.
                             /// </summary>
                             /// <returns></returns>
                             public Result ServiceStop() => CreateRest();
                         }
-                        public class PVERestart : Base
+                        public class PVERestart
                         {
-                            private object _node;
-                            private object _service;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _service;
                             internal PVERestart(Client client, object node, object service)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _service = service;
                             }
                             /// <summary>
                             /// Restart service.
                             /// </summary>
                             /// <returns></returns>
-                            public Result CreateRest()
-                            {
-                                return _client.Create($"/nodes/{_node}/services/{_service}/restart");
-                            }
+                            public Result CreateRest() { return _client.Create($"/nodes/{_node}/services/{_service}/restart"); }
+
                             /// <summary>
                             /// Restart service.
                             /// </summary>
                             /// <returns></returns>
                             public Result ServiceRestart() => CreateRest();
                         }
-                        public class PVEReload : Base
+                        public class PVEReload
                         {
-                            private object _node;
-                            private object _service;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _service;
                             internal PVEReload(Client client, object node, object service)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _service = service;
                             }
                             /// <summary>
                             /// Reload service.
                             /// </summary>
                             /// <returns></returns>
-                            public Result CreateRest()
-                            {
-                                return _client.Create($"/nodes/{_node}/services/{_service}/reload");
-                            }
+                            public Result CreateRest() { return _client.Create($"/nodes/{_node}/services/{_service}/reload"); }
+
                             /// <summary>
                             /// Reload service.
                             /// </summary>
@@ -8913,10 +8573,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Directory index
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/services/{_service}");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/services/{_service}"); }
+
                         /// <summary>
                         /// Directory index
                         /// </summary>
@@ -8927,32 +8585,25 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Service list.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/nodes/{_node}/services");
-                    }
+                    public Result GetRest() { return _client.Get($"/nodes/{_node}/services"); }
+
                     /// <summary>
                     /// Service list.
                     /// </summary>
                     /// <returns></returns>
                     public Result Index() => GetRest();
                 }
-                public class PVESubscription : Base
+                public class PVESubscription
                 {
-                    private object _node;
-                    internal PVESubscription(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVESubscription(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Read subscription info.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/nodes/{_node}/subscription");
-                    }
+                    public Result GetRest() { return _client.Get($"/nodes/{_node}/subscription"); }
+
                     /// <summary>
                     /// Read subscription info.
                     /// </summary>
@@ -8969,6 +8620,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("force", force);
                         return _client.Create($"/nodes/{_node}/subscription", parameters);
                     }
+
                     /// <summary>
                     /// Update subscription info.
                     /// </summary>
@@ -8986,6 +8638,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("key", key);
                         return _client.Set($"/nodes/{_node}/subscription", parameters);
                     }
+
                     /// <summary>
                     /// Set subscription key.
                     /// </summary>
@@ -8993,33 +8646,28 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result Set(string key) => SetRest(key);
                 }
-                public class PVENetwork : Base
+                public class PVENetwork
                 {
-                    private object _node;
-                    internal PVENetwork(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVENetwork(Client client, object node) { _client = client; _node = node; }
                     public PVEItemIface this[object iface] => new PVEItemIface(_client, _node, iface);
-                    public class PVEItemIface : Base
+                    public class PVEItemIface
                     {
-                        private object _node;
-                        private object _iface;
+                        private readonly Client _client;
+                        private readonly object _node;
+                        private readonly object _iface;
                         internal PVEItemIface(Client client, object node, object iface)
                         {
-                            _client = client;
-                            _node = node;
+                            _client = client; _node = node;
                             _iface = iface;
                         }
                         /// <summary>
                         /// Delete network device configuration
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest()
-                        {
-                            return _client.Delete($"/nodes/{_node}/network/{_iface}");
-                        }
+                        public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/network/{_iface}"); }
+
                         /// <summary>
                         /// Delete network device configuration
                         /// </summary>
@@ -9029,10 +8677,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Read network device configuration
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/network/{_iface}");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/network/{_iface}"); }
+
                         /// <summary>
                         /// Read network device configuration
                         /// </summary>
@@ -9050,8 +8696,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         ///   Enum: balance-rr,active-backup,balance-xor,broadcast,802.3ad,balance-tlb,balance-alb,balance-slb,lacp-balance-slb,lacp-balance-tcp</param>
                         /// <param name="bond_xmit_hash_policy">Selects the transmit hash policy to use for slave selection in balance-xor and 802.3ad modes.
                         ///   Enum: layer2,layer2+3,layer3+4</param>
-                        /// <param name="bridge_ports">Specify the iterfaces you want to add to your bridge.</param>
+                        /// <param name="bridge_ports">Specify the interfaces you want to add to your bridge.</param>
                         /// <param name="bridge_vlan_aware">Enable bridge vlan support.</param>
+                        /// <param name="cidr">IPv4 CIDR.</param>
+                        /// <param name="cidr6">IPv6 CIDR.</param>
                         /// <param name="comments">Comments</param>
                         /// <param name="comments6">Comments</param>
                         /// <param name="delete">A list of settings you want to delete.</param>
@@ -9062,11 +8710,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="ovs_bonds">Specify the interfaces used by the bonding device.</param>
                         /// <param name="ovs_bridge">The OVS bridge associated with a OVS port. This is required when you create an OVS port.</param>
                         /// <param name="ovs_options">OVS interface options.</param>
-                        /// <param name="ovs_ports">Specify the iterfaces you want to add to your bridge.</param>
+                        /// <param name="ovs_ports">Specify the interfaces you want to add to your bridge.</param>
                         /// <param name="ovs_tag">Specify a VLan tag (used by OVSPort, OVSIntPort, OVSBond)</param>
                         /// <param name="slaves">Specify the interfaces used by the bonding device.</param>
                         /// <returns></returns>
-                        public Result SetRest(string type, string address = null, string address6 = null, bool? autostart = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string comments = null, string comments6 = null, string delete = null, string gateway = null, string gateway6 = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null)
+                        public Result SetRest(string type, string address = null, string address6 = null, bool? autostart = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string delete = null, string gateway = null, string gateway6 = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("type", type);
@@ -9077,6 +8725,8 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("bond_xmit_hash_policy", bond_xmit_hash_policy);
                             parameters.Add("bridge_ports", bridge_ports);
                             parameters.Add("bridge_vlan_aware", bridge_vlan_aware);
+                            parameters.Add("cidr", cidr);
+                            parameters.Add("cidr6", cidr6);
                             parameters.Add("comments", comments);
                             parameters.Add("comments6", comments6);
                             parameters.Add("delete", delete);
@@ -9092,6 +8742,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("slaves", slaves);
                             return _client.Set($"/nodes/{_node}/network/{_iface}", parameters);
                         }
+
                         /// <summary>
                         /// Update network device configuration
                         /// </summary>
@@ -9104,8 +8755,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         ///   Enum: balance-rr,active-backup,balance-xor,broadcast,802.3ad,balance-tlb,balance-alb,balance-slb,lacp-balance-slb,lacp-balance-tcp</param>
                         /// <param name="bond_xmit_hash_policy">Selects the transmit hash policy to use for slave selection in balance-xor and 802.3ad modes.
                         ///   Enum: layer2,layer2+3,layer3+4</param>
-                        /// <param name="bridge_ports">Specify the iterfaces you want to add to your bridge.</param>
+                        /// <param name="bridge_ports">Specify the interfaces you want to add to your bridge.</param>
                         /// <param name="bridge_vlan_aware">Enable bridge vlan support.</param>
+                        /// <param name="cidr">IPv4 CIDR.</param>
+                        /// <param name="cidr6">IPv6 CIDR.</param>
                         /// <param name="comments">Comments</param>
                         /// <param name="comments6">Comments</param>
                         /// <param name="delete">A list of settings you want to delete.</param>
@@ -9116,20 +8769,18 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="ovs_bonds">Specify the interfaces used by the bonding device.</param>
                         /// <param name="ovs_bridge">The OVS bridge associated with a OVS port. This is required when you create an OVS port.</param>
                         /// <param name="ovs_options">OVS interface options.</param>
-                        /// <param name="ovs_ports">Specify the iterfaces you want to add to your bridge.</param>
+                        /// <param name="ovs_ports">Specify the interfaces you want to add to your bridge.</param>
                         /// <param name="ovs_tag">Specify a VLan tag (used by OVSPort, OVSIntPort, OVSBond)</param>
                         /// <param name="slaves">Specify the interfaces used by the bonding device.</param>
                         /// <returns></returns>
-                        public Result UpdateNetwork(string type, string address = null, string address6 = null, bool? autostart = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string comments = null, string comments6 = null, string delete = null, string gateway = null, string gateway6 = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null) => SetRest(type, address, address6, autostart, bond_mode, bond_xmit_hash_policy, bridge_ports, bridge_vlan_aware, comments, comments6, delete, gateway, gateway6, netmask, netmask6, ovs_bonds, ovs_bridge, ovs_options, ovs_ports, ovs_tag, slaves);
+                        public Result UpdateNetwork(string type, string address = null, string address6 = null, bool? autostart = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string delete = null, string gateway = null, string gateway6 = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null) => SetRest(type, address, address6, autostart, bond_mode, bond_xmit_hash_policy, bridge_ports, bridge_vlan_aware, cidr, cidr6, comments, comments6, delete, gateway, gateway6, netmask, netmask6, ovs_bonds, ovs_bridge, ovs_options, ovs_ports, ovs_tag, slaves);
                     }
                     /// <summary>
                     /// Revert network configuration changes.
                     /// </summary>
                     /// <returns></returns>
-                    public Result DeleteRest()
-                    {
-                        return _client.Delete($"/nodes/{_node}/network");
-                    }
+                    public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/network"); }
+
                     /// <summary>
                     /// Revert network configuration changes.
                     /// </summary>
@@ -9147,6 +8798,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("type", type);
                         return _client.Get($"/nodes/{_node}/network", parameters);
                     }
+
                     /// <summary>
                     /// List available networks
                     /// </summary>
@@ -9167,8 +8819,10 @@ namespace Corsinvest.ProxmoxVE.Api
                     ///   Enum: balance-rr,active-backup,balance-xor,broadcast,802.3ad,balance-tlb,balance-alb,balance-slb,lacp-balance-slb,lacp-balance-tcp</param>
                     /// <param name="bond_xmit_hash_policy">Selects the transmit hash policy to use for slave selection in balance-xor and 802.3ad modes.
                     ///   Enum: layer2,layer2+3,layer3+4</param>
-                    /// <param name="bridge_ports">Specify the iterfaces you want to add to your bridge.</param>
+                    /// <param name="bridge_ports">Specify the interfaces you want to add to your bridge.</param>
                     /// <param name="bridge_vlan_aware">Enable bridge vlan support.</param>
+                    /// <param name="cidr">IPv4 CIDR.</param>
+                    /// <param name="cidr6">IPv6 CIDR.</param>
                     /// <param name="comments">Comments</param>
                     /// <param name="comments6">Comments</param>
                     /// <param name="gateway">Default gateway address.</param>
@@ -9178,11 +8832,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="ovs_bonds">Specify the interfaces used by the bonding device.</param>
                     /// <param name="ovs_bridge">The OVS bridge associated with a OVS port. This is required when you create an OVS port.</param>
                     /// <param name="ovs_options">OVS interface options.</param>
-                    /// <param name="ovs_ports">Specify the iterfaces you want to add to your bridge.</param>
+                    /// <param name="ovs_ports">Specify the interfaces you want to add to your bridge.</param>
                     /// <param name="ovs_tag">Specify a VLan tag (used by OVSPort, OVSIntPort, OVSBond)</param>
                     /// <param name="slaves">Specify the interfaces used by the bonding device.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string iface, string type, string address = null, string address6 = null, bool? autostart = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string comments = null, string comments6 = null, string gateway = null, string gateway6 = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null)
+                    public Result CreateRest(string iface, string type, string address = null, string address6 = null, bool? autostart = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string gateway = null, string gateway6 = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("iface", iface);
@@ -9194,6 +8848,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("bond_xmit_hash_policy", bond_xmit_hash_policy);
                         parameters.Add("bridge_ports", bridge_ports);
                         parameters.Add("bridge_vlan_aware", bridge_vlan_aware);
+                        parameters.Add("cidr", cidr);
+                        parameters.Add("cidr6", cidr6);
                         parameters.Add("comments", comments);
                         parameters.Add("comments6", comments6);
                         parameters.Add("gateway", gateway);
@@ -9208,6 +8864,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("slaves", slaves);
                         return _client.Create($"/nodes/{_node}/network", parameters);
                     }
+
                     /// <summary>
                     /// Create network device configuration
                     /// </summary>
@@ -9221,8 +8878,10 @@ namespace Corsinvest.ProxmoxVE.Api
                     ///   Enum: balance-rr,active-backup,balance-xor,broadcast,802.3ad,balance-tlb,balance-alb,balance-slb,lacp-balance-slb,lacp-balance-tcp</param>
                     /// <param name="bond_xmit_hash_policy">Selects the transmit hash policy to use for slave selection in balance-xor and 802.3ad modes.
                     ///   Enum: layer2,layer2+3,layer3+4</param>
-                    /// <param name="bridge_ports">Specify the iterfaces you want to add to your bridge.</param>
+                    /// <param name="bridge_ports">Specify the interfaces you want to add to your bridge.</param>
                     /// <param name="bridge_vlan_aware">Enable bridge vlan support.</param>
+                    /// <param name="cidr">IPv4 CIDR.</param>
+                    /// <param name="cidr6">IPv6 CIDR.</param>
                     /// <param name="comments">Comments</param>
                     /// <param name="comments6">Comments</param>
                     /// <param name="gateway">Default gateway address.</param>
@@ -9232,56 +8891,51 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="ovs_bonds">Specify the interfaces used by the bonding device.</param>
                     /// <param name="ovs_bridge">The OVS bridge associated with a OVS port. This is required when you create an OVS port.</param>
                     /// <param name="ovs_options">OVS interface options.</param>
-                    /// <param name="ovs_ports">Specify the iterfaces you want to add to your bridge.</param>
+                    /// <param name="ovs_ports">Specify the interfaces you want to add to your bridge.</param>
                     /// <param name="ovs_tag">Specify a VLan tag (used by OVSPort, OVSIntPort, OVSBond)</param>
                     /// <param name="slaves">Specify the interfaces used by the bonding device.</param>
                     /// <returns></returns>
-                    public Result CreateNetwork(string iface, string type, string address = null, string address6 = null, bool? autostart = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string comments = null, string comments6 = null, string gateway = null, string gateway6 = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null) => CreateRest(iface, type, address, address6, autostart, bond_mode, bond_xmit_hash_policy, bridge_ports, bridge_vlan_aware, comments, comments6, gateway, gateway6, netmask, netmask6, ovs_bonds, ovs_bridge, ovs_options, ovs_ports, ovs_tag, slaves);
+                    public Result CreateNetwork(string iface, string type, string address = null, string address6 = null, bool? autostart = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string gateway = null, string gateway6 = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null) => CreateRest(iface, type, address, address6, autostart, bond_mode, bond_xmit_hash_policy, bridge_ports, bridge_vlan_aware, cidr, cidr6, comments, comments6, gateway, gateway6, netmask, netmask6, ovs_bonds, ovs_bridge, ovs_options, ovs_ports, ovs_tag, slaves);
                     /// <summary>
                     /// Reload network configuration
                     /// </summary>
                     /// <returns></returns>
-                    public Result SetRest()
-                    {
-                        return _client.Set($"/nodes/{_node}/network");
-                    }
+                    public Result SetRest() { return _client.Set($"/nodes/{_node}/network"); }
+
                     /// <summary>
                     /// Reload network configuration
                     /// </summary>
                     /// <returns></returns>
                     public Result ReloadNetworkConfig() => SetRest();
                 }
-                public class PVETasks : Base
+                public class PVETasks
                 {
-                    private object _node;
-                    internal PVETasks(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVETasks(Client client, object node) { _client = client; _node = node; }
                     public PVEItemUpid this[object upid] => new PVEItemUpid(_client, _node, upid);
-                    public class PVEItemUpid : Base
+                    public class PVEItemUpid
                     {
-                        private object _node;
-                        private object _upid;
+                        private readonly Client _client;
+                        private readonly object _node;
+                        private readonly object _upid;
                         internal PVEItemUpid(Client client, object node, object upid)
                         {
-                            _client = client;
-                            _node = node;
+                            _client = client; _node = node;
                             _upid = upid;
                         }
                         private PVELog _log;
                         public PVELog Log => _log ?? (_log = new PVELog(_client, _node, _upid));
                         private PVEStatus _status;
                         public PVEStatus Status => _status ?? (_status = new PVEStatus(_client, _node, _upid));
-                        public class PVELog : Base
+                        public class PVELog
                         {
-                            private object _node;
-                            private object _upid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _upid;
                             internal PVELog(Client client, object node, object upid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _upid = upid;
                             }
                             /// <summary>
@@ -9297,6 +8951,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("start", start);
                                 return _client.Get($"/nodes/{_node}/tasks/{_upid}/log", parameters);
                             }
+
                             /// <summary>
                             /// Read task log.
                             /// </summary>
@@ -9305,24 +8960,22 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result ReadTaskLog(int? limit = null, int? start = null) => GetRest(limit, start);
                         }
-                        public class PVEStatus : Base
+                        public class PVEStatus
                         {
-                            private object _node;
-                            private object _upid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _upid;
                             internal PVEStatus(Client client, object node, object upid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _upid = upid;
                             }
                             /// <summary>
                             /// Read task status.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest()
-                            {
-                                return _client.Get($"/nodes/{_node}/tasks/{_upid}/status");
-                            }
+                            public Result GetRest() { return _client.Get($"/nodes/{_node}/tasks/{_upid}/status"); }
+
                             /// <summary>
                             /// Read task status.
                             /// </summary>
@@ -9333,10 +8986,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Stop a task.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest()
-                        {
-                            return _client.Delete($"/nodes/{_node}/tasks/{_upid}");
-                        }
+                        public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/tasks/{_upid}"); }
+
                         /// <summary>
                         /// Stop a task.
                         /// </summary>
@@ -9346,10 +8997,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// 
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/tasks/{_upid}");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/tasks/{_upid}"); }
+
                         /// <summary>
                         /// 
                         /// </summary>
@@ -9380,6 +9029,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("vmid", vmid);
                         return _client.Get($"/nodes/{_node}/tasks", parameters);
                     }
+
                     /// <summary>
                     /// Read task list for one node (finished tasks).
                     /// </summary>
@@ -9394,14 +9044,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result NodeTasks(bool? errors = null, int? limit = null, string source = null, int? start = null, string typefilter = null, string userfilter = null, int? vmid = null) => GetRest(errors, limit, source, start, typefilter, userfilter, vmid);
                 }
-                public class PVEScan : Base
+                public class PVEScan
                 {
-                    private object _node;
-                    internal PVEScan(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEScan(Client client, object node) { _client = client; _node = node; }
                     private PVEZfs _zfs;
                     public PVEZfs Zfs => _zfs ?? (_zfs = new PVEZfs(_client, _node));
                     private PVENfs _nfs;
@@ -9418,36 +9065,28 @@ namespace Corsinvest.ProxmoxVE.Api
                     public PVELvmthin Lvmthin => _lvmthin ?? (_lvmthin = new PVELvmthin(_client, _node));
                     private PVEUsb _usb;
                     public PVEUsb Usb => _usb ?? (_usb = new PVEUsb(_client, _node));
-                    public class PVEZfs : Base
+                    public class PVEZfs
                     {
-                        private object _node;
-                        internal PVEZfs(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEZfs(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Scan zfs pool list on local node.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/scan/zfs");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/scan/zfs"); }
+
                         /// <summary>
                         /// Scan zfs pool list on local node.
                         /// </summary>
                         /// <returns></returns>
                         public Result Zfsscan() => GetRest();
                     }
-                    public class PVENfs : Base
+                    public class PVENfs
                     {
-                        private object _node;
-                        internal PVENfs(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVENfs(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Scan remote NFS server.
                         /// </summary>
@@ -9459,6 +9098,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("server", server);
                             return _client.Get($"/nodes/{_node}/scan/nfs", parameters);
                         }
+
                         /// <summary>
                         /// Scan remote NFS server.
                         /// </summary>
@@ -9466,14 +9106,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result Nfsscan(string server) => GetRest(server);
                     }
-                    public class PVECifs : Base
+                    public class PVECifs
                     {
-                        private object _node;
-                        internal PVECifs(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVECifs(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Scan remote CIFS server.
                         /// </summary>
@@ -9491,6 +9128,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("username", username);
                             return _client.Get($"/nodes/{_node}/scan/cifs", parameters);
                         }
+
                         /// <summary>
                         /// Scan remote CIFS server.
                         /// </summary>
@@ -9501,14 +9139,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result Cifsscan(string server, string domain = null, string password = null, string username = null) => GetRest(server, domain, password, username);
                     }
-                    public class PVEGlusterfs : Base
+                    public class PVEGlusterfs
                     {
-                        private object _node;
-                        internal PVEGlusterfs(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEGlusterfs(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Scan remote GlusterFS server.
                         /// </summary>
@@ -9520,6 +9155,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("server", server);
                             return _client.Get($"/nodes/{_node}/scan/glusterfs", parameters);
                         }
+
                         /// <summary>
                         /// Scan remote GlusterFS server.
                         /// </summary>
@@ -9527,14 +9163,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result Glusterfsscan(string server) => GetRest(server);
                     }
-                    public class PVEIscsi : Base
+                    public class PVEIscsi
                     {
-                        private object _node;
-                        internal PVEIscsi(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEIscsi(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Scan remote iSCSI server.
                         /// </summary>
@@ -9546,6 +9179,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("portal", portal);
                             return _client.Get($"/nodes/{_node}/scan/iscsi", parameters);
                         }
+
                         /// <summary>
                         /// Scan remote iSCSI server.
                         /// </summary>
@@ -9553,36 +9187,28 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result Iscsiscan(string portal) => GetRest(portal);
                     }
-                    public class PVELvm : Base
+                    public class PVELvm
                     {
-                        private object _node;
-                        internal PVELvm(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVELvm(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// List local LVM volume groups.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/scan/lvm");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/scan/lvm"); }
+
                         /// <summary>
                         /// List local LVM volume groups.
                         /// </summary>
                         /// <returns></returns>
                         public Result Lvmscan() => GetRest();
                     }
-                    public class PVELvmthin : Base
+                    public class PVELvmthin
                     {
-                        private object _node;
-                        internal PVELvmthin(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVELvmthin(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// List local LVM Thin Pools.
                         /// </summary>
@@ -9594,6 +9220,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("vg", vg);
                             return _client.Get($"/nodes/{_node}/scan/lvmthin", parameters);
                         }
+
                         /// <summary>
                         /// List local LVM Thin Pools.
                         /// </summary>
@@ -9601,22 +9228,17 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result Lvmthinscan(string vg) => GetRest(vg);
                     }
-                    public class PVEUsb : Base
+                    public class PVEUsb
                     {
-                        private object _node;
-                        internal PVEUsb(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEUsb(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// List local USB devices.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/scan/usb");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/scan/usb"); }
+
                         /// <summary>
                         /// List local USB devices.
                         /// </summary>
@@ -9627,65 +9249,55 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Index of available scan methods
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/nodes/{_node}/scan");
-                    }
+                    public Result GetRest() { return _client.Get($"/nodes/{_node}/scan"); }
+
                     /// <summary>
                     /// Index of available scan methods
                     /// </summary>
                     /// <returns></returns>
                     public Result Index() => GetRest();
                 }
-                public class PVEHardware : Base
+                public class PVEHardware
                 {
-                    private object _node;
-                    internal PVEHardware(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEHardware(Client client, object node) { _client = client; _node = node; }
                     private PVEPci _pci;
                     public PVEPci Pci => _pci ?? (_pci = new PVEPci(_client, _node));
-                    public class PVEPci : Base
+                    public class PVEPci
                     {
-                        private object _node;
-                        internal PVEPci(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEPci(Client client, object node) { _client = client; _node = node; }
                         public PVEItemPciid this[object pciid] => new PVEItemPciid(_client, _node, pciid);
-                        public class PVEItemPciid : Base
+                        public class PVEItemPciid
                         {
-                            private object _node;
-                            private object _pciid;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _pciid;
                             internal PVEItemPciid(Client client, object node, object pciid)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _pciid = pciid;
                             }
                             private PVEMdev _mdev;
                             public PVEMdev Mdev => _mdev ?? (_mdev = new PVEMdev(_client, _node, _pciid));
-                            public class PVEMdev : Base
+                            public class PVEMdev
                             {
-                                private object _node;
-                                private object _pciid;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _pciid;
                                 internal PVEMdev(Client client, object node, object pciid)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _pciid = pciid;
                                 }
                                 /// <summary>
                                 /// List mediated device types for given PCI device.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/hardware/pci/{_pciid}/mdev");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/hardware/pci/{_pciid}/mdev"); }
+
                                 /// <summary>
                                 /// List mediated device types for given PCI device.
                                 /// </summary>
@@ -9696,10 +9308,8 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Index of available pci methods
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest()
-                            {
-                                return _client.Get($"/nodes/{_node}/hardware/pci/{_pciid}");
-                            }
+                            public Result GetRest() { return _client.Get($"/nodes/{_node}/hardware/pci/{_pciid}"); }
+
                             /// <summary>
                             /// Index of available pci methods
                             /// </summary>
@@ -9719,6 +9329,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("verbose", verbose);
                             return _client.Get($"/nodes/{_node}/hardware/pci", parameters);
                         }
+
                         /// <summary>
                         /// List local PCI devices.
                         /// </summary>
@@ -9731,33 +9342,28 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Index of hardware types
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/nodes/{_node}/hardware");
-                    }
+                    public Result GetRest() { return _client.Get($"/nodes/{_node}/hardware"); }
+
                     /// <summary>
                     /// Index of hardware types
                     /// </summary>
                     /// <returns></returns>
                     public Result Index() => GetRest();
                 }
-                public class PVEStorage : Base
+                public class PVEStorage
                 {
-                    private object _node;
-                    internal PVEStorage(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEStorage(Client client, object node) { _client = client; _node = node; }
                     public PVEItemStorage this[object storage] => new PVEItemStorage(_client, _node, storage);
-                    public class PVEItemStorage : Base
+                    public class PVEItemStorage
                     {
-                        private object _node;
-                        private object _storage;
+                        private readonly Client _client;
+                        private readonly object _node;
+                        private readonly object _storage;
                         internal PVEItemStorage(Client client, object node, object storage)
                         {
-                            _client = client;
-                            _node = node;
+                            _client = client; _node = node;
                             _storage = storage;
                         }
                         private PVEContent _content;
@@ -9770,26 +9376,26 @@ namespace Corsinvest.ProxmoxVE.Api
                         public PVERrddata Rrddata => _rrddata ?? (_rrddata = new PVERrddata(_client, _node, _storage));
                         private PVEUpload _upload;
                         public PVEUpload Upload => _upload ?? (_upload = new PVEUpload(_client, _node, _storage));
-                        public class PVEContent : Base
+                        public class PVEContent
                         {
-                            private object _node;
-                            private object _storage;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _storage;
                             internal PVEContent(Client client, object node, object storage)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _storage = storage;
                             }
                             public PVEItemVolume this[object volume] => new PVEItemVolume(_client, _node, _storage, volume);
-                            public class PVEItemVolume : Base
+                            public class PVEItemVolume
                             {
-                                private object _node;
-                                private object _storage;
-                                private object _volume;
+                                private readonly Client _client;
+                                private readonly object _node;
+                                private readonly object _storage;
+                                private readonly object _volume;
                                 internal PVEItemVolume(Client client, object node, object storage, object volume)
                                 {
-                                    _client = client;
-                                    _node = node;
+                                    _client = client; _node = node;
                                     _storage = storage;
                                     _volume = volume;
                                 }
@@ -9797,10 +9403,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Delete volume
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result DeleteRest()
-                                {
-                                    return _client.Delete($"/nodes/{_node}/storage/{_storage}/content/{_volume}");
-                                }
+                                public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/storage/{_storage}/content/{_volume}"); }
+
                                 /// <summary>
                                 /// Delete volume
                                 /// </summary>
@@ -9810,10 +9414,8 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Get volume attributes
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest()
-                                {
-                                    return _client.Get($"/nodes/{_node}/storage/{_storage}/content/{_volume}");
-                                }
+                                public Result GetRest() { return _client.Get($"/nodes/{_node}/storage/{_storage}/content/{_volume}"); }
+
                                 /// <summary>
                                 /// Get volume attributes
                                 /// </summary>
@@ -9832,6 +9434,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("target_node", target_node);
                                     return _client.Create($"/nodes/{_node}/storage/{_storage}/content/{_volume}", parameters);
                                 }
+
                                 /// <summary>
                                 /// Copy a volume. This is experimental code - do not use.
                                 /// </summary>
@@ -9853,6 +9456,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("vmid", vmid);
                                 return _client.Get($"/nodes/{_node}/storage/{_storage}/content", parameters);
                             }
+
                             /// <summary>
                             /// List storage content.
                             /// </summary>
@@ -9878,6 +9482,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("format", format);
                                 return _client.Create($"/nodes/{_node}/storage/{_storage}/content", parameters);
                             }
+
                             /// <summary>
                             /// Allocate disk images.
                             /// </summary>
@@ -9889,38 +9494,36 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Create(string filename, string size, int vmid, string format = null) => CreateRest(filename, size, vmid, format);
                         }
-                        public class PVEStatus : Base
+                        public class PVEStatus
                         {
-                            private object _node;
-                            private object _storage;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _storage;
                             internal PVEStatus(Client client, object node, object storage)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _storage = storage;
                             }
                             /// <summary>
                             /// Read storage status.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest()
-                            {
-                                return _client.Get($"/nodes/{_node}/storage/{_storage}/status");
-                            }
+                            public Result GetRest() { return _client.Get($"/nodes/{_node}/storage/{_storage}/status"); }
+
                             /// <summary>
                             /// Read storage status.
                             /// </summary>
                             /// <returns></returns>
                             public Result ReadStatus() => GetRest();
                         }
-                        public class PVERrd : Base
+                        public class PVERrd
                         {
-                            private object _node;
-                            private object _storage;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _storage;
                             internal PVERrd(Client client, object node, object storage)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _storage = storage;
                             }
                             /// <summary>
@@ -9940,6 +9543,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("cf", cf);
                                 return _client.Get($"/nodes/{_node}/storage/{_storage}/rrd", parameters);
                             }
+
                             /// <summary>
                             /// Read storage RRD statistics (returns PNG).
                             /// </summary>
@@ -9951,14 +9555,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Rrd(string ds, string timeframe, string cf = null) => GetRest(ds, timeframe, cf);
                         }
-                        public class PVERrddata : Base
+                        public class PVERrddata
                         {
-                            private object _node;
-                            private object _storage;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _storage;
                             internal PVERrddata(Client client, object node, object storage)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _storage = storage;
                             }
                             /// <summary>
@@ -9976,6 +9580,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("cf", cf);
                                 return _client.Get($"/nodes/{_node}/storage/{_storage}/rrddata", parameters);
                             }
+
                             /// <summary>
                             /// Read storage RRD statistics.
                             /// </summary>
@@ -9986,14 +9591,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Rrddata(string timeframe, string cf = null) => GetRest(timeframe, cf);
                         }
-                        public class PVEUpload : Base
+                        public class PVEUpload
                         {
-                            private object _node;
-                            private object _storage;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _storage;
                             internal PVEUpload(Client client, object node, object storage)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _storage = storage;
                             }
                             /// <summary>
@@ -10001,7 +9606,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="content">Content type.</param>
                             /// <param name="filename">The name of the file to create.</param>
-                            /// <param name="tmpfilename">The source file name. This parameter is usually set by the REST handler. You can only overwrite it when connecting to the trustet port on localhost.</param>
+                            /// <param name="tmpfilename">The source file name. This parameter is usually set by the REST handler. You can only overwrite it when connecting to the trusted port on localhost.</param>
                             /// <returns></returns>
                             public Result CreateRest(string content, string filename, string tmpfilename = null)
                             {
@@ -10011,12 +9616,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("tmpfilename", tmpfilename);
                                 return _client.Create($"/nodes/{_node}/storage/{_storage}/upload", parameters);
                             }
+
                             /// <summary>
                             /// Upload templates and ISO images.
                             /// </summary>
                             /// <param name="content">Content type.</param>
                             /// <param name="filename">The name of the file to create.</param>
-                            /// <param name="tmpfilename">The source file name. This parameter is usually set by the REST handler. You can only overwrite it when connecting to the trustet port on localhost.</param>
+                            /// <param name="tmpfilename">The source file name. This parameter is usually set by the REST handler. You can only overwrite it when connecting to the trusted port on localhost.</param>
                             /// <returns></returns>
                             public Result Upload(string content, string filename, string tmpfilename = null) => CreateRest(content, filename, tmpfilename);
                         }
@@ -10024,10 +9630,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// 
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/storage/{_storage}");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/storage/{_storage}"); }
+
                         /// <summary>
                         /// 
                         /// </summary>
@@ -10053,6 +9657,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("target", target);
                         return _client.Get($"/nodes/{_node}/storage", parameters);
                     }
+
                     /// <summary>
                     /// Get status for all datastores.
                     /// </summary>
@@ -10064,14 +9669,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result Index(string content = null, bool? enabled = null, bool? format = null, string storage = null, string target = null) => GetRest(content, enabled, format, storage, target);
                 }
-                public class PVEDisks : Base
+                public class PVEDisks
                 {
-                    private object _node;
-                    internal PVEDisks(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEDisks(Client client, object node) { _client = client; _node = node; }
                     private PVELvm _lvm;
                     public PVELvm Lvm => _lvm ?? (_lvm = new PVELvm(_client, _node));
                     private PVELvmthin _lvmthin;
@@ -10086,22 +9688,17 @@ namespace Corsinvest.ProxmoxVE.Api
                     public PVESmart Smart => _smart ?? (_smart = new PVESmart(_client, _node));
                     private PVEInitgpt _initgpt;
                     public PVEInitgpt Initgpt => _initgpt ?? (_initgpt = new PVEInitgpt(_client, _node));
-                    public class PVELvm : Base
+                    public class PVELvm
                     {
-                        private object _node;
-                        internal PVELvm(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVELvm(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// List LVM Volume Groups
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/disks/lvm");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/disks/lvm"); }
+
                         /// <summary>
                         /// List LVM Volume Groups
                         /// </summary>
@@ -10122,6 +9719,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("add_storage", add_storage);
                             return _client.Create($"/nodes/{_node}/disks/lvm", parameters);
                         }
+
                         /// <summary>
                         /// Create an LVM Volume Group
                         /// </summary>
@@ -10131,22 +9729,17 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result Create(string device, string name, bool? add_storage = null) => CreateRest(device, name, add_storage);
                     }
-                    public class PVELvmthin : Base
+                    public class PVELvmthin
                     {
-                        private object _node;
-                        internal PVELvmthin(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVELvmthin(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// List LVM thinpools
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/disks/lvmthin");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/disks/lvmthin"); }
+
                         /// <summary>
                         /// List LVM thinpools
                         /// </summary>
@@ -10167,6 +9760,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("add_storage", add_storage);
                             return _client.Create($"/nodes/{_node}/disks/lvmthin", parameters);
                         }
+
                         /// <summary>
                         /// Create an LVM thinpool
                         /// </summary>
@@ -10176,22 +9770,17 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result Create(string device, string name, bool? add_storage = null) => CreateRest(device, name, add_storage);
                     }
-                    public class PVEDirectory : Base
+                    public class PVEDirectory
                     {
-                        private object _node;
-                        internal PVEDirectory(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEDirectory(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// PVE Managed Directory storages.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/disks/directory");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/disks/directory"); }
+
                         /// <summary>
                         /// PVE Managed Directory storages.
                         /// </summary>
@@ -10215,6 +9804,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("filesystem", filesystem);
                             return _client.Create($"/nodes/{_node}/disks/directory", parameters);
                         }
+
                         /// <summary>
                         /// Create a Filesystem on an unused disk. Will be mounted under '/mnt/pve/NAME'.
                         /// </summary>
@@ -10226,33 +9816,28 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result Create(string device, string name, bool? add_storage = null, string filesystem = null) => CreateRest(device, name, add_storage, filesystem);
                     }
-                    public class PVEZfs : Base
+                    public class PVEZfs
                     {
-                        private object _node;
-                        internal PVEZfs(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEZfs(Client client, object node) { _client = client; _node = node; }
                         public PVEItemName this[object name] => new PVEItemName(_client, _node, name);
-                        public class PVEItemName : Base
+                        public class PVEItemName
                         {
-                            private object _node;
-                            private object _name;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _name;
                             internal PVEItemName(Client client, object node, object name)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _name = name;
                             }
                             /// <summary>
                             /// Get details about a zpool.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest()
-                            {
-                                return _client.Get($"/nodes/{_node}/disks/zfs/{_name}");
-                            }
+                            public Result GetRest() { return _client.Get($"/nodes/{_node}/disks/zfs/{_name}"); }
+
                             /// <summary>
                             /// Get details about a zpool.
                             /// </summary>
@@ -10263,10 +9848,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// List Zpools.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/disks/zfs");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/disks/zfs"); }
+
                         /// <summary>
                         /// List Zpools.
                         /// </summary>
@@ -10295,6 +9878,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("compression", compression);
                             return _client.Create($"/nodes/{_node}/disks/zfs", parameters);
                         }
+
                         /// <summary>
                         /// Create a ZFS pool.
                         /// </summary>
@@ -10309,14 +9893,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result Create(string devices, string name, string raidlevel, bool? add_storage = null, int? ashift = null, string compression = null) => CreateRest(devices, name, raidlevel, add_storage, ashift, compression);
                     }
-                    public class PVEList : Base
+                    public class PVEList
                     {
-                        private object _node;
-                        internal PVEList(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEList(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// List local disks.
                         /// </summary>
@@ -10331,6 +9912,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("type", type);
                             return _client.Get($"/nodes/{_node}/disks/list", parameters);
                         }
+
                         /// <summary>
                         /// List local disks.
                         /// </summary>
@@ -10340,14 +9922,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result List(bool? skipsmart = null, string type = null) => GetRest(skipsmart, type);
                     }
-                    public class PVESmart : Base
+                    public class PVESmart
                     {
-                        private object _node;
-                        internal PVESmart(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVESmart(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Get SMART Health of a disk.
                         /// </summary>
@@ -10361,6 +9940,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("healthonly", healthonly);
                             return _client.Get($"/nodes/{_node}/disks/smart", parameters);
                         }
+
                         /// <summary>
                         /// Get SMART Health of a disk.
                         /// </summary>
@@ -10369,14 +9949,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result Smart(string disk, bool? healthonly = null) => GetRest(disk, healthonly);
                     }
-                    public class PVEInitgpt : Base
+                    public class PVEInitgpt
                     {
-                        private object _node;
-                        internal PVEInitgpt(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEInitgpt(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Initialize Disk with GPT
                         /// </summary>
@@ -10390,6 +9967,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("uuid", uuid);
                             return _client.Create($"/nodes/{_node}/disks/initgpt", parameters);
                         }
+
                         /// <summary>
                         /// Initialize Disk with GPT
                         /// </summary>
@@ -10402,46 +9980,36 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Node index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/nodes/{_node}/disks");
-                    }
+                    public Result GetRest() { return _client.Get($"/nodes/{_node}/disks"); }
+
                     /// <summary>
                     /// Node index.
                     /// </summary>
                     /// <returns></returns>
                     public Result Index() => GetRest();
                 }
-                public class PVEApt : Base
+                public class PVEApt
                 {
-                    private object _node;
-                    internal PVEApt(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEApt(Client client, object node) { _client = client; _node = node; }
                     private PVEUpdate _update;
                     public PVEUpdate Update => _update ?? (_update = new PVEUpdate(_client, _node));
                     private PVEChangelog _changelog;
                     public PVEChangelog Changelog => _changelog ?? (_changelog = new PVEChangelog(_client, _node));
                     private PVEVersions _versions;
                     public PVEVersions Versions => _versions ?? (_versions = new PVEVersions(_client, _node));
-                    public class PVEUpdate : Base
+                    public class PVEUpdate
                     {
-                        private object _node;
-                        internal PVEUpdate(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEUpdate(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// List available updates.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/apt/update");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/apt/update"); }
+
                         /// <summary>
                         /// List available updates.
                         /// </summary>
@@ -10460,6 +10028,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("quiet", quiet);
                             return _client.Create($"/nodes/{_node}/apt/update", parameters);
                         }
+
                         /// <summary>
                         /// This is used to resynchronize the package index files from their sources (apt-get update).
                         /// </summary>
@@ -10468,14 +10037,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result UpdateDatabase(bool? notify = null, bool? quiet = null) => CreateRest(notify, quiet);
                     }
-                    public class PVEChangelog : Base
+                    public class PVEChangelog
                     {
-                        private object _node;
-                        internal PVEChangelog(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEChangelog(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Get package changelogs.
                         /// </summary>
@@ -10489,6 +10055,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("version", version);
                             return _client.Get($"/nodes/{_node}/apt/changelog", parameters);
                         }
+
                         /// <summary>
                         /// Get package changelogs.
                         /// </summary>
@@ -10497,22 +10064,17 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result Changelog(string name, string version = null) => GetRest(name, version);
                     }
-                    public class PVEVersions : Base
+                    public class PVEVersions
                     {
-                        private object _node;
-                        internal PVEVersions(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEVersions(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Get package information for important Proxmox packages.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/apt/versions");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/apt/versions"); }
+
                         /// <summary>
                         /// Get package information for important Proxmox packages.
                         /// </summary>
@@ -10523,47 +10085,39 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Directory index for apt (Advanced Package Tool).
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/nodes/{_node}/apt");
-                    }
+                    public Result GetRest() { return _client.Get($"/nodes/{_node}/apt"); }
+
                     /// <summary>
                     /// Directory index for apt (Advanced Package Tool).
                     /// </summary>
                     /// <returns></returns>
                     public Result Index() => GetRest();
                 }
-                public class PVEFirewall : Base
+                public class PVEFirewall
                 {
-                    private object _node;
-                    internal PVEFirewall(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEFirewall(Client client, object node) { _client = client; _node = node; }
                     private PVERules _rules;
                     public PVERules Rules => _rules ?? (_rules = new PVERules(_client, _node));
                     private PVEOptions _options;
                     public PVEOptions Options => _options ?? (_options = new PVEOptions(_client, _node));
                     private PVELog _log;
                     public PVELog Log => _log ?? (_log = new PVELog(_client, _node));
-                    public class PVERules : Base
+                    public class PVERules
                     {
-                        private object _node;
-                        internal PVERules(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVERules(Client client, object node) { _client = client; _node = node; }
                         public PVEItemPos this[object pos] => new PVEItemPos(_client, _node, pos);
-                        public class PVEItemPos : Base
+                        public class PVEItemPos
                         {
-                            private object _node;
-                            private object _pos;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _pos;
                             internal PVEItemPos(Client client, object node, object pos)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _pos = pos;
                             }
                             /// <summary>
@@ -10577,6 +10131,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("digest", digest);
                                 return _client.Delete($"/nodes/{_node}/firewall/rules/{_pos}", parameters);
                             }
+
                             /// <summary>
                             /// Delete rule.
                             /// </summary>
@@ -10587,10 +10142,8 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Get single rule data.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest()
-                            {
-                                return _client.Get($"/nodes/{_node}/firewall/rules/{_pos}");
-                            }
+                            public Result GetRest() { return _client.Get($"/nodes/{_node}/firewall/rules/{_pos}"); }
+
                             /// <summary>
                             /// Get single rule data.
                             /// </summary>
@@ -10637,6 +10190,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("type", type);
                                 return _client.Set($"/nodes/{_node}/firewall/rules/{_pos}", parameters);
                             }
+
                             /// <summary>
                             /// Modify rule data.
                             /// </summary>
@@ -10664,10 +10218,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// List rules.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/firewall/rules");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/firewall/rules"); }
+
                         /// <summary>
                         /// List rules.
                         /// </summary>
@@ -10712,6 +10264,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("sport", sport);
                             return _client.Create($"/nodes/{_node}/firewall/rules", parameters);
                         }
+
                         /// <summary>
                         /// Create new rule.
                         /// </summary>
@@ -10734,22 +10287,17 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => CreateRest(action, type, comment, dest, digest, dport, enable, iface, log, macro, pos, proto, source, sport);
                     }
-                    public class PVEOptions : Base
+                    public class PVEOptions
                     {
-                        private object _node;
-                        internal PVEOptions(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEOptions(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Get host firewall options.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/firewall/options");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/firewall/options"); }
+
                         /// <summary>
                         /// Get host firewall options.
                         /// </summary>
@@ -10796,6 +10344,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("tcpflags", tcpflags);
                             return _client.Set($"/nodes/{_node}/firewall/options", parameters);
                         }
+
                         /// <summary>
                         /// Set Firewall options.
                         /// </summary>
@@ -10820,14 +10369,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result SetOptions(string delete = null, string digest = null, bool? enable = null, string log_level_in = null, string log_level_out = null, bool? log_nf_conntrack = null, bool? ndp = null, bool? nf_conntrack_allow_invalid = null, int? nf_conntrack_max = null, int? nf_conntrack_tcp_timeout_established = null, bool? nosmurfs = null, string smurf_log_level = null, string tcp_flags_log_level = null, bool? tcpflags = null) => SetRest(delete, digest, enable, log_level_in, log_level_out, log_nf_conntrack, ndp, nf_conntrack_allow_invalid, nf_conntrack_max, nf_conntrack_tcp_timeout_established, nosmurfs, smurf_log_level, tcp_flags_log_level, tcpflags);
                     }
-                    public class PVELog : Base
+                    public class PVELog
                     {
-                        private object _node;
-                        internal PVELog(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVELog(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Read firewall log
                         /// </summary>
@@ -10841,6 +10387,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("start", start);
                             return _client.Get($"/nodes/{_node}/firewall/log", parameters);
                         }
+
                         /// <summary>
                         /// Read firewall log
                         /// </summary>
@@ -10853,33 +10400,28 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Directory index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/nodes/{_node}/firewall");
-                    }
+                    public Result GetRest() { return _client.Get($"/nodes/{_node}/firewall"); }
+
                     /// <summary>
                     /// Directory index.
                     /// </summary>
                     /// <returns></returns>
                     public Result Index() => GetRest();
                 }
-                public class PVEReplication : Base
+                public class PVEReplication
                 {
-                    private object _node;
-                    internal PVEReplication(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEReplication(Client client, object node) { _client = client; _node = node; }
                     public PVEItemId this[object id] => new PVEItemId(_client, _node, id);
-                    public class PVEItemId : Base
+                    public class PVEItemId
                     {
-                        private object _node;
-                        private object _id;
+                        private readonly Client _client;
+                        private readonly object _node;
+                        private readonly object _id;
                         internal PVEItemId(Client client, object node, object id)
                         {
-                            _client = client;
-                            _node = node;
+                            _client = client; _node = node;
                             _id = id;
                         }
                         private PVEStatus _status;
@@ -10888,38 +10430,36 @@ namespace Corsinvest.ProxmoxVE.Api
                         public PVELog Log => _log ?? (_log = new PVELog(_client, _node, _id));
                         private PVEScheduleNow _scheduleNow;
                         public PVEScheduleNow ScheduleNow => _scheduleNow ?? (_scheduleNow = new PVEScheduleNow(_client, _node, _id));
-                        public class PVEStatus : Base
+                        public class PVEStatus
                         {
-                            private object _node;
-                            private object _id;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _id;
                             internal PVEStatus(Client client, object node, object id)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _id = id;
                             }
                             /// <summary>
                             /// Get replication job status.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest()
-                            {
-                                return _client.Get($"/nodes/{_node}/replication/{_id}/status");
-                            }
+                            public Result GetRest() { return _client.Get($"/nodes/{_node}/replication/{_id}/status"); }
+
                             /// <summary>
                             /// Get replication job status.
                             /// </summary>
                             /// <returns></returns>
                             public Result JobStatus() => GetRest();
                         }
-                        public class PVELog : Base
+                        public class PVELog
                         {
-                            private object _node;
-                            private object _id;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _id;
                             internal PVELog(Client client, object node, object id)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _id = id;
                             }
                             /// <summary>
@@ -10935,6 +10475,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("start", start);
                                 return _client.Get($"/nodes/{_node}/replication/{_id}/log", parameters);
                             }
+
                             /// <summary>
                             /// Read replication job log.
                             /// </summary>
@@ -10943,24 +10484,22 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result ReadJobLog(int? limit = null, int? start = null) => GetRest(limit, start);
                         }
-                        public class PVEScheduleNow : Base
+                        public class PVEScheduleNow
                         {
-                            private object _node;
-                            private object _id;
+                            private readonly Client _client;
+                            private readonly object _node;
+                            private readonly object _id;
                             internal PVEScheduleNow(Client client, object node, object id)
                             {
-                                _client = client;
-                                _node = node;
+                                _client = client; _node = node;
                                 _id = id;
                             }
                             /// <summary>
                             /// Schedule replication job to start as soon as possible.
                             /// </summary>
                             /// <returns></returns>
-                            public Result CreateRest()
-                            {
-                                return _client.Create($"/nodes/{_node}/replication/{_id}/schedule_now");
-                            }
+                            public Result CreateRest() { return _client.Create($"/nodes/{_node}/replication/{_id}/schedule_now"); }
+
                             /// <summary>
                             /// Schedule replication job to start as soon as possible.
                             /// </summary>
@@ -10971,10 +10510,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Directory index.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/replication/{_id}");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/replication/{_id}"); }
+
                         /// <summary>
                         /// Directory index.
                         /// </summary>
@@ -10992,6 +10529,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("guest", guest);
                         return _client.Get($"/nodes/{_node}/replication", parameters);
                     }
+
                     /// <summary>
                     /// List status of all replication jobs on this node.
                     /// </summary>
@@ -10999,46 +10537,35 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result Status(int? guest = null) => GetRest(guest);
                 }
-                public class PVECertificates : Base
+                public class PVECertificates
                 {
-                    private object _node;
-                    internal PVECertificates(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVECertificates(Client client, object node) { _client = client; _node = node; }
                     private PVEAcme _acme;
                     public PVEAcme Acme => _acme ?? (_acme = new PVEAcme(_client, _node));
                     private PVEInfo _info;
                     public PVEInfo Info => _info ?? (_info = new PVEInfo(_client, _node));
                     private PVECustom _custom;
                     public PVECustom Custom => _custom ?? (_custom = new PVECustom(_client, _node));
-                    public class PVEAcme : Base
+                    public class PVEAcme
                     {
-                        private object _node;
-                        internal PVEAcme(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEAcme(Client client, object node) { _client = client; _node = node; }
                         private PVECertificate _certificate;
                         public PVECertificate Certificate => _certificate ?? (_certificate = new PVECertificate(_client, _node));
-                        public class PVECertificate : Base
+                        public class PVECertificate
                         {
-                            private object _node;
-                            internal PVECertificate(Client client, object node)
-                            {
-                                _client = client;
-                                _node = node;
-                            }
+                            private readonly Client _client;
+                            private readonly object _node;
+                            internal PVECertificate(Client client, object node) { _client = client; _node = node; }
                             /// <summary>
                             /// Revoke existing certificate from CA.
                             /// </summary>
                             /// <returns></returns>
-                            public Result DeleteRest()
-                            {
-                                return _client.Delete($"/nodes/{_node}/certificates/acme/certificate");
-                            }
+                            public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/certificates/acme/certificate"); }
+
                             /// <summary>
                             /// Revoke existing certificate from CA.
                             /// </summary>
@@ -11055,6 +10582,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("force", force);
                                 return _client.Create($"/nodes/{_node}/certificates/acme/certificate", parameters);
                             }
+
                             /// <summary>
                             /// Order a new certificate from ACME-compatible CA.
                             /// </summary>
@@ -11072,6 +10600,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("force", force);
                                 return _client.Set($"/nodes/{_node}/certificates/acme/certificate", parameters);
                             }
+
                             /// <summary>
                             /// Renew existing certificate from CA.
                             /// </summary>
@@ -11083,46 +10612,36 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// ACME index.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/certificates/acme");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/certificates/acme"); }
+
                         /// <summary>
                         /// ACME index.
                         /// </summary>
                         /// <returns></returns>
                         public Result Index() => GetRest();
                     }
-                    public class PVEInfo : Base
+                    public class PVEInfo
                     {
-                        private object _node;
-                        internal PVEInfo(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVEInfo(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Get information about node's certificates.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest()
-                        {
-                            return _client.Get($"/nodes/{_node}/certificates/info");
-                        }
+                        public Result GetRest() { return _client.Get($"/nodes/{_node}/certificates/info"); }
+
                         /// <summary>
                         /// Get information about node's certificates.
                         /// </summary>
                         /// <returns></returns>
                         public Result Info() => GetRest();
                     }
-                    public class PVECustom : Base
+                    public class PVECustom
                     {
-                        private object _node;
-                        internal PVECustom(Client client, object node)
-                        {
-                            _client = client;
-                            _node = node;
-                        }
+                        private readonly Client _client;
+                        private readonly object _node;
+                        internal PVECustom(Client client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// DELETE custom certificate chain and key.
                         /// </summary>
@@ -11134,6 +10653,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("restart", restart);
                             return _client.Delete($"/nodes/{_node}/certificates/custom", parameters);
                         }
+
                         /// <summary>
                         /// DELETE custom certificate chain and key.
                         /// </summary>
@@ -11157,6 +10677,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("restart", restart);
                             return _client.Create($"/nodes/{_node}/certificates/custom", parameters);
                         }
+
                         /// <summary>
                         /// Upload or update custom certificate chain and key.
                         /// </summary>
@@ -11171,32 +10692,25 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Node index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/nodes/{_node}/certificates");
-                    }
+                    public Result GetRest() { return _client.Get($"/nodes/{_node}/certificates"); }
+
                     /// <summary>
                     /// Node index.
                     /// </summary>
                     /// <returns></returns>
                     public Result Index() => GetRest();
                 }
-                public class PVEConfig : Base
+                public class PVEConfig
                 {
-                    private object _node;
-                    internal PVEConfig(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEConfig(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Get node configuration options.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/nodes/{_node}/config");
-                    }
+                    public Result GetRest() { return _client.Get($"/nodes/{_node}/config"); }
+
                     /// <summary>
                     /// Get node configuration options.
                     /// </summary>
@@ -11221,6 +10735,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("wakeonlan", wakeonlan);
                         return _client.Set($"/nodes/{_node}/config", parameters);
                     }
+
                     /// <summary>
                     /// Set node configuration options.
                     /// </summary>
@@ -11232,44 +10747,34 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result SetOptions(string acme = null, string delete = null, string description = null, string digest = null, string wakeonlan = null) => SetRest(acme, delete, description, digest, wakeonlan);
                 }
-                public class PVEVersion : Base
+                public class PVEVersion
                 {
-                    private object _node;
-                    internal PVEVersion(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEVersion(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// API version details
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/nodes/{_node}/version");
-                    }
+                    public Result GetRest() { return _client.Get($"/nodes/{_node}/version"); }
+
                     /// <summary>
                     /// API version details
                     /// </summary>
                     /// <returns></returns>
                     public Result Version() => GetRest();
                 }
-                public class PVEStatus : Base
+                public class PVEStatus
                 {
-                    private object _node;
-                    internal PVEStatus(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEStatus(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Read node status
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/nodes/{_node}/status");
-                    }
+                    public Result GetRest() { return _client.Get($"/nodes/{_node}/status"); }
+
                     /// <summary>
                     /// Read node status
                     /// </summary>
@@ -11287,6 +10792,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("command", command);
                         return _client.Create($"/nodes/{_node}/status", parameters);
                     }
+
                     /// <summary>
                     /// Reboot or shutdown a node.
                     /// </summary>
@@ -11295,36 +10801,28 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result NodeCmd(string command) => CreateRest(command);
                 }
-                public class PVENetstat : Base
+                public class PVENetstat
                 {
-                    private object _node;
-                    internal PVENetstat(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVENetstat(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Read tap/vm network device interface counters
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/nodes/{_node}/netstat");
-                    }
+                    public Result GetRest() { return _client.Get($"/nodes/{_node}/netstat"); }
+
                     /// <summary>
                     /// Read tap/vm network device interface counters
                     /// </summary>
                     /// <returns></returns>
                     public Result Netstat() => GetRest();
                 }
-                public class PVEExecute : Base
+                public class PVEExecute
                 {
-                    private object _node;
-                    internal PVEExecute(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEExecute(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Execute multiple commands in order.
                     /// </summary>
@@ -11336,6 +10834,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("commands", commands);
                         return _client.Create($"/nodes/{_node}/execute", parameters);
                     }
+
                     /// <summary>
                     /// Execute multiple commands in order.
                     /// </summary>
@@ -11343,36 +10842,28 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result Execute(string commands) => CreateRest(commands);
                 }
-                public class PVEWakeonlan : Base
+                public class PVEWakeonlan
                 {
-                    private object _node;
-                    internal PVEWakeonlan(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEWakeonlan(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Try to wake a node via 'wake on LAN' network packet.
                     /// </summary>
                     /// <returns></returns>
-                    public Result CreateRest()
-                    {
-                        return _client.Create($"/nodes/{_node}/wakeonlan");
-                    }
+                    public Result CreateRest() { return _client.Create($"/nodes/{_node}/wakeonlan"); }
+
                     /// <summary>
                     /// Try to wake a node via 'wake on LAN' network packet.
                     /// </summary>
                     /// <returns></returns>
                     public Result Wakeonlan() => CreateRest();
                 }
-                public class PVERrd : Base
+                public class PVERrd
                 {
-                    private object _node;
-                    internal PVERrd(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVERrd(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Read node RRD statistics (returns PNG)
                     /// </summary>
@@ -11390,6 +10881,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("cf", cf);
                         return _client.Get($"/nodes/{_node}/rrd", parameters);
                     }
+
                     /// <summary>
                     /// Read node RRD statistics (returns PNG)
                     /// </summary>
@@ -11401,14 +10893,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result Rrd(string ds, string timeframe, string cf = null) => GetRest(ds, timeframe, cf);
                 }
-                public class PVERrddata : Base
+                public class PVERrddata
                 {
-                    private object _node;
-                    internal PVERrddata(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVERrddata(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Read node RRD statistics
                     /// </summary>
@@ -11424,6 +10913,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("cf", cf);
                         return _client.Get($"/nodes/{_node}/rrddata", parameters);
                     }
+
                     /// <summary>
                     /// Read node RRD statistics
                     /// </summary>
@@ -11434,14 +10924,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result Rrddata(string timeframe, string cf = null) => GetRest(timeframe, cf);
                 }
-                public class PVESyslog : Base
+                public class PVESyslog
                 {
-                    private object _node;
-                    internal PVESyslog(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVESyslog(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Read system log
                     /// </summary>
@@ -11461,6 +10948,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("until", until);
                         return _client.Get($"/nodes/{_node}/syslog", parameters);
                     }
+
                     /// <summary>
                     /// Read system log
                     /// </summary>
@@ -11472,14 +10960,47 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result Syslog(int? limit = null, string service = null, string since = null, int? start = null, string until = null) => GetRest(limit, service, since, start, until);
                 }
-                public class PVEVncshell : Base
+                public class PVEJournal
                 {
-                    private object _node;
-                    internal PVEVncshell(Client client, object node)
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEJournal(Client client, object node) { _client = client; _node = node; }
+                    /// <summary>
+                    /// Read Journal
+                    /// </summary>
+                    /// <param name="endcursor">End before the given Cursor. Conflicts with 'until'</param>
+                    /// <param name="lastentries">Limit to the last X lines. Conflicts with a range.</param>
+                    /// <param name="since">Display all log since this UNIX epoch. Conflicts with 'startcursor'.</param>
+                    /// <param name="startcursor">Start after the given Cursor. Conflicts with 'since'</param>
+                    /// <param name="until">Display all log until this UNIX epoch. Conflicts with 'endcursor'.</param>
+                    /// <returns></returns>
+                    public Result GetRest(string endcursor = null, int? lastentries = null, int? since = null, string startcursor = null, int? until = null)
                     {
-                        _client = client;
-                        _node = node;
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("endcursor", endcursor);
+                        parameters.Add("lastentries", lastentries);
+                        parameters.Add("since", since);
+                        parameters.Add("startcursor", startcursor);
+                        parameters.Add("until", until);
+                        return _client.Get($"/nodes/{_node}/journal", parameters);
                     }
+
+                    /// <summary>
+                    /// Read Journal
+                    /// </summary>
+                    /// <param name="endcursor">End before the given Cursor. Conflicts with 'until'</param>
+                    /// <param name="lastentries">Limit to the last X lines. Conflicts with a range.</param>
+                    /// <param name="since">Display all log since this UNIX epoch. Conflicts with 'startcursor'.</param>
+                    /// <param name="startcursor">Start after the given Cursor. Conflicts with 'since'</param>
+                    /// <param name="until">Display all log until this UNIX epoch. Conflicts with 'endcursor'.</param>
+                    /// <returns></returns>
+                    public Result Journal(string endcursor = null, int? lastentries = null, int? since = null, string startcursor = null, int? until = null) => GetRest(endcursor, lastentries, since, startcursor, until);
+                }
+                public class PVEVncshell
+                {
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEVncshell(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Creates a VNC Shell proxy.
                     /// </summary>
@@ -11500,6 +11021,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("width", width);
                         return _client.Create($"/nodes/{_node}/vncshell", parameters);
                     }
+
                     /// <summary>
                     /// Creates a VNC Shell proxy.
                     /// </summary>
@@ -11512,14 +11034,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result Vncshell(string cmd = null, int? height = null, bool? upgrade = null, bool? websocket = null, int? width = null) => CreateRest(cmd, height, upgrade, websocket, width);
                 }
-                public class PVETermproxy : Base
+                public class PVETermproxy
                 {
-                    private object _node;
-                    internal PVETermproxy(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVETermproxy(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Creates a VNC Shell proxy.
                     /// </summary>
@@ -11534,6 +11053,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("upgrade", upgrade);
                         return _client.Create($"/nodes/{_node}/termproxy", parameters);
                     }
+
                     /// <summary>
                     /// Creates a VNC Shell proxy.
                     /// </summary>
@@ -11543,14 +11063,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result Termproxy(string cmd = null, bool? upgrade = null) => CreateRest(cmd, upgrade);
                 }
-                public class PVEVncwebsocket : Base
+                public class PVEVncwebsocket
                 {
-                    private object _node;
-                    internal PVEVncwebsocket(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEVncwebsocket(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Opens a weksocket for VNC traffic.
                     /// </summary>
@@ -11564,6 +11081,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("vncticket", vncticket);
                         return _client.Get($"/nodes/{_node}/vncwebsocket", parameters);
                     }
+
                     /// <summary>
                     /// Opens a weksocket for VNC traffic.
                     /// </summary>
@@ -11572,14 +11090,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result Vncwebsocket(int port, string vncticket) => GetRest(port, vncticket);
                 }
-                public class PVESpiceshell : Base
+                public class PVESpiceshell
                 {
-                    private object _node;
-                    internal PVESpiceshell(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVESpiceshell(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Creates a SPICE shell.
                     /// </summary>
@@ -11596,6 +11111,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("upgrade", upgrade);
                         return _client.Create($"/nodes/{_node}/spiceshell", parameters);
                     }
+
                     /// <summary>
                     /// Creates a SPICE shell.
                     /// </summary>
@@ -11606,22 +11122,17 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result Spiceshell(string cmd = null, string proxy = null, bool? upgrade = null) => CreateRest(cmd, proxy, upgrade);
                 }
-                public class PVEDns : Base
+                public class PVEDns
                 {
-                    private object _node;
-                    internal PVEDns(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEDns(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Read DNS settings.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/nodes/{_node}/dns");
-                    }
+                    public Result GetRest() { return _client.Get($"/nodes/{_node}/dns"); }
+
                     /// <summary>
                     /// Read DNS settings.
                     /// </summary>
@@ -11644,6 +11155,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("dns3", dns3);
                         return _client.Set($"/nodes/{_node}/dns", parameters);
                     }
+
                     /// <summary>
                     /// Write DNS settings.
                     /// </summary>
@@ -11654,22 +11166,17 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result UpdateDns(string search, string dns1 = null, string dns2 = null, string dns3 = null) => SetRest(search, dns1, dns2, dns3);
                 }
-                public class PVETime : Base
+                public class PVETime
                 {
-                    private object _node;
-                    internal PVETime(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVETime(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Read server time and time zone settings.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/nodes/{_node}/time");
-                    }
+                    public Result GetRest() { return _client.Get($"/nodes/{_node}/time"); }
+
                     /// <summary>
                     /// Read server time and time zone settings.
                     /// </summary>
@@ -11686,6 +11193,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("timezone", timezone);
                         return _client.Set($"/nodes/{_node}/time", parameters);
                     }
+
                     /// <summary>
                     /// Set time zone.
                     /// </summary>
@@ -11693,22 +11201,17 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result SetTimezone(string timezone) => SetRest(timezone);
                 }
-                public class PVEAplinfo : Base
+                public class PVEAplinfo
                 {
-                    private object _node;
-                    internal PVEAplinfo(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEAplinfo(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Get list of appliances.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/nodes/{_node}/aplinfo");
-                    }
+                    public Result GetRest() { return _client.Get($"/nodes/{_node}/aplinfo"); }
+
                     /// <summary>
                     /// Get list of appliances.
                     /// </summary>
@@ -11718,7 +11221,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Download appliance templates.
                     /// </summary>
                     /// <param name="storage">The storage where the template will be stored</param>
-                    /// <param name="template">The template wich will downloaded</param>
+                    /// <param name="template">The template which will downloaded</param>
                     /// <returns></returns>
                     public Result CreateRest(string storage, string template)
                     {
@@ -11727,44 +11230,37 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("template", template);
                         return _client.Create($"/nodes/{_node}/aplinfo", parameters);
                     }
+
                     /// <summary>
                     /// Download appliance templates.
                     /// </summary>
                     /// <param name="storage">The storage where the template will be stored</param>
-                    /// <param name="template">The template wich will downloaded</param>
+                    /// <param name="template">The template which will downloaded</param>
                     /// <returns></returns>
                     public Result AplDownload(string storage, string template) => CreateRest(storage, template);
                 }
-                public class PVEReport : Base
+                public class PVEReport
                 {
-                    private object _node;
-                    internal PVEReport(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEReport(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Gather various systems information about a node
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/nodes/{_node}/report");
-                    }
+                    public Result GetRest() { return _client.Get($"/nodes/{_node}/report"); }
+
                     /// <summary>
                     /// Gather various systems information about a node
                     /// </summary>
                     /// <returns></returns>
                     public Result Report() => GetRest();
                 }
-                public class PVEStartall : Base
+                public class PVEStartall
                 {
-                    private object _node;
-                    internal PVEStartall(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEStartall(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Start all VMs and containers (when onboot=1).
                     /// </summary>
@@ -11778,6 +11274,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("vms", vms);
                         return _client.Create($"/nodes/{_node}/startall", parameters);
                     }
+
                     /// <summary>
                     /// Start all VMs and containers (when onboot=1).
                     /// </summary>
@@ -11786,14 +11283,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result Startall(bool? force = null, string vms = null) => CreateRest(force, vms);
                 }
-                public class PVEStopall : Base
+                public class PVEStopall
                 {
-                    private object _node;
-                    internal PVEStopall(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEStopall(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Stop all VMs and Containers.
                     /// </summary>
@@ -11805,6 +11299,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("vms", vms);
                         return _client.Create($"/nodes/{_node}/stopall", parameters);
                     }
+
                     /// <summary>
                     /// Stop all VMs and Containers.
                     /// </summary>
@@ -11812,14 +11307,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result Stopall(string vms = null) => CreateRest(vms);
                 }
-                public class PVEMigrateall : Base
+                public class PVEMigrateall
                 {
-                    private object _node;
-                    internal PVEMigrateall(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEMigrateall(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Migrate all VMs and Containers.
                     /// </summary>
@@ -11835,6 +11327,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("vms", vms);
                         return _client.Create($"/nodes/{_node}/migrateall", parameters);
                     }
+
                     /// <summary>
                     /// Migrate all VMs and Containers.
                     /// </summary>
@@ -11844,22 +11337,17 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <returns></returns>
                     public Result Migrateall(string target, int? maxworkers = null, string vms = null) => CreateRest(target, maxworkers, vms);
                 }
-                public class PVEHosts : Base
+                public class PVEHosts
                 {
-                    private object _node;
-                    internal PVEHosts(Client client, object node)
-                    {
-                        _client = client;
-                        _node = node;
-                    }
+                    private readonly Client _client;
+                    private readonly object _node;
+                    internal PVEHosts(Client client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Get the content of /etc/hosts.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/nodes/{_node}/hosts");
-                    }
+                    public Result GetRest() { return _client.Get($"/nodes/{_node}/hosts"); }
+
                     /// <summary>
                     /// Get the content of /etc/hosts.
                     /// </summary>
@@ -11878,6 +11366,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("digest", digest);
                         return _client.Create($"/nodes/{_node}/hosts", parameters);
                     }
+
                     /// <summary>
                     /// Write /etc/hosts.
                     /// </summary>
@@ -11890,10 +11379,8 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// Node index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest()
-                {
-                    return _client.Get($"/nodes/{_node}");
-                }
+                public Result GetRest() { return _client.Get($"/nodes/{_node}"); }
+
                 /// <summary>
                 /// Node index.
                 /// </summary>
@@ -11904,39 +11391,31 @@ namespace Corsinvest.ProxmoxVE.Api
             /// Cluster node index.
             /// </summary>
             /// <returns></returns>
-            public Result GetRest()
-            {
-                return _client.Get($"/nodes");
-            }
+            public Result GetRest() { return _client.Get($"/nodes"); }
+
             /// <summary>
             /// Cluster node index.
             /// </summary>
             /// <returns></returns>
             public Result Index() => GetRest();
         }
-        public class PVEStorage : Base
+        public class PVEStorage
         {
-            internal PVEStorage(Client client)
-            {
-                _client = client;
-            }
+            private readonly Client _client;
+
+            internal PVEStorage(Client client) { _client = client; }
             public PVEItemStorage this[object storage] => new PVEItemStorage(_client, storage);
-            public class PVEItemStorage : Base
+            public class PVEItemStorage
             {
-                private object _storage;
-                internal PVEItemStorage(Client client, object storage)
-                {
-                    _client = client;
-                    _storage = storage;
-                }
+                private readonly Client _client;
+                private readonly object _storage;
+                internal PVEItemStorage(Client client, object storage) { _client = client; _storage = storage; }
                 /// <summary>
                 /// Delete storage configuration.
                 /// </summary>
                 /// <returns></returns>
-                public Result DeleteRest()
-                {
-                    return _client.Delete($"/storage/{_storage}");
-                }
+                public Result DeleteRest() { return _client.Delete($"/storage/{_storage}"); }
+
                 /// <summary>
                 /// Delete storage configuration.
                 /// </summary>
@@ -11946,10 +11425,8 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// Read storage configuration.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest()
-                {
-                    return _client.Get($"/storage/{_storage}");
-                }
+                public Result GetRest() { return _client.Get($"/storage/{_storage}"); }
+
                 /// <summary>
                 /// Read storage configuration.
                 /// </summary>
@@ -12034,6 +11511,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("username", username);
                     return _client.Set($"/storage/{_storage}", parameters);
                 }
+
                 /// <summary>
                 /// Update storage configuration.
                 /// </summary>
@@ -12080,7 +11558,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// Storage index.
             /// </summary>
             /// <param name="type">Only list storage of specific type
-            ///   Enum: cephfs,cifs,dir,drbd,fake,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
+            ///   Enum: cephfs,cifs,dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,zfs,zfspool</param>
             /// <returns></returns>
             public Result GetRest(string type = null)
             {
@@ -12088,11 +11566,12 @@ namespace Corsinvest.ProxmoxVE.Api
                 parameters.Add("type", type);
                 return _client.Get($"/storage", parameters);
             }
+
             /// <summary>
             /// Storage index.
             /// </summary>
             /// <param name="type">Only list storage of specific type
-            ///   Enum: cephfs,cifs,dir,drbd,fake,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
+            ///   Enum: cephfs,cifs,dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,zfs,zfspool</param>
             /// <returns></returns>
             public Result Index(string type = null) => GetRest(type);
             /// <summary>
@@ -12100,7 +11579,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// </summary>
             /// <param name="storage">The storage identifier.</param>
             /// <param name="type">Storage type.
-            ///   Enum: cephfs,cifs,dir,drbd,fake,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
+            ///   Enum: cephfs,cifs,dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,zfs,zfspool</param>
             /// <param name="authsupported">Authsupported.</param>
             /// <param name="base_">Base volume. This volume is automatically activated.</param>
             /// <param name="blocksize">block size</param>
@@ -12197,12 +11676,13 @@ namespace Corsinvest.ProxmoxVE.Api
                 parameters.Add("volume", volume);
                 return _client.Create($"/storage", parameters);
             }
+
             /// <summary>
             /// Create a new storage.
             /// </summary>
             /// <param name="storage">The storage identifier.</param>
             /// <param name="type">Storage type.
-            ///   Enum: cephfs,cifs,dir,drbd,fake,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,sheepdog,zfs,zfspool</param>
+            ///   Enum: cephfs,cifs,dir,drbd,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,rbd,zfs,zfspool</param>
             /// <param name="authsupported">Authsupported.</param>
             /// <param name="base_">Base volume. This volume is automatically activated.</param>
             /// <param name="blocksize">block size</param>
@@ -12251,12 +11731,11 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <returns></returns>
             public Result Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, bool? disable = null, string domain = null, string export = null, string format = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null) => CreateRest(storage, type, authsupported, base_, blocksize, bwlimit, comstar_hg, comstar_tg, content, disable, domain, export, format, fuse, is_mountpoint, iscsiprovider, krbd, lio_tpg, maxfiles, mkdir, monhost, nodes, nowritecache, options, password, path, pool, portal, redundancy, saferemove, saferemove_throughput, server, server2, share, shared, smbversion, sparse, subdir, tagged_only, target, thinpool, transport, username, vgname, volume);
         }
-        public class PVEAccess : Base
+        public class PVEAccess
         {
-            internal PVEAccess(Client client)
-            {
-                _client = client;
-            }
+            private readonly Client _client;
+
+            internal PVEAccess(Client client) { _client = client; }
             private PVEUsers _users;
             public PVEUsers Users => _users ?? (_users = new PVEUsers(_client));
             private PVEGroups _groups;
@@ -12273,29 +11752,42 @@ namespace Corsinvest.ProxmoxVE.Api
             public PVEPassword Password => _password ?? (_password = new PVEPassword(_client));
             private PVETfa _tfa;
             public PVETfa Tfa => _tfa ?? (_tfa = new PVETfa(_client));
-            public class PVEUsers : Base
+            public class PVEUsers
             {
-                internal PVEUsers(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVEUsers(Client client) { _client = client; }
                 public PVEItemUserid this[object userid] => new PVEItemUserid(_client, userid);
-                public class PVEItemUserid : Base
+                public class PVEItemUserid
                 {
-                    private object _userid;
-                    internal PVEItemUserid(Client client, object userid)
+                    private readonly Client _client;
+                    private readonly object _userid;
+                    internal PVEItemUserid(Client client, object userid) { _client = client; _userid = userid; }
+                    private PVETfa _tfa;
+                    public PVETfa Tfa => _tfa ?? (_tfa = new PVETfa(_client, _userid));
+                    public class PVETfa
                     {
-                        _client = client;
-                        _userid = userid;
+                        private readonly Client _client;
+                        private readonly object _userid;
+                        internal PVETfa(Client client, object userid) { _client = client; _userid = userid; }
+                        /// <summary>
+                        /// Get user TFA types (Personal and Realm).
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result GetRest() { return _client.Get($"/access/users/{_userid}/tfa"); }
+
+                        /// <summary>
+                        /// Get user TFA types (Personal and Realm).
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result ReadUserTfaType() => GetRest();
                     }
                     /// <summary>
                     /// Delete user.
                     /// </summary>
                     /// <returns></returns>
-                    public Result DeleteRest()
-                    {
-                        return _client.Delete($"/access/users/{_userid}");
-                    }
+                    public Result DeleteRest() { return _client.Delete($"/access/users/{_userid}"); }
+
                     /// <summary>
                     /// Delete user.
                     /// </summary>
@@ -12305,10 +11797,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Get user configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/access/users/{_userid}");
-                    }
+                    public Result GetRest() { return _client.Get($"/access/users/{_userid}"); }
+
                     /// <summary>
                     /// Get user configuration.
                     /// </summary>
@@ -12341,6 +11831,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("lastname", lastname);
                         return _client.Set($"/access/users/{_userid}", parameters);
                     }
+
                     /// <summary>
                     /// Update user configuration.
                     /// </summary>
@@ -12367,6 +11858,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("enabled", enabled);
                     return _client.Get($"/access/users", parameters);
                 }
+
                 /// <summary>
                 /// User index.
                 /// </summary>
@@ -12402,6 +11894,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("password", password);
                     return _client.Create($"/access/users", parameters);
                 }
+
                 /// <summary>
                 /// Create new user.
                 /// </summary>
@@ -12418,29 +11911,23 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <returns></returns>
                 public Result CreateUser(string userid, string comment = null, string email = null, bool? enable = null, int? expire = null, string firstname = null, string groups = null, string keys = null, string lastname = null, string password = null) => CreateRest(userid, comment, email, enable, expire, firstname, groups, keys, lastname, password);
             }
-            public class PVEGroups : Base
+            public class PVEGroups
             {
-                internal PVEGroups(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVEGroups(Client client) { _client = client; }
                 public PVEItemGroupid this[object groupid] => new PVEItemGroupid(_client, groupid);
-                public class PVEItemGroupid : Base
+                public class PVEItemGroupid
                 {
-                    private object _groupid;
-                    internal PVEItemGroupid(Client client, object groupid)
-                    {
-                        _client = client;
-                        _groupid = groupid;
-                    }
+                    private readonly Client _client;
+                    private readonly object _groupid;
+                    internal PVEItemGroupid(Client client, object groupid) { _client = client; _groupid = groupid; }
                     /// <summary>
                     /// Delete group.
                     /// </summary>
                     /// <returns></returns>
-                    public Result DeleteRest()
-                    {
-                        return _client.Delete($"/access/groups/{_groupid}");
-                    }
+                    public Result DeleteRest() { return _client.Delete($"/access/groups/{_groupid}"); }
+
                     /// <summary>
                     /// Delete group.
                     /// </summary>
@@ -12450,10 +11937,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Get group configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/access/groups/{_groupid}");
-                    }
+                    public Result GetRest() { return _client.Get($"/access/groups/{_groupid}"); }
+
                     /// <summary>
                     /// Get group configuration.
                     /// </summary>
@@ -12470,6 +11955,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("comment", comment);
                         return _client.Set($"/access/groups/{_groupid}", parameters);
                     }
+
                     /// <summary>
                     /// Update group data.
                     /// </summary>
@@ -12481,10 +11967,8 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// Group index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest()
-                {
-                    return _client.Get($"/access/groups");
-                }
+                public Result GetRest() { return _client.Get($"/access/groups"); }
+
                 /// <summary>
                 /// Group index.
                 /// </summary>
@@ -12503,6 +11987,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("comment", comment);
                     return _client.Create($"/access/groups", parameters);
                 }
+
                 /// <summary>
                 /// Create new group.
                 /// </summary>
@@ -12511,29 +11996,23 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <returns></returns>
                 public Result CreateGroup(string groupid, string comment = null) => CreateRest(groupid, comment);
             }
-            public class PVERoles : Base
+            public class PVERoles
             {
-                internal PVERoles(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVERoles(Client client) { _client = client; }
                 public PVEItemRoleid this[object roleid] => new PVEItemRoleid(_client, roleid);
-                public class PVEItemRoleid : Base
+                public class PVEItemRoleid
                 {
-                    private object _roleid;
-                    internal PVEItemRoleid(Client client, object roleid)
-                    {
-                        _client = client;
-                        _roleid = roleid;
-                    }
+                    private readonly Client _client;
+                    private readonly object _roleid;
+                    internal PVEItemRoleid(Client client, object roleid) { _client = client; _roleid = roleid; }
                     /// <summary>
                     /// Delete role.
                     /// </summary>
                     /// <returns></returns>
-                    public Result DeleteRest()
-                    {
-                        return _client.Delete($"/access/roles/{_roleid}");
-                    }
+                    public Result DeleteRest() { return _client.Delete($"/access/roles/{_roleid}"); }
+
                     /// <summary>
                     /// Delete role.
                     /// </summary>
@@ -12543,10 +12022,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Get role configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/access/roles/{_roleid}");
-                    }
+                    public Result GetRest() { return _client.Get($"/access/roles/{_roleid}"); }
+
                     /// <summary>
                     /// Get role configuration.
                     /// </summary>
@@ -12565,6 +12042,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("privs", privs);
                         return _client.Set($"/access/roles/{_roleid}", parameters);
                     }
+
                     /// <summary>
                     /// Update an existing role.
                     /// </summary>
@@ -12577,10 +12055,8 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// Role index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest()
-                {
-                    return _client.Get($"/access/roles");
-                }
+                public Result GetRest() { return _client.Get($"/access/roles"); }
+
                 /// <summary>
                 /// Role index.
                 /// </summary>
@@ -12599,6 +12075,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("privs", privs);
                     return _client.Create($"/access/roles", parameters);
                 }
+
                 /// <summary>
                 /// Create new role.
                 /// </summary>
@@ -12607,20 +12084,17 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <returns></returns>
                 public Result CreateRole(string roleid, string privs = null) => CreateRest(roleid, privs);
             }
-            public class PVEAcl : Base
+            public class PVEAcl
             {
-                internal PVEAcl(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVEAcl(Client client) { _client = client; }
                 /// <summary>
                 /// Get Access Control List (ACLs).
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest()
-                {
-                    return _client.Get($"/access/acl");
-                }
+                public Result GetRest() { return _client.Get($"/access/acl"); }
+
                 /// <summary>
                 /// Get Access Control List (ACLs).
                 /// </summary>
@@ -12647,6 +12121,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("users", users);
                     return _client.Set($"/access/acl", parameters);
                 }
+
                 /// <summary>
                 /// Update Access Control List (add or remove permissions).
                 /// </summary>
@@ -12659,29 +12134,23 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <returns></returns>
                 public Result UpdateAcl(string path, string roles, bool? delete = null, string groups = null, bool? propagate = null, string users = null) => SetRest(path, roles, delete, groups, propagate, users);
             }
-            public class PVEDomains : Base
+            public class PVEDomains
             {
-                internal PVEDomains(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVEDomains(Client client) { _client = client; }
                 public PVEItemRealm this[object realm] => new PVEItemRealm(_client, realm);
-                public class PVEItemRealm : Base
+                public class PVEItemRealm
                 {
-                    private object _realm;
-                    internal PVEItemRealm(Client client, object realm)
-                    {
-                        _client = client;
-                        _realm = realm;
-                    }
+                    private readonly Client _client;
+                    private readonly object _realm;
+                    internal PVEItemRealm(Client client, object realm) { _client = client; _realm = realm; }
                     /// <summary>
                     /// Delete an authentication server.
                     /// </summary>
                     /// <returns></returns>
-                    public Result DeleteRest()
-                    {
-                        return _client.Delete($"/access/domains/{_realm}");
-                    }
+                    public Result DeleteRest() { return _client.Delete($"/access/domains/{_realm}"); }
+
                     /// <summary>
                     /// Delete an authentication server.
                     /// </summary>
@@ -12691,10 +12160,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Get auth server configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest()
-                    {
-                        return _client.Get($"/access/domains/{_realm}");
-                    }
+                    public Result GetRest() { return _client.Get($"/access/domains/{_realm}"); }
+
                     /// <summary>
                     /// Get auth server configuration.
                     /// </summary>
@@ -12743,6 +12210,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("verify", verify);
                         return _client.Set($"/access/domains/{_realm}", parameters);
                     }
+
                     /// <summary>
                     /// Update authentication server settings.
                     /// </summary>
@@ -12770,10 +12238,8 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// Authentication domain index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest()
-                {
-                    return _client.Get($"/access/domains");
-                }
+                public Result GetRest() { return _client.Get($"/access/domains"); }
+
                 /// <summary>
                 /// Authentication domain index.
                 /// </summary>
@@ -12823,6 +12289,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("verify", verify);
                     return _client.Create($"/access/domains", parameters);
                 }
+
                 /// <summary>
                 /// Add an authentication server.
                 /// </summary>
@@ -12847,20 +12314,17 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <returns></returns>
                 public Result Create(string realm, string type, string base_dn = null, string bind_dn = null, string capath = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string domain = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string tfa = null, string user_attr = null, bool? verify = null) => CreateRest(realm, type, base_dn, bind_dn, capath, cert, certkey, comment, default_, domain, port, secure, server1, server2, tfa, user_attr, verify);
             }
-            public class PVETicket : Base
+            public class PVETicket
             {
-                internal PVETicket(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVETicket(Client client) { _client = client; }
                 /// <summary>
                 /// Dummy. Useful for formatters which want to provide a login page.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest()
-                {
-                    return _client.Get($"/access/ticket");
-                }
+                public Result GetRest() { return _client.Get($"/access/ticket"); }
+
                 /// <summary>
                 /// Dummy. Useful for formatters which want to provide a login page.
                 /// </summary>
@@ -12887,6 +12351,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("realm", realm);
                     return _client.Create($"/access/ticket", parameters);
                 }
+
                 /// <summary>
                 /// Create or verify authentication ticket.
                 /// </summary>
@@ -12899,12 +12364,11 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <returns></returns>
                 public Result CreateTicket(string password, string username, string otp = null, string path = null, string privs = null, string realm = null) => CreateRest(password, username, otp, path, privs, realm);
             }
-            public class PVEPassword : Base
+            public class PVEPassword
             {
-                internal PVEPassword(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVEPassword(Client client) { _client = client; }
                 /// <summary>
                 /// Change user password.
                 /// </summary>
@@ -12918,6 +12382,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("userid", userid);
                     return _client.Set($"/access/password", parameters);
                 }
+
                 /// <summary>
                 /// Change user password.
                 /// </summary>
@@ -12926,12 +12391,11 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <returns></returns>
                 public Result ChangePassword(string password, string userid) => SetRest(password, userid);
             }
-            public class PVETfa : Base
+            public class PVETfa
             {
-                internal PVETfa(Client client)
-                {
-                    _client = client;
-                }
+                private readonly Client _client;
+
+                internal PVETfa(Client client) { _client = client; }
                 /// <summary>
                 /// Finish a u2f challenge.
                 /// </summary>
@@ -12943,6 +12407,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("response", response);
                     return _client.Create($"/access/tfa", parameters);
                 }
+
                 /// <summary>
                 /// Finish a u2f challenge.
                 /// </summary>
@@ -12971,6 +12436,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("response", response);
                     return _client.Set($"/access/tfa", parameters);
                 }
+
                 /// <summary>
                 /// Change user u2f authentication.
                 /// </summary>
@@ -12988,39 +12454,31 @@ namespace Corsinvest.ProxmoxVE.Api
             /// Directory index.
             /// </summary>
             /// <returns></returns>
-            public Result GetRest()
-            {
-                return _client.Get($"/access");
-            }
+            public Result GetRest() { return _client.Get($"/access"); }
+
             /// <summary>
             /// Directory index.
             /// </summary>
             /// <returns></returns>
             public Result Index() => GetRest();
         }
-        public class PVEPools : Base
+        public class PVEPools
         {
-            internal PVEPools(Client client)
-            {
-                _client = client;
-            }
+            private readonly Client _client;
+
+            internal PVEPools(Client client) { _client = client; }
             public PVEItemPoolid this[object poolid] => new PVEItemPoolid(_client, poolid);
-            public class PVEItemPoolid : Base
+            public class PVEItemPoolid
             {
-                private object _poolid;
-                internal PVEItemPoolid(Client client, object poolid)
-                {
-                    _client = client;
-                    _poolid = poolid;
-                }
+                private readonly Client _client;
+                private readonly object _poolid;
+                internal PVEItemPoolid(Client client, object poolid) { _client = client; _poolid = poolid; }
                 /// <summary>
                 /// Delete pool.
                 /// </summary>
                 /// <returns></returns>
-                public Result DeleteRest()
-                {
-                    return _client.Delete($"/pools/{_poolid}");
-                }
+                public Result DeleteRest() { return _client.Delete($"/pools/{_poolid}"); }
+
                 /// <summary>
                 /// Delete pool.
                 /// </summary>
@@ -13030,10 +12488,8 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// Get pool configuration.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest()
-                {
-                    return _client.Get($"/pools/{_poolid}");
-                }
+                public Result GetRest() { return _client.Get($"/pools/{_poolid}"); }
+
                 /// <summary>
                 /// Get pool configuration.
                 /// </summary>
@@ -13056,6 +12512,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("vms", vms);
                     return _client.Set($"/pools/{_poolid}", parameters);
                 }
+
                 /// <summary>
                 /// Update pool data.
                 /// </summary>
@@ -13070,10 +12527,8 @@ namespace Corsinvest.ProxmoxVE.Api
             /// Pool index.
             /// </summary>
             /// <returns></returns>
-            public Result GetRest()
-            {
-                return _client.Get($"/pools");
-            }
+            public Result GetRest() { return _client.Get($"/pools"); }
+
             /// <summary>
             /// Pool index.
             /// </summary>
@@ -13092,6 +12547,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 parameters.Add("comment", comment);
                 return _client.Create($"/pools", parameters);
             }
+
             /// <summary>
             /// Create new pool.
             /// </summary>
@@ -13100,25 +12556,23 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <returns></returns>
             public Result CreatePool(string poolid, string comment = null) => CreateRest(poolid, comment);
         }
-        public class PVEVersion : Base
+        public class PVEVersion
         {
-            internal PVEVersion(Client client)
-            {
-                _client = client;
-            }
+            private readonly Client _client;
+
+            internal PVEVersion(Client client) { _client = client; }
             /// <summary>
             /// API version details. The result also includes the global datacenter confguration.
             /// </summary>
             /// <returns></returns>
-            public Result GetRest()
-            {
-                return _client.Get($"/version");
-            }
+            public Result GetRest() { return _client.Get($"/version"); }
+
             /// <summary>
             /// API version details. The result also includes the global datacenter confguration.
             /// </summary>
             /// <returns></returns>
             public Result Version() => GetRest();
         }
+
     }
 }

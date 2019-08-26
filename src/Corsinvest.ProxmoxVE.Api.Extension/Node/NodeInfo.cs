@@ -9,8 +9,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
     /// </summary>
     public class NodeInfo : BaseInfo
     {
-        private const string FORMAT = "{0,-10} {1,7} {2,8} {3,-9} {4,-7} {5,-4}";
-
         internal NodeInfo(Client client, object apiData) : base(client, apiData) { }
 
         /// <summary>
@@ -72,34 +70,20 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         /// 
         /// </summary>
         /// <returns></returns>
-        public static string HeaderInfo() => string.Format(FORMAT, "NODE", "MEM(GB)", "DISK(GB)", "UPTIME", "STATUS", "TYPE");
+        public static string[] GetTitlesInfo() => new string[] { "NODE", "CPU", "MEM(GB)", "DISK(GB)", "UPTIME", "STATUS", "TYPE" };
 
         /// <summary>
         /// Row info
         /// </summary>
         /// <returns></returns>
-        public string RowInfo()
-            => string.Format(FORMAT,
-                             Node,
-                             UnitOfMeasurementHelper.GbToString(Memory),
-                             UnitOfMeasurementHelper.GbToString(MaxDisk),
-                             UnitOfMeasurementHelper.UpTimeToString(UpTime),
-                             Status,
-                             Type);
-
-        /// <summary>
-        /// Info
-        /// </summary>
-        /// <returns></returns>
-        public string[] Info()
-            => new string[]{ $"Node:   {Node}",
-                             $"Id:     {Id}",
-                             $"CPU:    {UnitOfMeasurementHelper.CPUUsageToStirng(CPU, ApiData.maxcpu)}",
-                             $"Memory: {UnitOfMeasurementHelper.MbToString(Memory)} MB",
-                             $"Disk:   {UnitOfMeasurementHelper.GbToString(MaxDisk)} GB",
-                             $"Uptime: {UnitOfMeasurementHelper.UpTimeToString(UpTime)}",
-                             $"Status: {Status}",
-                             $"Type:   {Type}"};
+        public string[] GetRowInfo()
+            => new string[] { Node,
+                              UnitOfMeasurementHelper.CPUUsageToStirng(CPU, ApiData.maxcpu),
+                              UnitOfMeasurementHelper.GbToString(Memory),
+                              UnitOfMeasurementHelper.GbToString(MaxDisk),
+                              UnitOfMeasurementHelper.UpTimeToString(UpTime),
+                              Status,
+                              Type };
 
         /// <summary>
         /// Restore backup

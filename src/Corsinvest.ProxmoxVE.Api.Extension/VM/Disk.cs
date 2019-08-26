@@ -4,7 +4,7 @@ using Corsinvest.ProxmoxVE.Api.Extension.Storage;
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
 {
     /// <summary>
-    /// Disck
+    /// Disk
     /// </summary>
     public abstract class Disk
     {
@@ -12,8 +12,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// Client API.
         /// </summary>
         protected Client Client { get; }
-
-        private StorageInfo _storageInfo;
 
         internal Disk(Client client, string id, string definition)
         {
@@ -47,6 +45,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <value></value>
         public string Storage { get; }
 
+        private StorageInfo _storageInfo;
         /// <summary>
         /// Storage info
         /// </summary>

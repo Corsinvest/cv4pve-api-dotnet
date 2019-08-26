@@ -6,9 +6,9 @@
     public enum StorageTypeEnum
     {
         /// <summary>
-        /// Ceph
+        /// Rbd
         /// </summary>
-        Ceph,
+        Rbd,
 
         /// <summary>
         /// ZFS

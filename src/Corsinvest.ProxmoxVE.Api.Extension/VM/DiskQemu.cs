@@ -3,7 +3,7 @@
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
 {
     /// <summary>
-    /// Disck QEMU
+    /// Disk Qemu
     /// </summary>
     public class DiskQemu : Disk
     {

@@ -3,17 +3,17 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     
-    <Version>1.1.3</Version>
+    <Version>1.0.0</Version>
     <Company>Corsinvest Srl</Company>
     <Authors>Daniele Corsini</Authors>
     <Copyright>Corsinvest Srl</Copyright>
-    <Product>Corsinvest for Proxmox VE Api Client</Product>
-    <AssemblyTitle>Corsinvest for Proxmox VE Api Client</AssemblyTitle>
-    <Description>Corsinvest for Proxmox VE Api Client</Description>
+    <Product>Corsinvest for Proxmox VE Api Metadata</Product>
+    <AssemblyTitle>Corsinvest for Proxmox VE Api Metadata</AssemblyTitle>
+    <Description>Corsinvest for Proxmox VE Api Metadata</Description>
     
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Corsinvest/cv4pve-api-dotnet</PackageProjectUrl>
-    <PackageTags>ProxmoxVE;Api,Client;Rest;Corsinvest;</PackageTags>
+    <PackageTags>ProxmoxVE;Api,Client;Rest;Corsinvest;Metadata</PackageTags>
     <PackageIconUrl>https://www.corsinvest.it/wp-content/uploads/2016/08/Corsinvest.ico</PackageIconUrl>
     <PackageReleaseNotes></PackageReleaseNotes>
   </PropertyGroup>

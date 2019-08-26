@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Corsinvest.ProxmoxVE.Api.Extension.VM;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension
@@ -33,6 +32,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         }
 
         /// <summary>
+        /// Timeout for WaitForTaskToFinish
+        /// </summary>
+        /// <value></value>
+        public static long WaitTimeout { get; set; } = 20000;
+
+        /// <summary>
         /// Wait until task is finish.
         /// </summary>
         /// <param name="result"></param>
@@ -42,7 +47,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         {
             if (result != null && !result.ResponseInError && wait)
             {
-                vm.Client.WaitForTaskToFinish(vm.Node, result.Response.data, 1000, 20000);
+                vm.Client.WaitForTaskToFinish(vm.Node, result.Response.data, 1000, WaitTimeout);
             }
         }
 

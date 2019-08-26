@@ -19,11 +19,14 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Storage
             {
                 switch (apiData.type)
                 {
-                    case "rbd": storages.Add(new Ceph(client, apiData)); break;
+                    case "rbd": storages.Add(new Rbd(client, apiData)); break;
                     case "dir": storages.Add(new Dir(client, apiData)); break;
                     case "nfs": storages.Add(new NFS(client, apiData)); break;
                     case "zfs": storages.Add(new ZFS(client, apiData)); break;
-                    //LVM CIFS
+
+                    // cephfs cifs drbd glusterfs iscsi 
+                    // iscsidirect lvm lvmthin zfspool
+
                     default: storages.Add(new Unknown(client, apiData)); break;
                 }
             }

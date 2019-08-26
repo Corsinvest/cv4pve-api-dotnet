@@ -2,7 +2,7 @@ using System;
 using Corsinvest.ProxmoxVE.Api.Extension.VM;
 using McMaster.Extensions.CommandLineUtils;
 
-namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
+namespace Corsinvest.ProxmoxVE.Api.Extension.Utils.Shell
 {
     /// <summary>
     /// Command option shell extension.
@@ -27,16 +27,21 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
         /// </summary>
         /// <param name="command"></param>
         /// <param name="optionName"></param>
+        /// <param name="searchInParent"></param>
         /// <returns></returns>
-        public static CommandOption GetOption(this CommandLineApplication command, string optionName)
+        public static CommandOption GetOption(this CommandLineApplication command,
+                                              string optionName,
+                                              bool searchInParent = false)
         {
             foreach (var option in command.GetOptions())
             {
                 if (option.ShortName == optionName || option.LongName == optionName) { return option; }
             }
 
+            //found in parent
+            if (searchInParent && command.Parent != null) { return command.Parent.GetOption(optionName, true); }
+
             return null;
-            //return command.Options.Where(a => a.ShortName == optionName || a.LongName == optionName).FirstOrDefault();
         }
 
         /// <summary>
@@ -104,7 +109,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
         {
             var opt = command.VmIdOrNameOption();
             opt.Description = @"The id or name VM/CT comma separated (eg. 100,101,102,TestDebian)
--vmid or -name exclude (e.g. -200, -TestUbuntu),
+-vmid or -name exclude (e.g. -200,-TestUbuntu)
 'all-???' for all VM/CT in specific host (e.g. all-pve1, all-\$(hostname)),
 'all' for all VM/CT in cluster";
 
@@ -176,28 +181,14 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
             => command.Option("--password", "The password", CommandOptionType.SingleValue).IsRequired();
 
         /// <summary>
-        /// Get client
+        /// Get Host and Port
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static Client Client(this CommandLineApplication command)
+        public static (string Host, int Port) GetHostAndPort(this CommandLineApplication command)
         {
-            var (host, port) = command.GetHostAndPort();
-            var client = new Client(host, port);
-            if (command.GetOption("debug").HasValue()) { client.DebugLevel = 99; }
-            return client;
-        }
-
-        /// <summary>
-        /// Get host and port
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="defaultPort"></param>
-        /// <returns></returns>
-        public static (string Host, int Port) GetHostAndPort(this CommandLineApplication command, int defaultPort = 8006)
-        {
-            var data = command.GetOption("host").Value().Split(':');
-            var port = defaultPort;
+            var data = command.GetOption("host", true).Value().Split(':');
+            var port = 8006;
             if (data.Length == 2) { int.TryParse(data[1], out port); }
             return (data[0], port);
         }
@@ -206,21 +197,22 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
         /// Try login client api
         /// </summary>
         /// <param name="command"></param>
-        /// <param name="client"></param>
-        /// <returns></returns>
-        public static bool ClientTryLogin(this CommandLineApplication command, Client client)
-            => client.Login(command.GetOption("username").Value(), command.GetOption("password").Value());
-
-        /// <summary>
-        /// Try login client api
-        /// </summary>
-        /// <param name="command"></param>
         /// <returns></returns>
         public static Client ClientTryLogin(this CommandLineApplication command)
         {
-            var client = Client(command);
-            if (ClientTryLogin(command, client)) { return client; }
-            throw new Exception("Problem connection!");
+            var (host, port) = GetHostAndPort(command);
+            var client = new Client(host, port);
+
+            //check enable debug
+            if (command.DebugIsActive()) { client.DebugLevel = 99; }
+
+            //try login
+            if (client.Login(command.GetOption("username", true).Value(),
+                             command.GetOption("password", true).Value())) { return client; }
+
+            var error = "Problem connection!";
+            if (!client.LastResult.IsSuccessStatusCode) { error += " " + client.LastResult.ReasonPhrase; }
+            throw new ApplicationException(error);
         }
         #endregion
 

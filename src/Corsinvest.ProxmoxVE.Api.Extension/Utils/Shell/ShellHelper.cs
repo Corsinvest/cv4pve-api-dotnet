@@ -5,7 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using McMaster.Extensions.CommandLineUtils;
 
-namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
+namespace Corsinvest.ProxmoxVE.Api.Extension.Utils.Shell
 {
     /// <summary>
     /// Shell Helper
@@ -41,7 +41,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
         /// <returns></returns>
         public static string MakeLogoAndTitle(string title)
         {
-            title += new string(' ', (47 - title.Length));
+            title += new string(' ', 47 - title.Length);
 
             return $@"{LOGO}
 
@@ -124,14 +124,18 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
         /// <returns></returns>
         public static CommandLineApplication CreateConsoleApp(string name, string description)
         {
-            var app = new CommandLineApplication();
+            var app = new CommandLineApplication()
+            {
+                Name = name,        
+                Description = description,
+                UsePagerForHelpText = false,
+            };
 
-            app.Name = name;
-            app.Description = description;
             app.AddFullNameLogo();
             app.HelpOption(true);
             app.DebugOption();
             app.DryRunOption();
+            app.AddLoginOptions();
 
             return app;
         }
@@ -157,17 +161,22 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell.Utils
             {
                 return app.Execute(args);
             }
-            catch (CommandParsingException ex)
-            {
-                stdOut.WriteLine(ex.Message);
-                return 1;
-            }
             catch (Exception ex)
             {
-                stdOut.WriteLine("================ EXCEPTION ================ ");
-                stdOut.WriteLine(ex.GetType().FullName);
-                stdOut.WriteLine(ex.Message);
-                stdOut.WriteLine(ex.StackTrace);
+                if (ex is CommandParsingException ||
+                    ex is ApplicationException ||
+                    ex is ArgumentException)
+                {
+                    stdOut.WriteLine(ex.Message);
+                }
+                else
+                {
+                    stdOut.WriteLine("================ EXCEPTION ================ ");
+                    stdOut.WriteLine(ex.GetType().FullName);
+                    stdOut.WriteLine(ex.Message);
+                    stdOut.WriteLine(ex.StackTrace);
+                }
+
                 return 1;
             }
         }

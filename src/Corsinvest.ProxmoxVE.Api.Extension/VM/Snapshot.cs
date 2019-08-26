@@ -9,9 +9,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
     /// </summary>
     public class Snapshot
     {
-        private const string FORMAT = "{0,-17} {1,-25} {2,-25} {3,-25} {4,-1}";
-        private const string FORMATEX = "{0,-10} {1,5} {2,-17} {3,-25} {4,-25} {5,-25} {6,-1}";
-
         private VMInfo _vm;
         private dynamic _apiData;
 
@@ -107,30 +104,24 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         public bool Ram => !(_apiData.vmstate == 0);
 
         /// <summary>
-        /// Header info
+        /// Get title info
         /// </summary>
         /// <param name="showNodeAndVm"></param>
         /// <returns></returns>
-        public static string HeaderInfo(bool showNodeAndVm)
+        public static string[] GetTitlesInfo(bool showNodeAndVm)
         {
             var data = new List<string>();
             if (showNodeAndVm) { data.AddRange(new string[] { "NODE", "VM" }); }
             data.AddRange(new string[] { "TIME", "PARENT", "NAME", "DESCRIPTION", "RAM" });
-            return string.Format(showNodeAndVm ? FORMATEX : FORMAT, data.ToArray());
+            return data.ToArray();
         }
-
-        /// <summary>
-        /// Info snapshot
-        /// </summary>
-        /// <returns></returns>
-        public override string ToString() => RowInfo(true);
 
         /// <summary>
         /// Row info
         /// </summary>
         /// <param name="showNodeAndVm"></param>
         /// <returns></returns>
-        public string RowInfo(bool showNodeAndVm)
+        public string[] GetRowInfo(bool showNodeAndVm)
         {
             var data = new List<string>();
             if (showNodeAndVm) { data.AddRange(new string[] { _vm.Node, _vm.Id, }); }
@@ -140,7 +131,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                                         Description,
                                         Ram ? "X" : ""});
 
-            return string.Format(showNodeAndVm ? FORMATEX : FORMAT, data.ToArray());
+            return data.ToArray();
         }
     }
 }

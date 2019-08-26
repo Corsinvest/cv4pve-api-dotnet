@@ -1,4 +1,6 @@
-﻿namespace Corsinvest.ProxmoxVE.Api.Extension.Storage
+﻿using Corsinvest.ProxmoxVE.Api.Extension.Utils;
+
+namespace Corsinvest.ProxmoxVE.Api.Extension.Storage
 {
     /// <summary>
     /// Storage info
@@ -8,15 +10,19 @@
         internal StorageInfo(Client client, object apiData, StorageTypeEnum type) : base(client, apiData)
         {
             Type = type;
+            JsonHelper.GetValueOrCreate(apiData, "disable", "0");
         }
 
         // public bool Active =>  Storage.active == 1;
-        // public bool Enabled =>  Storage.enabled == 1;
+        /// <summary>
+        /// Disabled
+        /// </summary>
+        public bool Disabled => ApiData.disable == "1";
 
         /// <summary>
         /// Shared
         /// </summary>
-        public bool Shared => ApiData.shared == 1;
+        public bool Shared => ApiData.shared == "1";
 
         /// <summary>
         /// Identifier

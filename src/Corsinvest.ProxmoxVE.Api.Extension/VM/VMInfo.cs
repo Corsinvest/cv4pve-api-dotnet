@@ -9,8 +9,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
     /// </summary>
     public class VMInfo : BaseInfo
     {
-        private const string FORMAT = "{0,-10} {1,5} {2,-20} {3,7} {4,8} {5,-9} {6,-7} {7,-4}";
-
         internal VMInfo(Client client, object apiData) : base(client, apiData) { }
 
         /// <summary>
@@ -92,7 +90,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <param name="state"></param>
         /// <param name="wait"></param>
         /// <returns></returns>
-
         public bool SetStatus(StatusEnum state, bool wait)
         {
             Result result = null;
@@ -204,55 +201,26 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         }
 
         /// <summary>
-        /// Header info
+        /// Titles info
         /// </summary>
         /// <returns></returns>
-        public static string HeaderInfo()
-            => string.Format(FORMAT, "NODE", "VMID", "NAME", "MEM(GB)", "DISK(GB)", "UPTIME", "STATUS", "TYPE");
+        public static string[] GetTitlesInfo()
+            => new string[] { "NODE", "VMID", "NAME", "OS TYPE", "MEM(GB)", "DISK(GB)", "UPTIME", "CPU", "STATUS", "TYPE" };
 
-        private string[] GetInfoValue()
+        /// <summary>
+        /// Row Info
+        /// </summary>
+        /// <returns></returns>
+        public string[] GetRowInfo()
             => new string[] { Node,
                               Id,
                               Name,
+                              Config.OsType,
                               UnitOfMeasurementHelper.GbToString(Memory),
-                              UnitOfMeasurementHelper.GbToString(MaxDisk),
+                              UnitOfMeasurementHelper.GbToString(MaxDisk) ,
                               UnitOfMeasurementHelper.UpTimeToString(UpTime),
+                              UnitOfMeasurementHelper.CPUUsageToStirng(CPU,MaxCpu),
                               Status,
                               Type + ""};
-
-        /// <summary>
-        /// ROw info
-        /// </summary>
-        /// <returns></returns>
-        public string RowInfo() => string.Format(FORMAT, GetInfoValue());
-
-        /// <summary>
-        /// Info
-        /// </summary>
-        /// <returns></returns>
-        public string[] Info()
-        {
-            var ret = new List<string>(
-                new string[] {
-                    $"Node:      {Node}",
-                    $"VmId:      {Id}",
-                    $"OsType:    {Config.OsType}",
-                    $"Name:      {Name}",
-                    $"CPU:       {Math.Round(CPU,2)}",
-                    $"MaxCpu:    {MaxCpu}",
-                    $"Memory:    {UnitOfMeasurementHelper.GbToString(Memory)} GB",
-                    $"MemoryMax: {UnitOfMeasurementHelper.GbToString(MemoryMax)} GB",
-                    $"Uptime:    {UnitOfMeasurementHelper.UpTimeToString(UpTime)}",
-                    $"Status:    {Status}",
-                    $"Type:      {Type}",
-                    $"Disk:      {UnitOfMeasurementHelper.GbToString(MaxDisk)} GB"});
-
-            foreach (var disk in Config.Disks)
-            {
-                ret.Add($"{disk.Storage} {disk.StorageInfo.TypeString} {disk.Name} {disk.Size}");
-            }
-
-            return ret.ToArray();
-        }
     }
 }

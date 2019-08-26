@@ -15,7 +15,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// Message enabling agent.
         /// </summary>
         /// <returns></returns>
-        public string GetMessageElablingAgent() => $"VM {VM.Id} consider enabling QEMU agent" +
+        public string GetMessageEnablingAgent() => $"VM {VM.Id} consider enabling QEMU agent" +
                                                     " see https://pve.proxmox.com/wiki/Qemu-guest-agent";
 
         /// <summary>

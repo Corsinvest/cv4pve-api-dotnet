@@ -26,7 +26,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// Data Json API.
         /// </summary>
         /// <value></value>
-        protected dynamic ApiData { get; }
+        public dynamic ApiData { get; }
 
         /// <summary>
         /// Cores assigned.
@@ -90,7 +90,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                 {
                     var value = items[key];
                     if (key == "description") { ret += $"#{value}" + Environment.NewLine; }
-                    else if (key == "digest") { }
+                  //  else if (key == "digest") { }
                     else { retTmp += $"{key}: {value}" + Environment.NewLine; }
                 }
 
