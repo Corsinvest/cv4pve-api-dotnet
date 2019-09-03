@@ -11,7 +11,7 @@ namespace Corsinvest.ProxmoxVE.Api
         private readonly Client _client;
 
         /// <summary>
-        /// Costructor
+        /// Constructor
         /// </summary>
         /// <param name="hostname"></param>
         /// <param name="port"></param>

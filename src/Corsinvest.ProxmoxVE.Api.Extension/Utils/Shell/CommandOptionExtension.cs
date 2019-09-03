@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Corsinvest.ProxmoxVE.Api.Extension.VM;
 using McMaster.Extensions.CommandLineUtils;
 
@@ -65,6 +65,14 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils.Shell
         /// <returns></returns>
         public static CommandOption NodeOption(this CommandLineApplication command)
             => command.Option("--node", "Node of cluster", CommandOptionType.SingleValue);
+
+        /// <summary>
+        /// Node argument
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public static CommandArgument NodeArgument(this CommandLineApplication command)
+            => command.Argument("node", "Node of cluster").IsRequired();
 
         /// <summary>
         /// Debug option
@@ -162,7 +170,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils.Shell
         /// <param name="command"></param>
         /// <returns></returns>
         public static CommandOption UsernameRealOption(this CommandLineApplication command)
-            => command.Option("--username", "User name <username>@<relam>", CommandOptionType.SingleValue).IsRequired();
+            => command.Option("--username", "User name <username>@<realm>", CommandOptionType.SingleValue).IsRequired();
 
         /// <summary>
         /// username options
@@ -246,7 +254,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils.Shell
         /// <param name="command"></param>
         /// <returns></returns>                              
         public static CommandOption MailToOption(this CommandLineApplication command)
-            => command.Option("--mailto",
+            => command.Option("--mail-to",
                                   "Comma-separated list of email addresses that should receive email notifications",
                                   CommandOptionType.SingleValue)
                       .Accepts(v => v.EmailAddress());

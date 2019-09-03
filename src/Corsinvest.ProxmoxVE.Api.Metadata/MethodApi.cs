@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
     public class MethodApi
     {
         /// <summary>
-        /// Costructor
+        /// Constructor
         /// </summary>
         /// <param name="token"></param>
         /// <param name="classApi"></param>

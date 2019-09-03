@@ -9,7 +9,7 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
     public class ParameterFormatApi
     {
         /// <summary>
-        /// Costructor
+        /// Constructor
         /// </summary>
         /// <param name="token"></param>
         public ParameterFormatApi(JToken token)
@@ -103,7 +103,7 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
         public int? MaxLength { get; }
 
         /// <summary>
-        /// Massimum
+        /// Maximum
         /// </summary>
         /// <value></value>
         public int? Maximum { get; }

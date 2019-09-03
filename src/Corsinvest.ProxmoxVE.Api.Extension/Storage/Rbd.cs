@@ -18,7 +18,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Storage
         public string Pool => ApiData.pool;
 
         /// <summary>
-        /// Monitorh hosts
+        /// Monitor hosts
         /// </summary>
         public string MonitorHosts => ApiData.monhost;
 
@@ -28,7 +28,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Storage
         public string Username => ApiData.username;
 
         /// <summary>
-        /// Krbf
+        /// Krbb
         /// </summary>
         public bool Krbd => ApiData.krbd == "1";
     }

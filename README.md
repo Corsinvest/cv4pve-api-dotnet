@@ -1,11 +1,11 @@
 # Corsinvest.ProxmoxVE.Api
 
-[![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html) 
+[![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.svg?label=Nuget%20%20Api) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Extension.svg?label=Nuget%20%20Extension) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Metadata.svg?label=Nuget%20%20Metadata) [![AppVeyor branch](https://img.shields.io/appveyor/ci/franklupo/cv4pve-api-dotnet/master.svg)](https://ci.appveyor.com/project/franklupo/cv4pve-api-dotnet) [![Donate to this project using Paypal](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=PPM9JHLQLRV2S&item_name=Open+Source+Project&currency_code=EUR&source=url)
 
-ProxmoVE Client API .Net
+Proxmox VE Client API .Net
 
-[ProxmoxVE Api](https://pve.proxmox.com/pve-docs/api-viewer/)
+[Proxmox VE Api](https://pve.proxmox.com/pve-docs/api-viewer/)
 
 [Nuget Api](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api)
 
@@ -37,7 +37,7 @@ The client is generated from a JSON Api on Proxmox VE.
 
 * Easy to learn
 * Method named
-* Method native sufix Rest (prevent)
+* Method native suffix Rest (prevent)
   * GetRest
   * CreateRest (Post)
   * SetRest (Put)
@@ -59,7 +59,7 @@ The client is generated from a JSON Api on Proxmox VE.
   * WaitForTaskToFinish
   * TaskIsRunning
   * GetExitStatusTask
-* Method directry access
+* Method direct access
   * Get
   * Create (Post)
   * Set (Put)

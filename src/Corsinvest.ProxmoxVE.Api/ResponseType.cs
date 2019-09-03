@@ -1,7 +1,7 @@
 namespace Corsinvest.ProxmoxVE.Api
 {
     /// <summary>
-    /// Resposnse type
+    /// Response type
     /// </summary>
     public enum ResponseType
     {

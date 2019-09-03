@@ -88,7 +88,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils.Shell
                 StartInfo = startInfo
             };
 
-            //addiotional variable
+            //additional variable
             if (environmentVariables != null)
             {
                 if (debug) { stdOut.WriteLine("-------------------------------------------------------"); }

@@ -51,7 +51,7 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
         }
 
         /// <summary>
-        /// Name Idexed
+        /// Name Indexed
         /// </summary>
         /// <returns></returns>
         public string NameIndexed { get; }
@@ -175,7 +175,7 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
         public string Renderer { get; }
 
         /// <summary>
-        /// Massimum
+        /// Maximum
         /// </summary>
         /// <value></value>
         public int? Maximum { get; }

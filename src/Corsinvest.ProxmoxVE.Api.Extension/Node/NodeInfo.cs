@@ -78,7 +78,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         /// <returns></returns>
         public string[] GetRowInfo()
             => new string[] { Node,
-                              UnitOfMeasurementHelper.CPUUsageToStirng(CPU, ApiData.maxcpu),
+                              UnitOfMeasurementHelper.CPUUsageToString(CPU, ApiData.maxcpu),
                               UnitOfMeasurementHelper.GbToString(Memory),
                               UnitOfMeasurementHelper.GbToString(MaxDisk),
                               UnitOfMeasurementHelper.UpTimeToString(UpTime),

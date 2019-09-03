@@ -18,7 +18,7 @@ namespace Corsinvest.ProxmoxVE.Api
         private string _ticketPVEAuthCookie;
 
         /// <summary>
-        /// Costructor
+        /// Constructor
         /// </summary>
         /// <param name="hostname"></param>
         /// <param name="port"></param>
@@ -182,7 +182,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 var request = new HttpRequestMessage(method, new Uri(uriString));
                 if (method != HttpMethod.Get) { request.Content = new FormUrlEncodedContent(@params); }
 
-                //tiket login
+                //ticket login
                 if (_ticketCSRFPreventionToken != null)
                 {
                     handler.CookieContainer.Add(request.RequestUri, new Cookie("PVEAuthCookie", _ticketPVEAuthCookie));
@@ -247,6 +247,16 @@ namespace Corsinvest.ProxmoxVE.Api
             if (value == null) { return; }
             foreach (var item in value) { parameters.Add(name + item.Key, item.Value); }
         }
+
+        /// <summary>
+        /// Wait for task to finish
+        /// </summary>
+        /// <param name="task">Task identifier</param>
+        /// <param name="wait">Millisecond wait next check</param>
+        /// <param name="timeOut">Millisecond timeout</param>
+        /// <return>O Success</return>
+        public int WaitForTaskToFinish(string task, long wait = 500, long timeOut = 10000)
+            => WaitForTaskToFinish(task.Split(':')[1],task,wait,timeOut);
 
         /// <summary>
         /// Wait for task to finish

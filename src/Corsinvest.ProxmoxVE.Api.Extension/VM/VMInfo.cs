@@ -219,7 +219,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                               UnitOfMeasurementHelper.GbToString(Memory),
                               UnitOfMeasurementHelper.GbToString(MaxDisk) ,
                               UnitOfMeasurementHelper.UpTimeToString(UpTime),
-                              UnitOfMeasurementHelper.CPUUsageToStirng(CPU,MaxCpu),
+                              UnitOfMeasurementHelper.CPUUsageToString(CPU,MaxCpu),
                               Status,
                               Type + ""};
     }

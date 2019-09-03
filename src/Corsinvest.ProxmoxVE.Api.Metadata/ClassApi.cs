@@ -10,12 +10,12 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
     public class ClassApi
     {
         /// <summary>
-        /// Costructor
+        /// Constructor
         /// </summary>
         public ClassApi() { IsRoot = true; }
 
         /// <summary>
-        /// Costructor
+        /// Constructor
         /// </summary>
         /// <param name="token"></param>
         /// <param name="parent"></param>

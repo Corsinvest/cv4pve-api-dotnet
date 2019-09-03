@@ -73,7 +73,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <param name="jolly">all for all vm, 
         /// <para>all-nodename all vm in host,</para>
         /// <para>vmid id vm</para>
-        /// <para>start with '-' excliude vm</para>
+        /// <para>start with '-' exclude vm</para>
         /// <para>comma reparated</para></param>
         /// <returns></returns>
         public static VMInfo[] GetVMs(this Client client, string jolly)
