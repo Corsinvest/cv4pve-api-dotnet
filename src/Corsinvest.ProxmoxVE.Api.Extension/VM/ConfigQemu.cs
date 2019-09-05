@@ -1,4 +1,5 @@
 ﻿
+using System.Linq;
 using Corsinvest.ProxmoxVE.Api.Extension.Utils;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
@@ -19,9 +20,14 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                                                     " see https://pve.proxmox.com/wiki/Qemu-guest-agent";
 
         /// <summary>
+        /// Agent
+        /// </summary>
+        public string Agent => ApiData.agent;
+
+        /// <summary>
         /// Agent enabled.
         /// </summary>
-        public bool AgentEnabled => ApiData.agent == "1";
+        public bool AgentEnabled => Agent.Split(',').Select(a => a.Trim()).Any(a => a == "1");
 
         /// <summary>
         /// Sockets.

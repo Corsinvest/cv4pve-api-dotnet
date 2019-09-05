@@ -17,10 +17,17 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <returns></returns>
         public static string Info(this IReadOnlyList<VMInfo> vms)
         {
-            var table = new Table(TableConfiguration.Unicode());
-            table.AddColumns(VMInfo.GetTitlesInfo());
-            foreach (var vm in vms) { table.AddRow(vm.GetRowInfo()); }
-            return table.ToString();
+            if (vms.Count == 0)
+            {
+                var table = new Table(TableConfiguration.Unicode());
+                table.AddColumns(VMInfo.GetTitlesInfo());
+                foreach (var vm in vms) { table.AddRow(vm.GetRowInfo()); }
+                return table.ToString();
+            }
+            else
+            {
+                return "";
+            }
         }
 
         /// <summary>
@@ -31,10 +38,17 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <returns></returns>
         public static string Info(this IEnumerable<Snapshot> snapshots, bool showNodeAndVm)
         {
-            var table = new Table(TableConfiguration.Unicode());
-            table.AddColumns(Snapshot.GetTitlesInfo(showNodeAndVm));
-            foreach (var snapshot in snapshots) { table.AddRow(snapshot.GetRowInfo(showNodeAndVm)); }
-            return table.ToString();
+            if (snapshots.Count() > 0)
+            {
+                var table = new Table(TableConfiguration.Unicode());
+                table.AddColumns(Snapshot.GetTitlesInfo(showNodeAndVm));
+                foreach (var snapshot in snapshots) { table.AddRow(snapshot.GetRowInfo(showNodeAndVm)); }
+                return table.ToString();
+            }
+            else
+            {
+                return "";
+            }
         }
     }
 }

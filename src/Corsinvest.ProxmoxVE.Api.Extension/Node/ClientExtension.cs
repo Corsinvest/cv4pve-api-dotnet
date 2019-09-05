@@ -17,10 +17,17 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         /// <returns></returns>
         public static string Info(this IReadOnlyList<NodeInfo> nodes)
         {
-            var table = new Table(TableConfiguration.Unicode());
-            table.AddColumns(NodeInfo.GetTitlesInfo());
-            foreach (var node in nodes) { table.AddRow(node.GetRowInfo()); }
-            return table.ToString();
+            if (nodes.Count > 0)
+            {
+                var table = new Table(TableConfiguration.Unicode());
+                table.AddColumns(NodeInfo.GetTitlesInfo());
+                foreach (var node in nodes) { table.AddRow(node.GetRowInfo()); }
+                return table.ToString();
+            }
+            else
+            {
+                return "";
+            }
         }
 
         /// <summary>

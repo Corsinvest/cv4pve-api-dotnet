@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Text;
 using Corsinvest.ProxmoxVE.Api.Extension.VM;
 using McMaster.Extensions.CommandLineUtils;
 
@@ -186,7 +188,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils.Shell
         /// <param name="command"></param>
         /// <returns></returns>
         public static CommandOption PasswordOption(this CommandLineApplication command)
-            => command.Option("--password", "The password", CommandOptionType.SingleValue).IsRequired();
+            => command.Option("--password", "The password. Specify 'file:path_file' to store password in file.", CommandOptionType.SingleValue).IsRequired();
 
         /// <summary>
         /// Get Host and Port
@@ -215,12 +217,40 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils.Shell
             if (command.DebugIsActive()) { client.DebugLevel = 99; }
 
             //try login
-            if (client.Login(command.GetOption("username", true).Value(),
-                             command.GetOption("password", true).Value())) { return client; }
+            if (client.Login(command.GetOption("username", true).Value(), GetPasswordFromOption(command))) { return client; }
 
             var error = "Problem connection!";
             if (!client.LastResult.IsSuccessStatusCode) { error += " " + client.LastResult.ReasonPhrase; }
             throw new ApplicationException(error);
+        }
+
+        /// <summary>
+        /// Return password from option
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public static string GetPasswordFromOption(this CommandLineApplication command)
+        {
+            const string KEY = "012345678901234567890123";
+
+            var password = command.GetOption("password", true).Value().Trim();
+
+            //check if file
+            if (password.StartsWith("file:"))
+            {
+                var fileName = password.Substring(5);
+                if (File.Exists(fileName))
+                {
+                    password = StringHelper.Decrypt(File.ReadAllText(fileName, ASCIIEncoding.UTF8), KEY, false);
+                }
+                else
+                {
+                    password = Prompt.GetPassword("Password:");
+                    File.WriteAllText(fileName, StringHelper.Encrypt(password, KEY, false), ASCIIEncoding.UTF8);
+                }
+            }
+
+            return password;
         }
         #endregion
 
