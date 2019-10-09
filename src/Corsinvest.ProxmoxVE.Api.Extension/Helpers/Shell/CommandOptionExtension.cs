@@ -1,10 +1,28 @@
-﻿using System;
+﻿/*
+ * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
+ * Copyright (C) 2016 Corsinvest Srl
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using System;
 using System.IO;
 using System.Text;
 using Corsinvest.ProxmoxVE.Api.Extension.VM;
 using McMaster.Extensions.CommandLineUtils;
 
-namespace Corsinvest.ProxmoxVE.Api.Extension.Utils.Shell
+namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
 {
     /// <summary>
     /// Command option shell extension.
@@ -59,6 +77,38 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils.Shell
         /// <param name="command"></param>
         /// <returns></returns>
         public static bool DryRunIsActive(this CommandLineApplication command) => command.GetOption("dry-run").HasValue();
+
+        /// <summary>
+        /// Self update option
+        /// </summary>
+        /// <param name="app"></param>
+        /// <returns></returns>
+        public static CommandLineApplication SelfUpdateCommand(this CommandLineApplication app)
+        {
+            return app.Command("self-update", cmd =>
+            {
+                cmd.Description = "Update application itself to the latest version";
+                var optInfo = cmd.Option("--info", "Info about last version", CommandOptionType.NoValue);
+
+                cmd.OnExecute(() =>
+                {
+                    if (optInfo.HasValue())
+                    {
+                        //show info
+                        var info = UpdateHelper.GetLastReleaseAssetFromGitHub(app.Name);
+                        Console.Out.WriteLine($@"Info last release application: '{app.Name}':
+Version:       {info.Version} 
+Published At:  {info.PublishedAt} 
+Download Url:  {info.BrowserDownloadUrl} 
+Release Notes: {info.ReleaseNotes}");
+                    }
+                    else
+                    {
+                        //execute update
+                    }
+                });
+            });
+        }
 
         /// <summary>
         /// Node option
@@ -141,7 +191,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils.Shell
         /// <returns></returns>
         public static CommandOption ScriptHookOption(this CommandLineApplication command)
         {
-            var opt = command.Option("--script", "Use specified hook script", CommandOptionType.NoValue);
+            var opt = command.Option("--script", "Use specified hook script", CommandOptionType.SingleValue);
             opt.Accepts().ExistingFile();
             return opt;
         }
@@ -204,14 +254,27 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils.Shell
         }
 
         /// <summary>
+        /// Get options connection
+        /// </summary>
+        /// <returns></returns>
+        public static (string Host, int Port, string Username, string password) GetOptionsConnection(this CommandLineApplication command)
+        {
+            var ret = command.GetHostAndPort();
+            return (ret.Host,
+                    ret.Port,
+                    command.GetOption("username").Value(),
+                    GetPasswordFromOption(command));
+        }
+
+        /// <summary>
         /// Try login client api
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static Client ClientTryLogin(this CommandLineApplication command)
+        public static PveClient ClientTryLogin(this CommandLineApplication command)
         {
             var (host, port) = GetHostAndPort(command);
-            var client = new Client(host, port);
+            var client = new PveClient(host, port);
 
             //check enable debug
             if (command.DebugIsActive()) { client.DebugLevel = 99; }

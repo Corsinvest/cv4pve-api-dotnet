@@ -1,7 +1,26 @@
-﻿using System;
+﻿/*
+ * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
+ * Copyright (C) 2016 Corsinvest Srl
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
 {
@@ -14,6 +33,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         {
             ApiData = apiData;
             VM = vm;
+            DynamicHelper.CheckKeyOrCreate(apiData, "lock", "");
         }
 
         /// <summary>
@@ -42,6 +62,17 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// Os type
         /// </summary>
         public string OsType => ApiData.ostype;
+
+        /// <summary>
+        /// Lock
+        /// </summary>
+        public string Lock => DynamicHelper.GetValue(ApiData, "lock", "");
+
+        /// <summary>
+        /// Is lock
+        /// </summary>
+        /// <returns></returns>
+        public bool IsLock => !string.IsNullOrWhiteSpace(Lock);
 
         /// <summary>
         /// Get disks.
@@ -90,7 +121,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                 {
                     var value = items[key];
                     if (key == "description") { ret += $"#{value}" + Environment.NewLine; }
-                  //  else if (key == "digest") { }
                     else { retTmp += $"{key}: {value}" + Environment.NewLine; }
                 }
 

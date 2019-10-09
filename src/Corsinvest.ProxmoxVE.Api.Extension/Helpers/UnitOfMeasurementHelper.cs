@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
  * Copyright (C) 2016 Corsinvest Srl
  *
@@ -16,21 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
- namespace Corsinvest.ProxmoxVE.Api
-{
-    /// <summary>
-    /// Response type
-    /// </summary>
-    public enum ResponseType
-    {
-        /// <summary>
-        /// Json
-        /// </summary>
-        Json,
+using System;
 
-        /// <summary>
-        /// Png
-        /// </summary>
-        Png
+namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
+{
+    internal class UnitOfMeasurementHelper
+    {
+        public static string CPUUsageToString(double cpu, dynamic maxCpu) 
+            => cpu == 0 ? "" : (Math.Round(cpu * 100, 1)) + $"% of {maxCpu} CUP";
+
+        public static string MbToString(long value) 
+            => value == 0 ? "" : Math.Round(value / 1024.0 / 1024.0, 2) + "";
+
+        public static string GbToString(long value) 
+            => value == 0 ? "" : Math.Round(value / 1024.0 / 1024.0 / 1024.0, 2) + "";
+
+        public static string UpTimeToString(TimeSpan? upTime) 
+            => upTime == null ? "" : upTime?.ToString(@"d\.hh\:mm");
     }
 }

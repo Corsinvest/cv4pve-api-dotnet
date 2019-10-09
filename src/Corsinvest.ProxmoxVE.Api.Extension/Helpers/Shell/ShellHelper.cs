@@ -1,11 +1,29 @@
-﻿using System;
+﻿/*
+ * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
+ * Copyright (C) 2016 Corsinvest Srl
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using McMaster.Extensions.CommandLineUtils;
 
-namespace Corsinvest.ProxmoxVE.Api.Extension.Utils.Shell
+namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
 {
     /// <summary>
     /// Shell Helper
@@ -15,24 +33,33 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils.Shell
         /// <summary>
         /// Email support.
         /// </summary>
-        public const string EMAIL_SUPPORT = "support@corsinvest.it";
+        public static readonly string EMAIL_SUPPORT = "support@corsinvest.it";
 
         /// <summary>
         /// Row shell for support.
         /// </summary>
-        public const string REPORT_BUGS = "Report bugs to " + EMAIL_SUPPORT;
+        public static readonly string REPORT_BUGS = "Report bugs to " + EMAIL_SUPPORT;
 
         /// <summary>
         /// Logo Corsinvest art ascii.
         /// </summary>
         /// <returns></returns>
-        public const string LOGO = @"
+        public static readonly string LOGO = @"
     ______                _                      __
    / ____/___  __________(_)___ _   _____  _____/ /_
   / /   / __ \/ ___/ ___/ / __ \ | / / _ \/ ___/ __/
  / /___/ /_/ / /  (__  ) / / / / |/ /  __(__  ) /_
  \____/\____/_/  /____/_/_/ /_/|___/\___/____/\__/
 ";
+
+        /// <summary>
+        /// Remember these things
+        /// </summary>
+        public static readonly string REMEMBER_THESE_THINGS = @"Remember these things:
+- Think before typing.
+- From great power comes great responsibility.
+
+Good job";
 
         /// <summary>
         /// Make string logo and title.
@@ -74,9 +101,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils.Shell
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                var escapedArgs = cmd.Replace("\"", "\\\"");
                 startInfo.FileName = "/bin/bash";
-                startInfo.Arguments = $"-c \"{escapedArgs}\"";
+                startInfo.Arguments = $"-c \"{cmd.Replace("\"", "\\\"")}\"";
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -117,6 +143,23 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils.Shell
         }
 
         /// <summary>
+        /// Get application data directory. If not exists create.
+        /// </summary>
+        /// <param name="appName"></param>
+        /// <returns></returns>
+        public static string GetApplicationDataDirectory(string appName)
+        {
+            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Corsinvest", appName);
+            if (!Directory.Exists(path))
+            {
+                var dir = Directory.CreateDirectory(path);
+                //dir.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
+            }
+
+            return path;
+        }
+
+        /// <summary>
         /// Create console application.
         /// </summary>
         /// <param name="name"></param>
@@ -126,7 +169,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils.Shell
         {
             var app = new CommandLineApplication()
             {
-                Name = name,        
+                Name = name,
                 Description = description,
                 UsePagerForHelpText = false,
             };
@@ -136,6 +179,14 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils.Shell
             app.DebugOption();
             app.DryRunOption();
             app.AddLoginOptions();
+            //app.SelfUpdateCommand();
+
+            //execute this
+            app.OnExecute(() =>
+            {
+                app.ShowHint();
+                return 1;
+            });
 
             return app;
         }
@@ -149,13 +200,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils.Shell
         /// <returns></returns>
         public static int ExecuteConsoleApp(this CommandLineApplication app, TextWriter stdOut, string[] args)
         {
-            //execute this
-            app.OnExecute(() =>
-            {
-                app.ShowHint();
-                return 1;
-            });
-
             //execute command
             try
             {

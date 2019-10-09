@@ -1,3 +1,21 @@
+/*
+ * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
+ * Copyright (C) 2016 Corsinvest Srl
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +27,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
     /// </summary>
     public class Snapshots : IReadOnlyList<Snapshot>
     {
-        private VMInfo _vm;
+        private readonly VMInfo _vm;
         private List<Snapshot> _snapshots;
 
         internal Snapshots(VMInfo vm)
@@ -27,6 +45,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
             {
                 case VMTypeEnum.Qemu: result = _vm.QemuApi.Snapshot.GetRest(); break;
                 case VMTypeEnum.Lxc: result = _vm.LxcApi.Snapshot.GetRest(); break;
+                default: break;
             }
 
             foreach (var snapshot in result.Response.data) { snapshots.Add(new Snapshot(_vm, snapshot)); }
@@ -72,6 +91,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
             {
                 case VMTypeEnum.Qemu: result = _vm.QemuApi.Snapshot.CreateRest(name, description, state); break;
                 case VMTypeEnum.Lxc: result = _vm.LxcApi.Snapshot.CreateRest(name, description); break;
+                default: break;
             }
 
             result.WaitForTaskToFinish(_vm, wait);
@@ -112,7 +132,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
             {
                 case VMTypeEnum.Qemu: result = _vm.QemuApi.Snapshot[snapshot.Name].DeleteRest(); break;
                 case VMTypeEnum.Lxc: result = _vm.LxcApi.Snapshot[snapshot.Name].DeleteRest(); break;
+                default: break;
             }
+
             result.WaitForTaskToFinish(_vm, wait);
 
             RefreshList();

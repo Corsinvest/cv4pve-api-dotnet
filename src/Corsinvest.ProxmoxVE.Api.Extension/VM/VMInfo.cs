@@ -1,6 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using Corsinvest.ProxmoxVE.Api.Extension.Utils;
+﻿/*
+ * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
+ * Copyright (C) 2016 Corsinvest Srl
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using System;
+using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
 {
@@ -9,7 +26,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
     /// </summary>
     public class VMInfo : BaseInfo
     {
-        internal VMInfo(Client client, object apiData) : base(client, apiData) { }
+        internal VMInfo(PveClient client, object apiData) : base(client, apiData) { }
 
         /// <summary>
         /// Identifier
@@ -66,6 +83,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// Status
         /// </summary>
         public string Status => ApiData.status;
+
+        /// <summary>
+        /// Check is running
+        /// </summary>
+        public bool IsRunning => Status == "running";
 
         /// <summary>
         /// Type
@@ -141,19 +163,19 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
             return !result.InError();
         }
 
-        internal Client.PVENodes.PVEItemNode NodeApi => Client.Nodes[Node];
+        internal PveClient.PVENodes.PVEItemNode NodeApi => Client.Nodes[Node];
 
         /// <summary>
         /// QEMU
         /// </summary>
         /// <returns></returns>
-        public Client.PVENodes.PVEItemNode.PVEQemu.PVEItemVmid QemuApi => (dynamic)Client.Nodes[Node].Qemu[Id];
+        public PveClient.PVENodes.PVEItemNode.PVEQemu.PVEItemVmid QemuApi => (dynamic)Client.Nodes[Node].Qemu[Id];
 
         /// <summary>
         /// LXC
         /// </summary>
         /// <returns></returns>
-        public Client.PVENodes.PVEItemNode.PVELxc.PVEItemVmid LxcApi => (dynamic)Client.Nodes[Node].Lxc[Id];
+        public PveClient.PVENodes.PVEItemNode.PVELxc.PVEItemVmid LxcApi => (dynamic)Client.Nodes[Node].Lxc[Id];
 
         /// <summary>
         /// Config
@@ -205,22 +227,23 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// </summary>
         /// <returns></returns>
         public static string[] GetTitlesInfo()
-            => new string[] { "NODE", "VMID", "NAME", "OS TYPE", "MEM(GB)", "DISK(GB)", "UPTIME", "CPU", "STATUS", "TYPE" };
+            => new[] { "NODE", "VMID", "NAME", "OS TYPE", "MEM(GB)",
+                       "DISK(GB)", "UPTIME", "CPU", "STATUS", "TYPE" };
 
         /// <summary>
         /// Row Info
         /// </summary>
         /// <returns></returns>
         public string[] GetRowInfo()
-            => new string[] { Node,
-                              Id,
-                              Name,
-                              Config.OsType,
-                              UnitOfMeasurementHelper.GbToString(Memory),
-                              UnitOfMeasurementHelper.GbToString(MaxDisk) ,
-                              UnitOfMeasurementHelper.UpTimeToString(UpTime),
-                              UnitOfMeasurementHelper.CPUUsageToString(CPU,MaxCpu),
-                              Status,
-                              Type + ""};
+            => new[] { Node,
+                       Id,
+                       Name,
+                       Config.OsType,
+                       UnitOfMeasurementHelper.GbToString(Memory),
+                       UnitOfMeasurementHelper.GbToString(MaxDisk) ,
+                       UnitOfMeasurementHelper.UpTimeToString(UpTime),
+                       UnitOfMeasurementHelper.CPUUsageToString(CPU,MaxCpu),
+                       Status,
+                       Type + ""};
     }
 }

@@ -50,10 +50,10 @@ The client is generated from a JSON Api on Proxmox VE.
   * client.Nodes["pve1"].Qemu[100].Snapshot().snapshotList().Response.data
 * Return data Proxmox VE
 * Debug Level show to console information REST call
-* Return result status
-  * StatusCode
-  * ReasonPhrase
-  * IsSuccessStatusCode
+* Return result
+  * Request
+  * Response
+  * Status
 * Last result action
 * Task utility
   * WaitForTaskToFinish
@@ -109,7 +109,7 @@ Example result:
 ## Usage
 
 ```C#
-var client = new Client("10.92.90.91");
+var client = new PveClient("10.92.90.91");
 if (client.Login("root", "password"))
 {
     var vm = client.Nodes["pve1"].Qemu[100];
@@ -122,7 +122,7 @@ if (client.Login("root", "password"))
     var response = vm.Snapshot.Snapshot("pippo2311");
 
     //update snapshot description
-    vm.Snapshot["pippo2311"].Config.UpdateSnapshotConfig("descr");
+    vm.Snapshot["pippo2311"].Config.UpdateSnapshotConfig("description");
 
     //delete snapshot
     vm.Snapshot["pippo2311"].Delsnapshot();
@@ -134,7 +134,7 @@ if (client.Login("root", "password"))
         Console.WriteLine(snapshot.name);
     }
 
-    //change reposnde type from json to png
+    //change response type from json to png
     client.ResponseType = "png";
     var dataImg = client.Nodes["pve1"].Rrd.Rrd("cpu", "day").Response;
     Console.WriteLine("<img src=\"{dataImg}\" \>");

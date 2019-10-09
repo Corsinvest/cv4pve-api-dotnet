@@ -1,3 +1,21 @@
+﻿/*
+ * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
+ * Copyright (C) 2016 Corsinvest Srl
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 using System.Collections.Generic;
 
 namespace Corsinvest.ProxmoxVE.Api
@@ -5,10 +23,10 @@ namespace Corsinvest.ProxmoxVE.Api
     /// <summary>
     /// Proxmox VE Client
     /// </summary>
-    public class Client : ClientBase
+    public class PveClient : PveClientBase
     {
 #pragma warning disable 1591
-        private readonly Client _client;
+        private readonly PveClient _client;
 
         /// <summary>
         /// Constructor
@@ -16,7 +34,7 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="hostname"></param>
         /// <param name="port"></param>
         /// <returns></returns>
-        public Client(string hostname, int port = 8006) : base(hostname, port)
+        public PveClient(string hostname, int port = 8006) : base(hostname, port)
         {
             _client = this;
         }
@@ -35,9 +53,9 @@ namespace Corsinvest.ProxmoxVE.Api
         public PVEVersion Version => _version ?? (_version = new PVEVersion(_client));
         public class PVECluster
         {
-            private readonly Client _client;
+            private readonly PveClient _client;
 
-            internal PVECluster(Client client) { _client = client; }
+            internal PVECluster(PveClient client) { _client = client; }
             private PVEReplication _replication;
             public PVEReplication Replication => _replication ?? (_replication = new PVEReplication(_client));
             private PVEConfig _config;
@@ -66,15 +84,15 @@ namespace Corsinvest.ProxmoxVE.Api
             public PVECeph Ceph => _ceph ?? (_ceph = new PVECeph(_client));
             public class PVEReplication
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVEReplication(Client client) { _client = client; }
+                internal PVEReplication(PveClient client) { _client = client; }
                 public PVEItemId this[object id] => new PVEItemId(_client, id);
                 public class PVEItemId
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _id;
-                    internal PVEItemId(Client client, object id) { _client = client; _id = id; }
+                    internal PVEItemId(PveClient client, object id) { _client = client; _id = id; }
                     /// <summary>
                     /// Mark replication job for removal.
                     /// </summary>
@@ -209,9 +227,9 @@ namespace Corsinvest.ProxmoxVE.Api
             }
             public class PVEConfig
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVEConfig(Client client) { _client = client; }
+                internal PVEConfig(PveClient client) { _client = client; }
                 private PVENodes _nodes;
                 public PVENodes Nodes => _nodes ?? (_nodes = new PVENodes(_client));
                 private PVEJoin _join;
@@ -222,15 +240,15 @@ namespace Corsinvest.ProxmoxVE.Api
                 public PVEQdevice Qdevice => _qdevice ?? (_qdevice = new PVEQdevice(_client));
                 public class PVENodes
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
 
-                    internal PVENodes(Client client) { _client = client; }
+                    internal PVENodes(PveClient client) { _client = client; }
                     public PVEItemNode this[object node] => new PVEItemNode(_client, node);
                     public class PVEItemNode
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEItemNode(Client client, object node) { _client = client; _node = node; }
+                        internal PVEItemNode(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Removes a node from the cluster configuration.
                         /// </summary>
@@ -284,9 +302,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEJoin
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
 
-                    internal PVEJoin(Client client) { _client = client; }
+                    internal PVEJoin(PveClient client) { _client = client; }
                     /// <summary>
                     /// Get information needed to join this cluster over the connected node.
                     /// </summary>
@@ -344,9 +362,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVETotem
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
 
-                    internal PVETotem(Client client) { _client = client; }
+                    internal PVETotem(PveClient client) { _client = client; }
                     /// <summary>
                     /// Get corosync totem protocol settings.
                     /// </summary>
@@ -361,9 +379,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEQdevice
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
 
-                    internal PVEQdevice(Client client) { _client = client; }
+                    internal PVEQdevice(PveClient client) { _client = client; }
                     /// <summary>
                     /// Get QDevice status
                     /// </summary>
@@ -417,9 +435,9 @@ namespace Corsinvest.ProxmoxVE.Api
             }
             public class PVEFirewall
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVEFirewall(Client client) { _client = client; }
+                internal PVEFirewall(PveClient client) { _client = client; }
                 private PVEGroups _groups;
                 public PVEGroups Groups => _groups ?? (_groups = new PVEGroups(_client));
                 private PVERules _rules;
@@ -436,22 +454,22 @@ namespace Corsinvest.ProxmoxVE.Api
                 public PVERefs Refs => _refs ?? (_refs = new PVERefs(_client));
                 public class PVEGroups
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
 
-                    internal PVEGroups(Client client) { _client = client; }
+                    internal PVEGroups(PveClient client) { _client = client; }
                     public PVEItemGroup this[object group] => new PVEItemGroup(_client, group);
                     public class PVEItemGroup
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _group;
-                        internal PVEItemGroup(Client client, object group) { _client = client; _group = group; }
+                        internal PVEItemGroup(PveClient client, object group) { _client = client; _group = group; }
                         public PVEItemPos this[object pos] => new PVEItemPos(_client, _group, pos);
                         public class PVEItemPos
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _group;
                             private readonly object _pos;
-                            internal PVEItemPos(Client client, object group, object pos)
+                            internal PVEItemPos(PveClient client, object group, object pos)
                             {
                                 _client = client; _group = group;
                                 _pos = pos;
@@ -675,15 +693,15 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVERules
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
 
-                    internal PVERules(Client client) { _client = client; }
+                    internal PVERules(PveClient client) { _client = client; }
                     public PVEItemPos this[object pos] => new PVEItemPos(_client, pos);
                     public class PVEItemPos
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _pos;
-                        internal PVEItemPos(Client client, object pos) { _client = client; _pos = pos; }
+                        internal PVEItemPos(PveClient client, object pos) { _client = client; _pos = pos; }
                         /// <summary>
                         /// Delete rule.
                         /// </summary>
@@ -853,22 +871,22 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEIpset
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
 
-                    internal PVEIpset(Client client) { _client = client; }
+                    internal PVEIpset(PveClient client) { _client = client; }
                     public PVEItemName this[object name] => new PVEItemName(_client, name);
                     public class PVEItemName
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _name;
-                        internal PVEItemName(Client client, object name) { _client = client; _name = name; }
+                        internal PVEItemName(PveClient client, object name) { _client = client; _name = name; }
                         public PVEItemCidr this[object cidr] => new PVEItemCidr(_client, _name, cidr);
                         public class PVEItemCidr
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _name;
                             private readonly object _cidr;
-                            internal PVEItemCidr(Client client, object name, object cidr)
+                            internal PVEItemCidr(PveClient client, object name, object cidr)
                             {
                                 _client = client; _name = name;
                                 _cidr = cidr;
@@ -1015,15 +1033,15 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEAliases
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
 
-                    internal PVEAliases(Client client) { _client = client; }
+                    internal PVEAliases(PveClient client) { _client = client; }
                     public PVEItemName this[object name] => new PVEItemName(_client, name);
                     public class PVEItemName
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _name;
-                        internal PVEItemName(Client client, object name) { _client = client; _name = name; }
+                        internal PVEItemName(PveClient client, object name) { _client = client; _name = name; }
                         /// <summary>
                         /// Remove IP or Network alias.
                         /// </summary>
@@ -1119,9 +1137,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEOptions
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
 
-                    internal PVEOptions(Client client) { _client = client; }
+                    internal PVEOptions(PveClient client) { _client = client; }
                     /// <summary>
                     /// Get Firewall options.
                     /// </summary>
@@ -1176,9 +1194,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEMacros
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
 
-                    internal PVEMacros(Client client) { _client = client; }
+                    internal PVEMacros(PveClient client) { _client = client; }
                     /// <summary>
                     /// List available macros
                     /// </summary>
@@ -1193,9 +1211,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVERefs
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
 
-                    internal PVERefs(Client client) { _client = client; }
+                    internal PVERefs(PveClient client) { _client = client; }
                     /// <summary>
                     /// Lists possible IPSet/Alias reference which are allowed in source/dest properties.
                     /// </summary>
@@ -1231,15 +1249,15 @@ namespace Corsinvest.ProxmoxVE.Api
             }
             public class PVEBackup
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVEBackup(Client client) { _client = client; }
+                internal PVEBackup(PveClient client) { _client = client; }
                 public PVEItemId this[object id] => new PVEItemId(_client, id);
                 public class PVEItemId
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _id;
-                    internal PVEItemId(Client client, object id) { _client = client; _id = id; }
+                    internal PVEItemId(PveClient client, object id) { _client = client; _id = id; }
                     /// <summary>
                     /// Delete vzdump backup job definition.
                     /// </summary>
@@ -1490,9 +1508,9 @@ namespace Corsinvest.ProxmoxVE.Api
             }
             public class PVEHa
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVEHa(Client client) { _client = client; }
+                internal PVEHa(PveClient client) { _client = client; }
                 private PVEResources _resources;
                 public PVEResources Resources => _resources ?? (_resources = new PVEResources(_client));
                 private PVEGroups _groups;
@@ -1501,24 +1519,24 @@ namespace Corsinvest.ProxmoxVE.Api
                 public PVEStatus Status => _status ?? (_status = new PVEStatus(_client));
                 public class PVEResources
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
 
-                    internal PVEResources(Client client) { _client = client; }
+                    internal PVEResources(PveClient client) { _client = client; }
                     public PVEItemSid this[object sid] => new PVEItemSid(_client, sid);
                     public class PVEItemSid
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _sid;
-                        internal PVEItemSid(Client client, object sid) { _client = client; _sid = sid; }
+                        internal PVEItemSid(PveClient client, object sid) { _client = client; _sid = sid; }
                         private PVEMigrate _migrate;
                         public PVEMigrate Migrate => _migrate ?? (_migrate = new PVEMigrate(_client, _sid));
                         private PVERelocate _relocate;
                         public PVERelocate Relocate => _relocate ?? (_relocate = new PVERelocate(_client, _sid));
                         public class PVEMigrate
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _sid;
-                            internal PVEMigrate(Client client, object sid) { _client = client; _sid = sid; }
+                            internal PVEMigrate(PveClient client, object sid) { _client = client; _sid = sid; }
                             /// <summary>
                             /// Request resource migration (online) to another node.
                             /// </summary>
@@ -1540,9 +1558,9 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVERelocate
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _sid;
-                            internal PVERelocate(Client client, object sid) { _client = client; _sid = sid; }
+                            internal PVERelocate(PveClient client, object sid) { _client = client; _sid = sid; }
                             /// <summary>
                             /// Request resource relocatzion to another node. This stops the service on the old node, and restarts it on the target node.
                             /// </summary>
@@ -1686,15 +1704,15 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEGroups
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
 
-                    internal PVEGroups(Client client) { _client = client; }
+                    internal PVEGroups(PveClient client) { _client = client; }
                     public PVEItemGroup this[object group] => new PVEItemGroup(_client, group);
                     public class PVEItemGroup
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _group;
-                        internal PVEItemGroup(Client client, object group) { _client = client; _group = group; }
+                        internal PVEItemGroup(PveClient client, object group) { _client = client; _group = group; }
                         /// <summary>
                         /// Delete ha group configuration.
                         /// </summary>
@@ -1800,18 +1818,18 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEStatus
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
 
-                    internal PVEStatus(Client client) { _client = client; }
+                    internal PVEStatus(PveClient client) { _client = client; }
                     private PVECurrent _current;
                     public PVECurrent Current => _current ?? (_current = new PVECurrent(_client));
                     private PVEManagerStatus _managerStatus;
                     public PVEManagerStatus ManagerStatus => _managerStatus ?? (_managerStatus = new PVEManagerStatus(_client));
                     public class PVECurrent
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
 
-                        internal PVECurrent(Client client) { _client = client; }
+                        internal PVECurrent(PveClient client) { _client = client; }
                         /// <summary>
                         /// Get HA manger status.
                         /// </summary>
@@ -1826,9 +1844,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEManagerStatus
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
 
-                        internal PVEManagerStatus(Client client) { _client = client; }
+                        internal PVEManagerStatus(PveClient client) { _client = client; }
                         /// <summary>
                         /// Get full HA manger status, including LRM status.
                         /// </summary>
@@ -1867,9 +1885,9 @@ namespace Corsinvest.ProxmoxVE.Api
             }
             public class PVEAcme
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVEAcme(Client client) { _client = client; }
+                internal PVEAcme(PveClient client) { _client = client; }
                 private PVEAccount _account;
                 public PVEAccount Account => _account ?? (_account = new PVEAccount(_client));
                 private PVETos _tos;
@@ -1878,15 +1896,15 @@ namespace Corsinvest.ProxmoxVE.Api
                 public PVEDirectories Directories => _directories ?? (_directories = new PVEDirectories(_client));
                 public class PVEAccount
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
 
-                    internal PVEAccount(Client client) { _client = client; }
+                    internal PVEAccount(PveClient client) { _client = client; }
                     public PVEItemName this[object name] => new PVEItemName(_client, name);
                     public class PVEItemName
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _name;
-                        internal PVEItemName(Client client, object name) { _client = client; _name = name; }
+                        internal PVEItemName(PveClient client, object name) { _client = client; _name = name; }
                         /// <summary>
                         /// Deactivate existing ACME account at CA.
                         /// </summary>
@@ -1969,9 +1987,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVETos
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
 
-                    internal PVETos(Client client) { _client = client; }
+                    internal PVETos(PveClient client) { _client = client; }
                     /// <summary>
                     /// Retrieve ACME TermsOfService URL from CA.
                     /// </summary>
@@ -1993,9 +2011,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEDirectories
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
 
-                    internal PVEDirectories(Client client) { _client = client; }
+                    internal PVEDirectories(PveClient client) { _client = client; }
                     /// <summary>
                     /// Get named known ACME directory endpoints.
                     /// </summary>
@@ -2022,9 +2040,9 @@ namespace Corsinvest.ProxmoxVE.Api
             }
             public class PVELog
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVELog(Client client) { _client = client; }
+                internal PVELog(PveClient client) { _client = client; }
                 /// <summary>
                 /// Read cluster log
                 /// </summary>
@@ -2046,9 +2064,9 @@ namespace Corsinvest.ProxmoxVE.Api
             }
             public class PVEResources
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVEResources(Client client) { _client = client; }
+                internal PVEResources(PveClient client) { _client = client; }
                 /// <summary>
                 /// Resources index (cluster wide).
                 /// </summary>
@@ -2072,9 +2090,9 @@ namespace Corsinvest.ProxmoxVE.Api
             }
             public class PVETasks
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVETasks(Client client) { _client = client; }
+                internal PVETasks(PveClient client) { _client = client; }
                 /// <summary>
                 /// List recent tasks (cluster wide).
                 /// </summary>
@@ -2089,9 +2107,9 @@ namespace Corsinvest.ProxmoxVE.Api
             }
             public class PVEOptions
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVEOptions(Client client) { _client = client; }
+                internal PVEOptions(PveClient client) { _client = client; }
                 /// <summary>
                 /// Get datacenter options.
                 /// </summary>
@@ -2171,9 +2189,9 @@ namespace Corsinvest.ProxmoxVE.Api
             }
             public class PVEStatus
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVEStatus(Client client) { _client = client; }
+                internal PVEStatus(PveClient client) { _client = client; }
                 /// <summary>
                 /// Get cluster status information.
                 /// </summary>
@@ -2188,9 +2206,9 @@ namespace Corsinvest.ProxmoxVE.Api
             }
             public class PVENextid
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVENextid(Client client) { _client = client; }
+                internal PVENextid(PveClient client) { _client = client; }
                 /// <summary>
                 /// Get next free VMID. If you pass an VMID it will raise an error if the ID is already used.
                 /// </summary>
@@ -2212,18 +2230,18 @@ namespace Corsinvest.ProxmoxVE.Api
             }
             public class PVECeph
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVECeph(Client client) { _client = client; }
+                internal PVECeph(PveClient client) { _client = client; }
                 private PVEMetadata _metadata;
                 public PVEMetadata Metadata => _metadata ?? (_metadata = new PVEMetadata(_client));
                 private PVEStatus _status;
                 public PVEStatus Status => _status ?? (_status = new PVEStatus(_client));
                 public class PVEMetadata
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
 
-                    internal PVEMetadata(Client client) { _client = client; }
+                    internal PVEMetadata(PveClient client) { _client = client; }
                     /// <summary>
                     /// Get ceph metadata.
                     /// </summary>
@@ -2238,9 +2256,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEStatus
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
 
-                    internal PVEStatus(Client client) { _client = client; }
+                    internal PVEStatus(PveClient client) { _client = client; }
                     /// <summary>
                     /// Get ceph status.
                     /// </summary>
@@ -2279,15 +2297,15 @@ namespace Corsinvest.ProxmoxVE.Api
         }
         public class PVENodes
         {
-            private readonly Client _client;
+            private readonly PveClient _client;
 
-            internal PVENodes(Client client) { _client = client; }
+            internal PVENodes(PveClient client) { _client = client; }
             public PVEItemNode this[object node] => new PVEItemNode(_client, node);
             public class PVEItemNode
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
                 private readonly object _node;
-                internal PVEItemNode(Client client, object node) { _client = client; _node = node; }
+                internal PVEItemNode(PveClient client, object node) { _client = client; _node = node; }
                 private PVEQemu _qemu;
                 public PVEQemu Qemu => _qemu ?? (_qemu = new PVEQemu(_client, _node));
                 private PVELxc _lxc;
@@ -2366,16 +2384,16 @@ namespace Corsinvest.ProxmoxVE.Api
                 public PVEHosts Hosts => _hosts ?? (_hosts = new PVEHosts(_client, _node));
                 public class PVEQemu
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEQemu(Client client, object node) { _client = client; _node = node; }
+                    internal PVEQemu(PveClient client, object node) { _client = client; _node = node; }
                     public PVEItemVmid this[object vmid] => new PVEItemVmid(_client, _node, vmid);
                     public class PVEItemVmid
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
                         private readonly object _vmid;
-                        internal PVEItemVmid(Client client, object node, object vmid)
+                        internal PVEItemVmid(PveClient client, object node, object vmid)
                         {
                             _client = client; _node = node;
                             _vmid = vmid;
@@ -2426,10 +2444,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         public PVECloudinit Cloudinit => _cloudinit ?? (_cloudinit = new PVECloudinit(_client, _node, _vmid));
                         public class PVEFirewall
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEFirewall(Client client, object node, object vmid)
+                            internal PVEFirewall(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -2448,10 +2466,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             public PVERefs Refs => _refs ?? (_refs = new PVERefs(_client, _node, _vmid));
                             public class PVERules
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVERules(Client client, object node, object vmid)
+                                internal PVERules(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -2459,11 +2477,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 public PVEItemPos this[object pos] => new PVEItemPos(_client, _node, _vmid, pos);
                                 public class PVEItemPos
                                 {
-                                    private readonly Client _client;
+                                    private readonly PveClient _client;
                                     private readonly object _node;
                                     private readonly object _vmid;
                                     private readonly object _pos;
-                                    internal PVEItemPos(Client client, object node, object vmid, object pos)
+                                    internal PVEItemPos(PveClient client, object node, object vmid, object pos)
                                     {
                                         _client = client; _node = node;
                                         _vmid = vmid;
@@ -2638,10 +2656,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEAliases
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEAliases(Client client, object node, object vmid)
+                                internal PVEAliases(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -2649,11 +2667,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 public PVEItemName this[object name] => new PVEItemName(_client, _node, _vmid, name);
                                 public class PVEItemName
                                 {
-                                    private readonly Client _client;
+                                    private readonly PveClient _client;
                                     private readonly object _node;
                                     private readonly object _vmid;
                                     private readonly object _name;
-                                    internal PVEItemName(Client client, object node, object vmid, object name)
+                                    internal PVEItemName(PveClient client, object node, object vmid, object name)
                                     {
                                         _client = client; _node = node;
                                         _vmid = vmid;
@@ -2754,10 +2772,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEIpset
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEIpset(Client client, object node, object vmid)
+                                internal PVEIpset(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -2765,11 +2783,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 public PVEItemName this[object name] => new PVEItemName(_client, _node, _vmid, name);
                                 public class PVEItemName
                                 {
-                                    private readonly Client _client;
+                                    private readonly PveClient _client;
                                     private readonly object _node;
                                     private readonly object _vmid;
                                     private readonly object _name;
-                                    internal PVEItemName(Client client, object node, object vmid, object name)
+                                    internal PVEItemName(PveClient client, object node, object vmid, object name)
                                     {
                                         _client = client; _node = node;
                                         _vmid = vmid;
@@ -2778,12 +2796,12 @@ namespace Corsinvest.ProxmoxVE.Api
                                     public PVEItemCidr this[object cidr] => new PVEItemCidr(_client, _node, _vmid, _name, cidr);
                                     public class PVEItemCidr
                                     {
-                                        private readonly Client _client;
+                                        private readonly PveClient _client;
                                         private readonly object _node;
                                         private readonly object _vmid;
                                         private readonly object _name;
                                         private readonly object _cidr;
-                                        internal PVEItemCidr(Client client, object node, object vmid, object name, object cidr)
+                                        internal PVEItemCidr(PveClient client, object node, object vmid, object name, object cidr)
                                         {
                                             _client = client; _node = node;
                                             _vmid = vmid;
@@ -2932,10 +2950,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEOptions
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEOptions(Client client, object node, object vmid)
+                                internal PVEOptions(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3013,10 +3031,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVELog
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVELog(Client client, object node, object vmid)
+                                internal PVELog(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3045,10 +3063,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVERefs
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVERefs(Client client, object node, object vmid)
+                                internal PVERefs(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3088,10 +3106,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEAgent
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEAgent(Client client, object node, object vmid)
+                            internal PVEAgent(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -3148,10 +3166,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             public PVEFile_Write File_Write => _file_Write ?? (_file_Write = new PVEFile_Write(_client, _node, _vmid));
                             public class PVEFsfreeze_Freeze
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEFsfreeze_Freeze(Client client, object node, object vmid)
+                                internal PVEFsfreeze_Freeze(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3170,10 +3188,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEFsfreeze_Status
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEFsfreeze_Status(Client client, object node, object vmid)
+                                internal PVEFsfreeze_Status(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3192,10 +3210,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEFsfreeze_Thaw
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEFsfreeze_Thaw(Client client, object node, object vmid)
+                                internal PVEFsfreeze_Thaw(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3214,10 +3232,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEFstrim
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEFstrim(Client client, object node, object vmid)
+                                internal PVEFstrim(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3236,10 +3254,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEGet_Fsinfo
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEGet_Fsinfo(Client client, object node, object vmid)
+                                internal PVEGet_Fsinfo(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3258,10 +3276,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEGet_Host_Name
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEGet_Host_Name(Client client, object node, object vmid)
+                                internal PVEGet_Host_Name(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3280,10 +3298,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEGet_Memory_Block_Info
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEGet_Memory_Block_Info(Client client, object node, object vmid)
+                                internal PVEGet_Memory_Block_Info(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3302,10 +3320,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEGet_Memory_Blocks
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEGet_Memory_Blocks(Client client, object node, object vmid)
+                                internal PVEGet_Memory_Blocks(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3324,10 +3342,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEGet_Osinfo
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEGet_Osinfo(Client client, object node, object vmid)
+                                internal PVEGet_Osinfo(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3346,10 +3364,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEGet_Time
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEGet_Time(Client client, object node, object vmid)
+                                internal PVEGet_Time(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3368,10 +3386,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEGet_Timezone
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEGet_Timezone(Client client, object node, object vmid)
+                                internal PVEGet_Timezone(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3390,10 +3408,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEGet_Users
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEGet_Users(Client client, object node, object vmid)
+                                internal PVEGet_Users(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3412,10 +3430,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEGet_Vcpus
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEGet_Vcpus(Client client, object node, object vmid)
+                                internal PVEGet_Vcpus(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3434,10 +3452,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEInfo
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEInfo(Client client, object node, object vmid)
+                                internal PVEInfo(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3456,10 +3474,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVENetwork_Get_Interfaces
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVENetwork_Get_Interfaces(Client client, object node, object vmid)
+                                internal PVENetwork_Get_Interfaces(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3478,10 +3496,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEPing
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEPing(Client client, object node, object vmid)
+                                internal PVEPing(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3500,10 +3518,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEShutdown
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEShutdown(Client client, object node, object vmid)
+                                internal PVEShutdown(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3522,10 +3540,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVESuspend_Disk
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVESuspend_Disk(Client client, object node, object vmid)
+                                internal PVESuspend_Disk(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3544,10 +3562,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVESuspend_Hybrid
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVESuspend_Hybrid(Client client, object node, object vmid)
+                                internal PVESuspend_Hybrid(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3566,10 +3584,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVESuspend_Ram
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVESuspend_Ram(Client client, object node, object vmid)
+                                internal PVESuspend_Ram(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3588,10 +3606,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVESet_User_Password
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVESet_User_Password(Client client, object node, object vmid)
+                                internal PVESet_User_Password(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3623,10 +3641,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEExec
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEExec(Client client, object node, object vmid)
+                                internal PVEExec(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3652,10 +3670,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEExec_Status
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEExec_Status(Client client, object node, object vmid)
+                                internal PVEExec_Status(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3681,10 +3699,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEFile_Read
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEFile_Read(Client client, object node, object vmid)
+                                internal PVEFile_Read(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3710,10 +3728,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEFile_Write
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEFile_Write(Client client, object node, object vmid)
+                                internal PVEFile_Write(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -3774,10 +3792,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVERrd
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVERrd(Client client, object node, object vmid)
+                            internal PVERrd(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -3813,10 +3831,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVERrddata
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVERrddata(Client client, object node, object vmid)
+                            internal PVERrddata(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -3849,10 +3867,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEConfig
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEConfig(Client client, object node, object vmid)
+                            internal PVEConfig(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -4390,10 +4408,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEPending
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEPending(Client client, object node, object vmid)
+                            internal PVEPending(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -4412,10 +4430,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEUnlink
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEUnlink(Client client, object node, object vmid)
+                            internal PVEUnlink(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -4444,10 +4462,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEVncproxy
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEVncproxy(Client client, object node, object vmid)
+                            internal PVEVncproxy(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -4473,10 +4491,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVETermproxy
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVETermproxy(Client client, object node, object vmid)
+                            internal PVETermproxy(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -4504,10 +4522,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEVncwebsocket
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEVncwebsocket(Client client, object node, object vmid)
+                            internal PVEVncwebsocket(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -4536,10 +4554,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVESpiceproxy
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVESpiceproxy(Client client, object node, object vmid)
+                            internal PVESpiceproxy(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -4565,10 +4583,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEStatus
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEStatus(Client client, object node, object vmid)
+                            internal PVEStatus(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -4589,10 +4607,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             public PVEResume Resume => _resume ?? (_resume = new PVEResume(_client, _node, _vmid));
                             public class PVECurrent
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVECurrent(Client client, object node, object vmid)
+                                internal PVECurrent(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -4611,10 +4629,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEStart
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEStart(Client client, object node, object vmid)
+                                internal PVEStart(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -4660,10 +4678,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEStop
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEStop(Client client, object node, object vmid)
+                                internal PVEStop(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -4698,10 +4716,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEReset
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEReset(Client client, object node, object vmid)
+                                internal PVEReset(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -4727,10 +4745,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEShutdown
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEShutdown(Client client, object node, object vmid)
+                                internal PVEShutdown(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -4765,10 +4783,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVESuspend
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVESuspend(Client client, object node, object vmid)
+                                internal PVESuspend(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -4800,10 +4818,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEResume
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEResume(Client client, object node, object vmid)
+                                internal PVEResume(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -4844,10 +4862,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVESendkey
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVESendkey(Client client, object node, object vmid)
+                            internal PVESendkey(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -4876,10 +4894,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEFeature
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEFeature(Client client, object node, object vmid)
+                            internal PVEFeature(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -4910,10 +4928,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEClone
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEClone(Client client, object node, object vmid)
+                            internal PVEClone(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -4968,10 +4986,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEMoveDisk
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEMoveDisk(Client client, object node, object vmid)
+                            internal PVEMoveDisk(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -5016,10 +5034,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEMigrate
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEMigrate(Client client, object node, object vmid)
+                            internal PVEMigrate(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -5086,10 +5104,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEMonitor
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEMonitor(Client client, object node, object vmid)
+                            internal PVEMonitor(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -5115,10 +5133,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEResize
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEResize(Client client, object node, object vmid)
+                            internal PVEResize(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -5155,10 +5173,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVESnapshot
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVESnapshot(Client client, object node, object vmid)
+                            internal PVESnapshot(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -5166,11 +5184,11 @@ namespace Corsinvest.ProxmoxVE.Api
                             public PVEItemSnapname this[object snapname] => new PVEItemSnapname(_client, _node, _vmid, snapname);
                             public class PVEItemSnapname
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
                                 private readonly object _snapname;
-                                internal PVEItemSnapname(Client client, object node, object vmid, object snapname)
+                                internal PVEItemSnapname(PveClient client, object node, object vmid, object snapname)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -5182,11 +5200,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 public PVERollback Rollback => _rollback ?? (_rollback = new PVERollback(_client, _node, _vmid, _snapname));
                                 public class PVEConfig
                                 {
-                                    private readonly Client _client;
+                                    private readonly PveClient _client;
                                     private readonly object _node;
                                     private readonly object _vmid;
                                     private readonly object _snapname;
-                                    internal PVEConfig(Client client, object node, object vmid, object snapname)
+                                    internal PVEConfig(PveClient client, object node, object vmid, object snapname)
                                     {
                                         _client = client; _node = node;
                                         _vmid = vmid;
@@ -5224,11 +5242,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 }
                                 public class PVERollback
                                 {
-                                    private readonly Client _client;
+                                    private readonly PveClient _client;
                                     private readonly object _node;
                                     private readonly object _vmid;
                                     private readonly object _snapname;
-                                    internal PVERollback(Client client, object node, object vmid, object snapname)
+                                    internal PVERollback(PveClient client, object node, object vmid, object snapname)
                                     {
                                         _client = client; _node = node;
                                         _vmid = vmid;
@@ -5314,10 +5332,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVETemplate
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVETemplate(Client client, object node, object vmid)
+                            internal PVETemplate(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -5345,10 +5363,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVECloudinit
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVECloudinit(Client client, object node, object vmid)
+                            internal PVECloudinit(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -5357,10 +5375,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             public PVEDump Dump => _dump ?? (_dump = new PVEDump(_client, _node, _vmid));
                             public class PVEDump
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEDump(Client client, object node, object vmid)
+                                internal PVEDump(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -5700,16 +5718,16 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVELxc
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVELxc(Client client, object node) { _client = client; _node = node; }
+                    internal PVELxc(PveClient client, object node) { _client = client; _node = node; }
                     public PVEItemVmid this[object vmid] => new PVEItemVmid(_client, _node, vmid);
                     public class PVEItemVmid
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
                         private readonly object _vmid;
-                        internal PVEItemVmid(Client client, object node, object vmid)
+                        internal PVEItemVmid(PveClient client, object node, object vmid)
                         {
                             _client = client; _node = node;
                             _vmid = vmid;
@@ -5748,10 +5766,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         public PVEMoveVolume MoveVolume => _moveVolume ?? (_moveVolume = new PVEMoveVolume(_client, _node, _vmid));
                         public class PVEConfig
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEConfig(Client client, object node, object vmid)
+                            internal PVEConfig(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -5884,10 +5902,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEStatus
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEStatus(Client client, object node, object vmid)
+                            internal PVEStatus(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -5906,10 +5924,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             public PVEResume Resume => _resume ?? (_resume = new PVEResume(_client, _node, _vmid));
                             public class PVECurrent
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVECurrent(Client client, object node, object vmid)
+                                internal PVECurrent(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -5928,10 +5946,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEStart
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEStart(Client client, object node, object vmid)
+                                internal PVEStart(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -5957,10 +5975,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEStop
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEStop(Client client, object node, object vmid)
+                                internal PVEStop(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -5986,10 +6004,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEShutdown
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEShutdown(Client client, object node, object vmid)
+                                internal PVEShutdown(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -6018,10 +6036,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVESuspend
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVESuspend(Client client, object node, object vmid)
+                                internal PVESuspend(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -6040,10 +6058,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEResume
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEResume(Client client, object node, object vmid)
+                                internal PVEResume(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -6074,10 +6092,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVESnapshot
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVESnapshot(Client client, object node, object vmid)
+                            internal PVESnapshot(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -6085,11 +6103,11 @@ namespace Corsinvest.ProxmoxVE.Api
                             public PVEItemSnapname this[object snapname] => new PVEItemSnapname(_client, _node, _vmid, snapname);
                             public class PVEItemSnapname
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
                                 private readonly object _snapname;
-                                internal PVEItemSnapname(Client client, object node, object vmid, object snapname)
+                                internal PVEItemSnapname(PveClient client, object node, object vmid, object snapname)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -6101,11 +6119,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 public PVEConfig Config => _config ?? (_config = new PVEConfig(_client, _node, _vmid, _snapname));
                                 public class PVERollback
                                 {
-                                    private readonly Client _client;
+                                    private readonly PveClient _client;
                                     private readonly object _node;
                                     private readonly object _vmid;
                                     private readonly object _snapname;
-                                    internal PVERollback(Client client, object node, object vmid, object snapname)
+                                    internal PVERollback(PveClient client, object node, object vmid, object snapname)
                                     {
                                         _client = client; _node = node;
                                         _vmid = vmid;
@@ -6125,11 +6143,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 }
                                 public class PVEConfig
                                 {
-                                    private readonly Client _client;
+                                    private readonly PveClient _client;
                                     private readonly object _node;
                                     private readonly object _vmid;
                                     private readonly object _snapname;
-                                    internal PVEConfig(Client client, object node, object vmid, object snapname)
+                                    internal PVEConfig(PveClient client, object node, object vmid, object snapname)
                                     {
                                         _client = client; _node = node;
                                         _vmid = vmid;
@@ -6230,10 +6248,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEFirewall
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEFirewall(Client client, object node, object vmid)
+                            internal PVEFirewall(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -6252,10 +6270,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             public PVERefs Refs => _refs ?? (_refs = new PVERefs(_client, _node, _vmid));
                             public class PVERules
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVERules(Client client, object node, object vmid)
+                                internal PVERules(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -6263,11 +6281,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 public PVEItemPos this[object pos] => new PVEItemPos(_client, _node, _vmid, pos);
                                 public class PVEItemPos
                                 {
-                                    private readonly Client _client;
+                                    private readonly PveClient _client;
                                     private readonly object _node;
                                     private readonly object _vmid;
                                     private readonly object _pos;
-                                    internal PVEItemPos(Client client, object node, object vmid, object pos)
+                                    internal PVEItemPos(PveClient client, object node, object vmid, object pos)
                                     {
                                         _client = client; _node = node;
                                         _vmid = vmid;
@@ -6442,10 +6460,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEAliases
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEAliases(Client client, object node, object vmid)
+                                internal PVEAliases(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -6453,11 +6471,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 public PVEItemName this[object name] => new PVEItemName(_client, _node, _vmid, name);
                                 public class PVEItemName
                                 {
-                                    private readonly Client _client;
+                                    private readonly PveClient _client;
                                     private readonly object _node;
                                     private readonly object _vmid;
                                     private readonly object _name;
-                                    internal PVEItemName(Client client, object node, object vmid, object name)
+                                    internal PVEItemName(PveClient client, object node, object vmid, object name)
                                     {
                                         _client = client; _node = node;
                                         _vmid = vmid;
@@ -6558,10 +6576,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEIpset
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEIpset(Client client, object node, object vmid)
+                                internal PVEIpset(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -6569,11 +6587,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 public PVEItemName this[object name] => new PVEItemName(_client, _node, _vmid, name);
                                 public class PVEItemName
                                 {
-                                    private readonly Client _client;
+                                    private readonly PveClient _client;
                                     private readonly object _node;
                                     private readonly object _vmid;
                                     private readonly object _name;
-                                    internal PVEItemName(Client client, object node, object vmid, object name)
+                                    internal PVEItemName(PveClient client, object node, object vmid, object name)
                                     {
                                         _client = client; _node = node;
                                         _vmid = vmid;
@@ -6582,12 +6600,12 @@ namespace Corsinvest.ProxmoxVE.Api
                                     public PVEItemCidr this[object cidr] => new PVEItemCidr(_client, _node, _vmid, _name, cidr);
                                     public class PVEItemCidr
                                     {
-                                        private readonly Client _client;
+                                        private readonly PveClient _client;
                                         private readonly object _node;
                                         private readonly object _vmid;
                                         private readonly object _name;
                                         private readonly object _cidr;
-                                        internal PVEItemCidr(Client client, object node, object vmid, object name, object cidr)
+                                        internal PVEItemCidr(PveClient client, object node, object vmid, object name, object cidr)
                                         {
                                             _client = client; _node = node;
                                             _vmid = vmid;
@@ -6736,10 +6754,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEOptions
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVEOptions(Client client, object node, object vmid)
+                                internal PVEOptions(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -6817,10 +6835,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVELog
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVELog(Client client, object node, object vmid)
+                                internal PVELog(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -6849,10 +6867,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVERefs
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _vmid;
-                                internal PVERefs(Client client, object node, object vmid)
+                                internal PVERefs(PveClient client, object node, object vmid)
                                 {
                                     _client = client; _node = node;
                                     _vmid = vmid;
@@ -6892,10 +6910,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVERrd
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVERrd(Client client, object node, object vmid)
+                            internal PVERrd(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -6931,10 +6949,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVERrddata
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVERrddata(Client client, object node, object vmid)
+                            internal PVERrddata(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -6967,10 +6985,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEVncproxy
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEVncproxy(Client client, object node, object vmid)
+                            internal PVEVncproxy(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -7002,10 +7020,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVETermproxy
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVETermproxy(Client client, object node, object vmid)
+                            internal PVETermproxy(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -7024,10 +7042,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEVncwebsocket
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEVncwebsocket(Client client, object node, object vmid)
+                            internal PVEVncwebsocket(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -7056,10 +7074,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVESpiceproxy
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVESpiceproxy(Client client, object node, object vmid)
+                            internal PVESpiceproxy(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -7085,10 +7103,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEMigrate
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEMigrate(Client client, object node, object vmid)
+                            internal PVEMigrate(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -7129,10 +7147,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEFeature
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEFeature(Client client, object node, object vmid)
+                            internal PVEFeature(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -7163,10 +7181,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVETemplate
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVETemplate(Client client, object node, object vmid)
+                            internal PVETemplate(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -7185,10 +7203,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEClone
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEClone(Client client, object node, object vmid)
+                            internal PVEClone(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -7238,10 +7256,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEResize
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEResize(Client client, object node, object vmid)
+                            internal PVEResize(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -7275,10 +7293,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEMoveVolume
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PVEMoveVolume(Client client, object node, object vmid)
+                            internal PVEMoveVolume(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
@@ -7490,9 +7508,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVECeph
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVECeph(Client client, object node) { _client = client; _node = node; }
+                    internal PVECeph(PveClient client, object node) { _client = client; _node = node; }
                     private PVEOsd _osd;
                     public PVEOsd Osd => _osd ?? (_osd = new PVEOsd(_client, _node));
                     private PVEMds _mds;
@@ -7531,16 +7549,16 @@ namespace Corsinvest.ProxmoxVE.Api
                     public PVERules Rules => _rules ?? (_rules = new PVERules(_client, _node));
                     public class PVEOsd
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEOsd(Client client, object node) { _client = client; _node = node; }
+                        internal PVEOsd(PveClient client, object node) { _client = client; _node = node; }
                         public PVEItemOsdid this[object osdid] => new PVEItemOsdid(_client, _node, osdid);
                         public class PVEItemOsdid
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _osdid;
-                            internal PVEItemOsdid(Client client, object node, object osdid)
+                            internal PVEItemOsdid(PveClient client, object node, object osdid)
                             {
                                 _client = client; _node = node;
                                 _osdid = osdid;
@@ -7553,10 +7571,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             public PVEScrub Scrub => _scrub ?? (_scrub = new PVEScrub(_client, _node, _osdid));
                             public class PVEIn
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _osdid;
-                                internal PVEIn(Client client, object node, object osdid)
+                                internal PVEIn(PveClient client, object node, object osdid)
                                 {
                                     _client = client; _node = node;
                                     _osdid = osdid;
@@ -7575,10 +7593,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEOut
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _osdid;
-                                internal PVEOut(Client client, object node, object osdid)
+                                internal PVEOut(PveClient client, object node, object osdid)
                                 {
                                     _client = client; _node = node;
                                     _osdid = osdid;
@@ -7597,10 +7615,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                             public class PVEScrub
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _osdid;
-                                internal PVEScrub(Client client, object node, object osdid)
+                                internal PVEScrub(PveClient client, object node, object osdid)
                                 {
                                     _client = client; _node = node;
                                     _osdid = osdid;
@@ -7690,16 +7708,16 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEMds
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEMds(Client client, object node) { _client = client; _node = node; }
+                        internal PVEMds(PveClient client, object node) { _client = client; _node = node; }
                         public PVEItemName this[object name] => new PVEItemName(_client, _node, name);
                         public class PVEItemName
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _name;
-                            internal PVEItemName(Client client, object node, object name)
+                            internal PVEItemName(PveClient client, object node, object name)
                             {
                                 _client = client; _node = node;
                                 _name = name;
@@ -7748,16 +7766,16 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEMgr
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEMgr(Client client, object node) { _client = client; _node = node; }
+                        internal PVEMgr(PveClient client, object node) { _client = client; _node = node; }
                         public PVEItemId this[object id] => new PVEItemId(_client, _node, id);
                         public class PVEItemId
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _id;
-                            internal PVEItemId(Client client, object node, object id)
+                            internal PVEItemId(PveClient client, object node, object id)
                             {
                                 _client = client; _node = node;
                                 _id = id;
@@ -7799,16 +7817,16 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEMon
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEMon(Client client, object node) { _client = client; _node = node; }
+                        internal PVEMon(PveClient client, object node) { _client = client; _node = node; }
                         public PVEItemMonid this[object monid] => new PVEItemMonid(_client, _node, monid);
                         public class PVEItemMonid
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _monid;
-                            internal PVEItemMonid(Client client, object node, object monid)
+                            internal PVEItemMonid(PveClient client, object node, object monid)
                             {
                                 _client = client; _node = node;
                                 _monid = monid;
@@ -7857,16 +7875,16 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEFs
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEFs(Client client, object node) { _client = client; _node = node; }
+                        internal PVEFs(PveClient client, object node) { _client = client; _node = node; }
                         public PVEItemName this[object name] => new PVEItemName(_client, _node, name);
                         public class PVEItemName
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _name;
-                            internal PVEItemName(Client client, object node, object name)
+                            internal PVEItemName(PveClient client, object node, object name)
                             {
                                 _client = client; _node = node;
                                 _name = name;
@@ -7907,9 +7925,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEDisks
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEDisks(Client client, object node) { _client = client; _node = node; }
+                        internal PVEDisks(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// List local disks.
                         /// </summary>
@@ -7933,9 +7951,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEConfig
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEConfig(Client client, object node) { _client = client; _node = node; }
+                        internal PVEConfig(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Get Ceph configuration.
                         /// </summary>
@@ -7950,9 +7968,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEConfigdb
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEConfigdb(Client client, object node) { _client = client; _node = node; }
+                        internal PVEConfigdb(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Get Ceph configuration database.
                         /// </summary>
@@ -7967,9 +7985,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEInit
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEInit(Client client, object node) { _client = client; _node = node; }
+                        internal PVEInit(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Create initial ceph default configuration and setup symlinks.
                         /// </summary>
@@ -8006,9 +8024,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEStop
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEStop(Client client, object node) { _client = client; _node = node; }
+                        internal PVEStop(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Stop ceph services.
                         /// </summary>
@@ -8030,9 +8048,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEStart
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEStart(Client client, object node) { _client = client; _node = node; }
+                        internal PVEStart(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Start ceph services.
                         /// </summary>
@@ -8054,9 +8072,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVERestart
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVERestart(Client client, object node) { _client = client; _node = node; }
+                        internal PVERestart(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Restart ceph services.
                         /// </summary>
@@ -8078,9 +8096,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEStatus
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEStatus(Client client, object node) { _client = client; _node = node; }
+                        internal PVEStatus(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Get ceph status.
                         /// </summary>
@@ -8095,16 +8113,16 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEPools
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEPools(Client client, object node) { _client = client; _node = node; }
+                        internal PVEPools(PveClient client, object node) { _client = client; _node = node; }
                         public PVEItemName this[object name] => new PVEItemName(_client, _node, name);
                         public class PVEItemName
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _name;
-                            internal PVEItemName(Client client, object node, object name)
+                            internal PVEItemName(PveClient client, object node, object name)
                             {
                                 _client = client; _node = node;
                                 _name = name;
@@ -8183,16 +8201,16 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEFlags
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEFlags(Client client, object node) { _client = client; _node = node; }
+                        internal PVEFlags(PveClient client, object node) { _client = client; _node = node; }
                         public PVEItemFlag this[object flag] => new PVEItemFlag(_client, _node, flag);
                         public class PVEItemFlag
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _flag;
-                            internal PVEItemFlag(Client client, object node, object flag)
+                            internal PVEItemFlag(PveClient client, object node, object flag)
                             {
                                 _client = client; _node = node;
                                 _flag = flag;
@@ -8234,9 +8252,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVECrush
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVECrush(Client client, object node) { _client = client; _node = node; }
+                        internal PVECrush(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Get OSD crush map
                         /// </summary>
@@ -8251,9 +8269,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVELog
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVELog(Client client, object node) { _client = client; _node = node; }
+                        internal PVELog(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Read ceph log
                         /// </summary>
@@ -8278,9 +8296,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVERules
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVERules(Client client, object node) { _client = client; _node = node; }
+                        internal PVERules(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// List ceph rules.
                         /// </summary>
@@ -8307,16 +8325,16 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEVzdump
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEVzdump(Client client, object node) { _client = client; _node = node; }
+                    internal PVEVzdump(PveClient client, object node) { _client = client; _node = node; }
                     private PVEExtractconfig _extractconfig;
                     public PVEExtractconfig Extractconfig => _extractconfig ?? (_extractconfig = new PVEExtractconfig(_client, _node));
                     public class PVEExtractconfig
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEExtractconfig(Client client, object node) { _client = client; _node = node; }
+                        internal PVEExtractconfig(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Extract configuration from vzdump backup archive.
                         /// </summary>
@@ -8435,16 +8453,16 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEServices
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEServices(Client client, object node) { _client = client; _node = node; }
+                    internal PVEServices(PveClient client, object node) { _client = client; _node = node; }
                     public PVEItemService this[object service] => new PVEItemService(_client, _node, service);
                     public class PVEItemService
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
                         private readonly object _service;
-                        internal PVEItemService(Client client, object node, object service)
+                        internal PVEItemService(PveClient client, object node, object service)
                         {
                             _client = client; _node = node;
                             _service = service;
@@ -8461,10 +8479,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         public PVEReload Reload => _reload ?? (_reload = new PVEReload(_client, _node, _service));
                         public class PVEState
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _service;
-                            internal PVEState(Client client, object node, object service)
+                            internal PVEState(PveClient client, object node, object service)
                             {
                                 _client = client; _node = node;
                                 _service = service;
@@ -8483,10 +8501,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEStart
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _service;
-                            internal PVEStart(Client client, object node, object service)
+                            internal PVEStart(PveClient client, object node, object service)
                             {
                                 _client = client; _node = node;
                                 _service = service;
@@ -8505,10 +8523,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEStop
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _service;
-                            internal PVEStop(Client client, object node, object service)
+                            internal PVEStop(PveClient client, object node, object service)
                             {
                                 _client = client; _node = node;
                                 _service = service;
@@ -8527,10 +8545,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVERestart
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _service;
-                            internal PVERestart(Client client, object node, object service)
+                            internal PVERestart(PveClient client, object node, object service)
                             {
                                 _client = client; _node = node;
                                 _service = service;
@@ -8549,10 +8567,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEReload
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _service;
-                            internal PVEReload(Client client, object node, object service)
+                            internal PVEReload(PveClient client, object node, object service)
                             {
                                 _client = client; _node = node;
                                 _service = service;
@@ -8595,9 +8613,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVESubscription
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVESubscription(Client client, object node) { _client = client; _node = node; }
+                    internal PVESubscription(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Read subscription info.
                     /// </summary>
@@ -8648,16 +8666,16 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVENetwork
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVENetwork(Client client, object node) { _client = client; _node = node; }
+                    internal PVENetwork(PveClient client, object node) { _client = client; _node = node; }
                     public PVEItemIface this[object iface] => new PVEItemIface(_client, _node, iface);
                     public class PVEItemIface
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
                         private readonly object _iface;
-                        internal PVEItemIface(Client client, object node, object iface)
+                        internal PVEItemIface(PveClient client, object node, object iface)
                         {
                             _client = client; _node = node;
                             _iface = iface;
@@ -8910,16 +8928,16 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVETasks
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVETasks(Client client, object node) { _client = client; _node = node; }
+                    internal PVETasks(PveClient client, object node) { _client = client; _node = node; }
                     public PVEItemUpid this[object upid] => new PVEItemUpid(_client, _node, upid);
                     public class PVEItemUpid
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
                         private readonly object _upid;
-                        internal PVEItemUpid(Client client, object node, object upid)
+                        internal PVEItemUpid(PveClient client, object node, object upid)
                         {
                             _client = client; _node = node;
                             _upid = upid;
@@ -8930,10 +8948,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         public PVEStatus Status => _status ?? (_status = new PVEStatus(_client, _node, _upid));
                         public class PVELog
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _upid;
-                            internal PVELog(Client client, object node, object upid)
+                            internal PVELog(PveClient client, object node, object upid)
                             {
                                 _client = client; _node = node;
                                 _upid = upid;
@@ -8962,10 +8980,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEStatus
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _upid;
-                            internal PVEStatus(Client client, object node, object upid)
+                            internal PVEStatus(PveClient client, object node, object upid)
                             {
                                 _client = client; _node = node;
                                 _upid = upid;
@@ -9046,9 +9064,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEScan
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEScan(Client client, object node) { _client = client; _node = node; }
+                    internal PVEScan(PveClient client, object node) { _client = client; _node = node; }
                     private PVEZfs _zfs;
                     public PVEZfs Zfs => _zfs ?? (_zfs = new PVEZfs(_client, _node));
                     private PVENfs _nfs;
@@ -9067,9 +9085,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     public PVEUsb Usb => _usb ?? (_usb = new PVEUsb(_client, _node));
                     public class PVEZfs
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEZfs(Client client, object node) { _client = client; _node = node; }
+                        internal PVEZfs(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Scan zfs pool list on local node.
                         /// </summary>
@@ -9084,9 +9102,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVENfs
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVENfs(Client client, object node) { _client = client; _node = node; }
+                        internal PVENfs(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Scan remote NFS server.
                         /// </summary>
@@ -9108,9 +9126,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVECifs
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVECifs(Client client, object node) { _client = client; _node = node; }
+                        internal PVECifs(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Scan remote CIFS server.
                         /// </summary>
@@ -9141,9 +9159,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEGlusterfs
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEGlusterfs(Client client, object node) { _client = client; _node = node; }
+                        internal PVEGlusterfs(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Scan remote GlusterFS server.
                         /// </summary>
@@ -9165,9 +9183,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEIscsi
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEIscsi(Client client, object node) { _client = client; _node = node; }
+                        internal PVEIscsi(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Scan remote iSCSI server.
                         /// </summary>
@@ -9189,9 +9207,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVELvm
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVELvm(Client client, object node) { _client = client; _node = node; }
+                        internal PVELvm(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// List local LVM volume groups.
                         /// </summary>
@@ -9206,9 +9224,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVELvmthin
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVELvmthin(Client client, object node) { _client = client; _node = node; }
+                        internal PVELvmthin(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// List local LVM Thin Pools.
                         /// </summary>
@@ -9230,9 +9248,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEUsb
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEUsb(Client client, object node) { _client = client; _node = node; }
+                        internal PVEUsb(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// List local USB devices.
                         /// </summary>
@@ -9259,23 +9277,23 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEHardware
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEHardware(Client client, object node) { _client = client; _node = node; }
+                    internal PVEHardware(PveClient client, object node) { _client = client; _node = node; }
                     private PVEPci _pci;
                     public PVEPci Pci => _pci ?? (_pci = new PVEPci(_client, _node));
                     public class PVEPci
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEPci(Client client, object node) { _client = client; _node = node; }
+                        internal PVEPci(PveClient client, object node) { _client = client; _node = node; }
                         public PVEItemPciid this[object pciid] => new PVEItemPciid(_client, _node, pciid);
                         public class PVEItemPciid
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _pciid;
-                            internal PVEItemPciid(Client client, object node, object pciid)
+                            internal PVEItemPciid(PveClient client, object node, object pciid)
                             {
                                 _client = client; _node = node;
                                 _pciid = pciid;
@@ -9284,10 +9302,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             public PVEMdev Mdev => _mdev ?? (_mdev = new PVEMdev(_client, _node, _pciid));
                             public class PVEMdev
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _pciid;
-                                internal PVEMdev(Client client, object node, object pciid)
+                                internal PVEMdev(PveClient client, object node, object pciid)
                                 {
                                     _client = client; _node = node;
                                     _pciid = pciid;
@@ -9352,16 +9370,16 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEStorage
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEStorage(Client client, object node) { _client = client; _node = node; }
+                    internal PVEStorage(PveClient client, object node) { _client = client; _node = node; }
                     public PVEItemStorage this[object storage] => new PVEItemStorage(_client, _node, storage);
                     public class PVEItemStorage
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
                         private readonly object _storage;
-                        internal PVEItemStorage(Client client, object node, object storage)
+                        internal PVEItemStorage(PveClient client, object node, object storage)
                         {
                             _client = client; _node = node;
                             _storage = storage;
@@ -9378,10 +9396,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         public PVEUpload Upload => _upload ?? (_upload = new PVEUpload(_client, _node, _storage));
                         public class PVEContent
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _storage;
-                            internal PVEContent(Client client, object node, object storage)
+                            internal PVEContent(PveClient client, object node, object storage)
                             {
                                 _client = client; _node = node;
                                 _storage = storage;
@@ -9389,11 +9407,11 @@ namespace Corsinvest.ProxmoxVE.Api
                             public PVEItemVolume this[object volume] => new PVEItemVolume(_client, _node, _storage, volume);
                             public class PVEItemVolume
                             {
-                                private readonly Client _client;
+                                private readonly PveClient _client;
                                 private readonly object _node;
                                 private readonly object _storage;
                                 private readonly object _volume;
-                                internal PVEItemVolume(Client client, object node, object storage, object volume)
+                                internal PVEItemVolume(PveClient client, object node, object storage, object volume)
                                 {
                                     _client = client; _node = node;
                                     _storage = storage;
@@ -9496,10 +9514,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEStatus
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _storage;
-                            internal PVEStatus(Client client, object node, object storage)
+                            internal PVEStatus(PveClient client, object node, object storage)
                             {
                                 _client = client; _node = node;
                                 _storage = storage;
@@ -9518,10 +9536,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVERrd
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _storage;
-                            internal PVERrd(Client client, object node, object storage)
+                            internal PVERrd(PveClient client, object node, object storage)
                             {
                                 _client = client; _node = node;
                                 _storage = storage;
@@ -9557,10 +9575,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVERrddata
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _storage;
-                            internal PVERrddata(Client client, object node, object storage)
+                            internal PVERrddata(PveClient client, object node, object storage)
                             {
                                 _client = client; _node = node;
                                 _storage = storage;
@@ -9593,10 +9611,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEUpload
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _storage;
-                            internal PVEUpload(Client client, object node, object storage)
+                            internal PVEUpload(PveClient client, object node, object storage)
                             {
                                 _client = client; _node = node;
                                 _storage = storage;
@@ -9671,9 +9689,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEDisks
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEDisks(Client client, object node) { _client = client; _node = node; }
+                    internal PVEDisks(PveClient client, object node) { _client = client; _node = node; }
                     private PVELvm _lvm;
                     public PVELvm Lvm => _lvm ?? (_lvm = new PVELvm(_client, _node));
                     private PVELvmthin _lvmthin;
@@ -9690,9 +9708,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     public PVEInitgpt Initgpt => _initgpt ?? (_initgpt = new PVEInitgpt(_client, _node));
                     public class PVELvm
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVELvm(Client client, object node) { _client = client; _node = node; }
+                        internal PVELvm(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// List LVM Volume Groups
                         /// </summary>
@@ -9731,9 +9749,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVELvmthin
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVELvmthin(Client client, object node) { _client = client; _node = node; }
+                        internal PVELvmthin(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// List LVM thinpools
                         /// </summary>
@@ -9772,9 +9790,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEDirectory
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEDirectory(Client client, object node) { _client = client; _node = node; }
+                        internal PVEDirectory(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// PVE Managed Directory storages.
                         /// </summary>
@@ -9818,16 +9836,16 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEZfs
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEZfs(Client client, object node) { _client = client; _node = node; }
+                        internal PVEZfs(PveClient client, object node) { _client = client; _node = node; }
                         public PVEItemName this[object name] => new PVEItemName(_client, _node, name);
                         public class PVEItemName
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _name;
-                            internal PVEItemName(Client client, object node, object name)
+                            internal PVEItemName(PveClient client, object node, object name)
                             {
                                 _client = client; _node = node;
                                 _name = name;
@@ -9895,9 +9913,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEList
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEList(Client client, object node) { _client = client; _node = node; }
+                        internal PVEList(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// List local disks.
                         /// </summary>
@@ -9924,9 +9942,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVESmart
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVESmart(Client client, object node) { _client = client; _node = node; }
+                        internal PVESmart(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Get SMART Health of a disk.
                         /// </summary>
@@ -9951,9 +9969,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEInitgpt
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEInitgpt(Client client, object node) { _client = client; _node = node; }
+                        internal PVEInitgpt(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Initialize Disk with GPT
                         /// </summary>
@@ -9990,9 +10008,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEApt
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEApt(Client client, object node) { _client = client; _node = node; }
+                    internal PVEApt(PveClient client, object node) { _client = client; _node = node; }
                     private PVEUpdate _update;
                     public PVEUpdate Update => _update ?? (_update = new PVEUpdate(_client, _node));
                     private PVEChangelog _changelog;
@@ -10001,9 +10019,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     public PVEVersions Versions => _versions ?? (_versions = new PVEVersions(_client, _node));
                     public class PVEUpdate
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEUpdate(Client client, object node) { _client = client; _node = node; }
+                        internal PVEUpdate(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// List available updates.
                         /// </summary>
@@ -10039,9 +10057,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEChangelog
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEChangelog(Client client, object node) { _client = client; _node = node; }
+                        internal PVEChangelog(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Get package changelogs.
                         /// </summary>
@@ -10066,9 +10084,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEVersions
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEVersions(Client client, object node) { _client = client; _node = node; }
+                        internal PVEVersions(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Get package information for important Proxmox packages.
                         /// </summary>
@@ -10095,9 +10113,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEFirewall
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEFirewall(Client client, object node) { _client = client; _node = node; }
+                    internal PVEFirewall(PveClient client, object node) { _client = client; _node = node; }
                     private PVERules _rules;
                     public PVERules Rules => _rules ?? (_rules = new PVERules(_client, _node));
                     private PVEOptions _options;
@@ -10106,16 +10124,16 @@ namespace Corsinvest.ProxmoxVE.Api
                     public PVELog Log => _log ?? (_log = new PVELog(_client, _node));
                     public class PVERules
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVERules(Client client, object node) { _client = client; _node = node; }
+                        internal PVERules(PveClient client, object node) { _client = client; _node = node; }
                         public PVEItemPos this[object pos] => new PVEItemPos(_client, _node, pos);
                         public class PVEItemPos
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _pos;
-                            internal PVEItemPos(Client client, object node, object pos)
+                            internal PVEItemPos(PveClient client, object node, object pos)
                             {
                                 _client = client; _node = node;
                                 _pos = pos;
@@ -10289,9 +10307,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEOptions
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEOptions(Client client, object node) { _client = client; _node = node; }
+                        internal PVEOptions(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Get host firewall options.
                         /// </summary>
@@ -10371,9 +10389,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVELog
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVELog(Client client, object node) { _client = client; _node = node; }
+                        internal PVELog(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Read firewall log
                         /// </summary>
@@ -10410,16 +10428,16 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEReplication
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEReplication(Client client, object node) { _client = client; _node = node; }
+                    internal PVEReplication(PveClient client, object node) { _client = client; _node = node; }
                     public PVEItemId this[object id] => new PVEItemId(_client, _node, id);
                     public class PVEItemId
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
                         private readonly object _id;
-                        internal PVEItemId(Client client, object node, object id)
+                        internal PVEItemId(PveClient client, object node, object id)
                         {
                             _client = client; _node = node;
                             _id = id;
@@ -10432,10 +10450,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         public PVEScheduleNow ScheduleNow => _scheduleNow ?? (_scheduleNow = new PVEScheduleNow(_client, _node, _id));
                         public class PVEStatus
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _id;
-                            internal PVEStatus(Client client, object node, object id)
+                            internal PVEStatus(PveClient client, object node, object id)
                             {
                                 _client = client; _node = node;
                                 _id = id;
@@ -10454,10 +10472,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVELog
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _id;
-                            internal PVELog(Client client, object node, object id)
+                            internal PVELog(PveClient client, object node, object id)
                             {
                                 _client = client; _node = node;
                                 _id = id;
@@ -10486,10 +10504,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         }
                         public class PVEScheduleNow
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _id;
-                            internal PVEScheduleNow(Client client, object node, object id)
+                            internal PVEScheduleNow(PveClient client, object node, object id)
                             {
                                 _client = client; _node = node;
                                 _id = id;
@@ -10539,9 +10557,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVECertificates
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVECertificates(Client client, object node) { _client = client; _node = node; }
+                    internal PVECertificates(PveClient client, object node) { _client = client; _node = node; }
                     private PVEAcme _acme;
                     public PVEAcme Acme => _acme ?? (_acme = new PVEAcme(_client, _node));
                     private PVEInfo _info;
@@ -10550,16 +10568,16 @@ namespace Corsinvest.ProxmoxVE.Api
                     public PVECustom Custom => _custom ?? (_custom = new PVECustom(_client, _node));
                     public class PVEAcme
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEAcme(Client client, object node) { _client = client; _node = node; }
+                        internal PVEAcme(PveClient client, object node) { _client = client; _node = node; }
                         private PVECertificate _certificate;
                         public PVECertificate Certificate => _certificate ?? (_certificate = new PVECertificate(_client, _node));
                         public class PVECertificate
                         {
-                            private readonly Client _client;
+                            private readonly PveClient _client;
                             private readonly object _node;
-                            internal PVECertificate(Client client, object node) { _client = client; _node = node; }
+                            internal PVECertificate(PveClient client, object node) { _client = client; _node = node; }
                             /// <summary>
                             /// Revoke existing certificate from CA.
                             /// </summary>
@@ -10622,9 +10640,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVEInfo
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVEInfo(Client client, object node) { _client = client; _node = node; }
+                        internal PVEInfo(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// Get information about node's certificates.
                         /// </summary>
@@ -10639,9 +10657,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                     public class PVECustom
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _node;
-                        internal PVECustom(Client client, object node) { _client = client; _node = node; }
+                        internal PVECustom(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
                         /// DELETE custom certificate chain and key.
                         /// </summary>
@@ -10702,9 +10720,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEConfig
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEConfig(Client client, object node) { _client = client; _node = node; }
+                    internal PVEConfig(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Get node configuration options.
                     /// </summary>
@@ -10749,9 +10767,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEVersion
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEVersion(Client client, object node) { _client = client; _node = node; }
+                    internal PVEVersion(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// API version details
                     /// </summary>
@@ -10766,9 +10784,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEStatus
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEStatus(Client client, object node) { _client = client; _node = node; }
+                    internal PVEStatus(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Read node status
                     /// </summary>
@@ -10803,9 +10821,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVENetstat
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVENetstat(Client client, object node) { _client = client; _node = node; }
+                    internal PVENetstat(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Read tap/vm network device interface counters
                     /// </summary>
@@ -10820,9 +10838,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEExecute
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEExecute(Client client, object node) { _client = client; _node = node; }
+                    internal PVEExecute(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Execute multiple commands in order.
                     /// </summary>
@@ -10844,9 +10862,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEWakeonlan
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEWakeonlan(Client client, object node) { _client = client; _node = node; }
+                    internal PVEWakeonlan(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Try to wake a node via 'wake on LAN' network packet.
                     /// </summary>
@@ -10861,9 +10879,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVERrd
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVERrd(Client client, object node) { _client = client; _node = node; }
+                    internal PVERrd(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Read node RRD statistics (returns PNG)
                     /// </summary>
@@ -10895,9 +10913,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVERrddata
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVERrddata(Client client, object node) { _client = client; _node = node; }
+                    internal PVERrddata(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Read node RRD statistics
                     /// </summary>
@@ -10926,9 +10944,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVESyslog
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVESyslog(Client client, object node) { _client = client; _node = node; }
+                    internal PVESyslog(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Read system log
                     /// </summary>
@@ -10962,9 +10980,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEJournal
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEJournal(Client client, object node) { _client = client; _node = node; }
+                    internal PVEJournal(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Read Journal
                     /// </summary>
@@ -10998,9 +11016,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEVncshell
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEVncshell(Client client, object node) { _client = client; _node = node; }
+                    internal PVEVncshell(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Creates a VNC Shell proxy.
                     /// </summary>
@@ -11036,9 +11054,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVETermproxy
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVETermproxy(Client client, object node) { _client = client; _node = node; }
+                    internal PVETermproxy(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Creates a VNC Shell proxy.
                     /// </summary>
@@ -11065,9 +11083,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEVncwebsocket
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEVncwebsocket(Client client, object node) { _client = client; _node = node; }
+                    internal PVEVncwebsocket(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Opens a weksocket for VNC traffic.
                     /// </summary>
@@ -11092,9 +11110,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVESpiceshell
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVESpiceshell(Client client, object node) { _client = client; _node = node; }
+                    internal PVESpiceshell(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Creates a SPICE shell.
                     /// </summary>
@@ -11124,9 +11142,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEDns
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEDns(Client client, object node) { _client = client; _node = node; }
+                    internal PVEDns(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Read DNS settings.
                     /// </summary>
@@ -11168,9 +11186,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVETime
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVETime(Client client, object node) { _client = client; _node = node; }
+                    internal PVETime(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Read server time and time zone settings.
                     /// </summary>
@@ -11203,9 +11221,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEAplinfo
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEAplinfo(Client client, object node) { _client = client; _node = node; }
+                    internal PVEAplinfo(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Get list of appliances.
                     /// </summary>
@@ -11241,9 +11259,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEReport
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEReport(Client client, object node) { _client = client; _node = node; }
+                    internal PVEReport(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Gather various systems information about a node
                     /// </summary>
@@ -11258,9 +11276,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEStartall
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEStartall(Client client, object node) { _client = client; _node = node; }
+                    internal PVEStartall(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Start all VMs and containers (when onboot=1).
                     /// </summary>
@@ -11285,9 +11303,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEStopall
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEStopall(Client client, object node) { _client = client; _node = node; }
+                    internal PVEStopall(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Stop all VMs and Containers.
                     /// </summary>
@@ -11309,9 +11327,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEMigrateall
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEMigrateall(Client client, object node) { _client = client; _node = node; }
+                    internal PVEMigrateall(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Migrate all VMs and Containers.
                     /// </summary>
@@ -11339,9 +11357,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
                 public class PVEHosts
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _node;
-                    internal PVEHosts(Client client, object node) { _client = client; _node = node; }
+                    internal PVEHosts(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
                     /// Get the content of /etc/hosts.
                     /// </summary>
@@ -11401,15 +11419,15 @@ namespace Corsinvest.ProxmoxVE.Api
         }
         public class PVEStorage
         {
-            private readonly Client _client;
+            private readonly PveClient _client;
 
-            internal PVEStorage(Client client) { _client = client; }
+            internal PVEStorage(PveClient client) { _client = client; }
             public PVEItemStorage this[object storage] => new PVEItemStorage(_client, storage);
             public class PVEItemStorage
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
                 private readonly object _storage;
-                internal PVEItemStorage(Client client, object storage) { _client = client; _storage = storage; }
+                internal PVEItemStorage(PveClient client, object storage) { _client = client; _storage = storage; }
                 /// <summary>
                 /// Delete storage configuration.
                 /// </summary>
@@ -11733,9 +11751,9 @@ namespace Corsinvest.ProxmoxVE.Api
         }
         public class PVEAccess
         {
-            private readonly Client _client;
+            private readonly PveClient _client;
 
-            internal PVEAccess(Client client) { _client = client; }
+            internal PVEAccess(PveClient client) { _client = client; }
             private PVEUsers _users;
             public PVEUsers Users => _users ?? (_users = new PVEUsers(_client));
             private PVEGroups _groups;
@@ -11754,22 +11772,22 @@ namespace Corsinvest.ProxmoxVE.Api
             public PVETfa Tfa => _tfa ?? (_tfa = new PVETfa(_client));
             public class PVEUsers
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVEUsers(Client client) { _client = client; }
+                internal PVEUsers(PveClient client) { _client = client; }
                 public PVEItemUserid this[object userid] => new PVEItemUserid(_client, userid);
                 public class PVEItemUserid
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _userid;
-                    internal PVEItemUserid(Client client, object userid) { _client = client; _userid = userid; }
+                    internal PVEItemUserid(PveClient client, object userid) { _client = client; _userid = userid; }
                     private PVETfa _tfa;
                     public PVETfa Tfa => _tfa ?? (_tfa = new PVETfa(_client, _userid));
                     public class PVETfa
                     {
-                        private readonly Client _client;
+                        private readonly PveClient _client;
                         private readonly object _userid;
-                        internal PVETfa(Client client, object userid) { _client = client; _userid = userid; }
+                        internal PVETfa(PveClient client, object userid) { _client = client; _userid = userid; }
                         /// <summary>
                         /// Get user TFA types (Personal and Realm).
                         /// </summary>
@@ -11913,15 +11931,15 @@ namespace Corsinvest.ProxmoxVE.Api
             }
             public class PVEGroups
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVEGroups(Client client) { _client = client; }
+                internal PVEGroups(PveClient client) { _client = client; }
                 public PVEItemGroupid this[object groupid] => new PVEItemGroupid(_client, groupid);
                 public class PVEItemGroupid
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _groupid;
-                    internal PVEItemGroupid(Client client, object groupid) { _client = client; _groupid = groupid; }
+                    internal PVEItemGroupid(PveClient client, object groupid) { _client = client; _groupid = groupid; }
                     /// <summary>
                     /// Delete group.
                     /// </summary>
@@ -11998,15 +12016,15 @@ namespace Corsinvest.ProxmoxVE.Api
             }
             public class PVERoles
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVERoles(Client client) { _client = client; }
+                internal PVERoles(PveClient client) { _client = client; }
                 public PVEItemRoleid this[object roleid] => new PVEItemRoleid(_client, roleid);
                 public class PVEItemRoleid
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _roleid;
-                    internal PVEItemRoleid(Client client, object roleid) { _client = client; _roleid = roleid; }
+                    internal PVEItemRoleid(PveClient client, object roleid) { _client = client; _roleid = roleid; }
                     /// <summary>
                     /// Delete role.
                     /// </summary>
@@ -12086,9 +12104,9 @@ namespace Corsinvest.ProxmoxVE.Api
             }
             public class PVEAcl
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVEAcl(Client client) { _client = client; }
+                internal PVEAcl(PveClient client) { _client = client; }
                 /// <summary>
                 /// Get Access Control List (ACLs).
                 /// </summary>
@@ -12136,15 +12154,15 @@ namespace Corsinvest.ProxmoxVE.Api
             }
             public class PVEDomains
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVEDomains(Client client) { _client = client; }
+                internal PVEDomains(PveClient client) { _client = client; }
                 public PVEItemRealm this[object realm] => new PVEItemRealm(_client, realm);
                 public class PVEItemRealm
                 {
-                    private readonly Client _client;
+                    private readonly PveClient _client;
                     private readonly object _realm;
-                    internal PVEItemRealm(Client client, object realm) { _client = client; _realm = realm; }
+                    internal PVEItemRealm(PveClient client, object realm) { _client = client; _realm = realm; }
                     /// <summary>
                     /// Delete an authentication server.
                     /// </summary>
@@ -12316,9 +12334,9 @@ namespace Corsinvest.ProxmoxVE.Api
             }
             public class PVETicket
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVETicket(Client client) { _client = client; }
+                internal PVETicket(PveClient client) { _client = client; }
                 /// <summary>
                 /// Dummy. Useful for formatters which want to provide a login page.
                 /// </summary>
@@ -12366,9 +12384,9 @@ namespace Corsinvest.ProxmoxVE.Api
             }
             public class PVEPassword
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVEPassword(Client client) { _client = client; }
+                internal PVEPassword(PveClient client) { _client = client; }
                 /// <summary>
                 /// Change user password.
                 /// </summary>
@@ -12393,9 +12411,9 @@ namespace Corsinvest.ProxmoxVE.Api
             }
             public class PVETfa
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
 
-                internal PVETfa(Client client) { _client = client; }
+                internal PVETfa(PveClient client) { _client = client; }
                 /// <summary>
                 /// Finish a u2f challenge.
                 /// </summary>
@@ -12464,15 +12482,15 @@ namespace Corsinvest.ProxmoxVE.Api
         }
         public class PVEPools
         {
-            private readonly Client _client;
+            private readonly PveClient _client;
 
-            internal PVEPools(Client client) { _client = client; }
+            internal PVEPools(PveClient client) { _client = client; }
             public PVEItemPoolid this[object poolid] => new PVEItemPoolid(_client, poolid);
             public class PVEItemPoolid
             {
-                private readonly Client _client;
+                private readonly PveClient _client;
                 private readonly object _poolid;
-                internal PVEItemPoolid(Client client, object poolid) { _client = client; _poolid = poolid; }
+                internal PVEItemPoolid(PveClient client, object poolid) { _client = client; _poolid = poolid; }
                 /// <summary>
                 /// Delete pool.
                 /// </summary>
@@ -12558,9 +12576,9 @@ namespace Corsinvest.ProxmoxVE.Api
         }
         public class PVEVersion
         {
-            private readonly Client _client;
+            private readonly PveClient _client;
 
-            internal PVEVersion(Client client) { _client = client; }
+            internal PVEVersion(PveClient client) { _client = client; }
             /// <summary>
             /// API version details. The result also includes the global datacenter confguration.
             /// </summary>
@@ -12573,6 +12591,5 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <returns></returns>
             public Result Version() => GetRest();
         }
-
     }
 }

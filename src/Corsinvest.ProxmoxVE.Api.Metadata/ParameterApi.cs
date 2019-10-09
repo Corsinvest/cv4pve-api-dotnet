@@ -1,3 +1,21 @@
+/*
+ * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
+ * Copyright (C) 2016 Corsinvest Srl
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -69,6 +87,23 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
         public List<ParameterFormatApi> Formats { get; } = new List<ParameterFormatApi>();
 
         /// <summary>
+        /// Get alignment value
+        /// </summary>
+        /// <returns></returns>
+        public string GetAlignmentValue()
+        {
+            switch (Renderer)
+            {
+                case "fraction_as_percentage": return "R";
+                case "bytes": return "R";
+                case "duration": return "R";
+                case "timestamp": return "R";
+                case "timestamp_gmt": return "R";
+                default: return "L";
+            }
+        }
+
+        /// <summary>
         /// Renderer value.
         /// </summary>
         /// <param name="value"></param>
@@ -78,20 +113,40 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
             switch (Renderer)
             {
                 case "fraction_as_percentage":
-                    if (double.TryParse(value.ToString(), out var percValue) && percValue > 0)
+                    if (double.TryParse(value.ToString(), out var perValue) && perValue > 0)
                     {
-                        value = Math.Round(percValue * 100, 2) + "%";
+                        value = Math.Round(perValue * 100, 2) + "%";
+                    }
+                    else
+                    {
+                        value = "";
                     }
                     break;
 
                 case "bytes":
-                    if (long.TryParse(value.ToString(), out var bytesValue))
+                    if (long.TryParse(value.ToString(), out var bytesValue) && bytesValue > 0)
                     {
-                        if (bytesValue > Math.Pow(1024, 4)) { value = Math.Round(bytesValue / Math.Pow(1024, 4), 2) + " TiB"; }
-                        else if (bytesValue > Math.Pow(1024, 3)) { value = Math.Round(bytesValue / Math.Pow(1024, 3), 2) + " GiB"; }
-                        else if (bytesValue > Math.Pow(1024, 2)) { value = Math.Round(bytesValue / Math.Pow(1024, 2), 2) + " MiB"; }
-                        else if (bytesValue > 1024) { value = Math.Round(bytesValue / 1024.0, 0) + " KiB"; }
+                        if (bytesValue > Math.Pow(1024, 4))
+                        {
+                            value = Math.Round(bytesValue / Math.Pow(1024, 4), 2) + " TiB";
+                        }
+                        else if (bytesValue > Math.Pow(1024, 3))
+                        {
+                            value = Math.Round(bytesValue / Math.Pow(1024, 3), 2) + " GiB";
+                        }
+                        else if (bytesValue > Math.Pow(1024, 2))
+                        {
+                            value = Math.Round(bytesValue / Math.Pow(1024, 2), 2) + " MiB";
+                        }
+                        else if (bytesValue > 1024)
+                        {
+                            value = Math.Round(bytesValue / 1024.0, 0) + " KiB";
+                        }
                         else { value = bytesValue + " B"; }
+                    }
+                    else
+                    {
+                        value = "";
                     }
                     break;
 

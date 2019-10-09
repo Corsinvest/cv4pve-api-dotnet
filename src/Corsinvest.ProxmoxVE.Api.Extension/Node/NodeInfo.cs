@@ -1,5 +1,23 @@
-﻿using System;
-using Corsinvest.ProxmoxVE.Api.Extension.Utils;
+﻿/*
+ * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
+ * Copyright (C) 2016 Corsinvest Srl
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using System;
+using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
 using Corsinvest.ProxmoxVE.Api.Extension.VM;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Node
@@ -9,7 +27,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
     /// </summary>
     public class NodeInfo : BaseInfo
     {
-        internal NodeInfo(Client client, object apiData) : base(client, apiData) { }
+        internal NodeInfo(PveClient client, object apiData) : base(client, apiData) { }
 
         /// <summary>
         /// Identifier
@@ -57,6 +75,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         public string Status => ApiData.status;
 
         /// <summary>
+        /// Check is Online
+        /// </summary>
+        public bool IsOnline => Status == "online";
+
+        /// <summary>
         /// Type
         /// </summary>
         public string Type => ApiData.type;
@@ -70,7 +93,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         /// 
         /// </summary>
         /// <returns></returns>
-        public static string[] GetTitlesInfo() => new string[] { "NODE", "CPU", "MEM(GB)", "DISK(GB)", "UPTIME", "STATUS", "TYPE" };
+        public static string[] GetTitlesInfo() 
+            => new[] { "NODE", "CPU", "MEM(GB)", "DISK(GB)", "UPTIME", "STATUS", "TYPE" };
 
         /// <summary>
         /// Row info

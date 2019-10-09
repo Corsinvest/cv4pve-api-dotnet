@@ -1,4 +1,22 @@
-﻿using System;
+﻿/*
+ * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
+ * Copyright (C) 2016 Corsinvest Srl
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -12,7 +30,7 @@ namespace Corsinvest.ProxmoxVE.Api
     /// <summary>
     /// Proxmox VE Client Base
     /// </summary>
-    public class ClientBase
+    public class PveClientBase
     {
         private string _ticketCSRFPreventionToken;
         private string _ticketPVEAuthCookie;
@@ -22,7 +40,7 @@ namespace Corsinvest.ProxmoxVE.Api
         /// </summary>
         /// <param name="hostname"></param>
         /// <param name="port"></param>
-        public ClientBase(string hostname, int port = 8006)
+        public PveClientBase(string hostname, int port = 8006)
         {
             Hostname = hostname;
             Port = port;
@@ -49,12 +67,13 @@ namespace Corsinvest.ProxmoxVE.Api
         /// 1 - Url and method
         /// 2 - Url and method and result
         /// </summary>
-        public int DebugLevel { get; set; } = 0;
+        public int DebugLevel { get; set; }
 
         /// <summary>
         /// Returns the base URL used to interact with the Proxmox VE API. 
         /// </summary>
-        public string GetApiUrl() => $"https://{Hostname}:{Port}/api2/{Enum.GetName(typeof(ResponseType), ResponseType).ToLower()}";
+        public string GetApiUrl()
+            => $"https://{Hostname}:{Port}/api2/{Enum.GetName(typeof(ResponseType), ResponseType).ToLower()}";
 
         /// <summary>
         /// Convert object to JSON.
@@ -72,7 +91,7 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="realm"></param>
         public bool Login(string userName, string password, string realm = "pam")
         {
-            var ticket = Create($"/access/ticket",
+            var ticket = Create("/access/ticket",
                                 new Dictionary<string, object>()
                                 {
                                     {"password", password},
@@ -113,7 +132,8 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="resource">Url request</param>
         /// <param name="parameters">Additional parameters</param>
         /// <returns>Result</returns>
-        public Result Get(string resource, IDictionary<string, object> parameters = null) => ExecuteAction(resource, HttpMethod.Get, parameters);
+        public Result Get(string resource, IDictionary<string, object> parameters = null) 
+            => ExecuteAction(resource, MethodType.Get, parameters);
 
         /// <summary>
         /// Execute Execute method POST
@@ -121,7 +141,8 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="resource">Url request</param>
         /// <param name="parameters">Additional parameters</param>
         /// <returns>Result</returns>
-        public Result Create(string resource, IDictionary<string, object> parameters = null) => ExecuteAction(resource, HttpMethod.Post, parameters);
+        public Result Create(string resource, IDictionary<string, object> parameters = null) 
+            => ExecuteAction(resource, MethodType.Create, parameters);
 
         /// <summary>
         /// Execute Execute method PUT
@@ -129,7 +150,8 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="resource">Url request</param>
         /// <param name="parameters">Additional parameters</param>
         /// <returns>Result</returns>
-        public Result Set(string resource, IDictionary<string, object> parameters = null) => ExecuteAction(resource, HttpMethod.Put, parameters);
+        public Result Set(string resource, IDictionary<string, object> parameters = null) 
+            => ExecuteAction(resource, MethodType.Set, parameters);
 
         /// <summary>
         /// Execute Execute method DELETE
@@ -137,9 +159,12 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="resource">Url request</param>
         /// <param name="parameters">Additional parameters</param>
         /// <returns>Result</returns>
-        public Result Delete(string resource, IDictionary<string, object> parameters = null) => ExecuteAction(resource, HttpMethod.Delete, parameters);
+        public Result Delete(string resource, IDictionary<string, object> parameters = null) 
+            => ExecuteAction(resource, MethodType.Delete, parameters);
 
-        private Result ExecuteAction(string resource, HttpMethod method, IDictionary<string, object> parameters = null)
+        private Result ExecuteAction(string resource,
+                                     MethodType methodType,
+                                     IDictionary<string, object> parameters = null)
         {
             using (var handler = new HttpClientHandler()
             {
@@ -149,6 +174,16 @@ namespace Corsinvest.ProxmoxVE.Api
             using (var client = new HttpClient(handler))
             {
                 client.BaseAddress = new Uri(GetApiUrl());
+
+                var httpMethod = HttpMethod.Get;
+                switch (methodType)
+                {
+                    case MethodType.Get: httpMethod = HttpMethod.Get; break;
+                    case MethodType.Set: httpMethod = HttpMethod.Put; break;
+                    case MethodType.Create: httpMethod = HttpMethod.Post; break;
+                    case MethodType.Delete: httpMethod = HttpMethod.Delete; break;
+                    default: httpMethod = HttpMethod.Get; break;
+                }
 
                 //load parameters
                 var @params = new Dictionary<string, string>();
@@ -163,15 +198,15 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
 
                 var uriString = GetApiUrl() + resource;
-                if (method == HttpMethod.Get && @params.Count > 0)
+                if (httpMethod == HttpMethod.Get && @params.Count > 0)
                 {
                     uriString += "?" + string.Join("&", @params.Select(a => $"{a.Key}={HttpUtility.UrlEncode(a.Value)}"));
                 }
 
                 if (DebugLevel >= 1)
                 {
-                    Console.Out.WriteLine($"Method: {method}, Url: {uriString}");
-                    if (method != HttpMethod.Get)
+                    Console.Out.WriteLine($"Method: {httpMethod}, Url: {uriString}");
+                    if (httpMethod != HttpMethod.Get)
                     {
                         Console.Out.WriteLine("Parameters:");
                         Console.Out.WriteLine(string.Join(Environment.NewLine,
@@ -179,8 +214,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
                 }
 
-                var request = new HttpRequestMessage(method, new Uri(uriString));
-                if (method != HttpMethod.Get) { request.Content = new FormUrlEncodedContent(@params); }
+                var request = new HttpRequestMessage(httpMethod, new Uri(uriString));
+                if (httpMethod != HttpMethod.Get) { request.Content = new FormUrlEncodedContent(@params); }
 
                 //ticket login
                 if (_ticketCSRFPreventionToken != null)
@@ -190,7 +225,6 @@ namespace Corsinvest.ProxmoxVE.Api
                 }
 
                 var response = client.SendAsync(request).Result;
-                dynamic result = null;
 
                 if (DebugLevel >= 2)
                 {
@@ -199,6 +233,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     Console.Out.WriteLine($"IsSuccessStatusCode: {response.IsSuccessStatusCode}");
                 }
 
+                dynamic result = null;
                 switch (ResponseType)
                 {
                     case ResponseType.Json:
@@ -224,7 +259,11 @@ namespace Corsinvest.ProxmoxVE.Api
                 LastResult = new Result(result,
                                         response.StatusCode,
                                         response.ReasonPhrase,
-                                        response.IsSuccessStatusCode);
+                                        response.IsSuccessStatusCode,
+                                        resource,
+                                        parameters,
+                                        methodType,
+                                        ResponseType);
 
                 return LastResult;
             }
@@ -242,7 +281,9 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="parameters"></param>
         /// <param name="name"></param>
         /// <param name="value"></param>
-        public static void AddIndexedParameter(Dictionary<string, object> parameters, string name, IDictionary<int, string> value)
+        public static void AddIndexedParameter(Dictionary<string, object> parameters,
+                                               string name,
+                                               IDictionary<int, string> value)
         {
             if (value == null) { return; }
             foreach (var item in value) { parameters.Add(name + item.Key, item.Value); }
@@ -256,7 +297,7 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="timeOut">Millisecond timeout</param>
         /// <return>O Success</return>
         public int WaitForTaskToFinish(string task, long wait = 500, long timeOut = 10000)
-            => WaitForTaskToFinish(task.Split(':')[1],task,wait,timeOut);
+            => WaitForTaskToFinish(task.Split(':')[1], task, wait, timeOut);
 
         /// <summary>
         /// Wait for task to finish
@@ -292,7 +333,8 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="node"></param>
         /// <param name="task"></param>
         /// <returns></returns>
-        public bool TaskIsRunning(string node, string task) => ReadTaskStatus(node, task).Response.data.status == "running";
+        public bool TaskIsRunning(string node, string task) 
+            => ReadTaskStatus(node, task).Response.data.status == "running";
 
         /// <summary>
         /// Get exists status task.
@@ -300,7 +342,8 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="node"></param>
         /// <param name="task"></param>
         /// <returns></returns>
-        public string GetExitStatusTask(string node, string task) => ReadTaskStatus(node, task).Response.data.exitstatus;
+        public string GetExitStatusTask(string node, string task) 
+            => ReadTaskStatus(node, task).Response.data.exitstatus;
 
         /// <summary>
         /// Read task status.

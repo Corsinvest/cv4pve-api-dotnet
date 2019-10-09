@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
  * Copyright (C) 2016 Corsinvest Srl
  *
@@ -15,22 +15,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
- namespace Corsinvest.ProxmoxVE.Api
+
+namespace Corsinvest.ProxmoxVE.Api
 {
     /// <summary>
-    /// Response type
+    /// Method type
     /// </summary>
-    public enum ResponseType
+    public enum MethodType
     {
         /// <summary>
-        /// Json
+        /// Get
         /// </summary>
-        Json,
+        Get,
 
         /// <summary>
-        /// Png
+        /// Set
         /// </summary>
-        Png
+        Set,
+
+        /// <summary>
+        /// Create
+        /// </summary>
+        Create,
+
+        /// <summary>
+        /// Delete
+        /// </summary>
+        Delete
     }
 }

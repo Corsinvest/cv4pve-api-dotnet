@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
  * Copyright (C) 2016 Corsinvest Srl
  *
@@ -15,22 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
- namespace Corsinvest.ProxmoxVE.Api
-{
-    /// <summary>
-    /// Response type
-    /// </summary>
-    public enum ResponseType
-    {
-        /// <summary>
-        /// Json
-        /// </summary>
-        Json,
 
-        /// <summary>
-        /// Png
-        /// </summary>
-        Png
+using System.Collections.Generic;
+
+namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
+{
+    internal class DynamicHelper
+    {
+        public static void CheckKeyOrCreate(dynamic obj, string key, object defaultValue = null)
+        {
+            var dic = (IDictionary<string, object>)obj;
+            if (!(dic.ContainsKey(key))) { dic.Add(key, defaultValue); }
+        }
+
+        public static object GetValue(dynamic obj, string key, object defaultValue = null)
+        {
+            var dic = (IDictionary<string, object>)obj;
+            dic.TryGetValue(key, out defaultValue);
+            return defaultValue;
+        }
     }
 }

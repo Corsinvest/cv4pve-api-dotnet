@@ -1,6 +1,24 @@
-﻿using System;
+﻿/*
+ * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
+ * Copyright (C) 2016 Corsinvest Srl
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using System;
 using System.Collections.Generic;
-using Corsinvest.ProxmoxVE.Api.Extension.Utils;
+using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
 {
@@ -9,18 +27,18 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
     /// </summary>
     public class Snapshot
     {
-        private VMInfo _vm;
-        private dynamic _apiData;
+        private readonly VMInfo _vm;
+        private readonly dynamic _apiData;
 
         internal Snapshot(VMInfo vm, object apiData)
         {
             _apiData = apiData;
             _vm = vm;
 
-            JsonHelper.GetValueOrCreate(_apiData, "description", "no-description");
-            JsonHelper.GetValueOrCreate(_apiData, "parent", "no-parent");
-            JsonHelper.GetValueOrCreate(_apiData, "snaptime");
-            JsonHelper.GetValueOrCreate(_apiData, "vmstate", 0);
+            DynamicHelper.CheckKeyOrCreate(_apiData, "description", "no-description");
+            DynamicHelper.CheckKeyOrCreate(_apiData, "parent", "no-parent");
+            DynamicHelper.CheckKeyOrCreate(_apiData, "snaptime");
+            DynamicHelper.CheckKeyOrCreate(_apiData, "vmstate", 0);
 
             Date = _apiData.snaptime == null ?
                    DateTime.Now :
@@ -72,6 +90,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
             {
                 case VMTypeEnum.Qemu: result = _vm.QemuApi.Snapshot[Name].Rollback.CreateRest(); break;
                 case VMTypeEnum.Lxc: result = _vm.LxcApi.Snapshot[Name].Rollback.CreateRest(); break;
+                default: break;
             }
             result.WaitForTaskToFinish(_vm, wait);
             return result;
@@ -101,7 +120,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <summary>
         /// Ram used
         /// </summary>
-        public bool Ram => !(_apiData.vmstate == 0);
+        public bool Ram => _apiData.vmstate != 0;
 
         /// <summary>
         /// Get title info
@@ -111,8 +130,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         public static string[] GetTitlesInfo(bool showNodeAndVm)
         {
             var data = new List<string>();
-            if (showNodeAndVm) { data.AddRange(new string[] { "NODE", "VM" }); }
-            data.AddRange(new string[] { "TIME", "PARENT", "NAME", "DESCRIPTION", "RAM" });
+            if (showNodeAndVm) { data.AddRange(new[] { "NODE", "VM" }); }
+            data.AddRange(new[] { "TIME", "PARENT", "NAME", "DESCRIPTION", "RAM" });
             return data.ToArray();
         }
 
@@ -124,12 +143,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         public string[] GetRowInfo(bool showNodeAndVm)
         {
             var data = new List<string>();
-            if (showNodeAndVm) { data.AddRange(new string[] { _vm.Node, _vm.Id, }); }
-            data.AddRange(new string[]{ Date.ToString("yy/MM/dd HH:mm:ss"),
-                                        Parent,
-                                        Name,
-                                        Description,
-                                        Ram ? "X" : ""});
+            if (showNodeAndVm) { data.AddRange(new[] { _vm.Node, _vm.Id, }); }
+            data.AddRange(new[]{ Date.ToString("yy/MM/dd HH:mm:ss"),
+                                 Parent,
+                                 Name,
+                                 Description,
+                                 Ram ? "X" : ""});
 
             return data.ToArray();
         }
