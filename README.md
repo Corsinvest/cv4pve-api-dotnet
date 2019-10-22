@@ -1,7 +1,6 @@
 # Corsinvest.ProxmoxVE.Api
 
-[![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
-![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.svg?label=Nuget%20%20Api) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Extension.svg?label=Nuget%20%20Extension) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Metadata.svg?label=Nuget%20%20Metadata) [![AppVeyor branch](https://img.shields.io/appveyor/ci/franklupo/cv4pve-api-dotnet/master.svg)](https://ci.appveyor.com/project/franklupo/cv4pve-api-dotnet) [![Donate to this project using Paypal](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=PPM9JHLQLRV2S&item_name=Open+Source+Project&currency_code=EUR&source=url)
+[![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg)](LICENSE.md) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.svg?label=Nuget%20%20Api) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Extension.svg?label=Nuget%20%20Extension) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Metadata.svg?label=Nuget%20%20Metadata) [![AppVeyor branch](https://img.shields.io/appveyor/ci/franklupo/cv4pve-api-dotnet/master.svg)](https://ci.appveyor.com/project/franklupo/cv4pve-api-dotnet)
 
 Proxmox VE Client API .Net
 
@@ -13,12 +12,6 @@ Proxmox VE Client API .Net
 
 [Nuget Metadata](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Metadata)
 
-# **Donations**
-
-If you like my work and want to support it, then please consider to deposit a donation through **Paypal** by clicking on the next button:
-
-[![paypal](https://www.paypalobjects.com/en_US/IT/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=PPM9JHLQLRV2S&item_name=Open+Source+Project&currency_code=EUR&source=url)
-
 ```text
    ______                _                      __
   / ____/___  __________(_)___ _   _____  _____/ /_
@@ -28,6 +21,15 @@ If you like my work and want to support it, then please consider to deposit a do
 
 Corsinvest for Proxmox VE Api Client  (Made in Italy)
 ```
+
+## Copyright and License
+
+Copyright: Corsinvest Srl
+For licensing details please visit [LICENSE.md](LICENSE.md)
+
+## Commercial Support
+
+This software is part of a suite of tools called cv4pve-tools. If you want commercial support, visit the [site](https://www.corsinvest.it/cv4pve-tools)
 
 ## General
 
@@ -140,7 +142,3 @@ if (client.Login("root", "password"))
     Console.WriteLine("<img src=\"{dataImg}\" \>");
 }
 ```
-
-## Extension Pack
-
-The extension pack add functionality to Client API.

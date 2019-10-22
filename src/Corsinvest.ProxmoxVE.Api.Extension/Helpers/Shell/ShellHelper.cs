@@ -1,25 +1,20 @@
 ﻿/*
  * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
- * Copyright (C) 2016 Corsinvest Srl
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This source file is available under two different licenses:
+ * - GNU General Public License version 3 (GPLv3)
+ * - Corsinvest Enterprise License (CEL)
+ * Full copyright and license information is available in
+ * LICENSE.md which is distributed with this source code.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
  */
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using McMaster.Extensions.CommandLineUtils;
 
@@ -30,16 +25,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
     /// </summary>
     public static class ShellHelper
     {
-        /// <summary>
-        /// Email support.
-        /// </summary>
-        public static readonly string EMAIL_SUPPORT = "support@corsinvest.it";
-
-        /// <summary>
-        /// Row shell for support.
-        /// </summary>
-        public static readonly string REPORT_BUGS = "Report bugs to " + EMAIL_SUPPORT;
-
         /// <summary>
         /// Logo Corsinvest art ascii.
         /// </summary>
@@ -70,7 +55,7 @@ Good job";
         {
             title += new string(' ', 47 - title.Length);
 
-            return $@"{LOGO}
+            return $@"{LOGO} 
 
 {title}(Made in Italy)";
         }
@@ -109,7 +94,7 @@ Good job";
                 startInfo.FileName = cmd;
             }
 
-            var process = new Process()
+            var process = new Process
             {
                 StartInfo = startInfo
             };
@@ -164,10 +149,13 @@ Good job";
         /// </summary>
         /// <param name="name"></param>
         /// <param name="description"></param>
+        /// <param name="CustomExecute"></param>
         /// <returns></returns>
-        public static CommandLineApplication CreateConsoleApp(string name, string description)
+        public static CommandLineApplication CreateConsoleApp(string name,
+                                                              string description,
+                                                              bool CustomExecute = false)
         {
-            var app = new CommandLineApplication()
+            var app = new CommandLineApplication
             {
                 Name = name,
                 Description = description,
@@ -179,14 +167,38 @@ Good job";
             app.DebugOption();
             app.DryRunOption();
             app.AddLoginOptions();
-            //app.SelfUpdateCommand();
+
+            var ver = Assembly.GetEntryAssembly()
+                              .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                              .InformationalVersion;
+
+            app.VersionOption("--version", ver);
+            // var optCheckUpdate = app.Option("--check-update", "Check update", CommandOptionType.NoValue);
 
             //execute this
-            app.OnExecute(() =>
+            if (!CustomExecute)
             {
-                app.ShowHint();
-                return 1;
-            });
+                app.OnExecute(() =>
+                {
+                    //if (optCheckUpdate.HasValue())
+                    //{
+                    //var info = UpdateHelper.GetLastReleaseAssetFromGitHub(app.Name);
+                    //Console.Out.WriteLine($@"===== In execution release:
+                    // Version:       {ver}
+
+                    // ===== Last release:
+                    // Version:       {info.Version} 
+                    // Published At:  {info.PublishedAt} 
+                    // Download Url:  {info.BrowserDownloadUrl} 
+                    // Release Notes: {info.ReleaseNotes}");
+
+                    //                     return 0;
+                    //                 }
+
+                    app.ShowHint();
+                    return 1;
+                });
+            }
 
             return app;
         }

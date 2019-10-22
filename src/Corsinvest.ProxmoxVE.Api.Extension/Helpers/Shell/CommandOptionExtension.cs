@@ -1,19 +1,13 @@
 ﻿/*
  * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
- * Copyright (C) 2016 Corsinvest Srl
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This source file is available under two different licenses:
+ * - GNU General Public License version 3 (GPLv3)
+ * - Corsinvest Enterprise License (CEL)
+ * Full copyright and license information is available in
+ * LICENSE.md which is distributed with this source code.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
  */
 
 using System;
@@ -39,7 +33,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
             while (parent.Parent != null) { parent = parent.Parent; }
 
             command.FullName = ShellHelper.MakeLogoAndTitle(parent.Description);
-            command.ExtendedHelpText = Environment.NewLine + ShellHelper.REPORT_BUGS;
         }
 
         /// <summary>
@@ -69,46 +62,16 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static bool DebugIsActive(this CommandLineApplication command) => command.GetOption("debug").HasValue();
+        public static bool DebugIsActive(this CommandLineApplication command)
+            => command.GetOption("debug").HasValue();
 
         /// <summary>
         /// Dryrun is active
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static bool DryRunIsActive(this CommandLineApplication command) => command.GetOption("dry-run").HasValue();
-
-        /// <summary>
-        /// Self update option
-        /// </summary>
-        /// <param name="app"></param>
-        /// <returns></returns>
-        public static CommandLineApplication SelfUpdateCommand(this CommandLineApplication app)
-        {
-            return app.Command("self-update", cmd =>
-            {
-                cmd.Description = "Update application itself to the latest version";
-                var optInfo = cmd.Option("--info", "Info about last version", CommandOptionType.NoValue);
-
-                cmd.OnExecute(() =>
-                {
-                    if (optInfo.HasValue())
-                    {
-                        //show info
-                        var info = UpdateHelper.GetLastReleaseAssetFromGitHub(app.Name);
-                        Console.Out.WriteLine($@"Info last release application: '{app.Name}':
-Version:       {info.Version} 
-Published At:  {info.PublishedAt} 
-Download Url:  {info.BrowserDownloadUrl} 
-Release Notes: {info.ReleaseNotes}");
-                    }
-                    else
-                    {
-                        //execute update
-                    }
-                });
-            });
-        }
+        public static bool DryRunIsActive(this CommandLineApplication command)
+            => command.GetOption("dry-run").HasValue();
 
         /// <summary>
         /// Node option
@@ -214,7 +177,9 @@ Release Notes: {info.ReleaseNotes}");
         /// <param name="command"></param>
         /// <returns></returns>
         public static CommandOption HostOption(this CommandLineApplication command)
-            => command.Option("--host", "The host name host[:port]", CommandOptionType.SingleValue).IsRequired();
+            => command.Option("--host",
+                              "The host name host[:port]",
+                              CommandOptionType.SingleValue).IsRequired();
 
         /// <summary>
         /// Username real option
@@ -222,7 +187,9 @@ Release Notes: {info.ReleaseNotes}");
         /// <param name="command"></param>
         /// <returns></returns>
         public static CommandOption UsernameRealOption(this CommandLineApplication command)
-            => command.Option("--username", "User name <username>@<realm>", CommandOptionType.SingleValue).IsRequired();
+            => command.Option("--username",
+                              "User name <username>@<realm>",
+                              CommandOptionType.SingleValue).IsRequired();
 
         /// <summary>
         /// username options
@@ -238,7 +205,9 @@ Release Notes: {info.ReleaseNotes}");
         /// <param name="command"></param>
         /// <returns></returns>
         public static CommandOption PasswordOption(this CommandLineApplication command)
-            => command.Option("--password", "The password. Specify 'file:path_file' to store password in file.", CommandOptionType.SingleValue).IsRequired();
+            => command.Option("--password",
+                              "The password. Specify 'file:path_file' to store password in file.",
+                              CommandOptionType.SingleValue).IsRequired();
 
         /// <summary>
         /// Get Host and Port
@@ -280,7 +249,10 @@ Release Notes: {info.ReleaseNotes}");
             if (command.DebugIsActive()) { client.DebugLevel = 99; }
 
             //try login
-            if (client.Login(command.GetOption("username", true).Value(), GetPasswordFromOption(command))) { return client; }
+            if (client.Login(command.GetOption("username", true).Value(), GetPasswordFromOption(command)))
+            {
+                return client;
+            }
 
             var error = "Problem connection!";
             if (!client.LastResult.IsSuccessStatusCode) { error += " " + client.LastResult.ReasonPhrase; }
@@ -338,7 +310,9 @@ Release Notes: {info.ReleaseNotes}");
         /// <param name="command"></param>
         /// <returns></returns>
         public static CommandOption<int> KeepOption(this CommandLineApplication command)
-            => command.Option<int>("--keep", "Specify the number which should will keep", CommandOptionType.SingleValue)
+            => command.Option<int>("--keep",
+                                   "Specify the number which should will keep",
+                                   CommandOptionType.SingleValue)
                       .IsRequired();
 
         /// <summary>
