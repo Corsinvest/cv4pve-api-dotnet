@@ -111,6 +111,8 @@ Example result:
 ## Usage
 
 ```C#
+//if you want use lite version only get/set/create/delete use PveClientBase
+
 var client = new PveClient("10.92.90.91");
 if (client.Login("root", "password"))
 {
