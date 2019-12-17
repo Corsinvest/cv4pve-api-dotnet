@@ -13,7 +13,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BetterConsoleTables;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Node
 {
@@ -22,26 +21,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
     /// </summary>
     public static class ClientExtension
     {
-        /// <summary>
-        /// Info nodes
-        /// </summary>
-        /// <param name="nodes"></param>
-        /// <returns></returns>
-        public static string Info(this IReadOnlyList<NodeInfo> nodes)
-        {
-            if (nodes.Count > 0)
-            {
-                var table = new Table(TableConfiguration.Unicode());
-                table.AddColumns(Alignment.Left, Alignment.Left, NodeInfo.GetTitlesInfo());
-                foreach (var node in nodes) { table.AddRow(node.GetRowInfo()); }
-                return table.ToString();
-            }
-            else
-            {
-                return "";
-            }
-        }
-
         /// <summary>
         /// Return node info from id.
         /// </summary>

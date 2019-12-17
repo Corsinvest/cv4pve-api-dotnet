@@ -104,9 +104,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// Se status
         /// </summary>
         /// <param name="state"></param>
-        /// <param name="wait"></param>
+        /// <param name="timeout"></param>
         /// <returns></returns>
-        public bool SetStatus(StatusEnum state, bool wait)
+        public bool SetStatus(StatusEnum state, long timeout)
         {
             Result result = null;
 
@@ -116,7 +116,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                     switch (Type)
                     {
                         case VMTypeEnum.Qemu: result = QemuApi.Status.Reset.VmReset(); break;
-                        case VMTypeEnum.Lxc: throw new Exception("Not possible in Container");
+                        case VMTypeEnum.Lxc: throw new ApplicationException("Not possible in Container");
                     }
                     break;
 
@@ -153,7 +153,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                     break;
             }
 
-            result.WaitForTaskToFinish(this, wait);
+            result.WaitForTaskToFinish(this, timeout);
             return !result.InError();
         }
 

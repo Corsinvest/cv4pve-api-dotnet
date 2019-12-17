@@ -25,9 +25,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// </summary>
         /// <param name="client"></param>
         /// <param name="vmIdOrName"></param>
-        /// <param name="path"></param>
+        /// <param name="fileName"></param>
         /// <returns></returns>
-        public static bool CreateFileSpaceClient(this PveClient client, string vmIdOrName, string path)
+        public static bool CreateFileSpaceClient(this PveClient client, string vmIdOrName, string fileName)
         {
             var ret = true;
 
@@ -54,7 +54,7 @@ proxy={data.proxy}
 ca={data.ca}
 ";
 
-                    File.WriteAllText(path, contests);
+                    File.WriteAllText(fileName, contests);
                 }
                 else
                 {

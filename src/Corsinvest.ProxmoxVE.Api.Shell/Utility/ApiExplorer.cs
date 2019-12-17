@@ -14,11 +14,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Corsinvest.ProxmoxVE.Api.Extension;
 using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
-using Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell;
 using Corsinvest.ProxmoxVE.Api.Metadata;
+using Corsinvest.ProxmoxVE.Api.Shell.Helpers;
 
-namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
+namespace Corsinvest.ProxmoxVE.Api.Shell.Utility
 {
     /// <summary>
     /// Api Explorer
@@ -30,6 +31,20 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
         /// </summary>
         public enum OutputType
         {
+            /// <summary>
+            /// Unicode
+            /// </summary>
+            Unicode,
+
+            /// <summary>
+            /// Unicode
+            /// </summary>
+            UnicodeAlt,
+
+            /// <summary>
+            /// Markdown
+            /// </summary>
+            Markdown,
             /// <summary>
             /// Text
             /// </summary>
@@ -44,6 +59,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
             /// Json pretty
             /// </summary>
             JsonPretty,
+
+            /// <summary>
+            /// Html
+            /// </summary>
+            Html,
 
             /// <summary>
             /// PNG image
@@ -67,6 +87,19 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
             return parameters;
         }
 
+        private static TableOutputType DecodeOutputType(OutputType output)
+        {
+            switch (output)
+            {
+                case OutputType.Text: return TableOutputType.Text;
+                case OutputType.Html: return TableOutputType.Html;
+                case OutputType.Unicode: return TableOutputType.Unicode;
+                case OutputType.UnicodeAlt: return TableOutputType.UnicodeAlt;
+                case OutputType.Markdown: return TableOutputType.Markdown;
+                default: return TableOutputType.Text;
+            }
+        }
+
         /// <summary>
         /// Execute methods
         /// </summary>
@@ -76,7 +109,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
         /// <param name="methodType"></param>
         /// <param name="parameters"></param>
         /// <param name="wait"></param>
-        /// <param name="output"></param>
+        /// <param name="outputType"></param>
         /// <param name="verbose"></param>
         public static (int ResultCode, string ResultText) Execute(PveClient client,
                                                                   ClassApi classApiRoot,
@@ -84,11 +117,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
                                                                   MethodType methodType,
                                                                   Dictionary<string, object> parameters,
                                                                   bool wait = false,
-                                                                  OutputType output = OutputType.Text,
+                                                                  OutputType outputType = OutputType.Unicode,
                                                                   bool verbose = false)
         {
             var currResponseType = client.ResponseType;
-            if (output == OutputType.Png) { client.ResponseType = ResponseType.Png; }
+            if (outputType == OutputType.Png) { client.ResponseType = ResponseType.Png; }
 
             //create result
             Result result = null;
@@ -125,7 +158,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
                 }
                 else
                 {
-                    switch (output)
+                    switch (outputType)
                     {
                         case OutputType.Png:
                             resultText.AppendLine(result.Response);
@@ -140,8 +173,13 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
                             break;
 
                         case OutputType.Text:
+                        case OutputType.Html:
+                        case OutputType.Unicode:
+                        case OutputType.UnicodeAlt:
+                        case OutputType.Markdown:
                             var data = result.Response.data;
 
+                            var tableOutput = DecodeOutputType(outputType);
                             var classApi = ClassApi.GetFromResource(classApiRoot, resource);
                             if (classApi == null)
                             {
@@ -154,10 +192,15 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
                                                                .FirstOrDefault()
                                                                .ReturnParameters;
 
+
                                 if (returnParameters.Count == 0)
                                 {
                                     //no return defined
-                                    resultText.Append(TableHelper.CreateTable(data));
+                                    resultText.Append(TableHelper.Create(data,
+                                                                         null,
+                                                                         false,
+                                                                         tableOutput,
+                                                                         null));
                                 }
                                 else
                                 {
@@ -166,7 +209,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
                                                                .Select(a => a.Name)
                                                                .ToArray();
 
-                                    resultText.Append(TableHelper.CreateTable(data, keys, returnParameters));
+                                    resultText.Append(TableHelper.Create(data,
+                                                                         keys,
+                                                                         false,
+                                                                         tableOutput,
+                                                                         returnParameters));
                                 }
                             }
                             break;
@@ -184,8 +231,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
 
             return ((int)result.StatusCode, resultText.ToString());
         }
-
-        private static void CreateTable(IEnumerable<ParameterApi> parameters, StringBuilder resultText)
+       
+        private static void CreateTable(IEnumerable<ParameterApi> parameters,
+                                        StringBuilder resultText,
+                                        OutputType outputType)
         {
             if (parameters.Count() > 0)
             {
@@ -219,7 +268,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
                     }
                 }
 
-                resultText.Append(TableHelper.CreateTable(new[] { "param", "type", "description" }, values, false));
+                resultText.Append(TableHelper.Create(new[] { "param", "type", "description" },
+                                                     values,
+                                                     DecodeOutputType(outputType),
+                                                     false));
             }
         }
 
@@ -228,13 +280,15 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
         /// </summary>
         /// <param name="classApiRoot"></param>
         /// <param name="resource"></param>
-        /// <param name="returns"></param>
+        /// <param name="outputType"></param>
+        /// <param name="returnsType"></param>
         /// <param name="command"></param>
         /// <param name="verbose"></param>
         /// <returns></returns>
         public static string Usage(ClassApi classApiRoot,
                                    string resource,
-                                   bool returns = false,
+                                   OutputType outputType,
+                                   bool returnsType = false,
                                    string command = null,
                                    bool verbose = false)
         {
@@ -270,14 +324,14 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
                     if (verbose)
                     {
                         ret.AppendLine().AppendLine("  " + method.Comment);
-                        CreateTable(parameters, ret);
+                        CreateTable(parameters, ret, outputType);
                     }
 
-                    if (returns)
+                    if (returnsType)
                     {
                         //show returns
                         ret.AppendLine("RETURNS:");
-                        CreateTable(method.ReturnParameters, ret);
+                        CreateTable(method.ReturnParameters, ret, outputType);
                     }
 
                     if (verbose) { ret.AppendLine(); }

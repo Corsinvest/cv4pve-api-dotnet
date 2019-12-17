@@ -11,12 +11,16 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Net.NetworkInformation;
 using System.Text;
+using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
 using Corsinvest.ProxmoxVE.Api.Extension.VM;
 using McMaster.Extensions.CommandLineUtils;
 
-namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
+namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers
 {
     /// <summary>
     /// Command option shell extension.
@@ -33,6 +37,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
             while (parent.Parent != null) { parent = parent.Parent; }
 
             command.FullName = ShellHelper.MakeLogoAndTitle(parent.Description);
+            command.ExtendedHelpText = $@"
+{parent.Name} is a part of suite cv4pve-tools.
+For more information visit https://www.cv4pve-tools.com";
         }
 
         /// <summary>
@@ -121,7 +128,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
         /// <param name="command"></param>
         /// <returns></returns>
         public static CommandOption VmIdOrNameOption(this CommandLineApplication command)
-            => command.Option("--vmid", "The id or name VM/CT", CommandOptionType.SingleValue).IsRequired();
+            => command.Option("--vmid", "The id or name VM/CT", CommandOptionType.SingleValue);
 
         /// <summary>
         /// Ids or names option
@@ -159,6 +166,14 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
             return opt;
         }
 
+        /// <summary>
+        /// Timeout operation
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public static CommandOption<long> TimeoutOption(this CommandLineApplication command)
+            => command.Option<long>("--timeout", "Timeout operation in seconds", CommandOptionType.SingleValue);
+
         #region Login option
         /// <summary>
         /// Add options login
@@ -166,10 +181,33 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
         /// <param name="command"></param>
         public static void AddLoginOptions(this CommandLineApplication command)
         {
-            command.HostOption();
-            command.UsernameRealOption();
-            command.PasswordOption();
+            command.HostOption()
+                   .DependOn(command, USERNAME_OPTION_NAME)
+                   .DependOn(command, PASSWORD_OPTION_NAME);
+
+            command.UsernameRealOption()
+                   .DependOn(command, HOST_OPTION_NAME)
+                   .DependOn(command, PASSWORD_OPTION_NAME);
+
+            command.PasswordOption()
+                   .DependOn(command, HOST_OPTION_NAME)
+                   .DependOn(command, USERNAME_OPTION_NAME);
         }
+
+        /// <summary>
+        /// Host option
+        /// </summary>
+        public static readonly string HOST_OPTION_NAME = "host";
+
+        /// <summary>
+        /// Username option
+        /// </summary>
+        public static readonly string USERNAME_OPTION_NAME = "username";
+
+        /// <summary>
+        /// Password option
+        /// </summary>
+        public static readonly string PASSWORD_OPTION_NAME = "password";
 
         /// <summary>
         /// Host option
@@ -177,9 +215,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
         /// <param name="command"></param>
         /// <returns></returns>
         public static CommandOption HostOption(this CommandLineApplication command)
-            => command.Option("--host",
-                              "The host name host[:port]",
-                              CommandOptionType.SingleValue).IsRequired();
+            => command.Option($"--{HOST_OPTION_NAME}",
+                              "The host name host[:port],host1[:port],host2[:port]",
+                              CommandOptionType.SingleValue);
 
         /// <summary>
         /// Username real option
@@ -187,9 +225,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
         /// <param name="command"></param>
         /// <returns></returns>
         public static CommandOption UsernameRealOption(this CommandLineApplication command)
-            => command.Option("--username",
+            => command.Option($"--{USERNAME_OPTION_NAME}",
                               "User name <username>@<realm>",
-                              CommandOptionType.SingleValue).IsRequired();
+                              CommandOptionType.SingleValue);
 
         /// <summary>
         /// username options
@@ -197,7 +235,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
         /// <param name="command"></param>
         /// <returns></returns>
         public static CommandOption Username(this CommandLineApplication command)
-            => command.Option("--username", "User name", CommandOptionType.SingleValue).IsRequired();
+            => command.Option($"--{USERNAME_OPTION_NAME}",
+                              "User name",
+                              CommandOptionType.SingleValue);
 
         /// <summary>
         /// Password option
@@ -205,34 +245,27 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
         /// <param name="command"></param>
         /// <returns></returns>
         public static CommandOption PasswordOption(this CommandLineApplication command)
-            => command.Option("--password",
+            => command.Option($"--{PASSWORD_OPTION_NAME}",
                               "The password. Specify 'file:path_file' to store password in file.",
-                              CommandOptionType.SingleValue).IsRequired();
+                              CommandOptionType.SingleValue);
 
         /// <summary>
         /// Get Host and Port
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static (string Host, int Port) GetHostAndPort(this CommandLineApplication command)
+        private static List<(string Host, int Port)> GetHostAndPort(this CommandLineApplication command)
         {
-            var data = command.GetOption("host", true).Value().Split(':');
-            var port = 8006;
-            if (data.Length == 2) { int.TryParse(data[1], out port); }
-            return (data[0], port);
-        }
+            var ret = new List<(string Host, int Port)>();
+            foreach (var host in command.GetOption(HOST_OPTION_NAME, true).Value().Split(','))
+            {
+                var data = host.Split(':');
+                var port = 8006;
+                if (data.Length == 2) { int.TryParse(data[1], out port); }
+                ret.Add((data[0], port));
+            }
 
-        /// <summary>
-        /// Get options connection
-        /// </summary>
-        /// <returns></returns>
-        public static (string Host, int Port, string Username, string password) GetOptionsConnection(this CommandLineApplication command)
-        {
-            var ret = command.GetHostAndPort();
-            return (ret.Host,
-                    ret.Port,
-                    command.GetOption("username").Value(),
-                    GetPasswordFromOption(command));
+            return ret;
         }
 
         /// <summary>
@@ -242,20 +275,43 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
         /// <returns></returns>
         public static PveClient ClientTryLogin(this CommandLineApplication command)
         {
-            var (host, port) = GetHostAndPort(command);
-            var client = new PveClient(host, port);
-
-            //check enable debug
-            if (command.DebugIsActive()) { client.DebugLevel = 99; }
-
-            //try login
-            if (client.Login(command.GetOption("username", true).Value(), GetPasswordFromOption(command)))
+            var error = "Problem connection!";
+            foreach (var host in GetHostAndPort(command))
             {
-                return client;
+                using (var ping = new Ping())
+                {
+                    if (ping.Send(host.Host).Status != IPStatus.Success)
+                    {
+                        if (command.DebugIsActive())
+                        {
+                            command.Out.WriteLine($"Error: try login unknown host {host.Host}");
+                        }
+                        continue;
+                    }
+                }
+
+                try
+                {
+                    var client = new PveClient(host.Host, host.Port);
+
+                    //check enable debug
+                    if (command.DebugIsActive()) { client.DebugLevel = 99; }
+
+                    //try login
+                    if (client.Login(command.GetOption(USERNAME_OPTION_NAME, true).Value(),
+                                     GetPasswordFromOption(command)))
+                    {
+                        return client;
+                    }
+
+                    if (!client.LastResult.IsSuccessStatusCode)
+                    {
+                        error += " " + client.LastResult.ReasonPhrase;
+                    }
+                }
+                catch { }
             }
 
-            var error = "Problem connection!";
-            if (!client.LastResult.IsSuccessStatusCode) { error += " " + client.LastResult.ReasonPhrase; }
             throw new ApplicationException(error);
         }
 
@@ -268,7 +324,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
         {
             const string KEY = "012345678901234567890123";
 
-            var password = command.GetOption("password", true).Value().Trim();
+            var password = command.GetOption(PASSWORD_OPTION_NAME, true).Value().Trim();
 
             //check if file
             if (password.StartsWith("file:"))
@@ -293,16 +349,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
         /// Label option
         /// </summary>
         /// <param name="command"></param>
-        /// <param name="required"></param>
         /// <returns></returns>
-        public static CommandOption LabelOption(this CommandLineApplication command, bool required)
-        {
-            var opt = command.Option("--label",
-                                     "Is usually 'hourly', 'daily', 'weekly', or 'monthly'",
-                                     CommandOptionType.SingleValue);
-            if (required) { opt.IsRequired(); }
-            return opt;
-        }
+        public static CommandOption LabelOption(this CommandLineApplication command)
+            => command.Option("--label",
+                              "Is usually 'hourly', 'daily', 'weekly', or 'monthly'",
+                              CommandOptionType.SingleValue);
 
         /// <summary>
         /// Keep option
@@ -312,8 +363,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
         public static CommandOption<int> KeepOption(this CommandLineApplication command)
             => command.Option<int>("--keep",
                                    "Specify the number which should will keep",
-                                   CommandOptionType.SingleValue)
-                      .IsRequired();
+                                   CommandOptionType.SingleValue);
 
         /// <summary>
         /// Mail to option
@@ -330,9 +380,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
         /// Vm Id option
         /// </summary>
         /// <param name="command"></param>
+        /// <param name="dependOn"></param>
         /// <returns></returns>
-        public static CommandOption<int> VmIdOption(this CommandLineApplication command)
-            => command.Option<int>("--vmid", "The id VM/CT", CommandOptionType.SingleValue).IsRequired();
+        public static CommandOption<int> VmIdOption(this CommandLineApplication command, string dependOn)
+            => command.Option<int>("--vmid", "The id VM/CT", CommandOptionType.SingleValue)
+                      .DependOn(command, dependOn);
 
         /// <summary>
         /// Wait option
@@ -407,17 +459,95 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell
         /// Snapshot name option
         /// </summary>
         /// <param name="command"></param>
+        /// <param name="dependOn"></param>
         /// <returns></returns>
-        public static CommandOption SnapshotNameOption(this CommandLineApplication command)
-            => command.Option("--snapname", "The name of the snapshot", CommandOptionType.SingleValue).IsRequired();
+        public static CommandOption SnapshotNameOption(this CommandLineApplication command, string dependOn)
+            => command.Option("--snapname", "The name of the snapshot", CommandOptionType.SingleValue)
+                      .DependOn(command, dependOn);
 
         /// <summary>
         /// Description option
         /// </summary>
         /// <param name="command"></param>
+        /// <param name="dependOn"></param>
         /// <returns></returns>
-        public static CommandOption DescriptionOption(this CommandLineApplication command)
+        public static CommandOption DescriptionOption(this CommandLineApplication command, string dependOn)
             => command.Option("--description", "A textual description or comment", CommandOptionType.SingleValue)
-                      .IsRequired();
+                      .DependOn(command, dependOn);
+
+        /// <summary>
+        /// Command check update application
+        /// </summary>
+        /// <param name="app"></param>
+        public static void CheckUpdateApp(this CommandLineApplication app)
+        {
+            app.Command("app-check-update", cmd =>
+            {
+                cmd.Description = "Check update application";
+                cmd.AddFullNameLogo();
+
+                cmd.OnExecute(() => app.Out.WriteLine(UpdateHelper.GetInfo(app.Name).Info));
+            });
+        }
+
+        /// <summary>
+        /// Upgrade application
+        /// </summary>
+        /// <param name="app"></param>
+        public static void UpgradeApp(this CommandLineApplication app)
+        {
+            const string APP_UPGRADE_FINISH="app-upgrade-finish";
+
+            app.Command("app-upgrade", cmd =>
+            {
+                cmd.Description = "Upgrade application";
+                cmd.AddFullNameLogo();
+                var optQuiet = cmd.Option("--quiet|-q",
+                                          "Non-interactive mode, does not request confirmation",
+                                          CommandOptionType.NoValue);
+
+                cmd.OnExecute(() =>
+                {
+                    var ret = UpdateHelper.GetInfo(app.Name);
+                    app.Out.WriteLine(ret.Info);
+
+                    if (ret.IsNewVersion)
+                    {
+                        if (!optQuiet.HasValue())
+                        {
+                            if (!Prompt.GetYesNo("Confirm upgrade application?", false))
+                            {
+                                app.Out.WriteLine("Upgrade abort!");
+                                return 1;
+                            }
+                        }
+
+                        app.Out.WriteLine($"Download {ret.BrowserDownloadUrl} ....");
+
+                        var fileNameNew = UpdateHelper.UpgradePrepare(ret.BrowserDownloadUrl,
+                                                                      Process.GetCurrentProcess().MainModule.FileName);
+
+                        Process.Start(fileNameNew, APP_UPGRADE_FINISH);
+                    }
+
+                    return 0;
+                });
+            });
+
+            //finish upgrade application
+            app.Command(APP_UPGRADE_FINISH, cmd =>
+            {
+                cmd.ShowInHelpText = false;
+                cmd.OnExecute(() =>
+                {
+                    var fileNameNew = Process.GetCurrentProcess().MainModule.FileName;
+                    UpdateHelper.UpgradeFinish(fileNameNew);
+
+                    app.Out.WriteLine("Upgrade completed!");
+
+                    return 0;
+                });
+            });
+        }
     }
 }

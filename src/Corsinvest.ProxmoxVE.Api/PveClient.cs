@@ -62,6 +62,8 @@ namespace Corsinvest.ProxmoxVE.Api
             public PVEHa Ha => _ha ?? (_ha = new PVEHa(_client));
             private PVEAcme _acme;
             public PVEAcme Acme => _acme ?? (_acme = new PVEAcme(_client));
+            private PVECeph _ceph;
+            public PVECeph Ceph => _ceph ?? (_ceph = new PVECeph(_client));
             private PVELog _log;
             public PVELog Log => _log ?? (_log = new PVELog(_client));
             private PVEResources _resources;
@@ -74,8 +76,6 @@ namespace Corsinvest.ProxmoxVE.Api
             public PVEStatus Status => _status ?? (_status = new PVEStatus(_client));
             private PVENextid _nextid;
             public PVENextid Nextid => _nextid ?? (_nextid = new PVENextid(_client));
-            private PVECeph _ceph;
-            public PVECeph Ceph => _ceph ?? (_ceph = new PVECeph(_client));
             public class PVEReplication
             {
                 private readonly PveClient _client;
@@ -2032,6 +2032,164 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <returns></returns>
                 public Result Index() => GetRest();
             }
+            public class PVECeph
+            {
+                private readonly PveClient _client;
+
+                internal PVECeph(PveClient client) { _client = client; }
+                private PVEMetadata _metadata;
+                public PVEMetadata Metadata => _metadata ?? (_metadata = new PVEMetadata(_client));
+                private PVEStatus _status;
+                public PVEStatus Status => _status ?? (_status = new PVEStatus(_client));
+                private PVEFlags _flags;
+                public PVEFlags Flags => _flags ?? (_flags = new PVEFlags(_client));
+                public class PVEMetadata
+                {
+                    private readonly PveClient _client;
+
+                    internal PVEMetadata(PveClient client) { _client = client; }
+                    /// <summary>
+                    /// Get ceph metadata.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result GetRest() { return _client.Get($"/cluster/ceph/metadata"); }
+
+                    /// <summary>
+                    /// Get ceph metadata.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result Metadata() => GetRest();
+                }
+                public class PVEStatus
+                {
+                    private readonly PveClient _client;
+
+                    internal PVEStatus(PveClient client) { _client = client; }
+                    /// <summary>
+                    /// Get ceph status.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result GetRest() { return _client.Get($"/cluster/ceph/status"); }
+
+                    /// <summary>
+                    /// Get ceph status.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result Status() => GetRest();
+                }
+                public class PVEFlags
+                {
+                    private readonly PveClient _client;
+
+                    internal PVEFlags(PveClient client) { _client = client; }
+                    public PVEItemFlag this[object flag] => new PVEItemFlag(_client, flag);
+                    public class PVEItemFlag
+                    {
+                        private readonly PveClient _client;
+                        private readonly object _flag;
+                        internal PVEItemFlag(PveClient client, object flag) { _client = client; _flag = flag; }
+                        /// <summary>
+                        /// Get the status of a specific ceph flag.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result GetRest() { return _client.Get($"/cluster/ceph/flags/{_flag}"); }
+
+                        /// <summary>
+                        /// Get the status of a specific ceph flag.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result GetFlag() => GetRest();
+                        /// <summary>
+                        /// Set or clear (unset) a specific ceph flag
+                        /// </summary>
+                        /// <param name="value">The new value of the flag</param>
+                        /// <returns></returns>
+                        public Result SetRest(bool value)
+                        {
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("value", value);
+                            return _client.Set($"/cluster/ceph/flags/{_flag}", parameters);
+                        }
+
+                        /// <summary>
+                        /// Set or clear (unset) a specific ceph flag
+                        /// </summary>
+                        /// <param name="value">The new value of the flag</param>
+                        /// <returns></returns>
+                        public Result UpdateFlag(bool value) => SetRest(value);
+                    }
+                    /// <summary>
+                    /// get the status of all ceph flags
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result GetRest() { return _client.Get($"/cluster/ceph/flags"); }
+
+                    /// <summary>
+                    /// get the status of all ceph flags
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result GetAllFlags() => GetRest();
+                    /// <summary>
+                    /// Set/Unset multiple ceph flags at once.
+                    /// </summary>
+                    /// <param name="nobackfill">Backfilling of PGs is suspended.</param>
+                    /// <param name="nodeep_scrub">Deep Scrubbing is disabled.</param>
+                    /// <param name="nodown">OSD failure reports are being ignored, such that the monitors will not mark OSDs down.</param>
+                    /// <param name="noin">OSDs that were previously marked out will not be marked back in when they start.</param>
+                    /// <param name="noout">OSDs will not automatically be marked out after the configured interval.</param>
+                    /// <param name="norebalance">Rebalancing of PGs is suspended.</param>
+                    /// <param name="norecover">Recovery of PGs is suspended.</param>
+                    /// <param name="noscrub">Scrubbing is disabled.</param>
+                    /// <param name="notieragent">Cache tiering activity is suspended.</param>
+                    /// <param name="noup">OSDs are not allowed to start.</param>
+                    /// <param name="pause">Pauses read and writes.</param>
+                    /// <returns></returns>
+                    public Result SetRest(bool? nobackfill = null, bool? nodeep_scrub = null, bool? nodown = null, bool? noin = null, bool? noout = null, bool? norebalance = null, bool? norecover = null, bool? noscrub = null, bool? notieragent = null, bool? noup = null, bool? pause = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("nobackfill", nobackfill);
+                        parameters.Add("nodeep-scrub", nodeep_scrub);
+                        parameters.Add("nodown", nodown);
+                        parameters.Add("noin", noin);
+                        parameters.Add("noout", noout);
+                        parameters.Add("norebalance", norebalance);
+                        parameters.Add("norecover", norecover);
+                        parameters.Add("noscrub", noscrub);
+                        parameters.Add("notieragent", notieragent);
+                        parameters.Add("noup", noup);
+                        parameters.Add("pause", pause);
+                        return _client.Set($"/cluster/ceph/flags", parameters);
+                    }
+
+                    /// <summary>
+                    /// Set/Unset multiple ceph flags at once.
+                    /// </summary>
+                    /// <param name="nobackfill">Backfilling of PGs is suspended.</param>
+                    /// <param name="nodeep_scrub">Deep Scrubbing is disabled.</param>
+                    /// <param name="nodown">OSD failure reports are being ignored, such that the monitors will not mark OSDs down.</param>
+                    /// <param name="noin">OSDs that were previously marked out will not be marked back in when they start.</param>
+                    /// <param name="noout">OSDs will not automatically be marked out after the configured interval.</param>
+                    /// <param name="norebalance">Rebalancing of PGs is suspended.</param>
+                    /// <param name="norecover">Recovery of PGs is suspended.</param>
+                    /// <param name="noscrub">Scrubbing is disabled.</param>
+                    /// <param name="notieragent">Cache tiering activity is suspended.</param>
+                    /// <param name="noup">OSDs are not allowed to start.</param>
+                    /// <param name="pause">Pauses read and writes.</param>
+                    /// <returns></returns>
+                    public Result SetFlags(bool? nobackfill = null, bool? nodeep_scrub = null, bool? nodown = null, bool? noin = null, bool? noout = null, bool? norebalance = null, bool? norecover = null, bool? noscrub = null, bool? notieragent = null, bool? noup = null, bool? pause = null) => SetRest(nobackfill, nodeep_scrub, nodown, noin, noout, norebalance, norecover, noscrub, notieragent, noup, pause);
+                }
+                /// <summary>
+                /// Cluster ceph index.
+                /// </summary>
+                /// <returns></returns>
+                public Result GetRest() { return _client.Get($"/cluster/ceph"); }
+
+                /// <summary>
+                /// Cluster ceph index.
+                /// </summary>
+                /// <returns></returns>
+                public Result Cephindex() => GetRest();
+            }
             public class PVELog
             {
                 private readonly PveClient _client;
@@ -2065,7 +2223,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// Resources index (cluster wide).
                 /// </summary>
                 /// <param name="type">
-                ///   Enum: vm,storage,node</param>
+                ///   Enum: vm,storage,node,sdn</param>
                 /// <returns></returns>
                 public Result GetRest(string type = null)
                 {
@@ -2078,7 +2236,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// Resources index (cluster wide).
                 /// </summary>
                 /// <param name="type">
-                ///   Enum: vm,storage,node</param>
+                ///   Enum: vm,storage,node,sdn</param>
                 /// <returns></returns>
                 public Result Resources(string type = null) => GetRest(type);
             }
@@ -2130,7 +2288,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="keyboard">Default keybord layout for vnc server.
                 ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                 /// <param name="language">Default GUI language.
-                ///   Enum: zh_CN,zh_TW,ca,en,eu,fr,de,it,es,ja,nb,nn,fa,pl,pt_BR,ru,sl,sv,tr</param>
+                ///   Enum: ca,da,de,en,es,eu,fa,fr,he,it,ja,nb,nn,pl,pt_BR,ru,sl,sv,tr,zh_CN,zh_TW</param>
                 /// <param name="mac_prefix">Prefix for autogenerated MAC addresses.</param>
                 /// <param name="max_workers">Defines how many workers (per node) are maximal started  on actions like 'stopall VMs' or task from the ha-manager.</param>
                 /// <param name="migration">For cluster wide migration settings.</param>
@@ -2172,7 +2330,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="keyboard">Default keybord layout for vnc server.
                 ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                 /// <param name="language">Default GUI language.
-                ///   Enum: zh_CN,zh_TW,ca,en,eu,fr,de,it,es,ja,nb,nn,fa,pl,pt_BR,ru,sl,sv,tr</param>
+                ///   Enum: ca,da,de,en,es,eu,fa,fr,he,it,ja,nb,nn,pl,pt_BR,ru,sl,sv,tr,zh_CN,zh_TW</param>
                 /// <param name="mac_prefix">Prefix for autogenerated MAC addresses.</param>
                 /// <param name="max_workers">Defines how many workers (per node) are maximal started  on actions like 'stopall VMs' or task from the ha-manager.</param>
                 /// <param name="migration">For cluster wide migration settings.</param>
@@ -2221,61 +2379,6 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="vmid">The (unique) ID of the VM.</param>
                 /// <returns></returns>
                 public Result Nextid(int? vmid = null) => GetRest(vmid);
-            }
-            public class PVECeph
-            {
-                private readonly PveClient _client;
-
-                internal PVECeph(PveClient client) { _client = client; }
-                private PVEMetadata _metadata;
-                public PVEMetadata Metadata => _metadata ?? (_metadata = new PVEMetadata(_client));
-                private PVEStatus _status;
-                public PVEStatus Status => _status ?? (_status = new PVEStatus(_client));
-                public class PVEMetadata
-                {
-                    private readonly PveClient _client;
-
-                    internal PVEMetadata(PveClient client) { _client = client; }
-                    /// <summary>
-                    /// Get ceph metadata.
-                    /// </summary>
-                    /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/ceph/metadata"); }
-
-                    /// <summary>
-                    /// Get ceph metadata.
-                    /// </summary>
-                    /// <returns></returns>
-                    public Result CephMetadata() => GetRest();
-                }
-                public class PVEStatus
-                {
-                    private readonly PveClient _client;
-
-                    internal PVEStatus(PveClient client) { _client = client; }
-                    /// <summary>
-                    /// Get ceph status.
-                    /// </summary>
-                    /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/ceph/status"); }
-
-                    /// <summary>
-                    /// Get ceph status.
-                    /// </summary>
-                    /// <returns></returns>
-                    public Result Cephstatus() => GetRest();
-                }
-                /// <summary>
-                /// Cluster ceph index.
-                /// </summary>
-                /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/cluster/ceph"); }
-
-                /// <summary>
-                /// Cluster ceph index.
-                /// </summary>
-                /// <returns></returns>
-                public Result Cephindex() => GetRest();
             }
             /// <summary>
             /// Cluster index.
@@ -2976,7 +3079,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="log_level_out">Log level for outgoing traffic.
                                 ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                                 /// <param name="macfilter">Enable/disable MAC address filter.</param>
-                                /// <param name="ndp">Enable NDP.</param>
+                                /// <param name="ndp">Enable NDP (Neighbor Discovery Protocol).</param>
                                 /// <param name="policy_in">Input policy.
                                 ///   Enum: ACCEPT,REJECT,DROP</param>
                                 /// <param name="policy_out">Output policy.
@@ -3014,7 +3117,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="log_level_out">Log level for outgoing traffic.
                                 ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                                 /// <param name="macfilter">Enable/disable MAC address filter.</param>
-                                /// <param name="ndp">Enable NDP.</param>
+                                /// <param name="ndp">Enable NDP (Neighbor Discovery Protocol).</param>
                                 /// <param name="policy_in">Input policy.
                                 ///   Enum: ACCEPT,REJECT,DROP</param>
                                 /// <param name="policy_out">Output policy.
@@ -3898,6 +4001,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="arch">Virtual processor architecture. Defaults to the host.
                             ///   Enum: x86_64,aarch64</param>
                             /// <param name="args">Arbitrary arguments passed to kvm.</param>
+                            /// <param name="audio0">Configure a audio device, useful in combination with QXL/Spice.</param>
                             /// <param name="autostart">Automatic restart after crash (currently ignored).</param>
                             /// <param name="background_delay">Time to wait for the task to finish. We return 'null' if the task finish within that time.</param>
                             /// <param name="balloon">Amount of target RAM for the VM in MB. Using zero disables the ballon driver.</param>
@@ -3962,10 +4066,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
                             /// <param name="smp">The number of CPUs. Please use option -sockets instead.</param>
                             /// <param name="sockets">The number of CPU sockets.</param>
+                            /// <param name="spice_enhancements">Configure additional enhancements for SPICE.</param>
                             /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
                             /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                             /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                             /// <param name="tablet">Enable/disable the USB tablet device.</param>
+                            /// <param name="tags">Tags of the VM. This is only meta information.</param>
                             /// <param name="tdf">Enable/disable time drift fix.</param>
                             /// <param name="template">Enable/disable Template.</param>
                             /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
@@ -3977,13 +4083,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result CreateRest(bool? acpi = null, string agent = null, string arch = null, string args = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                            public Result CreateRest(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("acpi", acpi);
                                 parameters.Add("agent", agent);
                                 parameters.Add("arch", arch);
                                 parameters.Add("args", args);
+                                parameters.Add("audio0", audio0);
                                 parameters.Add("autostart", autostart);
                                 parameters.Add("background_delay", background_delay);
                                 parameters.Add("balloon", balloon);
@@ -4032,10 +4139,12 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("smbios1", smbios1);
                                 parameters.Add("smp", smp);
                                 parameters.Add("sockets", sockets);
+                                parameters.Add("spice_enhancements", spice_enhancements);
                                 parameters.Add("sshkeys", sshkeys);
                                 parameters.Add("startdate", startdate);
                                 parameters.Add("startup", startup);
                                 parameters.Add("tablet", tablet);
+                                parameters.Add("tags", tags);
                                 parameters.Add("tdf", tdf);
                                 parameters.Add("template", template);
                                 parameters.Add("vcpus", vcpus);
@@ -4066,6 +4175,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="arch">Virtual processor architecture. Defaults to the host.
                             ///   Enum: x86_64,aarch64</param>
                             /// <param name="args">Arbitrary arguments passed to kvm.</param>
+                            /// <param name="audio0">Configure a audio device, useful in combination with QXL/Spice.</param>
                             /// <param name="autostart">Automatic restart after crash (currently ignored).</param>
                             /// <param name="background_delay">Time to wait for the task to finish. We return 'null' if the task finish within that time.</param>
                             /// <param name="balloon">Amount of target RAM for the VM in MB. Using zero disables the ballon driver.</param>
@@ -4130,10 +4240,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
                             /// <param name="smp">The number of CPUs. Please use option -sockets instead.</param>
                             /// <param name="sockets">The number of CPU sockets.</param>
+                            /// <param name="spice_enhancements">Configure additional enhancements for SPICE.</param>
                             /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
                             /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                             /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                             /// <param name="tablet">Enable/disable the USB tablet device.</param>
+                            /// <param name="tags">Tags of the VM. This is only meta information.</param>
                             /// <param name="tdf">Enable/disable time drift fix.</param>
                             /// <param name="template">Enable/disable Template.</param>
                             /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
@@ -4145,7 +4257,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result UpdateVmAsync(bool? acpi = null, string agent = null, string arch = null, string args = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => CreateRest(acpi, agent, arch, args, autostart, background_delay, balloon, bios, boot, bootdisk, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, delete, description, digest, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, sataN, scsiN, scsihw, searchdomain, serialN, shares, skiplock, smbios1, smp, sockets, sshkeys, startdate, startup, tablet, tdf, template, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
+                            public Result UpdateVmAsync(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => CreateRest(acpi, agent, arch, args, audio0, autostart, background_delay, balloon, bios, boot, bootdisk, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, delete, description, digest, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, sataN, scsiN, scsihw, searchdomain, serialN, shares, skiplock, smbios1, smp, sockets, spice_enhancements, sshkeys, startdate, startup, tablet, tags, tdf, template, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
                             /// <summary>
                             /// Set virtual machine options (synchrounous API) - You should consider using the POST method instead for any actions involving hotplug or storage allocation.
                             /// </summary>
@@ -4154,6 +4266,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="arch">Virtual processor architecture. Defaults to the host.
                             ///   Enum: x86_64,aarch64</param>
                             /// <param name="args">Arbitrary arguments passed to kvm.</param>
+                            /// <param name="audio0">Configure a audio device, useful in combination with QXL/Spice.</param>
                             /// <param name="autostart">Automatic restart after crash (currently ignored).</param>
                             /// <param name="balloon">Amount of target RAM for the VM in MB. Using zero disables the ballon driver.</param>
                             /// <param name="bios">Select BIOS implementation.
@@ -4217,10 +4330,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
                             /// <param name="smp">The number of CPUs. Please use option -sockets instead.</param>
                             /// <param name="sockets">The number of CPU sockets.</param>
+                            /// <param name="spice_enhancements">Configure additional enhancements for SPICE.</param>
                             /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
                             /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                             /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                             /// <param name="tablet">Enable/disable the USB tablet device.</param>
+                            /// <param name="tags">Tags of the VM. This is only meta information.</param>
                             /// <param name="tdf">Enable/disable time drift fix.</param>
                             /// <param name="template">Enable/disable Template.</param>
                             /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
@@ -4232,13 +4347,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result SetRest(bool? acpi = null, string agent = null, string arch = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                            public Result SetRest(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("acpi", acpi);
                                 parameters.Add("agent", agent);
                                 parameters.Add("arch", arch);
                                 parameters.Add("args", args);
+                                parameters.Add("audio0", audio0);
                                 parameters.Add("autostart", autostart);
                                 parameters.Add("balloon", balloon);
                                 parameters.Add("bios", bios);
@@ -4286,10 +4402,12 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("smbios1", smbios1);
                                 parameters.Add("smp", smp);
                                 parameters.Add("sockets", sockets);
+                                parameters.Add("spice_enhancements", spice_enhancements);
                                 parameters.Add("sshkeys", sshkeys);
                                 parameters.Add("startdate", startdate);
                                 parameters.Add("startup", startup);
                                 parameters.Add("tablet", tablet);
+                                parameters.Add("tags", tags);
                                 parameters.Add("tdf", tdf);
                                 parameters.Add("template", template);
                                 parameters.Add("vcpus", vcpus);
@@ -4320,6 +4438,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="arch">Virtual processor architecture. Defaults to the host.
                             ///   Enum: x86_64,aarch64</param>
                             /// <param name="args">Arbitrary arguments passed to kvm.</param>
+                            /// <param name="audio0">Configure a audio device, useful in combination with QXL/Spice.</param>
                             /// <param name="autostart">Automatic restart after crash (currently ignored).</param>
                             /// <param name="balloon">Amount of target RAM for the VM in MB. Using zero disables the ballon driver.</param>
                             /// <param name="bios">Select BIOS implementation.
@@ -4383,10 +4502,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
                             /// <param name="smp">The number of CPUs. Please use option -sockets instead.</param>
                             /// <param name="sockets">The number of CPU sockets.</param>
+                            /// <param name="spice_enhancements">Configure additional enhancements for SPICE.</param>
                             /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
                             /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                             /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                             /// <param name="tablet">Enable/disable the USB tablet device.</param>
+                            /// <param name="tags">Tags of the VM. This is only meta information.</param>
                             /// <param name="tdf">Enable/disable time drift fix.</param>
                             /// <param name="template">Enable/disable Template.</param>
                             /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
@@ -4398,7 +4519,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result UpdateVm(bool? acpi = null, string agent = null, string arch = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => SetRest(acpi, agent, arch, args, autostart, balloon, bios, boot, bootdisk, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, delete, description, digest, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, sataN, scsiN, scsihw, searchdomain, serialN, shares, skiplock, smbios1, smp, sockets, sshkeys, startdate, startup, tablet, tdf, template, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
+                            public Result UpdateVm(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => SetRest(acpi, agent, arch, args, audio0, autostart, balloon, bios, boot, bootdisk, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, delete, description, digest, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, sataN, scsiN, scsihw, searchdomain, serialN, shares, skiplock, smbios1, smp, sockets, spice_enhancements, sshkeys, startdate, startup, tablet, tags, tdf, template, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
                         }
                         public class PVEPending
                         {
@@ -4595,6 +4716,8 @@ namespace Corsinvest.ProxmoxVE.Api
                             public PVEReset Reset => _reset ?? (_reset = new PVEReset(_client, _node, _vmid));
                             private PVEShutdown _shutdown;
                             public PVEShutdown Shutdown => _shutdown ?? (_shutdown = new PVEShutdown(_client, _node, _vmid));
+                            private PVEReboot _reboot;
+                            public PVEReboot Reboot => _reboot ?? (_reboot = new PVEReboot(_client, _node, _vmid));
                             private PVESuspend _suspend;
                             public PVESuspend Suspend => _suspend ?? (_suspend = new PVESuspend(_client, _node, _vmid));
                             private PVEResume _resume;
@@ -4774,6 +4897,35 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="timeout">Wait maximal timeout seconds.</param>
                                 /// <returns></returns>
                                 public Result VmShutdown(bool? forceStop = null, bool? keepActive = null, bool? skiplock = null, int? timeout = null) => CreateRest(forceStop, keepActive, skiplock, timeout);
+                            }
+                            public class PVEReboot
+                            {
+                                private readonly PveClient _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
+                                internal PVEReboot(PveClient client, object node, object vmid)
+                                {
+                                    _client = client; _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Reboot the VM by shutting it down, and starting it again. Applies pending changes.
+                                /// </summary>
+                                /// <param name="timeout">Wait maximal timeout seconds for the shutdown.</param>
+                                /// <returns></returns>
+                                public Result CreateRest(int? timeout = null)
+                                {
+                                    var parameters = new Dictionary<string, object>();
+                                    parameters.Add("timeout", timeout);
+                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/reboot", parameters);
+                                }
+
+                                /// <summary>
+                                /// Reboot the VM by shutting it down, and starting it again. Applies pending changes.
+                                /// </summary>
+                                /// <param name="timeout">Wait maximal timeout seconds for the shutdown.</param>
+                                /// <returns></returns>
+                                public Result VmReboot(int? timeout = null) => CreateRest(timeout);
                             }
                             public class PVESuspend
                             {
@@ -5063,7 +5215,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="migration_network">CIDR of the (sub) network that is used for migration.</param>
                             /// <param name="migration_type">Migration traffic is encrypted using an SSH tunnel by default. On secure, completely private networks this can be disabled to increase performance.
                             ///   Enum: secure,insecure</param>
-                            /// <param name="online">Use online/live migration.</param>
+                            /// <param name="online">Use online/live migration if VM is running. Ignored if VM is stopped.</param>
                             /// <param name="targetstorage">Default target storage.</param>
                             /// <param name="with_local_disks">Enable live storage migration for local disk</param>
                             /// <returns></returns>
@@ -5090,7 +5242,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="migration_network">CIDR of the (sub) network that is used for migration.</param>
                             /// <param name="migration_type">Migration traffic is encrypted using an SSH tunnel by default. On secure, completely private networks this can be disabled to increase performance.
                             ///   Enum: secure,insecure</param>
-                            /// <param name="online">Use online/live migration.</param>
+                            /// <param name="online">Use online/live migration if VM is running. Ignored if VM is stopped.</param>
                             /// <param name="targetstorage">Default target storage.</param>
                             /// <param name="with_local_disks">Enable live storage migration for local disk</param>
                             /// <returns></returns>
@@ -5402,11 +5554,13 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <summary>
                         /// Destroy the vm (also delete all used/owned volumes).
                         /// </summary>
+                        /// <param name="purge">Remove vmid from backup cron jobs.</param>
                         /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                         /// <returns></returns>
-                        public Result DeleteRest(bool? skiplock = null)
+                        public Result DeleteRest(bool? purge = null, bool? skiplock = null)
                         {
                             var parameters = new Dictionary<string, object>();
+                            parameters.Add("purge", purge);
                             parameters.Add("skiplock", skiplock);
                             return _client.Delete($"/nodes/{_node}/qemu/{_vmid}", parameters);
                         }
@@ -5414,9 +5568,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <summary>
                         /// Destroy the vm (also delete all used/owned volumes).
                         /// </summary>
+                        /// <param name="purge">Remove vmid from backup cron jobs.</param>
                         /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                         /// <returns></returns>
-                        public Result DestroyVm(bool? skiplock = null) => DeleteRest(skiplock);
+                        public Result DestroyVm(bool? purge = null, bool? skiplock = null) => DeleteRest(purge, skiplock);
                         /// <summary>
                         /// Directory index
                         /// </summary>
@@ -5457,6 +5612,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     ///   Enum: x86_64,aarch64</param>
                     /// <param name="archive">The backup file.</param>
                     /// <param name="args">Arbitrary arguments passed to kvm.</param>
+                    /// <param name="audio0">Configure a audio device, useful in combination with QXL/Spice.</param>
                     /// <param name="autostart">Automatic restart after crash (currently ignored).</param>
                     /// <param name="balloon">Amount of target RAM for the VM in MB. Using zero disables the ballon driver.</param>
                     /// <param name="bios">Select BIOS implementation.
@@ -5518,12 +5674,14 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
                     /// <param name="smp">The number of CPUs. Please use option -sockets instead.</param>
                     /// <param name="sockets">The number of CPU sockets.</param>
+                    /// <param name="spice_enhancements">Configure additional enhancements for SPICE.</param>
                     /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
                     /// <param name="start">Start VM after it was created successfully.</param>
                     /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                     /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                     /// <param name="storage">Default storage.</param>
                     /// <param name="tablet">Enable/disable the USB tablet device.</param>
+                    /// <param name="tags">Tags of the VM. This is only meta information.</param>
                     /// <param name="tdf">Enable/disable time drift fix.</param>
                     /// <param name="template">Enable/disable Template.</param>
                     /// <param name="unique">Assign a unique random ethernet address.</param>
@@ -5536,7 +5694,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                     /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                     /// <returns></returns>
-                    public Result CreateRest(int vmid, bool? acpi = null, string agent = null, string arch = null, string archive = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                    public Result CreateRest(int vmid, bool? acpi = null, string agent = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("vmid", vmid);
@@ -5545,6 +5703,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("arch", arch);
                         parameters.Add("archive", archive);
                         parameters.Add("args", args);
+                        parameters.Add("audio0", audio0);
                         parameters.Add("autostart", autostart);
                         parameters.Add("balloon", balloon);
                         parameters.Add("bios", bios);
@@ -5590,12 +5749,14 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("smbios1", smbios1);
                         parameters.Add("smp", smp);
                         parameters.Add("sockets", sockets);
+                        parameters.Add("spice_enhancements", spice_enhancements);
                         parameters.Add("sshkeys", sshkeys);
                         parameters.Add("start", start);
                         parameters.Add("startdate", startdate);
                         parameters.Add("startup", startup);
                         parameters.Add("storage", storage);
                         parameters.Add("tablet", tablet);
+                        parameters.Add("tags", tags);
                         parameters.Add("tdf", tdf);
                         parameters.Add("template", template);
                         parameters.Add("unique", unique);
@@ -5629,6 +5790,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     ///   Enum: x86_64,aarch64</param>
                     /// <param name="archive">The backup file.</param>
                     /// <param name="args">Arbitrary arguments passed to kvm.</param>
+                    /// <param name="audio0">Configure a audio device, useful in combination with QXL/Spice.</param>
                     /// <param name="autostart">Automatic restart after crash (currently ignored).</param>
                     /// <param name="balloon">Amount of target RAM for the VM in MB. Using zero disables the ballon driver.</param>
                     /// <param name="bios">Select BIOS implementation.
@@ -5690,12 +5852,14 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
                     /// <param name="smp">The number of CPUs. Please use option -sockets instead.</param>
                     /// <param name="sockets">The number of CPU sockets.</param>
+                    /// <param name="spice_enhancements">Configure additional enhancements for SPICE.</param>
                     /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
                     /// <param name="start">Start VM after it was created successfully.</param>
                     /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                     /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                     /// <param name="storage">Default storage.</param>
                     /// <param name="tablet">Enable/disable the USB tablet device.</param>
+                    /// <param name="tags">Tags of the VM. This is only meta information.</param>
                     /// <param name="tdf">Enable/disable time drift fix.</param>
                     /// <param name="template">Enable/disable Template.</param>
                     /// <param name="unique">Assign a unique random ethernet address.</param>
@@ -5708,7 +5872,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                     /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                     /// <returns></returns>
-                    public Result CreateVm(int vmid, bool? acpi = null, string agent = null, string arch = null, string archive = null, string args = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => CreateRest(vmid, acpi, agent, arch, archive, args, autostart, balloon, bios, boot, bootdisk, bwlimit, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, description, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, pool, protection, reboot, sataN, scsiN, scsihw, searchdomain, serialN, shares, smbios1, smp, sockets, sshkeys, start, startdate, startup, storage, tablet, tdf, template, unique, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
+                    public Result CreateVm(int vmid, bool? acpi = null, string agent = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => CreateRest(vmid, acpi, agent, arch, archive, args, audio0, autostart, balloon, bios, boot, bootdisk, bwlimit, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, description, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, pool, protection, reboot, sataN, scsiN, scsihw, searchdomain, serialN, shares, smbios1, smp, sockets, spice_enhancements, sshkeys, start, startdate, startup, storage, tablet, tags, tdf, template, unique, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
                 }
                 public class PVELxc
                 {
@@ -5758,6 +5922,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         public PVEResize Resize => _resize ?? (_resize = new PVEResize(_client, _node, _vmid));
                         private PVEMoveVolume _moveVolume;
                         public PVEMoveVolume MoveVolume => _moveVolume ?? (_moveVolume = new PVEMoveVolume(_client, _node, _vmid));
+                        private PVEPending _pending;
+                        public PVEPending Pending => _pending ?? (_pending = new PVEPending(_client, _node, _vmid));
                         public class PVEConfig
                         {
                             private readonly PveClient _client;
@@ -5771,11 +5937,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <summary>
                             /// Get container configuration.
                             /// </summary>
+                            /// <param name="current">Get current values (instead of pending values).</param>
                             /// <param name="snapshot">Fetch config values from given snapshot.</param>
                             /// <returns></returns>
-                            public Result GetRest(string snapshot = null)
+                            public Result GetRest(bool? current = null, string snapshot = null)
                             {
                                 var parameters = new Dictionary<string, object>();
+                                parameters.Add("current", current);
                                 parameters.Add("snapshot", snapshot);
                                 return _client.Get($"/nodes/{_node}/lxc/{_vmid}/config", parameters);
                             }
@@ -5783,9 +5951,10 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <summary>
                             /// Get container configuration.
                             /// </summary>
+                            /// <param name="current">Get current values (instead of pending values).</param>
                             /// <param name="snapshot">Fetch config values from given snapshot.</param>
                             /// <returns></returns>
-                            public Result VmConfig(string snapshot = null) => GetRest(snapshot);
+                            public Result VmConfig(bool? current = null, string snapshot = null) => GetRest(current, snapshot);
                             /// <summary>
                             /// Set container options.
                             /// </summary>
@@ -5804,7 +5973,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="hookscript">Script that will be exectued during various steps in the containers lifetime.</param>
                             /// <param name="hostname">Set a host name for the container.</param>
                             /// <param name="lock_">Lock/unlock the VM.
-                            ///   Enum: backup,create,disk,fstrim,migrate,mounted,rollback,snapshot,snapshot-delete</param>
+                            ///   Enum: backup,create,destroyed,disk,fstrim,migrate,mounted,rollback,snapshot,snapshot-delete</param>
                             /// <param name="memory">Amount of RAM for the VM in MB.</param>
                             /// <param name="mpN">Use volume as container mount point.</param>
                             /// <param name="nameserver">Sets DNS server IP address for a container. Create will automatically use the setting from the host if you neither set searchdomain nor nameserver.</param>
@@ -5813,16 +5982,18 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="ostype">OS type. This is used to setup configuration inside the container, and corresponds to lxc setup scripts in /usr/share/lxc/config/&amp;lt;ostype&amp;gt;.common.conf. Value 'unmanaged' can be used to skip and OS specific setup.
                             ///   Enum: debian,ubuntu,centos,fedora,opensuse,archlinux,alpine,gentoo,unmanaged</param>
                             /// <param name="protection">Sets the protection flag of the container. This will prevent the CT or CT's disk remove/update operation.</param>
+                            /// <param name="revert">Revert a pending change.</param>
                             /// <param name="rootfs">Use volume as container root.</param>
                             /// <param name="searchdomain">Sets DNS search domains for a container. Create will automatically use the setting from the host if you neither set searchdomain nor nameserver.</param>
                             /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                             /// <param name="swap">Amount of SWAP for the VM in MB.</param>
+                            /// <param name="tags">Tags of the Container. This is only meta information.</param>
                             /// <param name="template">Enable/disable Template.</param>
                             /// <param name="tty">Specify the number of tty available to the container</param>
                             /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
                             /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                             /// <returns></returns>
-                            public Result SetRest(string arch = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string features = null, string hookscript = null, string hostname = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, bool? protection = null, string rootfs = null, string searchdomain = null, string startup = null, int? swap = null, bool? template = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
+                            public Result SetRest(string arch = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string features = null, string hookscript = null, string hostname = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, bool? protection = null, string revert = null, string rootfs = null, string searchdomain = null, string startup = null, int? swap = null, string tags = null, bool? template = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("arch", arch);
@@ -5843,10 +6014,12 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("onboot", onboot);
                                 parameters.Add("ostype", ostype);
                                 parameters.Add("protection", protection);
+                                parameters.Add("revert", revert);
                                 parameters.Add("rootfs", rootfs);
                                 parameters.Add("searchdomain", searchdomain);
                                 parameters.Add("startup", startup);
                                 parameters.Add("swap", swap);
+                                parameters.Add("tags", tags);
                                 parameters.Add("template", template);
                                 parameters.Add("tty", tty);
                                 parameters.Add("unprivileged", unprivileged);
@@ -5874,7 +6047,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="hookscript">Script that will be exectued during various steps in the containers lifetime.</param>
                             /// <param name="hostname">Set a host name for the container.</param>
                             /// <param name="lock_">Lock/unlock the VM.
-                            ///   Enum: backup,create,disk,fstrim,migrate,mounted,rollback,snapshot,snapshot-delete</param>
+                            ///   Enum: backup,create,destroyed,disk,fstrim,migrate,mounted,rollback,snapshot,snapshot-delete</param>
                             /// <param name="memory">Amount of RAM for the VM in MB.</param>
                             /// <param name="mpN">Use volume as container mount point.</param>
                             /// <param name="nameserver">Sets DNS server IP address for a container. Create will automatically use the setting from the host if you neither set searchdomain nor nameserver.</param>
@@ -5883,16 +6056,18 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="ostype">OS type. This is used to setup configuration inside the container, and corresponds to lxc setup scripts in /usr/share/lxc/config/&amp;lt;ostype&amp;gt;.common.conf. Value 'unmanaged' can be used to skip and OS specific setup.
                             ///   Enum: debian,ubuntu,centos,fedora,opensuse,archlinux,alpine,gentoo,unmanaged</param>
                             /// <param name="protection">Sets the protection flag of the container. This will prevent the CT or CT's disk remove/update operation.</param>
+                            /// <param name="revert">Revert a pending change.</param>
                             /// <param name="rootfs">Use volume as container root.</param>
                             /// <param name="searchdomain">Sets DNS search domains for a container. Create will automatically use the setting from the host if you neither set searchdomain nor nameserver.</param>
                             /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                             /// <param name="swap">Amount of SWAP for the VM in MB.</param>
+                            /// <param name="tags">Tags of the Container. This is only meta information.</param>
                             /// <param name="template">Enable/disable Template.</param>
                             /// <param name="tty">Specify the number of tty available to the container</param>
                             /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
                             /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                             /// <returns></returns>
-                            public Result UpdateVm(string arch = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string features = null, string hookscript = null, string hostname = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, bool? protection = null, string rootfs = null, string searchdomain = null, string startup = null, int? swap = null, bool? template = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null) => SetRest(arch, cmode, console, cores, cpulimit, cpuunits, delete, description, digest, features, hookscript, hostname, lock_, memory, mpN, nameserver, netN, onboot, ostype, protection, rootfs, searchdomain, startup, swap, template, tty, unprivileged, unusedN);
+                            public Result UpdateVm(string arch = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string features = null, string hookscript = null, string hostname = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, bool? protection = null, string revert = null, string rootfs = null, string searchdomain = null, string startup = null, int? swap = null, string tags = null, bool? template = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null) => SetRest(arch, cmode, console, cores, cpulimit, cpuunits, delete, description, digest, features, hookscript, hostname, lock_, memory, mpN, nameserver, netN, onboot, ostype, protection, revert, rootfs, searchdomain, startup, swap, tags, template, tty, unprivileged, unusedN);
                         }
                         public class PVEStatus
                         {
@@ -5916,6 +6091,8 @@ namespace Corsinvest.ProxmoxVE.Api
                             public PVESuspend Suspend => _suspend ?? (_suspend = new PVESuspend(_client, _node, _vmid));
                             private PVEResume _resume;
                             public PVEResume Resume => _resume ?? (_resume = new PVEResume(_client, _node, _vmid));
+                            private PVEReboot _reboot;
+                            public PVEReboot Reboot => _reboot ?? (_reboot = new PVEReboot(_client, _node, _vmid));
                             public class PVECurrent
                             {
                                 private readonly PveClient _client;
@@ -6071,6 +6248,35 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result VmResume() => CreateRest();
+                            }
+                            public class PVEReboot
+                            {
+                                private readonly PveClient _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
+                                internal PVEReboot(PveClient client, object node, object vmid)
+                                {
+                                    _client = client; _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Reboot the container by shutting it down, and starting it again. Applies pending changes.
+                                /// </summary>
+                                /// <param name="timeout">Wait maximal timeout seconds for the shutdown.</param>
+                                /// <returns></returns>
+                                public Result CreateRest(int? timeout = null)
+                                {
+                                    var parameters = new Dictionary<string, object>();
+                                    parameters.Add("timeout", timeout);
+                                    return _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/reboot", parameters);
+                                }
+
+                                /// <summary>
+                                /// Reboot the container by shutting it down, and starting it again. Applies pending changes.
+                                /// </summary>
+                                /// <param name="timeout">Wait maximal timeout seconds for the shutdown.</param>
+                                /// <returns></returns>
+                                public Result VmReboot(int? timeout = null) => CreateRest(timeout);
                             }
                             /// <summary>
                             /// Directory index
@@ -6780,7 +6986,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="log_level_out">Log level for outgoing traffic.
                                 ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                                 /// <param name="macfilter">Enable/disable MAC address filter.</param>
-                                /// <param name="ndp">Enable NDP.</param>
+                                /// <param name="ndp">Enable NDP (Neighbor Discovery Protocol).</param>
                                 /// <param name="policy_in">Input policy.
                                 ///   Enum: ACCEPT,REJECT,DROP</param>
                                 /// <param name="policy_out">Output policy.
@@ -6818,7 +7024,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="log_level_out">Log level for outgoing traffic.
                                 ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                                 /// <param name="macfilter">Enable/disable MAC address filter.</param>
-                                /// <param name="ndp">Enable NDP.</param>
+                                /// <param name="ndp">Enable NDP (Neighbor Discovery Protocol).</param>
                                 /// <param name="policy_in">Input policy.
                                 ///   Enum: ACCEPT,REJECT,DROP</param>
                                 /// <param name="policy_out">Output policy.
@@ -7328,17 +7534,46 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result MoveVolume(string storage, string volume, int? bwlimit = null, bool? delete = null, string digest = null) => CreateRest(storage, volume, bwlimit, delete, digest);
                         }
+                        public class PVEPending
+                        {
+                            private readonly PveClient _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
+                            internal PVEPending(PveClient client, object node, object vmid)
+                            {
+                                _client = client; _node = node;
+                                _vmid = vmid;
+                            }
+                            /// <summary>
+                            /// Get container configuration, including pending changes.
+                            /// </summary>
+                            /// <returns></returns>
+                            public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/pending"); }
+
+                            /// <summary>
+                            /// Get container configuration, including pending changes.
+                            /// </summary>
+                            /// <returns></returns>
+                            public Result VmPending() => GetRest();
+                        }
                         /// <summary>
                         /// Destroy the container (also delete all uses files).
                         /// </summary>
+                        /// <param name="purge">Remove vmid from backup cron jobs.</param>
                         /// <returns></returns>
-                        public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/lxc/{_vmid}"); }
+                        public Result DeleteRest(bool? purge = null)
+                        {
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("purge", purge);
+                            return _client.Delete($"/nodes/{_node}/lxc/{_vmid}", parameters);
+                        }
 
                         /// <summary>
                         /// Destroy the container (also delete all uses files).
                         /// </summary>
+                        /// <param name="purge">Remove vmid from backup cron jobs.</param>
                         /// <returns></returns>
-                        public Result DestroyVm() => DeleteRest();
+                        public Result DestroyVm(bool? purge = null) => DeleteRest(purge);
                         /// <summary>
                         /// Directory index
                         /// </summary>
@@ -7383,7 +7618,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="hostname">Set a host name for the container.</param>
                     /// <param name="ignore_unpack_errors">Ignore errors when extracting the template.</param>
                     /// <param name="lock_">Lock/unlock the VM.
-                    ///   Enum: backup,create,disk,fstrim,migrate,mounted,rollback,snapshot,snapshot-delete</param>
+                    ///   Enum: backup,create,destroyed,disk,fstrim,migrate,mounted,rollback,snapshot,snapshot-delete</param>
                     /// <param name="memory">Amount of RAM for the VM in MB.</param>
                     /// <param name="mpN">Use volume as container mount point.</param>
                     /// <param name="nameserver">Sets DNS server IP address for a container. Create will automatically use the setting from the host if you neither set searchdomain nor nameserver.</param>
@@ -7402,13 +7637,14 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                     /// <param name="storage">Default Storage.</param>
                     /// <param name="swap">Amount of SWAP for the VM in MB.</param>
+                    /// <param name="tags">Tags of the Container. This is only meta information.</param>
                     /// <param name="template">Enable/disable Template.</param>
                     /// <param name="tty">Specify the number of tty available to the container</param>
                     /// <param name="unique">Assign a unique random ethernet address.</param>
                     /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
                     /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string ostemplate, int vmid, string arch = null, int? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string description = null, string features = null, bool? force = null, string hookscript = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, bool? start = null, string startup = null, string storage = null, int? swap = null, bool? template = null, int? tty = null, bool? unique = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
+                    public Result CreateRest(string ostemplate, int vmid, string arch = null, int? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string description = null, string features = null, bool? force = null, string hookscript = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, bool? start = null, string startup = null, string storage = null, int? swap = null, string tags = null, bool? template = null, int? tty = null, bool? unique = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("ostemplate", ostemplate);
@@ -7442,6 +7678,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("startup", startup);
                         parameters.Add("storage", storage);
                         parameters.Add("swap", swap);
+                        parameters.Add("tags", tags);
                         parameters.Add("template", template);
                         parameters.Add("tty", tty);
                         parameters.Add("unique", unique);
@@ -7473,7 +7710,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="hostname">Set a host name for the container.</param>
                     /// <param name="ignore_unpack_errors">Ignore errors when extracting the template.</param>
                     /// <param name="lock_">Lock/unlock the VM.
-                    ///   Enum: backup,create,disk,fstrim,migrate,mounted,rollback,snapshot,snapshot-delete</param>
+                    ///   Enum: backup,create,destroyed,disk,fstrim,migrate,mounted,rollback,snapshot,snapshot-delete</param>
                     /// <param name="memory">Amount of RAM for the VM in MB.</param>
                     /// <param name="mpN">Use volume as container mount point.</param>
                     /// <param name="nameserver">Sets DNS server IP address for a container. Create will automatically use the setting from the host if you neither set searchdomain nor nameserver.</param>
@@ -7492,13 +7729,14 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                     /// <param name="storage">Default Storage.</param>
                     /// <param name="swap">Amount of SWAP for the VM in MB.</param>
+                    /// <param name="tags">Tags of the Container. This is only meta information.</param>
                     /// <param name="template">Enable/disable Template.</param>
                     /// <param name="tty">Specify the number of tty available to the container</param>
                     /// <param name="unique">Assign a unique random ethernet address.</param>
                     /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
                     /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                     /// <returns></returns>
-                    public Result CreateVm(string ostemplate, int vmid, string arch = null, int? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string description = null, string features = null, bool? force = null, string hookscript = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, bool? start = null, string startup = null, string storage = null, int? swap = null, bool? template = null, int? tty = null, bool? unique = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null) => CreateRest(ostemplate, vmid, arch, bwlimit, cmode, console, cores, cpulimit, cpuunits, description, features, force, hookscript, hostname, ignore_unpack_errors, lock_, memory, mpN, nameserver, netN, onboot, ostype, password, pool, protection, restore, rootfs, searchdomain, ssh_public_keys, start, startup, storage, swap, template, tty, unique, unprivileged, unusedN);
+                    public Result CreateVm(string ostemplate, int vmid, string arch = null, int? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string description = null, string features = null, bool? force = null, string hookscript = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, bool? start = null, string startup = null, string storage = null, int? swap = null, string tags = null, bool? template = null, int? tty = null, bool? unique = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null) => CreateRest(ostemplate, vmid, arch, bwlimit, cmode, console, cores, cpulimit, cpuunits, description, features, force, hookscript, hostname, ignore_unpack_errors, lock_, memory, mpN, nameserver, netN, onboot, ostype, password, pool, protection, restore, rootfs, searchdomain, ssh_public_keys, start, startup, storage, swap, tags, template, tty, unique, unprivileged, unusedN);
                 }
                 public class PVECeph
                 {
@@ -8221,13 +8459,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result UnsetFlag() => DeleteRest();
                             /// <summary>
-                            /// Set a ceph flag
+                            /// Set a specific ceph flag
                             /// </summary>
                             /// <returns></returns>
                             public Result CreateRest() { return _client.Create($"/nodes/{_node}/ceph/flags/{_flag}"); }
 
                             /// <summary>
-                            /// Set a ceph flag
+                            /// Set a specific ceph flag
                             /// </summary>
                             /// <returns></returns>
                             public Result SetFlag() => CreateRest();
@@ -9414,14 +9652,21 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <summary>
                                 /// Delete volume
                                 /// </summary>
+                                /// <param name="delay">Time to wait for the task to finish. We return 'null' if the task finish within that time.</param>
                                 /// <returns></returns>
-                                public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/storage/{_storage}/content/{_volume}"); }
+                                public Result DeleteRest(int? delay = null)
+                                {
+                                    var parameters = new Dictionary<string, object>();
+                                    parameters.Add("delay", delay);
+                                    return _client.Delete($"/nodes/{_node}/storage/{_storage}/content/{_volume}", parameters);
+                                }
 
                                 /// <summary>
                                 /// Delete volume
                                 /// </summary>
+                                /// <param name="delay">Time to wait for the task to finish. We return 'null' if the task finish within that time.</param>
                                 /// <returns></returns>
-                                public Result Delete() => DeleteRest();
+                                public Result Delete(int? delay = null) => DeleteRest(delay);
                                 /// <summary>
                                 /// Get volume attributes
                                 /// </summary>
@@ -10326,18 +10571,22 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="log_level_out">Log level for outgoing traffic.
                         ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                         /// <param name="log_nf_conntrack">Enable logging of conntrack information.</param>
-                        /// <param name="ndp">Enable NDP.</param>
+                        /// <param name="ndp">Enable NDP (Neighbor Discovery Protocol).</param>
                         /// <param name="nf_conntrack_allow_invalid">Allow invalid packets on connection tracking.</param>
                         /// <param name="nf_conntrack_max">Maximum number of tracked connections.</param>
                         /// <param name="nf_conntrack_tcp_timeout_established">Conntrack established timeout.</param>
+                        /// <param name="nf_conntrack_tcp_timeout_syn_recv">Conntrack syn recv timeout.</param>
                         /// <param name="nosmurfs">Enable SMURFS filter.</param>
+                        /// <param name="protection_synflood">Enable synflood protection</param>
+                        /// <param name="protection_synflood_burst">Synflood protection rate burst by ip src.</param>
+                        /// <param name="protection_synflood_rate">Synflood protection rate syn/sec by ip src.</param>
                         /// <param name="smurf_log_level">Log level for SMURFS filter.
                         ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                         /// <param name="tcp_flags_log_level">Log level for illegal tcp flags filter.
                         ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                         /// <param name="tcpflags">Filter illegal combinations of TCP flags.</param>
                         /// <returns></returns>
-                        public Result SetRest(string delete = null, string digest = null, bool? enable = null, string log_level_in = null, string log_level_out = null, bool? log_nf_conntrack = null, bool? ndp = null, bool? nf_conntrack_allow_invalid = null, int? nf_conntrack_max = null, int? nf_conntrack_tcp_timeout_established = null, bool? nosmurfs = null, string smurf_log_level = null, string tcp_flags_log_level = null, bool? tcpflags = null)
+                        public Result SetRest(string delete = null, string digest = null, bool? enable = null, string log_level_in = null, string log_level_out = null, bool? log_nf_conntrack = null, bool? ndp = null, bool? nf_conntrack_allow_invalid = null, int? nf_conntrack_max = null, int? nf_conntrack_tcp_timeout_established = null, int? nf_conntrack_tcp_timeout_syn_recv = null, bool? nosmurfs = null, bool? protection_synflood = null, int? protection_synflood_burst = null, int? protection_synflood_rate = null, string smurf_log_level = null, string tcp_flags_log_level = null, bool? tcpflags = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("delete", delete);
@@ -10350,7 +10599,11 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("nf_conntrack_allow_invalid", nf_conntrack_allow_invalid);
                             parameters.Add("nf_conntrack_max", nf_conntrack_max);
                             parameters.Add("nf_conntrack_tcp_timeout_established", nf_conntrack_tcp_timeout_established);
+                            parameters.Add("nf_conntrack_tcp_timeout_syn_recv", nf_conntrack_tcp_timeout_syn_recv);
                             parameters.Add("nosmurfs", nosmurfs);
+                            parameters.Add("protection_synflood", protection_synflood);
+                            parameters.Add("protection_synflood_burst", protection_synflood_burst);
+                            parameters.Add("protection_synflood_rate", protection_synflood_rate);
                             parameters.Add("smurf_log_level", smurf_log_level);
                             parameters.Add("tcp_flags_log_level", tcp_flags_log_level);
                             parameters.Add("tcpflags", tcpflags);
@@ -10368,18 +10621,22 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="log_level_out">Log level for outgoing traffic.
                         ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                         /// <param name="log_nf_conntrack">Enable logging of conntrack information.</param>
-                        /// <param name="ndp">Enable NDP.</param>
+                        /// <param name="ndp">Enable NDP (Neighbor Discovery Protocol).</param>
                         /// <param name="nf_conntrack_allow_invalid">Allow invalid packets on connection tracking.</param>
                         /// <param name="nf_conntrack_max">Maximum number of tracked connections.</param>
                         /// <param name="nf_conntrack_tcp_timeout_established">Conntrack established timeout.</param>
+                        /// <param name="nf_conntrack_tcp_timeout_syn_recv">Conntrack syn recv timeout.</param>
                         /// <param name="nosmurfs">Enable SMURFS filter.</param>
+                        /// <param name="protection_synflood">Enable synflood protection</param>
+                        /// <param name="protection_synflood_burst">Synflood protection rate burst by ip src.</param>
+                        /// <param name="protection_synflood_rate">Synflood protection rate syn/sec by ip src.</param>
                         /// <param name="smurf_log_level">Log level for SMURFS filter.
                         ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                         /// <param name="tcp_flags_log_level">Log level for illegal tcp flags filter.
                         ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                         /// <param name="tcpflags">Filter illegal combinations of TCP flags.</param>
                         /// <returns></returns>
-                        public Result SetOptions(string delete = null, string digest = null, bool? enable = null, string log_level_in = null, string log_level_out = null, bool? log_nf_conntrack = null, bool? ndp = null, bool? nf_conntrack_allow_invalid = null, int? nf_conntrack_max = null, int? nf_conntrack_tcp_timeout_established = null, bool? nosmurfs = null, string smurf_log_level = null, string tcp_flags_log_level = null, bool? tcpflags = null) => SetRest(delete, digest, enable, log_level_in, log_level_out, log_nf_conntrack, ndp, nf_conntrack_allow_invalid, nf_conntrack_max, nf_conntrack_tcp_timeout_established, nosmurfs, smurf_log_level, tcp_flags_log_level, tcpflags);
+                        public Result SetOptions(string delete = null, string digest = null, bool? enable = null, string log_level_in = null, string log_level_out = null, bool? log_nf_conntrack = null, bool? ndp = null, bool? nf_conntrack_allow_invalid = null, int? nf_conntrack_max = null, int? nf_conntrack_tcp_timeout_established = null, int? nf_conntrack_tcp_timeout_syn_recv = null, bool? nosmurfs = null, bool? protection_synflood = null, int? protection_synflood_burst = null, int? protection_synflood_rate = null, string smurf_log_level = null, string tcp_flags_log_level = null, bool? tcpflags = null) => SetRest(delete, digest, enable, log_level_in, log_level_out, log_nf_conntrack, ndp, nf_conntrack_allow_invalid, nf_conntrack_max, nf_conntrack_tcp_timeout_established, nf_conntrack_tcp_timeout_syn_recv, nosmurfs, protection_synflood, protection_synflood_burst, protection_synflood_rate, smurf_log_level, tcp_flags_log_level, tcpflags);
                     }
                     public class PVELog
                     {
@@ -10720,14 +10977,23 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <summary>
                     /// Get node configuration options.
                     /// </summary>
+                    /// <param name="property">Return only a specific property from the node configuration.
+                    ///   Enum: acme,description,startall-onboot-delay,wakeonlan</param>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/config"); }
+                    public Result GetRest(string property = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("property", property);
+                        return _client.Get($"/nodes/{_node}/config", parameters);
+                    }
 
                     /// <summary>
                     /// Get node configuration options.
                     /// </summary>
+                    /// <param name="property">Return only a specific property from the node configuration.
+                    ///   Enum: acme,description,startall-onboot-delay,wakeonlan</param>
                     /// <returns></returns>
-                    public Result GetConfig() => GetRest();
+                    public Result GetConfig(string property = null) => GetRest(property);
                     /// <summary>
                     /// Set node configuration options.
                     /// </summary>
@@ -10735,15 +11001,17 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="delete">A list of settings you want to delete.</param>
                     /// <param name="description">Node description/comment.</param>
                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
+                    /// <param name="startall_onboot_delay">Initial delay in seconds, before starting all the Virtual Guests with on-boot enabled.</param>
                     /// <param name="wakeonlan">MAC address for wake on LAN</param>
                     /// <returns></returns>
-                    public Result SetRest(string acme = null, string delete = null, string description = null, string digest = null, string wakeonlan = null)
+                    public Result SetRest(string acme = null, string delete = null, string description = null, string digest = null, int? startall_onboot_delay = null, string wakeonlan = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("acme", acme);
                         parameters.Add("delete", delete);
                         parameters.Add("description", description);
                         parameters.Add("digest", digest);
+                        parameters.Add("startall-onboot-delay", startall_onboot_delay);
                         parameters.Add("wakeonlan", wakeonlan);
                         return _client.Set($"/nodes/{_node}/config", parameters);
                     }
@@ -10755,9 +11023,10 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="delete">A list of settings you want to delete.</param>
                     /// <param name="description">Node description/comment.</param>
                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
+                    /// <param name="startall_onboot_delay">Initial delay in seconds, before starting all the Virtual Guests with on-boot enabled.</param>
                     /// <param name="wakeonlan">MAC address for wake on LAN</param>
                     /// <returns></returns>
-                    public Result SetOptions(string acme = null, string delete = null, string description = null, string digest = null, string wakeonlan = null) => SetRest(acme, delete, description, digest, wakeonlan);
+                    public Result SetOptions(string acme = null, string delete = null, string description = null, string digest = null, int? startall_onboot_delay = null, string wakeonlan = null) => SetRest(acme, delete, description, digest, startall_onboot_delay, wakeonlan);
                 }
                 public class PVEVersion
                 {
@@ -11017,7 +11286,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a VNC Shell proxy.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: upgrade,ceph_install,login</param>
+                    ///   Enum: login,ceph_install,upgrade</param>
                     /// <param name="height">sets the height of the console in pixels.</param>
                     /// <param name="upgrade">Deprecated, use the 'cmd' property instead! Run 'apt-get dist-upgrade' instead of normal shell.</param>
                     /// <param name="websocket">use websocket instead of standard vnc.</param>
@@ -11038,7 +11307,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a VNC Shell proxy.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: upgrade,ceph_install,login</param>
+                    ///   Enum: login,ceph_install,upgrade</param>
                     /// <param name="height">sets the height of the console in pixels.</param>
                     /// <param name="upgrade">Deprecated, use the 'cmd' property instead! Run 'apt-get dist-upgrade' instead of normal shell.</param>
                     /// <param name="websocket">use websocket instead of standard vnc.</param>
@@ -11055,7 +11324,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a VNC Shell proxy.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: upgrade,ceph_install,login</param>
+                    ///   Enum: login,ceph_install,upgrade</param>
                     /// <param name="upgrade">Deprecated, use the 'cmd' property instead! Run 'apt-get dist-upgrade' instead of normal shell.</param>
                     /// <returns></returns>
                     public Result CreateRest(string cmd = null, bool? upgrade = null)
@@ -11070,7 +11339,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a VNC Shell proxy.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: upgrade,ceph_install,login</param>
+                    ///   Enum: login,ceph_install,upgrade</param>
                     /// <param name="upgrade">Deprecated, use the 'cmd' property instead! Run 'apt-get dist-upgrade' instead of normal shell.</param>
                     /// <returns></returns>
                     public Result Termproxy(string cmd = null, bool? upgrade = null) => CreateRest(cmd, upgrade);
@@ -11111,7 +11380,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a SPICE shell.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: upgrade,ceph_install,login</param>
+                    ///   Enum: login,ceph_install,upgrade</param>
                     /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As reasonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                     /// <param name="upgrade">Deprecated, use the 'cmd' property instead! Run 'apt-get dist-upgrade' instead of normal shell.</param>
                     /// <returns></returns>
@@ -11128,7 +11397,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a SPICE shell.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: upgrade,ceph_install,login</param>
+                    ///   Enum: login,ceph_install,upgrade</param>
                     /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As reasonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                     /// <param name="upgrade">Deprecated, use the 'cmd' property instead! Run 'apt-get dist-upgrade' instead of normal shell.</param>
                     /// <returns></returns>
@@ -11274,10 +11543,10 @@ namespace Corsinvest.ProxmoxVE.Api
                     private readonly object _node;
                     internal PVEStartall(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
-                    /// Start all VMs and containers (when onboot=1).
+                    /// Start all VMs and containers located on this node (by default only those with onboot=1).
                     /// </summary>
-                    /// <param name="force">force if onboot=0.</param>
-                    /// <param name="vms">Only consider Guests with these IDs.</param>
+                    /// <param name="force">Issue start command even if virtual guest have 'onboot' not set or set to off.</param>
+                    /// <param name="vms">Only consider guests from this comma separated list of VMIDs.</param>
                     /// <returns></returns>
                     public Result CreateRest(bool? force = null, string vms = null)
                     {
@@ -11288,10 +11557,10 @@ namespace Corsinvest.ProxmoxVE.Api
                     }
 
                     /// <summary>
-                    /// Start all VMs and containers (when onboot=1).
+                    /// Start all VMs and containers located on this node (by default only those with onboot=1).
                     /// </summary>
-                    /// <param name="force">force if onboot=0.</param>
-                    /// <param name="vms">Only consider Guests with these IDs.</param>
+                    /// <param name="force">Issue start command even if virtual guest have 'onboot' not set or set to off.</param>
+                    /// <param name="vms">Only consider guests from this comma separated list of VMIDs.</param>
                     /// <returns></returns>
                     public Result Startall(bool? force = null, string vms = null) => CreateRest(force, vms);
                 }
@@ -11464,6 +11733,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="maxfiles">Maximal number of backup files per VM. Use '0' for unlimted.</param>
                 /// <param name="mkdir">Create the directory if it doesn't exist.</param>
                 /// <param name="monhost">IP addresses of monitors (for external clusters).</param>
+                /// <param name="mountpoint">mount point</param>
                 /// <param name="nodes">List of cluster node names.</param>
                 /// <param name="nowritecache">disable write caching on the target</param>
                 /// <param name="options">NFS mount options (see 'man nfs')</param>
@@ -11484,7 +11754,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 ///   Enum: tcp,rdma,unix</param>
                 /// <param name="username">RBD Id.</param>
                 /// <returns></returns>
-                public Result SetRest(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string format = null, bool? fuse = null, string is_mountpoint = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null)
+                public Result SetRest(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string format = null, bool? fuse = null, string is_mountpoint = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("blocksize", blocksize);
@@ -11504,6 +11774,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("maxfiles", maxfiles);
                     parameters.Add("mkdir", mkdir);
                     parameters.Add("monhost", monhost);
+                    parameters.Add("mountpoint", mountpoint);
                     parameters.Add("nodes", nodes);
                     parameters.Add("nowritecache", nowritecache);
                     parameters.Add("options", options);
@@ -11544,6 +11815,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="maxfiles">Maximal number of backup files per VM. Use '0' for unlimted.</param>
                 /// <param name="mkdir">Create the directory if it doesn't exist.</param>
                 /// <param name="monhost">IP addresses of monitors (for external clusters).</param>
+                /// <param name="mountpoint">mount point</param>
                 /// <param name="nodes">List of cluster node names.</param>
                 /// <param name="nowritecache">disable write caching on the target</param>
                 /// <param name="options">NFS mount options (see 'man nfs')</param>
@@ -11564,7 +11836,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 ///   Enum: tcp,rdma,unix</param>
                 /// <param name="username">RBD Id.</param>
                 /// <returns></returns>
-                public Result Update(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string format = null, bool? fuse = null, string is_mountpoint = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null) => SetRest(blocksize, bwlimit, comstar_hg, comstar_tg, content, delete, digest, disable, domain, format, fuse, is_mountpoint, krbd, lio_tpg, maxfiles, mkdir, monhost, nodes, nowritecache, options, password, pool, redundancy, saferemove, saferemove_throughput, server, server2, shared, smbversion, sparse, subdir, tagged_only, transport, username);
+                public Result Update(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string format = null, bool? fuse = null, string is_mountpoint = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null) => SetRest(blocksize, bwlimit, comstar_hg, comstar_tg, content, delete, digest, disable, domain, format, fuse, is_mountpoint, krbd, lio_tpg, maxfiles, mkdir, monhost, mountpoint, nodes, nowritecache, options, password, pool, redundancy, saferemove, saferemove_throughput, server, server2, shared, smbversion, sparse, subdir, tagged_only, transport, username);
             }
             /// <summary>
             /// Storage index.
@@ -11611,6 +11883,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="maxfiles">Maximal number of backup files per VM. Use '0' for unlimted.</param>
             /// <param name="mkdir">Create the directory if it doesn't exist.</param>
             /// <param name="monhost">IP addresses of monitors (for external clusters).</param>
+            /// <param name="mountpoint">mount point</param>
             /// <param name="nodes">List of cluster node names.</param>
             /// <param name="nowritecache">disable write caching on the target</param>
             /// <param name="options">NFS mount options (see 'man nfs')</param>
@@ -11638,7 +11911,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="vgname">Volume group name.</param>
             /// <param name="volume">Glusterfs Volume.</param>
             /// <returns></returns>
-            public Result CreateRest(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, bool? disable = null, string domain = null, string export = null, string format = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null)
+            public Result CreateRest(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, bool? disable = null, string domain = null, string export = null, string format = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null)
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("storage", storage);
@@ -11662,6 +11935,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 parameters.Add("maxfiles", maxfiles);
                 parameters.Add("mkdir", mkdir);
                 parameters.Add("monhost", monhost);
+                parameters.Add("mountpoint", mountpoint);
                 parameters.Add("nodes", nodes);
                 parameters.Add("nowritecache", nowritecache);
                 parameters.Add("options", options);
@@ -11714,6 +11988,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="maxfiles">Maximal number of backup files per VM. Use '0' for unlimted.</param>
             /// <param name="mkdir">Create the directory if it doesn't exist.</param>
             /// <param name="monhost">IP addresses of monitors (for external clusters).</param>
+            /// <param name="mountpoint">mount point</param>
             /// <param name="nodes">List of cluster node names.</param>
             /// <param name="nowritecache">disable write caching on the target</param>
             /// <param name="options">NFS mount options (see 'man nfs')</param>
@@ -11741,7 +12016,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="vgname">Volume group name.</param>
             /// <param name="volume">Glusterfs Volume.</param>
             /// <returns></returns>
-            public Result Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, bool? disable = null, string domain = null, string export = null, string format = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null) => CreateRest(storage, type, authsupported, base_, blocksize, bwlimit, comstar_hg, comstar_tg, content, disable, domain, export, format, fuse, is_mountpoint, iscsiprovider, krbd, lio_tpg, maxfiles, mkdir, monhost, nodes, nowritecache, options, password, path, pool, portal, redundancy, saferemove, saferemove_throughput, server, server2, share, shared, smbversion, sparse, subdir, tagged_only, target, thinpool, transport, username, vgname, volume);
+            public Result Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, bool? disable = null, string domain = null, string export = null, string format = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null) => CreateRest(storage, type, authsupported, base_, blocksize, bwlimit, comstar_hg, comstar_tg, content, disable, domain, export, format, fuse, is_mountpoint, iscsiprovider, krbd, lio_tpg, maxfiles, mkdir, monhost, mountpoint, nodes, nowritecache, options, password, path, pool, portal, redundancy, saferemove, saferemove_throughput, server, server2, share, shared, smbversion, sparse, subdir, tagged_only, target, thinpool, transport, username, vgname, volume);
         }
         public class PVEAccess
         {
@@ -12196,11 +12471,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="secure">Use secure LDAPS protocol.</param>
                     /// <param name="server1">Server IP address (or DNS name)</param>
                     /// <param name="server2">Fallback Server IP address (or DNS name)</param>
+                    /// <param name="sslversion">LDAPS TLS/SSL version. It's not recommended to use version older than 1.2!
+                    ///   Enum: tlsv1,tlsv1_1,tlsv1_2,tlsv1_3</param>
                     /// <param name="tfa">Use Two-factor authentication.</param>
                     /// <param name="user_attr">LDAP user attribute name</param>
                     /// <param name="verify">Verify the server's SSL certificate</param>
                     /// <returns></returns>
-                    public Result SetRest(string base_dn = null, string bind_dn = null, string capath = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string delete = null, string digest = null, string domain = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string tfa = null, string user_attr = null, bool? verify = null)
+                    public Result SetRest(string base_dn = null, string bind_dn = null, string capath = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string delete = null, string digest = null, string domain = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string tfa = null, string user_attr = null, bool? verify = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("base_dn", base_dn);
@@ -12217,6 +12494,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("secure", secure);
                         parameters.Add("server1", server1);
                         parameters.Add("server2", server2);
+                        parameters.Add("sslversion", sslversion);
                         parameters.Add("tfa", tfa);
                         parameters.Add("user_attr", user_attr);
                         parameters.Add("verify", verify);
@@ -12240,11 +12518,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="secure">Use secure LDAPS protocol.</param>
                     /// <param name="server1">Server IP address (or DNS name)</param>
                     /// <param name="server2">Fallback Server IP address (or DNS name)</param>
+                    /// <param name="sslversion">LDAPS TLS/SSL version. It's not recommended to use version older than 1.2!
+                    ///   Enum: tlsv1,tlsv1_1,tlsv1_2,tlsv1_3</param>
                     /// <param name="tfa">Use Two-factor authentication.</param>
                     /// <param name="user_attr">LDAP user attribute name</param>
                     /// <param name="verify">Verify the server's SSL certificate</param>
                     /// <returns></returns>
-                    public Result Update(string base_dn = null, string bind_dn = null, string capath = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string delete = null, string digest = null, string domain = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string tfa = null, string user_attr = null, bool? verify = null) => SetRest(base_dn, bind_dn, capath, cert, certkey, comment, default_, delete, digest, domain, port, secure, server1, server2, tfa, user_attr, verify);
+                    public Result Update(string base_dn = null, string bind_dn = null, string capath = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string delete = null, string digest = null, string domain = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string tfa = null, string user_attr = null, bool? verify = null) => SetRest(base_dn, bind_dn, capath, cert, certkey, comment, default_, delete, digest, domain, port, secure, server1, server2, sslversion, tfa, user_attr, verify);
                 }
                 /// <summary>
                 /// Authentication domain index.
@@ -12275,11 +12555,13 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="secure">Use secure LDAPS protocol.</param>
                 /// <param name="server1">Server IP address (or DNS name)</param>
                 /// <param name="server2">Fallback Server IP address (or DNS name)</param>
+                /// <param name="sslversion">LDAPS TLS/SSL version. It's not recommended to use version older than 1.2!
+                ///   Enum: tlsv1,tlsv1_1,tlsv1_2,tlsv1_3</param>
                 /// <param name="tfa">Use Two-factor authentication.</param>
                 /// <param name="user_attr">LDAP user attribute name</param>
                 /// <param name="verify">Verify the server's SSL certificate</param>
                 /// <returns></returns>
-                public Result CreateRest(string realm, string type, string base_dn = null, string bind_dn = null, string capath = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string domain = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string tfa = null, string user_attr = null, bool? verify = null)
+                public Result CreateRest(string realm, string type, string base_dn = null, string bind_dn = null, string capath = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string domain = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string tfa = null, string user_attr = null, bool? verify = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("realm", realm);
@@ -12296,6 +12578,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("secure", secure);
                     parameters.Add("server1", server1);
                     parameters.Add("server2", server2);
+                    parameters.Add("sslversion", sslversion);
                     parameters.Add("tfa", tfa);
                     parameters.Add("user_attr", user_attr);
                     parameters.Add("verify", verify);
@@ -12320,11 +12603,13 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="secure">Use secure LDAPS protocol.</param>
                 /// <param name="server1">Server IP address (or DNS name)</param>
                 /// <param name="server2">Fallback Server IP address (or DNS name)</param>
+                /// <param name="sslversion">LDAPS TLS/SSL version. It's not recommended to use version older than 1.2!
+                ///   Enum: tlsv1,tlsv1_1,tlsv1_2,tlsv1_3</param>
                 /// <param name="tfa">Use Two-factor authentication.</param>
                 /// <param name="user_attr">LDAP user attribute name</param>
                 /// <param name="verify">Verify the server's SSL certificate</param>
                 /// <returns></returns>
-                public Result Create(string realm, string type, string base_dn = null, string bind_dn = null, string capath = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string domain = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string tfa = null, string user_attr = null, bool? verify = null) => CreateRest(realm, type, base_dn, bind_dn, capath, cert, certkey, comment, default_, domain, port, secure, server1, server2, tfa, user_attr, verify);
+                public Result Create(string realm, string type, string base_dn = null, string bind_dn = null, string capath = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string domain = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string tfa = null, string user_attr = null, bool? verify = null) => CreateRest(realm, type, base_dn, bind_dn, capath, cert, certkey, comment, default_, domain, port, secure, server1, server2, sslversion, tfa, user_attr, verify);
             }
             public class PVETicket
             {

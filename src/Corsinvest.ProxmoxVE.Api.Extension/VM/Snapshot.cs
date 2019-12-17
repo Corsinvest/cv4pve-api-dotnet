@@ -75,9 +75,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <summary>
         /// Rollback
         /// </summary>
-        /// <param name="wait"></param>
+        /// <param name="timeout"></param>
         /// <returns></returns>
-        public Result Rollback(bool wait)
+        public Result Rollback(long timeout)
         {
             Result result = null;
             switch (_vm.Type)
@@ -86,7 +86,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                 case VMTypeEnum.Lxc: result = _vm.LxcApi.Snapshot[Name].Rollback.CreateRest(); break;
                 default: break;
             }
-            result.WaitForTaskToFinish(_vm, wait);
+            result.WaitForTaskToFinish(_vm, timeout);
             return result;
         }
 

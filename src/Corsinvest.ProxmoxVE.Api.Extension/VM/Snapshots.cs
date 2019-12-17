@@ -76,9 +76,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <param name="name"></param>
         /// <param name="description"></param>
         /// <param name="state"></param>
-        /// <param name="wait"></param>
+        /// <param name="timeout"></param>
         /// <returns></returns>
-        public Result Create(string name, string description, bool state, bool wait)
+        public Result Create(string name, string description, bool state, long timeout)
         {
             Result result = null;
             switch (_vm.Type)
@@ -88,7 +88,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                 default: break;
             }
 
-            result.WaitForTaskToFinish(_vm, wait);
+            result.WaitForTaskToFinish(_vm, timeout);
 
             RefreshList();
 
@@ -99,14 +99,15 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// Clear a VM/CT snapshot.
         /// </summary>
         /// <param name="keep"></param>
+        /// <param name="timeout"></param>
         /// <returns></returns>
-        public Result Clear(int keep)
+        public Result Clear(int keep, long timeout)
         {
             Result result = null;
             var snapshots = this.OrderBy(a => a.Date).ToArray();
             for (int i = 0; i < Count - keep; i++)
             {
-                result = Remove(snapshots[i], true);
+                result = Remove(snapshots[i], timeout);
                 if (result.ResponseInError) { break; }
             }
 
@@ -117,9 +118,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// Remove snapshot.
         /// </summary>
         /// <param name="snapshot"></param>
-        /// <param name="wait"></param>
+        /// <param name="timeout"></param>
         /// <returns></returns>
-        public Result Remove(Snapshot snapshot, bool wait)
+        public Result Remove(Snapshot snapshot, long timeout)
         {
             Result result = null;
             switch (_vm.Type)
@@ -129,7 +130,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                 default: break;
             }
 
-            result.WaitForTaskToFinish(_vm, wait);
+            result.WaitForTaskToFinish(_vm, timeout);
 
             RefreshList();
 

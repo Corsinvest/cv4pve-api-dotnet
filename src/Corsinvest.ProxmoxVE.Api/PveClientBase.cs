@@ -343,6 +343,7 @@ namespace Corsinvest.ProxmoxVE.Api
         /// Read task status.
         /// </summary>
         /// <returns></returns>
-        private Result ReadTaskStatus(string node, string task) => Get($"/nodes/{node}/tasks/{task}/status");
+        private Result ReadTaskStatus(string node, string task) 
+            => Get($"/nodes/{node}/tasks/{task}/status");
     }
 }

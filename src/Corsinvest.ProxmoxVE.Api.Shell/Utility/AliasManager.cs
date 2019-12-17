@@ -15,9 +15,9 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
-using Corsinvest.ProxmoxVE.Api.Extension.Helpers.Shell;
+using Corsinvest.ProxmoxVE.Api.Shell.Helpers;
 
-namespace Corsinvest.ProxmoxVE.Api.Extension.Shell
+namespace Corsinvest.ProxmoxVE.Api.Shell.Utility
 {
     /// <summary>
     /// Alias manager
@@ -26,8 +26,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell
     {
         private List<AliasDef> _alias = new List<AliasDef>
         {
-            //cluster
-            new AliasDef("cluster-top,ct,top","Cluster top","get /cluster/resources",true),
+            //cluster            
+            new AliasDef("cluster-top,ct,top,❤️","Cluster top","get /cluster/resources",true),
             new AliasDef("cluster-top-node,ctn,topn","Cluster top for node","get /cluster/resources type:node",true),
             new AliasDef("cluster-top-storage,cts,tops","Cluster top for storage",
                 "get /cluster/resources type:storage",true),
@@ -124,8 +124,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell
         /// To table
         /// </summary>
         /// <param name="verbose"></param>
+        /// <param name="outputType"></param>
         /// <returns></returns>
-        public string ToTable(bool verbose)
+        public string ToTable(bool verbose, TableOutputType outputType)
         {
             var columns = verbose ?
                             new[] { "name", "description", "command", "args", "sys" } :
@@ -143,7 +144,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Shell
                                             a.Description,
                                             a.System ? "X" : "" });
 
-            return TableHelper.CreateTable(columns, rows, false).ToString();
+            return TableHelper.Create(columns, rows, outputType, false);
         }
 
         /// <summary>

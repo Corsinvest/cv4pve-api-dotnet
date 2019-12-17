@@ -1,6 +1,6 @@
 # Corsinvest.ProxmoxVE.Api
 
-[![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg)](LICENSE.md) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.svg?label=Nuget%20%20Api) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Extension.svg?label=Nuget%20%20Extension) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Metadata.svg?label=Nuget%20%20Metadata) [![AppVeyor branch](https://img.shields.io/appveyor/ci/franklupo/cv4pve-api-dotnet/master.svg)](https://ci.appveyor.com/project/franklupo/cv4pve-api-dotnet)
+[![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg)](LICENSE.md) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.svg?label=Nuget%20%20Api) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Extension.svg?label=Nuget%20%20Extension) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Metadata.svg?label=Nuget%20%20Metadata) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Shell.svg?label=Nuget%20%20Shell) [![AppVeyor branch](https://img.shields.io/appveyor/ci/franklupo/cv4pve-api-dotnet/master.svg)](https://ci.appveyor.com/project/franklupo/cv4pve-api-dotnet)
 
 Proxmox VE Client API .Net
 
@@ -11,6 +11,8 @@ Proxmox VE Client API .Net
 [Nuget Extension](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Extension)
 
 [Nuget Metadata](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Metadata)
+
+[Nuget Shell](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shell)
 
 ```text
    ______                _                      __
@@ -29,7 +31,7 @@ For licensing details please visit [LICENSE.md](LICENSE.md)
 
 ## Commercial Support
 
-This software is part of a suite of tools called cv4pve-tools. If you want commercial support, visit the [site](https://www.corsinvest.it/cv4pve-tools)
+This software is part of a suite of tools called cv4pve-tools. If you want commercial support, visit the [site](https://www.cv4pve-tools.com)
 
 ## General
 

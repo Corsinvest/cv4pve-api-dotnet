@@ -21,6 +21,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
     public static class ResultExtension
     {
         /// <summary>
+        /// Default timeout
+        /// </summary>
+        public readonly static long DEFAULT_TIMEOUT = 30000;
+
+        /// <summary>
         /// Check result in error.
         /// </summary>
         /// <param name="result"></param>
@@ -44,22 +49,16 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         }
 
         /// <summary>
-        /// Timeout for WaitForTaskToFinish
-        /// </summary>
-        /// <value></value>
-        public static long WaitTimeout { get; set; } = 20000;
-
-        /// <summary>
         /// Wait until task is finish.
         /// </summary>
         /// <param name="result"></param>
         /// <param name="vm"></param>
-        /// <param name="wait"></param>
-        public static void WaitForTaskToFinish(this Result result, VMInfo vm, bool wait)
+        /// <param name="timeout"></param>
+        public static void WaitForTaskToFinish(this Result result, VMInfo vm, long timeout)
         {
-            if (result != null && !result.ResponseInError && wait)
+            if (result != null && !result.ResponseInError && timeout > 0)
             {
-                vm.Client.WaitForTaskToFinish(vm.Node, result.Response.data, 1000, WaitTimeout);
+                vm.Client.WaitForTaskToFinish(vm.Node, result.Response.data, 1000, timeout);
             }
         }
 

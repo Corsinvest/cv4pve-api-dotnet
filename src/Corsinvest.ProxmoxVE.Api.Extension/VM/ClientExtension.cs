@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
  */
- 
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,6 +52,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
 
         private static bool CheckIdOrName(VMInfo vm, string id)
         {
+            var nameLower = vm.Name.ToLower();
+            var idLower = id.ToLower();
+
             if (StringHelper.IsNumeric(id))
             {
                 //numeric
@@ -60,21 +63,21 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
             else if (id.StartsWith("%") && id.EndsWith("%"))
             {
                 //contain
-                return vm.Name.Contains(id.Replace("%", ""));
+                return nameLower.Contains(idLower.Replace("%", ""));
             }
             else if (id.StartsWith("%"))
             {
                 //startwith
-                return vm.Name.StartsWith(id.Replace("%", ""));
+                return nameLower.StartsWith(idLower.Replace("%", ""));
             }
             else if (id.EndsWith("%"))
             {
                 //endwith
-                return vm.Name.EndsWith(id.Replace("%", ""));
+                return nameLower.EndsWith(idLower.Replace("%", ""));
             }
             else
             {
-                return vm.Name == id;
+                return nameLower == idLower;
             }
         }
 
@@ -103,7 +106,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                 else if (id.StartsWith("all-"))
                 {
                     //all in specific node
-                    vms.AddRange(allVms.Where(a => a.Node == id.Substring(4)));
+                    vms.AddRange(allVms.Where(a => a.Node.ToLower() == id.ToLower().Substring(4)));
                 }
                 else
                 {

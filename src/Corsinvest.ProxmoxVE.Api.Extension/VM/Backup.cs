@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
  */
- 
+
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
 {
     /// <summary>
@@ -36,14 +36,14 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <param name="mailTo"></param>
         /// <param name="mailnotification"></param>
         /// <param name="storage"></param>
-        /// <param name="wait"></param>
+        /// <param name="timeout"></param>
         /// <returns></returns>
         public Result Create(string mode,
                              string compress,
                              string mailTo,
                              BackupMailNotificationEnum mailnotification,
                              string storage,
-                             bool wait)
+                             long timeout)
         {
             var result = _vm.NodeApi.Vzdump.CreateRest(vmid: _vm.Id,
                                                        mode: mode,
@@ -53,7 +53,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                                                        mailnotification: (mailnotification + "").ToLower(),
                                                        storage: storage);
 
-            result.WaitForTaskToFinish(_vm, wait);
+            result.WaitForTaskToFinish(_vm, timeout);
             return result;
         }
     }
