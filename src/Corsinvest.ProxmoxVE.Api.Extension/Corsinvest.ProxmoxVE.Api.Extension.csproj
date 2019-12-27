@@ -3,7 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
-    <Version>2.2.0</Version>
+    <Version>2.2.1</Version>
     <Company>Corsinvest Srl</Company>
     <Authors>Daniele Corsini</Authors>
     <Copyright>Corsinvest Srl</Copyright>
@@ -13,8 +13,7 @@
 
     <PackageTags>ProxmoxVE;Api,Client;Rest;Corsinvest;</PackageTags>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageReleaseNotes>- Remove wait and use timeout
-- Serche name no case sensitive
+    <PackageReleaseNotes>
     </PackageReleaseNotes>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageIcon>icon.png</PackageIcon>
