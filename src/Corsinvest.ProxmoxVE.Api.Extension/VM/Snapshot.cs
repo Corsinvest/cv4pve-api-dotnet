@@ -21,13 +21,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
     /// </summary>
     public class Snapshot
     {
-        private readonly VMInfo _vm;
         private readonly dynamic _apiData;
 
         internal Snapshot(VMInfo vm, object apiData)
         {
             _apiData = apiData;
-            _vm = vm;
+            VM = vm;
 
             DynamicHelper.CheckKeyOrCreate(_apiData, "description", "no-description");
             DynamicHelper.CheckKeyOrCreate(_apiData, "parent", "no-parent");
@@ -40,6 +39,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         }
 
         /// <summary>
+        /// VM/CT
+        /// </summary>
+        /// <value></value>
+        public VMInfo VM { get; }
+
+        /// <summary>
         /// Config
         /// </summary>
         /// <value></value>
@@ -47,10 +52,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         {
             get
             {
-                switch (_vm.Type)
+                switch (VM.Type)
                 {
-                    case VMTypeEnum.Qemu: return _vm.QemuApi.Snapshot[Name].Config.GetRest();
-                    case VMTypeEnum.Lxc: return _vm.LxcApi.Snapshot[Name].Config.GetRest();
+                    case VMTypeEnum.Qemu: return VM.QemuApi.Snapshot[Name].Config.GetRest();
+                    case VMTypeEnum.Lxc: return VM.LxcApi.Snapshot[Name].Config.GetRest();
                     default: return null;
                 }
             }
@@ -64,10 +69,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <returns></returns>
         public Result Update(string name, string description)
         {
-            switch (_vm.Type)
+            switch (VM.Type)
             {
-                case VMTypeEnum.Qemu: return _vm.QemuApi.Snapshot[Name].Config.SetRest(description);
-                case VMTypeEnum.Lxc: return _vm.LxcApi.Snapshot[Name].Config.SetRest(description);
+                case VMTypeEnum.Qemu: return VM.QemuApi.Snapshot[Name].Config.SetRest(description);
+                case VMTypeEnum.Lxc: return VM.LxcApi.Snapshot[Name].Config.SetRest(description);
                 default: return null;
             }
         }
@@ -80,13 +85,13 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         public Result Rollback(long timeout)
         {
             Result result = null;
-            switch (_vm.Type)
+            switch (VM.Type)
             {
-                case VMTypeEnum.Qemu: result = _vm.QemuApi.Snapshot[Name].Rollback.CreateRest(); break;
-                case VMTypeEnum.Lxc: result = _vm.LxcApi.Snapshot[Name].Rollback.CreateRest(); break;
+                case VMTypeEnum.Qemu: result = VM.QemuApi.Snapshot[Name].Rollback.CreateRest(); break;
+                case VMTypeEnum.Lxc: result = VM.LxcApi.Snapshot[Name].Rollback.CreateRest(); break;
                 default: break;
             }
-            result.WaitForTaskToFinish(_vm, timeout);
+            result.WaitForTaskToFinish(VM, timeout);
             return result;
         }
 
@@ -115,7 +120,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// Ram used
         /// </summary>
         public bool Ram => _apiData.vmstate != 0;
-
+        
         /// <summary>
         /// Get title info
         /// </summary>
@@ -137,7 +142,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         public string[] GetRowInfo(bool showNodeAndVm)
         {
             var data = new List<string>();
-            if (showNodeAndVm) { data.AddRange(new[] { _vm.Node, _vm.Id, }); }
+            if (showNodeAndVm) { data.AddRange(new[] { VM.Node, VM.Id, }); }
             data.AddRange(new[]{ Date.ToString("yy/MM/dd HH:mm:ss"),
                                  Parent,
                                  Name,

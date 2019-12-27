@@ -74,6 +74,15 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         public bool IsOnline => Status == "online";
 
         /// <summary>
+        /// Server id
+        /// </summary>
+        /// <returns></returns>
+        public string ServerId
+            => IsOnline ?
+                Client.Nodes[Node].Subscription.Get().Response.data.serverid :
+                "";
+
+        /// <summary>
         /// Type
         /// </summary>
         public string Type => ApiData.type;
@@ -84,10 +93,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         public TimeSpan? UpTime => ApiData.uptime == 0 ? null : TimeSpan.FromSeconds(ApiData.uptime);
 
         /// <summary>
-        /// 
+        /// Title info
         /// </summary>
         /// <returns></returns>
-        public static string[] GetTitlesInfo() 
+        public static string[] GetTitlesInfo()
             => new[] { "NODE", "CPU", "MEM(GB)", "DISK(GB)", "UPTIME", "STATUS", "TYPE" };
 
         /// <summary>
