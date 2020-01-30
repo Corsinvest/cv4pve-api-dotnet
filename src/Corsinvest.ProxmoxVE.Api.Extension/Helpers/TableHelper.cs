@@ -18,7 +18,7 @@ using System.Linq;
 using BetterConsoleTables;
 using Corsinvest.ProxmoxVE.Api.Metadata;
 
-namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers
+namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
 {
     /// <summary>
     /// Table output type

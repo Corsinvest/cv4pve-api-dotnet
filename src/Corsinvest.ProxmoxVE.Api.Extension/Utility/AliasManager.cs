@@ -15,9 +15,8 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
-using Corsinvest.ProxmoxVE.Api.Shell.Helpers;
 
-namespace Corsinvest.ProxmoxVE.Api.Shell.Utility
+namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
 {
     /// <summary>
     /// Alias manager
@@ -88,28 +87,28 @@ namespace Corsinvest.ProxmoxVE.Api.Shell.Utility
                          "create /nodes/{node}/qemu/{vmid}/snapshot/{snapname}/rollback",true),
 
             //LXC
-            new AliasDef("lcx-list,llst","LXC list vm","get /nodes/{node}/lcx",true),
+            new AliasDef("lxc-list,llst","LXC list vm","get /nodes/{node}/lxc",true),
             new AliasDef("lxc-migrate,lmig","LXC migrate vm other node",
                          "get /nodes/{node}/lxc/{vmid}/migrate target:{target}",true),
             new AliasDef("lxc-vzdump-restore,lvrst","LXC restore vzdump",
                          "create /nodes/{node}/lxc vmid:{vmid} ostemplate:{archive}",true),
 
             //status
-            new AliasDef("lcx-status,lsts","LXC current status vm","get /nodes/{node}/lcx/{vmid}/status/current",true),
-            new AliasDef("lcx-start,lstr","LXC start vm","create /nodes/{node}/lcx/{vmid}/status/start",true),
-            new AliasDef("lcx-stop,lsto","LXC stop vm","create /nodes/{node}/lcx/{vmid}/status/stop",true),
+            new AliasDef("lxc-status,lsts","LXC current status vm","get /nodes/{node}/lxc/{vmid}/status/current",true),
+            new AliasDef("lxc-start,lstr","LXC start vm","create /nodes/{node}/lxc/{vmid}/status/start",true),
+            new AliasDef("lxc-stop,lsto","LXC stop vm","create /nodes/{node}/lxc/{vmid}/status/stop",true),
             new AliasDef("lxc-shutdown,lsdwn","LXC shutdown vm",
                          "create /nodes/{node}/lxc/{vmid}/status/shutdown", true),
-            new AliasDef("lcx-config,lcfg","LXC config vm","get /nodes/{node}/lcx/{vmid}/config",true),
+            new AliasDef("lxc-config,lcfg","LXC config vm","get /nodes/{node}/lxc/{vmid}/config",true),
 
             //snapshot
-            new AliasDef("lcx-snap-list,lslst","LXC snapshot vm list","get /nodes/{node}/lcx/{vmid}/snapshot",true),
-            new AliasDef("lcx-snap-create,lscrt", "LXC snapshot vm create",
-                         "create /nodes/{node}/lcx/{vmid}/snapshot snapname:{snapname} description:{description}", true),
-            new AliasDef("lcx-snap-delete,lsdel","LXC snapshot vm delete",
-                         "delete /nodes/{node}/lcx/{vmid}/snapshot/{snapname}",true),
-            new AliasDef("lcx-snap-config,lscfg","LXC snapshot vm delete",
-                         "get /nodes/{node}/lcx/{vmid}/snapshot/{snapname}/config",true),
+            new AliasDef("lxc-snap-list,lslst","LXC snapshot vm list","get /nodes/{node}/lxc/{vmid}/snapshot",true),
+            new AliasDef("lxc-snap-create,lscrt", "LXC snapshot vm create",
+                         "create /nodes/{node}/lxc/{vmid}/snapshot snapname:{snapname} description:{description}", true),
+            new AliasDef("lxc-snap-delete,lsdel","LXC snapshot vm delete",
+                         "delete /nodes/{node}/lxc/{vmid}/snapshot/{snapname}",true),
+            new AliasDef("lxc-snap-config,lscfg","LXC snapshot vm delete",
+                         "get /nodes/{node}/lxc/{vmid}/snapshot/{snapname}/config",true),
             new AliasDef("lxc-snap-rollback,lsrbck","LXC snapshot vm rollback",
                          "create /nodes/{node}/lxc/{vmid}/snapshot/{snapname}/rollback",true),
         };

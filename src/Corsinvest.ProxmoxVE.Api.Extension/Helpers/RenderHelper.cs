@@ -16,7 +16,7 @@ using System.Dynamic;
 using System.Linq;
 using Corsinvest.ProxmoxVE.Api.Metadata;
 
-namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers
+namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
 {
     /// <summary>
     /// Render helper

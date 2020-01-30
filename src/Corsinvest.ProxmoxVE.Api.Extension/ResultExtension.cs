@@ -10,7 +10,10 @@
  * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
  */
 
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Corsinvest.ProxmoxVE.Api.Extension.VM;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension
@@ -26,6 +29,14 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         public readonly static long DEFAULT_TIMEOUT = 30000;
 
         /// <summary>
+        /// Enumerable result for Linq.
+        /// </summary>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static IEnumerable<dynamic> ToEnumerable(this Result result)
+            => ((IEnumerable)result.Response.data).Cast<dynamic>();
+
+        /// <summary>
         /// Check result in error.
         /// </summary>
         /// <param name="result"></param>
@@ -36,13 +47,13 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         /// Log error if exists
         /// </summary>
         /// <param name="result"></param>
-        /// <param name="stdOut"></param>
+        /// <param name="out"></param>
         /// <returns></returns>
-        public static bool LogInError(this Result result, TextWriter stdOut)
+        public static bool LogInError(this Result result, TextWriter @out)
         {
             if (result.InError())
             {
-                stdOut.WriteLine(result.GetError());
+                @out.WriteLine(result.GetError());
                 return true;
             }
             return false;

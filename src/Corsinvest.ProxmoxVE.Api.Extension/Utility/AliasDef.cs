@@ -13,7 +13,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Corsinvest.ProxmoxVE.Api.Shell.Utility
+namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
 {
     /// <summary>
     /// Alias command.

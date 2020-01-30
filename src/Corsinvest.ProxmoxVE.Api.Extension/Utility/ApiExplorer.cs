@@ -14,12 +14,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Corsinvest.ProxmoxVE.Api.Extension;
 using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
 using Corsinvest.ProxmoxVE.Api.Metadata;
-using Corsinvest.ProxmoxVE.Api.Shell.Helpers;
 
-namespace Corsinvest.ProxmoxVE.Api.Shell.Utility
+namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
 {
     /// <summary>
     /// Api Explorer

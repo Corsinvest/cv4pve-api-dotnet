@@ -250,25 +250,6 @@ For more information visit https://www.cv4pve-tools.com";
                               CommandOptionType.SingleValue);
 
         /// <summary>
-        /// Get Host and Port
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        private static List<(string Host, int Port)> GetHostAndPort(this CommandLineApplication command)
-        {
-            var ret = new List<(string Host, int Port)>();
-            foreach (var host in command.GetOption(HOST_OPTION_NAME, true).Value().Split(','))
-            {
-                var data = host.Split(':');
-                var port = 8006;
-                if (data.Length == 2) { int.TryParse(data[1], out port); }
-                ret.Add((data[0], port));
-            }
-
-            return ret;
-        }
-
-        /// <summary>
         /// Try login client api
         /// </summary>
         /// <param name="command"></param>
@@ -276,41 +257,27 @@ For more information visit https://www.cv4pve-tools.com";
         public static PveClient ClientTryLogin(this CommandLineApplication command)
         {
             var error = "Problem connection!";
-            foreach (var host in GetHostAndPort(command))
+            try
             {
-                using (var ping = new Ping())
+                var client = ClientHelper.GetClientFromHA(command.GetOption(HOST_OPTION_NAME, true).Value(),
+                                                          command.Out);
+
+                //check enable debug
+                if (command.DebugIsActive()) { client.DebugLevel = 99; }
+
+                //try login
+                if (client.Login(command.GetOption(USERNAME_OPTION_NAME, true).Value(),
+                                 GetPasswordFromOption(command)))
                 {
-                    if (ping.Send(host.Host).Status != IPStatus.Success)
-                    {
-                        if (command.DebugIsActive())
-                        {
-                            command.Out.WriteLine($"Error: try login unknown host {host.Host}");
-                        }
-                        continue;
-                    }
+                    return client;
                 }
 
-                try
+                if (!client.LastResult.IsSuccessStatusCode)
                 {
-                    var client = new PveClient(host.Host, host.Port);
-
-                    //check enable debug
-                    if (command.DebugIsActive()) { client.DebugLevel = 99; }
-
-                    //try login
-                    if (client.Login(command.GetOption(USERNAME_OPTION_NAME, true).Value(),
-                                     GetPasswordFromOption(command)))
-                    {
-                        return client;
-                    }
-
-                    if (!client.LastResult.IsSuccessStatusCode)
-                    {
-                        error += " " + client.LastResult.ReasonPhrase;
-                    }
+                    error += " " + client.LastResult.ReasonPhrase;
                 }
-                catch { }
             }
+            catch { }
 
             throw new ApplicationException(error);
         }
@@ -496,7 +463,7 @@ For more information visit https://www.cv4pve-tools.com";
         /// <param name="app"></param>
         public static void UpgradeApp(this CommandLineApplication app)
         {
-            const string APP_UPGRADE_FINISH="app-upgrade-finish";
+            const string APP_UPGRADE_FINISH = "app-upgrade-finish";
 
             app.Command("app-upgrade", cmd =>
             {

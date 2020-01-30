@@ -67,14 +67,14 @@ Good job";
         /// <param name="cmd"></param>
         /// <param name="redirectStandardOutput"></param>
         /// <param name="environmentVariables"></param>
-        /// <param name="stdOut"></param>
+        /// <param name="out"></param>
         /// <param name="dryRun"></param>
         /// <param name="debug"></param>
         /// <returns></returns>
         public static (string StandardOutput, int ExitCode) Execute(string cmd,
                                                                     bool redirectStandardOutput,
                                                                     IDictionary<string, string> environmentVariables,
-                                                                    TextWriter stdOut,
+                                                                    TextWriter @out,
                                                                     bool dryRun,
                                                                     bool debug)
         {
@@ -103,16 +103,16 @@ Good job";
             //additional variable
             if (environmentVariables != null)
             {
-                if (debug) { stdOut.WriteLine("-------------------------------------------------------"); }
+                if (debug) { @out.WriteLine("-------------------------------------------------------"); }
                 foreach (var variable in environmentVariables)
                 {
-                    if (debug) { stdOut.WriteLine($"{variable.Key}: {variable.Value}"); }
+                    if (debug) { @out.WriteLine($"{variable.Key}: {variable.Value}"); }
                     process.StartInfo.EnvironmentVariables.Add(variable.Key, variable.Value);
                 }
-                if (debug) { stdOut.WriteLine("-------------------------------------------------------"); }
+                if (debug) { @out.WriteLine("-------------------------------------------------------"); }
             }
 
-            if (debug) { stdOut.WriteLine($"Run command: {cmd}"); }
+            if (debug) { @out.WriteLine($"Run command: {cmd}"); }
 
             if (dryRun)
             {
@@ -137,23 +137,6 @@ Good job";
             return Assembly.GetEntryAssembly()
                   .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                   .InformationalVersion;
-        }
-
-        /// <summary>
-        /// Get application data directory. If not exists create.
-        /// </summary>
-        /// <param name="appName"></param>
-        /// <returns></returns>
-        public static string GetApplicationDataDirectory(string appName)
-        {
-            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Corsinvest", appName);
-            if (!Directory.Exists(path))
-            {
-                var dir = Directory.CreateDirectory(path);
-                //dir.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
-            }
-
-            return path;
         }
 
         /// <summary>

@@ -12,9 +12,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Corsinvest.ProxmoxVE.Api.Extension.Node;
+using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
 
-namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers
+namespace Corsinvest.ProxmoxVE.Api.Extension.Node
 {
     /// <summary>
     /// Extension client for node.

@@ -14,17 +14,41 @@ using System;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
 {
-    internal class UnitOfMeasurementHelper
+    /// <summary>
+    /// Unit Of Measurement Helper
+    /// </summary>
+    public class UnitOfMeasurementHelper
     {
+        /// <summary>
+        /// CPU Usage ToString
+        /// </summary>
+        /// <param name="cpu"></param>
+        /// <param name="maxCpu"></param>
+        /// <returns></returns>
         public static string CPUUsageToString(double cpu, dynamic maxCpu) 
             => cpu == 0 ? "" : (Math.Round(cpu * 100, 1)) + $"% of {maxCpu} CUP";
 
+        /// <summary>
+        /// Mb ToString
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string MbToString(long value) 
             => value == 0 ? "" : Math.Round(value / 1024.0 / 1024.0, 2) + "";
 
+        /// <summary>
+        /// Gb ToString
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string GbToString(long value) 
             => value == 0 ? "" : Math.Round(value / 1024.0 / 1024.0 / 1024.0, 2) + "";
 
+        /// <summary>
+        /// UpTime ToString
+        /// </summary>
+        /// <param name="upTime"></param>
+        /// <returns></returns>
         public static string UpTimeToString(TimeSpan? upTime) 
             => upTime == null ? "" : upTime?.ToString(@"d\.hh\:mm");
     }
