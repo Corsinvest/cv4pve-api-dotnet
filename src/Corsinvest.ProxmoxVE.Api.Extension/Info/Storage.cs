@@ -15,26 +15,15 @@ using System.Collections.Generic;
 namespace Corsinvest.ProxmoxVE.Api.Extension.Info
 {
     /// <summary>
-    /// Node Vm Info
+    /// Node Storage Info
     /// </summary>
-    public class NodeVm
+    public class Storage
     {
         /// <summary>
-        /// Config
+        /// Content
         /// </summary>
         /// <value></value>
-        public dynamic Config { get; set; }
-
-        /// <summary>
-        /// RrdData 
-        /// </summary>
-        public RrdData RrdData { get; set; } = new RrdData();
-
-        /// <summary>
-        /// Snapshots
-        /// </summary>
-        /// <value></value>
-        public IEnumerable<dynamic> Snapshots { get; set; }
+        public dynamic Content { get; set; }
 
         /// <summary>
         /// Status
@@ -43,15 +32,15 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
         public dynamic Status { get; set; }
 
         /// <summary>
-        /// Item
+        /// RrdData 
         /// </summary>
-        /// <value></value>
-        public dynamic Item { get; set; }
+        public RrdData RrdData { get; set; } = new RrdData();
 
         /// <summary>
-        /// Agent Guest Running
+        /// Permissions
         /// </summary>
         /// <value></value>
-        public dynamic AgentGuestRunning { get; internal set; }
+        public IEnumerable<dynamic> Permissions { get; set; }
+
     }
 }

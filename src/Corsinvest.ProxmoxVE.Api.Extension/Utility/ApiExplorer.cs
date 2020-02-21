@@ -229,7 +229,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
 
             return ((int)result.StatusCode, resultText.ToString());
         }
-       
+
         private static void CreateTable(IEnumerable<ParameterApi> parameters,
                                         StringBuilder resultText,
                                         OutputType outputType)
@@ -404,14 +404,16 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
                             {
                                 if (key == null)
                                 {
-                                    key = classApi.Methods.Where(a => a.IsGet)
-                                                          .FirstOrDefault()
-                                                          .ReturnLinkHRef
-                                                          .Replace("{", "")
-                                                          .Replace("}", "");
+                                    var returnLinkHRef = classApi.Methods.Where(a => a.IsGet)
+                                                                         .FirstOrDefault()
+                                                                         .ReturnLinkHRef;
+                                    if (!string.IsNullOrWhiteSpace(returnLinkHRef))
+                                    {
+                                        key = returnLinkHRef.Replace("{", "").Replace("}", "");
+                                    }
                                 }
 
-                                if (result.Response.data != null)
+                                if (result.Response.data != null && !string.IsNullOrWhiteSpace(key))
                                 {
                                     var data = new List<object>();
                                     foreach (IDictionary<string, object> item in result.Response.data) { data.Add(item[key]); }

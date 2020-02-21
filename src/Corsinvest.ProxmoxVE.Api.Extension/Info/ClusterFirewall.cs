@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
  *
  * This source file is available under two different licenses:
@@ -10,34 +10,26 @@
  * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
  */
 
+using System.Collections.Generic;
+
 namespace Corsinvest.ProxmoxVE.Api.Extension.Info
 {
     /// <summary>
-    /// Node Storage Info
+    /// Cluster Firewall
     /// </summary>
-    public class NodeStorage
+    public class ClusterFirewall : BaseFirewallEx
     {
         /// <summary>
-        /// Content
+        /// Groups
         /// </summary>
         /// <value></value>
-        public dynamic Content { get; set; }
+        public IEnumerable<dynamic> Groups { get; set; }
+
 
         /// <summary>
-        /// Status
+        /// Macros
         /// </summary>
         /// <value></value>
-        public dynamic Status { get; set; }
-
-        /// <summary>
-        /// RrdData 
-        /// </summary>
-        public RrdData RrdData { get; set; } = new RrdData();
-
-        /// <summary>
-        /// Item
-        /// </summary>
-        /// <value></value>
-        public dynamic Item { get; set; }
+        public IEnumerable<dynamic> Macros { get; set; }
     }
 }

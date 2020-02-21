@@ -38,6 +38,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
         public NodeDisks Disks { get; set; } = new NodeDisks();
 
         /// <summary>
+        /// Ceph
+        /// </summary>
+        /// <returns></returns>
+        public NodeCeph Ceph { get; set; } = new NodeCeph();
+
+        /// <summary>
         /// Dns
         /// </summary>
         /// <value></value>
@@ -60,18 +66,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
         /// </summary>
         /// <value></value>
         public IEnumerable<dynamic> Network { get; set; }
-
-        // /// <summary>
-        // /// Qemu
-        // /// </summary>
-        // /// <value></value>
-        // public IEnumerable<NodeVm> Qemu { get; set; }
-
-        // /// <summary>
-        // /// Lxc
-        // /// </summary>
-        // /// <value></value>
-        // public IEnumerable<NodeVm> Lxc { get; set; }
 
         /// <summary>
         /// Services
@@ -98,12 +92,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
         public IEnumerable<dynamic> Tasks { get; set; }
 
         /// <summary>
-        /// Item
-        /// </summary>
-        /// <value></value>
-        public dynamic Item { get; set; }
-
-        /// <summary>
         /// Report
         /// </summary>
         /// <value></value>
@@ -113,7 +101,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
         /// Package Versions
         /// </summary>
         /// <value></value>
-        public IEnumerable<dynamic> PackageVersions { get; set; } 
+        public IEnumerable<dynamic> PackageVersions { get; set; }
 
         /// <summary>
         /// Time zone
@@ -125,6 +113,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
         /// RrdData 
         /// </summary>
         public RrdData RrdData { get; set; } = new RrdData();
+
+        /// <summary>
+        /// Firewall
+        /// </summary>
+        public BaseFirewall Firewall { get; set; } = new BaseFirewall();
 
         /// <summary>
         /// Resources
@@ -143,5 +136,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
         /// </summary>
         /// <returns></returns>
         public NodeHardware Hardware { get; set; } = new NodeHardware();
+
+        /// <summary>
+        /// Certificates
+        /// </summary>
+        /// <value></value>
+        public IEnumerable<dynamic> Certificates { get; set; }
     }
 }

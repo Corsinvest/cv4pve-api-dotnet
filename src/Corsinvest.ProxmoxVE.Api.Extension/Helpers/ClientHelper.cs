@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Net.NetworkInformation;
+using System.Linq;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
 {
@@ -16,26 +18,52 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// <param name="out"></param>
         public static PveClient GetClientFromHA(string hostsAndPortHA, TextWriter @out)
         {
-            foreach (var hostAndPort in hostsAndPortHA.Split(','))
+            var data = GetHostsAndPorts(hostsAndPortHA, 8006, true, @out);
+            return data.Count() == 0 ?
+                    null :
+                    new PveClient(data[0].Host, data[0].Port);
+        }
+
+        /// <summary>
+        /// GetHostAndPort
+        /// Format 10.1.1.90:8006,10.1.1.91:8006,10.1.1.92:8006
+        /// </summary>
+        /// <param name="hostsAndPorts"></param>
+        /// <param name="defaultPort"></param>
+        /// <param name="checkPing"></param>
+        /// <param name="out"></param>
+        /// <returns></returns>
+        public static (string Host, int Port)[] GetHostsAndPorts(string hostsAndPorts,
+                                                                 int defaultPort,
+                                                                 bool checkPing,
+                                                                 TextWriter @out)
+        {
+            var ret = new List<(string Host, int port)>();
+            foreach (var hostAndPort in hostsAndPorts.Split(','))
             {
                 var data = hostAndPort.Split(':');
                 var host = data[0];
-                var port = 8006;
+                var port = defaultPort;
                 if (data.Length == 2) { int.TryParse(data[1], out port); }
 
-                using (var ping = new Ping())
+                var add = true;
+                if (checkPing)
                 {
-                    if (ping.Send(host).Status != IPStatus.Success)
+                    using (var ping = new Ping())
                     {
-                        @out?.WriteLine($"Error: try login unknown host {host}");
-                        continue;
+                        if (ping.Send(host).Status != IPStatus.Success)
+                        {
+                            @out?.WriteLine($"Error: unknown host {host}");
+                            add = false;
+                        }
                     }
                 }
 
-                return new PveClient(host, port);
+                if (add) { ret.Add((host, port)); }
             }
 
-            return null;
+            return ret.ToArray();
         }
+
     }
 }

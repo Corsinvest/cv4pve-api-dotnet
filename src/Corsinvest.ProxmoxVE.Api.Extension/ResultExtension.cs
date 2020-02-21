@@ -37,6 +37,14 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
             => ((IEnumerable)result.Response.data).Cast<dynamic>();
 
         /// <summary>
+        /// Enumerable result for Linq.
+        /// </summary>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static IEnumerable<dynamic> ToEnumerableOrDefault(this Result result)
+            => result.IsSuccessStatusCode ? result.ToEnumerable() : new List<dynamic>();
+
+        /// <summary>
         /// Check result in error.
         /// </summary>
         /// <param name="result"></param>
