@@ -11,10 +11,8 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Net.NetworkInformation;
 using System.Text;
 using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
 using Corsinvest.ProxmoxVE.Api.Extension.VM;
@@ -70,7 +68,23 @@ For more information visit https://www.cv4pve-tools.com";
         /// <param name="command"></param>
         /// <returns></returns>
         public static bool DebugIsActive(this CommandLineApplication command)
-            => command.GetOption("debug").HasValue();
+            => command.GetOption(DEBUG_OPTION_NAME).HasValue();
+
+        /// <summary>
+        /// Debug value
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public static int DebugValue(this CommandLineApplication command)
+        {
+            var ret =0;
+            if (command.DebugIsActive())
+            {
+                var value =command.GetOption(DEBUG_OPTION_NAME).Value() ?? "99";
+                ret = int.Parse(value);
+            }
+            return ret;
+        }
 
         /// <summary>
         /// Dryrun is active
@@ -101,9 +115,11 @@ For more information visit https://www.cv4pve-tools.com";
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static CommandOption DebugOption(this CommandLineApplication command)
+        public static CommandOption<int> DebugOption(this CommandLineApplication command)
         {
-            var opt = command.Option("--debug", "Debug application", CommandOptionType.NoValue);
+            var opt = command.Option<int>($"--{DEBUG_OPTION_NAME}", 
+                                          "Debug application", 
+                                          CommandOptionType.SingleOrNoValue);
             opt.ShowInHelpText = false;
             opt.Inherited = true;
             return opt;
@@ -210,6 +226,11 @@ For more information visit https://www.cv4pve-tools.com";
         public static readonly string PASSWORD_OPTION_NAME = "password";
 
         /// <summary>
+        /// Password option
+        /// </summary>
+        public static readonly string DEBUG_OPTION_NAME = "debug";
+
+        /// <summary>
         /// Host option
         /// </summary>
         /// <param name="command"></param>
@@ -262,8 +283,8 @@ For more information visit https://www.cv4pve-tools.com";
                 var client = ClientHelper.GetClientFromHA(command.GetOption(HOST_OPTION_NAME, true).Value(),
                                                           command.Out);
 
-                //check enable debug
-                if (command.DebugIsActive()) { client.DebugLevel = 99; }
+                //debug level
+                client.DebugLevel = command.DebugValue();
 
                 //try login
                 if (client.Login(command.GetOption(USERNAME_OPTION_NAME, true).Value(),

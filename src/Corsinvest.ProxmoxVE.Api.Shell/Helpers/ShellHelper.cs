@@ -205,7 +205,7 @@ Good job";
 
                 taskInfo.Wait(1000); 
 
-                if (app.OptionHelp.HasValue() && newVersion != null)
+                if ((app.OptionHelp.HasValue() || app.OptionVersion.HasValue()) && newVersion != null)
                 {
                     app.Out.WriteLine("====================================");
                     app.Out.WriteLine($"New version available: {newVersion}");
