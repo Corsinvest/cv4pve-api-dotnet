@@ -3973,7 +3973,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 _vmid = vmid;
                             }
                             /// <summary>
-                            /// Get current virtual machine configuration. This does not include pending configuration changes (see 'pending' API).
+                            /// Get the virtual machine configuration with pending configuration changes applied. Set the 'current' parameter to get the current configuration instead.
                             /// </summary>
                             /// <param name="current">Get current values (instead of pending values).</param>
                             /// <param name="snapshot">Fetch config values from given snapshot.</param>
@@ -3987,7 +3987,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
 
                             /// <summary>
-                            /// Get current virtual machine configuration. This does not include pending configuration changes (see 'pending' API).
+                            /// Get the virtual machine configuration with pending configuration changes applied. Set the 'current' parameter to get the current configuration instead.
                             /// </summary>
                             /// <param name="current">Get current values (instead of pending values).</param>
                             /// <param name="snapshot">Fetch config values from given snapshot.</param>
@@ -4056,7 +4056,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="reboot">Allow reboot. If set to '0' the VM exit on reboot.</param>
                             /// <param name="revert">Revert a pending change.</param>
                             /// <param name="sataN">Use volume as SATA hard disk or CD-ROM (n is 0 to 5).</param>
-                            /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 13).</param>
+                            /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 30).</param>
                             /// <param name="scsihw">SCSI controller model
                             ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
                             /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
@@ -4230,7 +4230,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="reboot">Allow reboot. If set to '0' the VM exit on reboot.</param>
                             /// <param name="revert">Revert a pending change.</param>
                             /// <param name="sataN">Use volume as SATA hard disk or CD-ROM (n is 0 to 5).</param>
-                            /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 13).</param>
+                            /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 30).</param>
                             /// <param name="scsihw">SCSI controller model
                             ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
                             /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
@@ -4320,7 +4320,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="reboot">Allow reboot. If set to '0' the VM exit on reboot.</param>
                             /// <param name="revert">Revert a pending change.</param>
                             /// <param name="sataN">Use volume as SATA hard disk or CD-ROM (n is 0 to 5).</param>
-                            /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 13).</param>
+                            /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 30).</param>
                             /// <param name="scsihw">SCSI controller model
                             ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
                             /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
@@ -4492,7 +4492,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="reboot">Allow reboot. If set to '0' the VM exit on reboot.</param>
                             /// <param name="revert">Revert a pending change.</param>
                             /// <param name="sataN">Use volume as SATA hard disk or CD-ROM (n is 0 to 5).</param>
-                            /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 13).</param>
+                            /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 30).</param>
                             /// <param name="scsihw">SCSI controller model
                             ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
                             /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
@@ -4532,13 +4532,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 _vmid = vmid;
                             }
                             /// <summary>
-                            /// Get virtual machine configuration, including pending changes.
+                            /// Get the virtual machine configuration with both current and pending values.
                             /// </summary>
                             /// <returns></returns>
                             public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/pending"); }
 
                             /// <summary>
-                            /// Get virtual machine configuration, including pending changes.
+                            /// Get the virtual machine configuration with both current and pending values.
                             /// </summary>
                             /// <returns></returns>
                             public Result VmPending() => GetRest();
@@ -4765,8 +4765,9 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <param name="stateuri">Some command save/restore state from this location.</param>
                                 /// <param name="targetstorage">Target storage for the migration. (Can be '1' to use the same storage id as on the source node.)</param>
+                                /// <param name="timeout">Wait maximal timeout seconds.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(string machine = null, string migratedfrom = null, string migration_network = null, string migration_type = null, bool? skiplock = null, string stateuri = null, string targetstorage = null)
+                                public Result CreateRest(string machine = null, string migratedfrom = null, string migration_network = null, string migration_type = null, bool? skiplock = null, string stateuri = null, string targetstorage = null, int? timeout = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("machine", machine);
@@ -4776,6 +4777,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("skiplock", skiplock);
                                     parameters.Add("stateuri", stateuri);
                                     parameters.Add("targetstorage", targetstorage);
+                                    parameters.Add("timeout", timeout);
                                     return _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/start", parameters);
                                 }
 
@@ -4790,8 +4792,9 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <param name="stateuri">Some command save/restore state from this location.</param>
                                 /// <param name="targetstorage">Target storage for the migration. (Can be '1' to use the same storage id as on the source node.)</param>
+                                /// <param name="timeout">Wait maximal timeout seconds.</param>
                                 /// <returns></returns>
-                                public Result VmStart(string machine = null, string migratedfrom = null, string migration_network = null, string migration_type = null, bool? skiplock = null, string stateuri = null, string targetstorage = null) => CreateRest(machine, migratedfrom, migration_network, migration_type, skiplock, stateuri, targetstorage);
+                                public Result VmStart(string machine = null, string migratedfrom = null, string migration_network = null, string migration_type = null, bool? skiplock = null, string stateuri = null, string targetstorage = null, int? timeout = null) => CreateRest(machine, migratedfrom, migration_network, migration_type, skiplock, stateuri, targetstorage, timeout);
                             }
                             public class PVEStop
                             {
@@ -5144,7 +5147,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Move volume to different storage.
                             /// </summary>
                             /// <param name="disk">The disk you want to move.
-                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
+                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
                             /// <param name="storage">Target storage.</param>
                             /// <param name="bwlimit">Override I/O bandwidth limit (in KiB/s).</param>
                             /// <param name="delete">Delete the original disk after successful copy. By default the original disk is kept as unused disk.</param>
@@ -5168,7 +5171,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Move volume to different storage.
                             /// </summary>
                             /// <param name="disk">The disk you want to move.
-                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
+                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
                             /// <param name="storage">Target storage.</param>
                             /// <param name="bwlimit">Override I/O bandwidth limit (in KiB/s).</param>
                             /// <param name="delete">Delete the original disk after successful copy. By default the original disk is kept as unused disk.</param>
@@ -5291,7 +5294,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Extend volume size.
                             /// </summary>
                             /// <param name="disk">The disk you want to resize.
-                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
+                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
                             /// <param name="size">The new size. With the `+` sign the value is added to the actual size of the volume and without it, the value is taken as an absolute one. Shrinking disk size is not supported.</param>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
@@ -5310,7 +5313,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Extend volume size.
                             /// </summary>
                             /// <param name="disk">The disk you want to resize.
-                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
+                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
                             /// <param name="size">The new size. With the `+` sign the value is added to the actual size of the volume and without it, the value is taken as an absolute one. Shrinking disk size is not supported.</param>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
@@ -5490,7 +5493,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Create a Template.
                             /// </summary>
                             /// <param name="disk">If you want to convert only 1 disk to base image.
-                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
+                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
                             /// <returns></returns>
                             public Result CreateRest(string disk = null)
                             {
@@ -5503,7 +5506,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Create a Template.
                             /// </summary>
                             /// <param name="disk">If you want to convert only 1 disk to base image.
-                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
+                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
                             /// <returns></returns>
                             public Result Template(string disk = null) => CreateRest(disk);
                         }
@@ -5665,7 +5668,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="protection">Sets the protection flag of the VM. This will disable the remove VM and remove disk operations.</param>
                     /// <param name="reboot">Allow reboot. If set to '0' the VM exit on reboot.</param>
                     /// <param name="sataN">Use volume as SATA hard disk or CD-ROM (n is 0 to 5).</param>
-                    /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 13).</param>
+                    /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 30).</param>
                     /// <param name="scsihw">SCSI controller model
                     ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
                     /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
@@ -5843,7 +5846,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="protection">Sets the protection flag of the VM. This will disable the remove VM and remove disk operations.</param>
                     /// <param name="reboot">Allow reboot. If set to '0' the VM exit on reboot.</param>
                     /// <param name="sataN">Use volume as SATA hard disk or CD-ROM (n is 0 to 5).</param>
-                    /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 13).</param>
+                    /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 30).</param>
                     /// <param name="scsihw">SCSI controller model
                     ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
                     /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
@@ -8942,6 +8945,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="address">IP address.</param>
                         /// <param name="address6">IP address.</param>
                         /// <param name="autostart">Automatically start interface on boot.</param>
+                        /// <param name="bond_primary">Specify the primary interface for active-backup bond.</param>
                         /// <param name="bond_mode">Bonding mode.
                         ///   Enum: balance-rr,active-backup,balance-xor,broadcast,802.3ad,balance-tlb,balance-alb,balance-slb,lacp-balance-slb,lacp-balance-tcp</param>
                         /// <param name="bond_xmit_hash_policy">Selects the transmit hash policy to use for slave selection in balance-xor and 802.3ad modes.
@@ -8955,6 +8959,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="delete">A list of settings you want to delete.</param>
                         /// <param name="gateway">Default gateway address.</param>
                         /// <param name="gateway6">Default ipv6 gateway address.</param>
+                        /// <param name="mtu">MTU.</param>
                         /// <param name="netmask">Network mask.</param>
                         /// <param name="netmask6">Network mask.</param>
                         /// <param name="ovs_bonds">Specify the interfaces used by the bonding device.</param>
@@ -8963,14 +8968,17 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="ovs_ports">Specify the interfaces you want to add to your bridge.</param>
                         /// <param name="ovs_tag">Specify a VLan tag (used by OVSPort, OVSIntPort, OVSBond)</param>
                         /// <param name="slaves">Specify the interfaces used by the bonding device.</param>
+                        /// <param name="vlan_id">vlan-id for a custom named vlan interface (ifupdown2 only).</param>
+                        /// <param name="vlan_raw_device">Specify the raw interface for the vlan interface.</param>
                         /// <returns></returns>
-                        public Result SetRest(string type, string address = null, string address6 = null, bool? autostart = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string delete = null, string gateway = null, string gateway6 = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null)
+                        public Result SetRest(string type, string address = null, string address6 = null, bool? autostart = null, string bond_primary = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string delete = null, string gateway = null, string gateway6 = null, int? mtu = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null, int? vlan_id = null, string vlan_raw_device = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("type", type);
                             parameters.Add("address", address);
                             parameters.Add("address6", address6);
                             parameters.Add("autostart", autostart);
+                            parameters.Add("bond-primary", bond_primary);
                             parameters.Add("bond_mode", bond_mode);
                             parameters.Add("bond_xmit_hash_policy", bond_xmit_hash_policy);
                             parameters.Add("bridge_ports", bridge_ports);
@@ -8982,6 +8990,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("delete", delete);
                             parameters.Add("gateway", gateway);
                             parameters.Add("gateway6", gateway6);
+                            parameters.Add("mtu", mtu);
                             parameters.Add("netmask", netmask);
                             parameters.Add("netmask6", netmask6);
                             parameters.Add("ovs_bonds", ovs_bonds);
@@ -8990,6 +8999,8 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("ovs_ports", ovs_ports);
                             parameters.Add("ovs_tag", ovs_tag);
                             parameters.Add("slaves", slaves);
+                            parameters.Add("vlan-id", vlan_id);
+                            parameters.Add("vlan-raw-device", vlan_raw_device);
                             return _client.Set($"/nodes/{_node}/network/{_iface}", parameters);
                         }
 
@@ -9001,6 +9012,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="address">IP address.</param>
                         /// <param name="address6">IP address.</param>
                         /// <param name="autostart">Automatically start interface on boot.</param>
+                        /// <param name="bond_primary">Specify the primary interface for active-backup bond.</param>
                         /// <param name="bond_mode">Bonding mode.
                         ///   Enum: balance-rr,active-backup,balance-xor,broadcast,802.3ad,balance-tlb,balance-alb,balance-slb,lacp-balance-slb,lacp-balance-tcp</param>
                         /// <param name="bond_xmit_hash_policy">Selects the transmit hash policy to use for slave selection in balance-xor and 802.3ad modes.
@@ -9014,6 +9026,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="delete">A list of settings you want to delete.</param>
                         /// <param name="gateway">Default gateway address.</param>
                         /// <param name="gateway6">Default ipv6 gateway address.</param>
+                        /// <param name="mtu">MTU.</param>
                         /// <param name="netmask">Network mask.</param>
                         /// <param name="netmask6">Network mask.</param>
                         /// <param name="ovs_bonds">Specify the interfaces used by the bonding device.</param>
@@ -9022,8 +9035,10 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="ovs_ports">Specify the interfaces you want to add to your bridge.</param>
                         /// <param name="ovs_tag">Specify a VLan tag (used by OVSPort, OVSIntPort, OVSBond)</param>
                         /// <param name="slaves">Specify the interfaces used by the bonding device.</param>
+                        /// <param name="vlan_id">vlan-id for a custom named vlan interface (ifupdown2 only).</param>
+                        /// <param name="vlan_raw_device">Specify the raw interface for the vlan interface.</param>
                         /// <returns></returns>
-                        public Result UpdateNetwork(string type, string address = null, string address6 = null, bool? autostart = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string delete = null, string gateway = null, string gateway6 = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null) => SetRest(type, address, address6, autostart, bond_mode, bond_xmit_hash_policy, bridge_ports, bridge_vlan_aware, cidr, cidr6, comments, comments6, delete, gateway, gateway6, netmask, netmask6, ovs_bonds, ovs_bridge, ovs_options, ovs_ports, ovs_tag, slaves);
+                        public Result UpdateNetwork(string type, string address = null, string address6 = null, bool? autostart = null, string bond_primary = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string delete = null, string gateway = null, string gateway6 = null, int? mtu = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null, int? vlan_id = null, string vlan_raw_device = null) => SetRest(type, address, address6, autostart, bond_primary, bond_mode, bond_xmit_hash_policy, bridge_ports, bridge_vlan_aware, cidr, cidr6, comments, comments6, delete, gateway, gateway6, mtu, netmask, netmask6, ovs_bonds, ovs_bridge, ovs_options, ovs_ports, ovs_tag, slaves, vlan_id, vlan_raw_device);
                     }
                     /// <summary>
                     /// Revert network configuration changes.
@@ -9065,6 +9080,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="address">IP address.</param>
                     /// <param name="address6">IP address.</param>
                     /// <param name="autostart">Automatically start interface on boot.</param>
+                    /// <param name="bond_primary">Specify the primary interface for active-backup bond.</param>
                     /// <param name="bond_mode">Bonding mode.
                     ///   Enum: balance-rr,active-backup,balance-xor,broadcast,802.3ad,balance-tlb,balance-alb,balance-slb,lacp-balance-slb,lacp-balance-tcp</param>
                     /// <param name="bond_xmit_hash_policy">Selects the transmit hash policy to use for slave selection in balance-xor and 802.3ad modes.
@@ -9077,6 +9093,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="comments6">Comments</param>
                     /// <param name="gateway">Default gateway address.</param>
                     /// <param name="gateway6">Default ipv6 gateway address.</param>
+                    /// <param name="mtu">MTU.</param>
                     /// <param name="netmask">Network mask.</param>
                     /// <param name="netmask6">Network mask.</param>
                     /// <param name="ovs_bonds">Specify the interfaces used by the bonding device.</param>
@@ -9085,8 +9102,10 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="ovs_ports">Specify the interfaces you want to add to your bridge.</param>
                     /// <param name="ovs_tag">Specify a VLan tag (used by OVSPort, OVSIntPort, OVSBond)</param>
                     /// <param name="slaves">Specify the interfaces used by the bonding device.</param>
+                    /// <param name="vlan_id">vlan-id for a custom named vlan interface (ifupdown2 only).</param>
+                    /// <param name="vlan_raw_device">Specify the raw interface for the vlan interface.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string iface, string type, string address = null, string address6 = null, bool? autostart = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string gateway = null, string gateway6 = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null)
+                    public Result CreateRest(string iface, string type, string address = null, string address6 = null, bool? autostart = null, string bond_primary = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string gateway = null, string gateway6 = null, int? mtu = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null, int? vlan_id = null, string vlan_raw_device = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("iface", iface);
@@ -9094,6 +9113,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("address", address);
                         parameters.Add("address6", address6);
                         parameters.Add("autostart", autostart);
+                        parameters.Add("bond-primary", bond_primary);
                         parameters.Add("bond_mode", bond_mode);
                         parameters.Add("bond_xmit_hash_policy", bond_xmit_hash_policy);
                         parameters.Add("bridge_ports", bridge_ports);
@@ -9104,6 +9124,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("comments6", comments6);
                         parameters.Add("gateway", gateway);
                         parameters.Add("gateway6", gateway6);
+                        parameters.Add("mtu", mtu);
                         parameters.Add("netmask", netmask);
                         parameters.Add("netmask6", netmask6);
                         parameters.Add("ovs_bonds", ovs_bonds);
@@ -9112,6 +9133,8 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("ovs_ports", ovs_ports);
                         parameters.Add("ovs_tag", ovs_tag);
                         parameters.Add("slaves", slaves);
+                        parameters.Add("vlan-id", vlan_id);
+                        parameters.Add("vlan-raw-device", vlan_raw_device);
                         return _client.Create($"/nodes/{_node}/network", parameters);
                     }
 
@@ -9124,6 +9147,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="address">IP address.</param>
                     /// <param name="address6">IP address.</param>
                     /// <param name="autostart">Automatically start interface on boot.</param>
+                    /// <param name="bond_primary">Specify the primary interface for active-backup bond.</param>
                     /// <param name="bond_mode">Bonding mode.
                     ///   Enum: balance-rr,active-backup,balance-xor,broadcast,802.3ad,balance-tlb,balance-alb,balance-slb,lacp-balance-slb,lacp-balance-tcp</param>
                     /// <param name="bond_xmit_hash_policy">Selects the transmit hash policy to use for slave selection in balance-xor and 802.3ad modes.
@@ -9136,6 +9160,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="comments6">Comments</param>
                     /// <param name="gateway">Default gateway address.</param>
                     /// <param name="gateway6">Default ipv6 gateway address.</param>
+                    /// <param name="mtu">MTU.</param>
                     /// <param name="netmask">Network mask.</param>
                     /// <param name="netmask6">Network mask.</param>
                     /// <param name="ovs_bonds">Specify the interfaces used by the bonding device.</param>
@@ -9144,8 +9169,10 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="ovs_ports">Specify the interfaces you want to add to your bridge.</param>
                     /// <param name="ovs_tag">Specify a VLan tag (used by OVSPort, OVSIntPort, OVSBond)</param>
                     /// <param name="slaves">Specify the interfaces used by the bonding device.</param>
+                    /// <param name="vlan_id">vlan-id for a custom named vlan interface (ifupdown2 only).</param>
+                    /// <param name="vlan_raw_device">Specify the raw interface for the vlan interface.</param>
                     /// <returns></returns>
-                    public Result CreateNetwork(string iface, string type, string address = null, string address6 = null, bool? autostart = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string gateway = null, string gateway6 = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null) => CreateRest(iface, type, address, address6, autostart, bond_mode, bond_xmit_hash_policy, bridge_ports, bridge_vlan_aware, cidr, cidr6, comments, comments6, gateway, gateway6, netmask, netmask6, ovs_bonds, ovs_bridge, ovs_options, ovs_ports, ovs_tag, slaves);
+                    public Result CreateNetwork(string iface, string type, string address = null, string address6 = null, bool? autostart = null, string bond_primary = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string gateway = null, string gateway6 = null, int? mtu = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null, int? vlan_id = null, string vlan_raw_device = null) => CreateRest(iface, type, address, address6, autostart, bond_primary, bond_mode, bond_xmit_hash_policy, bridge_ports, bridge_vlan_aware, cidr, cidr6, comments, comments6, gateway, gateway6, mtu, netmask, netmask6, ovs_bonds, ovs_bridge, ovs_options, ovs_ports, ovs_tag, slaves, vlan_id, vlan_raw_device);
                     /// <summary>
                     /// Reload network configuration
                     /// </summary>
@@ -11286,7 +11313,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a VNC Shell proxy.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: login,ceph_install,upgrade</param>
+                    ///   Enum: upgrade,login,ceph_install</param>
                     /// <param name="height">sets the height of the console in pixels.</param>
                     /// <param name="upgrade">Deprecated, use the 'cmd' property instead! Run 'apt-get dist-upgrade' instead of normal shell.</param>
                     /// <param name="websocket">use websocket instead of standard vnc.</param>
@@ -11307,7 +11334,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a VNC Shell proxy.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: login,ceph_install,upgrade</param>
+                    ///   Enum: upgrade,login,ceph_install</param>
                     /// <param name="height">sets the height of the console in pixels.</param>
                     /// <param name="upgrade">Deprecated, use the 'cmd' property instead! Run 'apt-get dist-upgrade' instead of normal shell.</param>
                     /// <param name="websocket">use websocket instead of standard vnc.</param>
@@ -11324,7 +11351,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a VNC Shell proxy.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: login,ceph_install,upgrade</param>
+                    ///   Enum: upgrade,login,ceph_install</param>
                     /// <param name="upgrade">Deprecated, use the 'cmd' property instead! Run 'apt-get dist-upgrade' instead of normal shell.</param>
                     /// <returns></returns>
                     public Result CreateRest(string cmd = null, bool? upgrade = null)
@@ -11339,7 +11366,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a VNC Shell proxy.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: login,ceph_install,upgrade</param>
+                    ///   Enum: upgrade,login,ceph_install</param>
                     /// <param name="upgrade">Deprecated, use the 'cmd' property instead! Run 'apt-get dist-upgrade' instead of normal shell.</param>
                     /// <returns></returns>
                     public Result Termproxy(string cmd = null, bool? upgrade = null) => CreateRest(cmd, upgrade);
@@ -11380,7 +11407,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a SPICE shell.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: login,ceph_install,upgrade</param>
+                    ///   Enum: upgrade,login,ceph_install</param>
                     /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As reasonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                     /// <param name="upgrade">Deprecated, use the 'cmd' property instead! Run 'apt-get dist-upgrade' instead of normal shell.</param>
                     /// <returns></returns>
@@ -11397,7 +11424,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a SPICE shell.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: login,ceph_install,upgrade</param>
+                    ///   Enum: upgrade,login,ceph_install</param>
                     /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As reasonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                     /// <param name="upgrade">Deprecated, use the 'cmd' property instead! Run 'apt-get dist-upgrade' instead of normal shell.</param>
                     /// <returns></returns>
@@ -11599,13 +11626,15 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="target">Target node.</param>
                     /// <param name="maxworkers">Maximal number of parallel migration job. If not set use 'max_workers' from datacenter.cfg, one of both must be set!</param>
                     /// <param name="vms">Only consider Guests with these IDs.</param>
+                    /// <param name="with_local_disks">Enable live storage migration for local disk</param>
                     /// <returns></returns>
-                    public Result CreateRest(string target, int? maxworkers = null, string vms = null)
+                    public Result CreateRest(string target, int? maxworkers = null, string vms = null, bool? with_local_disks = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("target", target);
                         parameters.Add("maxworkers", maxworkers);
                         parameters.Add("vms", vms);
+                        parameters.Add("with-local-disks", with_local_disks);
                         return _client.Create($"/nodes/{_node}/migrateall", parameters);
                     }
 
@@ -11615,8 +11644,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="target">Target node.</param>
                     /// <param name="maxworkers">Maximal number of parallel migration job. If not set use 'max_workers' from datacenter.cfg, one of both must be set!</param>
                     /// <param name="vms">Only consider Guests with these IDs.</param>
+                    /// <param name="with_local_disks">Enable live storage migration for local disk</param>
                     /// <returns></returns>
-                    public Result Migrateall(string target, int? maxworkers = null, string vms = null) => CreateRest(target, maxworkers, vms);
+                    public Result Migrateall(string target, int? maxworkers = null, string vms = null, bool? with_local_disks = null) => CreateRest(target, maxworkers, vms, with_local_disks);
                 }
                 public class PVEHosts
                 {
@@ -12039,6 +12069,8 @@ namespace Corsinvest.ProxmoxVE.Api
             public PVEPassword Password => _password ?? (_password = new PVEPassword(_client));
             private PVETfa _tfa;
             public PVETfa Tfa => _tfa ?? (_tfa = new PVETfa(_client));
+            private PVEPermissions _permissions;
+            public PVEPermissions Permissions => _permissions ?? (_permissions = new PVEPermissions(_client));
             public class PVEUsers
             {
                 private readonly PveClient _client;
@@ -12052,6 +12084,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     internal PVEItemUserid(PveClient client, object userid) { _client = client; _userid = userid; }
                     private PVETfa _tfa;
                     public PVETfa Tfa => _tfa ?? (_tfa = new PVETfa(_client, _userid));
+                    private PVEToken _token;
+                    public PVEToken Token => _token ?? (_token = new PVEToken(_client, _userid));
                     public class PVETfa
                     {
                         private readonly PveClient _client;
@@ -12068,6 +12102,105 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <returns></returns>
                         public Result ReadUserTfaType() => GetRest();
+                    }
+                    public class PVEToken
+                    {
+                        private readonly PveClient _client;
+                        private readonly object _userid;
+                        internal PVEToken(PveClient client, object userid) { _client = client; _userid = userid; }
+                        public PVEItemTokenid this[object tokenid] => new PVEItemTokenid(_client, _userid, tokenid);
+                        public class PVEItemTokenid
+                        {
+                            private readonly PveClient _client;
+                            private readonly object _userid;
+                            private readonly object _tokenid;
+                            internal PVEItemTokenid(PveClient client, object userid, object tokenid)
+                            {
+                                _client = client; _userid = userid;
+                                _tokenid = tokenid;
+                            }
+                            /// <summary>
+                            /// Remove API token for a specific user.
+                            /// </summary>
+                            /// <returns></returns>
+                            public Result DeleteRest() { return _client.Delete($"/access/users/{_userid}/token/{_tokenid}"); }
+
+                            /// <summary>
+                            /// Remove API token for a specific user.
+                            /// </summary>
+                            /// <returns></returns>
+                            public Result RemoveToken() => DeleteRest();
+                            /// <summary>
+                            /// Get specific API token information.
+                            /// </summary>
+                            /// <returns></returns>
+                            public Result GetRest() { return _client.Get($"/access/users/{_userid}/token/{_tokenid}"); }
+
+                            /// <summary>
+                            /// Get specific API token information.
+                            /// </summary>
+                            /// <returns></returns>
+                            public Result ReadToken() => GetRest();
+                            /// <summary>
+                            /// Generate a new API token for a specific user. NOTE: returns API token value, which needs to be stored as it cannot be retrieved afterwards!
+                            /// </summary>
+                            /// <param name="comment"></param>
+                            /// <param name="expire">API token expiration date (seconds since epoch). '0' means no expiration date.</param>
+                            /// <param name="privsep">Restrict API token privileges with separate ACLs (default), or give full privileges of corresponding user.</param>
+                            /// <returns></returns>
+                            public Result CreateRest(string comment = null, int? expire = null, bool? privsep = null)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("comment", comment);
+                                parameters.Add("expire", expire);
+                                parameters.Add("privsep", privsep);
+                                return _client.Create($"/access/users/{_userid}/token/{_tokenid}", parameters);
+                            }
+
+                            /// <summary>
+                            /// Generate a new API token for a specific user. NOTE: returns API token value, which needs to be stored as it cannot be retrieved afterwards!
+                            /// </summary>
+                            /// <param name="comment"></param>
+                            /// <param name="expire">API token expiration date (seconds since epoch). '0' means no expiration date.</param>
+                            /// <param name="privsep">Restrict API token privileges with separate ACLs (default), or give full privileges of corresponding user.</param>
+                            /// <returns></returns>
+                            public Result GenerateToken(string comment = null, int? expire = null, bool? privsep = null) => CreateRest(comment, expire, privsep);
+                            /// <summary>
+                            /// Update API token for a specific user.
+                            /// </summary>
+                            /// <param name="comment"></param>
+                            /// <param name="expire">API token expiration date (seconds since epoch). '0' means no expiration date.</param>
+                            /// <param name="privsep">Restrict API token privileges with separate ACLs (default), or give full privileges of corresponding user.</param>
+                            /// <returns></returns>
+                            public Result SetRest(string comment = null, int? expire = null, bool? privsep = null)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("comment", comment);
+                                parameters.Add("expire", expire);
+                                parameters.Add("privsep", privsep);
+                                return _client.Set($"/access/users/{_userid}/token/{_tokenid}", parameters);
+                            }
+
+                            /// <summary>
+                            /// Update API token for a specific user.
+                            /// </summary>
+                            /// <param name="comment"></param>
+                            /// <param name="expire">API token expiration date (seconds since epoch). '0' means no expiration date.</param>
+                            /// <param name="privsep">Restrict API token privileges with separate ACLs (default), or give full privileges of corresponding user.</param>
+                            /// <returns></returns>
+                            public Result UpdateTokenInfo(string comment = null, int? expire = null, bool? privsep = null) => SetRest(comment, expire, privsep);
+                        }
+                        /// <summary>
+                        /// Get user API tokens.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result GetRest() { return _client.Get($"/access/users/{_userid}/token"); }
+
+                        /// <summary>
+                        /// Get user API tokens.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result TokenIndex() => GetRest();
                     }
                     /// <summary>
                     /// Delete user.
@@ -12138,11 +12271,13 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// User index.
                 /// </summary>
                 /// <param name="enabled">Optional filter for enable property.</param>
+                /// <param name="full">Include group and token information.</param>
                 /// <returns></returns>
-                public Result GetRest(bool? enabled = null)
+                public Result GetRest(bool? enabled = null, bool? full = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("enabled", enabled);
+                    parameters.Add("full", full);
                     return _client.Get($"/access/users", parameters);
                 }
 
@@ -12150,8 +12285,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// User index.
                 /// </summary>
                 /// <param name="enabled">Optional filter for enable property.</param>
+                /// <param name="full">Include group and token information.</param>
                 /// <returns></returns>
-                public Result Index(bool? enabled = null) => GetRest(enabled);
+                public Result Index(bool? enabled = null, bool? full = null) => GetRest(enabled, full);
                 /// <summary>
                 /// Create new user.
                 /// </summary>
@@ -12395,9 +12531,10 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="delete">Remove permissions (instead of adding it).</param>
                 /// <param name="groups">List of groups.</param>
                 /// <param name="propagate">Allow to propagate (inherit) permissions.</param>
+                /// <param name="tokens">List of API tokens.</param>
                 /// <param name="users">List of users.</param>
                 /// <returns></returns>
-                public Result SetRest(string path, string roles, bool? delete = null, string groups = null, bool? propagate = null, string users = null)
+                public Result SetRest(string path, string roles, bool? delete = null, string groups = null, bool? propagate = null, string tokens = null, string users = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("path", path);
@@ -12405,6 +12542,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("delete", delete);
                     parameters.Add("groups", groups);
                     parameters.Add("propagate", propagate);
+                    parameters.Add("tokens", tokens);
                     parameters.Add("users", users);
                     return _client.Set($"/access/acl", parameters);
                 }
@@ -12417,9 +12555,10 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="delete">Remove permissions (instead of adding it).</param>
                 /// <param name="groups">List of groups.</param>
                 /// <param name="propagate">Allow to propagate (inherit) permissions.</param>
+                /// <param name="tokens">List of API tokens.</param>
                 /// <param name="users">List of users.</param>
                 /// <returns></returns>
-                public Result UpdateAcl(string path, string roles, bool? delete = null, string groups = null, bool? propagate = null, string users = null) => SetRest(path, roles, delete, groups, propagate, users);
+                public Result UpdateAcl(string path, string roles, bool? delete = null, string groups = null, bool? propagate = null, string tokens = null, string users = null) => SetRest(path, roles, delete, groups, propagate, tokens, users);
             }
             public class PVEDomains
             {
@@ -12746,6 +12885,33 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="response">Either the the response to the current u2f registration challenge, or, when adding TOTP, the currently valid TOTP value.</param>
                 /// <returns></returns>
                 public Result ChangeTfa(string action, string userid, string config = null, string key = null, string password = null, string response = null) => SetRest(action, userid, config, key, password, response);
+            }
+            public class PVEPermissions
+            {
+                private readonly PveClient _client;
+
+                internal PVEPermissions(PveClient client) { _client = client; }
+                /// <summary>
+                /// Retrieve effective permissions of given user/token.
+                /// </summary>
+                /// <param name="path">Only dump this specific path, not the whole tree.</param>
+                /// <param name="userid">User ID or full API token ID</param>
+                /// <returns></returns>
+                public Result GetRest(string path = null, string userid = null)
+                {
+                    var parameters = new Dictionary<string, object>();
+                    parameters.Add("path", path);
+                    parameters.Add("userid", userid);
+                    return _client.Get($"/access/permissions", parameters);
+                }
+
+                /// <summary>
+                /// Retrieve effective permissions of given user/token.
+                /// </summary>
+                /// <param name="path">Only dump this specific path, not the whole tree.</param>
+                /// <param name="userid">User ID or full API token ID</param>
+                /// <returns></returns>
+                public Result Permissions(string path = null, string userid = null) => GetRest(path, userid);
             }
             /// <summary>
             /// Directory index.
