@@ -111,6 +111,12 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
         /// <returns></returns>
         public bool IsPost => MethodType.ToLower() == "post";
 
+        /// <summary>
+        /// Is Post
+        /// </summary>
+        /// <returns></returns>
+        public bool IsPut => MethodType.ToLower() == "put";
+
 
         /// <summary>
         /// 

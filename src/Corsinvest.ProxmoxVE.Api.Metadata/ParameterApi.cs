@@ -42,6 +42,20 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
             Maximum = token["maximum"] == null ? null : (int?)token["maximum"];
             Minimum = token["minimum"] == null ? null : (int?)token["maximum"];
             Renderer = token["renderer"] + "";
+            Default = token["default"] == null ? null : token["default"] + "";
+
+            if (token["properties"] != null)
+            {
+                Items.AddRange(token["properties"]
+                                .Select(a => new ParameterApi(a.Parent[((JProperty)a).Name]))
+                                .ToArray());
+            }
+            else if (token["items"] != null && token["items"]["properties"] != null)
+            {
+                Items.AddRange(token["items"]["properties"]
+                                .Select(a => new ParameterApi(a.Parent[((JProperty)a).Name]))
+                                .ToArray());
+            }
 
             #region create enum values
             var enumValues = new List<string>();
@@ -79,6 +93,12 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
         /// </summary>
         /// <returns></returns>
         public List<ParameterFormatApi> Formats { get; } = new List<ParameterFormatApi>();
+
+        /// <summary>
+        /// Items
+        /// </summary>
+        /// <returns></returns>
+        public List<ParameterApi> Items { get; } = new List<ParameterApi>();
 
         /// <summary>
         /// Get alignment value
@@ -222,6 +242,12 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
         /// </summary>
         /// <value></value>
         public string Renderer { get; }
+
+        /// <summary>
+        /// Default
+        /// </summary>
+        /// <value></value>
+        public string Default { get; }
 
         /// <summary>
         /// Maximum

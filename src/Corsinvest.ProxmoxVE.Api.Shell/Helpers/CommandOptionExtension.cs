@@ -77,10 +77,10 @@ For more information visit https://www.cv4pve-tools.com";
         /// <returns></returns>
         public static int DebugValue(this CommandLineApplication command)
         {
-            var ret =0;
+            var ret = 0;
             if (command.DebugIsActive())
             {
-                var value =command.GetOption(DEBUG_OPTION_NAME).Value() ?? "99";
+                var value = command.GetOption(DEBUG_OPTION_NAME).Value() ?? "99";
                 ret = int.Parse(value);
             }
             return ret;
@@ -117,8 +117,8 @@ For more information visit https://www.cv4pve-tools.com";
         /// <returns></returns>
         public static CommandOption<int> DebugOption(this CommandLineApplication command)
         {
-            var opt = command.Option<int>($"--{DEBUG_OPTION_NAME}", 
-                                          "Debug application", 
+            var opt = command.Option<int>($"--{DEBUG_OPTION_NAME}",
+                                          "Debug application",
                                           CommandOptionType.SingleOrNoValue);
             opt.ShowInHelpText = false;
             opt.Inherited = true;
@@ -161,6 +161,27 @@ For more information visit https://www.cv4pve-tools.com";
 
             return opt;
         }
+
+        /// <summary>
+        /// Get username
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public static CommandOption GetUsername(this CommandLineApplication command) => command.GetOption(USERNAME_OPTION_NAME, true);
+
+        /// <summary>
+        /// Get password
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public static CommandOption GetPassword(this CommandLineApplication command) => command.GetOption(PASSWORD_OPTION_NAME, true);
+
+        /// <summary>
+        /// Get host
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public static CommandOption GetHost(this CommandLineApplication command) => command.GetOption(HOST_OPTION_NAME, true);
 
         /// <summary>
         /// VM State option
@@ -280,15 +301,13 @@ For more information visit https://www.cv4pve-tools.com";
             var error = "Problem connection!";
             try
             {
-                var client = ClientHelper.GetClientFromHA(command.GetOption(HOST_OPTION_NAME, true).Value(),
-                                                          command.Out);
+                var client = ClientHelper.GetClientFromHA(command.GetHost().Value(), command.Out);
 
                 //debug level
                 client.DebugLevel = command.DebugValue();
 
                 //try login
-                if (client.Login(command.GetOption(USERNAME_OPTION_NAME, true).Value(),
-                                 GetPasswordFromOption(command)))
+                if (client.Login(command.GetUsername().Value(), GetPasswordFromOption(command)))
                 {
                     return client;
                 }
@@ -312,7 +331,7 @@ For more information visit https://www.cv4pve-tools.com";
         {
             const string KEY = "012345678901234567890123";
 
-            var password = command.GetOption(PASSWORD_OPTION_NAME, true).Value().Trim();
+            var password = command.GetPassword().Value().Trim();
 
             //check if file
             if (password.StartsWith("file:"))
