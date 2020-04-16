@@ -65,9 +65,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// <param name="hasInnerRows"></param>
         /// <returns></returns>
         public static string Create(IEnumerable<string> columns,
-                                   IEnumerable<object[]> rows,
-                                   TableOutputType outputType,
-                                   bool hasInnerRows)
+                                    IEnumerable<object[]> rows,
+                                    TableOutputType outputType,
+                                    bool hasInnerRows)
             => Create(columns.Select(a => new ColumnHeader(a, Alignment.Left, Alignment.Left)),
                       rows,
                       outputType,
@@ -82,9 +82,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// <param name="hasInnerRows"></param>
         /// <returns></returns>
         private static string Create(IEnumerable<ColumnHeader> columns,
-                                   IEnumerable<object[]> rows,
-                                   TableOutputType outputType,
-                                   bool hasInnerRows)
+                                     IEnumerable<object[]> rows,
+                                     TableOutputType outputType,
+                                     bool hasInnerRows)
         {
             var table = new Table(columns.ToArray());
 
