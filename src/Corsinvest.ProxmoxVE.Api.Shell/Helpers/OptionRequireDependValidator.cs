@@ -10,6 +10,7 @@
  * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
  */
 
+using System;
 using System.ComponentModel.DataAnnotations;
 using McMaster.Extensions.CommandLineUtils;
 using McMaster.Extensions.CommandLineUtils.Validation;
@@ -57,8 +58,8 @@ namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers
             }
             else
             {
-                return new ValidationResult($"The --{option.LongName} field is required!"); 
-                //if (!depOpt.HasValue()) { return new ValidationResult($"The --{option.LongName} field is required!"); }
+               // return new ValidationResult($"The --{option.LongName} field is required!"); 
+                if (depOpt.HasValue()) { return new ValidationResult($"The --{option.LongName} field is required!"); }
             }
 
             return ValidationResult.Success;

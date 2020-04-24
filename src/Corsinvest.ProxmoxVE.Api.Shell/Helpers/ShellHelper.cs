@@ -151,7 +151,7 @@ Good job";
             {
                 Name = name,
                 Description = description,
-                UsePagerForHelpText = false,
+                UsePagerForHelpText = false,                
             };
 
             app.AddFullNameLogo();

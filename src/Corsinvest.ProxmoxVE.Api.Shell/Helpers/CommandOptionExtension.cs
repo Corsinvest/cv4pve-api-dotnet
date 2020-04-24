@@ -413,7 +413,6 @@ For more information visit https://www.cv4pve-tools.com";
             var ret = command.Option(template,
                                      description + " " + string.Join(",", Enum.GetNames(typeof(TEnum))),
                                      CommandOptionType.SingleValue);
-
             ret.Accepts().Enum<TEnum>(true);
             return ret;
         }
