@@ -16,9 +16,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// </summary>
         /// <param name="hostsAndPortHA"></param>
         /// <param name="out"></param>
-        public static PveClient GetClientFromHA(string hostsAndPortHA, TextWriter @out)
+        /// <param name="pingTimeout"></param>
+        public static PveClient GetClientFromHA(string hostsAndPortHA,
+                                                TextWriter @out,
+                                                int pingTimeout = 4000)
         {
-            var data = GetHostsAndPorts(hostsAndPortHA, 8006, true, @out);
+            var data = GetHostsAndPorts(hostsAndPortHA, 8006, true, @out, pingTimeout);
             return data.Count() == 0 ?
                     null :
                     new PveClient(data[0].Host, data[0].Port);
@@ -32,11 +35,13 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// <param name="defaultPort"></param>
         /// <param name="checkPing"></param>
         /// <param name="out"></param>
+        /// <param name="pingTimeout"></param>
         /// <returns></returns>
         public static (string Host, int Port)[] GetHostsAndPorts(string hostsAndPorts,
                                                                  int defaultPort,
                                                                  bool checkPing,
-                                                                 TextWriter @out)
+                                                                 TextWriter @out,
+                                                                 int pingTimeout = 4000)
         {
             var ret = new List<(string Host, int port)>();
             foreach (var hostAndPort in hostsAndPorts.Split(','))
@@ -51,7 +56,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
                 {
                     using (var ping = new Ping())
                     {
-                        if (ping.Send(host).Status != IPStatus.Success)
+                        if (ping.Send(host, pingTimeout).Status != IPStatus.Success)
                         {
                             @out?.WriteLine($"Error: unknown host {host}");
                             add = false;
@@ -64,6 +69,5 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
 
             return ret.ToArray();
         }
-
     }
 }
