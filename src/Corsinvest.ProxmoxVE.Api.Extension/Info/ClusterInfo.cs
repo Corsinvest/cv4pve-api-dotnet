@@ -147,7 +147,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
             Firewall.Macros = client.Cluster.Firewall.Macros.GetMacros().ToEnumerable();
             Firewall.Options = client.Cluster.Firewall.Options.GetOptions().Response.data;
             Firewall.Refs = client.Cluster.Firewall.Refs.Refs().ToEnumerable();
-            Firewall.Refs = client.Cluster.Firewall.Rules.GetRules().ToEnumerable();
+            Firewall.Rules = client.Cluster.Firewall.Rules.GetRules().ToEnumerable();
 
             var nodeList = new List<Node>();
             foreach (var nodeItem in client.Nodes.Index().ToEnumerable())

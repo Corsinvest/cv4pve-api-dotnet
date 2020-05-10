@@ -77,6 +77,26 @@ Good job";
                                                                     TextWriter @out,
                                                                     bool dryRun,
                                                                     bool debug)
+            => Execute(cmd, redirectStandardOutput, environmentVariables, @out, dryRun, debug, false);
+
+        /// <summary>
+        /// Execute shell command
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <param name="redirectStandardOutput"></param>
+        /// <param name="environmentVariables"></param>
+        /// <param name="out"></param>
+        /// <param name="dryRun"></param>
+        /// <param name="debug"></param>
+        /// <param name="waitForExit"></param>
+        /// <returns></returns>
+        public static (string StandardOutput, int ExitCode) Execute(string cmd,
+                                                                    bool redirectStandardOutput,
+                                                                    IDictionary<string, string> environmentVariables,
+                                                                    TextWriter @out,
+                                                                    bool dryRun,
+                                                                    bool debug,
+                                                                    bool waitForExit)
         {
             var startInfo = new ProcessStartInfo()
             {
@@ -122,9 +142,14 @@ Good job";
             {
                 process.Start();
                 var standardOutput = redirectStandardOutput ? process.StandardOutput.ReadToEnd() : "";
-                process.WaitForExit();
+                var exitCode = 0;
+                if (waitForExit)
+                {
+                    process.WaitForExit();
+                    exitCode = process.ExitCode;
+                }
 
-                return (standardOutput, process.ExitCode);
+                return (standardOutput, exitCode);
             }
         }
 
@@ -151,7 +176,7 @@ Good job";
             {
                 Name = name,
                 Description = description,
-                UsePagerForHelpText = false,                
+                UsePagerForHelpText = false,
             };
 
             app.AddFullNameLogo();
@@ -203,7 +228,7 @@ Good job";
 
                 var ret = app.Execute(args);
 
-                taskInfo.Wait(1000); 
+                taskInfo.Wait(1000);
 
                 if ((app.OptionHelp.HasValue() || app.OptionVersion.HasValue()) && newVersion != null)
                 {
