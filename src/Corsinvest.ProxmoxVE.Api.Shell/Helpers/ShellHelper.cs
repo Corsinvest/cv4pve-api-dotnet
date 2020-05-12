@@ -103,7 +103,7 @@ Good job";
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = redirectStandardOutput,
-            };
+            };           
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
