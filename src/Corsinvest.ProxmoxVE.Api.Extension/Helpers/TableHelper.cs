@@ -10,7 +10,6 @@
  * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
  */
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -83,19 +82,15 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
 
         private static string ToHtml(IEnumerable<ColumnHeader> columns, IEnumerable<object[]> rows)
         {
-            var ret = "<table style='width: 100%;border-collapse: collapse;border: 1px solid black;'>";
+            static string CreateRow(string tag, object[] values)
+                => "<tr>" +
+                    string.Join("", values.Select(a => $"<{tag} style='border: 1px solid black;'>{(a + "").Trim()}</{tag}>")) +
+                    "</tr>";
 
-            static string CreateRow(string tag, string value) => $"<{tag} style='border: 1px solid black;'>{value.Trim()}</{tag}>";
-
-            //header
-            ret += $"<thead>{string.Join(Environment.NewLine, columns.Select(a => CreateRow("th", a.Title)))}</thead>";
-
-            //rows
-            ret += $"<tbody>{string.Join(Environment.NewLine, rows.Select(a => CreateRow("th", a + "")))}</tbody>";
-
-            ret += "</table>";
-
-            return ret;
+            return "<table style='width: 100%;border-collapse: collapse;border: 1px solid black;'>" +
+                    $"<thead>{CreateRow("th", columns.Select(a => a.Title).ToArray())}</thead>" +
+                    $"<tbody>{string.Join("", rows.Select(a => CreateRow("td", a)))}</tbody>" +
+                    "</table>";
         }
 
         private static string ToJson(ColumnHeader[] columns, IEnumerable<object[]> rows, bool pretty)
