@@ -157,16 +157,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
                 {
                     switch (outputType)
                     {
-                        case OutputType.Png:
-                            resultText.AppendLine(result.Response);
-                            break;
+                        case OutputType.Png: resultText.AppendLine(result.Response); break;
 
                         case OutputType.Json:
-                            resultText.AppendLine(PveClient.ObjectToJson(result.Response.data, false));
-                            break;
-
                         case OutputType.JsonPretty:
-                            resultText.AppendLine(PveClient.ObjectToJson(result.Response.data));
+                            resultText.AppendLine(PveClient.ObjectToJson(result.Response.data, outputType == OutputType.JsonPretty));
                             break;
 
                         case OutputType.Text:

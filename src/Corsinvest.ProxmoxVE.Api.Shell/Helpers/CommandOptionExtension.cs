@@ -111,6 +111,14 @@ For more information visit https://www.cv4pve-tools.com";
             => command.Argument("node", "Node of cluster").IsRequired();
 
         /// <summary>
+        /// Output type
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public static CommandOption<TableOutputType> OutputTypeArgument(this CommandLineApplication command)
+            => command.OptionEnum<TableOutputType>("--output|-o", "Type output (default: text)");
+
+        /// <summary>
         /// Debug option
         /// </summary>
         /// <param name="command"></param>
@@ -404,15 +412,15 @@ For more information visit https://www.cv4pve-tools.com";
         /// <summary>
         /// Option from enum
         /// </summary>
-        public static CommandOption OptionEnum<TEnum>(this CommandLineApplication command,
+        public static CommandOption<TEnum> OptionEnum<TEnum>(this CommandLineApplication command,
                                                       string template,
                                                       string description) where TEnum : struct, IConvertible
         {
             if (!typeof(TEnum).IsEnum) { throw new ArgumentException("T must be an enumerated type"); }
 
-            var ret = command.Option(template,
-                                     description + " " + string.Join(",", Enum.GetNames(typeof(TEnum))),
-                                     CommandOptionType.SingleValue);
+            var ret = command.Option<TEnum>(template,
+                                            description + " " + string.Join(",", Enum.GetNames(typeof(TEnum))),
+                                            CommandOptionType.SingleValue);
             ret.Accepts().Enum<TEnum>(true);
             return ret;
         }
@@ -458,7 +466,7 @@ For more information visit https://www.cv4pve-tools.com";
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static CommandOption VMTypeOption(this CommandLineApplication command)
+        public static CommandOption<VMTypeEnum> VMTypeOption(this CommandLineApplication command)
             => command.OptionEnum<VMTypeEnum>("--vmType", "VM type");
 
         /// <summary>

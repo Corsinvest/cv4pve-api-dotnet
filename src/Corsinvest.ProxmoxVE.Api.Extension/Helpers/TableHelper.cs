@@ -17,40 +17,10 @@ using System.Dynamic;
 using System.Linq;
 using BetterConsoleTables;
 using Corsinvest.ProxmoxVE.Api.Metadata;
+using Newtonsoft.Json;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
 {
-    /// <summary>
-    /// Table output type
-    /// </summary>
-    public enum TableOutputType
-    {
-        /// <summary>
-        /// Text
-        /// </summary>
-        Text,
-
-        /// <summary>
-        /// Unicode
-        /// </summary>
-        Unicode,
-
-        /// <summary>
-        /// Unicode
-        /// </summary>
-        UnicodeAlt,
-
-        /// <summary>
-        /// Markdown
-        /// </summary>
-        Markdown,
-
-        /// <summary>
-        /// Html
-        /// </summary>
-        Html,
-    }
-
     /// <summary>
     /// Table helper
     /// </summary>
@@ -86,61 +56,61 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
                                      TableOutputType outputType,
                                      bool hasInnerRows)
         {
-            var table = new Table(columns.ToArray());
-
-            switch (outputType)
+            var ret = "";
+            if (outputType == TableOutputType.Html) { ret = ToHtml(columns, rows); }
+            else if (outputType == TableOutputType.Json) { ret = ToJson(columns.ToArray(), rows, false); }
+            else if (outputType == TableOutputType.JsonPretty) { ret = ToJson(columns.ToArray(), rows, true); }
+            else
             {
-                case TableOutputType.Text: table.Config = TableConfiguration.Default(); break;
-                case TableOutputType.Unicode: table.Config = TableConfiguration.Unicode(); break;
-                case TableOutputType.UnicodeAlt: table.Config = TableConfiguration.UnicodeAlt(); break;
-                case TableOutputType.Markdown: table.Config = TableConfiguration.Markdown(); break;
-                case TableOutputType.Html: table.Config = TableConfiguration.Unicode(); break;
-                default: break;
+                var table = new Table(columns.ToArray());
+
+                switch (outputType)
+                {
+                    case TableOutputType.Text: table.Config = TableConfiguration.Default(); break;
+                    case TableOutputType.Unicode: table.Config = TableConfiguration.Unicode(); break;
+                    case TableOutputType.UnicodeAlt: table.Config = TableConfiguration.UnicodeAlt(); break;
+                    case TableOutputType.Markdown: table.Config = TableConfiguration.Markdown(); break;
+                    default: break;
+                }
+
+                table.Config.hasInnerRows = hasInnerRows;
+                table.AddRows(rows);
+                ret = table.ToString();
             }
-
-            table.Config.hasInnerRows = hasInnerRows;
-            table.AddRows(rows);
-
-            var ret = table.ToString();
-            if (outputType == TableOutputType.Html) { ret = ToHtml(ret); }
 
             return ret;
         }
 
-        private static string CreateRow(string row, string tag)
-        {
-            var data = row.Split('│');
-            var ret = "";
-            for (int i = 1; i < data.Length - 1; i++)
-            {
-                ret += $"<{tag} style='border: 1px solid black;'>{data[i].Trim()}</{tag}>";
-            }
-
-            return $"<tr>{ret}</tr>";
-        }
-
-        private static string ToHtml(string stringTable)
+        private static string ToHtml(IEnumerable<ColumnHeader> columns, IEnumerable<object[]> rows)
         {
             var ret = "<table style='width: 100%;border-collapse: collapse;border: 1px solid black;'>";
-            var rows = stringTable.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
 
-            for (int i = 1; i < rows.Length; i++)
-            {
-                if (i == 1)
-                {
-                    //column header
-                    ret += "<thead>" + CreateRow(rows[i], "th") + "</thead>";
-                    ret += "<tbody>";
-                }
-                else if (rows[i].StartsWith("│"))
-                {
-                    ret += CreateRow(rows[i], "td") ;
-                }
-            }
+            static string CreateRow(string tag, string value) => $"<{tag} style='border: 1px solid black;'>{value.Trim()}</{tag}>";
 
-            ret += "</tbody></table>";
+            //header
+            ret += $"<thead>{string.Join(Environment.NewLine, columns.Select(a => CreateRow("th", a.Title)))}</thead>";
+
+            //rows
+            ret += $"<tbody>{string.Join(Environment.NewLine, rows.Select(a => CreateRow("th", a + "")))}</tbody>";
+
+            ret += "</table>";
 
             return ret;
+        }
+
+        private static string ToJson(ColumnHeader[] columns, IEnumerable<object[]> rows, bool pretty)
+        {
+            var data = new List<Dictionary<string, object>>();
+            var titles = columns.Select(a => a.Title.ToLower()).ToArray();
+
+            foreach (var row in rows)
+            {
+                var rowData = new Dictionary<string, object>();
+                data.Add(rowData);
+                for (int i = 0; i < columns.Count(); i++) { rowData.Add(titles[i], row[i]); }
+            }
+
+            return JsonConvert.SerializeObject(data, pretty ? Formatting.Indented : Formatting.None);
         }
 
         /// <summary>
