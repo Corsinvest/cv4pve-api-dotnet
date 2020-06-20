@@ -84,21 +84,27 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         public bool IsRunning => Status == "running";
 
         /// <summary>
+        /// Check is running
+        /// </summary>
+        public bool IsStopped => Status == "stopped";
+
+        /// <summary>
+        /// Check is unknown
+        /// </summary>
+        public bool IsUnknown => Status == "unknown";
+
+
+        /// <summary>
         /// Type
         /// </summary>
         /// <value></value>
         public VMTypeEnum Type
-        {
-            get
+            => ApiData.type switch
             {
-                switch (ApiData.type)
-                {
-                    case "lxc": return VMTypeEnum.Lxc;
-                    case "qemu": return VMTypeEnum.Qemu;
-                    default: return VMTypeEnum.Qemu;
-                }
-            }
-        }
+                "lxc" => VMTypeEnum.Lxc,
+                "qemu" => VMTypeEnum.Qemu,
+                _ => VMTypeEnum.Qemu,
+            };
 
         /// <summary>
         /// Se status
@@ -163,30 +169,26 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// QEMU
         /// </summary>
         /// <returns></returns>
-        public PveClient.PVENodes.PVEItemNode.PVEQemu.PVEItemVmid QemuApi => (dynamic)Client.Nodes[Node].Qemu[Id];
+        public PveClient.PVENodes.PVEItemNode.PVEQemu.PVEItemVmid QemuApi => (dynamic)NodeApi.Qemu[Id];
 
         /// <summary>
         /// LXC
         /// </summary>
         /// <returns></returns>
-        public PveClient.PVENodes.PVEItemNode.PVELxc.PVEItemVmid LxcApi => (dynamic)Client.Nodes[Node].Lxc[Id];
+        public PveClient.PVENodes.PVEItemNode.PVELxc.PVEItemVmid LxcApi => (dynamic)NodeApi.Lxc[Id];
+
 
         /// <summary>
         /// Config
         /// </summary>
         /// <value></value>
         public Config Config
-        {
-            get
+            => Type switch
             {
-                switch (Type)
-                {
-                    case VMTypeEnum.Qemu: return new ConfigQemu(this, QemuApi.Config.GetRest(true).Response.data);
-                    case VMTypeEnum.Lxc: return new ConfigLxc(this, LxcApi.Config.GetRest().Response.data);
-                    default: return null;
-                }
-            }
-        }
+                VMTypeEnum.Qemu => new ConfigQemu(this, QemuApi.Config.GetRest(true).Response.data),
+                VMTypeEnum.Lxc => new ConfigLxc(this, LxcApi.Config.GetRest().Response.data),
+                _ => null,
+            };
 
         /// <summary>
         /// Snapshots
@@ -207,14 +209,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <param name="online"></param>
         /// <returns></returns>
         public Result Migrate(string target, bool online)
-        {
-            switch (Type)
+            => Type switch
             {
-                case VMTypeEnum.Qemu: return QemuApi.Migrate.MigrateVm(target, online: online);
-                case VMTypeEnum.Lxc: return LxcApi.Migrate.MigrateVm(target, online: online);
-                default: return null;
-            }
-        }
+                VMTypeEnum.Qemu => QemuApi.Migrate.MigrateVm(target, online: online),
+                VMTypeEnum.Lxc => LxcApi.Migrate.MigrateVm(target, online: online),
+                _ => null,
+            };
 
         /// <summary>
         /// Titles info

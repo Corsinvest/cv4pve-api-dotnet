@@ -10,7 +10,6 @@
  * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
  */
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using McMaster.Extensions.CommandLineUtils;
 using McMaster.Extensions.CommandLineUtils.Validation;
@@ -22,9 +21,9 @@ namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers
     /// </summary>
     public class OptionRequireDependOnValidator : IOptionValidator
     {
-        private string _optionName;
-        private CommandLineApplication _command;
-        private string _errorMessage;
+        private readonly string _optionName;
+        private readonly CommandLineApplication _command;
+        private readonly string _errorMessage;
 
         /// <summary>
         /// Constructor

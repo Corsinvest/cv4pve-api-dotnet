@@ -23,7 +23,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
     /// </summary>
     public class AliasManager
     {
-        private List<AliasDef> _alias = new List<AliasDef>
+        private readonly List<AliasDef> _alias = new List<AliasDef>
         {
             //cluster            
             new AliasDef("cluster-top,ct,top,❤️","Cluster top","get /cluster/resources",true),

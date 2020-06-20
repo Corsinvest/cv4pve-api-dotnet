@@ -120,13 +120,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         /// <param name="archive"></param>
         /// <returns></returns>
         public Result RestoreBackup(VMTypeEnum type, int vmId, string archive)
-        {
-            switch (type)
+            => type switch
             {
-                case VMTypeEnum.Qemu: return Client.Nodes[Id].Qemu.CreateRest(vmid: vmId, archive: archive);
-                case VMTypeEnum.Lxc: return Client.Nodes[Id].Lxc.CreateRest(vmid: vmId, ostemplate: archive);
-                default: return null;
-            }
-        }
+                VMTypeEnum.Qemu => Client.Nodes[Id].Qemu.CreateRest(vmid: vmId, archive: archive),
+                VMTypeEnum.Lxc => Client.Nodes[Id].Lxc.CreateRest(vmid: vmId, ostemplate: archive),
+                _ => null,
+            };
     }
 }

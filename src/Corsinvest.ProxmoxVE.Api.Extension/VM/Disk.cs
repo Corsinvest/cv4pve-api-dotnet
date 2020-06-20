@@ -62,7 +62,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// Storage info
         /// </summary>
         /// <returns></returns>
-        public StorageInfo StorageInfo => _storageInfo ?? (_storageInfo = Client.GetStorages().FirstOrDefault(a => a.Id == Storage));
+        public StorageInfo StorageInfo => _storageInfo ??= Client.GetStorages().FirstOrDefault(a => a.Id == Storage);
 
         /// <summary>
         /// Name

@@ -103,7 +103,7 @@ Good job";
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = redirectStandardOutput,
-            };           
+            };
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
@@ -209,7 +209,7 @@ Good job";
             //execute command
             try
             {
-                Version newVersion = null;
+                Version webVersion = null;
 
                 //check new version available
                 var taskInfo = new Task(() =>
@@ -219,7 +219,7 @@ Good job";
                         var version = UpdateHelper.GetInfoLastReleaseAssetFromGitHub(app.Name).Version;
                         if (version.ToString() != GetCurrentVersionApp())
                         {
-                            newVersion = version;
+                            webVersion = version;
                         }
                     }
                     catch { }
@@ -230,10 +230,12 @@ Good job";
 
                 taskInfo.Wait(1000);
 
-                if ((app.OptionHelp.HasValue() || app.OptionVersion.HasValue()) && newVersion != null)
+                if ((app.OptionHelp.HasValue() || app.OptionVersion.HasValue()) &&
+                     webVersion != null &&
+                     webVersion > new Version(GetCurrentVersionApp()))
                 {
                     app.Out.WriteLine("====================================");
-                    app.Out.WriteLine($"New version available: {newVersion}");
+                    app.Out.WriteLine($"New version available: {webVersion}");
                     app.Out.WriteLine("====================================");
                 }
 

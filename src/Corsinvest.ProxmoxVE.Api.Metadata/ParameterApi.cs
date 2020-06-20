@@ -105,17 +105,15 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
         /// </summary>
         /// <returns></returns>
         public string GetAlignmentValue()
-        {
-            switch (Renderer)
+            => Renderer switch
             {
-                case "fraction_as_percentage": return "R";
-                case "bytes": return "R";
-                case "duration": return "R";
-                case "timestamp": return "R";
-                case "timestamp_gmt": return "R";
-                default: return "L";
-            }
-        }
+                "fraction_as_percentage" => "R",
+                "bytes" => "R",
+                "duration" => "R",
+                "timestamp" => "R",
+                "timestamp_gmt" => "R",
+                _ => "L",
+            };
 
         /// <summary>
         /// Renderer value.

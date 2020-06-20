@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
  */
- 
+
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
@@ -125,12 +125,12 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
         public string GetMethodTypeHumanized()
         {
             var name = MethodType.ToLower();
-            switch (name)
+            return name switch
             {
-                case "post": return "create";
-                case "put": return "set";
-                default: return name;
-            }
+                "post" => "create",
+                "put" => "set",
+                _ => name,
+            };
         }
 
         /// <summary>

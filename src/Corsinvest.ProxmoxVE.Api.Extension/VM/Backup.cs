@@ -17,7 +17,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
     /// </summary>
     public class Backup
     {
-        private VMInfo _vm;
+        private readonly VMInfo _vm;
 
         internal Backup(VMInfo vm) => _vm = vm;
 

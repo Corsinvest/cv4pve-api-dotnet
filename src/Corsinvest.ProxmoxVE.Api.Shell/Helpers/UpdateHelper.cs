@@ -34,7 +34,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers
         /// <returns></returns>
         public static (string Info, bool IsNewVersion, string BrowserDownloadUrl) GetInfo(string appName)
         {
-            var info = UpdateHelper.GetInfoLastReleaseAssetFromGitHub(appName);
+            var info = GetInfoLastReleaseAssetFromGitHub(appName);
             var currVer = ShellHelper.GetCurrentVersionApp();
             var isNewVersion = info.Version.ToString() != currVer;
             var msg = isNewVersion ?
@@ -145,7 +145,7 @@ Release Notes: {info.ReleaseNotes}
         /// <param name="fileNameNew"></param>
         public static void UpgradeFinish(string fileNameNew)
         {
-            var fileNameApp = UpdateHelper.GetFileNameAppFromNew(fileNameNew);
+            var fileNameApp = GetFileNameAppFromNew(fileNameNew);
             File.Copy(fileNameNew, fileNameApp, true);
         }
 
@@ -157,27 +157,23 @@ Release Notes: {info.ReleaseNotes}
         /// <returns>File name new version</returns>
         public static string UpgradePrepare(string assetUrl, string fileNameApp)
         {
-            using (var client = new WebClient())
-            {
-                var zipFile = Path.GetTempFileName();
+            using var client = new WebClient();
+            var zipFile = Path.GetTempFileName();
 
-                //download file
-                client.DownloadFile(new Uri(assetUrl), zipFile);
+            //download file
+            client.DownloadFile(new Uri(assetUrl), zipFile);
 
-                var fileNameNew = GetFileNameAppNew(fileNameApp);
-                if (File.Exists(fileNameNew)) { File.Delete(fileNameNew); }
+            var fileNameNew = GetFileNameAppNew(fileNameApp);
+            if (File.Exists(fileNameNew)) { File.Delete(fileNameNew); }
 
-                //unzip
-                using (var file = File.OpenRead(zipFile))
-                using (var zip = new ZipArchive(file, ZipArchiveMode.Read))
-                {
-                    foreach (var entry in zip.Entries) { entry.ExtractToFile(fileNameNew); }
-                }
+            //unzip
+            using var file = File.OpenRead(zipFile);
+            using var zip = new ZipArchive(file, ZipArchiveMode.Read);
+            foreach (var entry in zip.Entries) { entry.ExtractToFile(fileNameNew); }
 
-                File.Delete(zipFile);
+            File.Delete(zipFile);
 
-                return fileNameNew;
-            }
+            return fileNameNew;
         }
     }
 }

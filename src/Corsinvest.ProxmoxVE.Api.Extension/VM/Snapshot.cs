@@ -49,33 +49,25 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// </summary>
         /// <value></value>
         public Result Config
-        {
-            get
+            => VM.Type switch
             {
-                switch (VM.Type)
-                {
-                    case VMTypeEnum.Qemu: return VM.QemuApi.Snapshot[Name].Config.GetRest();
-                    case VMTypeEnum.Lxc: return VM.LxcApi.Snapshot[Name].Config.GetRest();
-                    default: return null;
-                }
-            }
-        }
+                VMTypeEnum.Qemu => VM.QemuApi.Snapshot[Name].Config.GetRest(),
+                VMTypeEnum.Lxc => VM.LxcApi.Snapshot[Name].Config.GetRest(),
+                _ => null,
+            };
 
         /// <summary>
         /// Update
         /// </summary>
-        /// <param name="name"></param>
         /// <param name="description"></param>
         /// <returns></returns>
-        public Result Update(string name, string description)
-        {
-            switch (VM.Type)
+        public Result Update(string description)
+            => VM.Type switch
             {
-                case VMTypeEnum.Qemu: return VM.QemuApi.Snapshot[Name].Config.SetRest(description);
-                case VMTypeEnum.Lxc: return VM.LxcApi.Snapshot[Name].Config.SetRest(description);
-                default: return null;
-            }
-        }
+                VMTypeEnum.Qemu => VM.QemuApi.Snapshot[Name].Config.SetRest(description),
+                VMTypeEnum.Lxc => VM.LxcApi.Snapshot[Name].Config.SetRest(description),
+                _ => null,
+            };
 
         /// <summary>
         /// Rollback
@@ -120,7 +112,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// Ram used
         /// </summary>
         public bool Ram => _apiData.vmstate != 0;
-        
+
         /// <summary>
         /// Get title info
         /// </summary>

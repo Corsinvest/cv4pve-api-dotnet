@@ -27,23 +27,20 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         /// <param name="client"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static NodeInfo GetNode(this PveClient client, string name)
-        {
-            var node = GetNodes(client).Where(a => a.Node == name).FirstOrDefault();
-            if (node == null) { throw new ArgumentException($"Node {name} not found!"); }
-            return node;
-        }
+        public static NodeInfo GetNode(this PveClient client, string name) 
+            => GetNodes(client).Where(a => a.Node == name).FirstOrDefault() ??
+                        throw new ArgumentException($"Node '{name}' not found!");
 
         /// <summary>
         /// Return all nodes info.
         /// </summary>
         /// <param name="client"></param>
         /// <returns></returns>
-        public static IReadOnlyList<NodeInfo> GetNodes(this PveClient client)
-        {
-            var nodes = new List<NodeInfo>();
-            foreach (var node in client.Nodes.GetRest().Response.data) { nodes.Add(new NodeInfo(client, node)); }
-            return nodes.OrderBy(a => a.Node).ToList().AsReadOnly();
-        }
+        public static IReadOnlyList<NodeInfo> GetNodes(this PveClient client) 
+            => client.Nodes.GetRest().ToEnumerable()
+                            .Select(a => new NodeInfo(client, a))
+                            .OrderBy(a => a.Node)
+                            .ToList()
+                            .AsReadOnly();
     }
 }

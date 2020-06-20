@@ -156,12 +156,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
             var rp = returnParameters?.Where(a => a.Name == key).FirstOrDefault();
             if (rp != null)
             {
-                switch (rp.GetAlignmentValue())
+                alignment = (rp.GetAlignmentValue()) switch
                 {
-                    case "R": alignment = Alignment.Right; break;
-                    case "L": alignment = Alignment.Left; break;
-                    default: alignment = Alignment.Left; break;
-                }
+                    "R" => Alignment.Right,
+                    "L" => Alignment.Left,
+                    _ => Alignment.Left,
+                };
             }
 
             return new ColumnHeader(key, alignment, alignment);

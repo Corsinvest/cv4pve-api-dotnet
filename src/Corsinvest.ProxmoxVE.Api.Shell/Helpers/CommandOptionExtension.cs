@@ -339,12 +339,12 @@ For more information visit https://www.cv4pve-tools.com";
                 var fileName = password.Substring(5);
                 if (File.Exists(fileName))
                 {
-                    password = StringHelper.Decrypt(File.ReadAllText(fileName, ASCIIEncoding.UTF8), KEY, false);
+                    password = StringHelper.Decrypt(File.ReadAllText(fileName, Encoding.UTF8), KEY, false);
                 }
                 else
                 {
                     password = Prompt.GetPassword("Password:");
-                    File.WriteAllText(fileName, StringHelper.Encrypt(password, KEY, false), ASCIIEncoding.UTF8);
+                    File.WriteAllText(fileName, StringHelper.Encrypt(password, KEY, false), Encoding.UTF8);
                 }
             }
 
@@ -514,10 +514,10 @@ For more information visit https://www.cv4pve-tools.com";
 
                 cmd.OnExecute(() =>
                 {
-                    var ret = UpdateHelper.GetInfo(app.Name);
-                    app.Out.WriteLine(ret.Info);
+                    var (Info, IsNewVersion, BrowserDownloadUrl) = UpdateHelper.GetInfo(app.Name);
+                    app.Out.WriteLine(Info);
 
-                    if (ret.IsNewVersion)
+                    if (IsNewVersion)
                     {
                         if (!optQuiet.HasValue())
                         {
@@ -528,9 +528,9 @@ For more information visit https://www.cv4pve-tools.com";
                             }
                         }
 
-                        app.Out.WriteLine($"Download {ret.BrowserDownloadUrl} ....");
+                        app.Out.WriteLine($"Download {BrowserDownloadUrl} ....");
 
-                        var fileNameNew = UpdateHelper.UpgradePrepare(ret.BrowserDownloadUrl,
+                        var fileNameNew = UpdateHelper.UpgradePrepare(BrowserDownloadUrl,
                                                                       Process.GetCurrentProcess().MainModule.FileName);
 
                         Process.Start(fileNameNew, APP_UPGRADE_FINISH);

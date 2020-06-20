@@ -30,6 +30,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
         public enum OutputType
         {
             /// <summary>
+            /// Text
+            /// </summary>
+            Text,
+
+            /// <summary>
             /// Unicode
             /// </summary>
             Unicode,
@@ -43,10 +48,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
             /// Markdown
             /// </summary>
             Markdown,
-            /// <summary>
-            /// Text
-            /// </summary>
-            Text,
 
             /// <summary>
             /// Json
@@ -86,17 +87,15 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
         }
 
         private static TableOutputType DecodeOutputType(OutputType output)
-        {
-            switch (output)
+            => output switch
             {
-                case OutputType.Text: return TableOutputType.Text;
-                case OutputType.Html: return TableOutputType.Html;
-                case OutputType.Unicode: return TableOutputType.Unicode;
-                case OutputType.UnicodeAlt: return TableOutputType.UnicodeAlt;
-                case OutputType.Markdown: return TableOutputType.Markdown;
-                default: return TableOutputType.Text;
-            }
-        }
+                OutputType.Text => TableOutputType.Text,
+                OutputType.Html => TableOutputType.Html,
+                OutputType.Unicode => TableOutputType.Unicode,
+                OutputType.UnicodeAlt => TableOutputType.UnicodeAlt,
+                OutputType.Markdown => TableOutputType.Markdown,
+                _ => TableOutputType.Text,
+            };
 
         /// <summary>
         /// Execute methods
@@ -139,7 +138,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
             {
                 resultText.AppendLine(result.ReasonPhrase);
                 resultText.AppendLine(verbose ?
-                                      PveClient.ObjectToJson((string)result.Response.errors) :
+                                      PveClientBase.ObjectToJson((string)result.Response.errors) :
                                       result.GetError());
             }
             else if (result.InError())
@@ -189,7 +188,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
                                                                .Where(a => a.IsGet)
                                                                .FirstOrDefault()
                                                                .ReturnParameters;
-
 
                                 if (returnParameters.Count == 0)
                                 {
@@ -257,12 +255,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
                         partsType = JoinWord(param.EnumValues, 18, ",");
                     }
 
-                    var row = 0;
-                    for (row = 0; row < Math.Max(partsType.Length, partsComment.Length); row++)
+                    for (var i = 0; i < Math.Max(partsType.Length, partsComment.Length); i++)
                     {
-                        values.Add(new[] { row == 0 ? param.Name : "",
-                                           row < partsType.Length ? partsType[row] : "",
-                                           row < partsComment.Length ? partsComment[row] : "" });
+                        values.Add(new[] { i == 0 ? param.Name : "",
+                                           i < partsType.Length ? partsType[i] : "",
+                                           i < partsComment.Length ? partsComment[i] : "" });
                     }
                 }
 

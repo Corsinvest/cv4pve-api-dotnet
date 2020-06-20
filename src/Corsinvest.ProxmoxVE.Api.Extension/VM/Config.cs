@@ -130,10 +130,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <returns></returns>
         public string GetAllConfigs()
         {
-            var ret = new List<string>();
-
-            //current
-            ret.Add(CreateConfig(ApiData, null));
+            var ret = new List<string>
+            {
+                //current
+                CreateConfig(ApiData, null)
+            };
 
             //snapshots
             foreach (var snapshot in VM.Snapshots)

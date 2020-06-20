@@ -160,107 +160,106 @@ namespace Corsinvest.ProxmoxVE.Api
                                      MethodType methodType,
                                      IDictionary<string, object> parameters = null)
         {
-            using (var handler = new HttpClientHandler()
+            using var handler = new HttpClientHandler()
             {
                 CookieContainer = new CookieContainer(),
                 ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; }
-            })
-            using (var client = new HttpClient(handler))
+            };
+            using var client = new HttpClient(handler)
             {
-                client.BaseAddress = new Uri(GetApiUrl());
+                BaseAddress = new Uri(GetApiUrl())
+            };
 
-                var httpMethod = HttpMethod.Get;
-                switch (methodType)
+            var httpMethod = methodType switch
+            {
+                MethodType.Get => HttpMethod.Get,
+                MethodType.Set => HttpMethod.Put,
+                MethodType.Create => HttpMethod.Post,
+                MethodType.Delete => HttpMethod.Delete,
+                _ => HttpMethod.Get,
+            };
+
+            //load parameters
+            var @params = new Dictionary<string, string>();
+            if (parameters != null)
+            {
+                foreach (var parameter in parameters.Where(a => a.Value != null))
                 {
-                    case MethodType.Get: httpMethod = HttpMethod.Get; break;
-                    case MethodType.Set: httpMethod = HttpMethod.Put; break;
-                    case MethodType.Create: httpMethod = HttpMethod.Post; break;
-                    case MethodType.Delete: httpMethod = HttpMethod.Delete; break;
-                    default: httpMethod = HttpMethod.Get; break;
+                    var value = parameter.Value;
+                    if (value is bool valueBool) { value = valueBool ? 1 : 0; }
+                    @params.Add(parameter.Key, value.ToString());
                 }
-
-                //load parameters
-                var @params = new Dictionary<string, string>();
-                if (parameters != null)
-                {
-                    foreach (var parameter in parameters.Where(a => a.Value != null))
-                    {
-                        var value = parameter.Value;
-                        if (value is bool) { value = ((bool)value) ? 1 : 0; }
-                        @params.Add(parameter.Key, value.ToString());
-                    }
-                }
-
-                var uriString = GetApiUrl() + resource;
-                if (httpMethod == HttpMethod.Get && @params.Count > 0)
-                {
-                    uriString += "?" + string.Join("&", @params.Select(a => $"{a.Key}={HttpUtility.UrlEncode(a.Value)}"));
-                }
-
-                if (DebugLevel >= 1)
-                {
-                    Console.Out.WriteLine($"Method: {httpMethod}, Url: {uriString}");
-                    if (httpMethod != HttpMethod.Get)
-                    {
-                        Console.Out.WriteLine("Parameters:");
-                        Console.Out.WriteLine(string.Join(Environment.NewLine,
-                                                          @params.Select(a => $"{a.Key} : {a.Value}")));
-                    }
-                }
-
-                var request = new HttpRequestMessage(httpMethod, new Uri(uriString));
-                if (httpMethod != HttpMethod.Get) { request.Content = new FormUrlEncodedContent(@params); }
-
-                //ticket login
-                if (_ticketCSRFPreventionToken != null)
-                {
-                    handler.CookieContainer.Add(request.RequestUri, new Cookie("PVEAuthCookie", _ticketPVEAuthCookie));
-                    request.Headers.Add("CSRFPreventionToken", _ticketCSRFPreventionToken);
-                }
-
-                var response = client.SendAsync(request).Result;
-
-                if (DebugLevel >= 2)
-                {
-                    Console.Out.WriteLine($"StatusCode:          {response.StatusCode}");
-                    Console.Out.WriteLine($"ReasonPhrase:        {response.ReasonPhrase}");
-                    Console.Out.WriteLine($"IsSuccessStatusCode: {response.IsSuccessStatusCode}");
-                }
-
-                dynamic result = null;
-                switch (ResponseType)
-                {
-                    case ResponseType.Json:
-                        var stringContent = response.Content.ReadAsStringAsync().Result;
-                        result = JsonConvert.DeserializeObject<ExpandoObject>(stringContent);
-                        if (DebugLevel >= 2) { Console.Out.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented)); }
-                        break;
-
-                    case ResponseType.Png:
-                        result = "data:image/png;base64," +
-                                 Convert.ToBase64String(response.Content.ReadAsByteArrayAsync().Result);
-
-                        if (DebugLevel >= 2) { Console.Out.WriteLine(result); }
-                        break;
-
-                    default: break;
-                }
-
-                if (result == null) { result = new ExpandoObject(); }
-
-                if (DebugLevel > 0) { Console.Out.WriteLine("============================="); }
-
-                LastResult = new Result(result,
-                                        response.StatusCode,
-                                        response.ReasonPhrase,
-                                        response.IsSuccessStatusCode,
-                                        resource,
-                                        parameters,
-                                        methodType,
-                                        ResponseType);
-
-                return LastResult;
             }
+
+            var uriString = GetApiUrl() + resource;
+            if (httpMethod == HttpMethod.Get && @params.Count > 0)
+            {
+                uriString += "?" + string.Join("&", @params.Select(a => $"{a.Key}={HttpUtility.UrlEncode(a.Value)}"));
+            }
+
+            if (DebugLevel >= 1)
+            {
+                Console.Out.WriteLine($"Method: {httpMethod}, Url: {uriString}");
+                if (httpMethod != HttpMethod.Get)
+                {
+                    Console.Out.WriteLine("Parameters:");
+                    Console.Out.WriteLine(string.Join(Environment.NewLine,
+                                                      @params.Select(a => $"{a.Key} : {a.Value}")));
+                }
+            }
+
+            var request = new HttpRequestMessage(httpMethod, new Uri(uriString));
+            if (httpMethod != HttpMethod.Get) { request.Content = new FormUrlEncodedContent(@params); }
+
+            //ticket login
+            if (_ticketCSRFPreventionToken != null)
+            {
+                handler.CookieContainer.Add(request.RequestUri, new Cookie("PVEAuthCookie", _ticketPVEAuthCookie));
+                request.Headers.Add("CSRFPreventionToken", _ticketCSRFPreventionToken);
+            }
+
+            var response = client.SendAsync(request).Result;
+
+            if (DebugLevel >= 2)
+            {
+                Console.Out.WriteLine($"StatusCode:          {response.StatusCode}");
+                Console.Out.WriteLine($"ReasonPhrase:        {response.ReasonPhrase}");
+                Console.Out.WriteLine($"IsSuccessStatusCode: {response.IsSuccessStatusCode}");
+            }
+
+            dynamic result = null;
+            switch (ResponseType)
+            {
+                case ResponseType.Json:
+                    var stringContent = response.Content.ReadAsStringAsync().Result;
+                    result = JsonConvert.DeserializeObject<ExpandoObject>(stringContent);
+                    if (DebugLevel >= 2) { Console.Out.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented)); }
+                    break;
+
+                case ResponseType.Png:
+                    result = "data:image/png;base64," +
+                             Convert.ToBase64String(response.Content.ReadAsByteArrayAsync().Result);
+
+                    if (DebugLevel >= 2) { Console.Out.WriteLine(result); }
+                    break;
+
+                default: break;
+            }
+
+            if (result == null) { result = new ExpandoObject(); }
+
+            if (DebugLevel > 0) { Console.Out.WriteLine("============================="); }
+
+            LastResult = new Result(result,
+                                    response.StatusCode,
+                                    response.ReasonPhrase,
+                                    response.IsSuccessStatusCode,
+                                    resource,
+                                    parameters,
+                                    methodType,
+                                    ResponseType);
+
+            return LastResult;
         }
 
         /// <summary>

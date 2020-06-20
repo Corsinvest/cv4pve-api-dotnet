@@ -28,56 +28,53 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="hostname"></param>
         /// <param name="port"></param>
         /// <returns></returns>
-        public PveClient(string hostname, int port = 8006) : base(hostname, port)
-        {
-            _client = this;
-        }
+        public PveClient(string hostname, int port = 8006) : base(hostname, port) => _client = this;
 
         private PVECluster _cluster;
-        public PVECluster Cluster => _cluster ?? (_cluster = new PVECluster(_client));
+        public PVECluster Cluster => _cluster ??= new PVECluster(_client);
         private PVENodes _nodes;
-        public PVENodes Nodes => _nodes ?? (_nodes = new PVENodes(_client));
+        public PVENodes Nodes => _nodes ??= new PVENodes(_client);
         private PVEStorage _storage;
-        public PVEStorage Storage => _storage ?? (_storage = new PVEStorage(_client));
+        public PVEStorage Storage => _storage ??= new PVEStorage(_client);
         private PVEAccess _access;
-        public PVEAccess Access => _access ?? (_access = new PVEAccess(_client));
+        public PVEAccess Access => _access ??= new PVEAccess(_client);
         private PVEPools _pools;
-        public PVEPools Pools => _pools ?? (_pools = new PVEPools(_client));
+        public PVEPools Pools => _pools ??= new PVEPools(_client);
         private PVEVersion _version;
-        public PVEVersion Version => _version ?? (_version = new PVEVersion(_client));
+        public PVEVersion Version => _version ??= new PVEVersion(_client);
         public class PVECluster
         {
             private readonly PveClient _client;
 
             internal PVECluster(PveClient client) { _client = client; }
             private PVEReplication _replication;
-            public PVEReplication Replication => _replication ?? (_replication = new PVEReplication(_client));
+            public PVEReplication Replication => _replication ??= new PVEReplication(_client);
             private PVEConfig _config;
-            public PVEConfig Config => _config ?? (_config = new PVEConfig(_client));
+            public PVEConfig Config => _config ??= new PVEConfig(_client);
             private PVEFirewall _firewall;
-            public PVEFirewall Firewall => _firewall ?? (_firewall = new PVEFirewall(_client));
+            public PVEFirewall Firewall => _firewall ??= new PVEFirewall(_client);
             private PVEBackup _backup;
-            public PVEBackup Backup => _backup ?? (_backup = new PVEBackup(_client));
+            public PVEBackup Backup => _backup ??= new PVEBackup(_client);
             private PVEHa _ha;
-            public PVEHa Ha => _ha ?? (_ha = new PVEHa(_client));
+            public PVEHa Ha => _ha ??= new PVEHa(_client);
             private PVEAcme _acme;
-            public PVEAcme Acme => _acme ?? (_acme = new PVEAcme(_client));
+            public PVEAcme Acme => _acme ??= new PVEAcme(_client);
             private PVECeph _ceph;
-            public PVECeph Ceph => _ceph ?? (_ceph = new PVECeph(_client));
+            public PVECeph Ceph => _ceph ??= new PVECeph(_client);
             private PVESdn _sdn;
-            public PVESdn Sdn => _sdn ?? (_sdn = new PVESdn(_client));
+            public PVESdn Sdn => _sdn ??= new PVESdn(_client);
             private PVELog _log;
-            public PVELog Log => _log ?? (_log = new PVELog(_client));
+            public PVELog Log => _log ??= new PVELog(_client);
             private PVEResources _resources;
-            public PVEResources Resources => _resources ?? (_resources = new PVEResources(_client));
+            public PVEResources Resources => _resources ??= new PVEResources(_client);
             private PVETasks _tasks;
-            public PVETasks Tasks => _tasks ?? (_tasks = new PVETasks(_client));
+            public PVETasks Tasks => _tasks ??= new PVETasks(_client);
             private PVEOptions _options;
-            public PVEOptions Options => _options ?? (_options = new PVEOptions(_client));
+            public PVEOptions Options => _options ??= new PVEOptions(_client);
             private PVEStatus _status;
-            public PVEStatus Status => _status ?? (_status = new PVEStatus(_client));
+            public PVEStatus Status => _status ??= new PVEStatus(_client);
             private PVENextid _nextid;
-            public PVENextid Nextid => _nextid ?? (_nextid = new PVENextid(_client));
+            public PVENextid Nextid => _nextid ??= new PVENextid(_client);
             public class PVEReplication
             {
                 private readonly PveClient _client;
@@ -227,15 +224,15 @@ namespace Corsinvest.ProxmoxVE.Api
 
                 internal PVEConfig(PveClient client) { _client = client; }
                 private PVEApiversion _apiversion;
-                public PVEApiversion Apiversion => _apiversion ?? (_apiversion = new PVEApiversion(_client));
+                public PVEApiversion Apiversion => _apiversion ??= new PVEApiversion(_client);
                 private PVENodes _nodes;
-                public PVENodes Nodes => _nodes ?? (_nodes = new PVENodes(_client));
+                public PVENodes Nodes => _nodes ??= new PVENodes(_client);
                 private PVEJoin _join;
-                public PVEJoin Join => _join ?? (_join = new PVEJoin(_client));
+                public PVEJoin Join => _join ??= new PVEJoin(_client);
                 private PVETotem _totem;
-                public PVETotem Totem => _totem ?? (_totem = new PVETotem(_client));
+                public PVETotem Totem => _totem ??= new PVETotem(_client);
                 private PVEQdevice _qdevice;
-                public PVEQdevice Qdevice => _qdevice ?? (_qdevice = new PVEQdevice(_client));
+                public PVEQdevice Qdevice => _qdevice ??= new PVEQdevice(_client);
                 public class PVEApiversion
                 {
                     private readonly PveClient _client;
@@ -460,19 +457,19 @@ namespace Corsinvest.ProxmoxVE.Api
 
                 internal PVEFirewall(PveClient client) { _client = client; }
                 private PVEGroups _groups;
-                public PVEGroups Groups => _groups ?? (_groups = new PVEGroups(_client));
+                public PVEGroups Groups => _groups ??= new PVEGroups(_client);
                 private PVERules _rules;
-                public PVERules Rules => _rules ?? (_rules = new PVERules(_client));
+                public PVERules Rules => _rules ??= new PVERules(_client);
                 private PVEIpset _ipset;
-                public PVEIpset Ipset => _ipset ?? (_ipset = new PVEIpset(_client));
+                public PVEIpset Ipset => _ipset ??= new PVEIpset(_client);
                 private PVEAliases _aliases;
-                public PVEAliases Aliases => _aliases ?? (_aliases = new PVEAliases(_client));
+                public PVEAliases Aliases => _aliases ??= new PVEAliases(_client);
                 private PVEOptions _options;
-                public PVEOptions Options => _options ?? (_options = new PVEOptions(_client));
+                public PVEOptions Options => _options ??= new PVEOptions(_client);
                 private PVEMacros _macros;
-                public PVEMacros Macros => _macros ?? (_macros = new PVEMacros(_client));
+                public PVEMacros Macros => _macros ??= new PVEMacros(_client);
                 private PVERefs _refs;
-                public PVERefs Refs => _refs ?? (_refs = new PVERefs(_client));
+                public PVERefs Refs => _refs ??= new PVERefs(_client);
                 public class PVEGroups
                 {
                     private readonly PveClient _client;
@@ -1539,11 +1536,11 @@ namespace Corsinvest.ProxmoxVE.Api
 
                 internal PVEHa(PveClient client) { _client = client; }
                 private PVEResources _resources;
-                public PVEResources Resources => _resources ?? (_resources = new PVEResources(_client));
+                public PVEResources Resources => _resources ??= new PVEResources(_client);
                 private PVEGroups _groups;
-                public PVEGroups Groups => _groups ?? (_groups = new PVEGroups(_client));
+                public PVEGroups Groups => _groups ??= new PVEGroups(_client);
                 private PVEStatus _status;
-                public PVEStatus Status => _status ?? (_status = new PVEStatus(_client));
+                public PVEStatus Status => _status ??= new PVEStatus(_client);
                 public class PVEResources
                 {
                     private readonly PveClient _client;
@@ -1556,9 +1553,9 @@ namespace Corsinvest.ProxmoxVE.Api
                         private readonly object _sid;
                         internal PVEItemSid(PveClient client, object sid) { _client = client; _sid = sid; }
                         private PVEMigrate _migrate;
-                        public PVEMigrate Migrate => _migrate ?? (_migrate = new PVEMigrate(_client, _sid));
+                        public PVEMigrate Migrate => _migrate ??= new PVEMigrate(_client, _sid);
                         private PVERelocate _relocate;
-                        public PVERelocate Relocate => _relocate ?? (_relocate = new PVERelocate(_client, _sid));
+                        public PVERelocate Relocate => _relocate ??= new PVERelocate(_client, _sid);
                         public class PVEMigrate
                         {
                             private readonly PveClient _client;
@@ -1849,9 +1846,9 @@ namespace Corsinvest.ProxmoxVE.Api
 
                     internal PVEStatus(PveClient client) { _client = client; }
                     private PVECurrent _current;
-                    public PVECurrent Current => _current ?? (_current = new PVECurrent(_client));
+                    public PVECurrent Current => _current ??= new PVECurrent(_client);
                     private PVEManagerStatus _managerStatus;
-                    public PVEManagerStatus ManagerStatus => _managerStatus ?? (_managerStatus = new PVEManagerStatus(_client));
+                    public PVEManagerStatus ManagerStatus => _managerStatus ??= new PVEManagerStatus(_client);
                     public class PVECurrent
                     {
                         private readonly PveClient _client;
@@ -1916,13 +1913,13 @@ namespace Corsinvest.ProxmoxVE.Api
 
                 internal PVEAcme(PveClient client) { _client = client; }
                 private PVEPlugins _plugins;
-                public PVEPlugins Plugins => _plugins ?? (_plugins = new PVEPlugins(_client));
+                public PVEPlugins Plugins => _plugins ??= new PVEPlugins(_client);
                 private PVEAccount _account;
-                public PVEAccount Account => _account ?? (_account = new PVEAccount(_client));
+                public PVEAccount Account => _account ??= new PVEAccount(_client);
                 private PVETos _tos;
-                public PVETos Tos => _tos ?? (_tos = new PVETos(_client));
+                public PVETos Tos => _tos ??= new PVETos(_client);
                 private PVEDirectories _directories;
-                public PVEDirectories Directories => _directories ?? (_directories = new PVEDirectories(_client));
+                public PVEDirectories Directories => _directories ??= new PVEDirectories(_client);
                 public class PVEPlugins
                 {
                     private readonly PveClient _client;
@@ -2206,11 +2203,11 @@ namespace Corsinvest.ProxmoxVE.Api
 
                 internal PVECeph(PveClient client) { _client = client; }
                 private PVEMetadata _metadata;
-                public PVEMetadata Metadata => _metadata ?? (_metadata = new PVEMetadata(_client));
+                public PVEMetadata Metadata => _metadata ??= new PVEMetadata(_client);
                 private PVEStatus _status;
-                public PVEStatus Status => _status ?? (_status = new PVEStatus(_client));
+                public PVEStatus Status => _status ??= new PVEStatus(_client);
                 private PVEFlags _flags;
-                public PVEFlags Flags => _flags ?? (_flags = new PVEFlags(_client));
+                public PVEFlags Flags => _flags ??= new PVEFlags(_client);
                 public class PVEMetadata
                 {
                     private readonly PveClient _client;
@@ -2373,11 +2370,11 @@ namespace Corsinvest.ProxmoxVE.Api
 
                 internal PVESdn(PveClient client) { _client = client; }
                 private PVEVnets _vnets;
-                public PVEVnets Vnets => _vnets ?? (_vnets = new PVEVnets(_client));
+                public PVEVnets Vnets => _vnets ??= new PVEVnets(_client);
                 private PVEZones _zones;
-                public PVEZones Zones => _zones ?? (_zones = new PVEZones(_client));
+                public PVEZones Zones => _zones ??= new PVEZones(_client);
                 private PVEControllers _controllers;
-                public PVEControllers Controllers => _controllers ?? (_controllers = new PVEControllers(_client));
+                public PVEControllers Controllers => _controllers ??= new PVEControllers(_client);
                 public class PVEVnets
                 {
                     private readonly PveClient _client;
@@ -3011,83 +3008,83 @@ namespace Corsinvest.ProxmoxVE.Api
                 private readonly object _node;
                 internal PVEItemNode(PveClient client, object node) { _client = client; _node = node; }
                 private PVEQemu _qemu;
-                public PVEQemu Qemu => _qemu ?? (_qemu = new PVEQemu(_client, _node));
+                public PVEQemu Qemu => _qemu ??= new PVEQemu(_client, _node);
                 private PVELxc _lxc;
-                public PVELxc Lxc => _lxc ?? (_lxc = new PVELxc(_client, _node));
+                public PVELxc Lxc => _lxc ??= new PVELxc(_client, _node);
                 private PVECeph _ceph;
-                public PVECeph Ceph => _ceph ?? (_ceph = new PVECeph(_client, _node));
+                public PVECeph Ceph => _ceph ??= new PVECeph(_client, _node);
                 private PVEVzdump _vzdump;
-                public PVEVzdump Vzdump => _vzdump ?? (_vzdump = new PVEVzdump(_client, _node));
+                public PVEVzdump Vzdump => _vzdump ??= new PVEVzdump(_client, _node);
                 private PVEServices _services;
-                public PVEServices Services => _services ?? (_services = new PVEServices(_client, _node));
+                public PVEServices Services => _services ??= new PVEServices(_client, _node);
                 private PVESubscription _subscription;
-                public PVESubscription Subscription => _subscription ?? (_subscription = new PVESubscription(_client, _node));
+                public PVESubscription Subscription => _subscription ??= new PVESubscription(_client, _node);
                 private PVENetwork _network;
-                public PVENetwork Network => _network ?? (_network = new PVENetwork(_client, _node));
+                public PVENetwork Network => _network ??= new PVENetwork(_client, _node);
                 private PVETasks _tasks;
-                public PVETasks Tasks => _tasks ?? (_tasks = new PVETasks(_client, _node));
+                public PVETasks Tasks => _tasks ??= new PVETasks(_client, _node);
                 private PVEScan _scan;
-                public PVEScan Scan => _scan ?? (_scan = new PVEScan(_client, _node));
+                public PVEScan Scan => _scan ??= new PVEScan(_client, _node);
                 private PVEHardware _hardware;
-                public PVEHardware Hardware => _hardware ?? (_hardware = new PVEHardware(_client, _node));
+                public PVEHardware Hardware => _hardware ??= new PVEHardware(_client, _node);
                 private PVEStorage _storage;
-                public PVEStorage Storage => _storage ?? (_storage = new PVEStorage(_client, _node));
+                public PVEStorage Storage => _storage ??= new PVEStorage(_client, _node);
                 private PVEDisks _disks;
-                public PVEDisks Disks => _disks ?? (_disks = new PVEDisks(_client, _node));
+                public PVEDisks Disks => _disks ??= new PVEDisks(_client, _node);
                 private PVEApt _apt;
-                public PVEApt Apt => _apt ?? (_apt = new PVEApt(_client, _node));
+                public PVEApt Apt => _apt ??= new PVEApt(_client, _node);
                 private PVEFirewall _firewall;
-                public PVEFirewall Firewall => _firewall ?? (_firewall = new PVEFirewall(_client, _node));
+                public PVEFirewall Firewall => _firewall ??= new PVEFirewall(_client, _node);
                 private PVEReplication _replication;
-                public PVEReplication Replication => _replication ?? (_replication = new PVEReplication(_client, _node));
+                public PVEReplication Replication => _replication ??= new PVEReplication(_client, _node);
                 private PVECertificates _certificates;
-                public PVECertificates Certificates => _certificates ?? (_certificates = new PVECertificates(_client, _node));
+                public PVECertificates Certificates => _certificates ??= new PVECertificates(_client, _node);
                 private PVEConfig _config;
-                public PVEConfig Config => _config ?? (_config = new PVEConfig(_client, _node));
+                public PVEConfig Config => _config ??= new PVEConfig(_client, _node);
                 private PVESdn _sdn;
-                public PVESdn Sdn => _sdn ?? (_sdn = new PVESdn(_client, _node));
+                public PVESdn Sdn => _sdn ??= new PVESdn(_client, _node);
                 private PVEVersion _version;
-                public PVEVersion Version => _version ?? (_version = new PVEVersion(_client, _node));
+                public PVEVersion Version => _version ??= new PVEVersion(_client, _node);
                 private PVEStatus _status;
-                public PVEStatus Status => _status ?? (_status = new PVEStatus(_client, _node));
+                public PVEStatus Status => _status ??= new PVEStatus(_client, _node);
                 private PVENetstat _netstat;
-                public PVENetstat Netstat => _netstat ?? (_netstat = new PVENetstat(_client, _node));
+                public PVENetstat Netstat => _netstat ??= new PVENetstat(_client, _node);
                 private PVEExecute _execute;
-                public PVEExecute Execute => _execute ?? (_execute = new PVEExecute(_client, _node));
+                public PVEExecute Execute => _execute ??= new PVEExecute(_client, _node);
                 private PVEWakeonlan _wakeonlan;
-                public PVEWakeonlan Wakeonlan => _wakeonlan ?? (_wakeonlan = new PVEWakeonlan(_client, _node));
+                public PVEWakeonlan Wakeonlan => _wakeonlan ??= new PVEWakeonlan(_client, _node);
                 private PVERrd _rrd;
-                public PVERrd Rrd => _rrd ?? (_rrd = new PVERrd(_client, _node));
+                public PVERrd Rrd => _rrd ??= new PVERrd(_client, _node);
                 private PVERrddata _rrddata;
-                public PVERrddata Rrddata => _rrddata ?? (_rrddata = new PVERrddata(_client, _node));
+                public PVERrddata Rrddata => _rrddata ??= new PVERrddata(_client, _node);
                 private PVESyslog _syslog;
-                public PVESyslog Syslog => _syslog ?? (_syslog = new PVESyslog(_client, _node));
+                public PVESyslog Syslog => _syslog ??= new PVESyslog(_client, _node);
                 private PVEJournal _journal;
-                public PVEJournal Journal => _journal ?? (_journal = new PVEJournal(_client, _node));
+                public PVEJournal Journal => _journal ??= new PVEJournal(_client, _node);
                 private PVEVncshell _vncshell;
-                public PVEVncshell Vncshell => _vncshell ?? (_vncshell = new PVEVncshell(_client, _node));
+                public PVEVncshell Vncshell => _vncshell ??= new PVEVncshell(_client, _node);
                 private PVETermproxy _termproxy;
-                public PVETermproxy Termproxy => _termproxy ?? (_termproxy = new PVETermproxy(_client, _node));
+                public PVETermproxy Termproxy => _termproxy ??= new PVETermproxy(_client, _node);
                 private PVEVncwebsocket _vncwebsocket;
-                public PVEVncwebsocket Vncwebsocket => _vncwebsocket ?? (_vncwebsocket = new PVEVncwebsocket(_client, _node));
+                public PVEVncwebsocket Vncwebsocket => _vncwebsocket ??= new PVEVncwebsocket(_client, _node);
                 private PVESpiceshell _spiceshell;
-                public PVESpiceshell Spiceshell => _spiceshell ?? (_spiceshell = new PVESpiceshell(_client, _node));
+                public PVESpiceshell Spiceshell => _spiceshell ??= new PVESpiceshell(_client, _node);
                 private PVEDns _dns;
-                public PVEDns Dns => _dns ?? (_dns = new PVEDns(_client, _node));
+                public PVEDns Dns => _dns ??= new PVEDns(_client, _node);
                 private PVETime _time;
-                public PVETime Time => _time ?? (_time = new PVETime(_client, _node));
+                public PVETime Time => _time ??= new PVETime(_client, _node);
                 private PVEAplinfo _aplinfo;
-                public PVEAplinfo Aplinfo => _aplinfo ?? (_aplinfo = new PVEAplinfo(_client, _node));
+                public PVEAplinfo Aplinfo => _aplinfo ??= new PVEAplinfo(_client, _node);
                 private PVEReport _report;
-                public PVEReport Report => _report ?? (_report = new PVEReport(_client, _node));
+                public PVEReport Report => _report ??= new PVEReport(_client, _node);
                 private PVEStartall _startall;
-                public PVEStartall Startall => _startall ?? (_startall = new PVEStartall(_client, _node));
+                public PVEStartall Startall => _startall ??= new PVEStartall(_client, _node);
                 private PVEStopall _stopall;
-                public PVEStopall Stopall => _stopall ?? (_stopall = new PVEStopall(_client, _node));
+                public PVEStopall Stopall => _stopall ??= new PVEStopall(_client, _node);
                 private PVEMigrateall _migrateall;
-                public PVEMigrateall Migrateall => _migrateall ?? (_migrateall = new PVEMigrateall(_client, _node));
+                public PVEMigrateall Migrateall => _migrateall ??= new PVEMigrateall(_client, _node);
                 private PVEHosts _hosts;
-                public PVEHosts Hosts => _hosts ?? (_hosts = new PVEHosts(_client, _node));
+                public PVEHosts Hosts => _hosts ??= new PVEHosts(_client, _node);
                 public class PVEQemu
                 {
                     private readonly PveClient _client;
@@ -3105,49 +3102,49 @@ namespace Corsinvest.ProxmoxVE.Api
                             _vmid = vmid;
                         }
                         private PVEFirewall _firewall;
-                        public PVEFirewall Firewall => _firewall ?? (_firewall = new PVEFirewall(_client, _node, _vmid));
+                        public PVEFirewall Firewall => _firewall ??= new PVEFirewall(_client, _node, _vmid);
                         private PVEAgent _agent;
-                        public PVEAgent Agent => _agent ?? (_agent = new PVEAgent(_client, _node, _vmid));
+                        public PVEAgent Agent => _agent ??= new PVEAgent(_client, _node, _vmid);
                         private PVERrd _rrd;
-                        public PVERrd Rrd => _rrd ?? (_rrd = new PVERrd(_client, _node, _vmid));
+                        public PVERrd Rrd => _rrd ??= new PVERrd(_client, _node, _vmid);
                         private PVERrddata _rrddata;
-                        public PVERrddata Rrddata => _rrddata ?? (_rrddata = new PVERrddata(_client, _node, _vmid));
+                        public PVERrddata Rrddata => _rrddata ??= new PVERrddata(_client, _node, _vmid);
                         private PVEConfig _config;
-                        public PVEConfig Config => _config ?? (_config = new PVEConfig(_client, _node, _vmid));
+                        public PVEConfig Config => _config ??= new PVEConfig(_client, _node, _vmid);
                         private PVEPending _pending;
-                        public PVEPending Pending => _pending ?? (_pending = new PVEPending(_client, _node, _vmid));
+                        public PVEPending Pending => _pending ??= new PVEPending(_client, _node, _vmid);
                         private PVEUnlink _unlink;
-                        public PVEUnlink Unlink => _unlink ?? (_unlink = new PVEUnlink(_client, _node, _vmid));
+                        public PVEUnlink Unlink => _unlink ??= new PVEUnlink(_client, _node, _vmid);
                         private PVEVncproxy _vncproxy;
-                        public PVEVncproxy Vncproxy => _vncproxy ?? (_vncproxy = new PVEVncproxy(_client, _node, _vmid));
+                        public PVEVncproxy Vncproxy => _vncproxy ??= new PVEVncproxy(_client, _node, _vmid);
                         private PVETermproxy _termproxy;
-                        public PVETermproxy Termproxy => _termproxy ?? (_termproxy = new PVETermproxy(_client, _node, _vmid));
+                        public PVETermproxy Termproxy => _termproxy ??= new PVETermproxy(_client, _node, _vmid);
                         private PVEVncwebsocket _vncwebsocket;
-                        public PVEVncwebsocket Vncwebsocket => _vncwebsocket ?? (_vncwebsocket = new PVEVncwebsocket(_client, _node, _vmid));
+                        public PVEVncwebsocket Vncwebsocket => _vncwebsocket ??= new PVEVncwebsocket(_client, _node, _vmid);
                         private PVESpiceproxy _spiceproxy;
-                        public PVESpiceproxy Spiceproxy => _spiceproxy ?? (_spiceproxy = new PVESpiceproxy(_client, _node, _vmid));
+                        public PVESpiceproxy Spiceproxy => _spiceproxy ??= new PVESpiceproxy(_client, _node, _vmid);
                         private PVEStatus _status;
-                        public PVEStatus Status => _status ?? (_status = new PVEStatus(_client, _node, _vmid));
+                        public PVEStatus Status => _status ??= new PVEStatus(_client, _node, _vmid);
                         private PVESendkey _sendkey;
-                        public PVESendkey Sendkey => _sendkey ?? (_sendkey = new PVESendkey(_client, _node, _vmid));
+                        public PVESendkey Sendkey => _sendkey ??= new PVESendkey(_client, _node, _vmid);
                         private PVEFeature _feature;
-                        public PVEFeature Feature => _feature ?? (_feature = new PVEFeature(_client, _node, _vmid));
+                        public PVEFeature Feature => _feature ??= new PVEFeature(_client, _node, _vmid);
                         private PVEClone _clone;
-                        public PVEClone Clone => _clone ?? (_clone = new PVEClone(_client, _node, _vmid));
+                        public PVEClone Clone => _clone ??= new PVEClone(_client, _node, _vmid);
                         private PVEMoveDisk _moveDisk;
-                        public PVEMoveDisk MoveDisk => _moveDisk ?? (_moveDisk = new PVEMoveDisk(_client, _node, _vmid));
+                        public PVEMoveDisk MoveDisk => _moveDisk ??= new PVEMoveDisk(_client, _node, _vmid);
                         private PVEMigrate _migrate;
-                        public PVEMigrate Migrate => _migrate ?? (_migrate = new PVEMigrate(_client, _node, _vmid));
+                        public PVEMigrate Migrate => _migrate ??= new PVEMigrate(_client, _node, _vmid);
                         private PVEMonitor _monitor;
-                        public PVEMonitor Monitor => _monitor ?? (_monitor = new PVEMonitor(_client, _node, _vmid));
+                        public PVEMonitor Monitor => _monitor ??= new PVEMonitor(_client, _node, _vmid);
                         private PVEResize _resize;
-                        public PVEResize Resize => _resize ?? (_resize = new PVEResize(_client, _node, _vmid));
+                        public PVEResize Resize => _resize ??= new PVEResize(_client, _node, _vmid);
                         private PVESnapshot _snapshot;
-                        public PVESnapshot Snapshot => _snapshot ?? (_snapshot = new PVESnapshot(_client, _node, _vmid));
+                        public PVESnapshot Snapshot => _snapshot ??= new PVESnapshot(_client, _node, _vmid);
                         private PVETemplate _template;
-                        public PVETemplate Template => _template ?? (_template = new PVETemplate(_client, _node, _vmid));
+                        public PVETemplate Template => _template ??= new PVETemplate(_client, _node, _vmid);
                         private PVECloudinit _cloudinit;
-                        public PVECloudinit Cloudinit => _cloudinit ?? (_cloudinit = new PVECloudinit(_client, _node, _vmid));
+                        public PVECloudinit Cloudinit => _cloudinit ??= new PVECloudinit(_client, _node, _vmid);
                         public class PVEFirewall
                         {
                             private readonly PveClient _client;
@@ -3159,17 +3156,17 @@ namespace Corsinvest.ProxmoxVE.Api
                                 _vmid = vmid;
                             }
                             private PVERules _rules;
-                            public PVERules Rules => _rules ?? (_rules = new PVERules(_client, _node, _vmid));
+                            public PVERules Rules => _rules ??= new PVERules(_client, _node, _vmid);
                             private PVEAliases _aliases;
-                            public PVEAliases Aliases => _aliases ?? (_aliases = new PVEAliases(_client, _node, _vmid));
+                            public PVEAliases Aliases => _aliases ??= new PVEAliases(_client, _node, _vmid);
                             private PVEIpset _ipset;
-                            public PVEIpset Ipset => _ipset ?? (_ipset = new PVEIpset(_client, _node, _vmid));
+                            public PVEIpset Ipset => _ipset ??= new PVEIpset(_client, _node, _vmid);
                             private PVEOptions _options;
-                            public PVEOptions Options => _options ?? (_options = new PVEOptions(_client, _node, _vmid));
+                            public PVEOptions Options => _options ??= new PVEOptions(_client, _node, _vmid);
                             private PVELog _log;
-                            public PVELog Log => _log ?? (_log = new PVELog(_client, _node, _vmid));
+                            public PVELog Log => _log ??= new PVELog(_client, _node, _vmid);
                             private PVERefs _refs;
-                            public PVERefs Refs => _refs ?? (_refs = new PVERefs(_client, _node, _vmid));
+                            public PVERefs Refs => _refs ??= new PVERefs(_client, _node, _vmid);
                             public class PVERules
                             {
                                 private readonly PveClient _client;
@@ -3821,55 +3818,55 @@ namespace Corsinvest.ProxmoxVE.Api
                                 _vmid = vmid;
                             }
                             private PVEFsfreeze_Freeze _fsfreeze_Freeze;
-                            public PVEFsfreeze_Freeze Fsfreeze_Freeze => _fsfreeze_Freeze ?? (_fsfreeze_Freeze = new PVEFsfreeze_Freeze(_client, _node, _vmid));
+                            public PVEFsfreeze_Freeze Fsfreeze_Freeze => _fsfreeze_Freeze ??= new PVEFsfreeze_Freeze(_client, _node, _vmid);
                             private PVEFsfreeze_Status _fsfreeze_Status;
-                            public PVEFsfreeze_Status Fsfreeze_Status => _fsfreeze_Status ?? (_fsfreeze_Status = new PVEFsfreeze_Status(_client, _node, _vmid));
+                            public PVEFsfreeze_Status Fsfreeze_Status => _fsfreeze_Status ??= new PVEFsfreeze_Status(_client, _node, _vmid);
                             private PVEFsfreeze_Thaw _fsfreeze_Thaw;
-                            public PVEFsfreeze_Thaw Fsfreeze_Thaw => _fsfreeze_Thaw ?? (_fsfreeze_Thaw = new PVEFsfreeze_Thaw(_client, _node, _vmid));
+                            public PVEFsfreeze_Thaw Fsfreeze_Thaw => _fsfreeze_Thaw ??= new PVEFsfreeze_Thaw(_client, _node, _vmid);
                             private PVEFstrim _fstrim;
-                            public PVEFstrim Fstrim => _fstrim ?? (_fstrim = new PVEFstrim(_client, _node, _vmid));
+                            public PVEFstrim Fstrim => _fstrim ??= new PVEFstrim(_client, _node, _vmid);
                             private PVEGet_Fsinfo _get_Fsinfo;
-                            public PVEGet_Fsinfo Get_Fsinfo => _get_Fsinfo ?? (_get_Fsinfo = new PVEGet_Fsinfo(_client, _node, _vmid));
+                            public PVEGet_Fsinfo Get_Fsinfo => _get_Fsinfo ??= new PVEGet_Fsinfo(_client, _node, _vmid);
                             private PVEGet_Host_Name _get_Host_Name;
-                            public PVEGet_Host_Name Get_Host_Name => _get_Host_Name ?? (_get_Host_Name = new PVEGet_Host_Name(_client, _node, _vmid));
+                            public PVEGet_Host_Name Get_Host_Name => _get_Host_Name ??= new PVEGet_Host_Name(_client, _node, _vmid);
                             private PVEGet_Memory_Block_Info _get_Memory_Block_Info;
-                            public PVEGet_Memory_Block_Info Get_Memory_Block_Info => _get_Memory_Block_Info ?? (_get_Memory_Block_Info = new PVEGet_Memory_Block_Info(_client, _node, _vmid));
+                            public PVEGet_Memory_Block_Info Get_Memory_Block_Info => _get_Memory_Block_Info ??= new PVEGet_Memory_Block_Info(_client, _node, _vmid);
                             private PVEGet_Memory_Blocks _get_Memory_Blocks;
-                            public PVEGet_Memory_Blocks Get_Memory_Blocks => _get_Memory_Blocks ?? (_get_Memory_Blocks = new PVEGet_Memory_Blocks(_client, _node, _vmid));
+                            public PVEGet_Memory_Blocks Get_Memory_Blocks => _get_Memory_Blocks ??= new PVEGet_Memory_Blocks(_client, _node, _vmid);
                             private PVEGet_Osinfo _get_Osinfo;
-                            public PVEGet_Osinfo Get_Osinfo => _get_Osinfo ?? (_get_Osinfo = new PVEGet_Osinfo(_client, _node, _vmid));
+                            public PVEGet_Osinfo Get_Osinfo => _get_Osinfo ??= new PVEGet_Osinfo(_client, _node, _vmid);
                             private PVEGet_Time _get_Time;
-                            public PVEGet_Time Get_Time => _get_Time ?? (_get_Time = new PVEGet_Time(_client, _node, _vmid));
+                            public PVEGet_Time Get_Time => _get_Time ??= new PVEGet_Time(_client, _node, _vmid);
                             private PVEGet_Timezone _get_Timezone;
-                            public PVEGet_Timezone Get_Timezone => _get_Timezone ?? (_get_Timezone = new PVEGet_Timezone(_client, _node, _vmid));
+                            public PVEGet_Timezone Get_Timezone => _get_Timezone ??= new PVEGet_Timezone(_client, _node, _vmid);
                             private PVEGet_Users _get_Users;
-                            public PVEGet_Users Get_Users => _get_Users ?? (_get_Users = new PVEGet_Users(_client, _node, _vmid));
+                            public PVEGet_Users Get_Users => _get_Users ??= new PVEGet_Users(_client, _node, _vmid);
                             private PVEGet_Vcpus _get_Vcpus;
-                            public PVEGet_Vcpus Get_Vcpus => _get_Vcpus ?? (_get_Vcpus = new PVEGet_Vcpus(_client, _node, _vmid));
+                            public PVEGet_Vcpus Get_Vcpus => _get_Vcpus ??= new PVEGet_Vcpus(_client, _node, _vmid);
                             private PVEInfo _info;
-                            public PVEInfo Info => _info ?? (_info = new PVEInfo(_client, _node, _vmid));
+                            public PVEInfo Info => _info ??= new PVEInfo(_client, _node, _vmid);
                             private PVENetwork_Get_Interfaces _network_Get_Interfaces;
-                            public PVENetwork_Get_Interfaces Network_Get_Interfaces => _network_Get_Interfaces ?? (_network_Get_Interfaces = new PVENetwork_Get_Interfaces(_client, _node, _vmid));
+                            public PVENetwork_Get_Interfaces Network_Get_Interfaces => _network_Get_Interfaces ??= new PVENetwork_Get_Interfaces(_client, _node, _vmid);
                             private PVEPing _ping;
-                            public PVEPing Ping => _ping ?? (_ping = new PVEPing(_client, _node, _vmid));
+                            public PVEPing Ping => _ping ??= new PVEPing(_client, _node, _vmid);
                             private PVEShutdown _shutdown;
-                            public PVEShutdown Shutdown => _shutdown ?? (_shutdown = new PVEShutdown(_client, _node, _vmid));
+                            public PVEShutdown Shutdown => _shutdown ??= new PVEShutdown(_client, _node, _vmid);
                             private PVESuspend_Disk _suspend_Disk;
-                            public PVESuspend_Disk Suspend_Disk => _suspend_Disk ?? (_suspend_Disk = new PVESuspend_Disk(_client, _node, _vmid));
+                            public PVESuspend_Disk Suspend_Disk => _suspend_Disk ??= new PVESuspend_Disk(_client, _node, _vmid);
                             private PVESuspend_Hybrid _suspend_Hybrid;
-                            public PVESuspend_Hybrid Suspend_Hybrid => _suspend_Hybrid ?? (_suspend_Hybrid = new PVESuspend_Hybrid(_client, _node, _vmid));
+                            public PVESuspend_Hybrid Suspend_Hybrid => _suspend_Hybrid ??= new PVESuspend_Hybrid(_client, _node, _vmid);
                             private PVESuspend_Ram _suspend_Ram;
-                            public PVESuspend_Ram Suspend_Ram => _suspend_Ram ?? (_suspend_Ram = new PVESuspend_Ram(_client, _node, _vmid));
+                            public PVESuspend_Ram Suspend_Ram => _suspend_Ram ??= new PVESuspend_Ram(_client, _node, _vmid);
                             private PVESet_User_Password _set_User_Password;
-                            public PVESet_User_Password Set_User_Password => _set_User_Password ?? (_set_User_Password = new PVESet_User_Password(_client, _node, _vmid));
+                            public PVESet_User_Password Set_User_Password => _set_User_Password ??= new PVESet_User_Password(_client, _node, _vmid);
                             private PVEExec _exec;
-                            public PVEExec Exec => _exec ?? (_exec = new PVEExec(_client, _node, _vmid));
+                            public PVEExec Exec => _exec ??= new PVEExec(_client, _node, _vmid);
                             private PVEExec_Status _exec_Status;
-                            public PVEExec_Status Exec_Status => _exec_Status ?? (_exec_Status = new PVEExec_Status(_client, _node, _vmid));
+                            public PVEExec_Status Exec_Status => _exec_Status ??= new PVEExec_Status(_client, _node, _vmid);
                             private PVEFile_Read _file_Read;
-                            public PVEFile_Read File_Read => _file_Read ?? (_file_Read = new PVEFile_Read(_client, _node, _vmid));
+                            public PVEFile_Read File_Read => _file_Read ??= new PVEFile_Read(_client, _node, _vmid);
                             private PVEFile_Write _file_Write;
-                            public PVEFile_Write File_Write => _file_Write ?? (_file_Write = new PVEFile_Write(_client, _node, _vmid));
+                            public PVEFile_Write File_Write => _file_Write ??= new PVEFile_Write(_client, _node, _vmid);
                             public class PVEFsfreeze_Freeze
                             {
                                 private readonly PveClient _client;
@@ -5325,21 +5322,21 @@ namespace Corsinvest.ProxmoxVE.Api
                                 _vmid = vmid;
                             }
                             private PVECurrent _current;
-                            public PVECurrent Current => _current ?? (_current = new PVECurrent(_client, _node, _vmid));
+                            public PVECurrent Current => _current ??= new PVECurrent(_client, _node, _vmid);
                             private PVEStart _start;
-                            public PVEStart Start => _start ?? (_start = new PVEStart(_client, _node, _vmid));
+                            public PVEStart Start => _start ??= new PVEStart(_client, _node, _vmid);
                             private PVEStop _stop;
-                            public PVEStop Stop => _stop ?? (_stop = new PVEStop(_client, _node, _vmid));
+                            public PVEStop Stop => _stop ??= new PVEStop(_client, _node, _vmid);
                             private PVEReset _reset;
-                            public PVEReset Reset => _reset ?? (_reset = new PVEReset(_client, _node, _vmid));
+                            public PVEReset Reset => _reset ??= new PVEReset(_client, _node, _vmid);
                             private PVEShutdown _shutdown;
-                            public PVEShutdown Shutdown => _shutdown ?? (_shutdown = new PVEShutdown(_client, _node, _vmid));
+                            public PVEShutdown Shutdown => _shutdown ??= new PVEShutdown(_client, _node, _vmid);
                             private PVEReboot _reboot;
-                            public PVEReboot Reboot => _reboot ?? (_reboot = new PVEReboot(_client, _node, _vmid));
+                            public PVEReboot Reboot => _reboot ??= new PVEReboot(_client, _node, _vmid);
                             private PVESuspend _suspend;
-                            public PVESuspend Suspend => _suspend ?? (_suspend = new PVESuspend(_client, _node, _vmid));
+                            public PVESuspend Suspend => _suspend ??= new PVESuspend(_client, _node, _vmid);
                             private PVEResume _resume;
-                            public PVEResume Resume => _resume ?? (_resume = new PVEResume(_client, _node, _vmid));
+                            public PVEResume Resume => _resume ??= new PVEResume(_client, _node, _vmid);
                             public class PVECurrent
                             {
                                 private readonly PveClient _client;
@@ -5965,9 +5962,9 @@ namespace Corsinvest.ProxmoxVE.Api
                                     _snapname = snapname;
                                 }
                                 private PVEConfig _config;
-                                public PVEConfig Config => _config ?? (_config = new PVEConfig(_client, _node, _vmid, _snapname));
+                                public PVEConfig Config => _config ??= new PVEConfig(_client, _node, _vmid, _snapname);
                                 private PVERollback _rollback;
-                                public PVERollback Rollback => _rollback ?? (_rollback = new PVERollback(_client, _node, _vmid, _snapname));
+                                public PVERollback Rollback => _rollback ??= new PVERollback(_client, _node, _vmid, _snapname);
                                 public class PVEConfig
                                 {
                                     private readonly PveClient _client;
@@ -6142,7 +6139,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 _vmid = vmid;
                             }
                             private PVEDump _dump;
-                            public PVEDump Dump => _dump ?? (_dump = new PVEDump(_client, _node, _vmid));
+                            public PVEDump Dump => _dump ??= new PVEDump(_client, _node, _vmid);
                             public class PVEDump
                             {
                                 private readonly PveClient _client;
@@ -6518,39 +6515,39 @@ namespace Corsinvest.ProxmoxVE.Api
                             _vmid = vmid;
                         }
                         private PVEConfig _config;
-                        public PVEConfig Config => _config ?? (_config = new PVEConfig(_client, _node, _vmid));
+                        public PVEConfig Config => _config ??= new PVEConfig(_client, _node, _vmid);
                         private PVEStatus _status;
-                        public PVEStatus Status => _status ?? (_status = new PVEStatus(_client, _node, _vmid));
+                        public PVEStatus Status => _status ??= new PVEStatus(_client, _node, _vmid);
                         private PVESnapshot _snapshot;
-                        public PVESnapshot Snapshot => _snapshot ?? (_snapshot = new PVESnapshot(_client, _node, _vmid));
+                        public PVESnapshot Snapshot => _snapshot ??= new PVESnapshot(_client, _node, _vmid);
                         private PVEFirewall _firewall;
-                        public PVEFirewall Firewall => _firewall ?? (_firewall = new PVEFirewall(_client, _node, _vmid));
+                        public PVEFirewall Firewall => _firewall ??= new PVEFirewall(_client, _node, _vmid);
                         private PVERrd _rrd;
-                        public PVERrd Rrd => _rrd ?? (_rrd = new PVERrd(_client, _node, _vmid));
+                        public PVERrd Rrd => _rrd ??= new PVERrd(_client, _node, _vmid);
                         private PVERrddata _rrddata;
-                        public PVERrddata Rrddata => _rrddata ?? (_rrddata = new PVERrddata(_client, _node, _vmid));
+                        public PVERrddata Rrddata => _rrddata ??= new PVERrddata(_client, _node, _vmid);
                         private PVEVncproxy _vncproxy;
-                        public PVEVncproxy Vncproxy => _vncproxy ?? (_vncproxy = new PVEVncproxy(_client, _node, _vmid));
+                        public PVEVncproxy Vncproxy => _vncproxy ??= new PVEVncproxy(_client, _node, _vmid);
                         private PVETermproxy _termproxy;
-                        public PVETermproxy Termproxy => _termproxy ?? (_termproxy = new PVETermproxy(_client, _node, _vmid));
+                        public PVETermproxy Termproxy => _termproxy ??= new PVETermproxy(_client, _node, _vmid);
                         private PVEVncwebsocket _vncwebsocket;
-                        public PVEVncwebsocket Vncwebsocket => _vncwebsocket ?? (_vncwebsocket = new PVEVncwebsocket(_client, _node, _vmid));
+                        public PVEVncwebsocket Vncwebsocket => _vncwebsocket ??= new PVEVncwebsocket(_client, _node, _vmid);
                         private PVESpiceproxy _spiceproxy;
-                        public PVESpiceproxy Spiceproxy => _spiceproxy ?? (_spiceproxy = new PVESpiceproxy(_client, _node, _vmid));
+                        public PVESpiceproxy Spiceproxy => _spiceproxy ??= new PVESpiceproxy(_client, _node, _vmid);
                         private PVEMigrate _migrate;
-                        public PVEMigrate Migrate => _migrate ?? (_migrate = new PVEMigrate(_client, _node, _vmid));
+                        public PVEMigrate Migrate => _migrate ??= new PVEMigrate(_client, _node, _vmid);
                         private PVEFeature _feature;
-                        public PVEFeature Feature => _feature ?? (_feature = new PVEFeature(_client, _node, _vmid));
+                        public PVEFeature Feature => _feature ??= new PVEFeature(_client, _node, _vmid);
                         private PVETemplate _template;
-                        public PVETemplate Template => _template ?? (_template = new PVETemplate(_client, _node, _vmid));
+                        public PVETemplate Template => _template ??= new PVETemplate(_client, _node, _vmid);
                         private PVEClone _clone;
-                        public PVEClone Clone => _clone ?? (_clone = new PVEClone(_client, _node, _vmid));
+                        public PVEClone Clone => _clone ??= new PVEClone(_client, _node, _vmid);
                         private PVEResize _resize;
-                        public PVEResize Resize => _resize ?? (_resize = new PVEResize(_client, _node, _vmid));
+                        public PVEResize Resize => _resize ??= new PVEResize(_client, _node, _vmid);
                         private PVEMoveVolume _moveVolume;
-                        public PVEMoveVolume MoveVolume => _moveVolume ?? (_moveVolume = new PVEMoveVolume(_client, _node, _vmid));
+                        public PVEMoveVolume MoveVolume => _moveVolume ??= new PVEMoveVolume(_client, _node, _vmid);
                         private PVEPending _pending;
-                        public PVEPending Pending => _pending ?? (_pending = new PVEPending(_client, _node, _vmid));
+                        public PVEPending Pending => _pending ??= new PVEPending(_client, _node, _vmid);
                         public class PVEConfig
                         {
                             private readonly PveClient _client;
@@ -6707,19 +6704,19 @@ namespace Corsinvest.ProxmoxVE.Api
                                 _vmid = vmid;
                             }
                             private PVECurrent _current;
-                            public PVECurrent Current => _current ?? (_current = new PVECurrent(_client, _node, _vmid));
+                            public PVECurrent Current => _current ??= new PVECurrent(_client, _node, _vmid);
                             private PVEStart _start;
-                            public PVEStart Start => _start ?? (_start = new PVEStart(_client, _node, _vmid));
+                            public PVEStart Start => _start ??= new PVEStart(_client, _node, _vmid);
                             private PVEStop _stop;
-                            public PVEStop Stop => _stop ?? (_stop = new PVEStop(_client, _node, _vmid));
+                            public PVEStop Stop => _stop ??= new PVEStop(_client, _node, _vmid);
                             private PVEShutdown _shutdown;
-                            public PVEShutdown Shutdown => _shutdown ?? (_shutdown = new PVEShutdown(_client, _node, _vmid));
+                            public PVEShutdown Shutdown => _shutdown ??= new PVEShutdown(_client, _node, _vmid);
                             private PVESuspend _suspend;
-                            public PVESuspend Suspend => _suspend ?? (_suspend = new PVESuspend(_client, _node, _vmid));
+                            public PVESuspend Suspend => _suspend ??= new PVESuspend(_client, _node, _vmid);
                             private PVEResume _resume;
-                            public PVEResume Resume => _resume ?? (_resume = new PVEResume(_client, _node, _vmid));
+                            public PVEResume Resume => _resume ??= new PVEResume(_client, _node, _vmid);
                             private PVEReboot _reboot;
-                            public PVEReboot Reboot => _reboot ?? (_reboot = new PVEReboot(_client, _node, _vmid));
+                            public PVEReboot Reboot => _reboot ??= new PVEReboot(_client, _node, _vmid);
                             public class PVECurrent
                             {
                                 private readonly PveClient _client;
@@ -6941,9 +6938,9 @@ namespace Corsinvest.ProxmoxVE.Api
                                     _snapname = snapname;
                                 }
                                 private PVERollback _rollback;
-                                public PVERollback Rollback => _rollback ?? (_rollback = new PVERollback(_client, _node, _vmid, _snapname));
+                                public PVERollback Rollback => _rollback ??= new PVERollback(_client, _node, _vmid, _snapname);
                                 private PVEConfig _config;
-                                public PVEConfig Config => _config ?? (_config = new PVEConfig(_client, _node, _vmid, _snapname));
+                                public PVEConfig Config => _config ??= new PVEConfig(_client, _node, _vmid, _snapname);
                                 public class PVERollback
                                 {
                                     private readonly PveClient _client;
@@ -7084,17 +7081,17 @@ namespace Corsinvest.ProxmoxVE.Api
                                 _vmid = vmid;
                             }
                             private PVERules _rules;
-                            public PVERules Rules => _rules ?? (_rules = new PVERules(_client, _node, _vmid));
+                            public PVERules Rules => _rules ??= new PVERules(_client, _node, _vmid);
                             private PVEAliases _aliases;
-                            public PVEAliases Aliases => _aliases ?? (_aliases = new PVEAliases(_client, _node, _vmid));
+                            public PVEAliases Aliases => _aliases ??= new PVEAliases(_client, _node, _vmid);
                             private PVEIpset _ipset;
-                            public PVEIpset Ipset => _ipset ?? (_ipset = new PVEIpset(_client, _node, _vmid));
+                            public PVEIpset Ipset => _ipset ??= new PVEIpset(_client, _node, _vmid);
                             private PVEOptions _options;
-                            public PVEOptions Options => _options ?? (_options = new PVEOptions(_client, _node, _vmid));
+                            public PVEOptions Options => _options ??= new PVEOptions(_client, _node, _vmid);
                             private PVELog _log;
-                            public PVELog Log => _log ?? (_log = new PVELog(_client, _node, _vmid));
+                            public PVELog Log => _log ??= new PVELog(_client, _node, _vmid);
                             private PVERefs _refs;
-                            public PVERefs Refs => _refs ?? (_refs = new PVERefs(_client, _node, _vmid));
+                            public PVERefs Refs => _refs ??= new PVERefs(_client, _node, _vmid);
                             public class PVERules
                             {
                                 private readonly PveClient _client;
@@ -8374,41 +8371,41 @@ namespace Corsinvest.ProxmoxVE.Api
                     private readonly object _node;
                     internal PVECeph(PveClient client, object node) { _client = client; _node = node; }
                     private PVEOsd _osd;
-                    public PVEOsd Osd => _osd ?? (_osd = new PVEOsd(_client, _node));
+                    public PVEOsd Osd => _osd ??= new PVEOsd(_client, _node);
                     private PVEMds _mds;
-                    public PVEMds Mds => _mds ?? (_mds = new PVEMds(_client, _node));
+                    public PVEMds Mds => _mds ??= new PVEMds(_client, _node);
                     private PVEMgr _mgr;
-                    public PVEMgr Mgr => _mgr ?? (_mgr = new PVEMgr(_client, _node));
+                    public PVEMgr Mgr => _mgr ??= new PVEMgr(_client, _node);
                     private PVEMon _mon;
-                    public PVEMon Mon => _mon ?? (_mon = new PVEMon(_client, _node));
+                    public PVEMon Mon => _mon ??= new PVEMon(_client, _node);
                     private PVEFs _fs;
-                    public PVEFs Fs => _fs ?? (_fs = new PVEFs(_client, _node));
+                    public PVEFs Fs => _fs ??= new PVEFs(_client, _node);
                     private PVEDisks _disks;
-                    public PVEDisks Disks => _disks ?? (_disks = new PVEDisks(_client, _node));
+                    public PVEDisks Disks => _disks ??= new PVEDisks(_client, _node);
                     private PVEConfig _config;
-                    public PVEConfig Config => _config ?? (_config = new PVEConfig(_client, _node));
+                    public PVEConfig Config => _config ??= new PVEConfig(_client, _node);
                     private PVEConfigdb _configdb;
-                    public PVEConfigdb Configdb => _configdb ?? (_configdb = new PVEConfigdb(_client, _node));
+                    public PVEConfigdb Configdb => _configdb ??= new PVEConfigdb(_client, _node);
                     private PVEInit _init;
-                    public PVEInit Init => _init ?? (_init = new PVEInit(_client, _node));
+                    public PVEInit Init => _init ??= new PVEInit(_client, _node);
                     private PVEStop _stop;
-                    public PVEStop Stop => _stop ?? (_stop = new PVEStop(_client, _node));
+                    public PVEStop Stop => _stop ??= new PVEStop(_client, _node);
                     private PVEStart _start;
-                    public PVEStart Start => _start ?? (_start = new PVEStart(_client, _node));
+                    public PVEStart Start => _start ??= new PVEStart(_client, _node);
                     private PVERestart _restart;
-                    public PVERestart Restart => _restart ?? (_restart = new PVERestart(_client, _node));
+                    public PVERestart Restart => _restart ??= new PVERestart(_client, _node);
                     private PVEStatus _status;
-                    public PVEStatus Status => _status ?? (_status = new PVEStatus(_client, _node));
+                    public PVEStatus Status => _status ??= new PVEStatus(_client, _node);
                     private PVEPools _pools;
-                    public PVEPools Pools => _pools ?? (_pools = new PVEPools(_client, _node));
+                    public PVEPools Pools => _pools ??= new PVEPools(_client, _node);
                     private PVEFlags _flags;
-                    public PVEFlags Flags => _flags ?? (_flags = new PVEFlags(_client, _node));
+                    public PVEFlags Flags => _flags ??= new PVEFlags(_client, _node);
                     private PVECrush _crush;
-                    public PVECrush Crush => _crush ?? (_crush = new PVECrush(_client, _node));
+                    public PVECrush Crush => _crush ??= new PVECrush(_client, _node);
                     private PVELog _log;
-                    public PVELog Log => _log ?? (_log = new PVELog(_client, _node));
+                    public PVELog Log => _log ??= new PVELog(_client, _node);
                     private PVERules _rules;
-                    public PVERules Rules => _rules ?? (_rules = new PVERules(_client, _node));
+                    public PVERules Rules => _rules ??= new PVERules(_client, _node);
                     public class PVEOsd
                     {
                         private readonly PveClient _client;
@@ -8426,11 +8423,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 _osdid = osdid;
                             }
                             private PVEIn _in;
-                            public PVEIn In => _in ?? (_in = new PVEIn(_client, _node, _osdid));
+                            public PVEIn In => _in ??= new PVEIn(_client, _node, _osdid);
                             private PVEOut _out;
-                            public PVEOut Out => _out ?? (_out = new PVEOut(_client, _node, _osdid));
+                            public PVEOut Out => _out ??= new PVEOut(_client, _node, _osdid);
                             private PVEScrub _scrub;
-                            public PVEScrub Scrub => _scrub ?? (_scrub = new PVEScrub(_client, _node, _osdid));
+                            public PVEScrub Scrub => _scrub ??= new PVEScrub(_client, _node, _osdid);
                             public class PVEIn
                             {
                                 private readonly PveClient _client;
@@ -9191,7 +9188,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     private readonly object _node;
                     internal PVEVzdump(PveClient client, object node) { _client = client; _node = node; }
                     private PVEExtractconfig _extractconfig;
-                    public PVEExtractconfig Extractconfig => _extractconfig ?? (_extractconfig = new PVEExtractconfig(_client, _node));
+                    public PVEExtractconfig Extractconfig => _extractconfig ??= new PVEExtractconfig(_client, _node);
                     public class PVEExtractconfig
                     {
                         private readonly PveClient _client;
@@ -9333,15 +9330,15 @@ namespace Corsinvest.ProxmoxVE.Api
                             _service = service;
                         }
                         private PVEState _state;
-                        public PVEState State => _state ?? (_state = new PVEState(_client, _node, _service));
+                        public PVEState State => _state ??= new PVEState(_client, _node, _service);
                         private PVEStart _start;
-                        public PVEStart Start => _start ?? (_start = new PVEStart(_client, _node, _service));
+                        public PVEStart Start => _start ??= new PVEStart(_client, _node, _service);
                         private PVEStop _stop;
-                        public PVEStop Stop => _stop ?? (_stop = new PVEStop(_client, _node, _service));
+                        public PVEStop Stop => _stop ??= new PVEStop(_client, _node, _service);
                         private PVERestart _restart;
-                        public PVERestart Restart => _restart ?? (_restart = new PVERestart(_client, _node, _service));
+                        public PVERestart Restart => _restart ??= new PVERestart(_client, _node, _service);
                         private PVEReload _reload;
-                        public PVEReload Reload => _reload ?? (_reload = new PVEReload(_client, _node, _service));
+                        public PVEReload Reload => _reload ??= new PVEReload(_client, _node, _service);
                         public class PVEState
                         {
                             private readonly PveClient _client;
@@ -9832,9 +9829,9 @@ namespace Corsinvest.ProxmoxVE.Api
                             _upid = upid;
                         }
                         private PVELog _log;
-                        public PVELog Log => _log ?? (_log = new PVELog(_client, _node, _upid));
+                        public PVELog Log => _log ??= new PVELog(_client, _node, _upid);
                         private PVEStatus _status;
-                        public PVEStatus Status => _status ?? (_status = new PVEStatus(_client, _node, _upid));
+                        public PVEStatus Status => _status ??= new PVEStatus(_client, _node, _upid);
                         public class PVELog
                         {
                             private readonly PveClient _client;
@@ -9957,21 +9954,21 @@ namespace Corsinvest.ProxmoxVE.Api
                     private readonly object _node;
                     internal PVEScan(PveClient client, object node) { _client = client; _node = node; }
                     private PVEZfs _zfs;
-                    public PVEZfs Zfs => _zfs ?? (_zfs = new PVEZfs(_client, _node));
+                    public PVEZfs Zfs => _zfs ??= new PVEZfs(_client, _node);
                     private PVENfs _nfs;
-                    public PVENfs Nfs => _nfs ?? (_nfs = new PVENfs(_client, _node));
+                    public PVENfs Nfs => _nfs ??= new PVENfs(_client, _node);
                     private PVECifs _cifs;
-                    public PVECifs Cifs => _cifs ?? (_cifs = new PVECifs(_client, _node));
+                    public PVECifs Cifs => _cifs ??= new PVECifs(_client, _node);
                     private PVEGlusterfs _glusterfs;
-                    public PVEGlusterfs Glusterfs => _glusterfs ?? (_glusterfs = new PVEGlusterfs(_client, _node));
+                    public PVEGlusterfs Glusterfs => _glusterfs ??= new PVEGlusterfs(_client, _node);
                     private PVEIscsi _iscsi;
-                    public PVEIscsi Iscsi => _iscsi ?? (_iscsi = new PVEIscsi(_client, _node));
+                    public PVEIscsi Iscsi => _iscsi ??= new PVEIscsi(_client, _node);
                     private PVELvm _lvm;
-                    public PVELvm Lvm => _lvm ?? (_lvm = new PVELvm(_client, _node));
+                    public PVELvm Lvm => _lvm ??= new PVELvm(_client, _node);
                     private PVELvmthin _lvmthin;
-                    public PVELvmthin Lvmthin => _lvmthin ?? (_lvmthin = new PVELvmthin(_client, _node));
+                    public PVELvmthin Lvmthin => _lvmthin ??= new PVELvmthin(_client, _node);
                     private PVEUsb _usb;
-                    public PVEUsb Usb => _usb ?? (_usb = new PVEUsb(_client, _node));
+                    public PVEUsb Usb => _usb ??= new PVEUsb(_client, _node);
                     public class PVEZfs
                     {
                         private readonly PveClient _client;
@@ -10170,7 +10167,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     private readonly object _node;
                     internal PVEHardware(PveClient client, object node) { _client = client; _node = node; }
                     private PVEPci _pci;
-                    public PVEPci Pci => _pci ?? (_pci = new PVEPci(_client, _node));
+                    public PVEPci Pci => _pci ??= new PVEPci(_client, _node);
                     public class PVEPci
                     {
                         private readonly PveClient _client;
@@ -10188,7 +10185,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 _pciid = pciid;
                             }
                             private PVEMdev _mdev;
-                            public PVEMdev Mdev => _mdev ?? (_mdev = new PVEMdev(_client, _node, _pciid));
+                            public PVEMdev Mdev => _mdev ??= new PVEMdev(_client, _node, _pciid);
                             public class PVEMdev
                             {
                                 private readonly PveClient _client;
@@ -10274,15 +10271,15 @@ namespace Corsinvest.ProxmoxVE.Api
                             _storage = storage;
                         }
                         private PVEContent _content;
-                        public PVEContent Content => _content ?? (_content = new PVEContent(_client, _node, _storage));
+                        public PVEContent Content => _content ??= new PVEContent(_client, _node, _storage);
                         private PVEStatus _status;
-                        public PVEStatus Status => _status ?? (_status = new PVEStatus(_client, _node, _storage));
+                        public PVEStatus Status => _status ??= new PVEStatus(_client, _node, _storage);
                         private PVERrd _rrd;
-                        public PVERrd Rrd => _rrd ?? (_rrd = new PVERrd(_client, _node, _storage));
+                        public PVERrd Rrd => _rrd ??= new PVERrd(_client, _node, _storage);
                         private PVERrddata _rrddata;
-                        public PVERrddata Rrddata => _rrddata ?? (_rrddata = new PVERrddata(_client, _node, _storage));
+                        public PVERrddata Rrddata => _rrddata ??= new PVERrddata(_client, _node, _storage);
                         private PVEUpload _upload;
-                        public PVEUpload Upload => _upload ?? (_upload = new PVEUpload(_client, _node, _storage));
+                        public PVEUpload Upload => _upload ??= new PVEUpload(_client, _node, _storage);
                         public class PVEContent
                         {
                             private readonly PveClient _client;
@@ -10589,19 +10586,19 @@ namespace Corsinvest.ProxmoxVE.Api
                     private readonly object _node;
                     internal PVEDisks(PveClient client, object node) { _client = client; _node = node; }
                     private PVELvm _lvm;
-                    public PVELvm Lvm => _lvm ?? (_lvm = new PVELvm(_client, _node));
+                    public PVELvm Lvm => _lvm ??= new PVELvm(_client, _node);
                     private PVELvmthin _lvmthin;
-                    public PVELvmthin Lvmthin => _lvmthin ?? (_lvmthin = new PVELvmthin(_client, _node));
+                    public PVELvmthin Lvmthin => _lvmthin ??= new PVELvmthin(_client, _node);
                     private PVEDirectory _directory;
-                    public PVEDirectory Directory => _directory ?? (_directory = new PVEDirectory(_client, _node));
+                    public PVEDirectory Directory => _directory ??= new PVEDirectory(_client, _node);
                     private PVEZfs _zfs;
-                    public PVEZfs Zfs => _zfs ?? (_zfs = new PVEZfs(_client, _node));
+                    public PVEZfs Zfs => _zfs ??= new PVEZfs(_client, _node);
                     private PVEList _list;
-                    public PVEList List => _list ?? (_list = new PVEList(_client, _node));
+                    public PVEList List => _list ??= new PVEList(_client, _node);
                     private PVESmart _smart;
-                    public PVESmart Smart => _smart ?? (_smart = new PVESmart(_client, _node));
+                    public PVESmart Smart => _smart ??= new PVESmart(_client, _node);
                     private PVEInitgpt _initgpt;
-                    public PVEInitgpt Initgpt => _initgpt ?? (_initgpt = new PVEInitgpt(_client, _node));
+                    public PVEInitgpt Initgpt => _initgpt ??= new PVEInitgpt(_client, _node);
                     public class PVELvm
                     {
                         private readonly PveClient _client;
@@ -10908,11 +10905,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     private readonly object _node;
                     internal PVEApt(PveClient client, object node) { _client = client; _node = node; }
                     private PVEUpdate _update;
-                    public PVEUpdate Update => _update ?? (_update = new PVEUpdate(_client, _node));
+                    public PVEUpdate Update => _update ??= new PVEUpdate(_client, _node);
                     private PVEChangelog _changelog;
-                    public PVEChangelog Changelog => _changelog ?? (_changelog = new PVEChangelog(_client, _node));
+                    public PVEChangelog Changelog => _changelog ??= new PVEChangelog(_client, _node);
                     private PVEVersions _versions;
-                    public PVEVersions Versions => _versions ?? (_versions = new PVEVersions(_client, _node));
+                    public PVEVersions Versions => _versions ??= new PVEVersions(_client, _node);
                     public class PVEUpdate
                     {
                         private readonly PveClient _client;
@@ -11013,11 +11010,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     private readonly object _node;
                     internal PVEFirewall(PveClient client, object node) { _client = client; _node = node; }
                     private PVERules _rules;
-                    public PVERules Rules => _rules ?? (_rules = new PVERules(_client, _node));
+                    public PVERules Rules => _rules ??= new PVERules(_client, _node);
                     private PVEOptions _options;
-                    public PVEOptions Options => _options ?? (_options = new PVEOptions(_client, _node));
+                    public PVEOptions Options => _options ??= new PVEOptions(_client, _node);
                     private PVELog _log;
-                    public PVELog Log => _log ?? (_log = new PVELog(_client, _node));
+                    public PVELog Log => _log ??= new PVELog(_client, _node);
                     public class PVERules
                     {
                         private readonly PveClient _client;
@@ -11351,11 +11348,11 @@ namespace Corsinvest.ProxmoxVE.Api
                             _id = id;
                         }
                         private PVEStatus _status;
-                        public PVEStatus Status => _status ?? (_status = new PVEStatus(_client, _node, _id));
+                        public PVEStatus Status => _status ??= new PVEStatus(_client, _node, _id);
                         private PVELog _log;
-                        public PVELog Log => _log ?? (_log = new PVELog(_client, _node, _id));
+                        public PVELog Log => _log ??= new PVELog(_client, _node, _id);
                         private PVEScheduleNow _scheduleNow;
-                        public PVEScheduleNow ScheduleNow => _scheduleNow ?? (_scheduleNow = new PVEScheduleNow(_client, _node, _id));
+                        public PVEScheduleNow ScheduleNow => _scheduleNow ??= new PVEScheduleNow(_client, _node, _id);
                         public class PVEStatus
                         {
                             private readonly PveClient _client;
@@ -11469,18 +11466,18 @@ namespace Corsinvest.ProxmoxVE.Api
                     private readonly object _node;
                     internal PVECertificates(PveClient client, object node) { _client = client; _node = node; }
                     private PVEAcme _acme;
-                    public PVEAcme Acme => _acme ?? (_acme = new PVEAcme(_client, _node));
+                    public PVEAcme Acme => _acme ??= new PVEAcme(_client, _node);
                     private PVEInfo _info;
-                    public PVEInfo Info => _info ?? (_info = new PVEInfo(_client, _node));
+                    public PVEInfo Info => _info ??= new PVEInfo(_client, _node);
                     private PVECustom _custom;
-                    public PVECustom Custom => _custom ?? (_custom = new PVECustom(_client, _node));
+                    public PVECustom Custom => _custom ??= new PVECustom(_client, _node);
                     public class PVEAcme
                     {
                         private readonly PveClient _client;
                         private readonly object _node;
                         internal PVEAcme(PveClient client, object node) { _client = client; _node = node; }
                         private PVECertificate _certificate;
-                        public PVECertificate Certificate => _certificate ?? (_certificate = new PVECertificate(_client, _node));
+                        public PVECertificate Certificate => _certificate ??= new PVECertificate(_client, _node);
                         public class PVECertificate
                         {
                             private readonly PveClient _client;
@@ -11694,7 +11691,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     private readonly object _node;
                     internal PVESdn(PveClient client, object node) { _client = client; _node = node; }
                     private PVEZones _zones;
-                    public PVEZones Zones => _zones ?? (_zones = new PVEZones(_client, _node));
+                    public PVEZones Zones => _zones ??= new PVEZones(_client, _node);
                     public class PVEZones
                     {
                         private readonly PveClient _client;
@@ -11712,7 +11709,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 _zone = zone;
                             }
                             private PVEContent _content;
-                            public PVEContent Content => _content ?? (_content = new PVEContent(_client, _node, _zone));
+                            public PVEContent Content => _content ??= new PVEContent(_client, _node, _zone);
                             public class PVEContent
                             {
                                 private readonly PveClient _client;
@@ -12779,23 +12776,23 @@ namespace Corsinvest.ProxmoxVE.Api
 
             internal PVEAccess(PveClient client) { _client = client; }
             private PVEUsers _users;
-            public PVEUsers Users => _users ?? (_users = new PVEUsers(_client));
+            public PVEUsers Users => _users ??= new PVEUsers(_client);
             private PVEGroups _groups;
-            public PVEGroups Groups => _groups ?? (_groups = new PVEGroups(_client));
+            public PVEGroups Groups => _groups ??= new PVEGroups(_client);
             private PVERoles _roles;
-            public PVERoles Roles => _roles ?? (_roles = new PVERoles(_client));
+            public PVERoles Roles => _roles ??= new PVERoles(_client);
             private PVEAcl _acl;
-            public PVEAcl Acl => _acl ?? (_acl = new PVEAcl(_client));
+            public PVEAcl Acl => _acl ??= new PVEAcl(_client);
             private PVEDomains _domains;
-            public PVEDomains Domains => _domains ?? (_domains = new PVEDomains(_client));
+            public PVEDomains Domains => _domains ??= new PVEDomains(_client);
             private PVETicket _ticket;
-            public PVETicket Ticket => _ticket ?? (_ticket = new PVETicket(_client));
+            public PVETicket Ticket => _ticket ??= new PVETicket(_client);
             private PVEPassword _password;
-            public PVEPassword Password => _password ?? (_password = new PVEPassword(_client));
+            public PVEPassword Password => _password ??= new PVEPassword(_client);
             private PVETfa _tfa;
-            public PVETfa Tfa => _tfa ?? (_tfa = new PVETfa(_client));
+            public PVETfa Tfa => _tfa ??= new PVETfa(_client);
             private PVEPermissions _permissions;
-            public PVEPermissions Permissions => _permissions ?? (_permissions = new PVEPermissions(_client));
+            public PVEPermissions Permissions => _permissions ??= new PVEPermissions(_client);
             public class PVEUsers
             {
                 private readonly PveClient _client;
@@ -12808,9 +12805,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     private readonly object _userid;
                     internal PVEItemUserid(PveClient client, object userid) { _client = client; _userid = userid; }
                     private PVETfa _tfa;
-                    public PVETfa Tfa => _tfa ?? (_tfa = new PVETfa(_client, _userid));
+                    public PVETfa Tfa => _tfa ??= new PVETfa(_client, _userid);
                     private PVEToken _token;
-                    public PVEToken Token => _token ?? (_token = new PVEToken(_client, _userid));
+                    public PVEToken Token => _token ??= new PVEToken(_client, _userid);
                     public class PVETfa
                     {
                         private readonly PveClient _client;
@@ -13297,7 +13294,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     private readonly object _realm;
                     internal PVEItemRealm(PveClient client, object realm) { _client = client; _realm = realm; }
                     private PVESync _sync;
-                    public PVESync Sync => _sync ?? (_sync = new PVESync(_client, _realm));
+                    public PVESync Sync => _sync ??= new PVESync(_client, _realm);
                     public class PVESync
                     {
                         private readonly PveClient _client;

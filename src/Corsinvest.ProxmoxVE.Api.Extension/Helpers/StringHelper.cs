@@ -41,7 +41,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static bool IsNumeric(string value) => int.TryParse(value, out var vmId);
+        public static bool IsNumeric(string value) => int.TryParse(value, out _);
 
         /// <summary>
         /// Decrypt
@@ -52,32 +52,28 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// <returns></returns>
         public static string Decrypt(string data, string key, bool useHashing)
         {
-            var keyArray = UTF8Encoding.UTF8.GetBytes(key);
+            var keyArray = Encoding.UTF8.GetBytes(key);
             var dataArray = Convert.FromBase64String(data);
 
             if (useHashing)
             {
-                using (var md5 = new MD5CryptoServiceProvider())
-                {
-                    keyArray = md5.ComputeHash(UTF8Encoding.UTF8.GetBytes(key));
-                    md5.Clear();
-                }
+                using var md5 = new MD5CryptoServiceProvider();
+                keyArray = md5.ComputeHash(Encoding.UTF8.GetBytes(key));
+                md5.Clear();
             }
 
-            using (var tDes = new TripleDESCryptoServiceProvider())
+            using var tDes = new TripleDESCryptoServiceProvider
             {
-                tDes.Key = keyArray;
-                tDes.Mode = CipherMode.ECB;
-                tDes.Padding = PaddingMode.PKCS7;
+                Key = keyArray,
+                Mode = CipherMode.ECB,
+                Padding = PaddingMode.PKCS7
+            };
 
-                using (var cTransform = tDes.CreateDecryptor())
-                {
-                    var resultArray = cTransform.TransformFinalBlock(dataArray, 0, dataArray.Length);
-                    tDes.Clear();
+            using var cTransform = tDes.CreateDecryptor();
+            var resultArray = cTransform.TransformFinalBlock(dataArray, 0, dataArray.Length);
+            tDes.Clear();
 
-                    return UTF8Encoding.UTF8.GetString(resultArray);
-                }
-            }
+            return Encoding.UTF8.GetString(resultArray);
         }
 
         /// <summary>
@@ -89,32 +85,28 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// <returns></returns>
         public static string Encrypt(string data, string key, bool useHashing)
         {
-            var keyArray = UTF8Encoding.UTF8.GetBytes(key);
-            var dataArray = UTF8Encoding.UTF8.GetBytes(data);
+            var keyArray = Encoding.UTF8.GetBytes(key);
+            var dataArray = Encoding.UTF8.GetBytes(data);
 
             if (useHashing)
             {
-                using (var md5 = new MD5CryptoServiceProvider())
-                {
-                    keyArray = md5.ComputeHash(UTF8Encoding.UTF8.GetBytes(key));
-                    md5.Clear();
-                }
+                using var md5 = new MD5CryptoServiceProvider();
+                keyArray = md5.ComputeHash(Encoding.UTF8.GetBytes(key));
+                md5.Clear();
             }
 
-            using (var tDes = new TripleDESCryptoServiceProvider())
+            using var tDes = new TripleDESCryptoServiceProvider
             {
-                tDes.Key = keyArray;
-                tDes.Mode = CipherMode.ECB;
-                tDes.Padding = PaddingMode.PKCS7;
+                Key = keyArray,
+                Mode = CipherMode.ECB,
+                Padding = PaddingMode.PKCS7
+            };
 
-                using (var cTransform = tDes.CreateEncryptor())
-                {
-                    var resultArray = cTransform.TransformFinalBlock(dataArray, 0, dataArray.Length);
-                    tDes.Clear();
+            using var cTransform = tDes.CreateEncryptor();
+            var resultArray = cTransform.TransformFinalBlock(dataArray, 0, dataArray.Length);
+            tDes.Clear();
 
-                    return Convert.ToBase64String(resultArray, 0, resultArray.Length);
-                }
-            }
+            return Convert.ToBase64String(resultArray, 0, resultArray.Length);
         }
 
         /// <summary>

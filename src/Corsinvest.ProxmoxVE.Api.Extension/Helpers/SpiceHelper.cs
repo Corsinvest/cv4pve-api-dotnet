@@ -29,10 +29,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// <returns></returns>
         public static bool CreateFileSpaceClient(this PveClient client, string vmIdOrName, string fileName)
         {
-            var ret = true;
+            var ret = false;
 
             var vm = client.GetVM(vmIdOrName);
-            if (vm != null)
+            if (vm != null && vm.Type == VMTypeEnum.Qemu)
             {
                 var response = vm.QemuApi.Spiceproxy.Spiceproxy(client.Hostname);
                 if (response.IsSuccessStatusCode)
@@ -53,17 +53,9 @@ host-subject={DynamicHelper.GetValue(data, "host-subject")}
 proxy={data.proxy}
 ca={data.ca}
 ";
-
                     File.WriteAllText(fileName, contests);
+                    ret = true;
                 }
-                else
-                {
-                    ret = false;
-                }
-            }
-            else
-            {
-                ret = false;
             }
 
             return ret;

@@ -22,7 +22,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         internal DiskQemu(PveClient client, string id, string definition) : base(client, id, definition)
         {
             var backup = definition.Split(':')[1].Split(',').Where(a => a.StartsWith("backup=")).FirstOrDefault();
-            Backup = backup == null ? true : backup == "1";
+            Backup = backup == null || backup == "1";
         }
     }
 }

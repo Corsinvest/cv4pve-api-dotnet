@@ -54,13 +54,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
                 var add = true;
                 if (checkPing)
                 {
-                    using (var ping = new Ping())
+                    using var ping = new Ping();
+                    if (ping.Send(host, pingTimeout).Status != IPStatus.Success)
                     {
-                        if (ping.Send(host, pingTimeout).Status != IPStatus.Success)
-                        {
-                            @out?.WriteLine($"Error: unknown host {host}");
-                            add = false;
-                        }
+                        @out?.WriteLine($"Error: unknown host {host}");
+                        add = false;
                     }
                 }
 
