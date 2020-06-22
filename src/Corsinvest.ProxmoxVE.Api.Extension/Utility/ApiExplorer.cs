@@ -182,9 +182,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
                                 var returnParameters = classApi.Methods
                                                                .Where(a => a.IsGet)
                                                                .FirstOrDefault()
-                                                               .ReturnParameters;
+                                                               ?.ReturnParameters;
 
-                                if (returnParameters.Count == 0)
+                                if (returnParameters == null || returnParameters.Count == 0)
                                 {
                                     //no return defined
                                     resultText.Append(TableHelper.Create(data,
