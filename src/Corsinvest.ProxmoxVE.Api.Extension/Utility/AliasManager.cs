@@ -25,7 +25,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
     {
         private readonly List<AliasDef> _alias = new List<AliasDef>
         {
-            //cluster            
+            //cluster
             new AliasDef("cluster-top,ct,top,❤️","Cluster top","get /cluster/resources",true),
             new AliasDef("cluster-top-node,ctn,topn","Cluster top for node","get /cluster/resources type:node",true),
             new AliasDef("cluster-top-storage,cts,tops","Cluster top for storage",

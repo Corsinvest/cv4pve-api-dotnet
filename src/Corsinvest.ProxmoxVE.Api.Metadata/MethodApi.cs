@@ -119,7 +119,7 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
 
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         public string GetMethodTypeHumanized()
@@ -140,12 +140,12 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
         public string ReturnType { get; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public bool ReturnIsArray { get; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public bool ReturnIsNull { get; }
 

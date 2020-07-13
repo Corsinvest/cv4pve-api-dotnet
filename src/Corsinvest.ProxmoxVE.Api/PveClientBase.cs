@@ -41,22 +41,22 @@ namespace Corsinvest.ProxmoxVE.Api
         }
 
         /// <summary>
-        /// Get hostname configured. 
+        /// Get hostname configured.
         /// </summary>
         public string Hostname { get; }
 
         /// <summary>
-        /// Get port configured. 
+        /// Get port configured.
         /// </summary>
         public int Port { get; }
 
         /// <summary>
-        /// Get/Set the response type that is going to be returned when doing requests (json, png). 
+        /// Get/Set the response type that is going to be returned when doing requests (json, png).
         /// </summary>
         public ResponseType ResponseType { get; set; } = ResponseType.Json;
 
         /// <summary>
-        /// Get/Set level console output debug. 
+        /// Get/Set level console output debug.
         /// 0 - nothing
         /// 1 - Url and method
         /// 2 - Url and method and result
@@ -64,7 +64,7 @@ namespace Corsinvest.ProxmoxVE.Api
         public int DebugLevel { get; set; }
 
         /// <summary>
-        /// Returns the base URL used to interact with the Proxmox VE API. 
+        /// Returns the base URL used to interact with the Proxmox VE API.
         /// </summary>
         public string GetApiUrl()
             => $"https://{Hostname}:{Port}/api2/{Enum.GetName(typeof(ResponseType), ResponseType).ToLower()}";
@@ -126,7 +126,7 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="resource">Url request</param>
         /// <param name="parameters">Additional parameters</param>
         /// <returns>Result</returns>
-        public Result Get(string resource, IDictionary<string, object> parameters = null) 
+        public Result Get(string resource, IDictionary<string, object> parameters = null)
             => ExecuteAction(resource, MethodType.Get, parameters);
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="resource">Url request</param>
         /// <param name="parameters">Additional parameters</param>
         /// <returns>Result</returns>
-        public Result Create(string resource, IDictionary<string, object> parameters = null) 
+        public Result Create(string resource, IDictionary<string, object> parameters = null)
             => ExecuteAction(resource, MethodType.Create, parameters);
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="resource">Url request</param>
         /// <param name="parameters">Additional parameters</param>
         /// <returns>Result</returns>
-        public Result Set(string resource, IDictionary<string, object> parameters = null) 
+        public Result Set(string resource, IDictionary<string, object> parameters = null)
             => ExecuteAction(resource, MethodType.Set, parameters);
 
         /// <summary>
@@ -153,7 +153,7 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="resource">Url request</param>
         /// <param name="parameters">Additional parameters</param>
         /// <returns>Result</returns>
-        public Result Delete(string resource, IDictionary<string, object> parameters = null) 
+        public Result Delete(string resource, IDictionary<string, object> parameters = null)
             => ExecuteAction(resource, MethodType.Delete, parameters);
 
         private Result ExecuteAction(string resource,
@@ -326,7 +326,7 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="node"></param>
         /// <param name="task"></param>
         /// <returns></returns>
-        public bool TaskIsRunning(string node, string task) 
+        public bool TaskIsRunning(string node, string task)
             => ReadTaskStatus(node, task).Response.data.status == "running";
 
         /// <summary>
@@ -335,14 +335,14 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="node"></param>
         /// <param name="task"></param>
         /// <returns></returns>
-        public string GetExitStatusTask(string node, string task) 
+        public string GetExitStatusTask(string node, string task)
             => ReadTaskStatus(node, task).Response.data.exitstatus;
 
         /// <summary>
         /// Read task status.
         /// </summary>
         /// <returns></returns>
-        private Result ReadTaskStatus(string node, string task) 
+        private Result ReadTaskStatus(string node, string task)
             => Get($"/nodes/{node}/tasks/{task}/status");
     }
 }

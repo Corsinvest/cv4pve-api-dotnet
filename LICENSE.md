@@ -12,7 +12,7 @@ The default license, without a valid Corsinvest Enterprise License (CEL) agreeme
 ## GNU General Public License version 3 (GPLv3)
 
 If you decide to choose the GPLv3 license, you must comply with the following terms:
-[GPLv3](gpl-3.0.txt)  
+[GPLv3](gpl-3.0.txt)
 
 ## Corsinvest Enterprise License (CEL)
 

@@ -110,7 +110,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
         public string Timezone { get; set; }
 
         /// <summary>
-        /// RrdData 
+        /// RrdData
         /// </summary>
         public RrdData RrdData { get; set; } = new RrdData();
 

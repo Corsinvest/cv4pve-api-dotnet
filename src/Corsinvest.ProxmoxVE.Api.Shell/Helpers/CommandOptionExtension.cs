@@ -384,7 +384,7 @@ For more information visit https://www.cv4pve-tools.com";
         /// Mail to option
         /// </summary>
         /// <param name="command"></param>
-        /// <returns></returns>                              
+        /// <returns></returns>
         public static CommandOption MailToOption(this CommandLineApplication command)
             => command.Option("--mail-to",
                                   "Comma-separated list of email addresses that should receive email notifications",

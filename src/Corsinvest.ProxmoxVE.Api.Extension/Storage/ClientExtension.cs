@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
  */
- 
+
 using System.Collections.Generic;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Storage
@@ -36,7 +36,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Storage
                     case "nfs": storages.Add(new NFS(client, apiData)); break;
                     case "zfs": storages.Add(new ZFS(client, apiData)); break;
 
-                    // cephfs cifs drbd glusterfs iscsi 
+                    // cephfs cifs drbd glusterfs iscsi
                     // iscsidirect lvm lvmthin zfspool
 
                     default: storages.Add(new Unknown(client, apiData)); break;

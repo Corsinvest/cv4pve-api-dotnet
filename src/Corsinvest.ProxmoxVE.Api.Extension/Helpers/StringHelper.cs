@@ -136,7 +136,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
                         if (sections[curPart][sections[curPart].Length - 1 - quoteCount] != '"') { break; }
                     }
 
-                    // if we didn't have a leftover " (i.e. the 2N+1), then we should 
+                    // if we didn't have a leftover " (i.e. the 2N+1), then we should
                     // continue adding in the next section to the current token.
                     while (quoteCount % 2 == 0 && (curPart != sections.Length - 1))
                     {
@@ -153,7 +153,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
                     }
 
                     // remove trailing " if we had a leftover
-                    // if we didn't have a leftover then we go to the end of the command line without an enclosing " 
+                    // if we didn't have a leftover then we go to the end of the command line without an enclosing "
                     // so it gets treated as a quoted argument anyway
                     if (quoteCount % 2 != 0) { token.Remove(token.Length - 1, 1); }
                     token.Replace("\"\"", "\"");

@@ -27,7 +27,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// </summary>
         /// <param name="client"></param>
         /// <returns></returns>
-        public static VMInfo[] GetVMs(this PveClient client) 
+        public static VMInfo[] GetVMs(this PveClient client)
             => client.Cluster.Resources.GetRest("vm").ToEnumerable()
                         .Select(a => new VMInfo(client, a))
                         .OrderBy(a => a.Node)
@@ -66,7 +66,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// Get vms from jolly.
         /// </summary>
         /// <param name="client"></param>
-        /// <param name="jolly">all for all vm, 
+        /// <param name="jolly">all for all vm,
         /// <para>all-nodename all vm in host,</para>
         /// <para>vmid id vm</para>
         /// <para>start with '-' exclude vm</para>
@@ -96,7 +96,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                 }
             }
 
-            //exclude data 
+            //exclude data
             foreach (var id in jolly.Split(',').Where(a => a.StartsWith("-")).Select(a => a.Substring(1)))
             {
                 var vm = allVms.Where(a => VmCheckIdOrName(a, id)).FirstOrDefault();

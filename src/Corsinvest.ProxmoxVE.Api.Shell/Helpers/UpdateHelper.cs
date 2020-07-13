@@ -45,9 +45,9 @@ namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers
 Version:       {currVer}
 
 ===== Last release:
-Version:       {info.Version} 
-Published At:  {info.PublishedAt} 
-Download Url:  {info.BrowserDownloadUrl} 
+Version:       {info.Version}
+Published At:  {info.PublishedAt}
+Download Url:  {info.BrowserDownloadUrl}
 Release Notes: {info.ReleaseNotes}
 
 {msg}", isNewVersion, info.BrowserDownloadUrl);

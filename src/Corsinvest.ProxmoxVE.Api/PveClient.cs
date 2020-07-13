@@ -6050,13 +6050,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result Delsnapshot(bool? force = null) => DeleteRest(force);
                                 /// <summary>
-                                /// 
+                                ///
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}"); }
 
                                 /// <summary>
-                                /// 
+                                ///
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result SnapshotCmdIdx() => GetRest();
@@ -7026,13 +7026,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <returns></returns>
                                 public Result Delsnapshot(bool? force = null) => DeleteRest(force);
                                 /// <summary>
-                                /// 
+                                ///
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}"); }
 
                                 /// <summary>
-                                /// 
+                                ///
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result SnapshotCmdIdx() => GetRest();
@@ -9898,13 +9898,13 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <returns></returns>
                         public Result StopTask() => DeleteRest();
                         /// <summary>
-                        /// 
+                        ///
                         /// </summary>
                         /// <returns></returns>
                         public Result GetRest() { return _client.Get($"/nodes/{_node}/tasks/{_upid}"); }
 
                         /// <summary>
-                        /// 
+                        ///
                         /// </summary>
                         /// <returns></returns>
                         public Result UpidIndex() => GetRest();
@@ -10538,13 +10538,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             public Result Upload(string content, string filename, string tmpfilename = null) => CreateRest(content, filename, tmpfilename);
                         }
                         /// <summary>
-                        /// 
+                        ///
                         /// </summary>
                         /// <returns></returns>
                         public Result GetRest() { return _client.Get($"/nodes/{_node}/storage/{_storage}"); }
 
                         /// <summary>
-                        /// 
+                        ///
                         /// </summary>
                         /// <returns></returns>
                         public Result Diridx() => GetRest();
@@ -11733,13 +11733,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 public Result Index() => GetRest();
                             }
                             /// <summary>
-                            /// 
+                            ///
                             /// </summary>
                             /// <returns></returns>
                             public Result GetRest() { return _client.Get($"/nodes/{_node}/sdn/zones/{_zone}"); }
 
                             /// <summary>
-                            /// 
+                            ///
                             /// </summary>
                             /// <returns></returns>
                             public Result Diridx() => GetRest();

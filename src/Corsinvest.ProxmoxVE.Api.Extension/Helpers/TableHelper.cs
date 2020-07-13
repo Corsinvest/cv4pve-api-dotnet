@@ -25,7 +25,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
     /// </summary>
     public class TableHelper
     {
-        /// <summary> 
+        /// <summary>
         /// Create table
         /// </summary>
         /// <param name="columns"></param>
@@ -205,6 +205,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
                 rows.AddRange(rowsTmp.OrderBy(a => a.Key).Select(a => a.Value).ToArray());
             }
 
+            //FIX zero row
             if (rows.Count > 0)
             {
                 return Create(columns, rows, outputType, hasInnerRows);

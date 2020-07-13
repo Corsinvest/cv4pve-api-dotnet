@@ -56,7 +56,7 @@ Good job";
         {
             title += new string(' ', 47 - title.Length);
 
-            return $@"{LOGO} 
+            return $@"{LOGO}
 
 {title}(Made in Italy)";
         }

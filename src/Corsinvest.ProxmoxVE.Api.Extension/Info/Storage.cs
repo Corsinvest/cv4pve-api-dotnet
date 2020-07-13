@@ -32,7 +32,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
         public dynamic Status { get; set; }
 
         /// <summary>
-        /// RrdData 
+        /// RrdData
         /// </summary>
         public RrdData RrdData { get; set; } = new RrdData();
 

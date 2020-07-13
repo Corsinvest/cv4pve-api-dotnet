@@ -26,7 +26,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
         public dynamic Config { get; set; }
 
         /// <summary>
-        /// RrdData 
+        /// RrdData
         /// </summary>
         public RrdData RrdData { get; set; } = new RrdData();
 

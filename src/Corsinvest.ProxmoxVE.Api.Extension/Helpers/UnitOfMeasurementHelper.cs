@@ -25,7 +25,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// <param name="cpu"></param>
         /// <param name="maxCpu"></param>
         /// <returns></returns>
-        public static string CPUUsageToString(double cpu, dynamic maxCpu) 
+        public static string CPUUsageToString(double cpu, dynamic maxCpu)
             => cpu == 0 ? "" : (Math.Round(cpu * 100, 1)) + $"% of {maxCpu} CUP";
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static string MbToString(long value) 
+        public static string MbToString(long value)
             => value == 0 ? "" : Math.Round(value / 1024.0 / 1024.0, 2) + "";
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static string GbToString(long value) 
+        public static string GbToString(long value)
             => value == 0 ? "" : Math.Round(value / 1024.0 / 1024.0 / 1024.0, 2) + "";
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// </summary>
         /// <param name="upTime"></param>
         /// <returns></returns>
-        public static string UpTimeToString(TimeSpan? upTime) 
+        public static string UpTimeToString(TimeSpan? upTime)
             => upTime == null ? "" : upTime?.ToString(@"d\.hh\:mm");
     }
 }

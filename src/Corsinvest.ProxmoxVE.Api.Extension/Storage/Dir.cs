@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
  */
- 
+
 namespace Corsinvest.ProxmoxVE.Api.Extension.Storage
 {
     /// <summary>
@@ -28,7 +28,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Storage
         /// Nodes
         /// </summary>
         public string Nodes => ApiData.nodes;
-        
+
         /// <summary>
         /// Max files.
         /// </summary>

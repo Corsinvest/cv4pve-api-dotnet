@@ -125,7 +125,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         }
 
         /// <summary>
-        /// Get all configuration 
+        /// Get all configuration
         /// </summary>
         /// <returns></returns>
         public string GetAllConfigs()

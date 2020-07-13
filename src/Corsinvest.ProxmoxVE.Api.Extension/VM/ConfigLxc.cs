@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
  */
- 
+
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
 {
     /// <summary>
@@ -33,7 +33,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// Search domain
         /// </summary>
         public string SearchDomain => ApiData.searchdomain;
-        
+
         /// <summary>
         /// Swap
         /// </summary>

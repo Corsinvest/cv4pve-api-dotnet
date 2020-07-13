@@ -74,19 +74,19 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <summary>
         /// Proxmox VE response.
         /// </summary>
-        /// <returns></returns>    
+        /// <returns></returns>
         public dynamic Response { get; }
 
         /// <summary>
         /// Proxmox VE response to dictionary.
         /// </summary>
-        /// <returns></returns>    
+        /// <returns></returns>
         public IDictionary<String, object> ResponseToDictionary => (IDictionary<String, object>)Response;
 
         /// <summary>
         /// Contains the values of status codes defined for HTTP.
         /// </summary>
-        /// <returns></returns>    
+        /// <returns></returns>
         public HttpStatusCode StatusCode { get; }
 
         /// <summary>

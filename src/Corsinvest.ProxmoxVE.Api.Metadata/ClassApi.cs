@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
  */
- 
+
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
@@ -124,7 +124,7 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
         public List<MethodApi> Methods { get; } = new List<MethodApi>();
 
         /// <summary>
-        /// Keys class 
+        /// Keys class
         /// </summary>
         /// <returns></returns>
         public List<string> Keys { get; } = new List<string>();
