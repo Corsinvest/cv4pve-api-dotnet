@@ -137,7 +137,13 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
 
             Options = client.Cluster.Options.GetOptions().Response.data;
 
-            HA.Status = client.Cluster.Ha.Status.Current.Status().ToEnumerable();
+            var status = client.Cluster.Ha.Status.Current.Status();
+            HA.Status = status.IsSuccessStatusCode ?
+                            client.Cluster.Ha.Status.Current.Status().ToEnumerable() :
+                            new List<dynamic>();
+
+HA.Status = client.Cluster.Ha.Status.Current.Status().ToEnumerable();
+
             HA.Resources = client.Cluster.Ha.Resources.Index().ToEnumerable();
             HA.Groups = client.Cluster.Ha.Groups.Index().ToEnumerable();
 
