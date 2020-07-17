@@ -17,14 +17,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// <param name="hostsAndPortHA"></param>
         /// <param name="out"></param>
         /// <param name="pingTimeout"></param>
-        public static PveClient GetClientFromHA(string hostsAndPortHA,
-                                                TextWriter @out,
-                                                int pingTimeout = 4000)
+        public static PveClient GetClientFromHA(string hostsAndPortHA, TextWriter @out, int pingTimeout = 4000)
         {
             var data = GetHostsAndPorts(hostsAndPortHA, 8006, true, @out, pingTimeout);
-            return data.Count() == 0 ?
-                    null :
-                    new PveClient(data[0].Host, data[0].Port);
+            return data.Count() == 0 ? null : new PveClient(data[0].Host, data[0].Port);
         }
 
         /// <summary>

@@ -16,6 +16,7 @@ using System.Linq;
 using System.Text;
 using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
 using Corsinvest.ProxmoxVE.Api.Metadata;
+using Newtonsoft.Json;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
 {
@@ -138,7 +139,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
             {
                 resultText.AppendLine(result.ReasonPhrase);
                 resultText.AppendLine(verbose ?
-                                      PveClientBase.ObjectToJson((string)result.Response.errors) :
+                                      JsonConvert.SerializeObject((string)result.Response.errors, Formatting.Indented) :
                                       result.GetError());
             }
             else if (result.InError())
@@ -151,7 +152,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
                 if (verbose)
                 {
                     //verbose full response json
-                    resultText.AppendLine(PveClient.ObjectToJson(result.Response));
+                    resultText.AppendLine(JsonConvert.SerializeObject(result.Response, Formatting.Indented));
                 }
                 else
                 {
@@ -161,7 +162,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
 
                         case OutputType.Json:
                         case OutputType.JsonPretty:
-                            resultText.AppendLine(PveClient.ObjectToJson(result.Response.data, outputType == OutputType.JsonPretty));
+                            resultText.AppendLine(JsonConvert.SerializeObject(result.Response.data,
+                                            outputType == OutputType.JsonPretty ? Formatting.Indented : Formatting.None));
                             break;
 
                         case OutputType.Text:

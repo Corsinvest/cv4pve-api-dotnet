@@ -203,9 +203,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
 
                 //order row by first column
                 rows.AddRange(rowsTmp.OrderBy(a => a.Key).Select(a => a.Value).ToArray());
+                if (rows.Count == 0) { data = ""; }
             }
 
-            //FIX zero row
             if (rows.Count > 0)
             {
                 return Create(columns, rows, outputType, hasInnerRows);

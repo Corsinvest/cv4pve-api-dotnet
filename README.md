@@ -71,6 +71,7 @@ The client is generated from a JSON Api on Proxmox VE.
 * Login return bool if access
 * Return Result class more information
 * ClientBase lite function
+* Form Proxmox VE 6.2 support Api Token for user
 
 ## Result
 
@@ -122,7 +123,7 @@ if (client.Login("root", "password"))
 
     //config vm
     var config = vm.Config.VmConfig();
-    Console.WriteLine(Client.ObjectToJson(config.Response));
+    Console.WriteLine(JsonConvert.SerializeObject(config.Response,Formatting.Indented));
 
     //create snapshot
     var response = vm.Snapshot.Snapshot("pippo2311");
@@ -136,7 +137,7 @@ if (client.Login("root", "password"))
     //list of snapshot
     foreach (var snapshot in vm.Snapshot.SnapshotList().Response.data)
     {
-        Console.WriteLine(Client.ObjectToJson(snapshot));
+        Console.WriteLine(JsonConvert.SerializeObject(snapshot,Formatting.Indented));
         Console.WriteLine(snapshot.name);
     }
 
@@ -145,4 +146,11 @@ if (client.Login("root", "password"))
     var dataImg = client.Nodes["pve1"].Rrd.Rrd("cpu", "day").Response;
     Console.WriteLine("<img src=\"{dataImg}\" \>");
 }
+
+//using Api Token
+var client = new PveClient("10.92.100.33");
+client.UseApiToken("root@pam!qqqqqq=8a8c1cd4-d373-43f1-b366-05ce4cb8061f");
+var version = client.Version.Version();
+Console.WriteLine(JsonConvert.SerializeObject(version.Response.data, Formatting.Indented));
+
 ```

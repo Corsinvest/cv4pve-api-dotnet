@@ -64,15 +64,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public bool Exists(string name)
-        {
-            foreach (var name1 in name.Split(','))
-            {
-                if (Names.Contains(name1)) { return true; }
-            }
-
-            return false;
-        }
+        public bool Exists(string name) => name.Split(',').Any(a => Names.Contains(a));
 
         /// <summary>
         /// Name alias

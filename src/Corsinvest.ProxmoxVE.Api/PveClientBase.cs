@@ -16,6 +16,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Web;
 using Newtonsoft.Json;
 
@@ -28,6 +29,7 @@ namespace Corsinvest.ProxmoxVE.Api
     {
         private string _ticketCSRFPreventionToken;
         private string _ticketPVEAuthCookie;
+        private string _apiTokenIdPVE;
 
         /// <summary>
         /// Constructor
@@ -70,12 +72,10 @@ namespace Corsinvest.ProxmoxVE.Api
             => $"https://{Hostname}:{Port}/api2/{Enum.GetName(typeof(ResponseType), ResponseType).ToLower()}";
 
         /// <summary>
-        /// Convert object to JSON.
+        /// Use Api Token
         /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="formatted"></param>
-        public static string ObjectToJson(object obj, bool formatted = true)
-            => JsonConvert.SerializeObject(obj, formatted ? Formatting.Indented : Formatting.None);
+        /// <param name="tokenId">E.g root@pam!qqqqqq=8a8c1cd4-d373-43f1-b366-05ce4cb8061f</param>
+        public void UseApiToken(string tokenId) => _apiTokenIdPVE = tokenId;
 
         /// <summary>
         /// Creation ticket from login.
@@ -102,7 +102,7 @@ namespace Corsinvest.ProxmoxVE.Api
         }
 
         /// <summary>
-        /// Creation ticket from login split username &lt;username&gt;@&lt;realm&gt;.
+        /// Creation ticket from login username &lt;username&gt;@&lt;realm&gt;.
         /// </summary>
         /// <param name="userName"></param>
         /// <param name="password"></param>
@@ -216,6 +216,11 @@ namespace Corsinvest.ProxmoxVE.Api
             {
                 handler.CookieContainer.Add(request.RequestUri, new Cookie("PVEAuthCookie", _ticketPVEAuthCookie));
                 request.Headers.Add("CSRFPreventionToken", _ticketCSRFPreventionToken);
+            }
+
+            if (_apiTokenIdPVE != null)
+            {
+                request.Headers.Authorization = new AuthenticationHeaderValue("PVEAPIToken", _apiTokenIdPVE);
             }
 
             var response = client.SendAsync(request).Result;
