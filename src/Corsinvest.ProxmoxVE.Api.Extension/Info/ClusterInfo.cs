@@ -239,6 +239,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
                 //get storage for backups
                 var storageWithBackups = node.Storage.Index(format: true, content: "backup")
                                                      .ToEnumerable()
+                                                     .Where(a => a.active == 1)
                                                      .Select(a => a.storage as string);
 
                 void SetCommonVM(Vm vmDetail, dynamic vm, int vmId, string type)
@@ -250,9 +251,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
                     vmDetail.Replication = node.Replication.Status(vmId).ToEnumerable();
 
                     vmDetail.Tasks = node.Tasks.NodeTasks(errors: true, limit: 1000, vmid: vmId)
-                                               .ToEnumerable().Where(a => a.starttime >= DateTimeUnixHelper.ConvertToUnixTime(DateTime.Now.AddDays(-2)));
+                                               .ToEnumerable()
+                                               .Where(a => a.starttime >= DateTimeUnixHelper.ConvertToUnixTime(DateTime.Now.AddDays(-2)));
 
-                    vmDetail.Backups = storageWithBackups.SelectMany(a => node.Storage[a].Content.Index("backup", vmId).ToEnumerable());
+                    vmDetail.Backups = storageWithBackups.SelectMany(a => node.Storage[a].Content.Index("backup", vmId).ToEnumerable()).ToList();
 
                     vmDetail.Permissions = Permissions.Acl.Where(a => a.path == $"/vms/{vmId}").ToList();
 

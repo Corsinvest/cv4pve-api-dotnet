@@ -77,18 +77,18 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
         /// Ceph FS
         /// </summary>
         /// <value></value>
-        public dynamic Fs { get; internal set; }
+        public dynamic Fs { get; set; }
 
         /// <summary>
         /// Metadata server
         /// </summary>
         /// <value></value>
-        public IEnumerable<dynamic> Mds { get; internal set; }
+        public IEnumerable<dynamic> Mds { get; set; }
 
         /// <summary>
         /// Manager
         /// </summary>
         /// <value></value>
-        public IEnumerable<dynamic> Mgr { get; internal set; }
+        public IEnumerable<dynamic> Mgr { get; set; }
     }
 }

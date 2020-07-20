@@ -23,12 +23,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
         /// Options
         /// </summary>
         /// <value></value>
-        public dynamic Options { get; internal set; }
+        public dynamic Options { get; set; }
 
         /// <summary>
         /// Rules
         /// </summary>
         /// <value></value>
-        public IEnumerable<dynamic> Rules { get; internal set; }
+        public IEnumerable<dynamic> Rules { get; set; }
     }
 }

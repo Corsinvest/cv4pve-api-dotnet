@@ -243,7 +243,7 @@ Good job";
             }
             catch (Exception ex)
             {
-                if (ex is CommandParsingException) //|| ex is ApplicationException || ex is ArgumentException)
+                if (ex is CommandParsingException || ex is ApplicationException ) //|| ex is ArgumentException)
                 {
                     app.Out.WriteLine(ex.Message);
                 }

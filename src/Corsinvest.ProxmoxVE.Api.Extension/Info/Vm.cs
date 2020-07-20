@@ -46,25 +46,25 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
         /// Agent Guest Running
         /// </summary>
         /// <value></value>
-        public dynamic AgentGuestRunning { get; internal set; }
+        public dynamic AgentGuestRunning { get; set; }
 
         /// <summary>
         /// Task history
         /// </summary>
         /// <value></value>
-        public IEnumerable<dynamic> Tasks { get; internal set; }
+        public IEnumerable<dynamic> Tasks { get; set; }
 
         /// <summary>
         /// Replication
         /// </summary>
         /// <value></value>
-        public IEnumerable<dynamic> Replication { get; internal set; }
+        public IEnumerable<dynamic> Replication { get; set; }
 
         /// <summary>
         /// Backups
         /// </summary>
         /// <value></value>
-        public IEnumerable<dynamic> Backups { get; internal set; }
+        public IEnumerable<dynamic> Backups { get; set; }
 
         /// <summary>
         /// Firewall
