@@ -171,6 +171,13 @@ For more information visit https://www.cv4pve-tools.com";
         }
 
         /// <summary>
+        /// Get Api token
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public static CommandOption GetApiToken(this CommandLineApplication command) => command.GetOption(API_TOKEN_OPTION_NAME, true);
+
+        /// <summary>
         /// Get username
         /// </summary>
         /// <param name="command"></param>
@@ -226,18 +233,26 @@ For more information visit https://www.cv4pve-tools.com";
         /// <param name="command"></param>
         public static void AddLoginOptions(this CommandLineApplication command)
         {
-            command.HostOption()
-                   .DependOn(command, USERNAME_OPTION_NAME)
-                   .DependOn(command, PASSWORD_OPTION_NAME);
+            command.HostOption();
+                 //    .DependOn(command, USERNAME_OPTION_NAME)
+                 //  .DependOn(command, PASSWORD_OPTION_NAME)
+
+            command.ApiTokenOption();
+                   //.DependOn(command, HOST_OPTION_NAME);
 
             command.UsernameRealOption()
-                   .DependOn(command, HOST_OPTION_NAME)
+                   //.DependOn(command, HOST_OPTION_NAME)
                    .DependOn(command, PASSWORD_OPTION_NAME);
 
             command.PasswordOption()
-                   .DependOn(command, HOST_OPTION_NAME)
+                   //.DependOn(command, HOST_OPTION_NAME)
                    .DependOn(command, USERNAME_OPTION_NAME);
         }
+
+        /// <summary>
+        /// Api Token
+        /// </summary>
+        public static readonly string API_TOKEN_OPTION_NAME = "api-token";
 
         /// <summary>
         /// Host option
@@ -267,6 +282,17 @@ For more information visit https://www.cv4pve-tools.com";
         public static CommandOption HostOption(this CommandLineApplication command)
             => command.Option($"--{HOST_OPTION_NAME}",
                               "The host name host[:port],host1[:port],host2[:port]",
+                              CommandOptionType.SingleValue);
+
+        /// <summary>
+        /// Api token option
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public static CommandOption ApiTokenOption(this CommandLineApplication command)
+            => command.Option($"--{API_TOKEN_OPTION_NAME}",
+                              @"Api token (eg root@pam!app=8a8c1cd4-d373-43f1-b366-05ce4cb8061f).
+Require Proxmox VE 6.2 or later",
                               CommandOptionType.SingleValue);
 
         /// <summary>
@@ -314,15 +340,33 @@ For more information visit https://www.cv4pve-tools.com";
                 //debug level
                 client.DebugLevel = command.DebugValue();
 
-                //try login
-                if (client.Login(command.GetUsername().Value(), GetPasswordFromOption(command)))
+                if (command.GetApiToken().HasValue())
                 {
-                    return client;
+                    //use api token
+                    client.UseApiToken(command.GetApiToken().Value());
+                    var ver = client.Version.Version();
+                    if (!ver.IsSuccessStatusCode)
+                    {
+                        error += " " + client.LastResult.ReasonPhrase;
+                    }
+                    else
+                    {
+                        return client;
+                    }
                 }
-
-                if (!client.LastResult.IsSuccessStatusCode)
+                else
                 {
-                    error += " " + client.LastResult.ReasonPhrase;
+                    //use user and password
+                    //try login
+                    if (client.Login(command.GetUsername().Value(), GetPasswordFromOption(command)))
+                    {
+                        return client;
+                    }
+
+                    if (!client.LastResult.IsSuccessStatusCode)
+                    {
+                        error += " " + client.LastResult.ReasonPhrase;
+                    }
                 }
             }
             catch { }
