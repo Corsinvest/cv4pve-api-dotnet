@@ -29,7 +29,6 @@ namespace Corsinvest.ProxmoxVE.Api
     {
         private string _ticketCSRFPreventionToken;
         private string _ticketPVEAuthCookie;
-        private string _apiTokenIdPVE;
 
         /// <summary>
         /// Constructor
@@ -72,10 +71,9 @@ namespace Corsinvest.ProxmoxVE.Api
             => $"https://{Hostname}:{Port}/api2/{Enum.GetName(typeof(ResponseType), ResponseType).ToLower()}";
 
         /// <summary>
-        /// Use Api Token
+        /// Api Token format USER@REALM!TOKENID=UUID
         /// </summary>
-        /// <param name="tokenId">E.g root@pam!qqqqqq=8a8c1cd4-d373-43f1-b366-05ce4cb8061f</param>
-        public void UseApiToken(string tokenId) => _apiTokenIdPVE = tokenId;
+        public string ApiToken { get; set; }
 
         /// <summary>
         /// Creation ticket from login.
@@ -218,9 +216,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 request.Headers.Add("CSRFPreventionToken", _ticketCSRFPreventionToken);
             }
 
-            if (_apiTokenIdPVE != null)
+            if (ApiToken != null)
             {
-                request.Headers.Authorization = new AuthenticationHeaderValue("PVEAPIToken", _apiTokenIdPVE);
+                request.Headers.Authorization = new AuthenticationHeaderValue("PVEAPIToken", ApiToken);
             }
 
             var response = client.SendAsync(request).Result;

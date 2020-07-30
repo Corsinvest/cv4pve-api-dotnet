@@ -234,11 +234,11 @@ For more information visit https://www.cv4pve-tools.com";
         public static void AddLoginOptions(this CommandLineApplication command)
         {
             command.HostOption();
-                 //    .DependOn(command, USERNAME_OPTION_NAME)
-                 //  .DependOn(command, PASSWORD_OPTION_NAME)
+            //    .DependOn(command, USERNAME_OPTION_NAME)
+            //  .DependOn(command, PASSWORD_OPTION_NAME)
 
             command.ApiTokenOption();
-                   //.DependOn(command, HOST_OPTION_NAME);
+            //.DependOn(command, HOST_OPTION_NAME);
 
             command.UsernameRealOption()
                    //.DependOn(command, HOST_OPTION_NAME)
@@ -291,8 +291,7 @@ For more information visit https://www.cv4pve-tools.com";
         /// <returns></returns>
         public static CommandOption ApiTokenOption(this CommandLineApplication command)
             => command.Option($"--{API_TOKEN_OPTION_NAME}",
-                              @"Api token (eg root@pam!app=8a8c1cd4-d373-43f1-b366-05ce4cb8061f).
-Require Proxmox VE 6.2 or later",
+                              "Api token format 'USER@REALM!TOKENID=UUID'. Require Proxmox VE 6.2 or later",
                               CommandOptionType.SingleValue);
 
         /// <summary>
@@ -343,7 +342,7 @@ Require Proxmox VE 6.2 or later",
                 if (command.GetApiToken().HasValue())
                 {
                     //use api token
-                    client.UseApiToken(command.GetApiToken().Value());
+                    client.ApiToken = command.GetApiToken().Value();
                     var ver = client.Version.Version();
                     if (!ver.IsSuccessStatusCode)
                     {
