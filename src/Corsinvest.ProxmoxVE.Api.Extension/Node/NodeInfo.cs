@@ -41,7 +41,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         /// <summary>
         /// Max Cpu
         /// </summary>
-        public int MaxCPU => ApiData.maxcpu;
+        public long MaxCPU => ApiData.maxcpu;
 
         /// <summary>
         /// Disk
