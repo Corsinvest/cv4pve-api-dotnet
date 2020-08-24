@@ -243,11 +243,19 @@ Good job";
             }
             catch (Exception ex)
             {
-                if (ex is CommandParsingException || ex is ApplicationException ) //|| ex is ArgumentException)
+                if (ex is CommandParsingException || ex is ApplicationException) //|| ex is ArgumentException)
                 {
                     app.Out.WriteLine(ex.Message);
                 }
                 else
+                {
+                    app.Out.WriteLine("================ EXCEPTION ================ ");
+                    app.Out.WriteLine(ex.GetType().FullName);
+                    app.Out.WriteLine(ex.Message);
+                    app.Out.WriteLine(ex.StackTrace);
+                }
+
+                if (app.DebugIsActive())
                 {
                     app.Out.WriteLine("================ EXCEPTION ================ ");
                     app.Out.WriteLine(ex.GetType().FullName);

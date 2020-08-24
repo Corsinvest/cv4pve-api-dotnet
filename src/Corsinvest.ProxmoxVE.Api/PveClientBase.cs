@@ -291,8 +291,8 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="task">Task identifier</param>
         /// <param name="wait">Millisecond wait next check</param>
         /// <param name="timeOut">Millisecond timeout</param>
-        /// <return>O Success</return>
-        public int WaitForTaskToFinish(string task, long wait = 500, long timeOut = 10000)
+        /// <return></return>
+        public bool WaitForTaskToFinish(string task, long wait = 500, long timeOut = 10000)
             => WaitForTaskToFinish(task.Split(':')[1], task, wait, timeOut);
 
         /// <summary>
@@ -302,15 +302,15 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="task">Task identifier</param>
         /// <param name="wait">Millisecond wait next check</param>
         /// <param name="timeOut">Millisecond timeout</param>
-        /// <return>O Success</return>
-        public int WaitForTaskToFinish(string node, string task, long wait = 500, long timeOut = 10000)
+        /// <return></return>
+        public bool WaitForTaskToFinish(string node, string task, long wait = 500, long timeOut = 10000)
         {
             var isRunning = true;
             if (wait <= 0) { wait = 500; }
             if (timeOut < wait) { timeOut = wait + 5000; }
             var timeStart = DateTime.Now;
             var waitTime = DateTime.Now;
-            while (isRunning && (timeStart - DateTime.Now).Milliseconds < timeOut)
+            while (isRunning && (DateTime.Now - timeStart).Milliseconds < timeOut)
             {
                 if ((DateTime.Now - waitTime).TotalMilliseconds >= wait)
                 {
@@ -320,7 +320,7 @@ namespace Corsinvest.ProxmoxVE.Api
             }
 
             //check timeout
-            return (timeStart - DateTime.Now).Milliseconds < timeOut ? 0 : 1;
+            return (DateTime.Now - timeStart).Milliseconds < timeOut;
         }
 
         /// <summary>
