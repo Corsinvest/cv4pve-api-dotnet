@@ -73,13 +73,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         /// <param name="result"></param>
         /// <param name="vm"></param>
         /// <param name="timeout"></param>
-        public static void WaitForTaskToFinish(this Result result, VMInfo vm, long timeout)
-        {
-            if (result != null && !result.ResponseInError && timeout > 0)
-            {
-                vm.Client.WaitForTaskToFinish(vm.Node, result.Response.data, 1000, timeout);
-            }
-        }
+        public static bool WaitForTaskToFinish(this Result result, VMInfo vm, long timeout)
+            => result != null && !result.ResponseInError && timeout > 0 ?
+                vm.Client.WaitForTaskToFinish(vm.Node, result.Response.data, 1000, timeout) :
+                true;
 
         /// <summary>
         /// Check task is running.

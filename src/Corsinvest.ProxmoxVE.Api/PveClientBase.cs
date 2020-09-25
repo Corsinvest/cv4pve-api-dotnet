@@ -216,7 +216,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 request.Headers.Add("CSRFPreventionToken", _ticketCSRFPreventionToken);
             }
 
-            if (ApiToken != null)
+            if (!string.IsNullOrWhiteSpace(ApiToken))
             {
                 request.Headers.Authorization = new AuthenticationHeaderValue("PVEAPIToken", ApiToken);
             }

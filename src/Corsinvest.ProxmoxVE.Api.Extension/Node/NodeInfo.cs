@@ -74,13 +74,15 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         public bool IsOnline => Status == "online";
 
         /// <summary>
+        /// Pve node
+        /// </summary>
+        public PveClient.PVENodes.PVEItemNode NodeApi => Client.Nodes[Node];
+
+        /// <summary>
         /// Server id
         /// </summary>
         /// <returns></returns>
-        public string ServerId
-            => IsOnline ?
-                Client.Nodes[Node].Subscription.Get().Response.data.serverid :
-                "";
+        public string ServerId => IsOnline ? NodeApi.Subscription.Get().Response.data.serverid : "";
 
         /// <summary>
         /// Type
@@ -122,8 +124,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         public Result RestoreBackup(VMTypeEnum type, int vmId, string archive)
             => type switch
             {
-                VMTypeEnum.Qemu => Client.Nodes[Id].Qemu.CreateRest(vmid: vmId, archive: archive),
-                VMTypeEnum.Lxc => Client.Nodes[Id].Lxc.CreateRest(vmid: vmId, ostemplate: archive),
+                VMTypeEnum.Qemu => NodeApi.Qemu.CreateRest(vmid: vmId, archive: archive),
+                VMTypeEnum.Lxc => NodeApi.Lxc.CreateRest(vmid: vmId, ostemplate: archive),
                 _ => null,
             };
     }

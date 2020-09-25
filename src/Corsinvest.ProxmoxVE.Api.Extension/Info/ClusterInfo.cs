@@ -161,8 +161,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
                 // { Item = nodeItem, };
                 //nodeDetail.Item.ssl_fingerprint = "REMOVED FOR SECURITY";
 
-                var nodeResource = Resources.Where(a => a.type == "node" &&
-                                                        a.node == nodeItem.node)
+                var nodeResource = Resources.Where(a => a.type == "node" && a.node == nodeItem.node)
                                             .FirstOrDefault();
                 nodeResource.Detail = nodeDetail;
                 if (nodeItem.status != "online") { continue; }

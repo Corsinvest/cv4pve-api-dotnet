@@ -3,7 +3,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
-    <Version>2.6.5</Version>
+    <Version>2.6.6</Version>
     <Company>Corsinvest Srl</Company>
     <Authors>Daniele Corsini</Authors>
     <Copyright>Corsinvest Srl</Copyright>
@@ -34,7 +34,7 @@
   <ItemGroup>
     <!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api\Corsinvest.ProxmoxVE.Api.csproj" /> -->
     <!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Metadata\Corsinvest.ProxmoxVE.Api.Metadata.csproj" />  -->
-    <PackageReference Include="Corsinvest.ProxmoxVE.Api" Version="2.6.5" />
+    <PackageReference Include="Corsinvest.ProxmoxVE.Api" Version="2.6.6" />
     <PackageReference Include="Corsinvest.ProxmoxVE.Api.Metadata" Version="2.5.0" />
     <PackageReference Include="BetterConsoleTables" Version="1.1.2" />
   </ItemGroup>

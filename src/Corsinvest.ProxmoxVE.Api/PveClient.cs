@@ -1344,6 +1344,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="node">Only run if executed on this node.</param>
                     /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
                     /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
+                    /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
                     /// <param name="quiet">Be quiet.</param>
                     /// <param name="remove">Remove old backup files if there are more than 'maxfiles' backup files.</param>
                     /// <param name="script">Use specified hook script.</param>
@@ -1356,7 +1357,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
                     /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                     /// <returns></returns>
-                    public Result SetRest(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
+                    public Result SetRest(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("starttime", starttime);
@@ -1378,6 +1379,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("node", node);
                         parameters.Add("pigz", pigz);
                         parameters.Add("pool", pool);
+                        parameters.Add("prune-backups", prune_backups);
                         parameters.Add("quiet", quiet);
                         parameters.Add("remove", remove);
                         parameters.Add("script", script);
@@ -1417,6 +1419,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="node">Only run if executed on this node.</param>
                     /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
                     /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
+                    /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
                     /// <param name="quiet">Be quiet.</param>
                     /// <param name="remove">Remove old backup files if there are more than 'maxfiles' backup files.</param>
                     /// <param name="script">Use specified hook script.</param>
@@ -1429,7 +1432,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
                     /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                     /// <returns></returns>
-                    public Result UpdateJob(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null) => SetRest(starttime, all, bwlimit, compress, delete, dow, dumpdir, enabled, exclude, exclude_path, ionice, lockwait, mailnotification, mailto, maxfiles, mode, node, pigz, pool, quiet, remove, script, size, stdexcludes, stop, stopwait, storage, tmpdir, vmid, zstd);
+                    public Result UpdateJob(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null) => SetRest(starttime, all, bwlimit, compress, delete, dow, dumpdir, enabled, exclude, exclude_path, ionice, lockwait, mailnotification, mailto, maxfiles, mode, node, pigz, pool, prune_backups, quiet, remove, script, size, stdexcludes, stop, stopwait, storage, tmpdir, vmid, zstd);
                 }
                 /// <summary>
                 /// List vzdump backup schedule.
@@ -1466,6 +1469,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="node">Only run if executed on this node.</param>
                 /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
                 /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
+                /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
                 /// <param name="quiet">Be quiet.</param>
                 /// <param name="remove">Remove old backup files if there are more than 'maxfiles' backup files.</param>
                 /// <param name="script">Use specified hook script.</param>
@@ -1478,7 +1482,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="vmid">The ID of the guest system you want to backup.</param>
                 /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                 /// <returns></returns>
-                public Result CreateRest(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
+                public Result CreateRest(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("starttime", starttime);
@@ -1499,6 +1503,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("node", node);
                     parameters.Add("pigz", pigz);
                     parameters.Add("pool", pool);
+                    parameters.Add("prune-backups", prune_backups);
                     parameters.Add("quiet", quiet);
                     parameters.Add("remove", remove);
                     parameters.Add("script", script);
@@ -1537,6 +1542,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="node">Only run if executed on this node.</param>
                 /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
                 /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
+                /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
                 /// <param name="quiet">Be quiet.</param>
                 /// <param name="remove">Remove old backup files if there are more than 'maxfiles' backup files.</param>
                 /// <param name="script">Use specified hook script.</param>
@@ -1549,7 +1555,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="vmid">The ID of the guest system you want to backup.</param>
                 /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                 /// <returns></returns>
-                public Result CreateJob(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null) => CreateRest(starttime, all, bwlimit, compress, dow, dumpdir, enabled, exclude, exclude_path, ionice, lockwait, mailnotification, mailto, maxfiles, mode, node, pigz, pool, quiet, remove, script, size, stdexcludes, stop, stopwait, storage, tmpdir, vmid, zstd);
+                public Result CreateJob(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null) => CreateRest(starttime, all, bwlimit, compress, dow, dumpdir, enabled, exclude, exclude_path, ionice, lockwait, mailnotification, mailto, maxfiles, mode, node, pigz, pool, prune_backups, quiet, remove, script, size, stdexcludes, stop, stopwait, storage, tmpdir, vmid, zstd);
             }
             public class PVEBackupinfo
             {
@@ -6704,6 +6710,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cores">The number of cores assigned to the container. A container can use all available cores by default.</param>
                             /// <param name="cpulimit">Limit of CPU usage.  NOTE: If the computer has 2 CPUs, it has a total of '2' CPU time. Value '0' indicates no CPU limit.</param>
                             /// <param name="cpuunits">CPU weight for a VM. Argument is used in the kernel fair scheduler. The larger the number is, the more CPU time this VM gets. Number is relative to the weights of all the other running VMs.  NOTE: You can disable fair-scheduler configuration by setting this to 0.</param>
+                            /// <param name="debug">Try to be more verbose. For now this only enables debug log-level on start.</param>
                             /// <param name="delete">A list of settings you want to delete.</param>
                             /// <param name="description">Container description. Only used on the configuration web interface.</param>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
@@ -6732,7 +6739,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
                             /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                             /// <returns></returns>
-                            public Result SetRest(string arch = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string features = null, string hookscript = null, string hostname = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, bool? protection = null, string revert = null, string rootfs = null, string searchdomain = null, string startup = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
+                            public Result SetRest(string arch = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, bool? debug = null, string delete = null, string description = null, string digest = null, string features = null, string hookscript = null, string hostname = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, bool? protection = null, string revert = null, string rootfs = null, string searchdomain = null, string startup = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("arch", arch);
@@ -6741,6 +6748,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("cores", cores);
                                 parameters.Add("cpulimit", cpulimit);
                                 parameters.Add("cpuunits", cpuunits);
+                                parameters.Add("debug", debug);
                                 parameters.Add("delete", delete);
                                 parameters.Add("description", description);
                                 parameters.Add("digest", digest);
@@ -6780,6 +6788,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cores">The number of cores assigned to the container. A container can use all available cores by default.</param>
                             /// <param name="cpulimit">Limit of CPU usage.  NOTE: If the computer has 2 CPUs, it has a total of '2' CPU time. Value '0' indicates no CPU limit.</param>
                             /// <param name="cpuunits">CPU weight for a VM. Argument is used in the kernel fair scheduler. The larger the number is, the more CPU time this VM gets. Number is relative to the weights of all the other running VMs.  NOTE: You can disable fair-scheduler configuration by setting this to 0.</param>
+                            /// <param name="debug">Try to be more verbose. For now this only enables debug log-level on start.</param>
                             /// <param name="delete">A list of settings you want to delete.</param>
                             /// <param name="description">Container description. Only used on the configuration web interface.</param>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
@@ -6808,7 +6817,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
                             /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                             /// <returns></returns>
-                            public Result UpdateVm(string arch = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string features = null, string hookscript = null, string hostname = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, bool? protection = null, string revert = null, string rootfs = null, string searchdomain = null, string startup = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null) => SetRest(arch, cmode, console, cores, cpulimit, cpuunits, delete, description, digest, features, hookscript, hostname, lock_, memory, mpN, nameserver, netN, onboot, ostype, protection, revert, rootfs, searchdomain, startup, swap, tags, template, timezone, tty, unprivileged, unusedN);
+                            public Result UpdateVm(string arch = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, bool? debug = null, string delete = null, string description = null, string digest = null, string features = null, string hookscript = null, string hostname = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, bool? protection = null, string revert = null, string rootfs = null, string searchdomain = null, string startup = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null) => SetRest(arch, cmode, console, cores, cpulimit, cpuunits, debug, delete, description, digest, features, hookscript, hostname, lock_, memory, mpN, nameserver, netN, onboot, ostype, protection, revert, rootfs, searchdomain, startup, swap, tags, template, timezone, tty, unprivileged, unusedN);
                         }
                         public class PVEStatus
                         {
@@ -6869,11 +6878,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <summary>
                                 /// Start the container.
                                 /// </summary>
+                                /// <param name="debug">If set, enables very verbose debug log-level on start.</param>
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(bool? skiplock = null)
+                                public Result CreateRest(bool? debug = null, bool? skiplock = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
+                                    parameters.Add("debug", debug);
                                     parameters.Add("skiplock", skiplock);
                                     return _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/start", parameters);
                                 }
@@ -6881,9 +6892,10 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <summary>
                                 /// Start the container.
                                 /// </summary>
+                                /// <param name="debug">If set, enables very verbose debug log-level on start.</param>
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <returns></returns>
-                                public Result VmStart(bool? skiplock = null) => CreateRest(skiplock);
+                                public Result VmStart(bool? debug = null, bool? skiplock = null) => CreateRest(debug, skiplock);
                             }
                             public class PVEStop
                             {
@@ -8355,6 +8367,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="cores">The number of cores assigned to the container. A container can use all available cores by default.</param>
                     /// <param name="cpulimit">Limit of CPU usage.  NOTE: If the computer has 2 CPUs, it has a total of '2' CPU time. Value '0' indicates no CPU limit.</param>
                     /// <param name="cpuunits">CPU weight for a VM. Argument is used in the kernel fair scheduler. The larger the number is, the more CPU time this VM gets. Number is relative to the weights of all the other running VMs.  NOTE: You can disable fair-scheduler configuration by setting this to 0.</param>
+                    /// <param name="debug">Try to be more verbose. For now this only enables debug log-level on start.</param>
                     /// <param name="description">Container description. Only used on the configuration web interface.</param>
                     /// <param name="features">Allow containers access to advanced features.</param>
                     /// <param name="force">Allow to overwrite existing container.</param>
@@ -8389,7 +8402,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
                     /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string ostemplate, int vmid, string arch = null, int? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string description = null, string features = null, bool? force = null, string hookscript = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, bool? start = null, string startup = null, string storage = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unique = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
+                    public Result CreateRest(string ostemplate, int vmid, string arch = null, int? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, bool? debug = null, string description = null, string features = null, bool? force = null, string hookscript = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, bool? start = null, string startup = null, string storage = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unique = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("ostemplate", ostemplate);
@@ -8401,6 +8414,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("cores", cores);
                         parameters.Add("cpulimit", cpulimit);
                         parameters.Add("cpuunits", cpuunits);
+                        parameters.Add("debug", debug);
                         parameters.Add("description", description);
                         parameters.Add("features", features);
                         parameters.Add("force", force);
@@ -8449,6 +8463,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="cores">The number of cores assigned to the container. A container can use all available cores by default.</param>
                     /// <param name="cpulimit">Limit of CPU usage.  NOTE: If the computer has 2 CPUs, it has a total of '2' CPU time. Value '0' indicates no CPU limit.</param>
                     /// <param name="cpuunits">CPU weight for a VM. Argument is used in the kernel fair scheduler. The larger the number is, the more CPU time this VM gets. Number is relative to the weights of all the other running VMs.  NOTE: You can disable fair-scheduler configuration by setting this to 0.</param>
+                    /// <param name="debug">Try to be more verbose. For now this only enables debug log-level on start.</param>
                     /// <param name="description">Container description. Only used on the configuration web interface.</param>
                     /// <param name="features">Allow containers access to advanced features.</param>
                     /// <param name="force">Allow to overwrite existing container.</param>
@@ -8483,7 +8498,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
                     /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                     /// <returns></returns>
-                    public Result CreateVm(string ostemplate, int vmid, string arch = null, int? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, string description = null, string features = null, bool? force = null, string hookscript = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, bool? start = null, string startup = null, string storage = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unique = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null) => CreateRest(ostemplate, vmid, arch, bwlimit, cmode, console, cores, cpulimit, cpuunits, description, features, force, hookscript, hostname, ignore_unpack_errors, lock_, memory, mpN, nameserver, netN, onboot, ostype, password, pool, protection, restore, rootfs, searchdomain, ssh_public_keys, start, startup, storage, swap, tags, template, timezone, tty, unique, unprivileged, unusedN);
+                    public Result CreateVm(string ostemplate, int vmid, string arch = null, int? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, int? cpulimit = null, int? cpuunits = null, bool? debug = null, string description = null, string features = null, bool? force = null, string hookscript = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, bool? start = null, string startup = null, string storage = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unique = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null) => CreateRest(ostemplate, vmid, arch, bwlimit, cmode, console, cores, cpulimit, cpuunits, debug, description, features, force, hookscript, hostname, ignore_unpack_errors, lock_, memory, mpN, nameserver, netN, onboot, ostype, password, pool, protection, restore, rootfs, searchdomain, ssh_public_keys, start, startup, storage, swap, tags, template, timezone, tty, unique, unprivileged, unusedN);
                 }
                 public class PVECeph
                 {
@@ -8655,16 +8670,18 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Create OSD
                         /// </summary>
                         /// <param name="dev">Block device name.</param>
+                        /// <param name="crush_device_class">Set the device class of the OSD in crush.</param>
                         /// <param name="db_dev">Block device name for block.db.</param>
                         /// <param name="db_size">Size in GiB for block.db.</param>
                         /// <param name="encrypted">Enables encryption of the OSD.</param>
                         /// <param name="wal_dev">Block device name for block.wal.</param>
                         /// <param name="wal_size">Size in GiB for block.wal.</param>
                         /// <returns></returns>
-                        public Result CreateRest(string dev, string db_dev = null, int? db_size = null, bool? encrypted = null, string wal_dev = null, int? wal_size = null)
+                        public Result CreateRest(string dev, string crush_device_class = null, string db_dev = null, int? db_size = null, bool? encrypted = null, string wal_dev = null, int? wal_size = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("dev", dev);
+                            parameters.Add("crush-device-class", crush_device_class);
                             parameters.Add("db_dev", db_dev);
                             parameters.Add("db_size", db_size);
                             parameters.Add("encrypted", encrypted);
@@ -8677,13 +8694,14 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Create OSD
                         /// </summary>
                         /// <param name="dev">Block device name.</param>
+                        /// <param name="crush_device_class">Set the device class of the OSD in crush.</param>
                         /// <param name="db_dev">Block device name for block.db.</param>
                         /// <param name="db_size">Size in GiB for block.db.</param>
                         /// <param name="encrypted">Enables encryption of the OSD.</param>
                         /// <param name="wal_dev">Block device name for block.wal.</param>
                         /// <param name="wal_size">Size in GiB for block.wal.</param>
                         /// <returns></returns>
-                        public Result Createosd(string dev, string db_dev = null, int? db_size = null, bool? encrypted = null, string wal_dev = null, int? wal_size = null) => CreateRest(dev, db_dev, db_size, encrypted, wal_dev, wal_size);
+                        public Result Createosd(string dev, string crush_device_class = null, string db_dev = null, int? db_size = null, bool? encrypted = null, string wal_dev = null, int? wal_size = null) => CreateRest(dev, crush_device_class, db_dev, db_size, encrypted, wal_dev, wal_size);
                     }
                     public class PVEMds
                     {
@@ -9353,6 +9371,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     ///   Enum: snapshot,suspend,stop</param>
                     /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
                     /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
+                    /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
                     /// <param name="quiet">Be quiet.</param>
                     /// <param name="remove">Remove old backup files if there are more than 'maxfiles' backup files.</param>
                     /// <param name="script">Use specified hook script.</param>
@@ -9366,7 +9385,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
                     /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                     /// <returns></returns>
-                    public Result CreateRest(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, int? pigz = null, string pool = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
+                    public Result CreateRest(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("all", all);
@@ -9383,6 +9402,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("mode", mode);
                         parameters.Add("pigz", pigz);
                         parameters.Add("pool", pool);
+                        parameters.Add("prune-backups", prune_backups);
                         parameters.Add("quiet", quiet);
                         parameters.Add("remove", remove);
                         parameters.Add("script", script);
@@ -9418,6 +9438,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     ///   Enum: snapshot,suspend,stop</param>
                     /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
                     /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
+                    /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
                     /// <param name="quiet">Be quiet.</param>
                     /// <param name="remove">Remove old backup files if there are more than 'maxfiles' backup files.</param>
                     /// <param name="script">Use specified hook script.</param>
@@ -9431,7 +9452,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
                     /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                     /// <returns></returns>
-                    public Result Vzdump(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, int? pigz = null, string pool = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null) => CreateRest(all, bwlimit, compress, dumpdir, exclude, exclude_path, ionice, lockwait, mailnotification, mailto, maxfiles, mode, pigz, pool, quiet, remove, script, size, stdexcludes, stdout, stop, stopwait, storage, tmpdir, vmid, zstd);
+                    public Result Vzdump(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, int? size = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null) => CreateRest(all, bwlimit, compress, dumpdir, exclude, exclude_path, ionice, lockwait, mailnotification, mailto, maxfiles, mode, pigz, pool, prune_backups, quiet, remove, script, size, stdexcludes, stdout, stop, stopwait, storage, tmpdir, vmid, zstd);
                 }
                 public class PVEServices
                 {
@@ -9536,13 +9557,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 _service = service;
                             }
                             /// <summary>
-                            /// Restart service.
+                            /// Hard restart service. Use reload if you want to reduce interruptions.
                             /// </summary>
                             /// <returns></returns>
                             public Result CreateRest() { return _client.Create($"/nodes/{_node}/services/{_service}/restart"); }
 
                             /// <summary>
-                            /// Restart service.
+                            /// Hard restart service. Use reload if you want to reduce interruptions.
                             /// </summary>
                             /// <returns></returns>
                             public Result ServiceRestart() => CreateRest();
@@ -9558,13 +9579,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 _service = service;
                             }
                             /// <summary>
-                            /// Reload service.
+                            /// Reload service. Falls back to restart if service cannot be reloaded.
                             /// </summary>
                             /// <returns></returns>
                             public Result CreateRest() { return _client.Create($"/nodes/{_node}/services/{_service}/reload"); }
 
                             /// <summary>
-                            /// Reload service.
+                            /// Reload service. Falls back to restart if service cannot be reloaded.
                             /// </summary>
                             /// <returns></returns>
                             public Result ServiceReload() => CreateRest();
@@ -10401,6 +10422,8 @@ namespace Corsinvest.ProxmoxVE.Api
                             _client = client; _node = node;
                             _storage = storage;
                         }
+                        private PVEPrunebackups _prunebackups;
+                        public PVEPrunebackups Prunebackups => _prunebackups ??= new PVEPrunebackups(_client, _node, _storage);
                         private PVEContent _content;
                         public PVEContent Content => _content ??= new PVEContent(_client, _node, _storage);
                         private PVEStatus _status;
@@ -10411,6 +10434,69 @@ namespace Corsinvest.ProxmoxVE.Api
                         public PVERrddata Rrddata => _rrddata ??= new PVERrddata(_client, _node, _storage);
                         private PVEUpload _upload;
                         public PVEUpload Upload => _upload ??= new PVEUpload(_client, _node, _storage);
+                        public class PVEPrunebackups
+                        {
+                            private readonly PveClient _client;
+                            private readonly object _node;
+                            private readonly object _storage;
+                            internal PVEPrunebackups(PveClient client, object node, object storage)
+                            {
+                                _client = client; _node = node;
+                                _storage = storage;
+                            }
+                            /// <summary>
+                            /// Prune backups. Only those using the standard naming scheme are considered.
+                            /// </summary>
+                            /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
+                            /// <param name="type">Either 'qemu' or 'lxc'. Only consider backups for guests of this type.
+                            ///   Enum: qemu,lxc</param>
+                            /// <param name="vmid">Only prune backups for this VM.</param>
+                            /// <returns></returns>
+                            public Result DeleteRest(string prune_backups = null, string type = null, int? vmid = null)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("prune-backups", prune_backups);
+                                parameters.Add("type", type);
+                                parameters.Add("vmid", vmid);
+                                return _client.Delete($"/nodes/{_node}/storage/{_storage}/prunebackups", parameters);
+                            }
+
+                            /// <summary>
+                            /// Prune backups. Only those using the standard naming scheme are considered.
+                            /// </summary>
+                            /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
+                            /// <param name="type">Either 'qemu' or 'lxc'. Only consider backups for guests of this type.
+                            ///   Enum: qemu,lxc</param>
+                            /// <param name="vmid">Only prune backups for this VM.</param>
+                            /// <returns></returns>
+                            public Result Delete(string prune_backups = null, string type = null, int? vmid = null) => DeleteRest(prune_backups, type, vmid);
+                            /// <summary>
+                            /// Get prune information for backups. NOTE: this is only a preview and might not be exactly what a subsequent prune call does, if the hour changes or if backups are removed/added in the meantime.
+                            /// </summary>
+                            /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
+                            /// <param name="type">Either 'qemu' or 'lxc'. Only consider backups for guests of this type.
+                            ///   Enum: qemu,lxc</param>
+                            /// <param name="vmid">Only consider backups for this guest.</param>
+                            /// <returns></returns>
+                            public Result GetRest(string prune_backups = null, string type = null, int? vmid = null)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("prune-backups", prune_backups);
+                                parameters.Add("type", type);
+                                parameters.Add("vmid", vmid);
+                                return _client.Get($"/nodes/{_node}/storage/{_storage}/prunebackups", parameters);
+                            }
+
+                            /// <summary>
+                            /// Get prune information for backups. NOTE: this is only a preview and might not be exactly what a subsequent prune call does, if the hour changes or if backups are removed/added in the meantime.
+                            /// </summary>
+                            /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
+                            /// <param name="type">Either 'qemu' or 'lxc'. Only consider backups for guests of this type.
+                            ///   Enum: qemu,lxc</param>
+                            /// <param name="vmid">Only consider backups for this guest.</param>
+                            /// <returns></returns>
+                            public Result Dryrun(string prune_backups = null, string type = null, int? vmid = null) => GetRest(prune_backups, type, vmid);
+                        }
                         public class PVEContent
                         {
                             private readonly PveClient _client;
@@ -12615,6 +12701,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="options">NFS mount options (see 'man nfs')</param>
                 /// <param name="password">Password for accessing the share/datastore.</param>
                 /// <param name="pool">Pool.</param>
+                /// <param name="prune_backups">The retention options with shorter intervals are processed first with --keep-last being the very first one. Each option covers a specific period of time. We say that backups within this period are covered by this option. The next option does not take care of already covered backups and only considers older backups.</param>
                 /// <param name="redundancy">The redundancy count specifies the number of nodes to which the resource should be deployed. It must be at least 1 and at most the number of nodes in the cluster.</param>
                 /// <param name="saferemove">Zero-out data when removing LVs.</param>
                 /// <param name="saferemove_throughput">Wipe throughput (cstream -t parameter value).</param>
@@ -12630,7 +12717,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 ///   Enum: tcp,rdma,unix</param>
                 /// <param name="username">RBD Id.</param>
                 /// <returns></returns>
-                public Result SetRest(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null)
+                public Result SetRest(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, string prune_backups = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("blocksize", blocksize);
@@ -12658,6 +12745,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("options", options);
                     parameters.Add("password", password);
                     parameters.Add("pool", pool);
+                    parameters.Add("prune-backups", prune_backups);
                     parameters.Add("redundancy", redundancy);
                     parameters.Add("saferemove", saferemove);
                     parameters.Add("saferemove_throughput", saferemove_throughput);
@@ -12701,6 +12789,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="options">NFS mount options (see 'man nfs')</param>
                 /// <param name="password">Password for accessing the share/datastore.</param>
                 /// <param name="pool">Pool.</param>
+                /// <param name="prune_backups">The retention options with shorter intervals are processed first with --keep-last being the very first one. Each option covers a specific period of time. We say that backups within this period are covered by this option. The next option does not take care of already covered backups and only considers older backups.</param>
                 /// <param name="redundancy">The redundancy count specifies the number of nodes to which the resource should be deployed. It must be at least 1 and at most the number of nodes in the cluster.</param>
                 /// <param name="saferemove">Zero-out data when removing LVs.</param>
                 /// <param name="saferemove_throughput">Wipe throughput (cstream -t parameter value).</param>
@@ -12716,7 +12805,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 ///   Enum: tcp,rdma,unix</param>
                 /// <param name="username">RBD Id.</param>
                 /// <returns></returns>
-                public Result Update(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null) => SetRest(blocksize, bwlimit, comstar_hg, comstar_tg, content, delete, digest, disable, domain, encryption_key, fingerprint, format, fuse, is_mountpoint, krbd, lio_tpg, maxfiles, mkdir, monhost, mountpoint, nodes, nowritecache, options, password, pool, redundancy, saferemove, saferemove_throughput, server, server2, shared, smbversion, sparse, subdir, tagged_only, transport, username);
+                public Result Update(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, string prune_backups = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null) => SetRest(blocksize, bwlimit, comstar_hg, comstar_tg, content, delete, digest, disable, domain, encryption_key, fingerprint, format, fuse, is_mountpoint, krbd, lio_tpg, maxfiles, mkdir, monhost, mountpoint, nodes, nowritecache, options, password, pool, prune_backups, redundancy, saferemove, saferemove_throughput, server, server2, shared, smbversion, sparse, subdir, tagged_only, transport, username);
             }
             /// <summary>
             /// Storage index.
@@ -12774,6 +12863,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="path">File system path.</param>
             /// <param name="pool">Pool.</param>
             /// <param name="portal">iSCSI portal (IP or DNS name with optional port).</param>
+            /// <param name="prune_backups">The retention options with shorter intervals are processed first with --keep-last being the very first one. Each option covers a specific period of time. We say that backups within this period are covered by this option. The next option does not take care of already covered backups and only considers older backups.</param>
             /// <param name="redundancy">The redundancy count specifies the number of nodes to which the resource should be deployed. It must be at least 1 and at most the number of nodes in the cluster.</param>
             /// <param name="saferemove">Zero-out data when removing LVs.</param>
             /// <param name="saferemove_throughput">Wipe throughput (cstream -t parameter value).</param>
@@ -12794,7 +12884,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="vgname">Volume group name.</param>
             /// <param name="volume">Glusterfs Volume.</param>
             /// <returns></returns>
-            public Result CreateRest(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null)
+            public Result CreateRest(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, string portal = null, string prune_backups = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null)
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("storage", storage);
@@ -12829,6 +12919,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 parameters.Add("path", path);
                 parameters.Add("pool", pool);
                 parameters.Add("portal", portal);
+                parameters.Add("prune-backups", prune_backups);
                 parameters.Add("redundancy", redundancy);
                 parameters.Add("saferemove", saferemove);
                 parameters.Add("saferemove_throughput", saferemove_throughput);
@@ -12885,6 +12976,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="path">File system path.</param>
             /// <param name="pool">Pool.</param>
             /// <param name="portal">iSCSI portal (IP or DNS name with optional port).</param>
+            /// <param name="prune_backups">The retention options with shorter intervals are processed first with --keep-last being the very first one. Each option covers a specific period of time. We say that backups within this period are covered by this option. The next option does not take care of already covered backups and only considers older backups.</param>
             /// <param name="redundancy">The redundancy count specifies the number of nodes to which the resource should be deployed. It must be at least 1 and at most the number of nodes in the cluster.</param>
             /// <param name="saferemove">Zero-out data when removing LVs.</param>
             /// <param name="saferemove_throughput">Wipe throughput (cstream -t parameter value).</param>
@@ -12905,7 +12997,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="vgname">Volume group name.</param>
             /// <param name="volume">Glusterfs Volume.</param>
             /// <returns></returns>
-            public Result Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, string portal = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null) => CreateRest(storage, type, authsupported, base_, blocksize, bwlimit, comstar_hg, comstar_tg, content, datastore, disable, domain, encryption_key, export, fingerprint, format, fuse, is_mountpoint, iscsiprovider, krbd, lio_tpg, maxfiles, mkdir, monhost, mountpoint, nodes, nowritecache, options, password, path, pool, portal, redundancy, saferemove, saferemove_throughput, server, server2, share, shared, smbversion, sparse, subdir, tagged_only, target, thinpool, transport, username, vgname, volume);
+            public Result Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, string portal = null, string prune_backups = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null) => CreateRest(storage, type, authsupported, base_, blocksize, bwlimit, comstar_hg, comstar_tg, content, datastore, disable, domain, encryption_key, export, fingerprint, format, fuse, is_mountpoint, iscsiprovider, krbd, lio_tpg, maxfiles, mkdir, monhost, mountpoint, nodes, nowritecache, options, password, path, pool, portal, prune_backups, redundancy, saferemove, saferemove_throughput, server, server2, share, shared, smbversion, sparse, subdir, tagged_only, target, thinpool, transport, username, vgname, volume);
         }
         public class PVEAccess
         {
