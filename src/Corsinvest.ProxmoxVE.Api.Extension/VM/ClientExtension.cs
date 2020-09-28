@@ -28,11 +28,14 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <param name="client"></param>
         /// <returns></returns>
         public static VMInfo[] GetVMs(this PveClient client)
-            => client.Cluster.Resources.GetRest("vm").ToEnumerable()
-                        .Select(a => new VMInfo(client, a))
-                        .OrderBy(a => a.Node)
-                        .ThenBy(a => a.Id)
-                        .ToArray();
+        {
+            var vms = new List<VMInfo>();
+            foreach (var vm in client.Cluster.Resources.GetRest("vm").Response.data)
+            {
+                vms.Add(new VMInfo(client, vm));
+            }
+            return vms.OrderBy(a => a.Node).ThenBy(a => a.Id).ToArray();
+        }
 
         /// <summary>
         /// Get vm info from id or name.
