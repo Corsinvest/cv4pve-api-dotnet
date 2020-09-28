@@ -34,7 +34,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         /// <param name="result"></param>
         /// <returns></returns>
         public static IEnumerable<dynamic> ToEnumerable(this Result result)
-            => ((IEnumerable)result.Response.data).Cast<dynamic>();
+            => ((IEnumerable)result.Response.data).Cast<dynamic>().ToArray();
 
         /// <summary>
         /// Enumerable result for Linq.
