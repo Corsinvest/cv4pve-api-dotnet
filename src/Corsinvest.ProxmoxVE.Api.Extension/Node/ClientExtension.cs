@@ -37,10 +37,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         /// <param name="client"></param>
         /// <returns></returns>
         public static IReadOnlyList<NodeInfo> GetNodes(this PveClient client)
-        {
-            var nodes = new List<NodeInfo>();
-            foreach (var node in client.Nodes.GetRest().Response.data) { nodes.Add(new NodeInfo(client, node)); }
-            return nodes.OrderBy(a => a.Node).ToList().AsReadOnly();
-        }
+            => client.Nodes.GetRest()
+                            .ToEnumerable()
+                            .Select(a => new NodeInfo(client, a))
+                            .OrderBy(a => a.Node)
+                            .ToList()
+                            .AsReadOnly();
     }
 }

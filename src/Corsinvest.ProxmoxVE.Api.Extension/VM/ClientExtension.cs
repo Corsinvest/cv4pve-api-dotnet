@@ -28,14 +28,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <param name="client"></param>
         /// <returns></returns>
         public static VMInfo[] GetVMs(this PveClient client)
-        {
-            var vms = new List<VMInfo>();
-            foreach (var vm in client.Cluster.Resources.GetRest("vm").Response.data)
-            {
-                vms.Add(new VMInfo(client, vm));
-            }
-            return vms.OrderBy(a => a.Node).ThenBy(a => a.Id).ToArray();
-        }
+            => client.Cluster.Resources.GetRest("vm").ToEnumerable()
+                                       .Select(a => new VMInfo(client, a))
+                                       .OrderBy(a => a.Node)
+                                       .ThenBy(a => a.Id)
+                                       .ToArray();
 
         /// <summary>
         /// Get vm info from id or name.
@@ -58,7 +55,18 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
             var nameLower = vm.Name.ToLower();
             var idLower = idOrNameCheck.ToLower();
 
-            if (StringHelper.IsNumeric(idOrNameCheck)) { return vm.Id == idOrNameCheck; }
+            if (idOrNameCheck.Contains(":"))
+            {
+                //range number
+                var range = idOrNameCheck.Split(":");
+                if (range.Count() != 2 ||
+                    !StringHelper.IsNumeric(range[0]) ||
+                    !StringHelper.IsNumeric(range[1])) { return false;}
+
+                return  long.Parse(vm.Id) >= long.Parse(range[0]) &&
+                        long.Parse(vm.Id) <= long.Parse(range[1]);
+            }
+            else if (StringHelper.IsNumeric(idOrNameCheck)) { return vm.Id == idOrNameCheck; }
             else if (idOrNameCheck.StartsWith("%") && idOrNameCheck.EndsWith("%")) { return nameLower.Contains(idLower.Replace("%", "")); }
             else if (idOrNameCheck.StartsWith("%")) { return nameLower.StartsWith(idLower.Replace("%", "")); }
             else if (idOrNameCheck.EndsWith("%")) { return nameLower.EndsWith(idLower.Replace("%", "")); }
@@ -72,8 +80,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <param name="jolly">all for all vm,
         /// <para>all-nodename all vm in host,</para>
         /// <para>vmid id vm</para>
+        /// <para>Range 100:104 return vm with id in range</para>
         /// <para>start with '-' exclude vm</para>
-        /// <para>comma reparated</para></param>
+        /// <para>comma reparated</para>
+        /// </param>
         /// <returns></returns>
         public static VMInfo[] GetVMs(this PveClient client, string jolly)
         {
@@ -93,20 +103,22 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                 }
                 else
                 {
-                    //specific id
-                    var vm = allVms.Where(a => VmCheckIdOrName(a, id)).FirstOrDefault();
-                    if (vm != null) { ret.Add(vm); }
+                    ret.AddRange(allVms.Where(a => VmCheckIdOrName(a, id)));
                 }
             }
+
+            ret = ret.Distinct().ToList();
 
             //exclude data
             foreach (var id in jolly.Split(',').Where(a => a.StartsWith("-")).Select(a => a.Substring(1)))
             {
-                var vm = allVms.Where(a => VmCheckIdOrName(a, id)).FirstOrDefault();
-                if (vm != null) { ret.Remove(vm); }
+                foreach (var item in allVms.Where(a => VmCheckIdOrName(a, id)))
+                {
+                    ret.Remove(item);
+                }
             }
 
-            return ret.Distinct().ToArray();
+            return ret.ToArray();
         }
     }
 }

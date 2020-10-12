@@ -11,6 +11,7 @@
  */
 
 using System.IO;
+using System.Text;
 using Corsinvest.ProxmoxVE.Api.Extension.VM;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
@@ -25,35 +26,26 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// </summary>
         /// <param name="client"></param>
         /// <param name="vmIdOrName"></param>
+        /// <param name="proxy"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public static bool CreateFileSpaceClient(this PveClient client, string vmIdOrName, string fileName)
+        public static bool CreateFileSpaceClient(this PveClient client,
+                                                 string vmIdOrName,
+                                                 string proxy,
+                                                 string fileName)
         {
             var ret = false;
 
             var vm = client.GetVM(vmIdOrName);
             if (vm != null && vm.Type == VMTypeEnum.Qemu)
             {
-                var response = vm.QemuApi.Spiceproxy.Spiceproxy(client.Hostname);
+                var response = vm.QemuApi.Spiceproxy.Spiceproxy(proxy);
                 if (response.IsSuccessStatusCode)
                 {
-                    var data = response.Response.data;
-
-                    var contests = $@"[virt-viewer]
-host={data.host}
-delete-this-file={DynamicHelper.GetValue(data, "delete-this-file")}
-password={data.password}
-title={data.title}
-secure-attention={DynamicHelper.GetValue(data, "secure-attention")}
-toggle-fullscreen={DynamicHelper.GetValue(data, "toggle-fullscreen")}
-tls-port={DynamicHelper.GetValue(data, "tls-port")}
-type={data.type}
-release-cursor={DynamicHelper.GetValue(data, "release-cursor")}
-host-subject={DynamicHelper.GetValue(data, "host-subject")}
-proxy={data.proxy}
-ca={data.ca}
-";
-                    File.WriteAllText(fileName, contests);
+                    var contests = new StringBuilder();
+                    contests.AppendLine("[virt-viewer]");
+                    foreach (var item in response.ToEnumerable()) { contests.AppendLine($"{item.Key}={item.Value}"); }
+                    File.WriteAllText(fileName, contests.ToString());
                     ret = true;
                 }
             }

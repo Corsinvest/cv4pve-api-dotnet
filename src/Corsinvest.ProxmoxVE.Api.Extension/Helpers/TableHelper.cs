@@ -171,7 +171,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
                     }
                 }
             }
-            else if (data is IList)
+            else if (data is IList list)
             {
                 if (keys == null)
                 {
@@ -184,7 +184,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
                 var rowsTmp = new List<KeyValuePair<object, object[]>>();
 
                 //array data
-                foreach (IDictionary<string, object> item in (IList)data)
+                foreach (IDictionary<string, object> item in list)
                 {
                     //create rows
                     var row = new List<object>();
