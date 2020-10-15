@@ -11,6 +11,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
@@ -93,7 +94,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// </summary>
         public bool IsUnknown => Status == "unknown";
 
-
         /// <summary>
         /// Type
         /// </summary>
@@ -105,6 +105,30 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                 "qemu" => VMTypeEnum.Qemu,
                 _ => VMTypeEnum.Qemu,
             };
+
+        /// <summary>
+        /// Get file for SPICE client using spiceconfig
+        /// </summary>
+        /// <param name="proxy"></param>
+        /// <returns></returns>
+        public string GetSpiceFileVV(string proxy)
+        {
+            var ret = "";
+
+            if (Type == VMTypeEnum.Qemu)
+            {
+                var oldResponseType = Client.ResponseType;
+                Client.ResponseType = ResponseType.None;
+
+                var response = Client.Create($"/spiceconfig/nodes/{Node}/qemu/{Id}/spiceproxy",
+                                             new Dictionary<string, object> { { "proxy", proxy } });
+
+                Client.ResponseType = oldResponseType;
+                ret = response.Response + "";
+            }
+
+            return ret;
+        }
 
         /// <summary>
         /// Se status

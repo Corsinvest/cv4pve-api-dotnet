@@ -18,6 +18,11 @@
     public enum ResponseType
     {
         /// <summary>
+        /// None
+        /// </summary>
+        None,
+
+        /// <summary>
         /// Json
         /// </summary>
         Json,

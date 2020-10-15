@@ -68,7 +68,14 @@ namespace Corsinvest.ProxmoxVE.Api
         /// Returns the base URL used to interact with the Proxmox VE API.
         /// </summary>
         public string GetApiUrl()
-            => $"https://{Hostname}:{Port}/api2/{Enum.GetName(typeof(ResponseType), ResponseType).ToLower()}";
+        {
+            var url = $"https://{Hostname}:{Port}/api2";
+            if (ResponseType != ResponseType.None)
+            {
+                url += $"/{Enum.GetName(typeof(ResponseType), ResponseType).ToLower()}";
+            }
+            return url;
+        }
 
         /// <summary>
         /// Api Token format USER@REALM!TOKENID=UUID
@@ -244,6 +251,10 @@ namespace Corsinvest.ProxmoxVE.Api
                              Convert.ToBase64String(response.Content.ReadAsByteArrayAsync().Result);
 
                     if (DebugLevel >= 2) { Console.Out.WriteLine(result); }
+                    break;
+
+                case ResponseType.None:
+                    result = response.Content.ReadAsStringAsync().Result;
                     break;
 
                 default: break;
