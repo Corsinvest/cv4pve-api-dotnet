@@ -88,7 +88,7 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <param name="realm"></param>
-        public bool Login(string userName, string password, string realm = "pam")
+        public bool Login(string userName, string password, string realm)
         {
             var ticket = Create("/access/ticket",
                                 new Dictionary<string, object>
@@ -255,6 +255,7 @@ namespace Corsinvest.ProxmoxVE.Api
 
                 case ResponseType.None:
                     result = response.Content.ReadAsStringAsync().Result;
+                    if (DebugLevel >= 2) { Console.Out.WriteLine(result); }
                     break;
 
                 default: break;

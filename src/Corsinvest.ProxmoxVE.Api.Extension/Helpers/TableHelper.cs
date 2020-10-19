@@ -55,7 +55,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
                                      TableOutputType outputType,
                                      bool hasInnerRows)
         {
-            var ret = "";
+            string ret;
             if (outputType == TableOutputType.Html) { ret = ToHtml(columns, rows); }
             else if (outputType == TableOutputType.Json) { ret = ToJson(columns.ToArray(), rows, false); }
             else if (outputType == TableOutputType.JsonPretty) { ret = ToJson(columns.ToArray(), rows, true); }

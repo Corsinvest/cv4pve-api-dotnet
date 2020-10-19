@@ -344,15 +344,10 @@ range 100:107,-105,200:204
                 {
                     //use api token
                     client.ApiToken = command.GetApiToken().Value();
+
+                    //check is valid API
                     var ver = client.Version.Version();
-                    if (!ver.IsSuccessStatusCode)
-                    {
-                        error += " " + client.LastResult.ReasonPhrase;
-                    }
-                    else
-                    {
-                        return client;
-                    }
+                    if (ver.IsSuccessStatusCode) { return client; }
                 }
                 else
                 {
@@ -363,13 +358,14 @@ range 100:107,-105,200:204
                         return client;
                     }
 
-                    if (!client.LastResult.IsSuccessStatusCode)
-                    {
-                        error += " " + client.LastResult.ReasonPhrase;
-                    }
                 }
+
+                if (!client.LastResult.IsSuccessStatusCode) { error += " " + client.LastResult.ReasonPhrase; }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                throw new ApplicationException(error, ex);
+            }
 
             throw new ApplicationException(error);
         }

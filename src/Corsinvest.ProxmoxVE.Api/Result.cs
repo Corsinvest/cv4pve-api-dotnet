@@ -81,7 +81,7 @@ namespace Corsinvest.ProxmoxVE.Api
         /// Proxmox VE response to dictionary.
         /// </summary>
         /// <returns></returns>
-        public IDictionary<String, object> ResponseToDictionary => (IDictionary<String, object>)Response;
+        public IDictionary<string, object> ResponseToDictionary => (IDictionary<string, object>)Response;
 
         /// <summary>
         /// Contains the values of status codes defined for HTTP.
