@@ -179,7 +179,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
                             {
                                 resultText.AppendLine($"no such resource '{resource}'");
                             }
-                            else
+                            else if (data != null)
                             {
                                 var returnParameters = classApi.Methods
                                                                .Where(a => a.IsGet)

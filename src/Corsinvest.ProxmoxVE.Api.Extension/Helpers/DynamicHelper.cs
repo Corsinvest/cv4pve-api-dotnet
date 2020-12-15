@@ -41,8 +41,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         public static object GetValue(dynamic obj, string key, object defaultValue = null)
         {
             var dic = (IDictionary<string, object>)obj;
-            dic.TryGetValue(key, out defaultValue);
-            return defaultValue;
+            return dic.TryGetValue(key, out var value) ? value : defaultValue;
         }
     }
 }

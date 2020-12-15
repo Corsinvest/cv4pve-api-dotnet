@@ -31,7 +31,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <summary>
         /// Name
         /// </summary>
-        public string Name => ApiData.name + "";
+        public string Name => DynamicHelper.GetValue(ApiData, "name") + "";
 
         /// <summary>
         /// Node

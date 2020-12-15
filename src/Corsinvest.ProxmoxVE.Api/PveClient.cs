@@ -49,6 +49,8 @@ namespace Corsinvest.ProxmoxVE.Api
             internal PVECluster(PveClient client) { _client = client; }
             private PVEReplication _replication;
             public PVEReplication Replication => _replication ??= new PVEReplication(_client);
+            private PVEMetrics _metrics;
+            public PVEMetrics Metrics => _metrics ??= new PVEMetrics(_client);
             private PVEConfig _config;
             public PVEConfig Config => _config ??= new PVEConfig(_client);
             private PVEFirewall _firewall;
@@ -219,6 +221,158 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="source">Source of the replication.</param>
                 /// <returns></returns>
                 public Result Create(string id, string target, string type, string comment = null, bool? disable = null, int? rate = null, string remove_job = null, string schedule = null, string source = null) => CreateRest(id, target, type, comment, disable, rate, remove_job, schedule, source);
+            }
+            public class PVEMetrics
+            {
+                private readonly PveClient _client;
+
+                internal PVEMetrics(PveClient client) { _client = client; }
+                private PVEServer _server;
+                public PVEServer Server => _server ??= new PVEServer(_client);
+                public class PVEServer
+                {
+                    private readonly PveClient _client;
+
+                    internal PVEServer(PveClient client) { _client = client; }
+                    public PVEItemId this[object id] => new PVEItemId(_client, id);
+                    public class PVEItemId
+                    {
+                        private readonly PveClient _client;
+                        private readonly object _id;
+                        internal PVEItemId(PveClient client, object id) { _client = client; _id = id; }
+                        /// <summary>
+                        /// Remove Metric server.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result DeleteRest() { return _client.Delete($"/cluster/metrics/server/{_id}"); }
+
+                        /// <summary>
+                        /// Remove Metric server.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result Delete() => DeleteRest();
+                        /// <summary>
+                        /// Read metric server configuration.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result GetRest() { return _client.Get($"/cluster/metrics/server/{_id}"); }
+
+                        /// <summary>
+                        /// Read metric server configuration.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result Read() => GetRest();
+                        /// <summary>
+                        /// Create a new external metric server config
+                        /// </summary>
+                        /// <param name="port">server network port</param>
+                        /// <param name="server">server dns name or IP address</param>
+                        /// <param name="type">Plugin type.
+                        ///   Enum: graphite,influxdb</param>
+                        /// <param name="disable">Flag to disable the plugin.</param>
+                        /// <param name="mtu">MTU for metrics transmission over UDP</param>
+                        /// <param name="path">root graphite path (ex: proxmox.mycluster.mykey)</param>
+                        /// <param name="proto">Protocol to send graphite data. TCP or UDP (default)
+                        ///   Enum: udp,tcp</param>
+                        /// <param name="timeout">graphite TCP socket timeout (default=1)</param>
+                        /// <returns></returns>
+                        public Result CreateRest(int port, string server, string type, bool? disable = null, int? mtu = null, string path = null, string proto = null, int? timeout = null)
+                        {
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("port", port);
+                            parameters.Add("server", server);
+                            parameters.Add("type", type);
+                            parameters.Add("disable", disable);
+                            parameters.Add("mtu", mtu);
+                            parameters.Add("path", path);
+                            parameters.Add("proto", proto);
+                            parameters.Add("timeout", timeout);
+                            return _client.Create($"/cluster/metrics/server/{_id}", parameters);
+                        }
+
+                        /// <summary>
+                        /// Create a new external metric server config
+                        /// </summary>
+                        /// <param name="port">server network port</param>
+                        /// <param name="server">server dns name or IP address</param>
+                        /// <param name="type">Plugin type.
+                        ///   Enum: graphite,influxdb</param>
+                        /// <param name="disable">Flag to disable the plugin.</param>
+                        /// <param name="mtu">MTU for metrics transmission over UDP</param>
+                        /// <param name="path">root graphite path (ex: proxmox.mycluster.mykey)</param>
+                        /// <param name="proto">Protocol to send graphite data. TCP or UDP (default)
+                        ///   Enum: udp,tcp</param>
+                        /// <param name="timeout">graphite TCP socket timeout (default=1)</param>
+                        /// <returns></returns>
+                        public Result Create(int port, string server, string type, bool? disable = null, int? mtu = null, string path = null, string proto = null, int? timeout = null) => CreateRest(port, server, type, disable, mtu, path, proto, timeout);
+                        /// <summary>
+                        /// Update metric server configuration.
+                        /// </summary>
+                        /// <param name="port">server network port</param>
+                        /// <param name="server">server dns name or IP address</param>
+                        /// <param name="delete">A list of settings you want to delete.</param>
+                        /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
+                        /// <param name="disable">Flag to disable the plugin.</param>
+                        /// <param name="mtu">MTU for metrics transmission over UDP</param>
+                        /// <param name="path">root graphite path (ex: proxmox.mycluster.mykey)</param>
+                        /// <param name="proto">Protocol to send graphite data. TCP or UDP (default)
+                        ///   Enum: udp,tcp</param>
+                        /// <param name="timeout">graphite TCP socket timeout (default=1)</param>
+                        /// <returns></returns>
+                        public Result SetRest(int port, string server, string delete = null, string digest = null, bool? disable = null, int? mtu = null, string path = null, string proto = null, int? timeout = null)
+                        {
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("port", port);
+                            parameters.Add("server", server);
+                            parameters.Add("delete", delete);
+                            parameters.Add("digest", digest);
+                            parameters.Add("disable", disable);
+                            parameters.Add("mtu", mtu);
+                            parameters.Add("path", path);
+                            parameters.Add("proto", proto);
+                            parameters.Add("timeout", timeout);
+                            return _client.Set($"/cluster/metrics/server/{_id}", parameters);
+                        }
+
+                        /// <summary>
+                        /// Update metric server configuration.
+                        /// </summary>
+                        /// <param name="port">server network port</param>
+                        /// <param name="server">server dns name or IP address</param>
+                        /// <param name="delete">A list of settings you want to delete.</param>
+                        /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
+                        /// <param name="disable">Flag to disable the plugin.</param>
+                        /// <param name="mtu">MTU for metrics transmission over UDP</param>
+                        /// <param name="path">root graphite path (ex: proxmox.mycluster.mykey)</param>
+                        /// <param name="proto">Protocol to send graphite data. TCP or UDP (default)
+                        ///   Enum: udp,tcp</param>
+                        /// <param name="timeout">graphite TCP socket timeout (default=1)</param>
+                        /// <returns></returns>
+                        public Result Update(int port, string server, string delete = null, string digest = null, bool? disable = null, int? mtu = null, string path = null, string proto = null, int? timeout = null) => SetRest(port, server, delete, digest, disable, mtu, path, proto, timeout);
+                    }
+                    /// <summary>
+                    /// List configured metric servers.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result GetRest() { return _client.Get($"/cluster/metrics/server"); }
+
+                    /// <summary>
+                    /// List configured metric servers.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result ServerIndex() => GetRest();
+                }
+                /// <summary>
+                /// Metrics index.
+                /// </summary>
+                /// <returns></returns>
+                public Result GetRest() { return _client.Get($"/cluster/metrics"); }
+
+                /// <summary>
+                /// Metrics index.
+                /// </summary>
+                /// <returns></returns>
+                public Result Index() => GetRest();
             }
             public class PVEConfig
             {
@@ -533,6 +687,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                             /// <param name="enable">Flag to enable/disable a rule.</param>
+                            /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                             /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                             /// <param name="log">Log level for firewall rule.
                             ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -544,7 +699,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="type">Rule type.
                             ///   Enum: in,out,group</param>
                             /// <returns></returns>
-                            public Result SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
+                            public Result SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("action", action);
@@ -554,6 +709,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("digest", digest);
                                 parameters.Add("dport", dport);
                                 parameters.Add("enable", enable);
+                                parameters.Add("icmp-type", icmp_type);
                                 parameters.Add("iface", iface);
                                 parameters.Add("log", log);
                                 parameters.Add("macro", macro);
@@ -575,6 +731,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                             /// <param name="enable">Flag to enable/disable a rule.</param>
+                            /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                             /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                             /// <param name="log">Log level for firewall rule.
                             ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -586,7 +743,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="type">Rule type.
                             ///   Enum: in,out,group</param>
                             /// <returns></returns>
-                            public Result UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => SetRest(action, comment, delete, dest, digest, dport, enable, iface, log, macro, moveto, proto, source, sport, type);
+                            public Result UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => SetRest(action, comment, delete, dest, digest, dport, enable, icmp_type, iface, log, macro, moveto, proto, source, sport, type);
                         }
                         /// <summary>
                         /// Delete security group.
@@ -621,6 +778,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                         /// <param name="enable">Flag to enable/disable a rule.</param>
+                        /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                         /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                         /// <param name="log">Log level for firewall rule.
                         ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -630,7 +788,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                         /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                         /// <returns></returns>
-                        public Result CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
+                        public Result CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("action", action);
@@ -640,6 +798,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("digest", digest);
                             parameters.Add("dport", dport);
                             parameters.Add("enable", enable);
+                            parameters.Add("icmp-type", icmp_type);
                             parameters.Add("iface", iface);
                             parameters.Add("log", log);
                             parameters.Add("macro", macro);
@@ -661,6 +820,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                         /// <param name="enable">Flag to enable/disable a rule.</param>
+                        /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                         /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                         /// <param name="log">Log level for firewall rule.
                         ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -670,7 +830,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                         /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                         /// <returns></returns>
-                        public Result CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => CreateRest(action, type, comment, dest, digest, dport, enable, iface, log, macro, pos, proto, source, sport);
+                        public Result CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => CreateRest(action, type, comment, dest, digest, dport, enable, icmp_type, iface, log, macro, pos, proto, source, sport);
                     }
                     /// <summary>
                     /// List security groups.
@@ -761,6 +921,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                         /// <param name="enable">Flag to enable/disable a rule.</param>
+                        /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                         /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                         /// <param name="log">Log level for firewall rule.
                         ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -772,7 +933,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="type">Rule type.
                         ///   Enum: in,out,group</param>
                         /// <returns></returns>
-                        public Result SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
+                        public Result SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("action", action);
@@ -782,6 +943,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("digest", digest);
                             parameters.Add("dport", dport);
                             parameters.Add("enable", enable);
+                            parameters.Add("icmp-type", icmp_type);
                             parameters.Add("iface", iface);
                             parameters.Add("log", log);
                             parameters.Add("macro", macro);
@@ -803,6 +965,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                         /// <param name="enable">Flag to enable/disable a rule.</param>
+                        /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                         /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                         /// <param name="log">Log level for firewall rule.
                         ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -814,7 +977,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="type">Rule type.
                         ///   Enum: in,out,group</param>
                         /// <returns></returns>
-                        public Result UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => SetRest(action, comment, delete, dest, digest, dport, enable, iface, log, macro, moveto, proto, source, sport, type);
+                        public Result UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => SetRest(action, comment, delete, dest, digest, dport, enable, icmp_type, iface, log, macro, moveto, proto, source, sport, type);
                     }
                     /// <summary>
                     /// List rules.
@@ -838,6 +1001,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                     /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                     /// <param name="enable">Flag to enable/disable a rule.</param>
+                    /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                     /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                     /// <param name="log">Log level for firewall rule.
                     ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -847,7 +1011,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                     /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
+                    public Result CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("action", action);
@@ -857,6 +1021,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("digest", digest);
                         parameters.Add("dport", dport);
                         parameters.Add("enable", enable);
+                        parameters.Add("icmp-type", icmp_type);
                         parameters.Add("iface", iface);
                         parameters.Add("log", log);
                         parameters.Add("macro", macro);
@@ -878,6 +1043,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                     /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                     /// <param name="enable">Flag to enable/disable a rule.</param>
+                    /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                     /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                     /// <param name="log">Log level for firewall rule.
                     ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -887,7 +1053,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                     /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                     /// <returns></returns>
-                    public Result CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => CreateRest(action, type, comment, dest, digest, dport, enable, iface, log, macro, pos, proto, source, sport);
+                    public Result CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => CreateRest(action, type, comment, dest, digest, dport, enable, icmp_type, iface, log, macro, pos, proto, source, sport);
                 }
                 public class PVEIpset
                 {
@@ -3329,6 +3495,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                                     /// <param name="enable">Flag to enable/disable a rule.</param>
+                                    /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                                     /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                                     /// <param name="log">Log level for firewall rule.
                                     ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -3340,7 +3507,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="type">Rule type.
                                     ///   Enum: in,out,group</param>
                                     /// <returns></returns>
-                                    public Result SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
+                                    public Result SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("action", action);
@@ -3350,6 +3517,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                         parameters.Add("digest", digest);
                                         parameters.Add("dport", dport);
                                         parameters.Add("enable", enable);
+                                        parameters.Add("icmp-type", icmp_type);
                                         parameters.Add("iface", iface);
                                         parameters.Add("log", log);
                                         parameters.Add("macro", macro);
@@ -3371,6 +3539,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                                     /// <param name="enable">Flag to enable/disable a rule.</param>
+                                    /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                                     /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                                     /// <param name="log">Log level for firewall rule.
                                     ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -3382,7 +3551,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="type">Rule type.
                                     ///   Enum: in,out,group</param>
                                     /// <returns></returns>
-                                    public Result UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => SetRest(action, comment, delete, dest, digest, dport, enable, iface, log, macro, moveto, proto, source, sport, type);
+                                    public Result UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => SetRest(action, comment, delete, dest, digest, dport, enable, icmp_type, iface, log, macro, moveto, proto, source, sport, type);
                                 }
                                 /// <summary>
                                 /// List rules.
@@ -3406,6 +3575,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                 /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                                 /// <param name="enable">Flag to enable/disable a rule.</param>
+                                /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                                 /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                                 /// <param name="log">Log level for firewall rule.
                                 ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -3415,7 +3585,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                                 /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
+                                public Result CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("action", action);
@@ -3425,6 +3595,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("digest", digest);
                                     parameters.Add("dport", dport);
                                     parameters.Add("enable", enable);
+                                    parameters.Add("icmp-type", icmp_type);
                                     parameters.Add("iface", iface);
                                     parameters.Add("log", log);
                                     parameters.Add("macro", macro);
@@ -3446,6 +3617,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                 /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                                 /// <param name="enable">Flag to enable/disable a rule.</param>
+                                /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                                 /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                                 /// <param name="log">Log level for firewall rule.
                                 ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -3455,7 +3627,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                                 /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                                 /// <returns></returns>
-                                public Result CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => CreateRest(action, type, comment, dest, digest, dport, enable, iface, log, macro, pos, proto, source, sport);
+                                public Result CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => CreateRest(action, type, comment, dest, digest, dport, enable, icmp_type, iface, log, macro, pos, proto, source, sport);
                             }
                             public class PVEAliases
                             {
@@ -4716,8 +4888,8 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="balloon">Amount of target RAM for the VM in MB. Using zero disables the ballon driver.</param>
                             /// <param name="bios">Select BIOS implementation.
                             ///   Enum: seabios,ovmf</param>
-                            /// <param name="boot">Boot on floppy (a), hard disk (c), CD-ROM (d), or network (n).</param>
-                            /// <param name="bootdisk">Enable booting from specified disk.</param>
+                            /// <param name="boot">Specify guest boot order. Use with 'order=', usage with no key or 'legacy=' is deprecated.</param>
+                            /// <param name="bootdisk">Enable booting from specified disk. Deprecated: Use 'boot: order=foo;bar' instead.</param>
                             /// <param name="cdrom">This is an alias for option -ide2</param>
                             /// <param name="cicustom">cloud-init: Specify custom files to replace the automatically generated ones at start.</param>
                             /// <param name="cipassword">cloud-init: Password to assign the user. Using this is generally not recommended. Use ssh keys instead. Also note that older cloud-init versions do not support hashed passwords.</param>
@@ -4742,6 +4914,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3).</param>
                             /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
                             /// <param name="ivshmem">Inter-VM shared memory. Useful for direct communication between VMs, or to the host.</param>
+                            /// <param name="keephugepages">Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.</param>
                             /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.cfg' configuration file.It should not be necessary to set it.
                             ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                             /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
@@ -4753,7 +4926,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="migrate_downtime">Set maximum tolerated downtime (in seconds) for migrations.</param>
                             /// <param name="migrate_speed">Set maximum speed (in MB/s) for migrations. Value 0 is no limit.</param>
                             /// <param name="name">Set a name for the VM. Only used on the configuration web interface.</param>
-                            /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
+                            /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will' 	    .' automatically use the setting from the host if neither searchdomain nor nameserver' 	    .' are set.</param>
                             /// <param name="netN">Specify network devices.</param>
                             /// <param name="numa">Enable/disable NUMA.</param>
                             /// <param name="numaN">NUMA topology.</param>
@@ -4769,7 +4942,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 30).</param>
                             /// <param name="scsihw">SCSI controller model
                             ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
-                            /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
+                            /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will' 	    .' automatically use the setting from the host if neither searchdomain nor nameserver' 	    .' are set.</param>
                             /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
                             /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning. Auto-ballooning is done by pvestatd.</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
@@ -4778,7 +4951,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="sockets">The number of CPU sockets.</param>
                             /// <param name="spice_enhancements">Configure additional enhancements for SPICE.</param>
                             /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
-                            /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
+                            /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are:'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                             /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                             /// <param name="tablet">Enable/disable the USB tablet device.</param>
                             /// <param name="tags">Tags of the VM. This is only meta information.</param>
@@ -4793,7 +4966,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result CreateRest(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                            public Result CreateRest(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("acpi", acpi);
@@ -4826,6 +4999,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("hotplug", hotplug);
                                 parameters.Add("hugepages", hugepages);
                                 parameters.Add("ivshmem", ivshmem);
+                                parameters.Add("keephugepages", keephugepages);
                                 parameters.Add("keyboard", keyboard);
                                 parameters.Add("kvm", kvm);
                                 parameters.Add("localtime", localtime);
@@ -4892,8 +5066,8 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="balloon">Amount of target RAM for the VM in MB. Using zero disables the ballon driver.</param>
                             /// <param name="bios">Select BIOS implementation.
                             ///   Enum: seabios,ovmf</param>
-                            /// <param name="boot">Boot on floppy (a), hard disk (c), CD-ROM (d), or network (n).</param>
-                            /// <param name="bootdisk">Enable booting from specified disk.</param>
+                            /// <param name="boot">Specify guest boot order. Use with 'order=', usage with no key or 'legacy=' is deprecated.</param>
+                            /// <param name="bootdisk">Enable booting from specified disk. Deprecated: Use 'boot: order=foo;bar' instead.</param>
                             /// <param name="cdrom">This is an alias for option -ide2</param>
                             /// <param name="cicustom">cloud-init: Specify custom files to replace the automatically generated ones at start.</param>
                             /// <param name="cipassword">cloud-init: Password to assign the user. Using this is generally not recommended. Use ssh keys instead. Also note that older cloud-init versions do not support hashed passwords.</param>
@@ -4918,6 +5092,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3).</param>
                             /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
                             /// <param name="ivshmem">Inter-VM shared memory. Useful for direct communication between VMs, or to the host.</param>
+                            /// <param name="keephugepages">Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.</param>
                             /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.cfg' configuration file.It should not be necessary to set it.
                             ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                             /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
@@ -4929,7 +5104,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="migrate_downtime">Set maximum tolerated downtime (in seconds) for migrations.</param>
                             /// <param name="migrate_speed">Set maximum speed (in MB/s) for migrations. Value 0 is no limit.</param>
                             /// <param name="name">Set a name for the VM. Only used on the configuration web interface.</param>
-                            /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
+                            /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will' 	    .' automatically use the setting from the host if neither searchdomain nor nameserver' 	    .' are set.</param>
                             /// <param name="netN">Specify network devices.</param>
                             /// <param name="numa">Enable/disable NUMA.</param>
                             /// <param name="numaN">NUMA topology.</param>
@@ -4945,7 +5120,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 30).</param>
                             /// <param name="scsihw">SCSI controller model
                             ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
-                            /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
+                            /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will' 	    .' automatically use the setting from the host if neither searchdomain nor nameserver' 	    .' are set.</param>
                             /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
                             /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning. Auto-ballooning is done by pvestatd.</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
@@ -4954,7 +5129,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="sockets">The number of CPU sockets.</param>
                             /// <param name="spice_enhancements">Configure additional enhancements for SPICE.</param>
                             /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
-                            /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
+                            /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are:'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                             /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                             /// <param name="tablet">Enable/disable the USB tablet device.</param>
                             /// <param name="tags">Tags of the VM. This is only meta information.</param>
@@ -4969,7 +5144,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result UpdateVmAsync(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => CreateRest(acpi, agent, arch, args, audio0, autostart, background_delay, balloon, bios, boot, bootdisk, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, delete, description, digest, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, rng0, sataN, scsiN, scsihw, searchdomain, serialN, shares, skiplock, smbios1, smp, sockets, spice_enhancements, sshkeys, startdate, startup, tablet, tags, tdf, template, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
+                            public Result UpdateVmAsync(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => CreateRest(acpi, agent, arch, args, audio0, autostart, background_delay, balloon, bios, boot, bootdisk, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, delete, description, digest, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keephugepages, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, rng0, sataN, scsiN, scsihw, searchdomain, serialN, shares, skiplock, smbios1, smp, sockets, spice_enhancements, sshkeys, startdate, startup, tablet, tags, tdf, template, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
                             /// <summary>
                             /// Set virtual machine options (synchrounous API) - You should consider using the POST method instead for any actions involving hotplug or storage allocation.
                             /// </summary>
@@ -4983,8 +5158,8 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="balloon">Amount of target RAM for the VM in MB. Using zero disables the ballon driver.</param>
                             /// <param name="bios">Select BIOS implementation.
                             ///   Enum: seabios,ovmf</param>
-                            /// <param name="boot">Boot on floppy (a), hard disk (c), CD-ROM (d), or network (n).</param>
-                            /// <param name="bootdisk">Enable booting from specified disk.</param>
+                            /// <param name="boot">Specify guest boot order. Use with 'order=', usage with no key or 'legacy=' is deprecated.</param>
+                            /// <param name="bootdisk">Enable booting from specified disk. Deprecated: Use 'boot: order=foo;bar' instead.</param>
                             /// <param name="cdrom">This is an alias for option -ide2</param>
                             /// <param name="cicustom">cloud-init: Specify custom files to replace the automatically generated ones at start.</param>
                             /// <param name="cipassword">cloud-init: Password to assign the user. Using this is generally not recommended. Use ssh keys instead. Also note that older cloud-init versions do not support hashed passwords.</param>
@@ -5009,6 +5184,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3).</param>
                             /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
                             /// <param name="ivshmem">Inter-VM shared memory. Useful for direct communication between VMs, or to the host.</param>
+                            /// <param name="keephugepages">Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.</param>
                             /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.cfg' configuration file.It should not be necessary to set it.
                             ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                             /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
@@ -5020,7 +5196,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="migrate_downtime">Set maximum tolerated downtime (in seconds) for migrations.</param>
                             /// <param name="migrate_speed">Set maximum speed (in MB/s) for migrations. Value 0 is no limit.</param>
                             /// <param name="name">Set a name for the VM. Only used on the configuration web interface.</param>
-                            /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
+                            /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will' 	    .' automatically use the setting from the host if neither searchdomain nor nameserver' 	    .' are set.</param>
                             /// <param name="netN">Specify network devices.</param>
                             /// <param name="numa">Enable/disable NUMA.</param>
                             /// <param name="numaN">NUMA topology.</param>
@@ -5036,7 +5212,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 30).</param>
                             /// <param name="scsihw">SCSI controller model
                             ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
-                            /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
+                            /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will' 	    .' automatically use the setting from the host if neither searchdomain nor nameserver' 	    .' are set.</param>
                             /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
                             /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning. Auto-ballooning is done by pvestatd.</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
@@ -5045,7 +5221,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="sockets">The number of CPU sockets.</param>
                             /// <param name="spice_enhancements">Configure additional enhancements for SPICE.</param>
                             /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
-                            /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
+                            /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are:'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                             /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                             /// <param name="tablet">Enable/disable the USB tablet device.</param>
                             /// <param name="tags">Tags of the VM. This is only meta information.</param>
@@ -5060,7 +5236,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result SetRest(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                            public Result SetRest(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("acpi", acpi);
@@ -5092,6 +5268,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("hotplug", hotplug);
                                 parameters.Add("hugepages", hugepages);
                                 parameters.Add("ivshmem", ivshmem);
+                                parameters.Add("keephugepages", keephugepages);
                                 parameters.Add("keyboard", keyboard);
                                 parameters.Add("kvm", kvm);
                                 parameters.Add("localtime", localtime);
@@ -5157,8 +5334,8 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="balloon">Amount of target RAM for the VM in MB. Using zero disables the ballon driver.</param>
                             /// <param name="bios">Select BIOS implementation.
                             ///   Enum: seabios,ovmf</param>
-                            /// <param name="boot">Boot on floppy (a), hard disk (c), CD-ROM (d), or network (n).</param>
-                            /// <param name="bootdisk">Enable booting from specified disk.</param>
+                            /// <param name="boot">Specify guest boot order. Use with 'order=', usage with no key or 'legacy=' is deprecated.</param>
+                            /// <param name="bootdisk">Enable booting from specified disk. Deprecated: Use 'boot: order=foo;bar' instead.</param>
                             /// <param name="cdrom">This is an alias for option -ide2</param>
                             /// <param name="cicustom">cloud-init: Specify custom files to replace the automatically generated ones at start.</param>
                             /// <param name="cipassword">cloud-init: Password to assign the user. Using this is generally not recommended. Use ssh keys instead. Also note that older cloud-init versions do not support hashed passwords.</param>
@@ -5183,6 +5360,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3).</param>
                             /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
                             /// <param name="ivshmem">Inter-VM shared memory. Useful for direct communication between VMs, or to the host.</param>
+                            /// <param name="keephugepages">Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.</param>
                             /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.cfg' configuration file.It should not be necessary to set it.
                             ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                             /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
@@ -5194,7 +5372,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="migrate_downtime">Set maximum tolerated downtime (in seconds) for migrations.</param>
                             /// <param name="migrate_speed">Set maximum speed (in MB/s) for migrations. Value 0 is no limit.</param>
                             /// <param name="name">Set a name for the VM. Only used on the configuration web interface.</param>
-                            /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
+                            /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will' 	    .' automatically use the setting from the host if neither searchdomain nor nameserver' 	    .' are set.</param>
                             /// <param name="netN">Specify network devices.</param>
                             /// <param name="numa">Enable/disable NUMA.</param>
                             /// <param name="numaN">NUMA topology.</param>
@@ -5210,7 +5388,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 30).</param>
                             /// <param name="scsihw">SCSI controller model
                             ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
-                            /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
+                            /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will' 	    .' automatically use the setting from the host if neither searchdomain nor nameserver' 	    .' are set.</param>
                             /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
                             /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning. Auto-ballooning is done by pvestatd.</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
@@ -5219,7 +5397,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="sockets">The number of CPU sockets.</param>
                             /// <param name="spice_enhancements">Configure additional enhancements for SPICE.</param>
                             /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
-                            /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
+                            /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are:'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                             /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                             /// <param name="tablet">Enable/disable the USB tablet device.</param>
                             /// <param name="tags">Tags of the VM. This is only meta information.</param>
@@ -5234,7 +5412,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result UpdateVm(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => SetRest(acpi, agent, arch, args, audio0, autostart, balloon, bios, boot, bootdisk, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, delete, description, digest, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, rng0, sataN, scsiN, scsihw, searchdomain, serialN, shares, skiplock, smbios1, smp, sockets, spice_enhancements, sshkeys, startdate, startup, tablet, tags, tdf, template, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
+                            public Result UpdateVm(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => SetRest(acpi, agent, arch, args, audio0, autostart, balloon, bios, boot, bootdisk, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, delete, description, digest, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keephugepages, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, rng0, sataN, scsiN, scsihw, searchdomain, serialN, shares, skiplock, smbios1, smp, sockets, spice_enhancements, sshkeys, startdate, startup, tablet, tags, tdf, template, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
                         }
                         public class PVEPending
                         {
@@ -6341,8 +6519,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="balloon">Amount of target RAM for the VM in MB. Using zero disables the ballon driver.</param>
                     /// <param name="bios">Select BIOS implementation.
                     ///   Enum: seabios,ovmf</param>
-                    /// <param name="boot">Boot on floppy (a), hard disk (c), CD-ROM (d), or network (n).</param>
-                    /// <param name="bootdisk">Enable booting from specified disk.</param>
+                    /// <param name="boot">Specify guest boot order. Use with 'order=', usage with no key or 'legacy=' is deprecated.</param>
+                    /// <param name="bootdisk">Enable booting from specified disk. Deprecated: Use 'boot: order=foo;bar' instead.</param>
                     /// <param name="bwlimit">Override I/O bandwidth limit (in KiB/s).</param>
                     /// <param name="cdrom">This is an alias for option -ide2</param>
                     /// <param name="cicustom">cloud-init: Specify custom files to replace the automatically generated ones at start.</param>
@@ -6366,6 +6544,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3).</param>
                     /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
                     /// <param name="ivshmem">Inter-VM shared memory. Useful for direct communication between VMs, or to the host.</param>
+                    /// <param name="keephugepages">Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.</param>
                     /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.cfg' configuration file.It should not be necessary to set it.
                     ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                     /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
@@ -6377,7 +6556,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="migrate_downtime">Set maximum tolerated downtime (in seconds) for migrations.</param>
                     /// <param name="migrate_speed">Set maximum speed (in MB/s) for migrations. Value 0 is no limit.</param>
                     /// <param name="name">Set a name for the VM. Only used on the configuration web interface.</param>
-                    /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
+                    /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will' 	    .' automatically use the setting from the host if neither searchdomain nor nameserver' 	    .' are set.</param>
                     /// <param name="netN">Specify network devices.</param>
                     /// <param name="numa">Enable/disable NUMA.</param>
                     /// <param name="numaN">NUMA topology.</param>
@@ -6393,7 +6572,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 30).</param>
                     /// <param name="scsihw">SCSI controller model
                     ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
-                    /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
+                    /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will' 	    .' automatically use the setting from the host if neither searchdomain nor nameserver' 	    .' are set.</param>
                     /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
                     /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning. Auto-ballooning is done by pvestatd.</param>
                     /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
@@ -6402,7 +6581,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="spice_enhancements">Configure additional enhancements for SPICE.</param>
                     /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
                     /// <param name="start">Start VM after it was created successfully.</param>
-                    /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
+                    /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are:'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                     /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                     /// <param name="storage">Default storage.</param>
                     /// <param name="tablet">Enable/disable the USB tablet device.</param>
@@ -6419,7 +6598,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                     /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                     /// <returns></returns>
-                    public Result CreateRest(int vmid, bool? acpi = null, string agent = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                    public Result CreateRest(int vmid, bool? acpi = null, string agent = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("vmid", vmid);
@@ -6452,6 +6631,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("hotplug", hotplug);
                         parameters.Add("hugepages", hugepages);
                         parameters.Add("ivshmem", ivshmem);
+                        parameters.Add("keephugepages", keephugepages);
                         parameters.Add("keyboard", keyboard);
                         parameters.Add("kvm", kvm);
                         parameters.Add("localtime", localtime);
@@ -6521,8 +6701,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="balloon">Amount of target RAM for the VM in MB. Using zero disables the ballon driver.</param>
                     /// <param name="bios">Select BIOS implementation.
                     ///   Enum: seabios,ovmf</param>
-                    /// <param name="boot">Boot on floppy (a), hard disk (c), CD-ROM (d), or network (n).</param>
-                    /// <param name="bootdisk">Enable booting from specified disk.</param>
+                    /// <param name="boot">Specify guest boot order. Use with 'order=', usage with no key or 'legacy=' is deprecated.</param>
+                    /// <param name="bootdisk">Enable booting from specified disk. Deprecated: Use 'boot: order=foo;bar' instead.</param>
                     /// <param name="bwlimit">Override I/O bandwidth limit (in KiB/s).</param>
                     /// <param name="cdrom">This is an alias for option -ide2</param>
                     /// <param name="cicustom">cloud-init: Specify custom files to replace the automatically generated ones at start.</param>
@@ -6546,6 +6726,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3).</param>
                     /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
                     /// <param name="ivshmem">Inter-VM shared memory. Useful for direct communication between VMs, or to the host.</param>
+                    /// <param name="keephugepages">Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.</param>
                     /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.cfg' configuration file.It should not be necessary to set it.
                     ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                     /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
@@ -6557,7 +6738,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="migrate_downtime">Set maximum tolerated downtime (in seconds) for migrations.</param>
                     /// <param name="migrate_speed">Set maximum speed (in MB/s) for migrations. Value 0 is no limit.</param>
                     /// <param name="name">Set a name for the VM. Only used on the configuration web interface.</param>
-                    /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
+                    /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will' 	    .' automatically use the setting from the host if neither searchdomain nor nameserver' 	    .' are set.</param>
                     /// <param name="netN">Specify network devices.</param>
                     /// <param name="numa">Enable/disable NUMA.</param>
                     /// <param name="numaN">NUMA topology.</param>
@@ -6573,7 +6754,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 30).</param>
                     /// <param name="scsihw">SCSI controller model
                     ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
-                    /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
+                    /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will' 	    .' automatically use the setting from the host if neither searchdomain nor nameserver' 	    .' are set.</param>
                     /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
                     /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning. Auto-ballooning is done by pvestatd.</param>
                     /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
@@ -6582,7 +6763,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="spice_enhancements">Configure additional enhancements for SPICE.</param>
                     /// <param name="sshkeys">cloud-init: Setup public SSH keys (one key per line, OpenSSH format).</param>
                     /// <param name="start">Start VM after it was created successfully.</param>
-                    /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are: 'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
+                    /// <param name="startdate">Set the initial date of the real time clock. Valid format for date are:'now' or '2006-06-17T16:01:21' or '2006-06-17'.</param>
                     /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                     /// <param name="storage">Default storage.</param>
                     /// <param name="tablet">Enable/disable the USB tablet device.</param>
@@ -6599,7 +6780,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                     /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                     /// <returns></returns>
-                    public Result CreateVm(int vmid, bool? acpi = null, string agent = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => CreateRest(vmid, acpi, agent, arch, archive, args, audio0, autostart, balloon, bios, boot, bootdisk, bwlimit, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, description, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, pool, protection, reboot, rng0, sataN, scsiN, scsihw, searchdomain, serialN, shares, smbios1, smp, sockets, spice_enhancements, sshkeys, start, startdate, startup, storage, tablet, tags, tdf, template, unique, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
+                    public Result CreateVm(int vmid, bool? acpi = null, string agent = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, int? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, int? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => CreateRest(vmid, acpi, agent, arch, archive, args, audio0, autostart, balloon, bios, boot, bootdisk, bwlimit, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, description, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keephugepages, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, pool, protection, reboot, rng0, sataN, scsiN, scsihw, searchdomain, serialN, shares, smbios1, smp, sockets, spice_enhancements, sshkeys, start, startdate, startup, storage, tablet, tags, tdf, template, unique, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
                 }
                 public class PVECpu
                 {
@@ -7283,6 +7464,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                                     /// <param name="enable">Flag to enable/disable a rule.</param>
+                                    /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                                     /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                                     /// <param name="log">Log level for firewall rule.
                                     ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -7294,7 +7476,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="type">Rule type.
                                     ///   Enum: in,out,group</param>
                                     /// <returns></returns>
-                                    public Result SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
+                                    public Result SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("action", action);
@@ -7304,6 +7486,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                         parameters.Add("digest", digest);
                                         parameters.Add("dport", dport);
                                         parameters.Add("enable", enable);
+                                        parameters.Add("icmp-type", icmp_type);
                                         parameters.Add("iface", iface);
                                         parameters.Add("log", log);
                                         parameters.Add("macro", macro);
@@ -7325,6 +7508,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                                     /// <param name="enable">Flag to enable/disable a rule.</param>
+                                    /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                                     /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                                     /// <param name="log">Log level for firewall rule.
                                     ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -7336,7 +7520,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="type">Rule type.
                                     ///   Enum: in,out,group</param>
                                     /// <returns></returns>
-                                    public Result UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => SetRest(action, comment, delete, dest, digest, dport, enable, iface, log, macro, moveto, proto, source, sport, type);
+                                    public Result UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => SetRest(action, comment, delete, dest, digest, dport, enable, icmp_type, iface, log, macro, moveto, proto, source, sport, type);
                                 }
                                 /// <summary>
                                 /// List rules.
@@ -7360,6 +7544,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                 /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                                 /// <param name="enable">Flag to enable/disable a rule.</param>
+                                /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                                 /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                                 /// <param name="log">Log level for firewall rule.
                                 ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -7369,7 +7554,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                                 /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
+                                public Result CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("action", action);
@@ -7379,6 +7564,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("digest", digest);
                                     parameters.Add("dport", dport);
                                     parameters.Add("enable", enable);
+                                    parameters.Add("icmp-type", icmp_type);
                                     parameters.Add("iface", iface);
                                     parameters.Add("log", log);
                                     parameters.Add("macro", macro);
@@ -7400,6 +7586,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                 /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                                 /// <param name="enable">Flag to enable/disable a rule.</param>
+                                /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                                 /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                                 /// <param name="log">Log level for firewall rule.
                                 ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -7409,7 +7596,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                                 /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                                 /// <returns></returns>
-                                public Result CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => CreateRest(action, type, comment, dest, digest, dport, enable, iface, log, macro, pos, proto, source, sport);
+                                public Result CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => CreateRest(action, type, comment, dest, digest, dport, enable, icmp_type, iface, log, macro, pos, proto, source, sport);
                             }
                             public class PVEAliases
                             {
@@ -9145,6 +9332,43 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="remove_storages">Remove all pveceph-managed storages configured for this pool</param>
                             /// <returns></returns>
                             public Result Destroypool(bool? force = null, bool? remove_storages = null) => DeleteRest(force, remove_storages);
+                            /// <summary>
+                            /// Change POOL settings
+                            /// </summary>
+                            /// <param name="application">The application of the pool.
+                            ///   Enum: rbd,cephfs,rgw</param>
+                            /// <param name="crush_rule">The rule to use for mapping object placement in the cluster.</param>
+                            /// <param name="min_size">Minimum number of replicas per object</param>
+                            /// <param name="pg_autoscale_mode">The automatic PG scaling mode of the pool.
+                            ///   Enum: on,off,warn</param>
+                            /// <param name="pg_num">Number of placement groups.</param>
+                            /// <param name="size">Number of replicas per object</param>
+                            /// <returns></returns>
+                            public Result SetRest(string application = null, string crush_rule = null, int? min_size = null, string pg_autoscale_mode = null, int? pg_num = null, int? size = null)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("application", application);
+                                parameters.Add("crush_rule", crush_rule);
+                                parameters.Add("min_size", min_size);
+                                parameters.Add("pg_autoscale_mode", pg_autoscale_mode);
+                                parameters.Add("pg_num", pg_num);
+                                parameters.Add("size", size);
+                                return _client.Set($"/nodes/{_node}/ceph/pools/{_name}", parameters);
+                            }
+
+                            /// <summary>
+                            /// Change POOL settings
+                            /// </summary>
+                            /// <param name="application">The application of the pool.
+                            ///   Enum: rbd,cephfs,rgw</param>
+                            /// <param name="crush_rule">The rule to use for mapping object placement in the cluster.</param>
+                            /// <param name="min_size">Minimum number of replicas per object</param>
+                            /// <param name="pg_autoscale_mode">The automatic PG scaling mode of the pool.
+                            ///   Enum: on,off,warn</param>
+                            /// <param name="pg_num">Number of placement groups.</param>
+                            /// <param name="size">Number of replicas per object</param>
+                            /// <returns></returns>
+                            public Result Setpool(string application = null, string crush_rule = null, int? min_size = null, string pg_autoscale_mode = null, int? pg_num = null, int? size = null) => SetRest(application, crush_rule, min_size, pg_autoscale_mode, pg_num, size);
                         }
                         /// <summary>
                         /// List all pools.
@@ -9162,14 +9386,16 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="name">The name of the pool. It must be unique.</param>
                         /// <param name="add_storages">Configure VM and CT storage using the new pool.</param>
-                        /// <param name="application">The application of the pool, 'rbd' by default.
+                        /// <param name="application">The application of the pool.
                         ///   Enum: rbd,cephfs,rgw</param>
                         /// <param name="crush_rule">The rule to use for mapping object placement in the cluster.</param>
                         /// <param name="min_size">Minimum number of replicas per object</param>
+                        /// <param name="pg_autoscale_mode">The automatic PG scaling mode of the pool.
+                        ///   Enum: on,off,warn</param>
                         /// <param name="pg_num">Number of placement groups.</param>
                         /// <param name="size">Number of replicas per object</param>
                         /// <returns></returns>
-                        public Result CreateRest(string name, bool? add_storages = null, string application = null, string crush_rule = null, int? min_size = null, int? pg_num = null, int? size = null)
+                        public Result CreateRest(string name, bool? add_storages = null, string application = null, string crush_rule = null, int? min_size = null, string pg_autoscale_mode = null, int? pg_num = null, int? size = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("name", name);
@@ -9177,6 +9403,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("application", application);
                             parameters.Add("crush_rule", crush_rule);
                             parameters.Add("min_size", min_size);
+                            parameters.Add("pg_autoscale_mode", pg_autoscale_mode);
                             parameters.Add("pg_num", pg_num);
                             parameters.Add("size", size);
                             return _client.Create($"/nodes/{_node}/ceph/pools", parameters);
@@ -9187,14 +9414,16 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="name">The name of the pool. It must be unique.</param>
                         /// <param name="add_storages">Configure VM and CT storage using the new pool.</param>
-                        /// <param name="application">The application of the pool, 'rbd' by default.
+                        /// <param name="application">The application of the pool.
                         ///   Enum: rbd,cephfs,rgw</param>
                         /// <param name="crush_rule">The rule to use for mapping object placement in the cluster.</param>
                         /// <param name="min_size">Minimum number of replicas per object</param>
+                        /// <param name="pg_autoscale_mode">The automatic PG scaling mode of the pool.
+                        ///   Enum: on,off,warn</param>
                         /// <param name="pg_num">Number of placement groups.</param>
                         /// <param name="size">Number of replicas per object</param>
                         /// <returns></returns>
-                        public Result Createpool(string name, bool? add_storages = null, string application = null, string crush_rule = null, int? min_size = null, int? pg_num = null, int? size = null) => CreateRest(name, add_storages, application, crush_rule, min_size, pg_num, size);
+                        public Result Createpool(string name, bool? add_storages = null, string application = null, string crush_rule = null, int? min_size = null, string pg_autoscale_mode = null, int? pg_num = null, int? size = null) => CreateRest(name, add_storages, application, crush_rule, min_size, pg_autoscale_mode, pg_num, size);
                     }
                     public class PVEFlags
                     {
@@ -10471,7 +10700,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <returns></returns>
                             public Result Delete(string prune_backups = null, string type = null, int? vmid = null) => DeleteRest(prune_backups, type, vmid);
                             /// <summary>
-                            /// Get prune information for backups. NOTE: this is only a preview and might not be exactly what a subsequent prune call does, if the hour changes or if backups are removed/added in the meantime.
+                            /// Get prune information for backups. NOTE: this is only a preview and might not be what a subsequent prune call does if backups are removed/added in the meantime.
                             /// </summary>
                             /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
                             /// <param name="type">Either 'qemu' or 'lxc'. Only consider backups for guests of this type.
@@ -10488,7 +10717,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
 
                             /// <summary>
-                            /// Get prune information for backups. NOTE: this is only a preview and might not be exactly what a subsequent prune call does, if the hour changes or if backups are removed/added in the meantime.
+                            /// Get prune information for backups. NOTE: this is only a preview and might not be what a subsequent prune call does if backups are removed/added in the meantime.
                             /// </summary>
                             /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
                             /// <param name="type">Either 'qemu' or 'lxc'. Only consider backups for guests of this type.
@@ -10570,6 +10799,24 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="target_node">Target node. Default is local node.</param>
                                 /// <returns></returns>
                                 public Result Copy(string target, string target_node = null) => CreateRest(target, target_node);
+                                /// <summary>
+                                /// Update volume attributes
+                                /// </summary>
+                                /// <param name="notes">The new notes.</param>
+                                /// <returns></returns>
+                                public Result SetRest(string notes = null)
+                                {
+                                    var parameters = new Dictionary<string, object>();
+                                    parameters.Add("notes", notes);
+                                    return _client.Set($"/nodes/{_node}/storage/{_storage}/content/{_volume}", parameters);
+                                }
+
+                                /// <summary>
+                                /// Update volume attributes
+                                /// </summary>
+                                /// <param name="notes">The new notes.</param>
+                                /// <returns></returns>
+                                public Result Updateattributes(string notes = null) => SetRest(notes);
                             }
                             /// <summary>
                             /// List storage content.
@@ -11287,6 +11534,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                             /// <param name="enable">Flag to enable/disable a rule.</param>
+                            /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                             /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                             /// <param name="log">Log level for firewall rule.
                             ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -11298,7 +11546,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="type">Rule type.
                             ///   Enum: in,out,group</param>
                             /// <returns></returns>
-                            public Result SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
+                            public Result SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("action", action);
@@ -11308,6 +11556,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("digest", digest);
                                 parameters.Add("dport", dport);
                                 parameters.Add("enable", enable);
+                                parameters.Add("icmp-type", icmp_type);
                                 parameters.Add("iface", iface);
                                 parameters.Add("log", log);
                                 parameters.Add("macro", macro);
@@ -11329,6 +11578,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                             /// <param name="enable">Flag to enable/disable a rule.</param>
+                            /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                             /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                             /// <param name="log">Log level for firewall rule.
                             ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -11340,7 +11590,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="type">Rule type.
                             ///   Enum: in,out,group</param>
                             /// <returns></returns>
-                            public Result UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => SetRest(action, comment, delete, dest, digest, dport, enable, iface, log, macro, moveto, proto, source, sport, type);
+                            public Result UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => SetRest(action, comment, delete, dest, digest, dport, enable, icmp_type, iface, log, macro, moveto, proto, source, sport, type);
                         }
                         /// <summary>
                         /// List rules.
@@ -11364,6 +11614,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                         /// <param name="enable">Flag to enable/disable a rule.</param>
+                        /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                         /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                         /// <param name="log">Log level for firewall rule.
                         ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -11373,7 +11624,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                         /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                         /// <returns></returns>
-                        public Result CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
+                        public Result CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("action", action);
@@ -11383,6 +11634,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("digest", digest);
                             parameters.Add("dport", dport);
                             parameters.Add("enable", enable);
+                            parameters.Add("icmp-type", icmp_type);
                             parameters.Add("iface", iface);
                             parameters.Add("log", log);
                             parameters.Add("macro", macro);
@@ -11404,6 +11656,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         /// <param name="dport">Restrict TCP/UDP destination port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                         /// <param name="enable">Flag to enable/disable a rule.</param>
+                        /// <param name="icmp_type">Specify icmp-type. Only valid if proto equals 'icmp'.</param>
                         /// <param name="iface">Network interface name. You have to use network configuration key names for VMs and containers ('net\d+'). Host related rules can use arbitrary strings.</param>
                         /// <param name="log">Log level for firewall rule.
                         ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
@@ -11413,7 +11666,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                         /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                         /// <returns></returns>
-                        public Result CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => CreateRest(action, type, comment, dest, digest, dport, enable, iface, log, macro, pos, proto, source, sport);
+                        public Result CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => CreateRest(action, type, comment, dest, digest, dport, enable, icmp_type, iface, log, macro, pos, proto, source, sport);
                     }
                     public class PVEOptions
                     {
@@ -12243,16 +12496,18 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a VNC Shell proxy.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: login,ceph_install,upgrade</param>
+                    ///   Enum: login,upgrade,ceph_install</param>
+                    /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                     /// <param name="height">sets the height of the console in pixels.</param>
                     /// <param name="upgrade">Deprecated, use the 'cmd' property instead! Run 'apt-get dist-upgrade' instead of normal shell.</param>
                     /// <param name="websocket">use websocket instead of standard vnc.</param>
                     /// <param name="width">sets the width of the console in pixels.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string cmd = null, int? height = null, bool? upgrade = null, bool? websocket = null, int? width = null)
+                    public Result CreateRest(string cmd = null, string cmd_opts = null, int? height = null, bool? upgrade = null, bool? websocket = null, int? width = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("cmd", cmd);
+                        parameters.Add("cmd-opts", cmd_opts);
                         parameters.Add("height", height);
                         parameters.Add("upgrade", upgrade);
                         parameters.Add("websocket", websocket);
@@ -12264,13 +12519,14 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a VNC Shell proxy.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: login,ceph_install,upgrade</param>
+                    ///   Enum: login,upgrade,ceph_install</param>
+                    /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                     /// <param name="height">sets the height of the console in pixels.</param>
                     /// <param name="upgrade">Deprecated, use the 'cmd' property instead! Run 'apt-get dist-upgrade' instead of normal shell.</param>
                     /// <param name="websocket">use websocket instead of standard vnc.</param>
                     /// <param name="width">sets the width of the console in pixels.</param>
                     /// <returns></returns>
-                    public Result Vncshell(string cmd = null, int? height = null, bool? upgrade = null, bool? websocket = null, int? width = null) => CreateRest(cmd, height, upgrade, websocket, width);
+                    public Result Vncshell(string cmd = null, string cmd_opts = null, int? height = null, bool? upgrade = null, bool? websocket = null, int? width = null) => CreateRest(cmd, cmd_opts, height, upgrade, websocket, width);
                 }
                 public class PVETermproxy
                 {
@@ -12281,13 +12537,15 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a VNC Shell proxy.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: login,ceph_install,upgrade</param>
+                    ///   Enum: login,upgrade,ceph_install</param>
+                    /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                     /// <param name="upgrade">Deprecated, use the 'cmd' property instead! Run 'apt-get dist-upgrade' instead of normal shell.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string cmd = null, bool? upgrade = null)
+                    public Result CreateRest(string cmd = null, string cmd_opts = null, bool? upgrade = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("cmd", cmd);
+                        parameters.Add("cmd-opts", cmd_opts);
                         parameters.Add("upgrade", upgrade);
                         return _client.Create($"/nodes/{_node}/termproxy", parameters);
                     }
@@ -12296,10 +12554,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a VNC Shell proxy.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: login,ceph_install,upgrade</param>
+                    ///   Enum: login,upgrade,ceph_install</param>
+                    /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                     /// <param name="upgrade">Deprecated, use the 'cmd' property instead! Run 'apt-get dist-upgrade' instead of normal shell.</param>
                     /// <returns></returns>
-                    public Result Termproxy(string cmd = null, bool? upgrade = null) => CreateRest(cmd, upgrade);
+                    public Result Termproxy(string cmd = null, string cmd_opts = null, bool? upgrade = null) => CreateRest(cmd, cmd_opts, upgrade);
                 }
                 public class PVEVncwebsocket
                 {
@@ -12337,14 +12596,16 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a SPICE shell.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: login,ceph_install,upgrade</param>
+                    ///   Enum: login,upgrade,ceph_install</param>
+                    /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                     /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As reasonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                     /// <param name="upgrade">Deprecated, use the 'cmd' property instead! Run 'apt-get dist-upgrade' instead of normal shell.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string cmd = null, string proxy = null, bool? upgrade = null)
+                    public Result CreateRest(string cmd = null, string cmd_opts = null, string proxy = null, bool? upgrade = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("cmd", cmd);
+                        parameters.Add("cmd-opts", cmd_opts);
                         parameters.Add("proxy", proxy);
                         parameters.Add("upgrade", upgrade);
                         return _client.Create($"/nodes/{_node}/spiceshell", parameters);
@@ -12354,11 +12615,12 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a SPICE shell.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: login,ceph_install,upgrade</param>
+                    ///   Enum: login,upgrade,ceph_install</param>
+                    /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                     /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As reasonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                     /// <param name="upgrade">Deprecated, use the 'cmd' property instead! Run 'apt-get dist-upgrade' instead of normal shell.</param>
                     /// <returns></returns>
-                    public Result Spiceshell(string cmd = null, string proxy = null, bool? upgrade = null) => CreateRest(cmd, proxy, upgrade);
+                    public Result Spiceshell(string cmd = null, string cmd_opts = null, string proxy = null, bool? upgrade = null) => CreateRest(cmd, cmd_opts, proxy, upgrade);
                 }
                 public class PVEDns
                 {
@@ -12701,6 +12963,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="options">NFS mount options (see 'man nfs')</param>
                 /// <param name="password">Password for accessing the share/datastore.</param>
                 /// <param name="pool">Pool.</param>
+                /// <param name="port">For non default port.</param>
                 /// <param name="prune_backups">The retention options with shorter intervals are processed first with --keep-last being the very first one. Each option covers a specific period of time. We say that backups within this period are covered by this option. The next option does not take care of already covered backups and only considers older backups.</param>
                 /// <param name="redundancy">The redundancy count specifies the number of nodes to which the resource should be deployed. It must be at least 1 and at most the number of nodes in the cluster.</param>
                 /// <param name="saferemove">Zero-out data when removing LVs.</param>
@@ -12717,7 +12980,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 ///   Enum: tcp,rdma,unix</param>
                 /// <param name="username">RBD Id.</param>
                 /// <returns></returns>
-                public Result SetRest(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, string prune_backups = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null)
+                public Result SetRest(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? port = null, string prune_backups = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("blocksize", blocksize);
@@ -12745,6 +13008,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("options", options);
                     parameters.Add("password", password);
                     parameters.Add("pool", pool);
+                    parameters.Add("port", port);
                     parameters.Add("prune-backups", prune_backups);
                     parameters.Add("redundancy", redundancy);
                     parameters.Add("saferemove", saferemove);
@@ -12789,6 +13053,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="options">NFS mount options (see 'man nfs')</param>
                 /// <param name="password">Password for accessing the share/datastore.</param>
                 /// <param name="pool">Pool.</param>
+                /// <param name="port">For non default port.</param>
                 /// <param name="prune_backups">The retention options with shorter intervals are processed first with --keep-last being the very first one. Each option covers a specific period of time. We say that backups within this period are covered by this option. The next option does not take care of already covered backups and only considers older backups.</param>
                 /// <param name="redundancy">The redundancy count specifies the number of nodes to which the resource should be deployed. It must be at least 1 and at most the number of nodes in the cluster.</param>
                 /// <param name="saferemove">Zero-out data when removing LVs.</param>
@@ -12805,7 +13070,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 ///   Enum: tcp,rdma,unix</param>
                 /// <param name="username">RBD Id.</param>
                 /// <returns></returns>
-                public Result Update(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, string prune_backups = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null) => SetRest(blocksize, bwlimit, comstar_hg, comstar_tg, content, delete, digest, disable, domain, encryption_key, fingerprint, format, fuse, is_mountpoint, krbd, lio_tpg, maxfiles, mkdir, monhost, mountpoint, nodes, nowritecache, options, password, pool, prune_backups, redundancy, saferemove, saferemove_throughput, server, server2, shared, smbversion, sparse, subdir, tagged_only, transport, username);
+                public Result Update(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? port = null, string prune_backups = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null) => SetRest(blocksize, bwlimit, comstar_hg, comstar_tg, content, delete, digest, disable, domain, encryption_key, fingerprint, format, fuse, is_mountpoint, krbd, lio_tpg, maxfiles, mkdir, monhost, mountpoint, nodes, nowritecache, options, password, pool, port, prune_backups, redundancy, saferemove, saferemove_throughput, server, server2, shared, smbversion, sparse, subdir, tagged_only, transport, username);
             }
             /// <summary>
             /// Storage index.
@@ -12840,7 +13105,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="comstar_hg">host group for comstar views</param>
             /// <param name="comstar_tg">target group for comstar views</param>
             /// <param name="content">Allowed content types.  NOTE: the value 'rootdir' is used for Containers, and value 'images' for VMs. </param>
-            /// <param name="datastore">Proxmox backup server datastore name.</param>
+            /// <param name="datastore">Proxmox Backup Server datastore name.</param>
             /// <param name="disable">Flag to disable the storage.</param>
             /// <param name="domain">CIFS domain.</param>
             /// <param name="encryption_key">Encryption key. Use 'autogen' to generate one automatically without passphrase.</param>
@@ -12862,6 +13127,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="password">Password for accessing the share/datastore.</param>
             /// <param name="path">File system path.</param>
             /// <param name="pool">Pool.</param>
+            /// <param name="port">For non default port.</param>
             /// <param name="portal">iSCSI portal (IP or DNS name with optional port).</param>
             /// <param name="prune_backups">The retention options with shorter intervals are processed first with --keep-last being the very first one. Each option covers a specific period of time. We say that backups within this period are covered by this option. The next option does not take care of already covered backups and only considers older backups.</param>
             /// <param name="redundancy">The redundancy count specifies the number of nodes to which the resource should be deployed. It must be at least 1 and at most the number of nodes in the cluster.</param>
@@ -12884,7 +13150,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="vgname">Volume group name.</param>
             /// <param name="volume">Glusterfs Volume.</param>
             /// <returns></returns>
-            public Result CreateRest(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, string portal = null, string prune_backups = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null)
+            public Result CreateRest(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, int? port = null, string portal = null, string prune_backups = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null)
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("storage", storage);
@@ -12918,6 +13184,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 parameters.Add("password", password);
                 parameters.Add("path", path);
                 parameters.Add("pool", pool);
+                parameters.Add("port", port);
                 parameters.Add("portal", portal);
                 parameters.Add("prune-backups", prune_backups);
                 parameters.Add("redundancy", redundancy);
@@ -12953,7 +13220,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="comstar_hg">host group for comstar views</param>
             /// <param name="comstar_tg">target group for comstar views</param>
             /// <param name="content">Allowed content types.  NOTE: the value 'rootdir' is used for Containers, and value 'images' for VMs. </param>
-            /// <param name="datastore">Proxmox backup server datastore name.</param>
+            /// <param name="datastore">Proxmox Backup Server datastore name.</param>
             /// <param name="disable">Flag to disable the storage.</param>
             /// <param name="domain">CIFS domain.</param>
             /// <param name="encryption_key">Encryption key. Use 'autogen' to generate one automatically without passphrase.</param>
@@ -12975,6 +13242,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="password">Password for accessing the share/datastore.</param>
             /// <param name="path">File system path.</param>
             /// <param name="pool">Pool.</param>
+            /// <param name="port">For non default port.</param>
             /// <param name="portal">iSCSI portal (IP or DNS name with optional port).</param>
             /// <param name="prune_backups">The retention options with shorter intervals are processed first with --keep-last being the very first one. Each option covers a specific period of time. We say that backups within this period are covered by this option. The next option does not take care of already covered backups and only considers older backups.</param>
             /// <param name="redundancy">The redundancy count specifies the number of nodes to which the resource should be deployed. It must be at least 1 and at most the number of nodes in the cluster.</param>
@@ -12997,7 +13265,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="vgname">Volume group name.</param>
             /// <param name="volume">Glusterfs Volume.</param>
             /// <returns></returns>
-            public Result Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, string portal = null, string prune_backups = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null) => CreateRest(storage, type, authsupported, base_, blocksize, bwlimit, comstar_hg, comstar_tg, content, datastore, disable, domain, encryption_key, export, fingerprint, format, fuse, is_mountpoint, iscsiprovider, krbd, lio_tpg, maxfiles, mkdir, monhost, mountpoint, nodes, nowritecache, options, password, path, pool, portal, prune_backups, redundancy, saferemove, saferemove_throughput, server, server2, share, shared, smbversion, sparse, subdir, tagged_only, target, thinpool, transport, username, vgname, volume);
+            public Result Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, string lio_tpg = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, int? port = null, string portal = null, string prune_backups = null, int? redundancy = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null) => CreateRest(storage, type, authsupported, base_, blocksize, bwlimit, comstar_hg, comstar_tg, content, datastore, disable, domain, encryption_key, export, fingerprint, format, fuse, is_mountpoint, iscsiprovider, krbd, lio_tpg, maxfiles, mkdir, monhost, mountpoint, nodes, nowritecache, options, password, path, pool, port, portal, prune_backups, redundancy, saferemove, saferemove_throughput, server, server2, share, shared, smbversion, sparse, subdir, tagged_only, target, thinpool, transport, username, vgname, volume);
         }
         public class PVEAccess
         {
@@ -13590,6 +13858,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="base_dn">LDAP base domain name</param>
                     /// <param name="bind_dn">LDAP bind domain name</param>
                     /// <param name="capath">Path to the CA certificate store</param>
+                    /// <param name="case_sensitive">username is case-sensitive</param>
                     /// <param name="cert">Path to the client certificate</param>
                     /// <param name="certkey">Path to the client certificate key</param>
                     /// <param name="comment">Description.</param>
@@ -13618,12 +13887,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="user_classes">The objectclasses for users.</param>
                     /// <param name="verify">Verify the server's SSL certificate</param>
                     /// <returns></returns>
-                    public Result SetRest(string base_dn = null, string bind_dn = null, string capath = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string delete = null, string digest = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, string mode = null, string password = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, bool? verify = null)
+                    public Result SetRest(string base_dn = null, string bind_dn = null, string capath = null, bool? case_sensitive = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string delete = null, string digest = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, string mode = null, string password = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, bool? verify = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("base_dn", base_dn);
                         parameters.Add("bind_dn", bind_dn);
                         parameters.Add("capath", capath);
+                        parameters.Add("case-sensitive", case_sensitive);
                         parameters.Add("cert", cert);
                         parameters.Add("certkey", certkey);
                         parameters.Add("comment", comment);
@@ -13658,6 +13928,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="base_dn">LDAP base domain name</param>
                     /// <param name="bind_dn">LDAP bind domain name</param>
                     /// <param name="capath">Path to the CA certificate store</param>
+                    /// <param name="case_sensitive">username is case-sensitive</param>
                     /// <param name="cert">Path to the client certificate</param>
                     /// <param name="certkey">Path to the client certificate key</param>
                     /// <param name="comment">Description.</param>
@@ -13686,7 +13957,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="user_classes">The objectclasses for users.</param>
                     /// <param name="verify">Verify the server's SSL certificate</param>
                     /// <returns></returns>
-                    public Result Update(string base_dn = null, string bind_dn = null, string capath = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string delete = null, string digest = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, string mode = null, string password = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, bool? verify = null) => SetRest(base_dn, bind_dn, capath, cert, certkey, comment, default_, delete, digest, domain, filter, group_classes, group_dn, group_filter, group_name_attr, mode, password, port, secure, server1, server2, sslversion, sync_defaults_options, sync_attributes, tfa, user_attr, user_classes, verify);
+                    public Result Update(string base_dn = null, string bind_dn = null, string capath = null, bool? case_sensitive = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string delete = null, string digest = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, string mode = null, string password = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, bool? verify = null) => SetRest(base_dn, bind_dn, capath, case_sensitive, cert, certkey, comment, default_, delete, digest, domain, filter, group_classes, group_dn, group_filter, group_name_attr, mode, password, port, secure, server1, server2, sslversion, sync_defaults_options, sync_attributes, tfa, user_attr, user_classes, verify);
                 }
                 /// <summary>
                 /// Authentication domain index.
@@ -13708,6 +13979,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="base_dn">LDAP base domain name</param>
                 /// <param name="bind_dn">LDAP bind domain name</param>
                 /// <param name="capath">Path to the CA certificate store</param>
+                /// <param name="case_sensitive">username is case-sensitive</param>
                 /// <param name="cert">Path to the client certificate</param>
                 /// <param name="certkey">Path to the client certificate key</param>
                 /// <param name="comment">Description.</param>
@@ -13734,7 +14006,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="user_classes">The objectclasses for users.</param>
                 /// <param name="verify">Verify the server's SSL certificate</param>
                 /// <returns></returns>
-                public Result CreateRest(string realm, string type, string base_dn = null, string bind_dn = null, string capath = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, string mode = null, string password = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, bool? verify = null)
+                public Result CreateRest(string realm, string type, string base_dn = null, string bind_dn = null, string capath = null, bool? case_sensitive = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, string mode = null, string password = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, bool? verify = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("realm", realm);
@@ -13742,6 +14014,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("base_dn", base_dn);
                     parameters.Add("bind_dn", bind_dn);
                     parameters.Add("capath", capath);
+                    parameters.Add("case-sensitive", case_sensitive);
                     parameters.Add("cert", cert);
                     parameters.Add("certkey", certkey);
                     parameters.Add("comment", comment);
@@ -13777,6 +14050,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="base_dn">LDAP base domain name</param>
                 /// <param name="bind_dn">LDAP bind domain name</param>
                 /// <param name="capath">Path to the CA certificate store</param>
+                /// <param name="case_sensitive">username is case-sensitive</param>
                 /// <param name="cert">Path to the client certificate</param>
                 /// <param name="certkey">Path to the client certificate key</param>
                 /// <param name="comment">Description.</param>
@@ -13803,7 +14077,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="user_classes">The objectclasses for users.</param>
                 /// <param name="verify">Verify the server's SSL certificate</param>
                 /// <returns></returns>
-                public Result Create(string realm, string type, string base_dn = null, string bind_dn = null, string capath = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, string mode = null, string password = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, bool? verify = null) => CreateRest(realm, type, base_dn, bind_dn, capath, cert, certkey, comment, default_, domain, filter, group_classes, group_dn, group_filter, group_name_attr, mode, password, port, secure, server1, server2, sslversion, sync_defaults_options, sync_attributes, tfa, user_attr, user_classes, verify);
+                public Result Create(string realm, string type, string base_dn = null, string bind_dn = null, string capath = null, bool? case_sensitive = null, string cert = null, string certkey = null, string comment = null, bool? default_ = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, string mode = null, string password = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, bool? verify = null) => CreateRest(realm, type, base_dn, bind_dn, capath, case_sensitive, cert, certkey, comment, default_, domain, filter, group_classes, group_dn, group_filter, group_name_attr, mode, password, port, secure, server1, server2, sslversion, sync_defaults_options, sync_attributes, tfa, user_attr, user_classes, verify);
             }
             public class PVETicket
             {
