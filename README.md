@@ -156,7 +156,7 @@ if (client.Login("root", "password"))
 
 //using Api Token
 var client = new PveClient("10.92.100.33");
-client.UseApiToken("root@pam!qqqqqq=8a8c1cd4-d373-43f1-b366-05ce4cb8061f");
+client.ApiToken = "root@pam!qqqqqq=8a8c1cd4-d373-43f1-b366-05ce4cb8061f";
 var version = client.Version.Version();
 Console.WriteLine(JsonConvert.SerializeObject(version.Response.data, Formatting.Indented));
 
