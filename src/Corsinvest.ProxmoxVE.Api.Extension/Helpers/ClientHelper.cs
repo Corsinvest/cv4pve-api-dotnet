@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Net.NetworkInformation;
 using System.Linq;
+using System.Net.Sockets;
+using System;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
 {
@@ -16,10 +17,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// </summary>
         /// <param name="hostsAndPortHA"></param>
         /// <param name="out"></param>
-        /// <param name="pingTimeout"></param>
-        public static PveClient GetClientFromHA(string hostsAndPortHA, TextWriter @out, int pingTimeout = 4000)
+        /// <param name="timeout"></param>
+        public static PveClient GetClientFromHA(string hostsAndPortHA, TextWriter @out, int timeout = 4000)
         {
-            var data = GetHostsAndPorts(hostsAndPortHA, 8006, true, @out, pingTimeout);
+            var data = GetHostsAndPorts(hostsAndPortHA, 8006, true, @out, timeout);
             return data.Count() == 0 ? null : new PveClient(data[0].Host, data[0].Port);
         }
 
@@ -29,15 +30,15 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// </summary>
         /// <param name="hostsAndPorts"></param>
         /// <param name="defaultPort"></param>
-        /// <param name="checkPing"></param>
+        /// <param name="checkPort"></param>
         /// <param name="out"></param>
-        /// <param name="pingTimeout"></param>
+        /// <param name="timeout"></param>
         /// <returns></returns>
         public static (string Host, int Port)[] GetHostsAndPorts(string hostsAndPorts,
                                                                  int defaultPort,
-                                                                 bool checkPing,
+                                                                 bool checkPort,
                                                                  TextWriter @out,
-                                                                 int pingTimeout = 4000)
+                                                                 int timeout = 4000)
         {
             var ret = new List<(string Host, int port)>();
             foreach (var hostAndPort in hostsAndPorts.Split(','))
@@ -48,14 +49,43 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
                 if (data.Length == 2) { int.TryParse(data[1], out port); }
 
                 var add = true;
-                if (checkPing)
+                if (checkPort)
                 {
-                    using var ping = new Ping();
-                    if (ping.Send(host, pingTimeout).Status != IPStatus.Success)
+                    add = false;
+                    try
                     {
-                        @out?.WriteLine($"Error: unknown host {host}");
-                        add = false;
+                        using var tcpClient = new TcpClient();
+                        var task = tcpClient.ConnectAsync(host, port);
+                        if (task.Wait(timeout))
+                        {
+                            //if fails within timeout, task.Wait still returns true.
+                            if (tcpClient.Connected)
+                            {
+                                add = true;
+                            }
+                            else
+                            {
+                                // connection refused probably
+                                @out?.WriteLine($"Error: problem connection host {host} with port {port}");
+                            }
+                        }
+                        else
+                        {
+                            // timed out
+                            @out?.WriteLine($"Error: timeput problem connection host {host} with port {port}");
+                        }
                     }
+                    catch (Exception ex)
+                    {
+                        @out?.WriteLine($"Error: host {host} {ex.Message}");
+                    }
+
+                    //using var ping = new Ping();
+                    //if (ping.Send(host, timeout).Status != IPStatus.Success)
+                    //{
+                    //    @out?.WriteLine($"Error: unknown host {host}");
+                    //    add = false;
+                    //}
                 }
 
                 if (add) { ret.Add((host, port)); }

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -8,13 +8,14 @@
     <Company>Corsinvest Srl</Company>
     <Authors>Daniele Corsini</Authors>
     <Copyright>Corsinvest Srl</Copyright>
-    <Product>Corsinvest for Proxmox VE Api Shell</Product>
-    <AssemblyTitle>Corsinvest for Proxmox VE Api Shell</AssemblyTitle>
-    <Description>Corsinvest for Proxmox VE Api Shell</Description>
+    <Product>Corsinvest for Proxmox VE Api Client Extension</Product>
+    <AssemblyTitle>Corsinvest for Proxmox VE Api Client Extension</AssemblyTitle>
+    <Description>Corsinvest for Proxmox VE Api Client Extension</Description>
 
-    <PackageTags>ProxmoxVE;Api,Client;Rest;Corsinvest;Shell</PackageTags>
+    <PackageTags>ProxmoxVE;Api,Client;Rest;Corsinvest;</PackageTags>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageReleaseNotes></PackageReleaseNotes>
+    <PackageReleaseNotes>
+    </PackageReleaseNotes>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageIcon>icon.png</PackageIcon>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -32,9 +33,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Extension\Corsinvest.ProxmoxVE.Api.Extension.csproj" />  -->
-    <PackageReference Include="Corsinvest.ProxmoxVE.Api.Extension" Version="2.8.0" />
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.0.0" />
+    <!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api\Corsinvest.ProxmoxVE.Api.csproj" /> -->
+    <PackageReference Include="Corsinvest.ProxmoxVE.Api" Version="2.8.0" />
+    <!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Metadata\Corsinvest.ProxmoxVE.Api.Metadata.csproj" /> -->
+    <PackageReference Include="Corsinvest.ProxmoxVE.Api.Metadata" Version="2.8.0" />
+    <PackageReference Include="BetterConsoleTables" Version="1.1.2" />
   </ItemGroup>
 
   <Target Name="SpicNSpan" AfterTargets="Clean">

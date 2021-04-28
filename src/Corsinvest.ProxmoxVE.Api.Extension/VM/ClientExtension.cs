@@ -58,7 +58,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
             if (idOrNameCheck.Contains(":"))
             {
                 //range number
-                var range = idOrNameCheck.Split(":");
+                var range = idOrNameCheck.Split(':');
                 if (range.Count() != 2 ||
                     !StringHelper.IsNumeric(range[0]) ||
                     !StringHelper.IsNumeric(range[1])) { return false;}
