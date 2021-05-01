@@ -379,20 +379,24 @@ range 100:107,-105,200:204
         {
             const string KEY = "012345678901234567890123";
 
-            var password = command.GetPassword().Value().Trim();
-
-            //check if file
-            if (password.StartsWith("file:"))
+            var password = command.GetPassword().Value();
+            if (!string.IsNullOrWhiteSpace(password))
             {
-                var fileName = password.Substring(5);
-                if (File.Exists(fileName))
+                password = password.Trim();
+
+                //check if file
+                if (password.StartsWith("file:"))
                 {
-                    password = StringHelper.Decrypt(File.ReadAllText(fileName, Encoding.UTF8), KEY, false);
-                }
-                else
-                {
-                    password = Prompt.GetPassword("Password:");
-                    File.WriteAllText(fileName, StringHelper.Encrypt(password, KEY, false), Encoding.UTF8);
+                    var fileName = password.Substring(5);
+                    if (File.Exists(fileName))
+                    {
+                        password = StringHelper.Decrypt(File.ReadAllText(fileName, Encoding.UTF8), KEY, false);
+                    }
+                    else
+                    {
+                        password = Prompt.GetPassword("Password:");
+                        File.WriteAllText(fileName, StringHelper.Encrypt(password, KEY, false), Encoding.UTF8);
+                    }
                 }
             }
 
