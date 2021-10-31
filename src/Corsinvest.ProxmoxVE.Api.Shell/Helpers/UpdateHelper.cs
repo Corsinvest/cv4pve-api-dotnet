@@ -93,7 +93,7 @@ Release Notes: {info.ReleaseNotes}
                     else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) { downloadEndWith += "linux-"; }
                     else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) { downloadEndWith += "osx-"; }
 
-                    //check architecure
+                    //check architetture
                     switch (RuntimeInformation.OSArchitecture)
                     {
                         case Architecture.Arm: downloadEndWith += "arm"; break;

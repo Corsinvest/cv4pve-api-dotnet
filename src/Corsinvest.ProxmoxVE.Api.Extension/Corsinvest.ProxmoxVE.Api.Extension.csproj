@@ -4,7 +4,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>8.0</LangVersion>
 
-    <Version>2.8.0</Version>
+    <Version>3.0.0</Version>
     <Company>Corsinvest Srl</Company>
     <Authors>Daniele Corsini</Authors>
     <Copyright>Corsinvest Srl</Copyright>
@@ -33,10 +33,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api\Corsinvest.ProxmoxVE.Api.csproj" /> -->
     <!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Metadata\Corsinvest.ProxmoxVE.Api.Metadata.csproj" /> -->
     <PackageReference Include="BetterConsoleTables" Version="1.1.2" />
-    <PackageReference Include="Corsinvest.ProxmoxVE.Api" Version="2.8.0" />
+    <!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api\Corsinvest.ProxmoxVE.Api.csproj" /> -->
+    <PackageReference Include="Corsinvest.ProxmoxVE.Api" Version="7.0.1" />
     <PackageReference Include="Corsinvest.ProxmoxVE.Api.Metadata" Version="2.8.0" />
   </ItemGroup>
 

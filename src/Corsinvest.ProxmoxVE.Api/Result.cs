@@ -10,10 +10,10 @@
  * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
  */
 
-using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Net;
+using System.Text;
 
 namespace Corsinvest.ProxmoxVE.Api
 {
@@ -107,16 +107,16 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <returns></returns>
         public string GetError()
         {
-            var ret = "";
+            var ret = new StringBuilder();
             if (ResponseInError)
             {
                 foreach (var item in (IDictionary<string, object>)Response.errors)
                 {
-                    if (!string.IsNullOrWhiteSpace(ret)) { ret += Environment.NewLine; }
-                    ret += $"{item.Key} : {item.Value}";
+                    if (!string.IsNullOrWhiteSpace(ret.ToString())) { ret.AppendLine(); }
+                    ret.Append($"{item.Key} : {item.Value}");
                 }
             }
-            return ret;
+            return ret.ToString();
         }
     }
 }

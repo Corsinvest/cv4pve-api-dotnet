@@ -13,6 +13,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
 
@@ -105,23 +106,23 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
 
         private string CreateConfig(IDictionary<string, object> items, string snapName)
         {
-            var ret = "";
+            var ret = new StringBuilder();
             if (items != null)
             {
-                if (!string.IsNullOrWhiteSpace(snapName)) { ret += $"[{snapName}]" + Environment.NewLine; }
+                if (!string.IsNullOrWhiteSpace(snapName)) { ret.AppendLine($"[{snapName}]"); }
 
-                var retTmp = "";
+                var retTmp = new StringBuilder();
                 foreach (var key in items.Keys.OrderBy(a => a))
                 {
                     var value = items[key];
-                    if (key == "description") { ret += $"#{value}" + Environment.NewLine; }
-                    else { retTmp += $"{key}: {value}" + Environment.NewLine; }
+                    if (key == "description") { ret.AppendLine($"#{value}"); }
+                    else { retTmp.AppendLine($"{key}: {value}"); }
                 }
 
-                ret += retTmp;
+                ret.Append(retTmp.ToString());
             }
 
-            return ret;
+            return ret.ToString();
         }
 
         /// <summary>

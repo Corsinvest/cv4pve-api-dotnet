@@ -165,8 +165,9 @@ For more information visit https://www.cv4pve-tools.com";
             opt.Description = @"The id or name VM/CT comma separated (eg. 100,101,102,TestDebian)
 -vmid or -name exclude (e.g. -200,-TestUbuntu)
 range 100:107,-105,200:204
-'all-???' for all VM/CT in specific host (e.g. all-pve1, all-\$(hostname)),
-'all' for all VM/CT in cluster";
+'@pool-???' for all VM/CT in specific pool (e.g. @pool-customer1),
+'@all-???' for all VM/CT in specific host (e.g. @all-pve1, @all-\$(hostname)),
+'@all' for all VM/CT in cluster";
 
             return opt;
         }

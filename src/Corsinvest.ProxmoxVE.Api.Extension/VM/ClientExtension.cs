@@ -61,9 +61,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                 var range = idOrNameCheck.Split(':');
                 if (range.Count() != 2 ||
                     !StringHelper.IsNumeric(range[0]) ||
-                    !StringHelper.IsNumeric(range[1])) { return false;}
+                    !StringHelper.IsNumeric(range[1])) { return false; }
 
-                return  long.Parse(vm.Id) >= long.Parse(range[0]) &&
+                return long.Parse(vm.Id) >= long.Parse(range[0]) &&
                         long.Parse(vm.Id) <= long.Parse(range[1]);
             }
             else if (StringHelper.IsNumeric(idOrNameCheck)) { return vm.Id == idOrNameCheck; }
@@ -91,15 +91,32 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
             var ret = new List<VMInfo>();
             foreach (var id in jolly.Split(','))
             {
-                if (id == "all")
+                if (id == "all" || id == "@all")
                 {
                     //all nodes
                     ret.AddRange(allVms);
                 }
-                else if (id.StartsWith("all-"))
+                else if (id.StartsWith("all-") || id.StartsWith("@all-"))
                 {
                     //all in specific node
-                    ret.AddRange(allVms.Where(a => a.Node.ToLower() == id.ToLower().Substring(4)));
+                    var idx = id.StartsWith("all-") ? 4 : 5;
+                    ret.AddRange(allVms.Where(a => a.Node.ToLower() == id.ToLower().Substring(idx)));
+                }
+                else if (id.StartsWith("@pool-"))
+                {
+                    //all in specific pool
+                    var poolName = id.ToLower().Substring(6);
+                    var result = client.Pools[poolName].GetRest();
+                    if (result.IsSuccessStatusCode)
+                    {
+                        foreach (var item in result.Response.data.members)
+                        {
+                            if (item.type == "qemu" || item.type == "lxc")
+                            {
+                                ret.Add(allVms.Where(a => a.Id == item.vmid + "").SingleOrDefault());
+                            }
+                        }
+                    }
                 }
                 else
                 {
