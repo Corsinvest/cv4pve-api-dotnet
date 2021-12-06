@@ -17,6 +17,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Web;
 using Newtonsoft.Json;
 
@@ -307,7 +308,7 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="wait">Millisecond wait next check</param>
         /// <param name="timeOut">Millisecond timeout</param>
         /// <return></return>
-        public bool WaitForTaskToFinish(string task, long wait = 500, long timeOut = 10000)
+        public bool WaitForTaskToFinish(string task, int wait = 500, long timeOut = 10000)
             => WaitForTaskToFinish(task.Split(':')[1], task, wait, timeOut);
 
         /// <summary>
@@ -318,20 +319,17 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="wait">Millisecond wait next check</param>
         /// <param name="timeOut">Millisecond timeout</param>
         /// <return></return>
-        public bool WaitForTaskToFinish(string node, string task, long wait = 500, long timeOut = 10000)
+        public bool WaitForTaskToFinish(string node, string task, int wait = 500, long timeOut = 10000)
         {
             var isRunning = true;
             if (wait <= 0) { wait = 500; }
             if (timeOut < wait) { timeOut = wait + 5000; }
             var timeStart = DateTime.Now;
-            var waitTime = DateTime.Now;
+
             while (isRunning && (DateTime.Now - timeStart).Milliseconds < timeOut)
             {
-                if ((DateTime.Now - waitTime).TotalMilliseconds >= wait)
-                {
-                    waitTime = DateTime.Now;
-                    isRunning = TaskIsRunning(node, task);
-                }
+                Thread.Sleep(wait);
+                isRunning = TaskIsRunning(node, task);
             }
 
             //check timeout
@@ -344,8 +342,7 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="node"></param>
         /// <param name="task"></param>
         /// <returns></returns>
-        public bool TaskIsRunning(string node, string task)
-            => ReadTaskStatus(node, task).Response.data.status == "running";
+        public bool TaskIsRunning(string node, string task) => ReadTaskStatus(node, task).Response.data.status == "running";
 
         /// <summary>
         /// Get exists status task.
@@ -353,14 +350,12 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="node"></param>
         /// <param name="task"></param>
         /// <returns></returns>
-        public string GetExitStatusTask(string node, string task)
-            => ReadTaskStatus(node, task).Response.data.exitstatus;
+        public string GetExitStatusTask(string node, string task) => ReadTaskStatus(node, task).Response.data.exitstatus;
 
         /// <summary>
         /// Read task status.
         /// </summary>
         /// <returns></returns>
-        private Result ReadTaskStatus(string node, string task)
-            => Get($"/nodes/{node}/tasks/{task}/status");
+        private Result ReadTaskStatus(string node, string task) => Get($"/nodes/{node}/tasks/{task}/status");
     }
 }
