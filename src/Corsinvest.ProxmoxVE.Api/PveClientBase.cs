@@ -197,7 +197,7 @@ namespace Corsinvest.ProxmoxVE.Api
             }
 
             var uriString = GetApiUrl() + resource;
-            if (httpMethod == HttpMethod.Get && @params.Count > 0)
+            if ((httpMethod == HttpMethod.Get || httpMethod == HttpMethod.Delete) && @params.Count > 0)
             {
                 uriString += "?" + string.Join("&", @params.Select(a => $"{a.Key}={HttpUtility.UrlEncode(a.Value)}"));
             }
@@ -214,7 +214,10 @@ namespace Corsinvest.ProxmoxVE.Api
             }
 
             var request = new HttpRequestMessage(httpMethod, new Uri(uriString));
-            if (httpMethod != HttpMethod.Get) { request.Content = new FormUrlEncodedContent(@params); }
+            if (httpMethod != HttpMethod.Get && httpMethod != HttpMethod.Delete)
+            {
+                request.Content = new FormUrlEncodedContent(@params);
+            }
 
             //ticket login
             if (_ticketCSRFPreventionToken != null)
