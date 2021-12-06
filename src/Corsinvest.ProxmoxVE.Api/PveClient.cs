@@ -65,6 +65,8 @@ namespace Corsinvest.ProxmoxVE.Api
             public PVEAcme Acme => _acme ??= new PVEAcme(_client);
             private PVECeph _ceph;
             public PVECeph Ceph => _ceph ??= new PVECeph(_client);
+            private PVEJobs _jobs;
+            public PVEJobs Jobs => _jobs ??= new PVEJobs(_client);
             private PVESdn _sdn;
             public PVESdn Sdn => _sdn ??= new PVESdn(_client);
             private PVELog _log;
@@ -282,8 +284,9 @@ namespace Corsinvest.ProxmoxVE.Api
                         ///   Enum: udp,tcp</param>
                         /// <param name="timeout">graphite TCP socket timeout (default=1)</param>
                         /// <param name="token">The InfluxDB access token. Only necessary when using the http v2 api. If the v2 compatibility api is used, use 'user:password' instead.</param>
+                        /// <param name="verify_certificate">Set to 0 to disable certificate verification for https endpoints.</param>
                         /// <returns></returns>
-                        public Result CreateRest(int port, string server, string type, string api_path_prefix = null, string bucket = null, bool? disable = null, string influxdbproto = null, int? max_body_size = null, int? mtu = null, string organization = null, string path = null, string proto = null, int? timeout = null, string token = null)
+                        public Result CreateRest(int port, string server, string type, string api_path_prefix = null, string bucket = null, bool? disable = null, string influxdbproto = null, int? max_body_size = null, int? mtu = null, string organization = null, string path = null, string proto = null, int? timeout = null, string token = null, bool? verify_certificate = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("port", port);
@@ -300,6 +303,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("proto", proto);
                             parameters.Add("timeout", timeout);
                             parameters.Add("token", token);
+                            parameters.Add("verify-certificate", verify_certificate);
                             return _client.Create($"/cluster/metrics/server/{_id}", parameters);
                         }
 
@@ -323,8 +327,9 @@ namespace Corsinvest.ProxmoxVE.Api
                         ///   Enum: udp,tcp</param>
                         /// <param name="timeout">graphite TCP socket timeout (default=1)</param>
                         /// <param name="token">The InfluxDB access token. Only necessary when using the http v2 api. If the v2 compatibility api is used, use 'user:password' instead.</param>
+                        /// <param name="verify_certificate">Set to 0 to disable certificate verification for https endpoints.</param>
                         /// <returns></returns>
-                        public Result Create(int port, string server, string type, string api_path_prefix = null, string bucket = null, bool? disable = null, string influxdbproto = null, int? max_body_size = null, int? mtu = null, string organization = null, string path = null, string proto = null, int? timeout = null, string token = null) => CreateRest(port, server, type, api_path_prefix, bucket, disable, influxdbproto, max_body_size, mtu, organization, path, proto, timeout, token);
+                        public Result Create(int port, string server, string type, string api_path_prefix = null, string bucket = null, bool? disable = null, string influxdbproto = null, int? max_body_size = null, int? mtu = null, string organization = null, string path = null, string proto = null, int? timeout = null, string token = null, bool? verify_certificate = null) => CreateRest(port, server, type, api_path_prefix, bucket, disable, influxdbproto, max_body_size, mtu, organization, path, proto, timeout, token, verify_certificate);
                         /// <summary>
                         /// Update metric server configuration.
                         /// </summary>
@@ -345,8 +350,9 @@ namespace Corsinvest.ProxmoxVE.Api
                         ///   Enum: udp,tcp</param>
                         /// <param name="timeout">graphite TCP socket timeout (default=1)</param>
                         /// <param name="token">The InfluxDB access token. Only necessary when using the http v2 api. If the v2 compatibility api is used, use 'user:password' instead.</param>
+                        /// <param name="verify_certificate">Set to 0 to disable certificate verification for https endpoints.</param>
                         /// <returns></returns>
-                        public Result SetRest(int port, string server, string api_path_prefix = null, string bucket = null, string delete = null, string digest = null, bool? disable = null, string influxdbproto = null, int? max_body_size = null, int? mtu = null, string organization = null, string path = null, string proto = null, int? timeout = null, string token = null)
+                        public Result SetRest(int port, string server, string api_path_prefix = null, string bucket = null, string delete = null, string digest = null, bool? disable = null, string influxdbproto = null, int? max_body_size = null, int? mtu = null, string organization = null, string path = null, string proto = null, int? timeout = null, string token = null, bool? verify_certificate = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("port", port);
@@ -364,6 +370,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("proto", proto);
                             parameters.Add("timeout", timeout);
                             parameters.Add("token", token);
+                            parameters.Add("verify-certificate", verify_certificate);
                             return _client.Set($"/cluster/metrics/server/{_id}", parameters);
                         }
 
@@ -387,8 +394,9 @@ namespace Corsinvest.ProxmoxVE.Api
                         ///   Enum: udp,tcp</param>
                         /// <param name="timeout">graphite TCP socket timeout (default=1)</param>
                         /// <param name="token">The InfluxDB access token. Only necessary when using the http v2 api. If the v2 compatibility api is used, use 'user:password' instead.</param>
+                        /// <param name="verify_certificate">Set to 0 to disable certificate verification for https endpoints.</param>
                         /// <returns></returns>
-                        public Result Update(int port, string server, string api_path_prefix = null, string bucket = null, string delete = null, string digest = null, bool? disable = null, string influxdbproto = null, int? max_body_size = null, int? mtu = null, string organization = null, string path = null, string proto = null, int? timeout = null, string token = null) => SetRest(port, server, api_path_prefix, bucket, delete, digest, disable, influxdbproto, max_body_size, mtu, organization, path, proto, timeout, token);
+                        public Result Update(int port, string server, string api_path_prefix = null, string bucket = null, string delete = null, string digest = null, bool? disable = null, string influxdbproto = null, int? max_body_size = null, int? mtu = null, string organization = null, string path = null, string proto = null, int? timeout = null, string token = null, bool? verify_certificate = null) => SetRest(port, server, api_path_prefix, bucket, delete, digest, disable, influxdbproto, max_body_size, mtu, organization, path, proto, timeout, token, verify_certificate);
                     }
                     /// <summary>
                     /// List configured metric servers.
@@ -1528,9 +1536,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <summary>
                     /// Update vzdump backup job definition.
                     /// </summary>
-                    /// <param name="starttime">Job Start time.</param>
                     /// <param name="all">Backup all known guest systems on this host.</param>
                     /// <param name="bwlimit">Limit I/O bandwidth (KBytes per second).</param>
+                    /// <param name="comment">Description for the Job.</param>
                     /// <param name="compress">Compress dump file.
                     ///   Enum: 0,1,gzip,lzo,zstd</param>
                     /// <param name="delete">A list of settings you want to delete.</param>
@@ -1553,7 +1561,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
                     /// <param name="quiet">Be quiet.</param>
                     /// <param name="remove">Prune older backups according to 'prune-backups'.</param>
+                    /// <param name="schedule">Backup schedule. The format is a subset of `systemd` calendar events.</param>
                     /// <param name="script">Use specified hook script.</param>
+                    /// <param name="starttime">Job Start time.</param>
                     /// <param name="stdexcludes">Exclude temporary files and logs.</param>
                     /// <param name="stop">Stop running backup jobs on this host.</param>
                     /// <param name="stopwait">Maximal time to wait until a guest system is stopped (minutes).</param>
@@ -1562,12 +1572,12 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
                     /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                     /// <returns></returns>
-                    public Result SetRest(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
+                    public Result SetRest(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
                     {
                         var parameters = new Dictionary<string, object>();
-                        parameters.Add("starttime", starttime);
                         parameters.Add("all", all);
                         parameters.Add("bwlimit", bwlimit);
+                        parameters.Add("comment", comment);
                         parameters.Add("compress", compress);
                         parameters.Add("delete", delete);
                         parameters.Add("dow", dow);
@@ -1587,7 +1597,9 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("prune-backups", prune_backups);
                         parameters.Add("quiet", quiet);
                         parameters.Add("remove", remove);
+                        parameters.Add("schedule", schedule);
                         parameters.Add("script", script);
+                        parameters.Add("starttime", starttime);
                         parameters.Add("stdexcludes", stdexcludes);
                         parameters.Add("stop", stop);
                         parameters.Add("stopwait", stopwait);
@@ -1601,9 +1613,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <summary>
                     /// Update vzdump backup job definition.
                     /// </summary>
-                    /// <param name="starttime">Job Start time.</param>
                     /// <param name="all">Backup all known guest systems on this host.</param>
                     /// <param name="bwlimit">Limit I/O bandwidth (KBytes per second).</param>
+                    /// <param name="comment">Description for the Job.</param>
                     /// <param name="compress">Compress dump file.
                     ///   Enum: 0,1,gzip,lzo,zstd</param>
                     /// <param name="delete">A list of settings you want to delete.</param>
@@ -1626,7 +1638,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
                     /// <param name="quiet">Be quiet.</param>
                     /// <param name="remove">Prune older backups according to 'prune-backups'.</param>
+                    /// <param name="schedule">Backup schedule. The format is a subset of `systemd` calendar events.</param>
                     /// <param name="script">Use specified hook script.</param>
+                    /// <param name="starttime">Job Start time.</param>
                     /// <param name="stdexcludes">Exclude temporary files and logs.</param>
                     /// <param name="stop">Stop running backup jobs on this host.</param>
                     /// <param name="stopwait">Maximal time to wait until a guest system is stopped (minutes).</param>
@@ -1635,7 +1649,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
                     /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                     /// <returns></returns>
-                    public Result UpdateJob(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null) => SetRest(starttime, all, bwlimit, compress, delete, dow, dumpdir, enabled, exclude, exclude_path, ionice, lockwait, mailnotification, mailto, maxfiles, mode, node, pigz, pool, prune_backups, quiet, remove, script, stdexcludes, stop, stopwait, storage, tmpdir, vmid, zstd);
+                    public Result UpdateJob(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null) => SetRest(all, bwlimit, comment, compress, delete, dow, dumpdir, enabled, exclude, exclude_path, ionice, lockwait, mailnotification, mailto, maxfiles, mode, node, pigz, pool, prune_backups, quiet, remove, schedule, script, starttime, stdexcludes, stop, stopwait, storage, tmpdir, vmid, zstd);
                 }
                 /// <summary>
                 /// List vzdump backup schedule.
@@ -1651,9 +1665,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <summary>
                 /// Create new vzdump backup job.
                 /// </summary>
-                /// <param name="starttime">Job Start time.</param>
                 /// <param name="all">Backup all known guest systems on this host.</param>
                 /// <param name="bwlimit">Limit I/O bandwidth (KBytes per second).</param>
+                /// <param name="comment">Description for the Job.</param>
                 /// <param name="compress">Compress dump file.
                 ///   Enum: 0,1,gzip,lzo,zstd</param>
                 /// <param name="dow">Day of week selection.</param>
@@ -1661,6 +1675,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="enabled">Enable or disable the job.</param>
                 /// <param name="exclude">Exclude specified guest systems (assumes --all)</param>
                 /// <param name="exclude_path">Exclude certain files/directories (shell globs). Paths starting with '/' are anchored to the container's root,  other paths match relative to each subdirectory.</param>
+                /// <param name="id">Job ID (will be autogenerated).</param>
                 /// <param name="ionice">Set CFQ ionice priority.</param>
                 /// <param name="lockwait">Maximal time to wait for the global lock (minutes).</param>
                 /// <param name="mailnotification">Specify when to send an email
@@ -1675,7 +1690,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
                 /// <param name="quiet">Be quiet.</param>
                 /// <param name="remove">Prune older backups according to 'prune-backups'.</param>
+                /// <param name="schedule">Backup schedule. The format is a subset of `systemd` calendar events.</param>
                 /// <param name="script">Use specified hook script.</param>
+                /// <param name="starttime">Job Start time.</param>
                 /// <param name="stdexcludes">Exclude temporary files and logs.</param>
                 /// <param name="stop">Stop running backup jobs on this host.</param>
                 /// <param name="stopwait">Maximal time to wait until a guest system is stopped (minutes).</param>
@@ -1684,18 +1701,19 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="vmid">The ID of the guest system you want to backup.</param>
                 /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                 /// <returns></returns>
-                public Result CreateRest(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
+                public Result CreateRest(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, string id = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
                 {
                     var parameters = new Dictionary<string, object>();
-                    parameters.Add("starttime", starttime);
                     parameters.Add("all", all);
                     parameters.Add("bwlimit", bwlimit);
+                    parameters.Add("comment", comment);
                     parameters.Add("compress", compress);
                     parameters.Add("dow", dow);
                     parameters.Add("dumpdir", dumpdir);
                     parameters.Add("enabled", enabled);
                     parameters.Add("exclude", exclude);
                     parameters.Add("exclude-path", exclude_path);
+                    parameters.Add("id", id);
                     parameters.Add("ionice", ionice);
                     parameters.Add("lockwait", lockwait);
                     parameters.Add("mailnotification", mailnotification);
@@ -1708,7 +1726,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("prune-backups", prune_backups);
                     parameters.Add("quiet", quiet);
                     parameters.Add("remove", remove);
+                    parameters.Add("schedule", schedule);
                     parameters.Add("script", script);
+                    parameters.Add("starttime", starttime);
                     parameters.Add("stdexcludes", stdexcludes);
                     parameters.Add("stop", stop);
                     parameters.Add("stopwait", stopwait);
@@ -1722,9 +1742,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <summary>
                 /// Create new vzdump backup job.
                 /// </summary>
-                /// <param name="starttime">Job Start time.</param>
                 /// <param name="all">Backup all known guest systems on this host.</param>
                 /// <param name="bwlimit">Limit I/O bandwidth (KBytes per second).</param>
+                /// <param name="comment">Description for the Job.</param>
                 /// <param name="compress">Compress dump file.
                 ///   Enum: 0,1,gzip,lzo,zstd</param>
                 /// <param name="dow">Day of week selection.</param>
@@ -1732,6 +1752,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="enabled">Enable or disable the job.</param>
                 /// <param name="exclude">Exclude specified guest systems (assumes --all)</param>
                 /// <param name="exclude_path">Exclude certain files/directories (shell globs). Paths starting with '/' are anchored to the container's root,  other paths match relative to each subdirectory.</param>
+                /// <param name="id">Job ID (will be autogenerated).</param>
                 /// <param name="ionice">Set CFQ ionice priority.</param>
                 /// <param name="lockwait">Maximal time to wait for the global lock (minutes).</param>
                 /// <param name="mailnotification">Specify when to send an email
@@ -1746,7 +1767,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
                 /// <param name="quiet">Be quiet.</param>
                 /// <param name="remove">Prune older backups according to 'prune-backups'.</param>
+                /// <param name="schedule">Backup schedule. The format is a subset of `systemd` calendar events.</param>
                 /// <param name="script">Use specified hook script.</param>
+                /// <param name="starttime">Job Start time.</param>
                 /// <param name="stdexcludes">Exclude temporary files and logs.</param>
                 /// <param name="stop">Stop running backup jobs on this host.</param>
                 /// <param name="stopwait">Maximal time to wait until a guest system is stopped (minutes).</param>
@@ -1755,7 +1778,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="vmid">The ID of the guest system you want to backup.</param>
                 /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                 /// <returns></returns>
-                public Result CreateJob(string starttime, bool? all = null, int? bwlimit = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null) => CreateRest(starttime, all, bwlimit, compress, dow, dumpdir, enabled, exclude, exclude_path, ionice, lockwait, mailnotification, mailto, maxfiles, mode, node, pigz, pool, prune_backups, quiet, remove, script, stdexcludes, stop, stopwait, storage, tmpdir, vmid, zstd);
+                public Result CreateJob(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, string id = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null) => CreateRest(all, bwlimit, comment, compress, dow, dumpdir, enabled, exclude, exclude_path, id, ionice, lockwait, mailnotification, mailto, maxfiles, mode, node, pigz, pool, prune_backups, quiet, remove, schedule, script, starttime, stdexcludes, stop, stopwait, storage, tmpdir, vmid, zstd);
             }
             public class PVEBackup_Info
             {
@@ -2222,7 +2245,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Update ACME plugin configuration.
                         /// </summary>
                         /// <param name="api">API plugin name
-                        ///   Enum: 1984hosting,acmedns,acmeproxy,active24,ad,ali,anx,arvan,aurora,autodns,aws,azure,cf,clouddns,cloudns,cn,conoha,constellix,cx,cyon,da,ddnss,desec,df,dgon,dnsimple,do,doapi,domeneshop,dp,dpi,dreamhost,duckdns,durabledns,dyn,dynu,dynv6,easydns,edgedns,euserv,exoscale,freedns,gandi_livedns,gcloud,gd,gdnsdk,he,hetzner,hexonet,hostingde,huaweicloud,infoblox,infomaniak,internetbs,inwx,ionos,ispconfig,jd,joker,kappernet,kas,kinghost,knot,leaseweb,lexicon,linode,linode_v4,loopia,lua,maradns,me,miab,misaka,myapi,mydevil,mydnsjp,namecheap,namecom,namesilo,nederhost,neodigit,netcup,netlify,nic,njalla,nm,nsd,nsone,nsupdate,nw,one,online,openprovider,openstack,opnsense,ovh,pdns,pleskxml,pointhq,porkbun,rackcorp,rackspace,rcode0,regru,scaleway,schlundtech,selectel,servercow,simply,tele3,transip,ultra,unoeuro,variomedia,vscale,vultr,websupport,world4you,yandex,zilore,zone,zonomi</param>
+                        ///   Enum: 1984hosting,acmedns,acmeproxy,active24,ad,ali,anx,arvan,aurora,autodns,aws,azion,azure,cf,clouddns,cloudns,cn,conoha,constellix,cx,cyon,da,ddnss,desec,df,dgon,dnsimple,do,doapi,domeneshop,dp,dpi,dreamhost,duckdns,durabledns,dyn,dynu,dynv6,easydns,edgedns,euserv,exoscale,freedns,gandi_livedns,gcloud,gd,gdnsdk,he,hetzner,hexonet,hostingde,huaweicloud,infoblox,infomaniak,internetbs,inwx,ionos,ispconfig,jd,joker,kappernet,kas,kinghost,knot,leaseweb,lexicon,linode,linode_v4,loopia,lua,maradns,me,miab,misaka,myapi,mydevil,mydnsjp,namecheap,namecom,namesilo,nederhost,neodigit,netcup,netlify,nic,njalla,nm,nsd,nsone,nsupdate,nw,oci,one,online,openprovider,openstack,opnsense,ovh,pdns,pleskxml,pointhq,porkbun,rackcorp,rackspace,rcode0,regru,scaleway,schlundtech,selectel,servercow,simply,tele3,transip,ultra,unoeuro,variomedia,veesp,vscale,vultr,websupport,world4you,yandex,zilore,zone,zonomi</param>
                         /// <param name="data">DNS plugin data. (base64 encoded)</param>
                         /// <param name="delete">A list of settings you want to delete.</param>
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
@@ -2247,7 +2270,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Update ACME plugin configuration.
                         /// </summary>
                         /// <param name="api">API plugin name
-                        ///   Enum: 1984hosting,acmedns,acmeproxy,active24,ad,ali,anx,arvan,aurora,autodns,aws,azure,cf,clouddns,cloudns,cn,conoha,constellix,cx,cyon,da,ddnss,desec,df,dgon,dnsimple,do,doapi,domeneshop,dp,dpi,dreamhost,duckdns,durabledns,dyn,dynu,dynv6,easydns,edgedns,euserv,exoscale,freedns,gandi_livedns,gcloud,gd,gdnsdk,he,hetzner,hexonet,hostingde,huaweicloud,infoblox,infomaniak,internetbs,inwx,ionos,ispconfig,jd,joker,kappernet,kas,kinghost,knot,leaseweb,lexicon,linode,linode_v4,loopia,lua,maradns,me,miab,misaka,myapi,mydevil,mydnsjp,namecheap,namecom,namesilo,nederhost,neodigit,netcup,netlify,nic,njalla,nm,nsd,nsone,nsupdate,nw,one,online,openprovider,openstack,opnsense,ovh,pdns,pleskxml,pointhq,porkbun,rackcorp,rackspace,rcode0,regru,scaleway,schlundtech,selectel,servercow,simply,tele3,transip,ultra,unoeuro,variomedia,vscale,vultr,websupport,world4you,yandex,zilore,zone,zonomi</param>
+                        ///   Enum: 1984hosting,acmedns,acmeproxy,active24,ad,ali,anx,arvan,aurora,autodns,aws,azion,azure,cf,clouddns,cloudns,cn,conoha,constellix,cx,cyon,da,ddnss,desec,df,dgon,dnsimple,do,doapi,domeneshop,dp,dpi,dreamhost,duckdns,durabledns,dyn,dynu,dynv6,easydns,edgedns,euserv,exoscale,freedns,gandi_livedns,gcloud,gd,gdnsdk,he,hetzner,hexonet,hostingde,huaweicloud,infoblox,infomaniak,internetbs,inwx,ionos,ispconfig,jd,joker,kappernet,kas,kinghost,knot,leaseweb,lexicon,linode,linode_v4,loopia,lua,maradns,me,miab,misaka,myapi,mydevil,mydnsjp,namecheap,namecom,namesilo,nederhost,neodigit,netcup,netlify,nic,njalla,nm,nsd,nsone,nsupdate,nw,oci,one,online,openprovider,openstack,opnsense,ovh,pdns,pleskxml,pointhq,porkbun,rackcorp,rackspace,rcode0,regru,scaleway,schlundtech,selectel,servercow,simply,tele3,transip,ultra,unoeuro,variomedia,veesp,vscale,vultr,websupport,world4you,yandex,zilore,zone,zonomi</param>
                         /// <param name="data">DNS plugin data. (base64 encoded)</param>
                         /// <param name="delete">A list of settings you want to delete.</param>
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
@@ -2284,7 +2307,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">ACME challenge type.
                     ///   Enum: dns,standalone</param>
                     /// <param name="api">API plugin name
-                    ///   Enum: 1984hosting,acmedns,acmeproxy,active24,ad,ali,anx,arvan,aurora,autodns,aws,azure,cf,clouddns,cloudns,cn,conoha,constellix,cx,cyon,da,ddnss,desec,df,dgon,dnsimple,do,doapi,domeneshop,dp,dpi,dreamhost,duckdns,durabledns,dyn,dynu,dynv6,easydns,edgedns,euserv,exoscale,freedns,gandi_livedns,gcloud,gd,gdnsdk,he,hetzner,hexonet,hostingde,huaweicloud,infoblox,infomaniak,internetbs,inwx,ionos,ispconfig,jd,joker,kappernet,kas,kinghost,knot,leaseweb,lexicon,linode,linode_v4,loopia,lua,maradns,me,miab,misaka,myapi,mydevil,mydnsjp,namecheap,namecom,namesilo,nederhost,neodigit,netcup,netlify,nic,njalla,nm,nsd,nsone,nsupdate,nw,one,online,openprovider,openstack,opnsense,ovh,pdns,pleskxml,pointhq,porkbun,rackcorp,rackspace,rcode0,regru,scaleway,schlundtech,selectel,servercow,simply,tele3,transip,ultra,unoeuro,variomedia,vscale,vultr,websupport,world4you,yandex,zilore,zone,zonomi</param>
+                    ///   Enum: 1984hosting,acmedns,acmeproxy,active24,ad,ali,anx,arvan,aurora,autodns,aws,azion,azure,cf,clouddns,cloudns,cn,conoha,constellix,cx,cyon,da,ddnss,desec,df,dgon,dnsimple,do,doapi,domeneshop,dp,dpi,dreamhost,duckdns,durabledns,dyn,dynu,dynv6,easydns,edgedns,euserv,exoscale,freedns,gandi_livedns,gcloud,gd,gdnsdk,he,hetzner,hexonet,hostingde,huaweicloud,infoblox,infomaniak,internetbs,inwx,ionos,ispconfig,jd,joker,kappernet,kas,kinghost,knot,leaseweb,lexicon,linode,linode_v4,loopia,lua,maradns,me,miab,misaka,myapi,mydevil,mydnsjp,namecheap,namecom,namesilo,nederhost,neodigit,netcup,netlify,nic,njalla,nm,nsd,nsone,nsupdate,nw,oci,one,online,openprovider,openstack,opnsense,ovh,pdns,pleskxml,pointhq,porkbun,rackcorp,rackspace,rcode0,regru,scaleway,schlundtech,selectel,servercow,simply,tele3,transip,ultra,unoeuro,variomedia,veesp,vscale,vultr,websupport,world4you,yandex,zilore,zone,zonomi</param>
                     /// <param name="data">DNS plugin data. (base64 encoded)</param>
                     /// <param name="disable">Flag to disable the config.</param>
                     /// <param name="nodes">List of cluster node names.</param>
@@ -2310,7 +2333,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">ACME challenge type.
                     ///   Enum: dns,standalone</param>
                     /// <param name="api">API plugin name
-                    ///   Enum: 1984hosting,acmedns,acmeproxy,active24,ad,ali,anx,arvan,aurora,autodns,aws,azure,cf,clouddns,cloudns,cn,conoha,constellix,cx,cyon,da,ddnss,desec,df,dgon,dnsimple,do,doapi,domeneshop,dp,dpi,dreamhost,duckdns,durabledns,dyn,dynu,dynv6,easydns,edgedns,euserv,exoscale,freedns,gandi_livedns,gcloud,gd,gdnsdk,he,hetzner,hexonet,hostingde,huaweicloud,infoblox,infomaniak,internetbs,inwx,ionos,ispconfig,jd,joker,kappernet,kas,kinghost,knot,leaseweb,lexicon,linode,linode_v4,loopia,lua,maradns,me,miab,misaka,myapi,mydevil,mydnsjp,namecheap,namecom,namesilo,nederhost,neodigit,netcup,netlify,nic,njalla,nm,nsd,nsone,nsupdate,nw,one,online,openprovider,openstack,opnsense,ovh,pdns,pleskxml,pointhq,porkbun,rackcorp,rackspace,rcode0,regru,scaleway,schlundtech,selectel,servercow,simply,tele3,transip,ultra,unoeuro,variomedia,vscale,vultr,websupport,world4you,yandex,zilore,zone,zonomi</param>
+                    ///   Enum: 1984hosting,acmedns,acmeproxy,active24,ad,ali,anx,arvan,aurora,autodns,aws,azion,azure,cf,clouddns,cloudns,cn,conoha,constellix,cx,cyon,da,ddnss,desec,df,dgon,dnsimple,do,doapi,domeneshop,dp,dpi,dreamhost,duckdns,durabledns,dyn,dynu,dynv6,easydns,edgedns,euserv,exoscale,freedns,gandi_livedns,gcloud,gd,gdnsdk,he,hetzner,hexonet,hostingde,huaweicloud,infoblox,infomaniak,internetbs,inwx,ionos,ispconfig,jd,joker,kappernet,kas,kinghost,knot,leaseweb,lexicon,linode,linode_v4,loopia,lua,maradns,me,miab,misaka,myapi,mydevil,mydnsjp,namecheap,namecom,namesilo,nederhost,neodigit,netcup,netlify,nic,njalla,nm,nsd,nsone,nsupdate,nw,oci,one,online,openprovider,openstack,opnsense,ovh,pdns,pleskxml,pointhq,porkbun,rackcorp,rackspace,rcode0,regru,scaleway,schlundtech,selectel,servercow,simply,tele3,transip,ultra,unoeuro,variomedia,veesp,vscale,vultr,websupport,world4you,yandex,zilore,zone,zonomi</param>
                     /// <param name="data">DNS plugin data. (base64 encoded)</param>
                     /// <param name="disable">Flag to disable the config.</param>
                     /// <param name="nodes">List of cluster node names.</param>
@@ -2646,6 +2669,55 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <returns></returns>
                 public Result Cephindex() => GetRest();
             }
+            public class PVEJobs
+            {
+                private readonly PveClient _client;
+
+                internal PVEJobs(PveClient client) { _client = client; }
+                private PVESchedule_Analyze _schedule_Analyze;
+                public PVESchedule_Analyze Schedule_Analyze => _schedule_Analyze ??= new PVESchedule_Analyze(_client);
+                public class PVESchedule_Analyze
+                {
+                    private readonly PveClient _client;
+
+                    internal PVESchedule_Analyze(PveClient client) { _client = client; }
+                    /// <summary>
+                    /// Returns a list of future schedule runtimes.
+                    /// </summary>
+                    /// <param name="schedule">Job schedule. The format is a subset of `systemd` calendar events.</param>
+                    /// <param name="iterations">Number of event-iteration to simulate and return.</param>
+                    /// <param name="starttime">UNIX timestamp to start the calculation from. Defaults to the current time.</param>
+                    /// <returns></returns>
+                    public Result GetRest(string schedule, int? iterations = null, int? starttime = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("schedule", schedule);
+                        parameters.Add("iterations", iterations);
+                        parameters.Add("starttime", starttime);
+                        return _client.Get($"/cluster/jobs/schedule-analyze", parameters);
+                    }
+
+                    /// <summary>
+                    /// Returns a list of future schedule runtimes.
+                    /// </summary>
+                    /// <param name="schedule">Job schedule. The format is a subset of `systemd` calendar events.</param>
+                    /// <param name="iterations">Number of event-iteration to simulate and return.</param>
+                    /// <param name="starttime">UNIX timestamp to start the calculation from. Defaults to the current time.</param>
+                    /// <returns></returns>
+                    public Result Schedule_Analyze(string schedule, int? iterations = null, int? starttime = null) => GetRest(schedule, iterations, starttime);
+                }
+                /// <summary>
+                /// Index for jobs related endpoints.
+                /// </summary>
+                /// <returns></returns>
+                public Result GetRest() { return _client.Get($"/cluster/jobs"); }
+
+                /// <summary>
+                /// Index for jobs related endpoints.
+                /// </summary>
+                /// <returns></returns>
+                public Result Index() => GetRest();
+            }
             public class PVESdn
             {
                 private readonly PveClient _client;
@@ -2976,14 +3048,17 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <summary>
                         /// Update sdn zone object configuration.
                         /// </summary>
+                        /// <param name="advertise_subnets">Advertise evpn subnets if you have silent hosts</param>
                         /// <param name="bridge"></param>
                         /// <param name="controller">Frr router name</param>
                         /// <param name="delete">A list of settings you want to delete.</param>
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
+                        /// <param name="disable_arp_nd_suppression">Disable ipv4 arp &amp;&amp; ipv6 neighbour discovery suppression</param>
                         /// <param name="dns">dns api server</param>
                         /// <param name="dnszone">dns domain zone  ex: mydomain.com</param>
                         /// <param name="dp_id">Faucet dataplane id</param>
                         /// <param name="exitnodes">List of cluster node names.</param>
+                        /// <param name="exitnodes_local_routing">Allow exitnodes to connect to evpn guests</param>
                         /// <param name="ipam">use a specific ipam</param>
                         /// <param name="mac">Anycast logical router mac address</param>
                         /// <param name="mtu">MTU</param>
@@ -2995,17 +3070,20 @@ namespace Corsinvest.ProxmoxVE.Api
                         ///   Enum: 802.1q,802.1ad</param>
                         /// <param name="vrf_vxlan">l3vni.</param>
                         /// <returns></returns>
-                        public Result SetRest(string bridge = null, string controller = null, string delete = null, string digest = null, string dns = null, string dnszone = null, int? dp_id = null, string exitnodes = null, string ipam = null, string mac = null, int? mtu = null, string nodes = null, string peers = null, string reversedns = null, int? tag = null, string vlan_protocol = null, int? vrf_vxlan = null)
+                        public Result SetRest(bool? advertise_subnets = null, string bridge = null, string controller = null, string delete = null, string digest = null, bool? disable_arp_nd_suppression = null, string dns = null, string dnszone = null, int? dp_id = null, string exitnodes = null, bool? exitnodes_local_routing = null, string ipam = null, string mac = null, int? mtu = null, string nodes = null, string peers = null, string reversedns = null, int? tag = null, string vlan_protocol = null, int? vrf_vxlan = null)
                         {
                             var parameters = new Dictionary<string, object>();
+                            parameters.Add("advertise-subnets", advertise_subnets);
                             parameters.Add("bridge", bridge);
                             parameters.Add("controller", controller);
                             parameters.Add("delete", delete);
                             parameters.Add("digest", digest);
+                            parameters.Add("disable-arp-nd-suppression", disable_arp_nd_suppression);
                             parameters.Add("dns", dns);
                             parameters.Add("dnszone", dnszone);
                             parameters.Add("dp-id", dp_id);
                             parameters.Add("exitnodes", exitnodes);
+                            parameters.Add("exitnodes-local-routing", exitnodes_local_routing);
                             parameters.Add("ipam", ipam);
                             parameters.Add("mac", mac);
                             parameters.Add("mtu", mtu);
@@ -3021,14 +3099,17 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <summary>
                         /// Update sdn zone object configuration.
                         /// </summary>
+                        /// <param name="advertise_subnets">Advertise evpn subnets if you have silent hosts</param>
                         /// <param name="bridge"></param>
                         /// <param name="controller">Frr router name</param>
                         /// <param name="delete">A list of settings you want to delete.</param>
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
+                        /// <param name="disable_arp_nd_suppression">Disable ipv4 arp &amp;&amp; ipv6 neighbour discovery suppression</param>
                         /// <param name="dns">dns api server</param>
                         /// <param name="dnszone">dns domain zone  ex: mydomain.com</param>
                         /// <param name="dp_id">Faucet dataplane id</param>
                         /// <param name="exitnodes">List of cluster node names.</param>
+                        /// <param name="exitnodes_local_routing">Allow exitnodes to connect to evpn guests</param>
                         /// <param name="ipam">use a specific ipam</param>
                         /// <param name="mac">Anycast logical router mac address</param>
                         /// <param name="mtu">MTU</param>
@@ -3040,7 +3121,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         ///   Enum: 802.1q,802.1ad</param>
                         /// <param name="vrf_vxlan">l3vni.</param>
                         /// <returns></returns>
-                        public Result Update(string bridge = null, string controller = null, string delete = null, string digest = null, string dns = null, string dnszone = null, int? dp_id = null, string exitnodes = null, string ipam = null, string mac = null, int? mtu = null, string nodes = null, string peers = null, string reversedns = null, int? tag = null, string vlan_protocol = null, int? vrf_vxlan = null) => SetRest(bridge, controller, delete, digest, dns, dnszone, dp_id, exitnodes, ipam, mac, mtu, nodes, peers, reversedns, tag, vlan_protocol, vrf_vxlan);
+                        public Result Update(bool? advertise_subnets = null, string bridge = null, string controller = null, string delete = null, string digest = null, bool? disable_arp_nd_suppression = null, string dns = null, string dnszone = null, int? dp_id = null, string exitnodes = null, bool? exitnodes_local_routing = null, string ipam = null, string mac = null, int? mtu = null, string nodes = null, string peers = null, string reversedns = null, int? tag = null, string vlan_protocol = null, int? vrf_vxlan = null) => SetRest(advertise_subnets, bridge, controller, delete, digest, disable_arp_nd_suppression, dns, dnszone, dp_id, exitnodes, exitnodes_local_routing, ipam, mac, mtu, nodes, peers, reversedns, tag, vlan_protocol, vrf_vxlan);
                     }
                     /// <summary>
                     /// SDN zones index.
@@ -3074,12 +3155,15 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Plugin type.
                     ///   Enum: evpn,faucet,qinq,simple,vlan,vxlan</param>
                     /// <param name="zone">The SDN zone object identifier.</param>
+                    /// <param name="advertise_subnets">Advertise evpn subnets if you have silent hosts</param>
                     /// <param name="bridge"></param>
                     /// <param name="controller">Frr router name</param>
+                    /// <param name="disable_arp_nd_suppression">Disable ipv4 arp &amp;&amp; ipv6 neighbour discovery suppression</param>
                     /// <param name="dns">dns api server</param>
                     /// <param name="dnszone">dns domain zone  ex: mydomain.com</param>
                     /// <param name="dp_id">Faucet dataplane id</param>
                     /// <param name="exitnodes">List of cluster node names.</param>
+                    /// <param name="exitnodes_local_routing">Allow exitnodes to connect to evpn guests</param>
                     /// <param name="ipam">use a specific ipam</param>
                     /// <param name="mac">Anycast logical router mac address</param>
                     /// <param name="mtu">MTU</param>
@@ -3091,17 +3175,20 @@ namespace Corsinvest.ProxmoxVE.Api
                     ///   Enum: 802.1q,802.1ad</param>
                     /// <param name="vrf_vxlan">l3vni.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string type, string zone, string bridge = null, string controller = null, string dns = null, string dnszone = null, int? dp_id = null, string exitnodes = null, string ipam = null, string mac = null, int? mtu = null, string nodes = null, string peers = null, string reversedns = null, int? tag = null, string vlan_protocol = null, int? vrf_vxlan = null)
+                    public Result CreateRest(string type, string zone, bool? advertise_subnets = null, string bridge = null, string controller = null, bool? disable_arp_nd_suppression = null, string dns = null, string dnszone = null, int? dp_id = null, string exitnodes = null, bool? exitnodes_local_routing = null, string ipam = null, string mac = null, int? mtu = null, string nodes = null, string peers = null, string reversedns = null, int? tag = null, string vlan_protocol = null, int? vrf_vxlan = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("type", type);
                         parameters.Add("zone", zone);
+                        parameters.Add("advertise-subnets", advertise_subnets);
                         parameters.Add("bridge", bridge);
                         parameters.Add("controller", controller);
+                        parameters.Add("disable-arp-nd-suppression", disable_arp_nd_suppression);
                         parameters.Add("dns", dns);
                         parameters.Add("dnszone", dnszone);
                         parameters.Add("dp-id", dp_id);
                         parameters.Add("exitnodes", exitnodes);
+                        parameters.Add("exitnodes-local-routing", exitnodes_local_routing);
                         parameters.Add("ipam", ipam);
                         parameters.Add("mac", mac);
                         parameters.Add("mtu", mtu);
@@ -3120,12 +3207,15 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Plugin type.
                     ///   Enum: evpn,faucet,qinq,simple,vlan,vxlan</param>
                     /// <param name="zone">The SDN zone object identifier.</param>
+                    /// <param name="advertise_subnets">Advertise evpn subnets if you have silent hosts</param>
                     /// <param name="bridge"></param>
                     /// <param name="controller">Frr router name</param>
+                    /// <param name="disable_arp_nd_suppression">Disable ipv4 arp &amp;&amp; ipv6 neighbour discovery suppression</param>
                     /// <param name="dns">dns api server</param>
                     /// <param name="dnszone">dns domain zone  ex: mydomain.com</param>
                     /// <param name="dp_id">Faucet dataplane id</param>
                     /// <param name="exitnodes">List of cluster node names.</param>
+                    /// <param name="exitnodes_local_routing">Allow exitnodes to connect to evpn guests</param>
                     /// <param name="ipam">use a specific ipam</param>
                     /// <param name="mac">Anycast logical router mac address</param>
                     /// <param name="mtu">MTU</param>
@@ -3137,7 +3227,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     ///   Enum: 802.1q,802.1ad</param>
                     /// <param name="vrf_vxlan">l3vni.</param>
                     /// <returns></returns>
-                    public Result Create(string type, string zone, string bridge = null, string controller = null, string dns = null, string dnszone = null, int? dp_id = null, string exitnodes = null, string ipam = null, string mac = null, int? mtu = null, string nodes = null, string peers = null, string reversedns = null, int? tag = null, string vlan_protocol = null, int? vrf_vxlan = null) => CreateRest(type, zone, bridge, controller, dns, dnszone, dp_id, exitnodes, ipam, mac, mtu, nodes, peers, reversedns, tag, vlan_protocol, vrf_vxlan);
+                    public Result Create(string type, string zone, bool? advertise_subnets = null, string bridge = null, string controller = null, bool? disable_arp_nd_suppression = null, string dns = null, string dnszone = null, int? dp_id = null, string exitnodes = null, bool? exitnodes_local_routing = null, string ipam = null, string mac = null, int? mtu = null, string nodes = null, string peers = null, string reversedns = null, int? tag = null, string vlan_protocol = null, int? vrf_vxlan = null) => CreateRest(type, zone, advertise_subnets, bridge, controller, disable_arp_nd_suppression, dns, dnszone, dp_id, exitnodes, exitnodes_local_routing, ipam, mac, mtu, nodes, peers, reversedns, tag, vlan_protocol, vrf_vxlan);
                 }
                 public class PVEControllers
                 {
@@ -3646,6 +3736,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="console">Select the default Console viewer. You can either use the builtin java applet (VNC; deprecated and maps to html5), an external virt-viewer comtatible application (SPICE), an HTML5 based vnc viewer (noVNC), or an HTML5 based console client (xtermjs). If the selected viewer is not available (e.g. SPICE not activated for the VM), the fallback is noVNC.
                 ///   Enum: applet,vv,html5,xtermjs</param>
                 /// <param name="delete">A list of settings you want to delete.</param>
+                /// <param name="description">Datacenter description. Shown in the web-interface datacenter notes panel. This is saved as comment inside the configuration file.</param>
                 /// <param name="email_from">Specify email address to send notification from (default is root@$hostname)</param>
                 /// <param name="fencing">Set the fencing mode of the HA cluster. Hardware mode needs a valid configuration of fence devices in /etc/pve/ha/fence.cfg. With both all two modes are used.  WARNING: 'hardware' and 'both' are EXPERIMENTAL &amp; WIP
                 ///   Enum: watchdog,hardware,both</param>
@@ -3660,13 +3751,15 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="migration">For cluster wide migration settings.</param>
                 /// <param name="migration_unsecure">Migration is secure using SSH tunnel by default. For secure private networks you can disable it to speed up migration. Deprecated, use the 'migration' property instead!</param>
                 /// <param name="u2f">u2f</param>
+                /// <param name="webauthn">webauthn configuration</param>
                 /// <returns></returns>
-                public Result SetRest(string bwlimit = null, string console = null, string delete = null, string email_from = null, string fencing = null, string ha = null, string http_proxy = null, string keyboard = null, string language = null, string mac_prefix = null, int? max_workers = null, string migration = null, bool? migration_unsecure = null, string u2f = null)
+                public Result SetRest(string bwlimit = null, string console = null, string delete = null, string description = null, string email_from = null, string fencing = null, string ha = null, string http_proxy = null, string keyboard = null, string language = null, string mac_prefix = null, int? max_workers = null, string migration = null, bool? migration_unsecure = null, string u2f = null, string webauthn = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("bwlimit", bwlimit);
                     parameters.Add("console", console);
                     parameters.Add("delete", delete);
+                    parameters.Add("description", description);
                     parameters.Add("email_from", email_from);
                     parameters.Add("fencing", fencing);
                     parameters.Add("ha", ha);
@@ -3678,6 +3771,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("migration", migration);
                     parameters.Add("migration_unsecure", migration_unsecure);
                     parameters.Add("u2f", u2f);
+                    parameters.Add("webauthn", webauthn);
                     return _client.Set($"/cluster/options", parameters);
                 }
 
@@ -3688,6 +3782,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="console">Select the default Console viewer. You can either use the builtin java applet (VNC; deprecated and maps to html5), an external virt-viewer comtatible application (SPICE), an HTML5 based vnc viewer (noVNC), or an HTML5 based console client (xtermjs). If the selected viewer is not available (e.g. SPICE not activated for the VM), the fallback is noVNC.
                 ///   Enum: applet,vv,html5,xtermjs</param>
                 /// <param name="delete">A list of settings you want to delete.</param>
+                /// <param name="description">Datacenter description. Shown in the web-interface datacenter notes panel. This is saved as comment inside the configuration file.</param>
                 /// <param name="email_from">Specify email address to send notification from (default is root@$hostname)</param>
                 /// <param name="fencing">Set the fencing mode of the HA cluster. Hardware mode needs a valid configuration of fence devices in /etc/pve/ha/fence.cfg. With both all two modes are used.  WARNING: 'hardware' and 'both' are EXPERIMENTAL &amp; WIP
                 ///   Enum: watchdog,hardware,both</param>
@@ -3702,8 +3797,9 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="migration">For cluster wide migration settings.</param>
                 /// <param name="migration_unsecure">Migration is secure using SSH tunnel by default. For secure private networks you can disable it to speed up migration. Deprecated, use the 'migration' property instead!</param>
                 /// <param name="u2f">u2f</param>
+                /// <param name="webauthn">webauthn configuration</param>
                 /// <returns></returns>
-                public Result SetOptions(string bwlimit = null, string console = null, string delete = null, string email_from = null, string fencing = null, string ha = null, string http_proxy = null, string keyboard = null, string language = null, string mac_prefix = null, int? max_workers = null, string migration = null, bool? migration_unsecure = null, string u2f = null) => SetRest(bwlimit, console, delete, email_from, fencing, ha, http_proxy, keyboard, language, mac_prefix, max_workers, migration, migration_unsecure, u2f);
+                public Result SetOptions(string bwlimit = null, string console = null, string delete = null, string description = null, string email_from = null, string fencing = null, string ha = null, string http_proxy = null, string keyboard = null, string language = null, string mac_prefix = null, int? max_workers = null, string migration = null, bool? migration_unsecure = null, string u2f = null, string webauthn = null) => SetRest(bwlimit, console, delete, description, email_from, fencing, ha, http_proxy, keyboard, language, mac_prefix, max_workers, migration, migration_unsecure, u2f, webauthn);
             }
             public class PVEStatus
             {
@@ -3839,6 +3935,8 @@ namespace Corsinvest.ProxmoxVE.Api
                 public PVETime Time => _time ??= new PVETime(_client, _node);
                 private PVEAplinfo _aplinfo;
                 public PVEAplinfo Aplinfo => _aplinfo ??= new PVEAplinfo(_client, _node);
+                private PVEQuery_Url_Metadata _query_Url_Metadata;
+                public PVEQuery_Url_Metadata Query_Url_Metadata => _query_Url_Metadata ??= new PVEQuery_Url_Metadata(_client, _node);
                 private PVEReport _report;
                 public PVEReport Report => _report ??= new PVEReport(_client, _node);
                 private PVEStartall _startall;
@@ -5376,7 +5474,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Set virtual machine options (asynchrounous API).
                             /// </summary>
                             /// <param name="acpi">Enable/disable ACPI.</param>
-                            /// <param name="agent">Enable/disable Qemu GuestAgent and its properties.</param>
+                            /// <param name="agent">Enable/disable communication with the Qemu Guest Agent and its properties.</param>
                             /// <param name="arch">Virtual processor architecture. Defaults to the host.
                             ///   Enum: x86_64,aarch64</param>
                             /// <param name="args">Arbitrary arguments passed to kvm.</param>
@@ -5386,7 +5484,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="balloon">Amount of target RAM for the VM in MB. Using zero disables the ballon driver.</param>
                             /// <param name="bios">Select BIOS implementation.
                             ///   Enum: seabios,ovmf</param>
-                            /// <param name="boot">Specify guest boot order. Use with 'order=', usage with no key or 'legacy=' is deprecated.</param>
+                            /// <param name="boot">Specify guest boot order. Use the 'order=' sub-property as usage with no key or 'legacy=' is deprecated.</param>
                             /// <param name="bootdisk">Enable booting from specified disk. Deprecated: Use 'boot: order=foo;bar' instead.</param>
                             /// <param name="cdrom">This is an alias for option -ide2</param>
                             /// <param name="cicustom">cloud-init: Specify custom files to replace the automatically generated ones at start.</param>
@@ -5397,7 +5495,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cores">The number of cores per socket.</param>
                             /// <param name="cpu">Emulated CPU type.</param>
                             /// <param name="cpulimit">Limit of CPU usage.</param>
-                            /// <param name="cpuunits">CPU weight for a VM.</param>
+                            /// <param name="cpuunits">CPU weight for a VM, will be clamped to [1, 10000] in cgroup v2.</param>
                             /// <param name="delete">A list of settings you want to delete.</param>
                             /// <param name="description">Description for the VM. Shown in the web-interface VM's summary. This is saved as comment inside the configuration file.</param>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
@@ -5406,17 +5504,17 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="freeze">Freeze CPU at startup (use 'c' monitor command to start execution).</param>
                             /// <param name="hookscript">Script that will be executed during various steps in the vms lifetime.</param>
                             /// <param name="hostpciN">Map host PCI devices into guest.</param>
-                            /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory' and 'usb'. Use '0' to disable hotplug completely. Value '1' is an alias for the default 'network,disk,usb'.</param>
+                            /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory' and 'usb'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`.</param>
                             /// <param name="hugepages">Enable/disable hugepages memory.
                             ///   Enum: any,2,1024</param>
                             /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume.</param>
                             /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration. This requires cloud-init 19.4 or newer.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
                             /// <param name="ivshmem">Inter-VM shared memory. Useful for direct communication between VMs, or to the host.</param>
                             /// <param name="keephugepages">Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.</param>
-                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.cfg' configuration file.It should not be necessary to set it.
+                            /// <param name="keyboard">Keyboard layout for VNC server. The default is read from the'/etc/pve/datacenter.cfg' configuration file. It should not be necessary to set it.
                             ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                             /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
-                            /// <param name="localtime">Set the real time clock to local time. This is enabled by default if ostype indicates a Microsoft OS.</param>
+                            /// <param name="localtime">Set the real time clock (RTC) to local time. This is enabled by default if the `ostype` indicates a Microsoft Windows OS.</param>
                             /// <param name="lock_">Lock/unlock the VM.
                             ///   Enum: backup,clone,create,migrate,rollback,snapshot,snapshot-delete,suspending,suspended</param>
                             /// <param name="machine">Specifies the Qemu machine type.</param>
@@ -5430,7 +5528,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="numaN">NUMA topology.</param>
                             /// <param name="onboot">Specifies whether a VM will be started during system bootup.</param>
                             /// <param name="ostype">Specify guest operating system.
-                            ///   Enum: other,wxp,w2k,w2k3,w2k8,wvista,win7,win8,win10,l24,l26,solaris</param>
+                            ///   Enum: other,wxp,w2k,w2k3,w2k8,wvista,win7,win8,win10,win11,l24,l26,solaris</param>
                             /// <param name="parallelN">Map host parallel devices (n is 0 to 2).</param>
                             /// <param name="protection">Sets the protection flag of the VM. This will disable the remove VM and remove disk operations.</param>
                             /// <param name="reboot">Allow reboot. If set to '0' the VM exit on reboot.</param>
@@ -5455,6 +5553,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="tags">Tags of the VM. This is only meta information.</param>
                             /// <param name="tdf">Enable/disable time drift fix.</param>
                             /// <param name="template">Enable/disable Template.</param>
+                            /// <param name="tpmstate0">Configure a Disk for storing TPM state. Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Note that SIZE_IN_GiB is ignored here and that the default size of 4 MiB will always be used instead. The format is also fixed to 'raw'.</param>
                             /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                             /// <param name="usbN">Configure an USB device (n is 0 to 4).</param>
                             /// <param name="vcpus">Number of hotplugged vcpus.</param>
@@ -5464,7 +5563,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result CreateRest(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                            public Result CreateRest(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("acpi", acpi);
@@ -5530,6 +5629,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("tags", tags);
                                 parameters.Add("tdf", tdf);
                                 parameters.Add("template", template);
+                                parameters.Add("tpmstate0", tpmstate0);
                                 parameters.Add("vcpus", vcpus);
                                 parameters.Add("vga", vga);
                                 parameters.Add("vmgenid", vmgenid);
@@ -5554,7 +5654,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Set virtual machine options (asynchrounous API).
                             /// </summary>
                             /// <param name="acpi">Enable/disable ACPI.</param>
-                            /// <param name="agent">Enable/disable Qemu GuestAgent and its properties.</param>
+                            /// <param name="agent">Enable/disable communication with the Qemu Guest Agent and its properties.</param>
                             /// <param name="arch">Virtual processor architecture. Defaults to the host.
                             ///   Enum: x86_64,aarch64</param>
                             /// <param name="args">Arbitrary arguments passed to kvm.</param>
@@ -5564,7 +5664,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="balloon">Amount of target RAM for the VM in MB. Using zero disables the ballon driver.</param>
                             /// <param name="bios">Select BIOS implementation.
                             ///   Enum: seabios,ovmf</param>
-                            /// <param name="boot">Specify guest boot order. Use with 'order=', usage with no key or 'legacy=' is deprecated.</param>
+                            /// <param name="boot">Specify guest boot order. Use the 'order=' sub-property as usage with no key or 'legacy=' is deprecated.</param>
                             /// <param name="bootdisk">Enable booting from specified disk. Deprecated: Use 'boot: order=foo;bar' instead.</param>
                             /// <param name="cdrom">This is an alias for option -ide2</param>
                             /// <param name="cicustom">cloud-init: Specify custom files to replace the automatically generated ones at start.</param>
@@ -5575,7 +5675,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cores">The number of cores per socket.</param>
                             /// <param name="cpu">Emulated CPU type.</param>
                             /// <param name="cpulimit">Limit of CPU usage.</param>
-                            /// <param name="cpuunits">CPU weight for a VM.</param>
+                            /// <param name="cpuunits">CPU weight for a VM, will be clamped to [1, 10000] in cgroup v2.</param>
                             /// <param name="delete">A list of settings you want to delete.</param>
                             /// <param name="description">Description for the VM. Shown in the web-interface VM's summary. This is saved as comment inside the configuration file.</param>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
@@ -5584,17 +5684,17 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="freeze">Freeze CPU at startup (use 'c' monitor command to start execution).</param>
                             /// <param name="hookscript">Script that will be executed during various steps in the vms lifetime.</param>
                             /// <param name="hostpciN">Map host PCI devices into guest.</param>
-                            /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory' and 'usb'. Use '0' to disable hotplug completely. Value '1' is an alias for the default 'network,disk,usb'.</param>
+                            /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory' and 'usb'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`.</param>
                             /// <param name="hugepages">Enable/disable hugepages memory.
                             ///   Enum: any,2,1024</param>
                             /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume.</param>
                             /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration. This requires cloud-init 19.4 or newer.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
                             /// <param name="ivshmem">Inter-VM shared memory. Useful for direct communication between VMs, or to the host.</param>
                             /// <param name="keephugepages">Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.</param>
-                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.cfg' configuration file.It should not be necessary to set it.
+                            /// <param name="keyboard">Keyboard layout for VNC server. The default is read from the'/etc/pve/datacenter.cfg' configuration file. It should not be necessary to set it.
                             ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                             /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
-                            /// <param name="localtime">Set the real time clock to local time. This is enabled by default if ostype indicates a Microsoft OS.</param>
+                            /// <param name="localtime">Set the real time clock (RTC) to local time. This is enabled by default if the `ostype` indicates a Microsoft Windows OS.</param>
                             /// <param name="lock_">Lock/unlock the VM.
                             ///   Enum: backup,clone,create,migrate,rollback,snapshot,snapshot-delete,suspending,suspended</param>
                             /// <param name="machine">Specifies the Qemu machine type.</param>
@@ -5608,7 +5708,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="numaN">NUMA topology.</param>
                             /// <param name="onboot">Specifies whether a VM will be started during system bootup.</param>
                             /// <param name="ostype">Specify guest operating system.
-                            ///   Enum: other,wxp,w2k,w2k3,w2k8,wvista,win7,win8,win10,l24,l26,solaris</param>
+                            ///   Enum: other,wxp,w2k,w2k3,w2k8,wvista,win7,win8,win10,win11,l24,l26,solaris</param>
                             /// <param name="parallelN">Map host parallel devices (n is 0 to 2).</param>
                             /// <param name="protection">Sets the protection flag of the VM. This will disable the remove VM and remove disk operations.</param>
                             /// <param name="reboot">Allow reboot. If set to '0' the VM exit on reboot.</param>
@@ -5633,6 +5733,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="tags">Tags of the VM. This is only meta information.</param>
                             /// <param name="tdf">Enable/disable time drift fix.</param>
                             /// <param name="template">Enable/disable Template.</param>
+                            /// <param name="tpmstate0">Configure a Disk for storing TPM state. Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Note that SIZE_IN_GiB is ignored here and that the default size of 4 MiB will always be used instead. The format is also fixed to 'raw'.</param>
                             /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                             /// <param name="usbN">Configure an USB device (n is 0 to 4).</param>
                             /// <param name="vcpus">Number of hotplugged vcpus.</param>
@@ -5642,12 +5743,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result UpdateVmAsync(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => CreateRest(acpi, agent, arch, args, audio0, autostart, background_delay, balloon, bios, boot, bootdisk, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, delete, description, digest, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keephugepages, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, rng0, sataN, scsiN, scsihw, searchdomain, serialN, shares, skiplock, smbios1, smp, sockets, spice_enhancements, sshkeys, startdate, startup, tablet, tags, tdf, template, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
+                            public Result UpdateVmAsync(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => CreateRest(acpi, agent, arch, args, audio0, autostart, background_delay, balloon, bios, boot, bootdisk, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, delete, description, digest, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keephugepages, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, rng0, sataN, scsiN, scsihw, searchdomain, serialN, shares, skiplock, smbios1, smp, sockets, spice_enhancements, sshkeys, startdate, startup, tablet, tags, tdf, template, tpmstate0, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
                             /// <summary>
                             /// Set virtual machine options (synchrounous API) - You should consider using the POST method instead for any actions involving hotplug or storage allocation.
                             /// </summary>
                             /// <param name="acpi">Enable/disable ACPI.</param>
-                            /// <param name="agent">Enable/disable Qemu GuestAgent and its properties.</param>
+                            /// <param name="agent">Enable/disable communication with the Qemu Guest Agent and its properties.</param>
                             /// <param name="arch">Virtual processor architecture. Defaults to the host.
                             ///   Enum: x86_64,aarch64</param>
                             /// <param name="args">Arbitrary arguments passed to kvm.</param>
@@ -5656,7 +5757,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="balloon">Amount of target RAM for the VM in MB. Using zero disables the ballon driver.</param>
                             /// <param name="bios">Select BIOS implementation.
                             ///   Enum: seabios,ovmf</param>
-                            /// <param name="boot">Specify guest boot order. Use with 'order=', usage with no key or 'legacy=' is deprecated.</param>
+                            /// <param name="boot">Specify guest boot order. Use the 'order=' sub-property as usage with no key or 'legacy=' is deprecated.</param>
                             /// <param name="bootdisk">Enable booting from specified disk. Deprecated: Use 'boot: order=foo;bar' instead.</param>
                             /// <param name="cdrom">This is an alias for option -ide2</param>
                             /// <param name="cicustom">cloud-init: Specify custom files to replace the automatically generated ones at start.</param>
@@ -5667,7 +5768,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cores">The number of cores per socket.</param>
                             /// <param name="cpu">Emulated CPU type.</param>
                             /// <param name="cpulimit">Limit of CPU usage.</param>
-                            /// <param name="cpuunits">CPU weight for a VM.</param>
+                            /// <param name="cpuunits">CPU weight for a VM, will be clamped to [1, 10000] in cgroup v2.</param>
                             /// <param name="delete">A list of settings you want to delete.</param>
                             /// <param name="description">Description for the VM. Shown in the web-interface VM's summary. This is saved as comment inside the configuration file.</param>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
@@ -5676,17 +5777,17 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="freeze">Freeze CPU at startup (use 'c' monitor command to start execution).</param>
                             /// <param name="hookscript">Script that will be executed during various steps in the vms lifetime.</param>
                             /// <param name="hostpciN">Map host PCI devices into guest.</param>
-                            /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory' and 'usb'. Use '0' to disable hotplug completely. Value '1' is an alias for the default 'network,disk,usb'.</param>
+                            /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory' and 'usb'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`.</param>
                             /// <param name="hugepages">Enable/disable hugepages memory.
                             ///   Enum: any,2,1024</param>
                             /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume.</param>
                             /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration. This requires cloud-init 19.4 or newer.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
                             /// <param name="ivshmem">Inter-VM shared memory. Useful for direct communication between VMs, or to the host.</param>
                             /// <param name="keephugepages">Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.</param>
-                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.cfg' configuration file.It should not be necessary to set it.
+                            /// <param name="keyboard">Keyboard layout for VNC server. The default is read from the'/etc/pve/datacenter.cfg' configuration file. It should not be necessary to set it.
                             ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                             /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
-                            /// <param name="localtime">Set the real time clock to local time. This is enabled by default if ostype indicates a Microsoft OS.</param>
+                            /// <param name="localtime">Set the real time clock (RTC) to local time. This is enabled by default if the `ostype` indicates a Microsoft Windows OS.</param>
                             /// <param name="lock_">Lock/unlock the VM.
                             ///   Enum: backup,clone,create,migrate,rollback,snapshot,snapshot-delete,suspending,suspended</param>
                             /// <param name="machine">Specifies the Qemu machine type.</param>
@@ -5700,7 +5801,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="numaN">NUMA topology.</param>
                             /// <param name="onboot">Specifies whether a VM will be started during system bootup.</param>
                             /// <param name="ostype">Specify guest operating system.
-                            ///   Enum: other,wxp,w2k,w2k3,w2k8,wvista,win7,win8,win10,l24,l26,solaris</param>
+                            ///   Enum: other,wxp,w2k,w2k3,w2k8,wvista,win7,win8,win10,win11,l24,l26,solaris</param>
                             /// <param name="parallelN">Map host parallel devices (n is 0 to 2).</param>
                             /// <param name="protection">Sets the protection flag of the VM. This will disable the remove VM and remove disk operations.</param>
                             /// <param name="reboot">Allow reboot. If set to '0' the VM exit on reboot.</param>
@@ -5725,6 +5826,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="tags">Tags of the VM. This is only meta information.</param>
                             /// <param name="tdf">Enable/disable time drift fix.</param>
                             /// <param name="template">Enable/disable Template.</param>
+                            /// <param name="tpmstate0">Configure a Disk for storing TPM state. Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Note that SIZE_IN_GiB is ignored here and that the default size of 4 MiB will always be used instead. The format is also fixed to 'raw'.</param>
                             /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                             /// <param name="usbN">Configure an USB device (n is 0 to 4).</param>
                             /// <param name="vcpus">Number of hotplugged vcpus.</param>
@@ -5734,7 +5836,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result SetRest(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                            public Result SetRest(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("acpi", acpi);
@@ -5799,6 +5901,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("tags", tags);
                                 parameters.Add("tdf", tdf);
                                 parameters.Add("template", template);
+                                parameters.Add("tpmstate0", tpmstate0);
                                 parameters.Add("vcpus", vcpus);
                                 parameters.Add("vga", vga);
                                 parameters.Add("vmgenid", vmgenid);
@@ -5823,7 +5926,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Set virtual machine options (synchrounous API) - You should consider using the POST method instead for any actions involving hotplug or storage allocation.
                             /// </summary>
                             /// <param name="acpi">Enable/disable ACPI.</param>
-                            /// <param name="agent">Enable/disable Qemu GuestAgent and its properties.</param>
+                            /// <param name="agent">Enable/disable communication with the Qemu Guest Agent and its properties.</param>
                             /// <param name="arch">Virtual processor architecture. Defaults to the host.
                             ///   Enum: x86_64,aarch64</param>
                             /// <param name="args">Arbitrary arguments passed to kvm.</param>
@@ -5832,7 +5935,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="balloon">Amount of target RAM for the VM in MB. Using zero disables the ballon driver.</param>
                             /// <param name="bios">Select BIOS implementation.
                             ///   Enum: seabios,ovmf</param>
-                            /// <param name="boot">Specify guest boot order. Use with 'order=', usage with no key or 'legacy=' is deprecated.</param>
+                            /// <param name="boot">Specify guest boot order. Use the 'order=' sub-property as usage with no key or 'legacy=' is deprecated.</param>
                             /// <param name="bootdisk">Enable booting from specified disk. Deprecated: Use 'boot: order=foo;bar' instead.</param>
                             /// <param name="cdrom">This is an alias for option -ide2</param>
                             /// <param name="cicustom">cloud-init: Specify custom files to replace the automatically generated ones at start.</param>
@@ -5843,7 +5946,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cores">The number of cores per socket.</param>
                             /// <param name="cpu">Emulated CPU type.</param>
                             /// <param name="cpulimit">Limit of CPU usage.</param>
-                            /// <param name="cpuunits">CPU weight for a VM.</param>
+                            /// <param name="cpuunits">CPU weight for a VM, will be clamped to [1, 10000] in cgroup v2.</param>
                             /// <param name="delete">A list of settings you want to delete.</param>
                             /// <param name="description">Description for the VM. Shown in the web-interface VM's summary. This is saved as comment inside the configuration file.</param>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
@@ -5852,17 +5955,17 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="freeze">Freeze CPU at startup (use 'c' monitor command to start execution).</param>
                             /// <param name="hookscript">Script that will be executed during various steps in the vms lifetime.</param>
                             /// <param name="hostpciN">Map host PCI devices into guest.</param>
-                            /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory' and 'usb'. Use '0' to disable hotplug completely. Value '1' is an alias for the default 'network,disk,usb'.</param>
+                            /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory' and 'usb'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`.</param>
                             /// <param name="hugepages">Enable/disable hugepages memory.
                             ///   Enum: any,2,1024</param>
                             /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume.</param>
                             /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration. This requires cloud-init 19.4 or newer.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
                             /// <param name="ivshmem">Inter-VM shared memory. Useful for direct communication between VMs, or to the host.</param>
                             /// <param name="keephugepages">Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.</param>
-                            /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.cfg' configuration file.It should not be necessary to set it.
+                            /// <param name="keyboard">Keyboard layout for VNC server. The default is read from the'/etc/pve/datacenter.cfg' configuration file. It should not be necessary to set it.
                             ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                             /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
-                            /// <param name="localtime">Set the real time clock to local time. This is enabled by default if ostype indicates a Microsoft OS.</param>
+                            /// <param name="localtime">Set the real time clock (RTC) to local time. This is enabled by default if the `ostype` indicates a Microsoft Windows OS.</param>
                             /// <param name="lock_">Lock/unlock the VM.
                             ///   Enum: backup,clone,create,migrate,rollback,snapshot,snapshot-delete,suspending,suspended</param>
                             /// <param name="machine">Specifies the Qemu machine type.</param>
@@ -5876,7 +5979,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="numaN">NUMA topology.</param>
                             /// <param name="onboot">Specifies whether a VM will be started during system bootup.</param>
                             /// <param name="ostype">Specify guest operating system.
-                            ///   Enum: other,wxp,w2k,w2k3,w2k8,wvista,win7,win8,win10,l24,l26,solaris</param>
+                            ///   Enum: other,wxp,w2k,w2k3,w2k8,wvista,win7,win8,win10,win11,l24,l26,solaris</param>
                             /// <param name="parallelN">Map host parallel devices (n is 0 to 2).</param>
                             /// <param name="protection">Sets the protection flag of the VM. This will disable the remove VM and remove disk operations.</param>
                             /// <param name="reboot">Allow reboot. If set to '0' the VM exit on reboot.</param>
@@ -5901,6 +6004,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="tags">Tags of the VM. This is only meta information.</param>
                             /// <param name="tdf">Enable/disable time drift fix.</param>
                             /// <param name="template">Enable/disable Template.</param>
+                            /// <param name="tpmstate0">Configure a Disk for storing TPM state. Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Note that SIZE_IN_GiB is ignored here and that the default size of 4 MiB will always be used instead. The format is also fixed to 'raw'.</param>
                             /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                             /// <param name="usbN">Configure an USB device (n is 0 to 4).</param>
                             /// <param name="vcpus">Number of hotplugged vcpus.</param>
@@ -5910,7 +6014,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result UpdateVm(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => SetRest(acpi, agent, arch, args, audio0, autostart, balloon, bios, boot, bootdisk, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, delete, description, digest, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keephugepages, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, rng0, sataN, scsiN, scsihw, searchdomain, serialN, shares, skiplock, smbios1, smp, sockets, spice_enhancements, sshkeys, startdate, startup, tablet, tags, tdf, template, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
+                            public Result UpdateVm(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => SetRest(acpi, agent, arch, args, audio0, autostart, balloon, bios, boot, bootdisk, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, delete, description, digest, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keephugepages, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, rng0, sataN, scsiN, scsihw, searchdomain, serialN, shares, skiplock, smbios1, smp, sockets, spice_enhancements, sshkeys, startdate, startup, tablet, tags, tdf, template, tpmstate0, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
                         }
                         public class PVEPending
                         {
@@ -6541,42 +6645,53 @@ namespace Corsinvest.ProxmoxVE.Api
                                 _vmid = vmid;
                             }
                             /// <summary>
-                            /// Move volume to different storage.
+                            /// Move volume to different storage or to a different VM.
                             /// </summary>
                             /// <param name="disk">The disk you want to move.
-                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
-                            /// <param name="storage">Target storage.</param>
+                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0,tpmstate0,unused0,unused1,unused2,unused3,unused4,unused5,unused6,unused7,unused8,unused9,unused10,unused11,unused12,unused13,unused14,unused15,unused16,unused17,unused18,unused19,unused20,unused21,unused22,unused23,unused24,unused25,unused26,unused27,unused28,unused29,unused30,unused31,unused32,unused33,unused34,unused35,unused36,unused37,unused38,unused39,unused40,unused41,unused42,unused43,unused44,unused45,unused46,unused47,unused48,unused49,unused50,unused51,unused52,unused53,unused54,unused55,unused56,unused57,unused58,unused59,unused60,unused61,unused62,unused63,unused64,unused65,unused66,unused67,unused68,unused69,unused70,unused71,unused72,unused73,unused74,unused75,unused76,unused77,unused78,unused79,unused80,unused81,unused82,unused83,unused84,unused85,unused86,unused87,unused88,unused89,unused90,unused91,unused92,unused93,unused94,unused95,unused96,unused97,unused98,unused99,unused100,unused101,unused102,unused103,unused104,unused105,unused106,unused107,unused108,unused109,unused110,unused111,unused112,unused113,unused114,unused115,unused116,unused117,unused118,unused119,unused120,unused121,unused122,unused123,unused124,unused125,unused126,unused127,unused128,unused129,unused130,unused131,unused132,unused133,unused134,unused135,unused136,unused137,unused138,unused139,unused140,unused141,unused142,unused143,unused144,unused145,unused146,unused147,unused148,unused149,unused150,unused151,unused152,unused153,unused154,unused155,unused156,unused157,unused158,unused159,unused160,unused161,unused162,unused163,unused164,unused165,unused166,unused167,unused168,unused169,unused170,unused171,unused172,unused173,unused174,unused175,unused176,unused177,unused178,unused179,unused180,unused181,unused182,unused183,unused184,unused185,unused186,unused187,unused188,unused189,unused190,unused191,unused192,unused193,unused194,unused195,unused196,unused197,unused198,unused199,unused200,unused201,unused202,unused203,unused204,unused205,unused206,unused207,unused208,unused209,unused210,unused211,unused212,unused213,unused214,unused215,unused216,unused217,unused218,unused219,unused220,unused221,unused222,unused223,unused224,unused225,unused226,unused227,unused228,unused229,unused230,unused231,unused232,unused233,unused234,unused235,unused236,unused237,unused238,unused239,unused240,unused241,unused242,unused243,unused244,unused245,unused246,unused247,unused248,unused249,unused250,unused251,unused252,unused253,unused254,unused255</param>
                             /// <param name="bwlimit">Override I/O bandwidth limit (in KiB/s).</param>
                             /// <param name="delete">Delete the original disk after successful copy. By default the original disk is kept as unused disk.</param>
-                            /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
+                            /// <param name="digest">Prevent changes if current configuration file has different SHA1" 		    ." digest. This can be used to prevent concurrent modifications.</param>
                             /// <param name="format">Target Format.
                             ///   Enum: raw,qcow2,vmdk</param>
+                            /// <param name="storage">Target storage.</param>
+                            /// <param name="target_digest">Prevent changes if the current config file of the target VM has a" 		    ." different SHA1 digest. This can be used to detect concurrent modifications.</param>
+                            /// <param name="target_disk">The config key the disk will be moved to on the target VM (for example, ide0 or scsi1). Default is the source disk key.
+                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0,tpmstate0,unused0,unused1,unused2,unused3,unused4,unused5,unused6,unused7,unused8,unused9,unused10,unused11,unused12,unused13,unused14,unused15,unused16,unused17,unused18,unused19,unused20,unused21,unused22,unused23,unused24,unused25,unused26,unused27,unused28,unused29,unused30,unused31,unused32,unused33,unused34,unused35,unused36,unused37,unused38,unused39,unused40,unused41,unused42,unused43,unused44,unused45,unused46,unused47,unused48,unused49,unused50,unused51,unused52,unused53,unused54,unused55,unused56,unused57,unused58,unused59,unused60,unused61,unused62,unused63,unused64,unused65,unused66,unused67,unused68,unused69,unused70,unused71,unused72,unused73,unused74,unused75,unused76,unused77,unused78,unused79,unused80,unused81,unused82,unused83,unused84,unused85,unused86,unused87,unused88,unused89,unused90,unused91,unused92,unused93,unused94,unused95,unused96,unused97,unused98,unused99,unused100,unused101,unused102,unused103,unused104,unused105,unused106,unused107,unused108,unused109,unused110,unused111,unused112,unused113,unused114,unused115,unused116,unused117,unused118,unused119,unused120,unused121,unused122,unused123,unused124,unused125,unused126,unused127,unused128,unused129,unused130,unused131,unused132,unused133,unused134,unused135,unused136,unused137,unused138,unused139,unused140,unused141,unused142,unused143,unused144,unused145,unused146,unused147,unused148,unused149,unused150,unused151,unused152,unused153,unused154,unused155,unused156,unused157,unused158,unused159,unused160,unused161,unused162,unused163,unused164,unused165,unused166,unused167,unused168,unused169,unused170,unused171,unused172,unused173,unused174,unused175,unused176,unused177,unused178,unused179,unused180,unused181,unused182,unused183,unused184,unused185,unused186,unused187,unused188,unused189,unused190,unused191,unused192,unused193,unused194,unused195,unused196,unused197,unused198,unused199,unused200,unused201,unused202,unused203,unused204,unused205,unused206,unused207,unused208,unused209,unused210,unused211,unused212,unused213,unused214,unused215,unused216,unused217,unused218,unused219,unused220,unused221,unused222,unused223,unused224,unused225,unused226,unused227,unused228,unused229,unused230,unused231,unused232,unused233,unused234,unused235,unused236,unused237,unused238,unused239,unused240,unused241,unused242,unused243,unused244,unused245,unused246,unused247,unused248,unused249,unused250,unused251,unused252,unused253,unused254,unused255</param>
+                            /// <param name="target_vmid">The (unique) ID of the VM.</param>
                             /// <returns></returns>
-                            public Result CreateRest(string disk, string storage, int? bwlimit = null, bool? delete = null, string digest = null, string format = null)
+                            public Result CreateRest(string disk, int? bwlimit = null, bool? delete = null, string digest = null, string format = null, string storage = null, string target_digest = null, string target_disk = null, int? target_vmid = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("disk", disk);
-                                parameters.Add("storage", storage);
                                 parameters.Add("bwlimit", bwlimit);
                                 parameters.Add("delete", delete);
                                 parameters.Add("digest", digest);
                                 parameters.Add("format", format);
+                                parameters.Add("storage", storage);
+                                parameters.Add("target-digest", target_digest);
+                                parameters.Add("target-disk", target_disk);
+                                parameters.Add("target-vmid", target_vmid);
                                 return _client.Create($"/nodes/{_node}/qemu/{_vmid}/move_disk", parameters);
                             }
 
                             /// <summary>
-                            /// Move volume to different storage.
+                            /// Move volume to different storage or to a different VM.
                             /// </summary>
                             /// <param name="disk">The disk you want to move.
-                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
-                            /// <param name="storage">Target storage.</param>
+                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0,tpmstate0,unused0,unused1,unused2,unused3,unused4,unused5,unused6,unused7,unused8,unused9,unused10,unused11,unused12,unused13,unused14,unused15,unused16,unused17,unused18,unused19,unused20,unused21,unused22,unused23,unused24,unused25,unused26,unused27,unused28,unused29,unused30,unused31,unused32,unused33,unused34,unused35,unused36,unused37,unused38,unused39,unused40,unused41,unused42,unused43,unused44,unused45,unused46,unused47,unused48,unused49,unused50,unused51,unused52,unused53,unused54,unused55,unused56,unused57,unused58,unused59,unused60,unused61,unused62,unused63,unused64,unused65,unused66,unused67,unused68,unused69,unused70,unused71,unused72,unused73,unused74,unused75,unused76,unused77,unused78,unused79,unused80,unused81,unused82,unused83,unused84,unused85,unused86,unused87,unused88,unused89,unused90,unused91,unused92,unused93,unused94,unused95,unused96,unused97,unused98,unused99,unused100,unused101,unused102,unused103,unused104,unused105,unused106,unused107,unused108,unused109,unused110,unused111,unused112,unused113,unused114,unused115,unused116,unused117,unused118,unused119,unused120,unused121,unused122,unused123,unused124,unused125,unused126,unused127,unused128,unused129,unused130,unused131,unused132,unused133,unused134,unused135,unused136,unused137,unused138,unused139,unused140,unused141,unused142,unused143,unused144,unused145,unused146,unused147,unused148,unused149,unused150,unused151,unused152,unused153,unused154,unused155,unused156,unused157,unused158,unused159,unused160,unused161,unused162,unused163,unused164,unused165,unused166,unused167,unused168,unused169,unused170,unused171,unused172,unused173,unused174,unused175,unused176,unused177,unused178,unused179,unused180,unused181,unused182,unused183,unused184,unused185,unused186,unused187,unused188,unused189,unused190,unused191,unused192,unused193,unused194,unused195,unused196,unused197,unused198,unused199,unused200,unused201,unused202,unused203,unused204,unused205,unused206,unused207,unused208,unused209,unused210,unused211,unused212,unused213,unused214,unused215,unused216,unused217,unused218,unused219,unused220,unused221,unused222,unused223,unused224,unused225,unused226,unused227,unused228,unused229,unused230,unused231,unused232,unused233,unused234,unused235,unused236,unused237,unused238,unused239,unused240,unused241,unused242,unused243,unused244,unused245,unused246,unused247,unused248,unused249,unused250,unused251,unused252,unused253,unused254,unused255</param>
                             /// <param name="bwlimit">Override I/O bandwidth limit (in KiB/s).</param>
                             /// <param name="delete">Delete the original disk after successful copy. By default the original disk is kept as unused disk.</param>
-                            /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
+                            /// <param name="digest">Prevent changes if current configuration file has different SHA1" 		    ." digest. This can be used to prevent concurrent modifications.</param>
                             /// <param name="format">Target Format.
                             ///   Enum: raw,qcow2,vmdk</param>
+                            /// <param name="storage">Target storage.</param>
+                            /// <param name="target_digest">Prevent changes if the current config file of the target VM has a" 		    ." different SHA1 digest. This can be used to detect concurrent modifications.</param>
+                            /// <param name="target_disk">The config key the disk will be moved to on the target VM (for example, ide0 or scsi1). Default is the source disk key.
+                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0,tpmstate0,unused0,unused1,unused2,unused3,unused4,unused5,unused6,unused7,unused8,unused9,unused10,unused11,unused12,unused13,unused14,unused15,unused16,unused17,unused18,unused19,unused20,unused21,unused22,unused23,unused24,unused25,unused26,unused27,unused28,unused29,unused30,unused31,unused32,unused33,unused34,unused35,unused36,unused37,unused38,unused39,unused40,unused41,unused42,unused43,unused44,unused45,unused46,unused47,unused48,unused49,unused50,unused51,unused52,unused53,unused54,unused55,unused56,unused57,unused58,unused59,unused60,unused61,unused62,unused63,unused64,unused65,unused66,unused67,unused68,unused69,unused70,unused71,unused72,unused73,unused74,unused75,unused76,unused77,unused78,unused79,unused80,unused81,unused82,unused83,unused84,unused85,unused86,unused87,unused88,unused89,unused90,unused91,unused92,unused93,unused94,unused95,unused96,unused97,unused98,unused99,unused100,unused101,unused102,unused103,unused104,unused105,unused106,unused107,unused108,unused109,unused110,unused111,unused112,unused113,unused114,unused115,unused116,unused117,unused118,unused119,unused120,unused121,unused122,unused123,unused124,unused125,unused126,unused127,unused128,unused129,unused130,unused131,unused132,unused133,unused134,unused135,unused136,unused137,unused138,unused139,unused140,unused141,unused142,unused143,unused144,unused145,unused146,unused147,unused148,unused149,unused150,unused151,unused152,unused153,unused154,unused155,unused156,unused157,unused158,unused159,unused160,unused161,unused162,unused163,unused164,unused165,unused166,unused167,unused168,unused169,unused170,unused171,unused172,unused173,unused174,unused175,unused176,unused177,unused178,unused179,unused180,unused181,unused182,unused183,unused184,unused185,unused186,unused187,unused188,unused189,unused190,unused191,unused192,unused193,unused194,unused195,unused196,unused197,unused198,unused199,unused200,unused201,unused202,unused203,unused204,unused205,unused206,unused207,unused208,unused209,unused210,unused211,unused212,unused213,unused214,unused215,unused216,unused217,unused218,unused219,unused220,unused221,unused222,unused223,unused224,unused225,unused226,unused227,unused228,unused229,unused230,unused231,unused232,unused233,unused234,unused235,unused236,unused237,unused238,unused239,unused240,unused241,unused242,unused243,unused244,unused245,unused246,unused247,unused248,unused249,unused250,unused251,unused252,unused253,unused254,unused255</param>
+                            /// <param name="target_vmid">The (unique) ID of the VM.</param>
                             /// <returns></returns>
-                            public Result MoveVmDisk(string disk, string storage, int? bwlimit = null, bool? delete = null, string digest = null, string format = null) => CreateRest(disk, storage, bwlimit, delete, digest, format);
+                            public Result MoveVmDisk(string disk, int? bwlimit = null, bool? delete = null, string digest = null, string format = null, string storage = null, string target_digest = null, string target_disk = null, int? target_vmid = null) => CreateRest(disk, bwlimit, delete, digest, format, storage, target_digest, target_disk, target_vmid);
                         }
                         public class PVEMigrate
                         {
@@ -6691,7 +6806,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Extend volume size.
                             /// </summary>
                             /// <param name="disk">The disk you want to resize.
-                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
+                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0,tpmstate0</param>
                             /// <param name="size">The new size. With the `+` sign the value is added to the actual size of the volume and without it, the value is taken as an absolute one. Shrinking disk size is not supported.</param>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
@@ -6710,7 +6825,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Extend volume size.
                             /// </summary>
                             /// <param name="disk">The disk you want to resize.
-                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
+                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0,tpmstate0</param>
                             /// <param name="size">The new size. With the `+` sign the value is added to the actual size of the volume and without it, the value is taken as an absolute one. Shrinking disk size is not supported.</param>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
@@ -6890,7 +7005,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Create a Template.
                             /// </summary>
                             /// <param name="disk">If you want to convert only 1 disk to base image.
-                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
+                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0,tpmstate0</param>
                             /// <returns></returns>
                             public Result CreateRest(string disk = null)
                             {
@@ -6903,7 +7018,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Create a Template.
                             /// </summary>
                             /// <param name="disk">If you want to convert only 1 disk to base image.
-                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0</param>
+                            ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0,tpmstate0</param>
                             /// <returns></returns>
                             public Result Template(string disk = null) => CreateRest(disk);
                         }
@@ -7010,7 +7125,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="vmid">The (unique) ID of the VM.</param>
                     /// <param name="acpi">Enable/disable ACPI.</param>
-                    /// <param name="agent">Enable/disable Qemu GuestAgent and its properties.</param>
+                    /// <param name="agent">Enable/disable communication with the Qemu Guest Agent and its properties.</param>
                     /// <param name="arch">Virtual processor architecture. Defaults to the host.
                     ///   Enum: x86_64,aarch64</param>
                     /// <param name="archive">The backup archive. Either the file system path to a .tar or .vma file (use '-' to pipe data from stdin) or a proxmox storage backup volume identifier.</param>
@@ -7020,7 +7135,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="balloon">Amount of target RAM for the VM in MB. Using zero disables the ballon driver.</param>
                     /// <param name="bios">Select BIOS implementation.
                     ///   Enum: seabios,ovmf</param>
-                    /// <param name="boot">Specify guest boot order. Use with 'order=', usage with no key or 'legacy=' is deprecated.</param>
+                    /// <param name="boot">Specify guest boot order. Use the 'order=' sub-property as usage with no key or 'legacy=' is deprecated.</param>
                     /// <param name="bootdisk">Enable booting from specified disk. Deprecated: Use 'boot: order=foo;bar' instead.</param>
                     /// <param name="bwlimit">Override I/O bandwidth limit (in KiB/s).</param>
                     /// <param name="cdrom">This is an alias for option -ide2</param>
@@ -7032,25 +7147,25 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="cores">The number of cores per socket.</param>
                     /// <param name="cpu">Emulated CPU type.</param>
                     /// <param name="cpulimit">Limit of CPU usage.</param>
-                    /// <param name="cpuunits">CPU weight for a VM.</param>
+                    /// <param name="cpuunits">CPU weight for a VM, will be clamped to [1, 10000] in cgroup v2.</param>
                     /// <param name="description">Description for the VM. Shown in the web-interface VM's summary. This is saved as comment inside the configuration file.</param>
                     /// <param name="efidisk0">Configure a Disk for storing EFI vars. Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Note that SIZE_IN_GiB is ignored here and that the default EFI vars are copied to the volume instead.</param>
                     /// <param name="force">Allow to overwrite existing VM.</param>
                     /// <param name="freeze">Freeze CPU at startup (use 'c' monitor command to start execution).</param>
                     /// <param name="hookscript">Script that will be executed during various steps in the vms lifetime.</param>
                     /// <param name="hostpciN">Map host PCI devices into guest.</param>
-                    /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory' and 'usb'. Use '0' to disable hotplug completely. Value '1' is an alias for the default 'network,disk,usb'.</param>
+                    /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory' and 'usb'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`.</param>
                     /// <param name="hugepages">Enable/disable hugepages memory.
                     ///   Enum: any,2,1024</param>
                     /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume.</param>
                     /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration. This requires cloud-init 19.4 or newer.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
                     /// <param name="ivshmem">Inter-VM shared memory. Useful for direct communication between VMs, or to the host.</param>
                     /// <param name="keephugepages">Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.</param>
-                    /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.cfg' configuration file.It should not be necessary to set it.
+                    /// <param name="keyboard">Keyboard layout for VNC server. The default is read from the'/etc/pve/datacenter.cfg' configuration file. It should not be necessary to set it.
                     ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                     /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
                     /// <param name="live_restore">Start the VM immediately from the backup and restore in background. PBS only.</param>
-                    /// <param name="localtime">Set the real time clock to local time. This is enabled by default if ostype indicates a Microsoft OS.</param>
+                    /// <param name="localtime">Set the real time clock (RTC) to local time. This is enabled by default if the `ostype` indicates a Microsoft Windows OS.</param>
                     /// <param name="lock_">Lock/unlock the VM.
                     ///   Enum: backup,clone,create,migrate,rollback,snapshot,snapshot-delete,suspending,suspended</param>
                     /// <param name="machine">Specifies the Qemu machine type.</param>
@@ -7064,7 +7179,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="numaN">NUMA topology.</param>
                     /// <param name="onboot">Specifies whether a VM will be started during system bootup.</param>
                     /// <param name="ostype">Specify guest operating system.
-                    ///   Enum: other,wxp,w2k,w2k3,w2k8,wvista,win7,win8,win10,l24,l26,solaris</param>
+                    ///   Enum: other,wxp,w2k,w2k3,w2k8,wvista,win7,win8,win10,win11,l24,l26,solaris</param>
                     /// <param name="parallelN">Map host parallel devices (n is 0 to 2).</param>
                     /// <param name="pool">Add the VM to the specified pool.</param>
                     /// <param name="protection">Sets the protection flag of the VM. This will disable the remove VM and remove disk operations.</param>
@@ -7090,6 +7205,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="tags">Tags of the VM. This is only meta information.</param>
                     /// <param name="tdf">Enable/disable time drift fix.</param>
                     /// <param name="template">Enable/disable Template.</param>
+                    /// <param name="tpmstate0">Configure a Disk for storing TPM state. Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Note that SIZE_IN_GiB is ignored here and that the default size of 4 MiB will always be used instead. The format is also fixed to 'raw'.</param>
                     /// <param name="unique">Assign a unique random ethernet address.</param>
                     /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                     /// <param name="usbN">Configure an USB device (n is 0 to 4).</param>
@@ -7100,7 +7216,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                     /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                     /// <returns></returns>
-                    public Result CreateRest(int vmid, bool? acpi = null, string agent = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? live_restore = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                    public Result CreateRest(int vmid, bool? acpi = null, string agent = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? live_restore = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("vmid", vmid);
@@ -7168,6 +7284,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("tags", tags);
                         parameters.Add("tdf", tdf);
                         parameters.Add("template", template);
+                        parameters.Add("tpmstate0", tpmstate0);
                         parameters.Add("unique", unique);
                         parameters.Add("vcpus", vcpus);
                         parameters.Add("vga", vga);
@@ -7194,7 +7311,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="vmid">The (unique) ID of the VM.</param>
                     /// <param name="acpi">Enable/disable ACPI.</param>
-                    /// <param name="agent">Enable/disable Qemu GuestAgent and its properties.</param>
+                    /// <param name="agent">Enable/disable communication with the Qemu Guest Agent and its properties.</param>
                     /// <param name="arch">Virtual processor architecture. Defaults to the host.
                     ///   Enum: x86_64,aarch64</param>
                     /// <param name="archive">The backup archive. Either the file system path to a .tar or .vma file (use '-' to pipe data from stdin) or a proxmox storage backup volume identifier.</param>
@@ -7204,7 +7321,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="balloon">Amount of target RAM for the VM in MB. Using zero disables the ballon driver.</param>
                     /// <param name="bios">Select BIOS implementation.
                     ///   Enum: seabios,ovmf</param>
-                    /// <param name="boot">Specify guest boot order. Use with 'order=', usage with no key or 'legacy=' is deprecated.</param>
+                    /// <param name="boot">Specify guest boot order. Use the 'order=' sub-property as usage with no key or 'legacy=' is deprecated.</param>
                     /// <param name="bootdisk">Enable booting from specified disk. Deprecated: Use 'boot: order=foo;bar' instead.</param>
                     /// <param name="bwlimit">Override I/O bandwidth limit (in KiB/s).</param>
                     /// <param name="cdrom">This is an alias for option -ide2</param>
@@ -7216,25 +7333,25 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="cores">The number of cores per socket.</param>
                     /// <param name="cpu">Emulated CPU type.</param>
                     /// <param name="cpulimit">Limit of CPU usage.</param>
-                    /// <param name="cpuunits">CPU weight for a VM.</param>
+                    /// <param name="cpuunits">CPU weight for a VM, will be clamped to [1, 10000] in cgroup v2.</param>
                     /// <param name="description">Description for the VM. Shown in the web-interface VM's summary. This is saved as comment inside the configuration file.</param>
                     /// <param name="efidisk0">Configure a Disk for storing EFI vars. Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Note that SIZE_IN_GiB is ignored here and that the default EFI vars are copied to the volume instead.</param>
                     /// <param name="force">Allow to overwrite existing VM.</param>
                     /// <param name="freeze">Freeze CPU at startup (use 'c' monitor command to start execution).</param>
                     /// <param name="hookscript">Script that will be executed during various steps in the vms lifetime.</param>
                     /// <param name="hostpciN">Map host PCI devices into guest.</param>
-                    /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory' and 'usb'. Use '0' to disable hotplug completely. Value '1' is an alias for the default 'network,disk,usb'.</param>
+                    /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory' and 'usb'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`.</param>
                     /// <param name="hugepages">Enable/disable hugepages memory.
                     ///   Enum: any,2,1024</param>
                     /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume.</param>
                     /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration. This requires cloud-init 19.4 or newer.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
                     /// <param name="ivshmem">Inter-VM shared memory. Useful for direct communication between VMs, or to the host.</param>
                     /// <param name="keephugepages">Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.</param>
-                    /// <param name="keyboard">Keybord layout for vnc server. Default is read from the '/etc/pve/datacenter.cfg' configuration file.It should not be necessary to set it.
+                    /// <param name="keyboard">Keyboard layout for VNC server. The default is read from the'/etc/pve/datacenter.cfg' configuration file. It should not be necessary to set it.
                     ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                     /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
                     /// <param name="live_restore">Start the VM immediately from the backup and restore in background. PBS only.</param>
-                    /// <param name="localtime">Set the real time clock to local time. This is enabled by default if ostype indicates a Microsoft OS.</param>
+                    /// <param name="localtime">Set the real time clock (RTC) to local time. This is enabled by default if the `ostype` indicates a Microsoft Windows OS.</param>
                     /// <param name="lock_">Lock/unlock the VM.
                     ///   Enum: backup,clone,create,migrate,rollback,snapshot,snapshot-delete,suspending,suspended</param>
                     /// <param name="machine">Specifies the Qemu machine type.</param>
@@ -7248,7 +7365,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="numaN">NUMA topology.</param>
                     /// <param name="onboot">Specifies whether a VM will be started during system bootup.</param>
                     /// <param name="ostype">Specify guest operating system.
-                    ///   Enum: other,wxp,w2k,w2k3,w2k8,wvista,win7,win8,win10,l24,l26,solaris</param>
+                    ///   Enum: other,wxp,w2k,w2k3,w2k8,wvista,win7,win8,win10,win11,l24,l26,solaris</param>
                     /// <param name="parallelN">Map host parallel devices (n is 0 to 2).</param>
                     /// <param name="pool">Add the VM to the specified pool.</param>
                     /// <param name="protection">Sets the protection flag of the VM. This will disable the remove VM and remove disk operations.</param>
@@ -7274,6 +7391,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="tags">Tags of the VM. This is only meta information.</param>
                     /// <param name="tdf">Enable/disable time drift fix.</param>
                     /// <param name="template">Enable/disable Template.</param>
+                    /// <param name="tpmstate0">Configure a Disk for storing TPM state. Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Note that SIZE_IN_GiB is ignored here and that the default size of 4 MiB will always be used instead. The format is also fixed to 'raw'.</param>
                     /// <param name="unique">Assign a unique random ethernet address.</param>
                     /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                     /// <param name="usbN">Configure an USB device (n is 0 to 4).</param>
@@ -7284,7 +7402,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                     /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                     /// <returns></returns>
-                    public Result CreateVm(int vmid, bool? acpi = null, string agent = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? live_restore = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => CreateRest(vmid, acpi, agent, arch, archive, args, audio0, autostart, balloon, bios, boot, bootdisk, bwlimit, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, description, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keephugepages, keyboard, kvm, live_restore, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, pool, protection, reboot, rng0, sataN, scsiN, scsihw, searchdomain, serialN, shares, smbios1, smp, sockets, spice_enhancements, sshkeys, start, startdate, startup, storage, tablet, tags, tdf, template, unique, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
+                    public Result CreateVm(int vmid, bool? acpi = null, string agent = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? live_restore = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => CreateRest(vmid, acpi, agent, arch, archive, args, audio0, autostart, balloon, bios, boot, bootdisk, bwlimit, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, description, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keephugepages, keyboard, kvm, live_restore, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, pool, protection, reboot, rng0, sataN, scsiN, scsihw, searchdomain, serialN, shares, smbios1, smp, sockets, spice_enhancements, sshkeys, start, startdate, startup, storage, tablet, tags, tdf, template, tpmstate0, unique, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
                 }
                 public class PVELxc
                 {
@@ -7637,13 +7755,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                     _vmid = vmid;
                                 }
                                 /// <summary>
-                                /// Suspend the container.
+                                /// Suspend the container. This is experimental.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result CreateRest() { return _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/suspend"); }
 
                                 /// <summary>
-                                /// Suspend the container.
+                                /// Suspend the container. This is experimental.
                                 /// </summary>
                                 /// <returns></returns>
                                 public Result VmSuspend() => CreateRest();
@@ -8926,37 +9044,48 @@ namespace Corsinvest.ProxmoxVE.Api
                                 _vmid = vmid;
                             }
                             /// <summary>
-                            /// Move a rootfs-/mp-volume to a different storage
+                            /// Move a rootfs-/mp-volume to a different storage or to a different container.
                             /// </summary>
-                            /// <param name="storage">Target Storage.</param>
                             /// <param name="volume">Volume which will be moved.
-                            ///   Enum: rootfs,mp0,mp1,mp2,mp3,mp4,mp5,mp6,mp7,mp8,mp9,mp10,mp11,mp12,mp13,mp14,mp15,mp16,mp17,mp18,mp19,mp20,mp21,mp22,mp23,mp24,mp25,mp26,mp27,mp28,mp29,mp30,mp31,mp32,mp33,mp34,mp35,mp36,mp37,mp38,mp39,mp40,mp41,mp42,mp43,mp44,mp45,mp46,mp47,mp48,mp49,mp50,mp51,mp52,mp53,mp54,mp55,mp56,mp57,mp58,mp59,mp60,mp61,mp62,mp63,mp64,mp65,mp66,mp67,mp68,mp69,mp70,mp71,mp72,mp73,mp74,mp75,mp76,mp77,mp78,mp79,mp80,mp81,mp82,mp83,mp84,mp85,mp86,mp87,mp88,mp89,mp90,mp91,mp92,mp93,mp94,mp95,mp96,mp97,mp98,mp99,mp100,mp101,mp102,mp103,mp104,mp105,mp106,mp107,mp108,mp109,mp110,mp111,mp112,mp113,mp114,mp115,mp116,mp117,mp118,mp119,mp120,mp121,mp122,mp123,mp124,mp125,mp126,mp127,mp128,mp129,mp130,mp131,mp132,mp133,mp134,mp135,mp136,mp137,mp138,mp139,mp140,mp141,mp142,mp143,mp144,mp145,mp146,mp147,mp148,mp149,mp150,mp151,mp152,mp153,mp154,mp155,mp156,mp157,mp158,mp159,mp160,mp161,mp162,mp163,mp164,mp165,mp166,mp167,mp168,mp169,mp170,mp171,mp172,mp173,mp174,mp175,mp176,mp177,mp178,mp179,mp180,mp181,mp182,mp183,mp184,mp185,mp186,mp187,mp188,mp189,mp190,mp191,mp192,mp193,mp194,mp195,mp196,mp197,mp198,mp199,mp200,mp201,mp202,mp203,mp204,mp205,mp206,mp207,mp208,mp209,mp210,mp211,mp212,mp213,mp214,mp215,mp216,mp217,mp218,mp219,mp220,mp221,mp222,mp223,mp224,mp225,mp226,mp227,mp228,mp229,mp230,mp231,mp232,mp233,mp234,mp235,mp236,mp237,mp238,mp239,mp240,mp241,mp242,mp243,mp244,mp245,mp246,mp247,mp248,mp249,mp250,mp251,mp252,mp253,mp254,mp255</param>
+                            ///   Enum: rootfs,mp0,mp1,mp2,mp3,mp4,mp5,mp6,mp7,mp8,mp9,mp10,mp11,mp12,mp13,mp14,mp15,mp16,mp17,mp18,mp19,mp20,mp21,mp22,mp23,mp24,mp25,mp26,mp27,mp28,mp29,mp30,mp31,mp32,mp33,mp34,mp35,mp36,mp37,mp38,mp39,mp40,mp41,mp42,mp43,mp44,mp45,mp46,mp47,mp48,mp49,mp50,mp51,mp52,mp53,mp54,mp55,mp56,mp57,mp58,mp59,mp60,mp61,mp62,mp63,mp64,mp65,mp66,mp67,mp68,mp69,mp70,mp71,mp72,mp73,mp74,mp75,mp76,mp77,mp78,mp79,mp80,mp81,mp82,mp83,mp84,mp85,mp86,mp87,mp88,mp89,mp90,mp91,mp92,mp93,mp94,mp95,mp96,mp97,mp98,mp99,mp100,mp101,mp102,mp103,mp104,mp105,mp106,mp107,mp108,mp109,mp110,mp111,mp112,mp113,mp114,mp115,mp116,mp117,mp118,mp119,mp120,mp121,mp122,mp123,mp124,mp125,mp126,mp127,mp128,mp129,mp130,mp131,mp132,mp133,mp134,mp135,mp136,mp137,mp138,mp139,mp140,mp141,mp142,mp143,mp144,mp145,mp146,mp147,mp148,mp149,mp150,mp151,mp152,mp153,mp154,mp155,mp156,mp157,mp158,mp159,mp160,mp161,mp162,mp163,mp164,mp165,mp166,mp167,mp168,mp169,mp170,mp171,mp172,mp173,mp174,mp175,mp176,mp177,mp178,mp179,mp180,mp181,mp182,mp183,mp184,mp185,mp186,mp187,mp188,mp189,mp190,mp191,mp192,mp193,mp194,mp195,mp196,mp197,mp198,mp199,mp200,mp201,mp202,mp203,mp204,mp205,mp206,mp207,mp208,mp209,mp210,mp211,mp212,mp213,mp214,mp215,mp216,mp217,mp218,mp219,mp220,mp221,mp222,mp223,mp224,mp225,mp226,mp227,mp228,mp229,mp230,mp231,mp232,mp233,mp234,mp235,mp236,mp237,mp238,mp239,mp240,mp241,mp242,mp243,mp244,mp245,mp246,mp247,mp248,mp249,mp250,mp251,mp252,mp253,mp254,mp255,unused0,unused1,unused2,unused3,unused4,unused5,unused6,unused7,unused8,unused9,unused10,unused11,unused12,unused13,unused14,unused15,unused16,unused17,unused18,unused19,unused20,unused21,unused22,unused23,unused24,unused25,unused26,unused27,unused28,unused29,unused30,unused31,unused32,unused33,unused34,unused35,unused36,unused37,unused38,unused39,unused40,unused41,unused42,unused43,unused44,unused45,unused46,unused47,unused48,unused49,unused50,unused51,unused52,unused53,unused54,unused55,unused56,unused57,unused58,unused59,unused60,unused61,unused62,unused63,unused64,unused65,unused66,unused67,unused68,unused69,unused70,unused71,unused72,unused73,unused74,unused75,unused76,unused77,unused78,unused79,unused80,unused81,unused82,unused83,unused84,unused85,unused86,unused87,unused88,unused89,unused90,unused91,unused92,unused93,unused94,unused95,unused96,unused97,unused98,unused99,unused100,unused101,unused102,unused103,unused104,unused105,unused106,unused107,unused108,unused109,unused110,unused111,unused112,unused113,unused114,unused115,unused116,unused117,unused118,unused119,unused120,unused121,unused122,unused123,unused124,unused125,unused126,unused127,unused128,unused129,unused130,unused131,unused132,unused133,unused134,unused135,unused136,unused137,unused138,unused139,unused140,unused141,unused142,unused143,unused144,unused145,unused146,unused147,unused148,unused149,unused150,unused151,unused152,unused153,unused154,unused155,unused156,unused157,unused158,unused159,unused160,unused161,unused162,unused163,unused164,unused165,unused166,unused167,unused168,unused169,unused170,unused171,unused172,unused173,unused174,unused175,unused176,unused177,unused178,unused179,unused180,unused181,unused182,unused183,unused184,unused185,unused186,unused187,unused188,unused189,unused190,unused191,unused192,unused193,unused194,unused195,unused196,unused197,unused198,unused199,unused200,unused201,unused202,unused203,unused204,unused205,unused206,unused207,unused208,unused209,unused210,unused211,unused212,unused213,unused214,unused215,unused216,unused217,unused218,unused219,unused220,unused221,unused222,unused223,unused224,unused225,unused226,unused227,unused228,unused229,unused230,unused231,unused232,unused233,unused234,unused235,unused236,unused237,unused238,unused239,unused240,unused241,unused242,unused243,unused244,unused245,unused246,unused247,unused248,unused249,unused250,unused251,unused252,unused253,unused254,unused255</param>
                             /// <param name="bwlimit">Override I/O bandwidth limit (in KiB/s).</param>
                             /// <param name="delete">Delete the original volume after successful copy. By default the original is kept as an unused volume entry.</param>
-                            /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
+                            /// <param name="digest">Prevent changes if current configuration file has different SHA1 " . 		    "digest. This can be used to prevent concurrent modifications.</param>
+                            /// <param name="storage">Target Storage.</param>
+                            /// <param name="target_digest">Prevent changes if current configuration file of the target " . 		    "container has a different SHA1 digest. This can be used to prevent " . 		    "concurrent modifications.</param>
+                            /// <param name="target_vmid">The (unique) ID of the VM.</param>
+                            /// <param name="target_volume">The config key the volume will be moved to. Default is the source volume key.
+                            ///   Enum: rootfs,mp0,mp1,mp2,mp3,mp4,mp5,mp6,mp7,mp8,mp9,mp10,mp11,mp12,mp13,mp14,mp15,mp16,mp17,mp18,mp19,mp20,mp21,mp22,mp23,mp24,mp25,mp26,mp27,mp28,mp29,mp30,mp31,mp32,mp33,mp34,mp35,mp36,mp37,mp38,mp39,mp40,mp41,mp42,mp43,mp44,mp45,mp46,mp47,mp48,mp49,mp50,mp51,mp52,mp53,mp54,mp55,mp56,mp57,mp58,mp59,mp60,mp61,mp62,mp63,mp64,mp65,mp66,mp67,mp68,mp69,mp70,mp71,mp72,mp73,mp74,mp75,mp76,mp77,mp78,mp79,mp80,mp81,mp82,mp83,mp84,mp85,mp86,mp87,mp88,mp89,mp90,mp91,mp92,mp93,mp94,mp95,mp96,mp97,mp98,mp99,mp100,mp101,mp102,mp103,mp104,mp105,mp106,mp107,mp108,mp109,mp110,mp111,mp112,mp113,mp114,mp115,mp116,mp117,mp118,mp119,mp120,mp121,mp122,mp123,mp124,mp125,mp126,mp127,mp128,mp129,mp130,mp131,mp132,mp133,mp134,mp135,mp136,mp137,mp138,mp139,mp140,mp141,mp142,mp143,mp144,mp145,mp146,mp147,mp148,mp149,mp150,mp151,mp152,mp153,mp154,mp155,mp156,mp157,mp158,mp159,mp160,mp161,mp162,mp163,mp164,mp165,mp166,mp167,mp168,mp169,mp170,mp171,mp172,mp173,mp174,mp175,mp176,mp177,mp178,mp179,mp180,mp181,mp182,mp183,mp184,mp185,mp186,mp187,mp188,mp189,mp190,mp191,mp192,mp193,mp194,mp195,mp196,mp197,mp198,mp199,mp200,mp201,mp202,mp203,mp204,mp205,mp206,mp207,mp208,mp209,mp210,mp211,mp212,mp213,mp214,mp215,mp216,mp217,mp218,mp219,mp220,mp221,mp222,mp223,mp224,mp225,mp226,mp227,mp228,mp229,mp230,mp231,mp232,mp233,mp234,mp235,mp236,mp237,mp238,mp239,mp240,mp241,mp242,mp243,mp244,mp245,mp246,mp247,mp248,mp249,mp250,mp251,mp252,mp253,mp254,mp255,unused0,unused1,unused2,unused3,unused4,unused5,unused6,unused7,unused8,unused9,unused10,unused11,unused12,unused13,unused14,unused15,unused16,unused17,unused18,unused19,unused20,unused21,unused22,unused23,unused24,unused25,unused26,unused27,unused28,unused29,unused30,unused31,unused32,unused33,unused34,unused35,unused36,unused37,unused38,unused39,unused40,unused41,unused42,unused43,unused44,unused45,unused46,unused47,unused48,unused49,unused50,unused51,unused52,unused53,unused54,unused55,unused56,unused57,unused58,unused59,unused60,unused61,unused62,unused63,unused64,unused65,unused66,unused67,unused68,unused69,unused70,unused71,unused72,unused73,unused74,unused75,unused76,unused77,unused78,unused79,unused80,unused81,unused82,unused83,unused84,unused85,unused86,unused87,unused88,unused89,unused90,unused91,unused92,unused93,unused94,unused95,unused96,unused97,unused98,unused99,unused100,unused101,unused102,unused103,unused104,unused105,unused106,unused107,unused108,unused109,unused110,unused111,unused112,unused113,unused114,unused115,unused116,unused117,unused118,unused119,unused120,unused121,unused122,unused123,unused124,unused125,unused126,unused127,unused128,unused129,unused130,unused131,unused132,unused133,unused134,unused135,unused136,unused137,unused138,unused139,unused140,unused141,unused142,unused143,unused144,unused145,unused146,unused147,unused148,unused149,unused150,unused151,unused152,unused153,unused154,unused155,unused156,unused157,unused158,unused159,unused160,unused161,unused162,unused163,unused164,unused165,unused166,unused167,unused168,unused169,unused170,unused171,unused172,unused173,unused174,unused175,unused176,unused177,unused178,unused179,unused180,unused181,unused182,unused183,unused184,unused185,unused186,unused187,unused188,unused189,unused190,unused191,unused192,unused193,unused194,unused195,unused196,unused197,unused198,unused199,unused200,unused201,unused202,unused203,unused204,unused205,unused206,unused207,unused208,unused209,unused210,unused211,unused212,unused213,unused214,unused215,unused216,unused217,unused218,unused219,unused220,unused221,unused222,unused223,unused224,unused225,unused226,unused227,unused228,unused229,unused230,unused231,unused232,unused233,unused234,unused235,unused236,unused237,unused238,unused239,unused240,unused241,unused242,unused243,unused244,unused245,unused246,unused247,unused248,unused249,unused250,unused251,unused252,unused253,unused254,unused255</param>
                             /// <returns></returns>
-                            public Result CreateRest(string storage, string volume, float? bwlimit = null, bool? delete = null, string digest = null)
+                            public Result CreateRest(string volume, float? bwlimit = null, bool? delete = null, string digest = null, string storage = null, string target_digest = null, int? target_vmid = null, string target_volume = null)
                             {
                                 var parameters = new Dictionary<string, object>();
-                                parameters.Add("storage", storage);
                                 parameters.Add("volume", volume);
                                 parameters.Add("bwlimit", bwlimit);
                                 parameters.Add("delete", delete);
                                 parameters.Add("digest", digest);
+                                parameters.Add("storage", storage);
+                                parameters.Add("target-digest", target_digest);
+                                parameters.Add("target-vmid", target_vmid);
+                                parameters.Add("target-volume", target_volume);
                                 return _client.Create($"/nodes/{_node}/lxc/{_vmid}/move_volume", parameters);
                             }
 
                             /// <summary>
-                            /// Move a rootfs-/mp-volume to a different storage
+                            /// Move a rootfs-/mp-volume to a different storage or to a different container.
                             /// </summary>
-                            /// <param name="storage">Target Storage.</param>
                             /// <param name="volume">Volume which will be moved.
-                            ///   Enum: rootfs,mp0,mp1,mp2,mp3,mp4,mp5,mp6,mp7,mp8,mp9,mp10,mp11,mp12,mp13,mp14,mp15,mp16,mp17,mp18,mp19,mp20,mp21,mp22,mp23,mp24,mp25,mp26,mp27,mp28,mp29,mp30,mp31,mp32,mp33,mp34,mp35,mp36,mp37,mp38,mp39,mp40,mp41,mp42,mp43,mp44,mp45,mp46,mp47,mp48,mp49,mp50,mp51,mp52,mp53,mp54,mp55,mp56,mp57,mp58,mp59,mp60,mp61,mp62,mp63,mp64,mp65,mp66,mp67,mp68,mp69,mp70,mp71,mp72,mp73,mp74,mp75,mp76,mp77,mp78,mp79,mp80,mp81,mp82,mp83,mp84,mp85,mp86,mp87,mp88,mp89,mp90,mp91,mp92,mp93,mp94,mp95,mp96,mp97,mp98,mp99,mp100,mp101,mp102,mp103,mp104,mp105,mp106,mp107,mp108,mp109,mp110,mp111,mp112,mp113,mp114,mp115,mp116,mp117,mp118,mp119,mp120,mp121,mp122,mp123,mp124,mp125,mp126,mp127,mp128,mp129,mp130,mp131,mp132,mp133,mp134,mp135,mp136,mp137,mp138,mp139,mp140,mp141,mp142,mp143,mp144,mp145,mp146,mp147,mp148,mp149,mp150,mp151,mp152,mp153,mp154,mp155,mp156,mp157,mp158,mp159,mp160,mp161,mp162,mp163,mp164,mp165,mp166,mp167,mp168,mp169,mp170,mp171,mp172,mp173,mp174,mp175,mp176,mp177,mp178,mp179,mp180,mp181,mp182,mp183,mp184,mp185,mp186,mp187,mp188,mp189,mp190,mp191,mp192,mp193,mp194,mp195,mp196,mp197,mp198,mp199,mp200,mp201,mp202,mp203,mp204,mp205,mp206,mp207,mp208,mp209,mp210,mp211,mp212,mp213,mp214,mp215,mp216,mp217,mp218,mp219,mp220,mp221,mp222,mp223,mp224,mp225,mp226,mp227,mp228,mp229,mp230,mp231,mp232,mp233,mp234,mp235,mp236,mp237,mp238,mp239,mp240,mp241,mp242,mp243,mp244,mp245,mp246,mp247,mp248,mp249,mp250,mp251,mp252,mp253,mp254,mp255</param>
+                            ///   Enum: rootfs,mp0,mp1,mp2,mp3,mp4,mp5,mp6,mp7,mp8,mp9,mp10,mp11,mp12,mp13,mp14,mp15,mp16,mp17,mp18,mp19,mp20,mp21,mp22,mp23,mp24,mp25,mp26,mp27,mp28,mp29,mp30,mp31,mp32,mp33,mp34,mp35,mp36,mp37,mp38,mp39,mp40,mp41,mp42,mp43,mp44,mp45,mp46,mp47,mp48,mp49,mp50,mp51,mp52,mp53,mp54,mp55,mp56,mp57,mp58,mp59,mp60,mp61,mp62,mp63,mp64,mp65,mp66,mp67,mp68,mp69,mp70,mp71,mp72,mp73,mp74,mp75,mp76,mp77,mp78,mp79,mp80,mp81,mp82,mp83,mp84,mp85,mp86,mp87,mp88,mp89,mp90,mp91,mp92,mp93,mp94,mp95,mp96,mp97,mp98,mp99,mp100,mp101,mp102,mp103,mp104,mp105,mp106,mp107,mp108,mp109,mp110,mp111,mp112,mp113,mp114,mp115,mp116,mp117,mp118,mp119,mp120,mp121,mp122,mp123,mp124,mp125,mp126,mp127,mp128,mp129,mp130,mp131,mp132,mp133,mp134,mp135,mp136,mp137,mp138,mp139,mp140,mp141,mp142,mp143,mp144,mp145,mp146,mp147,mp148,mp149,mp150,mp151,mp152,mp153,mp154,mp155,mp156,mp157,mp158,mp159,mp160,mp161,mp162,mp163,mp164,mp165,mp166,mp167,mp168,mp169,mp170,mp171,mp172,mp173,mp174,mp175,mp176,mp177,mp178,mp179,mp180,mp181,mp182,mp183,mp184,mp185,mp186,mp187,mp188,mp189,mp190,mp191,mp192,mp193,mp194,mp195,mp196,mp197,mp198,mp199,mp200,mp201,mp202,mp203,mp204,mp205,mp206,mp207,mp208,mp209,mp210,mp211,mp212,mp213,mp214,mp215,mp216,mp217,mp218,mp219,mp220,mp221,mp222,mp223,mp224,mp225,mp226,mp227,mp228,mp229,mp230,mp231,mp232,mp233,mp234,mp235,mp236,mp237,mp238,mp239,mp240,mp241,mp242,mp243,mp244,mp245,mp246,mp247,mp248,mp249,mp250,mp251,mp252,mp253,mp254,mp255,unused0,unused1,unused2,unused3,unused4,unused5,unused6,unused7,unused8,unused9,unused10,unused11,unused12,unused13,unused14,unused15,unused16,unused17,unused18,unused19,unused20,unused21,unused22,unused23,unused24,unused25,unused26,unused27,unused28,unused29,unused30,unused31,unused32,unused33,unused34,unused35,unused36,unused37,unused38,unused39,unused40,unused41,unused42,unused43,unused44,unused45,unused46,unused47,unused48,unused49,unused50,unused51,unused52,unused53,unused54,unused55,unused56,unused57,unused58,unused59,unused60,unused61,unused62,unused63,unused64,unused65,unused66,unused67,unused68,unused69,unused70,unused71,unused72,unused73,unused74,unused75,unused76,unused77,unused78,unused79,unused80,unused81,unused82,unused83,unused84,unused85,unused86,unused87,unused88,unused89,unused90,unused91,unused92,unused93,unused94,unused95,unused96,unused97,unused98,unused99,unused100,unused101,unused102,unused103,unused104,unused105,unused106,unused107,unused108,unused109,unused110,unused111,unused112,unused113,unused114,unused115,unused116,unused117,unused118,unused119,unused120,unused121,unused122,unused123,unused124,unused125,unused126,unused127,unused128,unused129,unused130,unused131,unused132,unused133,unused134,unused135,unused136,unused137,unused138,unused139,unused140,unused141,unused142,unused143,unused144,unused145,unused146,unused147,unused148,unused149,unused150,unused151,unused152,unused153,unused154,unused155,unused156,unused157,unused158,unused159,unused160,unused161,unused162,unused163,unused164,unused165,unused166,unused167,unused168,unused169,unused170,unused171,unused172,unused173,unused174,unused175,unused176,unused177,unused178,unused179,unused180,unused181,unused182,unused183,unused184,unused185,unused186,unused187,unused188,unused189,unused190,unused191,unused192,unused193,unused194,unused195,unused196,unused197,unused198,unused199,unused200,unused201,unused202,unused203,unused204,unused205,unused206,unused207,unused208,unused209,unused210,unused211,unused212,unused213,unused214,unused215,unused216,unused217,unused218,unused219,unused220,unused221,unused222,unused223,unused224,unused225,unused226,unused227,unused228,unused229,unused230,unused231,unused232,unused233,unused234,unused235,unused236,unused237,unused238,unused239,unused240,unused241,unused242,unused243,unused244,unused245,unused246,unused247,unused248,unused249,unused250,unused251,unused252,unused253,unused254,unused255</param>
                             /// <param name="bwlimit">Override I/O bandwidth limit (in KiB/s).</param>
                             /// <param name="delete">Delete the original volume after successful copy. By default the original is kept as an unused volume entry.</param>
-                            /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
+                            /// <param name="digest">Prevent changes if current configuration file has different SHA1 " . 		    "digest. This can be used to prevent concurrent modifications.</param>
+                            /// <param name="storage">Target Storage.</param>
+                            /// <param name="target_digest">Prevent changes if current configuration file of the target " . 		    "container has a different SHA1 digest. This can be used to prevent " . 		    "concurrent modifications.</param>
+                            /// <param name="target_vmid">The (unique) ID of the VM.</param>
+                            /// <param name="target_volume">The config key the volume will be moved to. Default is the source volume key.
+                            ///   Enum: rootfs,mp0,mp1,mp2,mp3,mp4,mp5,mp6,mp7,mp8,mp9,mp10,mp11,mp12,mp13,mp14,mp15,mp16,mp17,mp18,mp19,mp20,mp21,mp22,mp23,mp24,mp25,mp26,mp27,mp28,mp29,mp30,mp31,mp32,mp33,mp34,mp35,mp36,mp37,mp38,mp39,mp40,mp41,mp42,mp43,mp44,mp45,mp46,mp47,mp48,mp49,mp50,mp51,mp52,mp53,mp54,mp55,mp56,mp57,mp58,mp59,mp60,mp61,mp62,mp63,mp64,mp65,mp66,mp67,mp68,mp69,mp70,mp71,mp72,mp73,mp74,mp75,mp76,mp77,mp78,mp79,mp80,mp81,mp82,mp83,mp84,mp85,mp86,mp87,mp88,mp89,mp90,mp91,mp92,mp93,mp94,mp95,mp96,mp97,mp98,mp99,mp100,mp101,mp102,mp103,mp104,mp105,mp106,mp107,mp108,mp109,mp110,mp111,mp112,mp113,mp114,mp115,mp116,mp117,mp118,mp119,mp120,mp121,mp122,mp123,mp124,mp125,mp126,mp127,mp128,mp129,mp130,mp131,mp132,mp133,mp134,mp135,mp136,mp137,mp138,mp139,mp140,mp141,mp142,mp143,mp144,mp145,mp146,mp147,mp148,mp149,mp150,mp151,mp152,mp153,mp154,mp155,mp156,mp157,mp158,mp159,mp160,mp161,mp162,mp163,mp164,mp165,mp166,mp167,mp168,mp169,mp170,mp171,mp172,mp173,mp174,mp175,mp176,mp177,mp178,mp179,mp180,mp181,mp182,mp183,mp184,mp185,mp186,mp187,mp188,mp189,mp190,mp191,mp192,mp193,mp194,mp195,mp196,mp197,mp198,mp199,mp200,mp201,mp202,mp203,mp204,mp205,mp206,mp207,mp208,mp209,mp210,mp211,mp212,mp213,mp214,mp215,mp216,mp217,mp218,mp219,mp220,mp221,mp222,mp223,mp224,mp225,mp226,mp227,mp228,mp229,mp230,mp231,mp232,mp233,mp234,mp235,mp236,mp237,mp238,mp239,mp240,mp241,mp242,mp243,mp244,mp245,mp246,mp247,mp248,mp249,mp250,mp251,mp252,mp253,mp254,mp255,unused0,unused1,unused2,unused3,unused4,unused5,unused6,unused7,unused8,unused9,unused10,unused11,unused12,unused13,unused14,unused15,unused16,unused17,unused18,unused19,unused20,unused21,unused22,unused23,unused24,unused25,unused26,unused27,unused28,unused29,unused30,unused31,unused32,unused33,unused34,unused35,unused36,unused37,unused38,unused39,unused40,unused41,unused42,unused43,unused44,unused45,unused46,unused47,unused48,unused49,unused50,unused51,unused52,unused53,unused54,unused55,unused56,unused57,unused58,unused59,unused60,unused61,unused62,unused63,unused64,unused65,unused66,unused67,unused68,unused69,unused70,unused71,unused72,unused73,unused74,unused75,unused76,unused77,unused78,unused79,unused80,unused81,unused82,unused83,unused84,unused85,unused86,unused87,unused88,unused89,unused90,unused91,unused92,unused93,unused94,unused95,unused96,unused97,unused98,unused99,unused100,unused101,unused102,unused103,unused104,unused105,unused106,unused107,unused108,unused109,unused110,unused111,unused112,unused113,unused114,unused115,unused116,unused117,unused118,unused119,unused120,unused121,unused122,unused123,unused124,unused125,unused126,unused127,unused128,unused129,unused130,unused131,unused132,unused133,unused134,unused135,unused136,unused137,unused138,unused139,unused140,unused141,unused142,unused143,unused144,unused145,unused146,unused147,unused148,unused149,unused150,unused151,unused152,unused153,unused154,unused155,unused156,unused157,unused158,unused159,unused160,unused161,unused162,unused163,unused164,unused165,unused166,unused167,unused168,unused169,unused170,unused171,unused172,unused173,unused174,unused175,unused176,unused177,unused178,unused179,unused180,unused181,unused182,unused183,unused184,unused185,unused186,unused187,unused188,unused189,unused190,unused191,unused192,unused193,unused194,unused195,unused196,unused197,unused198,unused199,unused200,unused201,unused202,unused203,unused204,unused205,unused206,unused207,unused208,unused209,unused210,unused211,unused212,unused213,unused214,unused215,unused216,unused217,unused218,unused219,unused220,unused221,unused222,unused223,unused224,unused225,unused226,unused227,unused228,unused229,unused230,unused231,unused232,unused233,unused234,unused235,unused236,unused237,unused238,unused239,unused240,unused241,unused242,unused243,unused244,unused245,unused246,unused247,unused248,unused249,unused250,unused251,unused252,unused253,unused254,unused255</param>
                             /// <returns></returns>
-                            public Result MoveVolume(string storage, string volume, float? bwlimit = null, bool? delete = null, string digest = null) => CreateRest(storage, volume, bwlimit, delete, digest);
+                            public Result MoveVolume(string volume, float? bwlimit = null, bool? delete = null, string digest = null, string storage = null, string target_digest = null, int? target_vmid = null, string target_volume = null) => CreateRest(volume, bwlimit, delete, digest, storage, target_digest, target_vmid, target_volume);
                         }
                         public class PVEPending
                         {
@@ -10691,8 +10820,8 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <summary>
                             /// Read task log.
                             /// </summary>
-                            /// <param name="limit"></param>
-                            /// <param name="start"></param>
+                            /// <param name="limit">The maximum amount of lines that should be printed.</param>
+                            /// <param name="start">The line number to start printing at.</param>
                             /// <returns></returns>
                             public Result GetRest(int? limit = null, int? start = null)
                             {
@@ -10705,8 +10834,8 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <summary>
                             /// Read task log.
                             /// </summary>
-                            /// <param name="limit"></param>
-                            /// <param name="start"></param>
+                            /// <param name="limit">The maximum amount of lines that should be printed.</param>
+                            /// <param name="start">The line number to start printing at.</param>
                             /// <returns></returns>
                             public Result ReadTaskLog(int? limit = null, int? start = null) => GetRest(limit, start);
                         }
@@ -10758,7 +10887,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <summary>
                     /// Read task list for one node (finished tasks).
                     /// </summary>
-                    /// <param name="errors"></param>
+                    /// <param name="errors">Only list tasks with a status of ERROR.</param>
                     /// <param name="limit">Only list this amount of tasks.</param>
                     /// <param name="since">Only list tasks since this UNIX epoch.</param>
                     /// <param name="source">List archived, active or all tasks.
@@ -10789,7 +10918,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <summary>
                     /// Read task list for one node (finished tasks).
                     /// </summary>
-                    /// <param name="errors"></param>
+                    /// <param name="errors">Only list tasks with a status of ERROR.</param>
                     /// <param name="limit">Only list this amount of tasks.</param>
                     /// <param name="since">Only list tasks since this UNIX epoch.</param>
                     /// <param name="source">List archived, active or all tasks.
@@ -11099,7 +11228,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <summary>
                         /// List local PCI devices.
                         /// </summary>
-                        /// <param name="pci_class_blacklist">A list of blacklisted PCI classes, which will not be returned. Following are filtered by default: Memory Controller (05), Bridge (06), Generic System Peripheral (08) and Processor (0b).</param>
+                        /// <param name="pci_class_blacklist">A list of blacklisted PCI classes, which will not be returned. Following are filtered by default: Memory Controller (05), Bridge (06) and Processor (0b).</param>
                         /// <param name="verbose">If disabled, does only print the PCI IDs. Otherwise, additional information like vendor and device will be returned.</param>
                         /// <returns></returns>
                         public Result GetRest(string pci_class_blacklist = null, bool? verbose = null)
@@ -11113,7 +11242,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <summary>
                         /// List local PCI devices.
                         /// </summary>
-                        /// <param name="pci_class_blacklist">A list of blacklisted PCI classes, which will not be returned. Following are filtered by default: Memory Controller (05), Bridge (06), Generic System Peripheral (08) and Processor (0b).</param>
+                        /// <param name="pci_class_blacklist">A list of blacklisted PCI classes, which will not be returned. Following are filtered by default: Memory Controller (05), Bridge (06) and Processor (0b).</param>
                         /// <param name="verbose">If disabled, does only print the PCI IDs. Otherwise, additional information like vendor and device will be returned.</param>
                         /// <returns></returns>
                         public Result Pciscan(string pci_class_blacklist = null, bool? verbose = null) => GetRest(pci_class_blacklist, verbose);
@@ -11393,11 +11522,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Update volume attributes
                                 /// </summary>
                                 /// <param name="notes">The new notes.</param>
+                                /// <param name="protected_">Protection status. Currently only supported for backups.</param>
                                 /// <returns></returns>
-                                public Result SetRest(string notes = null)
+                                public Result SetRest(string notes = null, bool? protected_ = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("notes", notes);
+                                    parameters.Add("protected", protected_);
                                     return _client.Set($"/nodes/{_node}/storage/{_storage}/content/{_volume}", parameters);
                                 }
 
@@ -11405,8 +11536,9 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Update volume attributes
                                 /// </summary>
                                 /// <param name="notes">The new notes.</param>
+                                /// <param name="protected_">Protection status. Currently only supported for backups.</param>
                                 /// <returns></returns>
-                                public Result Updateattributes(string notes = null) => SetRest(notes);
+                                public Result Updateattributes(string notes = null, bool? protected_ = null) => SetRest(notes, protected_);
                             }
                             /// <summary>
                             /// List storage content.
@@ -11648,15 +11780,21 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <summary>
                             /// Upload templates and ISO images.
                             /// </summary>
-                            /// <param name="content">Content type.</param>
-                            /// <param name="filename">The name of the file to create.</param>
+                            /// <param name="content">Content type.
+                            ///   Enum: iso,vztmpl</param>
+                            /// <param name="filename">The name of the file to create. Caution: This will be normalized!</param>
+                            /// <param name="checksum">The expected checksum of the file.</param>
+                            /// <param name="checksum_algorithm">The algorithm to calculate the checksum of the file.
+                            ///   Enum: md5,sha1,sha224,sha256,sha384,sha512</param>
                             /// <param name="tmpfilename">The source file name. This parameter is usually set by the REST handler. You can only overwrite it when connecting to the trusted port on localhost.</param>
                             /// <returns></returns>
-                            public Result CreateRest(string content, string filename, string tmpfilename = null)
+                            public Result CreateRest(string content, string filename, string checksum = null, string checksum_algorithm = null, string tmpfilename = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("content", content);
                                 parameters.Add("filename", filename);
+                                parameters.Add("checksum", checksum);
+                                parameters.Add("checksum-algorithm", checksum_algorithm);
                                 parameters.Add("tmpfilename", tmpfilename);
                                 return _client.Create($"/nodes/{_node}/storage/{_storage}/upload", parameters);
                             }
@@ -11664,11 +11802,15 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <summary>
                             /// Upload templates and ISO images.
                             /// </summary>
-                            /// <param name="content">Content type.</param>
-                            /// <param name="filename">The name of the file to create.</param>
+                            /// <param name="content">Content type.
+                            ///   Enum: iso,vztmpl</param>
+                            /// <param name="filename">The name of the file to create. Caution: This will be normalized!</param>
+                            /// <param name="checksum">The expected checksum of the file.</param>
+                            /// <param name="checksum_algorithm">The algorithm to calculate the checksum of the file.
+                            ///   Enum: md5,sha1,sha224,sha256,sha384,sha512</param>
                             /// <param name="tmpfilename">The source file name. This parameter is usually set by the REST handler. You can only overwrite it when connecting to the trusted port on localhost.</param>
                             /// <returns></returns>
-                            public Result Upload(string content, string filename, string tmpfilename = null) => CreateRest(content, filename, tmpfilename);
+                            public Result Upload(string content, string filename, string checksum = null, string checksum_algorithm = null, string tmpfilename = null) => CreateRest(content, filename, checksum, checksum_algorithm, tmpfilename);
                         }
                         public class PVEDownload_Url
                         {
@@ -11787,6 +11929,39 @@ namespace Corsinvest.ProxmoxVE.Api
                         private readonly PveClient _client;
                         private readonly object _node;
                         internal PVELvm(PveClient client, object node) { _client = client; _node = node; }
+                        public PVEItemName this[object name] => new PVEItemName(_client, _node, name);
+                        public class PVEItemName
+                        {
+                            private readonly PveClient _client;
+                            private readonly object _node;
+                            private readonly object _name;
+                            internal PVEItemName(PveClient client, object node, object name)
+                            {
+                                _client = client; _node = node;
+                                _name = name;
+                            }
+                            /// <summary>
+                            /// Remove an LVM Volume Group.
+                            /// </summary>
+                            /// <param name="cleanup_config">Marks associated storage(s) as not available on this node anymore or removes them from the configuration (if configured for this node only).</param>
+                            /// <param name="cleanup_disks">Also wipe disks so they can be repurposed afterwards.</param>
+                            /// <returns></returns>
+                            public Result DeleteRest(bool? cleanup_config = null, bool? cleanup_disks = null)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("cleanup-config", cleanup_config);
+                                parameters.Add("cleanup-disks", cleanup_disks);
+                                return _client.Delete($"/nodes/{_node}/disks/lvm/{_name}", parameters);
+                            }
+
+                            /// <summary>
+                            /// Remove an LVM Volume Group.
+                            /// </summary>
+                            /// <param name="cleanup_config">Marks associated storage(s) as not available on this node anymore or removes them from the configuration (if configured for this node only).</param>
+                            /// <param name="cleanup_disks">Also wipe disks so they can be repurposed afterwards.</param>
+                            /// <returns></returns>
+                            public Result Delete(bool? cleanup_config = null, bool? cleanup_disks = null) => DeleteRest(cleanup_config, cleanup_disks);
+                        }
                         /// <summary>
                         /// List LVM Volume Groups
                         /// </summary>
@@ -11828,6 +12003,42 @@ namespace Corsinvest.ProxmoxVE.Api
                         private readonly PveClient _client;
                         private readonly object _node;
                         internal PVELvmthin(PveClient client, object node) { _client = client; _node = node; }
+                        public PVEItemName this[object name] => new PVEItemName(_client, _node, name);
+                        public class PVEItemName
+                        {
+                            private readonly PveClient _client;
+                            private readonly object _node;
+                            private readonly object _name;
+                            internal PVEItemName(PveClient client, object node, object name)
+                            {
+                                _client = client; _node = node;
+                                _name = name;
+                            }
+                            /// <summary>
+                            /// Remove an LVM thin pool.
+                            /// </summary>
+                            /// <param name="volume_group">The storage identifier.</param>
+                            /// <param name="cleanup_config">Marks associated storage(s) as not available on this node anymore or removes them from the configuration (if configured for this node only).</param>
+                            /// <param name="cleanup_disks">Also wipe disks so they can be repurposed afterwards.</param>
+                            /// <returns></returns>
+                            public Result DeleteRest(string volume_group, bool? cleanup_config = null, bool? cleanup_disks = null)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("volume-group", volume_group);
+                                parameters.Add("cleanup-config", cleanup_config);
+                                parameters.Add("cleanup-disks", cleanup_disks);
+                                return _client.Delete($"/nodes/{_node}/disks/lvmthin/{_name}", parameters);
+                            }
+
+                            /// <summary>
+                            /// Remove an LVM thin pool.
+                            /// </summary>
+                            /// <param name="volume_group">The storage identifier.</param>
+                            /// <param name="cleanup_config">Marks associated storage(s) as not available on this node anymore or removes them from the configuration (if configured for this node only).</param>
+                            /// <param name="cleanup_disks">Also wipe disks so they can be repurposed afterwards.</param>
+                            /// <returns></returns>
+                            public Result Delete(string volume_group, bool? cleanup_config = null, bool? cleanup_disks = null) => DeleteRest(volume_group, cleanup_config, cleanup_disks);
+                        }
                         /// <summary>
                         /// List LVM thinpools
                         /// </summary>
@@ -11869,6 +12080,39 @@ namespace Corsinvest.ProxmoxVE.Api
                         private readonly PveClient _client;
                         private readonly object _node;
                         internal PVEDirectory(PveClient client, object node) { _client = client; _node = node; }
+                        public PVEItemName this[object name] => new PVEItemName(_client, _node, name);
+                        public class PVEItemName
+                        {
+                            private readonly PveClient _client;
+                            private readonly object _node;
+                            private readonly object _name;
+                            internal PVEItemName(PveClient client, object node, object name)
+                            {
+                                _client = client; _node = node;
+                                _name = name;
+                            }
+                            /// <summary>
+                            /// Unmounts the storage and removes the mount unit.
+                            /// </summary>
+                            /// <param name="cleanup_config">Marks associated storage(s) as not available on this node anymore or removes them from the configuration (if configured for this node only).</param>
+                            /// <param name="cleanup_disks">Also wipe disk so it can be repurposed afterwards.</param>
+                            /// <returns></returns>
+                            public Result DeleteRest(bool? cleanup_config = null, bool? cleanup_disks = null)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("cleanup-config", cleanup_config);
+                                parameters.Add("cleanup-disks", cleanup_disks);
+                                return _client.Delete($"/nodes/{_node}/disks/directory/{_name}", parameters);
+                            }
+
+                            /// <summary>
+                            /// Unmounts the storage and removes the mount unit.
+                            /// </summary>
+                            /// <param name="cleanup_config">Marks associated storage(s) as not available on this node anymore or removes them from the configuration (if configured for this node only).</param>
+                            /// <param name="cleanup_disks">Also wipe disk so it can be repurposed afterwards.</param>
+                            /// <returns></returns>
+                            public Result Delete(bool? cleanup_config = null, bool? cleanup_disks = null) => DeleteRest(cleanup_config, cleanup_disks);
+                        }
                         /// <summary>
                         /// PVE Managed Directory storages.
                         /// </summary>
@@ -11927,6 +12171,27 @@ namespace Corsinvest.ProxmoxVE.Api
                                 _name = name;
                             }
                             /// <summary>
+                            /// Destroy a ZFS pool.
+                            /// </summary>
+                            /// <param name="cleanup_config">Marks associated storage(s) as not available on this node anymore or removes them from the configuration (if configured for this node only).</param>
+                            /// <param name="cleanup_disks">Also wipe disks so they can be repurposed afterwards.</param>
+                            /// <returns></returns>
+                            public Result DeleteRest(bool? cleanup_config = null, bool? cleanup_disks = null)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("cleanup-config", cleanup_config);
+                                parameters.Add("cleanup-disks", cleanup_disks);
+                                return _client.Delete($"/nodes/{_node}/disks/zfs/{_name}", parameters);
+                            }
+
+                            /// <summary>
+                            /// Destroy a ZFS pool.
+                            /// </summary>
+                            /// <param name="cleanup_config">Marks associated storage(s) as not available on this node anymore or removes them from the configuration (if configured for this node only).</param>
+                            /// <param name="cleanup_disks">Also wipe disks so they can be repurposed afterwards.</param>
+                            /// <returns></returns>
+                            public Result Delete(bool? cleanup_config = null, bool? cleanup_disks = null) => DeleteRest(cleanup_config, cleanup_disks);
+                            /// <summary>
                             /// Get details about a zpool.
                             /// </summary>
                             /// <returns></returns>
@@ -11959,7 +12224,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="add_storage">Configure storage using the zpool.</param>
                         /// <param name="ashift">Pool sector size exponent.</param>
                         /// <param name="compression">The compression algorithm to use.
-                        ///   Enum: on,off,gzip,lz4,lzjb,zle</param>
+                        ///   Enum: on,off,gzip,lz4,lzjb,zle,zstd</param>
                         /// <returns></returns>
                         public Result CreateRest(string devices, string name, string raidlevel, bool? add_storage = null, int? ashift = null, string compression = null)
                         {
@@ -11983,7 +12248,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="add_storage">Configure storage using the zpool.</param>
                         /// <param name="ashift">Pool sector size exponent.</param>
                         /// <param name="compression">The compression algorithm to use.
-                        ///   Enum: on,off,gzip,lz4,lzjb,zle</param>
+                        ///   Enum: on,off,gzip,lz4,lzjb,zle,zstd</param>
                         /// <returns></returns>
                         public Result Create(string devices, string name, string raidlevel, bool? add_storage = null, int? ashift = null, string compression = null) => CreateRest(devices, name, raidlevel, add_storage, ashift, compression);
                     }
@@ -13309,7 +13574,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a VNC Shell proxy.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: login,ceph_install,upgrade</param>
+                    ///   Enum: ceph_install,upgrade,login</param>
                     /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                     /// <param name="height">sets the height of the console in pixels.</param>
                     /// <param name="websocket">use websocket instead of standard vnc.</param>
@@ -13330,7 +13595,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a VNC Shell proxy.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: login,ceph_install,upgrade</param>
+                    ///   Enum: ceph_install,upgrade,login</param>
                     /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                     /// <param name="height">sets the height of the console in pixels.</param>
                     /// <param name="websocket">use websocket instead of standard vnc.</param>
@@ -13347,7 +13612,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a VNC Shell proxy.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: login,ceph_install,upgrade</param>
+                    ///   Enum: ceph_install,upgrade,login</param>
                     /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                     /// <returns></returns>
                     public Result CreateRest(string cmd = null, string cmd_opts = null)
@@ -13362,7 +13627,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a VNC Shell proxy.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: login,ceph_install,upgrade</param>
+                    ///   Enum: ceph_install,upgrade,login</param>
                     /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                     /// <returns></returns>
                     public Result Termproxy(string cmd = null, string cmd_opts = null) => CreateRest(cmd, cmd_opts);
@@ -13403,7 +13668,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a SPICE shell.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: login,ceph_install,upgrade</param>
+                    ///   Enum: ceph_install,upgrade,login</param>
                     /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                     /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As reasonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                     /// <returns></returns>
@@ -13420,7 +13685,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a SPICE shell.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: login,ceph_install,upgrade</param>
+                    ///   Enum: ceph_install,upgrade,login</param>
                     /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                     /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As reasonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                     /// <returns></returns>
@@ -13542,6 +13807,33 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="template">The template which will downloaded</param>
                     /// <returns></returns>
                     public Result AplDownload(string storage, string template) => CreateRest(storage, template);
+                }
+                public class PVEQuery_Url_Metadata
+                {
+                    private readonly PveClient _client;
+                    private readonly object _node;
+                    internal PVEQuery_Url_Metadata(PveClient client, object node) { _client = client; _node = node; }
+                    /// <summary>
+                    /// Query metadata of an URL: file size, file name and mime type.
+                    /// </summary>
+                    /// <param name="url">The URL to query the metadata from.</param>
+                    /// <param name="verify_certificates">If false, no SSL/TLS certificates will be verified.</param>
+                    /// <returns></returns>
+                    public Result GetRest(string url, bool? verify_certificates = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("url", url);
+                        parameters.Add("verify-certificates", verify_certificates);
+                        return _client.Get($"/nodes/{_node}/query-url-metadata", parameters);
+                    }
+
+                    /// <summary>
+                    /// Query metadata of an URL: file size, file name and mime type.
+                    /// </summary>
+                    /// <param name="url">The URL to query the metadata from.</param>
+                    /// <param name="verify_certificates">If false, no SSL/TLS certificates will be verified.</param>
+                    /// <returns></returns>
+                    public Result QueryUrlMetadata(string url, bool? verify_certificates = null) => GetRest(url, verify_certificates);
                 }
                 public class PVEReport
                 {
@@ -13754,8 +14046,10 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="encryption_key">Encryption key. Use 'autogen' to generate one automatically without passphrase.</param>
                 /// <param name="fingerprint">Certificate SHA 256 fingerprint.</param>
                 /// <param name="format">Default image format.</param>
+                /// <param name="fs_name">The Ceph filesystem name.</param>
                 /// <param name="fuse">Mount CephFS through FUSE.</param>
                 /// <param name="is_mountpoint">Assume the given path is an externally managed mountpoint and consider the storage offline if it is not mounted. Using a boolean (yes/no) value serves as a shortcut to using the target path in this field.</param>
+                /// <param name="keyring">Client keyring contents (for external clusters).</param>
                 /// <param name="krbd">Always access rbd through krbd kernel module.</param>
                 /// <param name="lio_tpg">target portal group for Linux LIO targets</param>
                 /// <param name="master_pubkey">Base64-encoded, PEM-formatted public RSA key. Used to encrypt a copy of the encryption-key which will be added to each encrypted backup.</param>
@@ -13771,14 +14065,16 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="password">Password for accessing the share/datastore.</param>
                 /// <param name="pool">Pool.</param>
                 /// <param name="port">For non default port.</param>
+                /// <param name="preallocation">Preallocation mode for raw and qcow2 images. Using 'metadata' on raw images results in preallocation=off.
+                ///   Enum: off,metadata,falloc,full</param>
                 /// <param name="prune_backups">The retention options with shorter intervals are processed first with --keep-last being the very first one. Each option covers a specific period of time. We say that backups within this period are covered by this option. The next option does not take care of already covered backups and only considers older backups.</param>
                 /// <param name="saferemove">Zero-out data when removing LVs.</param>
                 /// <param name="saferemove_throughput">Wipe throughput (cstream -t parameter value).</param>
                 /// <param name="server">Server IP or DNS name.</param>
                 /// <param name="server2">Backup volfile server IP or DNS name.</param>
                 /// <param name="shared">Mark storage as shared.</param>
-                /// <param name="smbversion">SMB protocol version
-                ///   Enum: 2.0,2.1,3.0</param>
+                /// <param name="smbversion">SMB protocol version. 'default' if not set, negotiates the highest SMB2+ version supported by both the client and server.
+                ///   Enum: default,2.0,2.1,3,3.0,3.11</param>
                 /// <param name="sparse">use sparse volumes</param>
                 /// <param name="subdir">Subdir to mount.</param>
                 /// <param name="tagged_only">Only use logical volumes tagged with 'pve-vm-ID'.</param>
@@ -13786,7 +14082,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 ///   Enum: tcp,rdma,unix</param>
                 /// <param name="username">RBD Id.</param>
                 /// <returns></returns>
-                public Result SetRest(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? port = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null)
+                public Result SetRest(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? port = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("blocksize", blocksize);
@@ -13801,8 +14097,10 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("encryption-key", encryption_key);
                     parameters.Add("fingerprint", fingerprint);
                     parameters.Add("format", format);
+                    parameters.Add("fs-name", fs_name);
                     parameters.Add("fuse", fuse);
                     parameters.Add("is_mountpoint", is_mountpoint);
+                    parameters.Add("keyring", keyring);
                     parameters.Add("krbd", krbd);
                     parameters.Add("lio_tpg", lio_tpg);
                     parameters.Add("master-pubkey", master_pubkey);
@@ -13818,6 +14116,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("password", password);
                     parameters.Add("pool", pool);
                     parameters.Add("port", port);
+                    parameters.Add("preallocation", preallocation);
                     parameters.Add("prune-backups", prune_backups);
                     parameters.Add("saferemove", saferemove);
                     parameters.Add("saferemove_throughput", saferemove_throughput);
@@ -13848,8 +14147,10 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="encryption_key">Encryption key. Use 'autogen' to generate one automatically without passphrase.</param>
                 /// <param name="fingerprint">Certificate SHA 256 fingerprint.</param>
                 /// <param name="format">Default image format.</param>
+                /// <param name="fs_name">The Ceph filesystem name.</param>
                 /// <param name="fuse">Mount CephFS through FUSE.</param>
                 /// <param name="is_mountpoint">Assume the given path is an externally managed mountpoint and consider the storage offline if it is not mounted. Using a boolean (yes/no) value serves as a shortcut to using the target path in this field.</param>
+                /// <param name="keyring">Client keyring contents (for external clusters).</param>
                 /// <param name="krbd">Always access rbd through krbd kernel module.</param>
                 /// <param name="lio_tpg">target portal group for Linux LIO targets</param>
                 /// <param name="master_pubkey">Base64-encoded, PEM-formatted public RSA key. Used to encrypt a copy of the encryption-key which will be added to each encrypted backup.</param>
@@ -13865,14 +14166,16 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="password">Password for accessing the share/datastore.</param>
                 /// <param name="pool">Pool.</param>
                 /// <param name="port">For non default port.</param>
+                /// <param name="preallocation">Preallocation mode for raw and qcow2 images. Using 'metadata' on raw images results in preallocation=off.
+                ///   Enum: off,metadata,falloc,full</param>
                 /// <param name="prune_backups">The retention options with shorter intervals are processed first with --keep-last being the very first one. Each option covers a specific period of time. We say that backups within this period are covered by this option. The next option does not take care of already covered backups and only considers older backups.</param>
                 /// <param name="saferemove">Zero-out data when removing LVs.</param>
                 /// <param name="saferemove_throughput">Wipe throughput (cstream -t parameter value).</param>
                 /// <param name="server">Server IP or DNS name.</param>
                 /// <param name="server2">Backup volfile server IP or DNS name.</param>
                 /// <param name="shared">Mark storage as shared.</param>
-                /// <param name="smbversion">SMB protocol version
-                ///   Enum: 2.0,2.1,3.0</param>
+                /// <param name="smbversion">SMB protocol version. 'default' if not set, negotiates the highest SMB2+ version supported by both the client and server.
+                ///   Enum: default,2.0,2.1,3,3.0,3.11</param>
                 /// <param name="sparse">use sparse volumes</param>
                 /// <param name="subdir">Subdir to mount.</param>
                 /// <param name="tagged_only">Only use logical volumes tagged with 'pve-vm-ID'.</param>
@@ -13880,7 +14183,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 ///   Enum: tcp,rdma,unix</param>
                 /// <param name="username">RBD Id.</param>
                 /// <returns></returns>
-                public Result Update(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? port = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null) => SetRest(blocksize, bwlimit, comstar_hg, comstar_tg, content, delete, digest, disable, domain, encryption_key, fingerprint, format, fuse, is_mountpoint, krbd, lio_tpg, master_pubkey, maxfiles, mkdir, monhost, mountpoint, namespace_, nocow, nodes, nowritecache, options, password, pool, port, prune_backups, saferemove, saferemove_throughput, server, server2, shared, smbversion, sparse, subdir, tagged_only, transport, username);
+                public Result Update(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? port = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null) => SetRest(blocksize, bwlimit, comstar_hg, comstar_tg, content, delete, digest, disable, domain, encryption_key, fingerprint, format, fs_name, fuse, is_mountpoint, keyring, krbd, lio_tpg, master_pubkey, maxfiles, mkdir, monhost, mountpoint, namespace_, nocow, nodes, nowritecache, options, password, pool, port, preallocation, prune_backups, saferemove, saferemove_throughput, server, server2, shared, smbversion, sparse, subdir, tagged_only, transport, username);
             }
             /// <summary>
             /// Storage index.
@@ -13922,9 +14225,11 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="export">NFS export path.</param>
             /// <param name="fingerprint">Certificate SHA 256 fingerprint.</param>
             /// <param name="format">Default image format.</param>
+            /// <param name="fs_name">The Ceph filesystem name.</param>
             /// <param name="fuse">Mount CephFS through FUSE.</param>
             /// <param name="is_mountpoint">Assume the given path is an externally managed mountpoint and consider the storage offline if it is not mounted. Using a boolean (yes/no) value serves as a shortcut to using the target path in this field.</param>
             /// <param name="iscsiprovider">iscsi provider</param>
+            /// <param name="keyring">Client keyring contents (for external clusters).</param>
             /// <param name="krbd">Always access rbd through krbd kernel module.</param>
             /// <param name="lio_tpg">target portal group for Linux LIO targets</param>
             /// <param name="master_pubkey">Base64-encoded, PEM-formatted public RSA key. Used to encrypt a copy of the encryption-key which will be added to each encrypted backup.</param>
@@ -13942,6 +14247,8 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="pool">Pool.</param>
             /// <param name="port">For non default port.</param>
             /// <param name="portal">iSCSI portal (IP or DNS name with optional port).</param>
+            /// <param name="preallocation">Preallocation mode for raw and qcow2 images. Using 'metadata' on raw images results in preallocation=off.
+            ///   Enum: off,metadata,falloc,full</param>
             /// <param name="prune_backups">The retention options with shorter intervals are processed first with --keep-last being the very first one. Each option covers a specific period of time. We say that backups within this period are covered by this option. The next option does not take care of already covered backups and only considers older backups.</param>
             /// <param name="saferemove">Zero-out data when removing LVs.</param>
             /// <param name="saferemove_throughput">Wipe throughput (cstream -t parameter value).</param>
@@ -13949,8 +14256,8 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="server2">Backup volfile server IP or DNS name.</param>
             /// <param name="share">CIFS share.</param>
             /// <param name="shared">Mark storage as shared.</param>
-            /// <param name="smbversion">SMB protocol version
-            ///   Enum: 2.0,2.1,3.0</param>
+            /// <param name="smbversion">SMB protocol version. 'default' if not set, negotiates the highest SMB2+ version supported by both the client and server.
+            ///   Enum: default,2.0,2.1,3,3.0,3.11</param>
             /// <param name="sparse">use sparse volumes</param>
             /// <param name="subdir">Subdir to mount.</param>
             /// <param name="tagged_only">Only use logical volumes tagged with 'pve-vm-ID'.</param>
@@ -13962,7 +14269,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="vgname">Volume group name.</param>
             /// <param name="volume">Glusterfs Volume.</param>
             /// <returns></returns>
-            public Result CreateRest(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, int? port = null, string portal = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null)
+            public Result CreateRest(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, int? port = null, string portal = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null)
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("storage", storage);
@@ -13981,9 +14288,11 @@ namespace Corsinvest.ProxmoxVE.Api
                 parameters.Add("export", export);
                 parameters.Add("fingerprint", fingerprint);
                 parameters.Add("format", format);
+                parameters.Add("fs-name", fs_name);
                 parameters.Add("fuse", fuse);
                 parameters.Add("is_mountpoint", is_mountpoint);
                 parameters.Add("iscsiprovider", iscsiprovider);
+                parameters.Add("keyring", keyring);
                 parameters.Add("krbd", krbd);
                 parameters.Add("lio_tpg", lio_tpg);
                 parameters.Add("master-pubkey", master_pubkey);
@@ -14001,6 +14310,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 parameters.Add("pool", pool);
                 parameters.Add("port", port);
                 parameters.Add("portal", portal);
+                parameters.Add("preallocation", preallocation);
                 parameters.Add("prune-backups", prune_backups);
                 parameters.Add("saferemove", saferemove);
                 parameters.Add("saferemove_throughput", saferemove_throughput);
@@ -14041,9 +14351,11 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="export">NFS export path.</param>
             /// <param name="fingerprint">Certificate SHA 256 fingerprint.</param>
             /// <param name="format">Default image format.</param>
+            /// <param name="fs_name">The Ceph filesystem name.</param>
             /// <param name="fuse">Mount CephFS through FUSE.</param>
             /// <param name="is_mountpoint">Assume the given path is an externally managed mountpoint and consider the storage offline if it is not mounted. Using a boolean (yes/no) value serves as a shortcut to using the target path in this field.</param>
             /// <param name="iscsiprovider">iscsi provider</param>
+            /// <param name="keyring">Client keyring contents (for external clusters).</param>
             /// <param name="krbd">Always access rbd through krbd kernel module.</param>
             /// <param name="lio_tpg">target portal group for Linux LIO targets</param>
             /// <param name="master_pubkey">Base64-encoded, PEM-formatted public RSA key. Used to encrypt a copy of the encryption-key which will be added to each encrypted backup.</param>
@@ -14061,6 +14373,8 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="pool">Pool.</param>
             /// <param name="port">For non default port.</param>
             /// <param name="portal">iSCSI portal (IP or DNS name with optional port).</param>
+            /// <param name="preallocation">Preallocation mode for raw and qcow2 images. Using 'metadata' on raw images results in preallocation=off.
+            ///   Enum: off,metadata,falloc,full</param>
             /// <param name="prune_backups">The retention options with shorter intervals are processed first with --keep-last being the very first one. Each option covers a specific period of time. We say that backups within this period are covered by this option. The next option does not take care of already covered backups and only considers older backups.</param>
             /// <param name="saferemove">Zero-out data when removing LVs.</param>
             /// <param name="saferemove_throughput">Wipe throughput (cstream -t parameter value).</param>
@@ -14068,8 +14382,8 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="server2">Backup volfile server IP or DNS name.</param>
             /// <param name="share">CIFS share.</param>
             /// <param name="shared">Mark storage as shared.</param>
-            /// <param name="smbversion">SMB protocol version
-            ///   Enum: 2.0,2.1,3.0</param>
+            /// <param name="smbversion">SMB protocol version. 'default' if not set, negotiates the highest SMB2+ version supported by both the client and server.
+            ///   Enum: default,2.0,2.1,3,3.0,3.11</param>
             /// <param name="sparse">use sparse volumes</param>
             /// <param name="subdir">Subdir to mount.</param>
             /// <param name="tagged_only">Only use logical volumes tagged with 'pve-vm-ID'.</param>
@@ -14081,7 +14395,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="vgname">Volume group name.</param>
             /// <param name="volume">Glusterfs Volume.</param>
             /// <returns></returns>
-            public Result Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, int? port = null, string portal = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null) => CreateRest(storage, type, authsupported, base_, blocksize, bwlimit, comstar_hg, comstar_tg, content, datastore, disable, domain, encryption_key, export, fingerprint, format, fuse, is_mountpoint, iscsiprovider, krbd, lio_tpg, master_pubkey, maxfiles, mkdir, monhost, mountpoint, namespace_, nocow, nodes, nowritecache, options, password, path, pool, port, portal, prune_backups, saferemove, saferemove_throughput, server, server2, share, shared, smbversion, sparse, subdir, tagged_only, target, thinpool, transport, username, vgname, volume);
+            public Result Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, int? port = null, string portal = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null) => CreateRest(storage, type, authsupported, base_, blocksize, bwlimit, comstar_hg, comstar_tg, content, datastore, disable, domain, encryption_key, export, fingerprint, format, fs_name, fuse, is_mountpoint, iscsiprovider, keyring, krbd, lio_tpg, master_pubkey, maxfiles, mkdir, monhost, mountpoint, namespace_, nocow, nodes, nowritecache, options, password, path, pool, port, portal, preallocation, prune_backups, saferemove, saferemove_throughput, server, server2, share, shared, smbversion, sparse, subdir, tagged_only, target, thinpool, transport, username, vgname, volume);
         }
         public class PVEAccess
         {
@@ -14100,12 +14414,12 @@ namespace Corsinvest.ProxmoxVE.Api
             public PVEDomains Domains => _domains ??= new PVEDomains(_client);
             private PVEOpenid _openid;
             public PVEOpenid Openid => _openid ??= new PVEOpenid(_client);
+            private PVETfa _tfa;
+            public PVETfa Tfa => _tfa ??= new PVETfa(_client);
             private PVETicket _ticket;
             public PVETicket Ticket => _ticket ??= new PVETicket(_client);
             private PVEPassword _password;
             public PVEPassword Password => _password ??= new PVEPassword(_client);
-            private PVETfa _tfa;
-            public PVETfa Tfa => _tfa ??= new PVETfa(_client);
             private PVEPermissions _permissions;
             public PVEPermissions Permissions => _permissions ??= new PVEPermissions(_client);
             public class PVEUsers
@@ -14131,14 +14445,21 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <summary>
                         /// Get user TFA types (Personal and Realm).
                         /// </summary>
+                        /// <param name="multiple">Request all entries as an array.</param>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/access/users/{_userid}/tfa"); }
+                        public Result GetRest(bool? multiple = null)
+                        {
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("multiple", multiple);
+                            return _client.Get($"/access/users/{_userid}/tfa", parameters);
+                        }
 
                         /// <summary>
                         /// Get user TFA types (Personal and Realm).
                         /// </summary>
+                        /// <param name="multiple">Request all entries as an array.</param>
                         /// <returns></returns>
-                        public Result ReadUserTfaType() => GetRest();
+                        public Result ReadUserTfaType(bool? multiple = null) => GetRest(multiple);
                     }
                     public class PVEToken
                     {
@@ -15004,6 +15325,159 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <returns></returns>
                 public Result Index() => GetRest();
             }
+            public class PVETfa
+            {
+                private readonly PveClient _client;
+
+                internal PVETfa(PveClient client) { _client = client; }
+                public PVEItemUserid this[object userid] => new PVEItemUserid(_client, userid);
+                public class PVEItemUserid
+                {
+                    private readonly PveClient _client;
+                    private readonly object _userid;
+                    internal PVEItemUserid(PveClient client, object userid) { _client = client; _userid = userid; }
+                    public PVEItemId this[object id] => new PVEItemId(_client, _userid, id);
+                    public class PVEItemId
+                    {
+                        private readonly PveClient _client;
+                        private readonly object _userid;
+                        private readonly object _id;
+                        internal PVEItemId(PveClient client, object userid, object id)
+                        {
+                            _client = client; _userid = userid;
+                            _id = id;
+                        }
+                        /// <summary>
+                        /// Delete a TFA entry by ID.
+                        /// </summary>
+                        /// <param name="password">The current password.</param>
+                        /// <returns></returns>
+                        public Result DeleteRest(string password = null)
+                        {
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("password", password);
+                            return _client.Delete($"/access/tfa/{_userid}/{_id}", parameters);
+                        }
+
+                        /// <summary>
+                        /// Delete a TFA entry by ID.
+                        /// </summary>
+                        /// <param name="password">The current password.</param>
+                        /// <returns></returns>
+                        public Result DeleteTfa(string password = null) => DeleteRest(password);
+                        /// <summary>
+                        /// Fetch a requested TFA entry if present.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result GetRest() { return _client.Get($"/access/tfa/{_userid}/{_id}"); }
+
+                        /// <summary>
+                        /// Fetch a requested TFA entry if present.
+                        /// </summary>
+                        /// <returns></returns>
+                        public Result GetTfaEntry() => GetRest();
+                        /// <summary>
+                        /// Add a TFA entry for a user.
+                        /// </summary>
+                        /// <param name="description">A description to distinguish multiple entries from one another</param>
+                        /// <param name="enable">Whether the entry should be enabled for login.</param>
+                        /// <param name="password">The current password.</param>
+                        /// <returns></returns>
+                        public Result SetRest(string description = null, bool? enable = null, string password = null)
+                        {
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("description", description);
+                            parameters.Add("enable", enable);
+                            parameters.Add("password", password);
+                            return _client.Set($"/access/tfa/{_userid}/{_id}", parameters);
+                        }
+
+                        /// <summary>
+                        /// Add a TFA entry for a user.
+                        /// </summary>
+                        /// <param name="description">A description to distinguish multiple entries from one another</param>
+                        /// <param name="enable">Whether the entry should be enabled for login.</param>
+                        /// <param name="password">The current password.</param>
+                        /// <returns></returns>
+                        public Result UpdateTfaEntry(string description = null, bool? enable = null, string password = null) => SetRest(description, enable, password);
+                    }
+                    /// <summary>
+                    /// List TFA configurations of users.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result GetRest() { return _client.Get($"/access/tfa/{_userid}"); }
+
+                    /// <summary>
+                    /// List TFA configurations of users.
+                    /// </summary>
+                    /// <returns></returns>
+                    public Result ListUserTfa() => GetRest();
+                    /// <summary>
+                    /// Add a TFA entry for a user.
+                    /// </summary>
+                    /// <param name="type">TFA Entry Type.
+                    ///   Enum: totp,u2f,webauthn,recovery,yubico</param>
+                    /// <param name="challenge">When responding to a u2f challenge: the original challenge string</param>
+                    /// <param name="description">A description to distinguish multiple entries from one another</param>
+                    /// <param name="password">The current password.</param>
+                    /// <param name="totp">A totp URI.</param>
+                    /// <param name="value">The current value for the provided totp URI, or a Webauthn/U2F challenge response</param>
+                    /// <returns></returns>
+                    public Result CreateRest(string type, string challenge = null, string description = null, string password = null, string totp = null, string value = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("type", type);
+                        parameters.Add("challenge", challenge);
+                        parameters.Add("description", description);
+                        parameters.Add("password", password);
+                        parameters.Add("totp", totp);
+                        parameters.Add("value", value);
+                        return _client.Create($"/access/tfa/{_userid}", parameters);
+                    }
+
+                    /// <summary>
+                    /// Add a TFA entry for a user.
+                    /// </summary>
+                    /// <param name="type">TFA Entry Type.
+                    ///   Enum: totp,u2f,webauthn,recovery,yubico</param>
+                    /// <param name="challenge">When responding to a u2f challenge: the original challenge string</param>
+                    /// <param name="description">A description to distinguish multiple entries from one another</param>
+                    /// <param name="password">The current password.</param>
+                    /// <param name="totp">A totp URI.</param>
+                    /// <param name="value">The current value for the provided totp URI, or a Webauthn/U2F challenge response</param>
+                    /// <returns></returns>
+                    public Result AddTfaEntry(string type, string challenge = null, string description = null, string password = null, string totp = null, string value = null) => CreateRest(type, challenge, description, password, totp, value);
+                }
+                /// <summary>
+                /// List TFA configurations of users.
+                /// </summary>
+                /// <returns></returns>
+                public Result GetRest() { return _client.Get($"/access/tfa"); }
+
+                /// <summary>
+                /// List TFA configurations of users.
+                /// </summary>
+                /// <returns></returns>
+                public Result ListTfa() => GetRest();
+                /// <summary>
+                /// Finish a u2f challenge.
+                /// </summary>
+                /// <param name="response">The response to the current authentication challenge.</param>
+                /// <returns></returns>
+                public Result CreateRest(string response)
+                {
+                    var parameters = new Dictionary<string, object>();
+                    parameters.Add("response", response);
+                    return _client.Create($"/access/tfa", parameters);
+                }
+
+                /// <summary>
+                /// Finish a u2f challenge.
+                /// </summary>
+                /// <param name="response">The response to the current authentication challenge.</param>
+                /// <returns></returns>
+                public Result VerifyTfa(string response) => CreateRest(response);
+            }
             public class PVETicket
             {
                 private readonly PveClient _client;
@@ -15025,20 +15499,24 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// </summary>
                 /// <param name="password">The secret password. This can also be a valid ticket.</param>
                 /// <param name="username">User name</param>
+                /// <param name="new_format">With webauthn the format of half-authenticated tickts changed. New clients should pass 1 here and not worry about the old format. The old format is deprecated and will be retired with PVE-8.0</param>
                 /// <param name="otp">One-time password for Two-factor authentication.</param>
                 /// <param name="path">Verify ticket, and check if user have access 'privs' on 'path'</param>
                 /// <param name="privs">Verify ticket, and check if user have access 'privs' on 'path'</param>
                 /// <param name="realm">You can optionally pass the realm using this parameter. Normally the realm is simply added to the username &amp;lt;username&amp;gt;@&amp;lt;relam&amp;gt;.</param>
+                /// <param name="tfa_challenge">The signed TFA challenge string the user wants to respond to.</param>
                 /// <returns></returns>
-                public Result CreateRest(string password, string username, string otp = null, string path = null, string privs = null, string realm = null)
+                public Result CreateRest(string password, string username, bool? new_format = null, string otp = null, string path = null, string privs = null, string realm = null, string tfa_challenge = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("password", password);
                     parameters.Add("username", username);
+                    parameters.Add("new-format", new_format);
                     parameters.Add("otp", otp);
                     parameters.Add("path", path);
                     parameters.Add("privs", privs);
                     parameters.Add("realm", realm);
+                    parameters.Add("tfa-challenge", tfa_challenge);
                     return _client.Create($"/access/ticket", parameters);
                 }
 
@@ -15047,12 +15525,14 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// </summary>
                 /// <param name="password">The secret password. This can also be a valid ticket.</param>
                 /// <param name="username">User name</param>
+                /// <param name="new_format">With webauthn the format of half-authenticated tickts changed. New clients should pass 1 here and not worry about the old format. The old format is deprecated and will be retired with PVE-8.0</param>
                 /// <param name="otp">One-time password for Two-factor authentication.</param>
                 /// <param name="path">Verify ticket, and check if user have access 'privs' on 'path'</param>
                 /// <param name="privs">Verify ticket, and check if user have access 'privs' on 'path'</param>
                 /// <param name="realm">You can optionally pass the realm using this parameter. Normally the realm is simply added to the username &amp;lt;username&amp;gt;@&amp;lt;relam&amp;gt;.</param>
+                /// <param name="tfa_challenge">The signed TFA challenge string the user wants to respond to.</param>
                 /// <returns></returns>
-                public Result CreateTicket(string password, string username, string otp = null, string path = null, string privs = null, string realm = null) => CreateRest(password, username, otp, path, privs, realm);
+                public Result CreateTicket(string password, string username, bool? new_format = null, string otp = null, string path = null, string privs = null, string realm = null, string tfa_challenge = null) => CreateRest(password, username, new_format, otp, path, privs, realm, tfa_challenge);
             }
             public class PVEPassword
             {
@@ -15080,65 +15560,6 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="userid">User ID</param>
                 /// <returns></returns>
                 public Result ChangePassword(string password, string userid) => SetRest(password, userid);
-            }
-            public class PVETfa
-            {
-                private readonly PveClient _client;
-
-                internal PVETfa(PveClient client) { _client = client; }
-                /// <summary>
-                /// Finish a u2f challenge.
-                /// </summary>
-                /// <param name="response">The response to the current authentication challenge.</param>
-                /// <returns></returns>
-                public Result CreateRest(string response)
-                {
-                    var parameters = new Dictionary<string, object>();
-                    parameters.Add("response", response);
-                    return _client.Create($"/access/tfa", parameters);
-                }
-
-                /// <summary>
-                /// Finish a u2f challenge.
-                /// </summary>
-                /// <param name="response">The response to the current authentication challenge.</param>
-                /// <returns></returns>
-                public Result VerifyTfa(string response) => CreateRest(response);
-                /// <summary>
-                /// Change user u2f authentication.
-                /// </summary>
-                /// <param name="action">The action to perform
-                ///   Enum: delete,new,confirm</param>
-                /// <param name="userid">User ID</param>
-                /// <param name="config">A TFA configuration. This must currently be of type TOTP of not set at all.</param>
-                /// <param name="key">When adding TOTP, the shared secret value.</param>
-                /// <param name="password">The current password.</param>
-                /// <param name="response">Either the the response to the current u2f registration challenge, or, when adding TOTP, the currently valid TOTP value.</param>
-                /// <returns></returns>
-                public Result SetRest(string action, string userid, string config = null, string key = null, string password = null, string response = null)
-                {
-                    var parameters = new Dictionary<string, object>();
-                    parameters.Add("action", action);
-                    parameters.Add("userid", userid);
-                    parameters.Add("config", config);
-                    parameters.Add("key", key);
-                    parameters.Add("password", password);
-                    parameters.Add("response", response);
-                    return _client.Set($"/access/tfa", parameters);
-                }
-
-                /// <summary>
-                /// Change user u2f authentication.
-                /// </summary>
-                /// <param name="action">The action to perform
-                ///   Enum: delete,new,confirm</param>
-                /// <param name="userid">User ID</param>
-                /// <param name="config">A TFA configuration. This must currently be of type TOTP of not set at all.</param>
-                /// <param name="key">When adding TOTP, the shared secret value.</param>
-                /// <param name="password">The current password.</param>
-                /// <param name="response">Either the the response to the current u2f registration challenge, or, when adding TOTP, the currently valid TOTP value.</param>
-                /// <returns></returns>
-                public Result ChangeTfa(string action, string userid, string config = null, string key = null, string password = null, string response = null) => SetRest(action, userid, config, key, password, response);
             }
             public class PVEPermissions
             {
@@ -15279,13 +15700,13 @@ namespace Corsinvest.ProxmoxVE.Api
 
             internal PVEVersion(PveClient client) { _client = client; }
             /// <summary>
-            /// API version details. The result also includes the global datacenter confguration.
+            /// API version details, including some parts of the global datacenter config.
             /// </summary>
             /// <returns></returns>
             public Result GetRest() { return _client.Get($"/version"); }
 
             /// <summary>
-            /// API version details. The result also includes the global datacenter confguration.
+            /// API version details, including some parts of the global datacenter config.
             /// </summary>
             /// <returns></returns>
             public Result Version() => GetRest();
