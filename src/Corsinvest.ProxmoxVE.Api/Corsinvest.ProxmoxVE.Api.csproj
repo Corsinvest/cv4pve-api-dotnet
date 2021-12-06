@@ -16,6 +16,7 @@
     <PackageTags>ProxmoxVE;Api,Client;Rest;Corsinvest;</PackageTags>
     <PackageReleaseNotes></PackageReleaseNotes>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <RepositoryType>Github</RepositoryType>

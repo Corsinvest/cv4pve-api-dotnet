@@ -1,6 +1,6 @@
 # Corsinvest.ProxmoxVE.Api
 
-[![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg)](LICENSE.md) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.svg?label=Nuget%20%20Api) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Extension.svg?label=Nuget%20%20Extension) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Metadata.svg?label=Nuget%20%20Metadata) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Shell.svg?label=Nuget%20%20Shell) [![AppVeyor branch](https://img.shields.io/appveyor/ci/franklupo/cv4pve-api-dotnet/master.svg)](https://ci.appveyor.com/project/franklupo/cv4pve-api-dotnet)
+[![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg)](LICENSE.md) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.svg?label=Nuget%20%20Api) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Extension.svg?label=Nuget%20%20Extension) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Metadata.svg?label=Nuget%20%20Metadata) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Shell.svg?label=Nuget%20%20Shell)
 
 Proxmox VE Client API .Net
 

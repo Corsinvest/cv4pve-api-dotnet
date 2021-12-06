@@ -25,11 +25,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Storage
         public string Path => ApiData.path;
 
         /// <summary>
-        /// Nodes
-        /// </summary>
-        public string Nodes => ApiData.nodes;
-
-        /// <summary>
         /// Options
         /// </summary>
         public string Options => ApiData.options;

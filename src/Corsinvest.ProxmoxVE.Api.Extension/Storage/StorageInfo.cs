@@ -10,6 +10,7 @@
  * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
  */
 
+using System.Linq;
 using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Storage
@@ -23,6 +24,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Storage
         {
             Type = type;
             DynamicHelper.CheckKeyOrCreate(apiData, "disable", "0");
+
+            DynamicHelper.CheckKeyOrCreate(apiData, "nodes", "All");
+            Nodes = ApiData.nodes.Split(',');
         }
 
         // public bool Active =>  Storage.active == 1;
@@ -61,5 +65,18 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Storage
         /// </summary>
         /// <value></value>
         public StorageTypeEnum Type { get; }
+
+        /// <summary>
+        /// Nodes
+        /// </summary>
+        /// <value></value>
+        public string[] Nodes { get; }
+
+        /// <summary>
+        /// Storage in node
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        public bool InNode(string node) => Nodes.Contains("all") || Nodes.Contains(node);
     }
 }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29102.190
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6719F1A5-0108-4DDE-BE5B-50D75DF7DC3A}"
 EndProject
@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Corsinvest.ProxmoxVE.Api.Ex
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Corsinvest.ProxmoxVE.Api.Metadata", "src\Corsinvest.ProxmoxVE.Api.Metadata\Corsinvest.ProxmoxVE.Api.Metadata.csproj", "{692CCB0F-FC3F-47A6-858A-D08C9191CB38}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Corsinvest.ProxmoxVE.Api.Shell", "src\Corsinvest.ProxmoxVE.Api.Shell\Corsinvest.ProxmoxVE.Api.Shell.csproj", "{CAFEC2C7-A2F5-4923-B1B7-003633324105}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Corsinvest.ProxmoxVE.Api.Shell", "src\Corsinvest.ProxmoxVE.Api.Shell\Corsinvest.ProxmoxVE.Api.Shell.csproj", "{CAFEC2C7-A2F5-4923-B1B7-003633324105}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

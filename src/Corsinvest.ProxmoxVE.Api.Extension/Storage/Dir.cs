@@ -25,11 +25,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Storage
         public string Path => ApiData.path;
 
         /// <summary>
-        /// Nodes
-        /// </summary>
-        public string Nodes => ApiData.nodes;
-
-        /// <summary>
         /// Max files.
         /// </summary>
         public int Maxfiles => ApiData.maxfiles;
