@@ -28,6 +28,25 @@ body:
       label: Relevant log output
       description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
       render: shell
+
+  - type: input
+    id: net-version
+    attributes:
+      label: Net Version
+      description: Net Version (.NET Framework 4.7,.NET Framework 4.8, NetCore 3.1, .Net 5.0, .Net 6.0)
+      placeholder: 3.X.X
+    validations:
+      required: true
+  
+  - type: input
+    id: proxmox-ve-version
+    attributes:
+      label: Peoxmox VE Version
+      description: Peoxmox VE Version
+      placeholder: 5.X.X
+    validations:
+      required: true
+
   - type: input
     id: bug-version
     attributes:
