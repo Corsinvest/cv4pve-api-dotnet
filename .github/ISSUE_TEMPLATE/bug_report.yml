@@ -41,8 +41,8 @@ body:
   - type: input
     id: proxmox-ve-version
     attributes:
-      label: Peoxmox VE Version
-      description: Peoxmox VE Version
+      label: Proxmox VE Version
+      description: Proxmox VE Version
       placeholder: 5.X.X
     validations:
       required: true
