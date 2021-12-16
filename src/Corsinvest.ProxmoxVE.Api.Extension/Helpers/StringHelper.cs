@@ -61,7 +61,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
                 md5.Clear();
             }
 
-            using var tDes = new TripleDESCryptoServiceProvider
+            using var tDes = new TripleDESCryptoServiceProvider()
             {
                 Key = keyArray,
                 Mode = CipherMode.ECB,

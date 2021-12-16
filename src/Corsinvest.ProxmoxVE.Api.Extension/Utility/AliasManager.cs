@@ -127,21 +127,22 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
         /// <returns></returns>
         public string ToTable(bool verbose, TableOutputType outputType)
         {
-            var columns = verbose ?
-                            new[] { "name", "description", "command", "args", "sys" } :
-                            new[] { "name", "description", "sys" };
+            var columns = verbose
+                            ? new[] { "name", "description", "command", "args", "sys" }
+                            : new[] { "name", "description", "sys" };
 
             var rows = Alias.OrderByDescending(a => a.System)
                             .ThenBy(a => a.Name)
-                            .Select(a => verbose ?
-                                    new[] { a.Name,
-                                            a.Description,
-                                            a.Command,
-                                            string.Join(",", StringHelper.GetArgumentTags(a.Command)),
-                                            a.System ? "X" : "" } :
-                                    new[] { a.Name,
-                                            a.Description,
-                                            a.System ? "X" : "" });
+                            .Select(a => verbose
+                                    ? new[] { a.Name,
+                                              a.Description,
+                                              a.Command,
+                                              string.Join(",", StringHelper.GetArgumentTags(a.Command)),
+                                              a.System ? "X" : "" }
+
+                                    : new[] { a.Name,
+                                              a.Description,
+                                              a.System ? "X" : "" });
 
             return TableHelper.Create(columns, rows, outputType, false);
         }

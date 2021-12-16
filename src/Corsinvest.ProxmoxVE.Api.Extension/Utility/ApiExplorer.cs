@@ -138,9 +138,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
             if (result != null && !result.IsSuccessStatusCode)
             {
                 resultText.AppendLine(result.ReasonPhrase);
-                resultText.AppendLine(verbose ?
-                                      JsonConvert.SerializeObject((string)result.Response.errors, Formatting.Indented) :
-                                      result.GetError());
+                resultText.AppendLine(verbose
+                                        ? JsonConvert.SerializeObject((string)result.Response.errors, Formatting.Indented)
+                                        : result.GetError());
             }
             else if (result.InError())
             {
@@ -163,7 +163,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
                         case OutputType.Json:
                         case OutputType.JsonPretty:
                             resultText.AppendLine(JsonConvert.SerializeObject(result.Response.data,
-                                            outputType == OutputType.JsonPretty ? Formatting.Indented : Formatting.None));
+                                                                              outputType == OutputType.JsonPretty
+                                                                                ? Formatting.Indented
+                                                                                : Formatting.None));
                             break;
 
                         case OutputType.Text:

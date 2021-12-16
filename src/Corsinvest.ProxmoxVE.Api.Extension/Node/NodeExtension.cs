@@ -29,12 +29,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         /// <returns></returns>
         public static string Info(this IReadOnlyList<NodeInfo> nodes, TableOutputType outputType)
         {
-            return nodes.Count > 0 ?
-                    TableHelper.Create(NodeInfo.GetTitlesInfo(),
-                                       nodes.Select(a => a.GetRowInfo()),
-                                       outputType,
-                                       false) :
-                    "";
+            return nodes.Count > 0
+                    ? TableHelper.Create(NodeInfo.GetTitlesInfo(),
+                                         nodes.Select(a => a.GetRowInfo()),
+                                         outputType,
+                                         false)
+                    : "";
         }
     }
 }

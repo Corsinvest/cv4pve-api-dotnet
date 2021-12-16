@@ -4,7 +4,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>8.0</LangVersion>
 
-    <Version>2.8.0</Version>
+    <Version>2.9.0</Version>
     <Company>Corsinvest Srl</Company>
     <Authors>Daniele Corsini</Authors>
     <Copyright>Corsinvest Srl</Copyright>

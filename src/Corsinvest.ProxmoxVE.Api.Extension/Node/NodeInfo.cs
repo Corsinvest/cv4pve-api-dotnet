@@ -82,7 +82,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         /// Server id
         /// </summary>
         /// <returns></returns>
-        public string ServerId => IsOnline ? NodeApi.Subscription.Get().Response.data.serverid : "";
+        public string ServerId
+            => IsOnline
+                ? NodeApi.Subscription.Get().Response.data.serverid
+                : "";
 
         /// <summary>
         /// Type
@@ -92,7 +95,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         /// <summary>
         /// Up Time
         /// </summary>
-        public TimeSpan? UpTime => ApiData.uptime == 0 ? null : TimeSpan.FromSeconds(ApiData.uptime);
+        public TimeSpan? UpTime
+            => ApiData.uptime == 0
+                ? null
+                : TimeSpan.FromSeconds(ApiData.uptime);
 
         /// <summary>
         /// Title info

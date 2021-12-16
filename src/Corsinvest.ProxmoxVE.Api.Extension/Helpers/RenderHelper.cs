@@ -31,18 +31,13 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// <param name="returnParameters"></param>
         /// <returns></returns>
         public static object Value(object value, string key, List<ParameterApi> returnParameters)
-        {
-            if (returnParameters == null)
-            {
-                return (value is ExpandoObject || value is IList) ?
-                        Newtonsoft.Json.JsonConvert.SerializeObject(value) :
-                        value;
-            }
-            else
-            {
-                return returnParameters.Where(a => a.Name == key).FirstOrDefault().RendererValue(value);
-            }
-        }
+            => returnParameters == null
+                ? (value is ExpandoObject || value is IList)
+                    ? Newtonsoft.Json.JsonConvert.SerializeObject(value)
+                    : value
 
+                : returnParameters.Where(a => a.Name == key)
+                                    .FirstOrDefault()
+                                    .RendererValue(value);
     }
 }

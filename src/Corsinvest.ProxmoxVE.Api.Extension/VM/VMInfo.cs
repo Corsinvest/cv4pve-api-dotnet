@@ -67,7 +67,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// Up Time
         /// </summary>
         /// <returns></returns>
-        public TimeSpan? UpTime => ApiData.uptime == 0 ? null : TimeSpan.FromSeconds(ApiData.uptime);
+        public TimeSpan? UpTime
+            => ApiData.uptime == 0
+                ? null
+                : TimeSpan.FromSeconds(ApiData.uptime);
 
         /// <summary>
         /// Is Template

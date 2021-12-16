@@ -40,7 +40,7 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
             Type = token["type"] + "";
             TypeText = token["typetext"] + "";
             Maximum = token["maximum"] == null ? null : (int?)token["maximum"];
-            Minimum = token["minimum"] == null ? null : (int?)token["maximum"];
+            Minimum = token["minimum"] == null ? null : (int?)token["minimum"];
             Renderer = token["renderer"] + "";
             Default = token["default"] == null ? null : token["default"] + "";
 

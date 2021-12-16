@@ -49,9 +49,9 @@ namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public static CommandOption<T> DependOn<T>(this CommandOption<T> option,
-                                                CommandLineApplication command,
-                                                string optionName,
-                                                string errorMessage = null)
+                                                   CommandLineApplication command,
+                                                   string optionName,
+                                                   string errorMessage = null)
         {
             if (!string.IsNullOrWhiteSpace(optionName))
             {

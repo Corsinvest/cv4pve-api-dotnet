@@ -33,9 +33,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
             DynamicHelper.CheckKeyOrCreate(_apiData, "snaptime");
             DynamicHelper.CheckKeyOrCreate(_apiData, "vmstate", 0);
 
-            Date = _apiData.snaptime == null ?
-                   DateTime.Now :
-                   DateTimeOffset.FromUnixTimeSeconds(_apiData.snaptime).DateTime;
+            Date = _apiData.snaptime == null
+                        ? DateTime.Now
+                        : DateTimeOffset.FromUnixTimeSeconds(_apiData.snaptime).DateTime;
         }
 
         /// <summary>

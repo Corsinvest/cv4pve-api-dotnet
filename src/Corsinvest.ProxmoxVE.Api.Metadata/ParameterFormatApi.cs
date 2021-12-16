@@ -31,7 +31,7 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
             Optional = (token["optional"] ?? 0).ToString() == "1";
             Type = token["type"] + "";
             Maximum = token["maximum"] == null ? null : (int?)token["maximum"];
-            Minimum = token["minimum"] == null ? null : (int?)token["maximum"];
+            Minimum = token["minimum"] == null ? null : (int?)token["minimum"];
             DefaultKey = token["default_key"] + "";
             FormatDescription = token["format_description"] + "";
             Format = token["format"] + "";

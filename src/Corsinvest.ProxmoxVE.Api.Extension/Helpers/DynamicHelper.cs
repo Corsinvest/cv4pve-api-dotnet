@@ -28,7 +28,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         public static void CheckKeyOrCreate(dynamic obj, string key, object defaultValue = null)
         {
             var dic = (IDictionary<string, object>)obj;
-            if (!(dic.ContainsKey(key))) { dic.Add(key, defaultValue); }
+            if (!dic.ContainsKey(key)) { dic.Add(key, defaultValue); }
         }
 
         /// <summary>
@@ -41,7 +41,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         public static object GetValue(dynamic obj, string key, object defaultValue = null)
         {
             var dic = (IDictionary<string, object>)obj;
-            return dic.TryGetValue(key, out var value) ? value : defaultValue;
+            return dic.TryGetValue(key, out var value)
+                        ? value
+                        : defaultValue;
         }
     }
 }

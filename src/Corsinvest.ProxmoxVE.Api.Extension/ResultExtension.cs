@@ -42,7 +42,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         /// <param name="result"></param>
         /// <returns></returns>
         public static IEnumerable<dynamic> ToEnumerableOrDefault(this Result result)
-            => result.IsSuccessStatusCode ? result.ToEnumerable() : new List<dynamic>();
+            => result.IsSuccessStatusCode
+                ? result.ToEnumerable()
+                : new List<dynamic>();
 
         /// <summary>
         /// Check result in error.
@@ -74,9 +76,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         /// <param name="vm"></param>
         /// <param name="timeout"></param>
         public static bool WaitForTaskToFinish(this Result result, VMInfo vm, long timeout)
-            => result != null && !result.ResponseInError && timeout > 0 ?
-                vm.Client.WaitForTaskToFinish(vm.Node, result.Response.data, 1000, timeout) :
-                true;
+            => result != null && !result.ResponseInError && timeout > 0
+                ? vm.Client.WaitForTaskToFinish(vm.Node, result.Response.data, 1000, timeout)
+                : true;
 
         /// <summary>
         /// Check task is running.

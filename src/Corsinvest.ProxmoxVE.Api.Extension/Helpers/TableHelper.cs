@@ -105,7 +105,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
                 for (int i = 0; i < columns.Count(); i++) { rowData.Add(titles[i], row[i]); }
             }
 
-            return JsonConvert.SerializeObject(data, pretty ? Formatting.Indented : Formatting.None);
+            return JsonConvert.SerializeObject(data, pretty
+                                                ? Formatting.Indented
+                                                : Formatting.None);
         }
 
         /// <summary>

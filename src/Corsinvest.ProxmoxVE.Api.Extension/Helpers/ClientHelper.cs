@@ -33,7 +33,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         public static PveClient GetClientFromHA(string hostsAndPortHA, TextWriter @out, int timeout = 4000)
         {
             var data = GetHostsAndPorts(hostsAndPortHA, 8006, true, @out, timeout);
-            return data.Count() == 0 ? null : new PveClient(data[0].Host, data[0].Port);
+            return data.Count() == 0
+                    ? null
+                    : new PveClient(data[0].Host, data[0].Port);
         }
 
         /// <summary>

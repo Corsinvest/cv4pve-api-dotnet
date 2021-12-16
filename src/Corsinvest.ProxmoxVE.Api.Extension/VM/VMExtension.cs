@@ -29,12 +29,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <returns></returns>
         public static string Info(this IReadOnlyList<VMInfo> vms, TableOutputType outputType)
         {
-            return vms.Count > 0 ?
-                    TableHelper.Create(VMInfo.GetTitlesInfo(),
-                                       vms.Select(a => a.GetRowInfo()),
-                                       outputType,
-                                       false) :
-                    "";
+            return vms.Count > 0
+                    ? TableHelper.Create(VMInfo.GetTitlesInfo(),
+                                         vms.Select(a => a.GetRowInfo()),
+                                         outputType,
+                                         false)
+                    : "";
         }
 
         /// <summary>
@@ -46,12 +46,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <returns></returns>
         public static string Info(this IEnumerable<Snapshot> snapshots, bool showNodeAndVm, TableOutputType outputType)
         {
-            return snapshots.Count() > 0 ?
-                    TableHelper.Create(Snapshot.GetTitlesInfo(showNodeAndVm),
-                                       snapshots.Select(a => a.GetRowInfo(showNodeAndVm)),
-                                       outputType,
-                                       false) :
-                    "";
+            return snapshots.Count() > 0
+                    ? TableHelper.Create(Snapshot.GetTitlesInfo(showNodeAndVm),
+                                         snapshots.Select(a => a.GetRowInfo(showNodeAndVm)),
+                                         outputType,
+                                         false)
+                    : "";
         }
     }
 }

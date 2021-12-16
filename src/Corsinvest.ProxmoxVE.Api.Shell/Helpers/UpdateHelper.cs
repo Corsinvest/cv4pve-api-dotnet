@@ -37,9 +37,9 @@ namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers
             var info = GetInfoLastReleaseAssetFromGitHub(appName);
             var currVer = ShellHelper.GetCurrentVersionApp();
             var isNewVersion = info.Version.ToString() != currVer;
-            var msg = isNewVersion ?
-                        $"New version available: {info.Version}" :
-                        "You are already at the latest version";
+            var msg = isNewVersion
+                        ? $"New version available: {info.Version}"
+                        : "You are already at the latest version";
 
             return ($@"===== In execution release:
 Version:       {currVer}
