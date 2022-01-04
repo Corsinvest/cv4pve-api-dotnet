@@ -56,7 +56,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
                                      bool hasInnerRows)
         {
             string ret;
-            if (outputType == TableOutputType.Html) { ret = ToHtml(columns, rows); }
+            if (rows.Count() == 0) { ret = ""; }
+            else if (outputType == TableOutputType.Html) { ret = ToHtml(columns, rows); }
             else if (outputType == TableOutputType.Json) { ret = ToJson(columns.ToArray(), rows, false); }
             else if (outputType == TableOutputType.JsonPretty) { ret = ToJson(columns.ToArray(), rows, true); }
             else
@@ -190,11 +191,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
                 {
                     //create rows
                     var row = new List<object>();
-                    foreach (var column in columns)
+                    foreach (var title in columns.Select(a => a.Title))
                     {
-                        if (item.TryGetValue(column.Title, out var value))
+                        if (item.TryGetValue(title, out var value))
                         {
-                            value = RenderHelper.Value(value, column.Title, returnParameters);
+                            value = RenderHelper.Value(value, title, returnParameters);
                         }
                         if (value == null) { value = ""; }
                         row.Add(value);
