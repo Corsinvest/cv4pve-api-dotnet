@@ -13,6 +13,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
@@ -27,12 +28,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// </summary>
         /// <param name="client"></param>
         /// <returns></returns>
-        public static VMInfo[] GetVMs(this PveClient client)
-            => client.Cluster.Resources.GetRest("vm").ToEnumerable()
-                                       .Select(a => new VMInfo(client, a))
-                                       .OrderBy(a => a.Node)
-                                       .ThenBy(a => a.Id)
-                                       .ToArray();
+        public static async Task<VMInfo[]> GetVMs(this PveClient client)
+            => (await client.Cluster.Resources.GetRest("vm")).ToEnumerable()
+                                                             .Select(a => new VMInfo(client, a))
+                                                             .OrderBy(a => a.Node)
+                                                             .ThenBy(a => a.Id)
+                                                             .ToArray();
 
         /// <summary>
         /// Get vm info from id or name.
@@ -40,8 +41,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <param name="client"></param>
         /// <param name="idOrName"></param>
         /// <returns></returns>
-        public static VMInfo GetVM(this PveClient client, string idOrName)
-            => GetVMs(client).Where(a => VmCheckIdOrName(a, idOrName)).FirstOrDefault() ??
+        public static async Task<VMInfo> GetVM(this PveClient client, string idOrName)
+            => (await GetVMs(client)).Where(a => VmCheckIdOrName(a, idOrName)).FirstOrDefault() ??
                     throw new ArgumentException($"VM/CT '{idOrName}' not found!");
 
         /// <summary>
@@ -85,9 +86,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <para>comma reparated</para>
         /// </param>
         /// <returns></returns>
-        public static VMInfo[] GetVMs(this PveClient client, string jolly)
+        public static async Task<VMInfo[]> GetVMs(this PveClient client, string jolly)
         {
-            var allVms = GetVMs(client);
+            var allVms = await GetVMs(client);
             var ret = new List<VMInfo>();
             foreach (var id in jolly.Split(','))
             {
@@ -106,7 +107,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                 {
                     //all in specific pool
                     var poolName = id.ToLower().Substring(6);
-                    var result = client.Pools[poolName].GetRest();
+                    var result = await client.Pools[poolName].GetRest();
                     if (result.IsSuccessStatusCode)
                     {
                         foreach (var item in result.Response.data.members)

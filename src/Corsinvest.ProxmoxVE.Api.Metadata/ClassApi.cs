@@ -12,6 +12,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
 namespace Corsinvest.ProxmoxVE.Api.Metadata
@@ -63,8 +64,8 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
         /// <param name="port"></param>
         /// <param name="resource"></param>
         /// <returns></returns>
-        public static ClassApi GetFromResource(string host, int port, string resource)
-            => GetFromResource(GeneretorClassApi.Generate(host, port), resource);
+        public static async Task<ClassApi> GetFromResource(string host, int port, string resource)
+            => GetFromResource(await GeneretorClassApi.Generate(host, port), resource);
 
         /// <summary>
         /// Get From Resource

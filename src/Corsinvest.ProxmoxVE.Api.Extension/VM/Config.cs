@@ -140,7 +140,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
             //snapshots
             foreach (var snapshot in VM.Snapshots)
             {
-                ret.Add(CreateConfig(snapshot.Config.Response.data, snapshot.Name));
+                ret.Add(CreateConfig(snapshot.Config.ToData(), snapshot.Name));
             }
 
             return string.Join(Environment.NewLine, ret);

@@ -14,6 +14,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
 using Corsinvest.ProxmoxVE.Api.Extension.VM;
 using McMaster.Extensions.CommandLineUtils;
@@ -331,7 +332,7 @@ range 100:107,-105,200:204
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static PveClient ClientTryLogin(this CommandLineApplication command)
+        public static async Task<PveClient> ClientTryLogin(this CommandLineApplication command)
         {
             var error = "Problem connection!";
             try
@@ -347,14 +348,14 @@ range 100:107,-105,200:204
                     client.ApiToken = command.GetApiToken().Value();
 
                     //check is valid API
-                    var ver = client.Version.Version();
+                    var ver = await client.Version.Version();
                     if (ver.IsSuccessStatusCode) { return client; }
                 }
                 else
                 {
                     //use user and password
                     //try login
-                    if (client.Login(command.GetUsername().Value(), GetPasswordFromOption(command)))
+                    if (await client.Login(command.GetUsername().Value(), GetPasswordFromOption(command)))
                     {
                         return client;
                     }

@@ -13,6 +13,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Node
 {
@@ -27,8 +28,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         /// <param name="client"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static NodeInfo GetNode(this PveClient client, string name)
-            => GetNodes(client).Where(a => a.Node == name).FirstOrDefault() ??
+        public static async Task<NodeInfo> GetNode(this PveClient client, string name)
+            => (await GetNodes(client)).Where(a => a.Node == name).FirstOrDefault() ??
                         throw new ArgumentException($"Node '{name}' not found!");
 
         /// <summary>
@@ -36,12 +37,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         /// </summary>
         /// <param name="client"></param>
         /// <returns></returns>
-        public static IReadOnlyList<NodeInfo> GetNodes(this PveClient client)
-            => client.Nodes.GetRest()
-                            .ToEnumerable()
-                            .Select(a => new NodeInfo(client, a))
-                            .OrderBy(a => a.Node)
-                            .ToList()
-                            .AsReadOnly();
+        public static async Task<IReadOnlyList<NodeInfo>> GetNodes(this PveClient client)
+            => (await client.Nodes.GetRest()).ToEnumerable()
+                                             .Select(a => new NodeInfo(client, a))
+                                             .OrderBy(a => a.Node)
+                                             .ToList()
+                                             .AsReadOnly();
     }
 }

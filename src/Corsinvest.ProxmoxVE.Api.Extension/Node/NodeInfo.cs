@@ -11,6 +11,7 @@
  */
 
 using System;
+using System.Threading.Tasks;
 using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
 using Corsinvest.ProxmoxVE.Api.Extension.VM;
 
@@ -84,7 +85,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         /// <returns></returns>
         public string ServerId
             => IsOnline
-                ? NodeApi.Subscription.Get().Response.data.serverid
+                ?  NodeApi.Subscription.Get().GetAwaiter().GetResult().ToData().serverid
                 : "";
 
         /// <summary>
@@ -127,11 +128,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Node
         /// <param name="vmId"></param>
         /// <param name="archive"></param>
         /// <returns></returns>
-        public Result RestoreBackup(VMTypeEnum type, int vmId, string archive)
+        public async Task<Result> RestoreBackup(VMTypeEnum type, int vmId, string archive)
             => type switch
             {
-                VMTypeEnum.Qemu => NodeApi.Qemu.CreateRest(vmid: vmId, archive: archive),
-                VMTypeEnum.Lxc => NodeApi.Lxc.CreateRest(vmid: vmId, ostemplate: archive),
+                VMTypeEnum.Qemu => await NodeApi.Qemu.CreateRest(vmid: vmId, archive: archive),
+                VMTypeEnum.Lxc => await NodeApi.Lxc.CreateRest(vmid: vmId, ostemplate: archive),
                 _ => null,
             };
     }

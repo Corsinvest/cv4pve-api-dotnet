@@ -28,11 +28,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// Format 10.1.1.90:8006,10.1.1.91:8006,10.1.1.92:8006
         /// </summary>
         /// <param name="hostsAndPortHA"></param>
-        /// <param name="out"></param>
+        /// <param name="output"></param>
         /// <param name="timeout"></param>
-        public static PveClient GetClientFromHA(string hostsAndPortHA, TextWriter @out, int timeout = 4000)
+        public static PveClient GetClientFromHA(string hostsAndPortHA, TextWriter output, int timeout = 4000)
         {
-            var data = GetHostsAndPorts(hostsAndPortHA, 8006, true, @out, timeout);
+            var data = GetHostsAndPorts(hostsAndPortHA, 8006, true, output, timeout);
             return data.Count() == 0
                     ? null
                     : new PveClient(data[0].Host, data[0].Port);
@@ -45,13 +45,13 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
         /// <param name="hostsAndPorts"></param>
         /// <param name="defaultPort"></param>
         /// <param name="checkPort"></param>
-        /// <param name="out"></param>
+        /// <param name="output"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
         public static (string Host, int Port)[] GetHostsAndPorts(string hostsAndPorts,
                                                                  int defaultPort,
                                                                  bool checkPort,
-                                                                 TextWriter @out,
+                                                                 TextWriter output,
                                                                  int timeout = 4000)
         {
             var ret = new List<(string Host, int port)>();
@@ -80,18 +80,18 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Helpers
                             else
                             {
                                 // connection refused probably
-                                @out?.WriteLine($"Error: problem connection host {host} with port {port}");
+                                output?.WriteLine($"Error: problem connection host {host} with port {port}");
                             }
                         }
                         else
                         {
                             // timed out
-                            @out?.WriteLine($"Error: timeput problem connection host {host} with port {port}");
+                            output?.WriteLine($"Error: timeput problem connection host {host} with port {port}");
                         }
                     }
                     catch (Exception ex)
                     {
-                        @out?.WriteLine($"Error: host {host} {ex.Message}");
+                        output?.WriteLine($"Error: host {host} {ex.Message}");
                     }
 
                     //using var ping = new Ping();

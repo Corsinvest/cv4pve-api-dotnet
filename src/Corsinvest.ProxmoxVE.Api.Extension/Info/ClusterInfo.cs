@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Info
@@ -111,52 +112,52 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
         /// Collect data from client
         /// </summary>
         /// <param name="client"></param>
-        public void Collect(PveClient client)
+        public async Task Collect(PveClient client)
         {
             var stopwatch = Stopwatch.StartNew();
 
             Version = new Version(1, 0, 0);
             Date = DateTime.Now;
 
-            Pools = client.Pools.Index().ToEnumerable();
+            Pools = (await client.Pools.Index()).ToEnumerable();
 
-            Permissions.Users = client.Access.Users.Index().ToEnumerable();
-            Permissions.Groups = client.Access.Groups.Index().ToEnumerable();
-            Permissions.Roles = client.Access.Roles.Index().ToEnumerable();
-            Permissions.Acl = client.Access.Acl.ReadAcl().ToEnumerable();
-            Permissions.Domains = client.Access.Domains.Index().ToEnumerable();
+            Permissions.Users = (await client.Access.Users.Index()).ToEnumerable();
+            Permissions.Groups = (await client.Access.Groups.Index()).ToEnumerable();
+            Permissions.Roles = (await client.Access.Roles.Index()).ToEnumerable();
+            Permissions.Acl = (await client.Access.Acl.ReadAcl()).ToEnumerable();
+            Permissions.Domains = (await client.Access.Domains.Index()).ToEnumerable();
 
             //client.Cluster.Ceph.Flags
 
-            Storage = client.Storage.Index().ToEnumerable();
+            Storage = (await client.Storage.Index()).ToEnumerable();
 
-            Replication = client.Cluster.Replication.Index().ToEnumerable();
-            Config.Totem = client.Cluster.Config.Totem.Totem().Response.data;
-            Config.Nodes = client.Cluster.Config.Nodes.Nodes().ToEnumerable();
-            Backups = client.Cluster.Backup.Index().ToEnumerable();
-            Resources = client.Cluster.Resources.Resources().ToEnumerable();
-            Status = client.Cluster.Status.GetStatus().ToEnumerable();
+            Replication = (await client.Cluster.Replication.Index()).ToEnumerable();
+            Config.Totem = (await client.Cluster.Config.Totem.Totem()).ToData();
+            Config.Nodes = (await client.Cluster.Config.Nodes.Nodes()).ToEnumerable();
+            Backups = (await client.Cluster.Backup.Index()).ToEnumerable();
+            Resources = (await client.Cluster.Resources.Resources()).ToEnumerable();
+            Status = (await client.Cluster.Status.GetStatus()).ToEnumerable();
 
-            Options = client.Cluster.Options.GetOptions().Response.data;
+            Options = (await client.Cluster.Options.GetOptions()).ToData();
 
-            var status = client.Cluster.Ha.Status.Current.Status();
+            var status = await client.Cluster.Ha.Status.Current.Status();
             HA.Status = status.IsSuccessStatusCode
-                                ? client.Cluster.Ha.Status.Current.Status().ToEnumerable()
+                                ? (await client.Cluster.Ha.Status.Current.Status()).ToEnumerable()
                                 : new List<dynamic>();
 
-            HA.Resources = client.Cluster.Ha.Resources.Index().ToEnumerable();
-            HA.Groups = client.Cluster.Ha.Groups.Index().ToEnumerable();
+            HA.Resources = (await client.Cluster.Ha.Resources.Index()).ToEnumerable();
+            HA.Groups = (await client.Cluster.Ha.Groups.Index()).ToEnumerable();
 
-            Firewall.Aliases = client.Cluster.Firewall.Aliases.GetAliases().ToEnumerable();
-            Firewall.Groups = client.Cluster.Firewall.Groups.ListSecurityGroups().ToEnumerable();
-            Firewall.Ipset = client.Cluster.Firewall.Ipset.IpsetIndex().ToEnumerable();
-            Firewall.Macros = client.Cluster.Firewall.Macros.GetMacros().ToEnumerable();
-            Firewall.Options = client.Cluster.Firewall.Options.GetOptions().Response.data;
-            Firewall.Refs = client.Cluster.Firewall.Refs.Refs().ToEnumerable();
-            Firewall.Rules = client.Cluster.Firewall.Rules.GetRules().ToEnumerable();
+            Firewall.Aliases = (await client.Cluster.Firewall.Aliases.GetAliases()).ToEnumerable();
+            Firewall.Groups = (await client.Cluster.Firewall.Groups.ListSecurityGroups()).ToEnumerable();
+            Firewall.Ipset = (await client.Cluster.Firewall.Ipset.IpsetIndex()).ToEnumerable();
+            Firewall.Macros = (await client.Cluster.Firewall.Macros.GetMacros()).ToEnumerable();
+            Firewall.Options = (await client.Cluster.Firewall.Options.GetOptions()).ToData();
+            Firewall.Refs = (await client.Cluster.Firewall.Refs.Refs()).ToEnumerable();
+            Firewall.Rules = (await client.Cluster.Firewall.Rules.GetRules()).ToEnumerable();
 
             var nodeList = new List<Node>();
-            foreach (var nodeItem in client.Nodes.Index().ToEnumerable())
+            foreach (var nodeItem in (await client.Nodes.Index()).ToEnumerable())
             {
                 var node = client.Nodes[nodeItem.node as string];
                 var nodeDetail = new Node();
@@ -167,20 +168,20 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
                 nodeResource.Detail = nodeDetail;
                 if (nodeItem.status != "online") { continue; }
 
-                //nodeResult.Report = node.Report.Report().Response.data;
-                nodeDetail.PackageVersions = node.Apt.Versions.Versions().ToEnumerable();
-                nodeDetail.AptUpdate = node.Apt.Update.ListUpdates().ToEnumerable();
-                nodeDetail.Status = node.Status.Status().Response.data;
-                nodeDetail.Services = node.Services.Index().ToEnumerable();
-                nodeDetail.Subscription = node.Subscription.Get().Response.data;
+                //nodeResult.Report = node.Report.Report().ToData();
+                nodeDetail.PackageVersions = (await node.Apt.Versions.Versions()).ToEnumerable();
+                nodeDetail.AptUpdate = (await node.Apt.Update.ListUpdates()).ToEnumerable();
+                nodeDetail.Status = (await node.Status.Status()).ToData();
+                nodeDetail.Services = (await node.Services.Index()).ToEnumerable();
+                nodeDetail.Subscription = (await node.Subscription.Get()).ToData();
                 nodeDetail.Subscription.key = "REMOVED FOR SECURITY";
 
-                nodeDetail.Firewall.Options = node.Firewall.Options.GetOptions().Response.data;
-                nodeDetail.Firewall.Rules = node.Firewall.Rules.GetRules().ToEnumerable();
+                nodeDetail.Firewall.Options = (await node.Firewall.Options.GetOptions()).ToData();
+                nodeDetail.Firewall.Rules = (await node.Firewall.Rules.GetRules()).ToEnumerable();
 
-                nodeDetail.Version = node.Version.Version().Response.data;
+                nodeDetail.Version = (await node.Version.Version()).ToData();
 
-                nodeDetail.Certificates = node.Certificates.Info.Info().ToEnumerable();
+                nodeDetail.Certificates = (await node.Certificates.Info.Info()).ToEnumerable();
                 foreach (var item in nodeDetail.Certificates)
                 {
                     item.fingerprint = "REMOVED FOR SECURITY";
@@ -188,133 +189,138 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
                 }
 
                 //ceph
-                nodeDetail.Ceph.Status = node.Ceph.Status.Status().Response.data;
+                nodeDetail.Ceph.Status = (await node.Ceph.Status.Status()).ToData();
                 if (nodeDetail.Ceph.Status != null)
                 {
-                    nodeDetail.Ceph.Config = node.Ceph.Config.Config().Response.data;
-                    nodeDetail.Ceph.Crush = node.Ceph.Crush.Crush().Response.data;
+                    nodeDetail.Ceph.Config = (await node.Ceph.Config.Config()).ToData();
+                    nodeDetail.Ceph.Crush = (await node.Ceph.Crush.Crush()).ToData();
                     //nodeDetail.Ceph.Disks = node.Ceph.Disks.Disks().ToEnumerable();
-                    //nodeDetail.Ceph.Flags = node.Ceph.Flags.GetFlags().Response.data;
-                    nodeDetail.Ceph.Mon = node.Ceph.Mon.Listmon().ToEnumerable();
-                    nodeDetail.Ceph.Osd = node.Ceph.Osd.Index().Response.data;
-                    nodeDetail.Ceph.Fs = node.Ceph.Fs.Index().Response.data;
-                    nodeDetail.Ceph.Pools = node.Ceph.Pools.Lspools().ToEnumerable();
-                    nodeDetail.Ceph.Rules = node.Ceph.Rules.Rules().ToEnumerable();
-                    nodeDetail.Ceph.Mds = node.Ceph.Mds.Index().ToEnumerableOrDefault();
-                    nodeDetail.Ceph.Mgr = node.Ceph.Mgr.Index().ToEnumerableOrDefault();
+                    //nodeDetail.Ceph.Flags = node.Ceph.Flags.GetFlags().ToData();
+                    nodeDetail.Ceph.Mon = (await node.Ceph.Mon.Listmon()).ToEnumerable();
+                    nodeDetail.Ceph.Osd = (await node.Ceph.Osd.Index()).ToData();
+                    nodeDetail.Ceph.Fs = (await node.Ceph.Fs.Index()).ToData();
+                    nodeDetail.Ceph.Pools = (await node.Ceph.Pools.Lspools()).ToEnumerable();
+                    nodeDetail.Ceph.Rules = (await node.Ceph.Rules.Rules()).ToEnumerable();
+                    nodeDetail.Ceph.Mds = (await node.Ceph.Mds.Index()).ToEnumerableOrDefault();
+                    nodeDetail.Ceph.Mgr = (await node.Ceph.Mgr.Index()).ToEnumerableOrDefault();
                 }
 
                 //last 2 days
-                nodeDetail.Tasks = node.Tasks.NodeTasks(errors: true, limit: 1000)
+                nodeDetail.Tasks = (await node.Tasks.NodeTasks(errors: true, limit: 1000))
                                              .ToEnumerable()
                                              .Where(a => a.starttime >= DateTimeUnixHelper.ConvertToUnixTime(DateTime.Now.AddDays(-2)));
-                nodeDetail.Replication = node.Replication.Status().ToEnumerable();
-                nodeDetail.Hardware.Pci = node.Hardware.Pci.Pciscan().ToEnumerable();
+                nodeDetail.Replication = (await node.Replication.Status()).ToEnumerable();
+                nodeDetail.Hardware.Pci = (await node.Hardware.Pci.Pciscan()).ToEnumerable();
 
-                var diskList = node.Disks.List.List().ToEnumerable();
+                var diskList = (await node.Disks.List.List()).ToEnumerable();
                 foreach (var item in diskList)
                 {
-                    item.Smart = node.Disks.Smart.Smart(item.devpath).Response.data;
+                    Result result = await node.Disks.Smart.Smart(item.devpath);
+                    item.Smart = result.ToData();
                 }
 
                 nodeDetail.Disks.List = diskList;
-                nodeDetail.Disks.Directory = node.Disks.Directory.Index().ToEnumerable();
-                nodeDetail.Disks.Lvm = node.Disks.Lvm.Index().Response.data;
-                nodeDetail.Disks.Lvmthin = node.Disks.Lvmthin.Index().ToEnumerable();
+                nodeDetail.Disks.Directory = (await node.Disks.Directory.Index()).ToEnumerable();
+                nodeDetail.Disks.Lvm = (await node.Disks.Lvm.Index()).ToData();
+                nodeDetail.Disks.Lvmthin = (await node.Disks.Lvmthin.Index()).ToEnumerable();
 
-                var diskZfs = node.Disks.Zfs.Index().ToEnumerable();
+                var diskZfs = (await node.Disks.Zfs.Index()).ToEnumerable();
                 foreach (var item in diskZfs)
                 {
-                    item.Detail = node.Disks.Zfs[item.name].Detail().Response.data;
+                    Result result = await node.Disks.Zfs[item.name].Detail();
+                    item.Detail = result.ToData();
                 }
                 nodeDetail.Disks.Zfs = diskZfs;
 
-                nodeDetail.Dns = node.Dns.Dns().Response.data;
-                nodeDetail.Hosts = node.Hosts.GetEtcHosts().Response.data.data;
-                nodeDetail.Netstat = node.Netstat.Netstat().ToEnumerable();
-                nodeDetail.Network = node.Network.Index().ToEnumerable();
-                nodeDetail.Timezone = node.Time.Time().Response.data.timezone as string;
+                nodeDetail.Dns = (await node.Dns.Dns()).ToData();
+                nodeDetail.Hosts = (await node.Hosts.GetEtcHosts()).ToData().data;
+                nodeDetail.Netstat = (await node.Netstat.Netstat()).ToEnumerable();
+                nodeDetail.Network = (await node.Network.Index()).ToEnumerable();
+                nodeDetail.Timezone = (await node.Time.Time()).ToData().timezone as string;
 
-                ReadRrdData(nodeDetail.RrdData, node.Rrddata);
+                await ReadRrdData(nodeDetail.RrdData, node.Rrddata);
 
                 //get storage for backups
-                var storageWithBackups = node.Storage.Index(format: true, content: "backup")
-                                                     .ToEnumerable()
-                                                     .Where(a => a.active == 1)
-                                                     .Select(a => a.storage as string);
+                var storageWithBackups = (await node.Storage.Index(format: true, content: "backup"))
+                                                            .ToEnumerable()
+                                                            .Where(a => a.active == 1)
+                                                            .Select(a => a.storage as string);
 
-                void SetCommonVM(Vm vmDetail, dynamic vm, int vmId, string type)
+                async Task SetCommonVM(Vm vmDetail, dynamic vm, int vmId, string type)
                 {
                     vmDetail.Config.description = "REMOVED FOR SECURITY";
 
-                    ReadRrdData(vmDetail.RrdData, vm.Rrddata);
+                    await ReadRrdData(vmDetail.RrdData, vm.Rrddata);
 
-                    vmDetail.Replication = node.Replication.Status(vmId).ToEnumerable();
+                    vmDetail.Replication = (await node.Replication.Status(vmId)).ToEnumerable();
 
-                    vmDetail.Tasks = node.Tasks.NodeTasks(errors: true, limit: 1000, vmid: vmId)
+                    vmDetail.Tasks = (await node.Tasks.NodeTasks(errors: true, limit: 1000, vmid: vmId))
                                                .ToEnumerable()
                                                .Where(a => a.starttime >= DateTimeUnixHelper.ConvertToUnixTime(DateTime.Now.AddDays(-2)));
 
-                    vmDetail.Backups = storageWithBackups.SelectMany(a => node.Storage[a].Content.Index("backup", vmId)
-                                                         .ToEnumerable())
-                                                         .ToList();
+                    var backups = new List<dynamic>();
+                    foreach (var item in storageWithBackups)
+                    {
+                        backups.AddRange((await node.Storage[item].Content.Index("backup", vmId)).ToEnumerable());
+                    }
+                    vmDetail.Backups = backups;
 
                     vmDetail.Permissions = Permissions.Acl.Where(a => a.path == $"/vms/{vmId}").ToList();
 
                     //firewall
-                    vmDetail.Firewall.Aliases = ((Result)vm.Firewall.Aliases.GetAliases()).ToEnumerable();
-                    vmDetail.Firewall.Ipset = ((Result)vm.Firewall.Ipset.IpsetIndex()).ToEnumerable();
-                    vmDetail.Firewall.Options = vm.Firewall.Options.GetOptions().Response.data;
-                    vmDetail.Firewall.Refs = ((Result)vm.Firewall.Refs.Refs()).ToEnumerable();
-                    vmDetail.Firewall.Refs = ((Result)vm.Firewall.Rules.GetRules()).ToEnumerable();
+                    vmDetail.Firewall.Aliases = ((Result) await ((dynamic)vm).Firewall.Aliases.GetAliases()).ToEnumerable();
+                    vmDetail.Firewall.Ipset = ((Result) await ((dynamic)vm).Firewall.Ipset.IpsetIndex()).ToEnumerable();
+                    vmDetail.Firewall.Options =  ((Result)await ((dynamic)vm).Firewall.Options.GetOptions()).ToData();
+                    vmDetail.Firewall.Refs = ((Result) await ((dynamic)vm).Firewall.Refs.Refs()).ToEnumerable();
+                    vmDetail.Firewall.Refs = ((Result) await ((dynamic)vm).Firewall.Rules.GetRules()).ToEnumerable();
 
                     var vmResource = Resources.Where(a => a.type == type && a.vmid == vmId).FirstOrDefault();
                     vmResource.Detail = vmDetail;
                 }
 
                 //lxc
-                foreach (var vmItem in node.Lxc.Vmlist().ToEnumerable())
+                foreach (var vmItem in (await node.Lxc.Vmlist()).ToEnumerable())
                 {
                     int vmId = Convert.ToInt32(vmItem.vmid);
                     var vm = node.Lxc[vmId];
                     var vmDetail = new Vm
                     {
-                        Config = vm.Config.VmConfig().Response.data,
-                        Snapshots = vm.Snapshot.List().ToEnumerable(),
-                        Status = vm.Status.Current.VmStatus().Response.data
+                        Config = (await vm.Config.VmConfig()).ToData(),
+                        Snapshots = (await vm.Snapshot.List()).ToEnumerable(),
+                        Status = (await vm.Status.Current.VmStatus()).ToData()
                     };
 
-                    SetCommonVM(vmDetail, vm, vmId, "lxc");
+                    await SetCommonVM(vmDetail, vm, vmId, "lxc");
                 }
 
                 //qemu
-                foreach (var vmItem in node.Qemu.Vmlist().ToEnumerable())
+                foreach (var vmItem in (await node.Qemu.Vmlist()).ToEnumerable())
                 {
                     int vmId = Convert.ToInt32(vmItem.vmid);
                     var vm = node.Qemu[vmId];
                     var vmDetail = new Vm
                     {
-                        Config = vm.Config.VmConfig().Response.data,
-                        AgentGuestRunning = vm.Agent.Network_Get_Interfaces.Network_Get_Interfaces().Response.data != null,
-                        Snapshots = vm.Snapshot.SnapshotList().ToEnumerable(),
-                        Status = vm.Status.Current.VmStatus().Response.data
+                        Config = (await vm.Config.VmConfig()).ToData(),
+                        AgentGuestRunning = (await vm.Agent.Network_Get_Interfaces.Network_Get_Interfaces()).ToData() != null,
+                        Snapshots = (await vm.Snapshot.SnapshotList()).ToEnumerable(),
+                        Status = (await vm.Status.Current.VmStatus()).ToData()
                     };
 
-                    SetCommonVM(vmDetail, vm, vmId, "qemu");
+                    await SetCommonVM(vmDetail, vm, vmId, "qemu");
                 }
 
                 //storages
-                foreach (var storageItem in node.Storage.Index().ToEnumerable()
+                foreach (var storageItem in (await node.Storage.Index()).ToEnumerable()
                                                                 .Where(a => a.enabled == 1 && a.active == 1))
                 {
                     var storageNode = node.Storage[storageItem.storage as string];
                     var storeageDetail = new Storage
                     {
-                        Content = storageNode.Content.Index().Response.data,
-                        Status = storageNode.Status.ReadStatus().Response.data,
+                        Content = (await storageNode.Content.Index()).ToData(),
+                        Status = (await storageNode.Status.ReadStatus()).ToData(),
                     };
 
-                    ReadRrdData(storeageDetail.RrdData, storageNode.Rrddata);
+                    await ReadRrdData(storeageDetail.RrdData, storageNode.Rrddata);
 
                     storeageDetail.Permissions = Permissions.Acl.Where(a => a.path == $"/storage/{storageItem.storage}")
                                                                 .ToList();
@@ -333,10 +339,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Info
             CollectExecution = stopwatch.Elapsed;
         }
 
-        private static void ReadRrdData(RrdData rrdDataItem, dynamic itemToRead)
+        private static async Task ReadRrdData(RrdData rrdDataItem, dynamic itemToRead)
         {
-            rrdDataItem.Day = ((Result)itemToRead.Rrddata("day", "AVERAGE")).ToEnumerable();
-            rrdDataItem.Week = ((Result)itemToRead.Rrddata("week", "AVERAGE")).ToEnumerable();
+            rrdDataItem.Day = ((Result)await itemToRead.Rrddata("day", "AVERAGE")).ToEnumerable();
+            rrdDataItem.Week = ((Result)await itemToRead.Rrddata("week", "AVERAGE")).ToEnumerable();
         }
     }
 }

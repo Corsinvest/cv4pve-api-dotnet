@@ -143,11 +143,7 @@ Release Notes: {info.ReleaseNotes}
         /// Finish upgrade
         /// </summary>
         /// <param name="fileNameNew"></param>
-        public static void UpgradeFinish(string fileNameNew)
-        {
-            var fileNameApp = GetFileNameAppFromNew(fileNameNew);
-            File.Copy(fileNameNew, fileNameApp, true);
-        }
+        public static void UpgradeFinish(string fileNameNew) => File.Copy(fileNameNew, GetFileNameAppFromNew(fileNameNew), true);
 
         /// <summary>
         /// Prepare upgrade from last release

@@ -13,6 +13,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
 {
@@ -27,22 +28,22 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         internal Snapshots(VMInfo vm)
         {
             _vm = vm;
-            RefreshList();
+            RefreshList().GetAwaiter().GetResult();
         }
 
-        private void RefreshList()
+        private async Task RefreshList()
         {
             var snapshots = new List<Snapshot>();
 
             Result result = null;
             switch (_vm.Type)
             {
-                case VMTypeEnum.Qemu: result = _vm.QemuApi.Snapshot.GetRest(); break;
-                case VMTypeEnum.Lxc: result = _vm.LxcApi.Snapshot.GetRest(); break;
+                case VMTypeEnum.Qemu: result = await _vm.QemuApi.Snapshot.GetRest(); break;
+                case VMTypeEnum.Lxc: result = await _vm.LxcApi.Snapshot.GetRest(); break;
                 default: break;
             }
 
-            foreach (var snapshot in result.Response.data) { snapshots.Add(new Snapshot(_vm, snapshot)); }
+            foreach (var snapshot in result.ToData()) { snapshots.Add(new Snapshot(_vm, snapshot)); }
             _snapshots = snapshots.OrderBy(a => a.Date).ToList();
         }
 
@@ -78,19 +79,19 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <param name="state"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public Result Create(string name, string description, bool state, long timeout)
+        public async Task<Result> Create(string name, string description, bool state, long timeout)
         {
             Result result = null;
             switch (_vm.Type)
             {
-                case VMTypeEnum.Qemu: result = _vm.QemuApi.Snapshot.CreateRest(name, description, state); break;
-                case VMTypeEnum.Lxc: result = _vm.LxcApi.Snapshot.CreateRest(name, description); break;
+                case VMTypeEnum.Qemu: result = await _vm.QemuApi.Snapshot.CreateRest(name, description, state); break;
+                case VMTypeEnum.Lxc: result = await _vm.LxcApi.Snapshot.CreateRest(name, description); break;
                 default: break;
             }
 
-            result.WaitForTaskToFinish(_vm, timeout);
+            await result.WaitForTaskToFinish(_vm, timeout);
 
-            RefreshList();
+            await RefreshList();
 
             return result;
         }
@@ -101,13 +102,13 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <param name="keep"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public Result Clear(int keep, long timeout)
+        public async Task<Result> Clear(int keep, long timeout)
         {
             Result result = null;
             var snapshots = this.OrderBy(a => a.Date).ToArray();
             for (int i = 0; i < Count - keep; i++)
             {
-                result = Remove(snapshots[i], timeout);
+                result = await Remove(snapshots[i], timeout);
                 if (result.ResponseInError) { break; }
             }
 
@@ -120,19 +121,19 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <param name="snapshot"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public Result Remove(Snapshot snapshot, long timeout)
+        public async Task< Result> Remove(Snapshot snapshot, long timeout)
         {
             Result result = null;
             switch (_vm.Type)
             {
-                case VMTypeEnum.Qemu: result = _vm.QemuApi.Snapshot[snapshot.Name].DeleteRest(); break;
-                case VMTypeEnum.Lxc: result = _vm.LxcApi.Snapshot[snapshot.Name].DeleteRest(); break;
+                case VMTypeEnum.Qemu: result = await _vm.QemuApi.Snapshot[snapshot.Name].DeleteRest(); break;
+                case VMTypeEnum.Lxc: result = await _vm.LxcApi.Snapshot[snapshot.Name].DeleteRest(); break;
                 default: break;
             }
 
-            result.WaitForTaskToFinish(_vm, timeout);
+            await result.WaitForTaskToFinish(_vm, timeout);
 
-            RefreshList();
+            await RefreshList();
 
             return result;
         }

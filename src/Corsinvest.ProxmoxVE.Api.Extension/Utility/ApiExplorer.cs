@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
 using Corsinvest.ProxmoxVE.Api.Metadata;
 using Newtonsoft.Json;
@@ -109,14 +110,14 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
         /// <param name="wait"></param>
         /// <param name="outputType"></param>
         /// <param name="verbose"></param>
-        public static (int ResultCode, string ResultText) Execute(PveClient client,
-                                                                  ClassApi classApiRoot,
-                                                                  string resource,
-                                                                  MethodType methodType,
-                                                                  Dictionary<string, object> parameters,
-                                                                  bool wait = false,
-                                                                  OutputType outputType = OutputType.Unicode,
-                                                                  bool verbose = false)
+        public static async Task<(int ResultCode, string ResultText)> Execute(PveClient client,
+                                                                              ClassApi classApiRoot,
+                                                                              string resource,
+                                                                              MethodType methodType,
+                                                                              Dictionary<string, object> parameters,
+                                                                              bool wait = false,
+                                                                              OutputType outputType = OutputType.Unicode,
+                                                                              bool verbose = false)
         {
             var currResponseType = client.ResponseType;
             if (outputType == OutputType.Png) { client.ResponseType = ResponseType.Png; }
@@ -125,10 +126,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
             Result result = null;
             switch (methodType)
             {
-                case MethodType.Get: result = client.Get(resource, parameters); break;
-                case MethodType.Set: result = client.Set(resource, parameters); break;
-                case MethodType.Create: result = client.Create(resource, parameters); break;
-                case MethodType.Delete: result = client.Delete(resource, parameters); break;
+                case MethodType.Get: result = await client.Get(resource, parameters); break;
+                case MethodType.Set: result = await client.Set(resource, parameters); break;
+                case MethodType.Create: result = await client.Create(resource, parameters); break;
+                case MethodType.Delete: result = await client.Delete(resource, parameters); break;
             }
 
             //restore prev ResponseType
@@ -162,7 +163,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
 
                         case OutputType.Json:
                         case OutputType.JsonPretty:
-                            resultText.AppendLine(JsonConvert.SerializeObject(result.Response.data,
+                            resultText.AppendLine(JsonConvert.SerializeObject(result.ToData(),
                                                                               outputType == OutputType.JsonPretty
                                                                                 ? Formatting.Indented
                                                                                 : Formatting.None));
@@ -173,7 +174,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
                         case OutputType.Unicode:
                         case OutputType.UnicodeAlt:
                         case OutputType.Markdown:
-                            var data = result.Response.data;
+                            var data = result.ToData();
 
                             var tableOutput = DecodeOutputType(outputType);
                             var classApi = ClassApi.GetFromResource(classApiRoot, resource);
@@ -219,8 +220,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
 
                 if (wait)
                 {
-                    var task = (string)result.Response.data;
-                    client.WaitForTaskToFinish(task.Split(':')[1], task, 1000, 30000);
+                    var task = (string)result.ToData();
+                    await client.WaitForTaskToFinish(task.Split(':')[1], task, 1000, 30000);
                 }
             }
 
@@ -361,9 +362,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
         /// <param name="classApiRoot"></param>
         /// <param name="resource"></param>
         /// <returns></returns>
-        public static (IEnumerable<(string Attribute, string Value)> Values, string Error) ListValues(PveClient client,
-                                                                                                      ClassApi classApiRoot,
-                                                                                                      string resource)
+        public static async Task<(IEnumerable<(string Attribute, string Value)> Values, string Error)> ListValues(PveClient client,
+                                                                                                                  ClassApi classApiRoot,
+                                                                                                                  string resource)
         {
             var values = new List<(string Attribute, string Value)>();
             var error = "";
@@ -391,7 +392,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
 
                         if (subClass.IsIndexed)
                         {
-                            var result = client.Get(resource);
+                            var result = await client.Get(resource);
                             if (result.InError())
                             {
                                 error = result.GetError();
@@ -409,10 +410,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
                                     }
                                 }
 
-                                if (result.Response.data != null && !string.IsNullOrWhiteSpace(key))
+                                if (result.ToData() != null && !string.IsNullOrWhiteSpace(key))
                                 {
                                     var data = new List<object>();
-                                    foreach (IDictionary<string, object> item in result.Response.data) { data.Add(item[key]); }
+                                    foreach (IDictionary<string, object> item in result.ToData()) { data.Add(item[key]); }
                                     foreach (var item in data.OrderBy(a => a)) { values.Add((attribute, item + "")); }
                                 }
                             }
@@ -435,9 +436,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utility
         /// <param name="classApiRoot"></param>
         /// <param name="resource"></param>
         /// <returns></returns>
-        public static string List(PveClient client, ClassApi classApiRoot, string resource)
+        public static async Task<string> List(PveClient client, ClassApi classApiRoot, string resource)
         {
-            var (Values, Error) = ListValues(client, classApiRoot, resource);
+            var (Values, Error) = await ListValues(client, classApiRoot, resource);
             return string.Join(Environment.NewLine, Values.Select(a => $"{a.Attribute}        {a.Value}")) +
                    (string.IsNullOrWhiteSpace(Error) ? "" : Environment.NewLine + Error) +
                    Environment.NewLine;

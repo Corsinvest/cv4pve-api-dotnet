@@ -10,10 +10,12 @@
  * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
  */
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Corsinvest.ProxmoxVE.Api.Extension.VM;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension
@@ -34,7 +36,21 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         /// <param name="result"></param>
         /// <returns></returns>
         public static IEnumerable<dynamic> ToEnumerable(this Result result)
-            => ((IEnumerable)result.Response.data).Cast<dynamic>();
+            => ((IEnumerable)result.ToData()).Cast<dynamic>();
+
+        /// <summary>
+        /// Enumerable result data.
+        /// </summary>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static dynamic ToData(this Result result) => result.Response.data;
+
+        /// <summary>
+        /// Enumerable result data.
+        /// </summary>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static T ToData<T>(this Result result) => (T)Convert.ChangeType(result.ToData(), typeof(T));
 
         /// <summary>
         /// Enumerable result for Linq.
@@ -57,13 +73,13 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         /// Log error if exists
         /// </summary>
         /// <param name="result"></param>
-        /// <param name="out"></param>
+        /// <param name="output"></param>
         /// <returns></returns>
-        public static bool LogInError(this Result result, TextWriter @out)
+        public static bool LogInError(this Result result, TextWriter output)
         {
             if (result.InError())
             {
-                @out.WriteLine(result.GetError());
+                output.WriteLine(result.GetError());
                 return true;
             }
             return false;
@@ -75,9 +91,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         /// <param name="result"></param>
         /// <param name="vm"></param>
         /// <param name="timeout"></param>
-        public static bool WaitForTaskToFinish(this Result result, VMInfo vm, long timeout)
+        public static async Task<bool> WaitForTaskToFinish(this Result result, VMInfo vm, long timeout)
             => result != null && !result.ResponseInError && timeout > 0
-                ? vm.Client.WaitForTaskToFinish(vm.Node, result.Response.data, 1000, timeout)
+                ? await vm.Client.WaitForTaskToFinish(vm.Node, result.ToData(), 1000, timeout)
                 : true;
 
         /// <summary>
@@ -86,8 +102,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         /// <param name="result"></param>
         /// <param name="vm"></param>
         /// <returns></returns>
-        public static bool IsRunningTask(this Result result, VMInfo vm)
-            => vm.Client.TaskIsRunning(vm.Node, result.Response.data);
+        public static async Task<bool> IsRunningTask(this Result result, VMInfo vm)
+            => await vm.Client.TaskIsRunning(vm.Node, result.ToData());
 
         /// <summary>
         /// Get exit status code task.
@@ -95,7 +111,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         /// <param name="result"></param>
         /// <param name="vm"></param>
         /// <returns></returns>
-        public static string GetExitStatusTask(this Result result, VMInfo vm)
-            => vm.Client.GetExitStatusTask(vm.Node, result.Response.data);
+        public static async Task<string> GetExitStatusTask(this Result result, VMInfo vm)
+            => await vm.Client.GetExitStatusTask(vm.Node, result.ToData());
     }
 }

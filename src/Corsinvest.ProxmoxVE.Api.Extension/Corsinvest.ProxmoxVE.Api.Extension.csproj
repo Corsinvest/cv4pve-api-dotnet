@@ -4,7 +4,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>8.0</LangVersion>
 
-    <Version>3.1.3</Version>
+    <Version>3.2.0</Version>
     <Company>Corsinvest Srl</Company>
     <Authors>Daniele Corsini</Authors>
     <Copyright>Corsinvest Srl</Copyright>
@@ -34,11 +34,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Metadata\Corsinvest.ProxmoxVE.Api.Metadata.csproj" /> -->
-    <PackageReference Include="BetterConsoleTables" Version="1.1.2" />
+    <PackageReference Include="BetterConsoleTables" Version="1.1.3" />
     <!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api\Corsinvest.ProxmoxVE.Api.csproj" /> -->
-    <PackageReference Include="Corsinvest.ProxmoxVE.Api" Version="7.1.0" />
-    <PackageReference Include="Corsinvest.ProxmoxVE.Api.Metadata" Version="2.9.0" />
+    <PackageReference Include="Corsinvest.ProxmoxVE.Api" Version="7.2.0" />
+    <!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Metadata\Corsinvest.ProxmoxVE.Api.Metadata.csproj" /> -->
+    <PackageReference Include="Corsinvest.ProxmoxVE.Api.Metadata" Version="3.0.0" />
   </ItemGroup>
 
   <Target Name="SpicNSpan" AfterTargets="Clean">

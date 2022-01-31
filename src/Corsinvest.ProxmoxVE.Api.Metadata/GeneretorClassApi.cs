@@ -12,6 +12,7 @@
 
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
 namespace Corsinvest.ProxmoxVE.Api.Metadata
@@ -27,14 +28,14 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
         /// <param name="host"></param>
         /// <param name="port"></param>
         /// <returns></returns>
-        public static ClassApi Generate(string host = "pve.proxmox.com", int port = 443)
+        public static async Task<ClassApi> Generate(string host = "pve.proxmox.com", int port = 443)
         {
             var classApi = new ClassApi();
-            foreach (var token in JArray.Parse(GetJsonSchemaFromApiDoc(host, port))) { new ClassApi(token, classApi); }
+            foreach (var token in JArray.Parse(await GetJsonSchemaFromApiDoc(host, port))) { new ClassApi(token, classApi); }
             return classApi;
         }
 
-        private static string GetJsonSchemaFromApiDoc(string host, int port)
+        private static async Task<string> GetJsonSchemaFromApiDoc(string host, int port)
         {
             var url = $"https://{host}:{port}/pve-docs/api-viewer/apidoc.js";
             var json = new StringBuilder();
@@ -44,9 +45,9 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
                 ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; }
             })
             using (var client = new HttpClient(httpClientHandler))
-            using (var response = client.GetAsync(url).Result)
+            using (var response = await client.GetAsync(url))
             {
-                var data = response.Content.ReadAsStringAsync().Result;
+                var data = await response.Content.ReadAsStringAsync();
                 //start Json API
                 data = data.Substring(data.IndexOf("["));
 

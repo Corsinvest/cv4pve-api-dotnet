@@ -18,6 +18,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json;
 
@@ -89,15 +90,15 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <param name="realm"></param>
-        public bool Login(string userName, string password, string realm)
+        public async Task<bool> Login(string userName, string password, string realm)
         {
-            var ticket = Create("/access/ticket",
-                                new Dictionary<string, object>
-                                {
-                                    {"password", password},
-                                    {"username", userName},
-                                    {"realm", realm},
-                                });
+            var ticket = await Create("/access/ticket",
+                                      new Dictionary<string, object>
+                                      {
+                                          {"password", password},
+                                          {"username", userName},
+                                          {"realm", realm},
+                                      });
 
             if (ticket.IsSuccessStatusCode)
             {
@@ -112,7 +113,7 @@ namespace Corsinvest.ProxmoxVE.Api
         /// </summary>
         /// <param name="userName"></param>
         /// <param name="password"></param>
-        public bool Login(string userName, string password)
+        public async Task<bool> Login(string userName, string password)
         {
             var realm = "pam";
 
@@ -123,7 +124,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 userName = data[0];
                 realm = data[1];
             }
-            return Login(userName, password, realm);
+            return await Login(userName, password, realm);
         }
 
         /// <summary>
@@ -132,8 +133,8 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="resource">Url request</param>
         /// <param name="parameters">Additional parameters</param>
         /// <returns>Result</returns>
-        public Result Get(string resource, IDictionary<string, object> parameters = null)
-            => ExecuteAction(resource, MethodType.Get, parameters);
+        public async Task<Result> Get(string resource, IDictionary<string, object> parameters = null)
+            => await ExecuteAction(resource, MethodType.Get, parameters);
 
         /// <summary>
         /// Execute Execute method POST
@@ -141,8 +142,8 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="resource">Url request</param>
         /// <param name="parameters">Additional parameters</param>
         /// <returns>Result</returns>
-        public Result Create(string resource, IDictionary<string, object> parameters = null)
-            => ExecuteAction(resource, MethodType.Create, parameters);
+        public async Task<Result> Create(string resource, IDictionary<string, object> parameters = null)
+            => await ExecuteAction(resource, MethodType.Create, parameters);
 
         /// <summary>
         /// Execute Execute method PUT
@@ -150,8 +151,8 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="resource">Url request</param>
         /// <param name="parameters">Additional parameters</param>
         /// <returns>Result</returns>
-        public Result Set(string resource, IDictionary<string, object> parameters = null)
-            => ExecuteAction(resource, MethodType.Set, parameters);
+        public async Task<Result> Set(string resource, IDictionary<string, object> parameters = null)
+            => await ExecuteAction(resource, MethodType.Set, parameters);
 
         /// <summary>
         /// Execute Execute method DELETE
@@ -159,12 +160,12 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="resource">Url request</param>
         /// <param name="parameters">Additional parameters</param>
         /// <returns>Result</returns>
-        public Result Delete(string resource, IDictionary<string, object> parameters = null)
-            => ExecuteAction(resource, MethodType.Delete, parameters);
+        public async Task<Result> Delete(string resource, IDictionary<string, object> parameters = null)
+            => await ExecuteAction(resource, MethodType.Delete, parameters);
 
-        private Result ExecuteAction(string resource,
-                                     MethodType methodType,
-                                     IDictionary<string, object> parameters = null)
+        private async Task<Result> ExecuteAction(string resource,
+                                                 MethodType methodType,
+                                                 IDictionary<string, object> parameters = null)
         {
             using var handler = new HttpClientHandler()
             {
@@ -232,7 +233,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 request.Headers.Authorization = new AuthenticationHeaderValue("PVEAPIToken", ApiToken);
             }
 
-            var response = client.SendAsync(request).Result;
+            var response = await client.SendAsync(request);
 
             if (DebugLevel >= 2)
             {
@@ -245,20 +246,19 @@ namespace Corsinvest.ProxmoxVE.Api
             switch (ResponseType)
             {
                 case ResponseType.Json:
-                    var stringContent = response.Content.ReadAsStringAsync().Result;
+                    var stringContent = await response.Content.ReadAsStringAsync();
                     result = JsonConvert.DeserializeObject<ExpandoObject>(stringContent);
                     if (DebugLevel >= 2) { Console.Out.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented)); }
                     break;
 
                 case ResponseType.Png:
-                    result = "data:image/png;base64," +
-                             Convert.ToBase64String(response.Content.ReadAsByteArrayAsync().Result);
+                    result = "data:image/png;base64," + Convert.ToBase64String(await response.Content.ReadAsByteArrayAsync());
 
                     if (DebugLevel >= 2) { Console.Out.WriteLine(result); }
                     break;
 
                 case ResponseType.None:
-                    result = response.Content.ReadAsStringAsync().Result;
+                    result = await response.Content.ReadAsStringAsync();
                     if (DebugLevel >= 2) { Console.Out.WriteLine(result); }
                     break;
 
@@ -308,8 +308,8 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="wait">Millisecond wait next check</param>
         /// <param name="timeOut">Millisecond timeout</param>
         /// <return></return>
-        public bool WaitForTaskToFinish(string task, int wait = 500, long timeOut = 10000)
-            => WaitForTaskToFinish(task.Split(':')[1], task, wait, timeOut);
+        public async Task<bool> WaitForTaskToFinish(string task, int wait = 500, long timeOut = 10000)
+            => await WaitForTaskToFinish(task.Split(':')[1], task, wait, timeOut);
 
         /// <summary>
         /// Wait for task to finish
@@ -319,7 +319,7 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="wait">Millisecond wait next check</param>
         /// <param name="timeOut">Millisecond timeout</param>
         /// <return></return>
-        public bool WaitForTaskToFinish(string node, string task, int wait = 500, long timeOut = 10000)
+        public async Task<bool> WaitForTaskToFinish(string node, string task, int wait = 500, long timeOut = 10000)
         {
             var isRunning = true;
             if (wait <= 0) { wait = 500; }
@@ -329,7 +329,7 @@ namespace Corsinvest.ProxmoxVE.Api
             while (isRunning && (DateTime.Now - timeStart).Milliseconds < timeOut)
             {
                 Thread.Sleep(wait);
-                isRunning = TaskIsRunning(node, task);
+                isRunning = await TaskIsRunning(node, task);
             }
 
             //check timeout
@@ -342,7 +342,8 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="node"></param>
         /// <param name="task"></param>
         /// <returns></returns>
-        public bool TaskIsRunning(string node, string task) => ReadTaskStatus(node, task).Response.data.status == "running";
+        public async Task<bool> TaskIsRunning(string node, string task)
+            => (await ReadTaskStatus(node, task)).Response.data.status == "running";
 
         /// <summary>
         /// Get exists status task.
@@ -350,12 +351,14 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="node"></param>
         /// <param name="task"></param>
         /// <returns></returns>
-        public string GetExitStatusTask(string node, string task) => ReadTaskStatus(node, task).Response.data.exitstatus;
+        public async Task<string> GetExitStatusTask(string node, string task) =>
+            (await ReadTaskStatus(node, task)).Response.data.exitstatus;
 
         /// <summary>
         /// Read task status.
         /// </summary>
         /// <returns></returns>
-        private Result ReadTaskStatus(string node, string task) => Get($"/nodes/{node}/tasks/{task}/status");
+        private async Task<Result> ReadTaskStatus(string node, string task)
+            => await Get($"/nodes/{node}/tasks/{task}/status");
     }
 }

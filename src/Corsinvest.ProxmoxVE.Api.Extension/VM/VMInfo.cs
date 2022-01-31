@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
@@ -114,7 +115,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// </summary>
         /// <param name="proxy"></param>
         /// <returns></returns>
-        public string GetSpiceFileVV(string proxy)
+        public async Task<string> GetSpiceFileVV(string proxy)
         {
             var ret = "";
 
@@ -123,8 +124,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                 var oldResponseType = Client.ResponseType;
                 Client.ResponseType = ResponseType.None;
 
-                var response = Client.Create($"/spiceconfig/nodes/{Node}/qemu/{Id}/spiceproxy",
-                                             new Dictionary<string, object> { { "proxy", proxy } });
+                var response = (await Client.Create($"/spiceconfig/nodes/{Node}/qemu/{Id}/spiceproxy",
+                                                    new Dictionary<string, object> { { "proxy", proxy } })).Response;
 
                 Client.ResponseType = oldResponseType;
                 ret = response.Response + "";
@@ -139,7 +140,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <param name="state"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public bool SetStatus(StatusEnum state, long timeout)
+        public async Task<bool> SetStatus(StatusEnum state, long timeout)
         {
             Result result = null;
 
@@ -148,7 +149,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                 case StatusEnum.Reset:
                     switch (Type)
                     {
-                        case VMTypeEnum.Qemu: result = QemuApi.Status.Reset.VmReset(); break;
+                        case VMTypeEnum.Qemu: result = await QemuApi.Status.Reset.VmReset(); break;
                         case VMTypeEnum.Lxc: throw new ApplicationException("Not possible in Container");
                     }
                     break;
@@ -156,37 +157,37 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                 case StatusEnum.Shutdown:
                     switch (Type)
                     {
-                        case VMTypeEnum.Qemu: result = QemuApi.Status.Shutdown.VmShutdown(); break;
-                        case VMTypeEnum.Lxc: result = LxcApi.Status.Shutdown.VmShutdown(); break;
+                        case VMTypeEnum.Qemu: result = await QemuApi.Status.Shutdown.VmShutdown(); break;
+                        case VMTypeEnum.Lxc: result = await LxcApi.Status.Shutdown.VmShutdown(); break;
                     }
                     break;
 
                 case StatusEnum.Start:
                     switch (Type)
                     {
-                        case VMTypeEnum.Qemu: result = QemuApi.Status.Start.VmStart(); break;
-                        case VMTypeEnum.Lxc: result = LxcApi.Status.Start.VmStart(); break;
+                        case VMTypeEnum.Qemu: result = await QemuApi.Status.Start.VmStart(); break;
+                        case VMTypeEnum.Lxc: result = await LxcApi.Status.Start.VmStart(); break;
                     }
                     break;
 
                 case StatusEnum.Stop:
                     switch (Type)
                     {
-                        case VMTypeEnum.Qemu: result = QemuApi.Status.Stop.VmStop(); break;
-                        case VMTypeEnum.Lxc: result = LxcApi.Status.Stop.VmStop(); break;
+                        case VMTypeEnum.Qemu: result = await QemuApi.Status.Stop.VmStop(); break;
+                        case VMTypeEnum.Lxc: result = await LxcApi.Status.Stop.VmStop(); break;
                     }
                     break;
 
                 case StatusEnum.Suspend:
                     switch (Type)
                     {
-                        case VMTypeEnum.Qemu: result = QemuApi.Status.Suspend.VmSuspend(); break;
-                        case VMTypeEnum.Lxc: result = LxcApi.Status.Suspend.VmSuspend(); break;
+                        case VMTypeEnum.Qemu: result = await QemuApi.Status.Suspend.VmSuspend(); break;
+                        case VMTypeEnum.Lxc: result = await LxcApi.Status.Suspend.VmSuspend(); break;
                     }
                     break;
             }
 
-            result.WaitForTaskToFinish(this, timeout);
+            await result.WaitForTaskToFinish(this, timeout);
             return !result.InError();
         }
 
@@ -212,8 +213,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         public Config Config
             => Type switch
             {
-                VMTypeEnum.Qemu => new ConfigQemu(this, QemuApi.Config.GetRest(true).Response.data),
-                VMTypeEnum.Lxc => new ConfigLxc(this, LxcApi.Config.GetRest().Response.data),
+                VMTypeEnum.Qemu => new ConfigQemu(this, QemuApi.Config.GetRest(true).GetAwaiter().GetResult().ToData()),
+                VMTypeEnum.Lxc => new ConfigLxc(this, LxcApi.Config.GetRest().GetAwaiter().GetResult().ToData()),
                 _ => null,
             };
 
@@ -235,11 +236,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <param name="target"></param>
         /// <param name="online"></param>
         /// <returns></returns>
-        public Result Migrate(string target, bool online)
+        public async Task<Result> Migrate(string target, bool online)
             => Type switch
             {
-                VMTypeEnum.Qemu => QemuApi.Migrate.MigrateVm(target, online: online),
-                VMTypeEnum.Lxc => LxcApi.Migrate.MigrateVm(target, online: online),
+                VMTypeEnum.Qemu => await QemuApi.Migrate.MigrateVm(target, online: online),
+                VMTypeEnum.Lxc => await LxcApi.Migrate.MigrateVm(target, online: online),
                 _ => null,
             };
 

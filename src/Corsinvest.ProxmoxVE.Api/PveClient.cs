@@ -10,6 +10,7 @@
  * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
  */
 
+using System.Threading.Tasks;
 using System.Collections.Generic;
 
 namespace Corsinvest.ProxmoxVE.Api
@@ -98,12 +99,12 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="force">Will remove the jobconfig entry, but will not cleanup.</param>
                     /// <param name="keep">Keep replicated data at target (do not remove).</param>
                     /// <returns></returns>
-                    public Result DeleteRest(bool? force = null, bool? keep = null)
+                    public async Task<Result> DeleteRest(bool? force = null, bool? keep = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("force", force);
                         parameters.Add("keep", keep);
-                        return _client.Delete($"/cluster/replication/{_id}", parameters);
+                        return await _client.Delete($"/cluster/replication/{_id}", parameters);
                     }
 
                     /// <summary>
@@ -112,18 +113,18 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="force">Will remove the jobconfig entry, but will not cleanup.</param>
                     /// <param name="keep">Keep replicated data at target (do not remove).</param>
                     /// <returns></returns>
-                    public Result Delete(bool? force = null, bool? keep = null) => DeleteRest(force, keep);
+                    public async Task<Result> Delete(bool? force = null, bool? keep = null) => await DeleteRest(force, keep);
                     /// <summary>
                     /// Read replication job configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/replication/{_id}"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/replication/{_id}"); }
 
                     /// <summary>
                     /// Read replication job configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Read() => GetRest();
+                    public async Task<Result> Read() => await GetRest();
                     /// <summary>
                     /// Update replication job configuration.
                     /// </summary>
@@ -137,7 +138,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="schedule">Storage replication schedule. The format is a subset of `systemd` calendar events.</param>
                     /// <param name="source">For internal use, to detect if the guest was stolen.</param>
                     /// <returns></returns>
-                    public Result SetRest(string comment = null, string delete = null, string digest = null, bool? disable = null, float? rate = null, string remove_job = null, string schedule = null, string source = null)
+                    public async Task<Result> SetRest(string comment = null, string delete = null, string digest = null, bool? disable = null, float? rate = null, string remove_job = null, string schedule = null, string source = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("comment", comment);
@@ -148,7 +149,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("remove_job", remove_job);
                         parameters.Add("schedule", schedule);
                         parameters.Add("source", source);
-                        return _client.Set($"/cluster/replication/{_id}", parameters);
+                        return await _client.Set($"/cluster/replication/{_id}", parameters);
                     }
 
                     /// <summary>
@@ -164,19 +165,19 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="schedule">Storage replication schedule. The format is a subset of `systemd` calendar events.</param>
                     /// <param name="source">For internal use, to detect if the guest was stolen.</param>
                     /// <returns></returns>
-                    public Result Update(string comment = null, string delete = null, string digest = null, bool? disable = null, float? rate = null, string remove_job = null, string schedule = null, string source = null) => SetRest(comment, delete, digest, disable, rate, remove_job, schedule, source);
+                    public async Task<Result> Update(string comment = null, string delete = null, string digest = null, bool? disable = null, float? rate = null, string remove_job = null, string schedule = null, string source = null) => await SetRest(comment, delete, digest, disable, rate, remove_job, schedule, source);
                 }
                 /// <summary>
                 /// List replication jobs.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/cluster/replication"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/cluster/replication"); }
 
                 /// <summary>
                 /// List replication jobs.
                 /// </summary>
                 /// <returns></returns>
-                public Result Index() => GetRest();
+                public async Task<Result> Index() => await GetRest();
                 /// <summary>
                 /// Create a new replication job
                 /// </summary>
@@ -192,7 +193,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="schedule">Storage replication schedule. The format is a subset of `systemd` calendar events.</param>
                 /// <param name="source">For internal use, to detect if the guest was stolen.</param>
                 /// <returns></returns>
-                public Result CreateRest(string id, string target, string type, string comment = null, bool? disable = null, float? rate = null, string remove_job = null, string schedule = null, string source = null)
+                public async Task<Result> CreateRest(string id, string target, string type, string comment = null, bool? disable = null, float? rate = null, string remove_job = null, string schedule = null, string source = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("id", id);
@@ -204,7 +205,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("remove_job", remove_job);
                     parameters.Add("schedule", schedule);
                     parameters.Add("source", source);
-                    return _client.Create($"/cluster/replication", parameters);
+                    return await _client.Create($"/cluster/replication", parameters);
                 }
 
                 /// <summary>
@@ -222,7 +223,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="schedule">Storage replication schedule. The format is a subset of `systemd` calendar events.</param>
                 /// <param name="source">For internal use, to detect if the guest was stolen.</param>
                 /// <returns></returns>
-                public Result Create(string id, string target, string type, string comment = null, bool? disable = null, float? rate = null, string remove_job = null, string schedule = null, string source = null) => CreateRest(id, target, type, comment, disable, rate, remove_job, schedule, source);
+                public async Task<Result> Create(string id, string target, string type, string comment = null, bool? disable = null, float? rate = null, string remove_job = null, string schedule = null, string source = null) => await CreateRest(id, target, type, comment, disable, rate, remove_job, schedule, source);
             }
             public class PVEMetrics
             {
@@ -246,24 +247,24 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Remove Metric server.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest() { return _client.Delete($"/cluster/metrics/server/{_id}"); }
+                        public async Task<Result> DeleteRest() { return await _client.Delete($"/cluster/metrics/server/{_id}"); }
 
                         /// <summary>
                         /// Remove Metric server.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Delete() => DeleteRest();
+                        public async Task<Result> Delete() => await DeleteRest();
                         /// <summary>
                         /// Read metric server configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/cluster/metrics/server/{_id}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/cluster/metrics/server/{_id}"); }
 
                         /// <summary>
                         /// Read metric server configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Read() => GetRest();
+                        public async Task<Result> Read() => await GetRest();
                         /// <summary>
                         /// Create a new external metric server config
                         /// </summary>
@@ -286,7 +287,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="token">The InfluxDB access token. Only necessary when using the http v2 api. If the v2 compatibility api is used, use 'user:password' instead.</param>
                         /// <param name="verify_certificate">Set to 0 to disable certificate verification for https endpoints.</param>
                         /// <returns></returns>
-                        public Result CreateRest(int port, string server, string type, string api_path_prefix = null, string bucket = null, bool? disable = null, string influxdbproto = null, int? max_body_size = null, int? mtu = null, string organization = null, string path = null, string proto = null, int? timeout = null, string token = null, bool? verify_certificate = null)
+                        public async Task<Result> CreateRest(int port, string server, string type, string api_path_prefix = null, string bucket = null, bool? disable = null, string influxdbproto = null, int? max_body_size = null, int? mtu = null, string organization = null, string path = null, string proto = null, int? timeout = null, string token = null, bool? verify_certificate = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("port", port);
@@ -304,7 +305,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("timeout", timeout);
                             parameters.Add("token", token);
                             parameters.Add("verify-certificate", verify_certificate);
-                            return _client.Create($"/cluster/metrics/server/{_id}", parameters);
+                            return await _client.Create($"/cluster/metrics/server/{_id}", parameters);
                         }
 
                         /// <summary>
@@ -329,7 +330,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="token">The InfluxDB access token. Only necessary when using the http v2 api. If the v2 compatibility api is used, use 'user:password' instead.</param>
                         /// <param name="verify_certificate">Set to 0 to disable certificate verification for https endpoints.</param>
                         /// <returns></returns>
-                        public Result Create(int port, string server, string type, string api_path_prefix = null, string bucket = null, bool? disable = null, string influxdbproto = null, int? max_body_size = null, int? mtu = null, string organization = null, string path = null, string proto = null, int? timeout = null, string token = null, bool? verify_certificate = null) => CreateRest(port, server, type, api_path_prefix, bucket, disable, influxdbproto, max_body_size, mtu, organization, path, proto, timeout, token, verify_certificate);
+                        public async Task<Result> Create(int port, string server, string type, string api_path_prefix = null, string bucket = null, bool? disable = null, string influxdbproto = null, int? max_body_size = null, int? mtu = null, string organization = null, string path = null, string proto = null, int? timeout = null, string token = null, bool? verify_certificate = null) => await CreateRest(port, server, type, api_path_prefix, bucket, disable, influxdbproto, max_body_size, mtu, organization, path, proto, timeout, token, verify_certificate);
                         /// <summary>
                         /// Update metric server configuration.
                         /// </summary>
@@ -352,7 +353,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="token">The InfluxDB access token. Only necessary when using the http v2 api. If the v2 compatibility api is used, use 'user:password' instead.</param>
                         /// <param name="verify_certificate">Set to 0 to disable certificate verification for https endpoints.</param>
                         /// <returns></returns>
-                        public Result SetRest(int port, string server, string api_path_prefix = null, string bucket = null, string delete = null, string digest = null, bool? disable = null, string influxdbproto = null, int? max_body_size = null, int? mtu = null, string organization = null, string path = null, string proto = null, int? timeout = null, string token = null, bool? verify_certificate = null)
+                        public async Task<Result> SetRest(int port, string server, string api_path_prefix = null, string bucket = null, string delete = null, string digest = null, bool? disable = null, string influxdbproto = null, int? max_body_size = null, int? mtu = null, string organization = null, string path = null, string proto = null, int? timeout = null, string token = null, bool? verify_certificate = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("port", port);
@@ -371,7 +372,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("timeout", timeout);
                             parameters.Add("token", token);
                             parameters.Add("verify-certificate", verify_certificate);
-                            return _client.Set($"/cluster/metrics/server/{_id}", parameters);
+                            return await _client.Set($"/cluster/metrics/server/{_id}", parameters);
                         }
 
                         /// <summary>
@@ -396,31 +397,31 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="token">The InfluxDB access token. Only necessary when using the http v2 api. If the v2 compatibility api is used, use 'user:password' instead.</param>
                         /// <param name="verify_certificate">Set to 0 to disable certificate verification for https endpoints.</param>
                         /// <returns></returns>
-                        public Result Update(int port, string server, string api_path_prefix = null, string bucket = null, string delete = null, string digest = null, bool? disable = null, string influxdbproto = null, int? max_body_size = null, int? mtu = null, string organization = null, string path = null, string proto = null, int? timeout = null, string token = null, bool? verify_certificate = null) => SetRest(port, server, api_path_prefix, bucket, delete, digest, disable, influxdbproto, max_body_size, mtu, organization, path, proto, timeout, token, verify_certificate);
+                        public async Task<Result> Update(int port, string server, string api_path_prefix = null, string bucket = null, string delete = null, string digest = null, bool? disable = null, string influxdbproto = null, int? max_body_size = null, int? mtu = null, string organization = null, string path = null, string proto = null, int? timeout = null, string token = null, bool? verify_certificate = null) => await SetRest(port, server, api_path_prefix, bucket, delete, digest, disable, influxdbproto, max_body_size, mtu, organization, path, proto, timeout, token, verify_certificate);
                     }
                     /// <summary>
                     /// List configured metric servers.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/metrics/server"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/metrics/server"); }
 
                     /// <summary>
                     /// List configured metric servers.
                     /// </summary>
                     /// <returns></returns>
-                    public Result ServerIndex() => GetRest();
+                    public async Task<Result> ServerIndex() => await GetRest();
                 }
                 /// <summary>
                 /// Metrics index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/cluster/metrics"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/cluster/metrics"); }
 
                 /// <summary>
                 /// Metrics index.
                 /// </summary>
                 /// <returns></returns>
-                public Result Index() => GetRest();
+                public async Task<Result> Index() => await GetRest();
             }
             public class PVEConfig
             {
@@ -446,13 +447,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Return the version of the cluster join API available on this node.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/config/apiversion"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/config/apiversion"); }
 
                     /// <summary>
                     /// Return the version of the cluster join API available on this node.
                     /// </summary>
                     /// <returns></returns>
-                    public Result JoinApiVersion() => GetRest();
+                    public async Task<Result> JoinApiVersion() => await GetRest();
                 }
                 public class PVENodes
                 {
@@ -469,13 +470,13 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Removes a node from the cluster configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest() { return _client.Delete($"/cluster/config/nodes/{_node}"); }
+                        public async Task<Result> DeleteRest() { return await _client.Delete($"/cluster/config/nodes/{_node}"); }
 
                         /// <summary>
                         /// Removes a node from the cluster configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Delnode() => DeleteRest();
+                        public async Task<Result> Delnode() => await DeleteRest();
                         /// <summary>
                         /// Adds a node to the cluster configuration. This call is for internal use.
                         /// </summary>
@@ -486,7 +487,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="nodeid">Node id for this node.</param>
                         /// <param name="votes">Number of votes for this node</param>
                         /// <returns></returns>
-                        public Result CreateRest(int? apiversion = null, bool? force = null, IDictionary<int, string> linkN = null, string new_node_ip = null, int? nodeid = null, int? votes = null)
+                        public async Task<Result> CreateRest(int? apiversion = null, bool? force = null, IDictionary<int, string> linkN = null, string new_node_ip = null, int? nodeid = null, int? votes = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("apiversion", apiversion);
@@ -495,7 +496,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("nodeid", nodeid);
                             parameters.Add("votes", votes);
                             AddIndexedParameter(parameters, "link", linkN);
-                            return _client.Create($"/cluster/config/nodes/{_node}", parameters);
+                            return await _client.Create($"/cluster/config/nodes/{_node}", parameters);
                         }
 
                         /// <summary>
@@ -508,19 +509,19 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="nodeid">Node id for this node.</param>
                         /// <param name="votes">Number of votes for this node</param>
                         /// <returns></returns>
-                        public Result Addnode(int? apiversion = null, bool? force = null, IDictionary<int, string> linkN = null, string new_node_ip = null, int? nodeid = null, int? votes = null) => CreateRest(apiversion, force, linkN, new_node_ip, nodeid, votes);
+                        public async Task<Result> Addnode(int? apiversion = null, bool? force = null, IDictionary<int, string> linkN = null, string new_node_ip = null, int? nodeid = null, int? votes = null) => await CreateRest(apiversion, force, linkN, new_node_ip, nodeid, votes);
                     }
                     /// <summary>
                     /// Corosync node list.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/config/nodes"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/config/nodes"); }
 
                     /// <summary>
                     /// Corosync node list.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Nodes() => GetRest();
+                    public async Task<Result> Nodes() => await GetRest();
                 }
                 public class PVEJoin
                 {
@@ -532,11 +533,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="node">The node for which the joinee gets the nodeinfo. </param>
                     /// <returns></returns>
-                    public Result GetRest(string node = null)
+                    public async Task<Result> GetRest(string node = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("node", node);
-                        return _client.Get($"/cluster/config/join", parameters);
+                        return await _client.Get($"/cluster/config/join", parameters);
                     }
 
                     /// <summary>
@@ -544,7 +545,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="node">The node for which the joinee gets the nodeinfo. </param>
                     /// <returns></returns>
-                    public Result JoinInfo(string node = null) => GetRest(node);
+                    public async Task<Result> JoinInfo(string node = null) => await GetRest(node);
                     /// <summary>
                     /// Joins this node into an existing cluster. If no links are given, default to IP resolved by node's hostname on single link (fallback fails for clusters with multiple links).
                     /// </summary>
@@ -556,7 +557,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="nodeid">Node id for this node.</param>
                     /// <param name="votes">Number of votes for this node</param>
                     /// <returns></returns>
-                    public Result CreateRest(string fingerprint, string hostname, string password, bool? force = null, IDictionary<int, string> linkN = null, int? nodeid = null, int? votes = null)
+                    public async Task<Result> CreateRest(string fingerprint, string hostname, string password, bool? force = null, IDictionary<int, string> linkN = null, int? nodeid = null, int? votes = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("fingerprint", fingerprint);
@@ -566,7 +567,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("nodeid", nodeid);
                         parameters.Add("votes", votes);
                         AddIndexedParameter(parameters, "link", linkN);
-                        return _client.Create($"/cluster/config/join", parameters);
+                        return await _client.Create($"/cluster/config/join", parameters);
                     }
 
                     /// <summary>
@@ -580,7 +581,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="nodeid">Node id for this node.</param>
                     /// <param name="votes">Number of votes for this node</param>
                     /// <returns></returns>
-                    public Result Join(string fingerprint, string hostname, string password, bool? force = null, IDictionary<int, string> linkN = null, int? nodeid = null, int? votes = null) => CreateRest(fingerprint, hostname, password, force, linkN, nodeid, votes);
+                    public async Task<Result> Join(string fingerprint, string hostname, string password, bool? force = null, IDictionary<int, string> linkN = null, int? nodeid = null, int? votes = null) => await CreateRest(fingerprint, hostname, password, force, linkN, nodeid, votes);
                 }
                 public class PVETotem
                 {
@@ -591,13 +592,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Get corosync totem protocol settings.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/config/totem"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/config/totem"); }
 
                     /// <summary>
                     /// Get corosync totem protocol settings.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Totem() => GetRest();
+                    public async Task<Result> Totem() => await GetRest();
                 }
                 public class PVEQdevice
                 {
@@ -608,25 +609,25 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Get QDevice status
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/config/qdevice"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/config/qdevice"); }
 
                     /// <summary>
                     /// Get QDevice status
                     /// </summary>
                     /// <returns></returns>
-                    public Result Status() => GetRest();
+                    public async Task<Result> Status() => await GetRest();
                 }
                 /// <summary>
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/cluster/config"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/cluster/config"); }
 
                 /// <summary>
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
-                public Result Index() => GetRest();
+                public async Task<Result> Index() => await GetRest();
                 /// <summary>
                 /// Generate new cluster configuration. If no links given, default to local IP address as link0.
                 /// </summary>
@@ -635,14 +636,14 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="nodeid">Node id for this node.</param>
                 /// <param name="votes">Number of votes for this node.</param>
                 /// <returns></returns>
-                public Result CreateRest(string clustername, IDictionary<int, string> linkN = null, int? nodeid = null, int? votes = null)
+                public async Task<Result> CreateRest(string clustername, IDictionary<int, string> linkN = null, int? nodeid = null, int? votes = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("clustername", clustername);
                     parameters.Add("nodeid", nodeid);
                     parameters.Add("votes", votes);
                     AddIndexedParameter(parameters, "link", linkN);
-                    return _client.Create($"/cluster/config", parameters);
+                    return await _client.Create($"/cluster/config", parameters);
                 }
 
                 /// <summary>
@@ -653,7 +654,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="nodeid">Node id for this node.</param>
                 /// <param name="votes">Number of votes for this node.</param>
                 /// <returns></returns>
-                public Result Create(string clustername, IDictionary<int, string> linkN = null, int? nodeid = null, int? votes = null) => CreateRest(clustername, linkN, nodeid, votes);
+                public async Task<Result> Create(string clustername, IDictionary<int, string> linkN = null, int? nodeid = null, int? votes = null) => await CreateRest(clustername, linkN, nodeid, votes);
             }
             public class PVEFirewall
             {
@@ -701,11 +702,11 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <returns></returns>
-                            public Result DeleteRest(string digest = null)
+                            public async Task<Result> DeleteRest(string digest = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("digest", digest);
-                                return _client.Delete($"/cluster/firewall/groups/{_group}/{_pos}", parameters);
+                                return await _client.Delete($"/cluster/firewall/groups/{_group}/{_pos}", parameters);
                             }
 
                             /// <summary>
@@ -713,18 +714,18 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <returns></returns>
-                            public Result DeleteRule(string digest = null) => DeleteRest(digest);
+                            public async Task<Result> DeleteRule(string digest = null) => await DeleteRest(digest);
                             /// <summary>
                             /// Get single rule data.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/cluster/firewall/groups/{_group}/{_pos}"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/cluster/firewall/groups/{_group}/{_pos}"); }
 
                             /// <summary>
                             /// Get single rule data.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRule() => GetRest();
+                            public async Task<Result> GetRule() => await GetRest();
                             /// <summary>
                             /// Modify rule data.
                             /// </summary>
@@ -747,7 +748,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="type">Rule type.
                             ///   Enum: in,out,group</param>
                             /// <returns></returns>
-                            public Result SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
+                            public async Task<Result> SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("action", action);
@@ -766,7 +767,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("source", source);
                                 parameters.Add("sport", sport);
                                 parameters.Add("type", type);
-                                return _client.Set($"/cluster/firewall/groups/{_group}/{_pos}", parameters);
+                                return await _client.Set($"/cluster/firewall/groups/{_group}/{_pos}", parameters);
                             }
 
                             /// <summary>
@@ -791,30 +792,30 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="type">Rule type.
                             ///   Enum: in,out,group</param>
                             /// <returns></returns>
-                            public Result UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => SetRest(action, comment, delete, dest, digest, dport, enable, icmp_type, iface, log, macro, moveto, proto, source, sport, type);
+                            public async Task<Result> UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => await SetRest(action, comment, delete, dest, digest, dport, enable, icmp_type, iface, log, macro, moveto, proto, source, sport, type);
                         }
                         /// <summary>
                         /// Delete security group.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest() { return _client.Delete($"/cluster/firewall/groups/{_group}"); }
+                        public async Task<Result> DeleteRest() { return await _client.Delete($"/cluster/firewall/groups/{_group}"); }
 
                         /// <summary>
                         /// Delete security group.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteSecurityGroup() => DeleteRest();
+                        public async Task<Result> DeleteSecurityGroup() => await DeleteRest();
                         /// <summary>
                         /// List rules.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/cluster/firewall/groups/{_group}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/cluster/firewall/groups/{_group}"); }
 
                         /// <summary>
                         /// List rules.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRules() => GetRest();
+                        public async Task<Result> GetRules() => await GetRest();
                         /// <summary>
                         /// Create new rule.
                         /// </summary>
@@ -836,7 +837,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                         /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                         /// <returns></returns>
-                        public Result CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
+                        public async Task<Result> CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("action", action);
@@ -854,7 +855,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("proto", proto);
                             parameters.Add("source", source);
                             parameters.Add("sport", sport);
-                            return _client.Create($"/cluster/firewall/groups/{_group}", parameters);
+                            return await _client.Create($"/cluster/firewall/groups/{_group}", parameters);
                         }
 
                         /// <summary>
@@ -878,19 +879,19 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                         /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                         /// <returns></returns>
-                        public Result CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => CreateRest(action, type, comment, dest, digest, dport, enable, icmp_type, iface, log, macro, pos, proto, source, sport);
+                        public async Task<Result> CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => await CreateRest(action, type, comment, dest, digest, dport, enable, icmp_type, iface, log, macro, pos, proto, source, sport);
                     }
                     /// <summary>
                     /// List security groups.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/firewall/groups"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/firewall/groups"); }
 
                     /// <summary>
                     /// List security groups.
                     /// </summary>
                     /// <returns></returns>
-                    public Result ListSecurityGroups() => GetRest();
+                    public async Task<Result> ListSecurityGroups() => await GetRest();
                     /// <summary>
                     /// Create new security group.
                     /// </summary>
@@ -899,14 +900,14 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                     /// <param name="rename">Rename/update an existing security group. You can set 'rename' to the same value as 'name' to update the 'comment' of an existing group.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string group, string comment = null, string digest = null, string rename = null)
+                    public async Task<Result> CreateRest(string group, string comment = null, string digest = null, string rename = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("group", group);
                         parameters.Add("comment", comment);
                         parameters.Add("digest", digest);
                         parameters.Add("rename", rename);
-                        return _client.Create($"/cluster/firewall/groups", parameters);
+                        return await _client.Create($"/cluster/firewall/groups", parameters);
                     }
 
                     /// <summary>
@@ -917,7 +918,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                     /// <param name="rename">Rename/update an existing security group. You can set 'rename' to the same value as 'name' to update the 'comment' of an existing group.</param>
                     /// <returns></returns>
-                    public Result CreateSecurityGroup(string group, string comment = null, string digest = null, string rename = null) => CreateRest(group, comment, digest, rename);
+                    public async Task<Result> CreateSecurityGroup(string group, string comment = null, string digest = null, string rename = null) => await CreateRest(group, comment, digest, rename);
                 }
                 public class PVERules
                 {
@@ -935,11 +936,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         /// <returns></returns>
-                        public Result DeleteRest(string digest = null)
+                        public async Task<Result> DeleteRest(string digest = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("digest", digest);
-                            return _client.Delete($"/cluster/firewall/rules/{_pos}", parameters);
+                            return await _client.Delete($"/cluster/firewall/rules/{_pos}", parameters);
                         }
 
                         /// <summary>
@@ -947,18 +948,18 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         /// <returns></returns>
-                        public Result DeleteRule(string digest = null) => DeleteRest(digest);
+                        public async Task<Result> DeleteRule(string digest = null) => await DeleteRest(digest);
                         /// <summary>
                         /// Get single rule data.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/cluster/firewall/rules/{_pos}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/cluster/firewall/rules/{_pos}"); }
 
                         /// <summary>
                         /// Get single rule data.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRule() => GetRest();
+                        public async Task<Result> GetRule() => await GetRest();
                         /// <summary>
                         /// Modify rule data.
                         /// </summary>
@@ -981,7 +982,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="type">Rule type.
                         ///   Enum: in,out,group</param>
                         /// <returns></returns>
-                        public Result SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
+                        public async Task<Result> SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("action", action);
@@ -1000,7 +1001,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("source", source);
                             parameters.Add("sport", sport);
                             parameters.Add("type", type);
-                            return _client.Set($"/cluster/firewall/rules/{_pos}", parameters);
+                            return await _client.Set($"/cluster/firewall/rules/{_pos}", parameters);
                         }
 
                         /// <summary>
@@ -1025,19 +1026,19 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="type">Rule type.
                         ///   Enum: in,out,group</param>
                         /// <returns></returns>
-                        public Result UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => SetRest(action, comment, delete, dest, digest, dport, enable, icmp_type, iface, log, macro, moveto, proto, source, sport, type);
+                        public async Task<Result> UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => await SetRest(action, comment, delete, dest, digest, dport, enable, icmp_type, iface, log, macro, moveto, proto, source, sport, type);
                     }
                     /// <summary>
                     /// List rules.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/firewall/rules"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/firewall/rules"); }
 
                     /// <summary>
                     /// List rules.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRules() => GetRest();
+                    public async Task<Result> GetRules() => await GetRest();
                     /// <summary>
                     /// Create new rule.
                     /// </summary>
@@ -1059,7 +1060,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                     /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
+                    public async Task<Result> CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("action", action);
@@ -1077,7 +1078,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("proto", proto);
                         parameters.Add("source", source);
                         parameters.Add("sport", sport);
-                        return _client.Create($"/cluster/firewall/rules", parameters);
+                        return await _client.Create($"/cluster/firewall/rules", parameters);
                     }
 
                     /// <summary>
@@ -1101,7 +1102,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                     /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                     /// <returns></returns>
-                    public Result CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => CreateRest(action, type, comment, dest, digest, dport, enable, icmp_type, iface, log, macro, pos, proto, source, sport);
+                    public async Task<Result> CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => await CreateRest(action, type, comment, dest, digest, dport, enable, icmp_type, iface, log, macro, pos, proto, source, sport);
                 }
                 public class PVEIpset
                 {
@@ -1130,11 +1131,11 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <returns></returns>
-                            public Result DeleteRest(string digest = null)
+                            public async Task<Result> DeleteRest(string digest = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("digest", digest);
-                                return _client.Delete($"/cluster/firewall/ipset/{_name}/{_cidr}", parameters);
+                                return await _client.Delete($"/cluster/firewall/ipset/{_name}/{_cidr}", parameters);
                             }
 
                             /// <summary>
@@ -1142,18 +1143,18 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <returns></returns>
-                            public Result RemoveIp(string digest = null) => DeleteRest(digest);
+                            public async Task<Result> RemoveIp(string digest = null) => await DeleteRest(digest);
                             /// <summary>
                             /// Read IP or Network settings from IPSet.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/cluster/firewall/ipset/{_name}/{_cidr}"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/cluster/firewall/ipset/{_name}/{_cidr}"); }
 
                             /// <summary>
                             /// Read IP or Network settings from IPSet.
                             /// </summary>
                             /// <returns></returns>
-                            public Result ReadIp() => GetRest();
+                            public async Task<Result> ReadIp() => await GetRest();
                             /// <summary>
                             /// Update IP or Network settings
                             /// </summary>
@@ -1161,13 +1162,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <param name="nomatch"></param>
                             /// <returns></returns>
-                            public Result SetRest(string comment = null, string digest = null, bool? nomatch = null)
+                            public async Task<Result> SetRest(string comment = null, string digest = null, bool? nomatch = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("comment", comment);
                                 parameters.Add("digest", digest);
                                 parameters.Add("nomatch", nomatch);
-                                return _client.Set($"/cluster/firewall/ipset/{_name}/{_cidr}", parameters);
+                                return await _client.Set($"/cluster/firewall/ipset/{_name}/{_cidr}", parameters);
                             }
 
                             /// <summary>
@@ -1177,30 +1178,30 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <param name="nomatch"></param>
                             /// <returns></returns>
-                            public Result UpdateIp(string comment = null, string digest = null, bool? nomatch = null) => SetRest(comment, digest, nomatch);
+                            public async Task<Result> UpdateIp(string comment = null, string digest = null, bool? nomatch = null) => await SetRest(comment, digest, nomatch);
                         }
                         /// <summary>
                         /// Delete IPSet
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest() { return _client.Delete($"/cluster/firewall/ipset/{_name}"); }
+                        public async Task<Result> DeleteRest() { return await _client.Delete($"/cluster/firewall/ipset/{_name}"); }
 
                         /// <summary>
                         /// Delete IPSet
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteIpset() => DeleteRest();
+                        public async Task<Result> DeleteIpset() => await DeleteRest();
                         /// <summary>
                         /// List IPSet content
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/cluster/firewall/ipset/{_name}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/cluster/firewall/ipset/{_name}"); }
 
                         /// <summary>
                         /// List IPSet content
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetIpset() => GetRest();
+                        public async Task<Result> GetIpset() => await GetRest();
                         /// <summary>
                         /// Add IP or Network to IPSet.
                         /// </summary>
@@ -1208,13 +1209,13 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="comment"></param>
                         /// <param name="nomatch"></param>
                         /// <returns></returns>
-                        public Result CreateRest(string cidr, string comment = null, bool? nomatch = null)
+                        public async Task<Result> CreateRest(string cidr, string comment = null, bool? nomatch = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("cidr", cidr);
                             parameters.Add("comment", comment);
                             parameters.Add("nomatch", nomatch);
-                            return _client.Create($"/cluster/firewall/ipset/{_name}", parameters);
+                            return await _client.Create($"/cluster/firewall/ipset/{_name}", parameters);
                         }
 
                         /// <summary>
@@ -1224,19 +1225,19 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="comment"></param>
                         /// <param name="nomatch"></param>
                         /// <returns></returns>
-                        public Result CreateIp(string cidr, string comment = null, bool? nomatch = null) => CreateRest(cidr, comment, nomatch);
+                        public async Task<Result> CreateIp(string cidr, string comment = null, bool? nomatch = null) => await CreateRest(cidr, comment, nomatch);
                     }
                     /// <summary>
                     /// List IPSets
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/firewall/ipset"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/firewall/ipset"); }
 
                     /// <summary>
                     /// List IPSets
                     /// </summary>
                     /// <returns></returns>
-                    public Result IpsetIndex() => GetRest();
+                    public async Task<Result> IpsetIndex() => await GetRest();
                     /// <summary>
                     /// Create new IPSet
                     /// </summary>
@@ -1245,14 +1246,14 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                     /// <param name="rename">Rename an existing IPSet. You can set 'rename' to the same value as 'name' to update the 'comment' of an existing IPSet.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string name, string comment = null, string digest = null, string rename = null)
+                    public async Task<Result> CreateRest(string name, string comment = null, string digest = null, string rename = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("name", name);
                         parameters.Add("comment", comment);
                         parameters.Add("digest", digest);
                         parameters.Add("rename", rename);
-                        return _client.Create($"/cluster/firewall/ipset", parameters);
+                        return await _client.Create($"/cluster/firewall/ipset", parameters);
                     }
 
                     /// <summary>
@@ -1263,7 +1264,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                     /// <param name="rename">Rename an existing IPSet. You can set 'rename' to the same value as 'name' to update the 'comment' of an existing IPSet.</param>
                     /// <returns></returns>
-                    public Result CreateIpset(string name, string comment = null, string digest = null, string rename = null) => CreateRest(name, comment, digest, rename);
+                    public async Task<Result> CreateIpset(string name, string comment = null, string digest = null, string rename = null) => await CreateRest(name, comment, digest, rename);
                 }
                 public class PVEAliases
                 {
@@ -1281,11 +1282,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         /// <returns></returns>
-                        public Result DeleteRest(string digest = null)
+                        public async Task<Result> DeleteRest(string digest = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("digest", digest);
-                            return _client.Delete($"/cluster/firewall/aliases/{_name}", parameters);
+                            return await _client.Delete($"/cluster/firewall/aliases/{_name}", parameters);
                         }
 
                         /// <summary>
@@ -1293,18 +1294,18 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         /// <returns></returns>
-                        public Result RemoveAlias(string digest = null) => DeleteRest(digest);
+                        public async Task<Result> RemoveAlias(string digest = null) => await DeleteRest(digest);
                         /// <summary>
                         /// Read alias.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/cluster/firewall/aliases/{_name}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/cluster/firewall/aliases/{_name}"); }
 
                         /// <summary>
                         /// Read alias.
                         /// </summary>
                         /// <returns></returns>
-                        public Result ReadAlias() => GetRest();
+                        public async Task<Result> ReadAlias() => await GetRest();
                         /// <summary>
                         /// Update IP or Network alias.
                         /// </summary>
@@ -1313,14 +1314,14 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         /// <param name="rename">Rename an existing alias.</param>
                         /// <returns></returns>
-                        public Result SetRest(string cidr, string comment = null, string digest = null, string rename = null)
+                        public async Task<Result> SetRest(string cidr, string comment = null, string digest = null, string rename = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("cidr", cidr);
                             parameters.Add("comment", comment);
                             parameters.Add("digest", digest);
                             parameters.Add("rename", rename);
-                            return _client.Set($"/cluster/firewall/aliases/{_name}", parameters);
+                            return await _client.Set($"/cluster/firewall/aliases/{_name}", parameters);
                         }
 
                         /// <summary>
@@ -1331,19 +1332,19 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         /// <param name="rename">Rename an existing alias.</param>
                         /// <returns></returns>
-                        public Result UpdateAlias(string cidr, string comment = null, string digest = null, string rename = null) => SetRest(cidr, comment, digest, rename);
+                        public async Task<Result> UpdateAlias(string cidr, string comment = null, string digest = null, string rename = null) => await SetRest(cidr, comment, digest, rename);
                     }
                     /// <summary>
                     /// List aliases
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/firewall/aliases"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/firewall/aliases"); }
 
                     /// <summary>
                     /// List aliases
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetAliases() => GetRest();
+                    public async Task<Result> GetAliases() => await GetRest();
                     /// <summary>
                     /// Create IP or Network Alias.
                     /// </summary>
@@ -1351,13 +1352,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="name">Alias name.</param>
                     /// <param name="comment"></param>
                     /// <returns></returns>
-                    public Result CreateRest(string cidr, string name, string comment = null)
+                    public async Task<Result> CreateRest(string cidr, string name, string comment = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("cidr", cidr);
                         parameters.Add("name", name);
                         parameters.Add("comment", comment);
-                        return _client.Create($"/cluster/firewall/aliases", parameters);
+                        return await _client.Create($"/cluster/firewall/aliases", parameters);
                     }
 
                     /// <summary>
@@ -1367,7 +1368,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="name">Alias name.</param>
                     /// <param name="comment"></param>
                     /// <returns></returns>
-                    public Result CreateAlias(string cidr, string name, string comment = null) => CreateRest(cidr, name, comment);
+                    public async Task<Result> CreateAlias(string cidr, string name, string comment = null) => await CreateRest(cidr, name, comment);
                 }
                 public class PVEOptions
                 {
@@ -1378,13 +1379,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Get Firewall options.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/firewall/options"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/firewall/options"); }
 
                     /// <summary>
                     /// Get Firewall options.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetOptions() => GetRest();
+                    public async Task<Result> GetOptions() => await GetRest();
                     /// <summary>
                     /// Set Firewall options.
                     /// </summary>
@@ -1398,7 +1399,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="policy_out">Output policy.
                     ///   Enum: ACCEPT,REJECT,DROP</param>
                     /// <returns></returns>
-                    public Result SetRest(string delete = null, string digest = null, bool? ebtables = null, int? enable = null, string log_ratelimit = null, string policy_in = null, string policy_out = null)
+                    public async Task<Result> SetRest(string delete = null, string digest = null, bool? ebtables = null, int? enable = null, string log_ratelimit = null, string policy_in = null, string policy_out = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("delete", delete);
@@ -1408,7 +1409,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("log_ratelimit", log_ratelimit);
                         parameters.Add("policy_in", policy_in);
                         parameters.Add("policy_out", policy_out);
-                        return _client.Set($"/cluster/firewall/options", parameters);
+                        return await _client.Set($"/cluster/firewall/options", parameters);
                     }
 
                     /// <summary>
@@ -1424,7 +1425,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="policy_out">Output policy.
                     ///   Enum: ACCEPT,REJECT,DROP</param>
                     /// <returns></returns>
-                    public Result SetOptions(string delete = null, string digest = null, bool? ebtables = null, int? enable = null, string log_ratelimit = null, string policy_in = null, string policy_out = null) => SetRest(delete, digest, ebtables, enable, log_ratelimit, policy_in, policy_out);
+                    public async Task<Result> SetOptions(string delete = null, string digest = null, bool? ebtables = null, int? enable = null, string log_ratelimit = null, string policy_in = null, string policy_out = null) => await SetRest(delete, digest, ebtables, enable, log_ratelimit, policy_in, policy_out);
                 }
                 public class PVEMacros
                 {
@@ -1435,13 +1436,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// List available macros
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/firewall/macros"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/firewall/macros"); }
 
                     /// <summary>
                     /// List available macros
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetMacros() => GetRest();
+                    public async Task<Result> GetMacros() => await GetRest();
                 }
                 public class PVERefs
                 {
@@ -1454,11 +1455,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Only list references of specified type.
                     ///   Enum: alias,ipset</param>
                     /// <returns></returns>
-                    public Result GetRest(string type = null)
+                    public async Task<Result> GetRest(string type = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("type", type);
-                        return _client.Get($"/cluster/firewall/refs", parameters);
+                        return await _client.Get($"/cluster/firewall/refs", parameters);
                     }
 
                     /// <summary>
@@ -1467,19 +1468,19 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Only list references of specified type.
                     ///   Enum: alias,ipset</param>
                     /// <returns></returns>
-                    public Result Refs(string type = null) => GetRest(type);
+                    public async Task<Result> Refs(string type = null) => await GetRest(type);
                 }
                 /// <summary>
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/cluster/firewall"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/cluster/firewall"); }
 
                 /// <summary>
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
-                public Result Index() => GetRest();
+                public async Task<Result> Index() => await GetRest();
             }
             public class PVEBackup
             {
@@ -1503,36 +1504,36 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Returns included guests and the backup status of their disks. Optimized to be used in ExtJS tree views.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/cluster/backup/{_id}/included_volumes"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/cluster/backup/{_id}/included_volumes"); }
 
                         /// <summary>
                         /// Returns included guests and the backup status of their disks. Optimized to be used in ExtJS tree views.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetVolumeBackupIncluded() => GetRest();
+                        public async Task<Result> GetVolumeBackupIncluded() => await GetRest();
                     }
                     /// <summary>
                     /// Delete vzdump backup job definition.
                     /// </summary>
                     /// <returns></returns>
-                    public Result DeleteRest() { return _client.Delete($"/cluster/backup/{_id}"); }
+                    public async Task<Result> DeleteRest() { return await _client.Delete($"/cluster/backup/{_id}"); }
 
                     /// <summary>
                     /// Delete vzdump backup job definition.
                     /// </summary>
                     /// <returns></returns>
-                    public Result DeleteJob() => DeleteRest();
+                    public async Task<Result> DeleteJob() => await DeleteRest();
                     /// <summary>
                     /// Read vzdump backup job definition.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/backup/{_id}"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/backup/{_id}"); }
 
                     /// <summary>
                     /// Read vzdump backup job definition.
                     /// </summary>
                     /// <returns></returns>
-                    public Result ReadJob() => GetRest();
+                    public async Task<Result> ReadJob() => await GetRest();
                     /// <summary>
                     /// Update vzdump backup job definition.
                     /// </summary>
@@ -1572,7 +1573,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
                     /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                     /// <returns></returns>
-                    public Result SetRest(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
+                    public async Task<Result> SetRest(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("all", all);
@@ -1607,7 +1608,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("tmpdir", tmpdir);
                         parameters.Add("vmid", vmid);
                         parameters.Add("zstd", zstd);
-                        return _client.Set($"/cluster/backup/{_id}", parameters);
+                        return await _client.Set($"/cluster/backup/{_id}", parameters);
                     }
 
                     /// <summary>
@@ -1649,19 +1650,19 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
                     /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                     /// <returns></returns>
-                    public Result UpdateJob(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null) => SetRest(all, bwlimit, comment, compress, delete, dow, dumpdir, enabled, exclude, exclude_path, ionice, lockwait, mailnotification, mailto, maxfiles, mode, node, pigz, pool, prune_backups, quiet, remove, schedule, script, starttime, stdexcludes, stop, stopwait, storage, tmpdir, vmid, zstd);
+                    public async Task<Result> UpdateJob(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null) => await SetRest(all, bwlimit, comment, compress, delete, dow, dumpdir, enabled, exclude, exclude_path, ionice, lockwait, mailnotification, mailto, maxfiles, mode, node, pigz, pool, prune_backups, quiet, remove, schedule, script, starttime, stdexcludes, stop, stopwait, storage, tmpdir, vmid, zstd);
                 }
                 /// <summary>
                 /// List vzdump backup schedule.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/cluster/backup"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/cluster/backup"); }
 
                 /// <summary>
                 /// List vzdump backup schedule.
                 /// </summary>
                 /// <returns></returns>
-                public Result Index() => GetRest();
+                public async Task<Result> Index() => await GetRest();
                 /// <summary>
                 /// Create new vzdump backup job.
                 /// </summary>
@@ -1701,7 +1702,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="vmid">The ID of the guest system you want to backup.</param>
                 /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                 /// <returns></returns>
-                public Result CreateRest(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, string id = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
+                public async Task<Result> CreateRest(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, string id = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("all", all);
@@ -1736,7 +1737,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("tmpdir", tmpdir);
                     parameters.Add("vmid", vmid);
                     parameters.Add("zstd", zstd);
-                    return _client.Create($"/cluster/backup", parameters);
+                    return await _client.Create($"/cluster/backup", parameters);
                 }
 
                 /// <summary>
@@ -1778,7 +1779,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="vmid">The ID of the guest system you want to backup.</param>
                 /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                 /// <returns></returns>
-                public Result CreateJob(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, string id = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null) => CreateRest(all, bwlimit, comment, compress, dow, dumpdir, enabled, exclude, exclude_path, id, ionice, lockwait, mailnotification, mailto, maxfiles, mode, node, pigz, pool, prune_backups, quiet, remove, schedule, script, starttime, stdexcludes, stop, stopwait, storage, tmpdir, vmid, zstd);
+                public async Task<Result> CreateJob(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, string id = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null) => await CreateRest(all, bwlimit, comment, compress, dow, dumpdir, enabled, exclude, exclude_path, id, ionice, lockwait, mailnotification, mailto, maxfiles, mode, node, pigz, pool, prune_backups, quiet, remove, schedule, script, starttime, stdexcludes, stop, stopwait, storage, tmpdir, vmid, zstd);
             }
             public class PVEBackup_Info
             {
@@ -1796,25 +1797,25 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Shows all guests which are not covered by any backup job.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/backup-info/not-backed-up"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/backup-info/not-backed-up"); }
 
                     /// <summary>
                     /// Shows all guests which are not covered by any backup job.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetGuestsNotInBackup() => GetRest();
+                    public async Task<Result> GetGuestsNotInBackup() => await GetRest();
                 }
                 /// <summary>
                 /// Index for backup info related endpoints
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/cluster/backup-info"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/cluster/backup-info"); }
 
                 /// <summary>
                 /// Index for backup info related endpoints
                 /// </summary>
                 /// <returns></returns>
-                public Result Index() => GetRest();
+                public async Task<Result> Index() => await GetRest();
             }
             public class PVEHa
             {
@@ -1852,11 +1853,11 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="node">Target node.</param>
                             /// <returns></returns>
-                            public Result CreateRest(string node)
+                            public async Task<Result> CreateRest(string node)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("node", node);
-                                return _client.Create($"/cluster/ha/resources/{_sid}/migrate", parameters);
+                                return await _client.Create($"/cluster/ha/resources/{_sid}/migrate", parameters);
                             }
 
                             /// <summary>
@@ -1864,7 +1865,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="node">Target node.</param>
                             /// <returns></returns>
-                            public Result Migrate(string node) => CreateRest(node);
+                            public async Task<Result> Migrate(string node) => await CreateRest(node);
                         }
                         public class PVERelocate
                         {
@@ -1876,11 +1877,11 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="node">Target node.</param>
                             /// <returns></returns>
-                            public Result CreateRest(string node)
+                            public async Task<Result> CreateRest(string node)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("node", node);
-                                return _client.Create($"/cluster/ha/resources/{_sid}/relocate", parameters);
+                                return await _client.Create($"/cluster/ha/resources/{_sid}/relocate", parameters);
                             }
 
                             /// <summary>
@@ -1888,30 +1889,30 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="node">Target node.</param>
                             /// <returns></returns>
-                            public Result Relocate(string node) => CreateRest(node);
+                            public async Task<Result> Relocate(string node) => await CreateRest(node);
                         }
                         /// <summary>
                         /// Delete resource configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest() { return _client.Delete($"/cluster/ha/resources/{_sid}"); }
+                        public async Task<Result> DeleteRest() { return await _client.Delete($"/cluster/ha/resources/{_sid}"); }
 
                         /// <summary>
                         /// Delete resource configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Delete() => DeleteRest();
+                        public async Task<Result> Delete() => await DeleteRest();
                         /// <summary>
                         /// Read resource configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/cluster/ha/resources/{_sid}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/cluster/ha/resources/{_sid}"); }
 
                         /// <summary>
                         /// Read resource configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Read() => GetRest();
+                        public async Task<Result> Read() => await GetRest();
                         /// <summary>
                         /// Update resource configuration.
                         /// </summary>
@@ -1924,7 +1925,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="state">Requested resource state.
                         ///   Enum: started,stopped,enabled,disabled,ignored</param>
                         /// <returns></returns>
-                        public Result SetRest(string comment = null, string delete = null, string digest = null, string group = null, int? max_relocate = null, int? max_restart = null, string state = null)
+                        public async Task<Result> SetRest(string comment = null, string delete = null, string digest = null, string group = null, int? max_relocate = null, int? max_restart = null, string state = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("comment", comment);
@@ -1934,7 +1935,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("max_relocate", max_relocate);
                             parameters.Add("max_restart", max_restart);
                             parameters.Add("state", state);
-                            return _client.Set($"/cluster/ha/resources/{_sid}", parameters);
+                            return await _client.Set($"/cluster/ha/resources/{_sid}", parameters);
                         }
 
                         /// <summary>
@@ -1949,7 +1950,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="state">Requested resource state.
                         ///   Enum: started,stopped,enabled,disabled,ignored</param>
                         /// <returns></returns>
-                        public Result Update(string comment = null, string delete = null, string digest = null, string group = null, int? max_relocate = null, int? max_restart = null, string state = null) => SetRest(comment, delete, digest, group, max_relocate, max_restart, state);
+                        public async Task<Result> Update(string comment = null, string delete = null, string digest = null, string group = null, int? max_relocate = null, int? max_restart = null, string state = null) => await SetRest(comment, delete, digest, group, max_relocate, max_restart, state);
                     }
                     /// <summary>
                     /// List HA resources.
@@ -1957,11 +1958,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Only list resources of specific type
                     ///   Enum: ct,vm</param>
                     /// <returns></returns>
-                    public Result GetRest(string type = null)
+                    public async Task<Result> GetRest(string type = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("type", type);
-                        return _client.Get($"/cluster/ha/resources", parameters);
+                        return await _client.Get($"/cluster/ha/resources", parameters);
                     }
 
                     /// <summary>
@@ -1970,7 +1971,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Only list resources of specific type
                     ///   Enum: ct,vm</param>
                     /// <returns></returns>
-                    public Result Index(string type = null) => GetRest(type);
+                    public async Task<Result> Index(string type = null) => await GetRest(type);
                     /// <summary>
                     /// Create a new HA resource.
                     /// </summary>
@@ -1984,7 +1985,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Resource type.
                     ///   Enum: ct,vm</param>
                     /// <returns></returns>
-                    public Result CreateRest(string sid, string comment = null, string group = null, int? max_relocate = null, int? max_restart = null, string state = null, string type = null)
+                    public async Task<Result> CreateRest(string sid, string comment = null, string group = null, int? max_relocate = null, int? max_restart = null, string state = null, string type = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("sid", sid);
@@ -1994,7 +1995,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("max_restart", max_restart);
                         parameters.Add("state", state);
                         parameters.Add("type", type);
-                        return _client.Create($"/cluster/ha/resources", parameters);
+                        return await _client.Create($"/cluster/ha/resources", parameters);
                     }
 
                     /// <summary>
@@ -2010,7 +2011,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Resource type.
                     ///   Enum: ct,vm</param>
                     /// <returns></returns>
-                    public Result Create(string sid, string comment = null, string group = null, int? max_relocate = null, int? max_restart = null, string state = null, string type = null) => CreateRest(sid, comment, group, max_relocate, max_restart, state, type);
+                    public async Task<Result> Create(string sid, string comment = null, string group = null, int? max_relocate = null, int? max_restart = null, string state = null, string type = null) => await CreateRest(sid, comment, group, max_relocate, max_restart, state, type);
                 }
                 public class PVEGroups
                 {
@@ -2027,24 +2028,24 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Delete ha group configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest() { return _client.Delete($"/cluster/ha/groups/{_group}"); }
+                        public async Task<Result> DeleteRest() { return await _client.Delete($"/cluster/ha/groups/{_group}"); }
 
                         /// <summary>
                         /// Delete ha group configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Delete() => DeleteRest();
+                        public async Task<Result> Delete() => await DeleteRest();
                         /// <summary>
                         /// Read ha group configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/cluster/ha/groups/{_group}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/cluster/ha/groups/{_group}"); }
 
                         /// <summary>
                         /// Read ha group configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Read() => GetRest();
+                        public async Task<Result> Read() => await GetRest();
                         /// <summary>
                         /// Update ha group configuration.
                         /// </summary>
@@ -2055,7 +2056,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="nofailback">The CRM tries to run services on the node with the highest priority. If a node with higher priority comes online, the CRM migrates the service to that node. Enabling nofailback prevents that behavior.</param>
                         /// <param name="restricted">Resources bound to restricted groups may only run on nodes defined by the group.</param>
                         /// <returns></returns>
-                        public Result SetRest(string comment = null, string delete = null, string digest = null, string nodes = null, bool? nofailback = null, bool? restricted = null)
+                        public async Task<Result> SetRest(string comment = null, string delete = null, string digest = null, string nodes = null, bool? nofailback = null, bool? restricted = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("comment", comment);
@@ -2064,7 +2065,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("nodes", nodes);
                             parameters.Add("nofailback", nofailback);
                             parameters.Add("restricted", restricted);
-                            return _client.Set($"/cluster/ha/groups/{_group}", parameters);
+                            return await _client.Set($"/cluster/ha/groups/{_group}", parameters);
                         }
 
                         /// <summary>
@@ -2077,19 +2078,19 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="nofailback">The CRM tries to run services on the node with the highest priority. If a node with higher priority comes online, the CRM migrates the service to that node. Enabling nofailback prevents that behavior.</param>
                         /// <param name="restricted">Resources bound to restricted groups may only run on nodes defined by the group.</param>
                         /// <returns></returns>
-                        public Result Update(string comment = null, string delete = null, string digest = null, string nodes = null, bool? nofailback = null, bool? restricted = null) => SetRest(comment, delete, digest, nodes, nofailback, restricted);
+                        public async Task<Result> Update(string comment = null, string delete = null, string digest = null, string nodes = null, bool? nofailback = null, bool? restricted = null) => await SetRest(comment, delete, digest, nodes, nofailback, restricted);
                     }
                     /// <summary>
                     /// Get HA groups.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/ha/groups"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/ha/groups"); }
 
                     /// <summary>
                     /// Get HA groups.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Index() => GetRest();
+                    public async Task<Result> Index() => await GetRest();
                     /// <summary>
                     /// Create a new HA group.
                     /// </summary>
@@ -2101,7 +2102,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Group type.
                     ///   Enum: group</param>
                     /// <returns></returns>
-                    public Result CreateRest(string group, string nodes, string comment = null, bool? nofailback = null, bool? restricted = null, string type = null)
+                    public async Task<Result> CreateRest(string group, string nodes, string comment = null, bool? nofailback = null, bool? restricted = null, string type = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("group", group);
@@ -2110,7 +2111,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("nofailback", nofailback);
                         parameters.Add("restricted", restricted);
                         parameters.Add("type", type);
-                        return _client.Create($"/cluster/ha/groups", parameters);
+                        return await _client.Create($"/cluster/ha/groups", parameters);
                     }
 
                     /// <summary>
@@ -2124,7 +2125,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Group type.
                     ///   Enum: group</param>
                     /// <returns></returns>
-                    public Result Create(string group, string nodes, string comment = null, bool? nofailback = null, bool? restricted = null, string type = null) => CreateRest(group, nodes, comment, nofailback, restricted, type);
+                    public async Task<Result> Create(string group, string nodes, string comment = null, bool? nofailback = null, bool? restricted = null, string type = null) => await CreateRest(group, nodes, comment, nofailback, restricted, type);
                 }
                 public class PVEStatus
                 {
@@ -2144,13 +2145,13 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Get HA manger status.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/cluster/ha/status/current"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/cluster/ha/status/current"); }
 
                         /// <summary>
                         /// Get HA manger status.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Status() => GetRest();
+                        public async Task<Result> Status() => await GetRest();
                     }
                     public class PVEManagerStatus
                     {
@@ -2161,37 +2162,37 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Get full HA manger status, including LRM status.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/cluster/ha/status/manager_status"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/cluster/ha/status/manager_status"); }
 
                         /// <summary>
                         /// Get full HA manger status, including LRM status.
                         /// </summary>
                         /// <returns></returns>
-                        public Result ManagerStatus() => GetRest();
+                        public async Task<Result> ManagerStatus() => await GetRest();
                     }
                     /// <summary>
                     /// Directory index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/ha/status"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/ha/status"); }
 
                     /// <summary>
                     /// Directory index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Index() => GetRest();
+                    public async Task<Result> Index() => await GetRest();
                 }
                 /// <summary>
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/cluster/ha"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/cluster/ha"); }
 
                 /// <summary>
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
-                public Result Index() => GetRest();
+                public async Task<Result> Index() => await GetRest();
             }
             public class PVEAcme
             {
@@ -2223,24 +2224,24 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Delete ACME plugin configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest() { return _client.Delete($"/cluster/acme/plugins/{_id}"); }
+                        public async Task<Result> DeleteRest() { return await _client.Delete($"/cluster/acme/plugins/{_id}"); }
 
                         /// <summary>
                         /// Delete ACME plugin configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeletePlugin() => DeleteRest();
+                        public async Task<Result> DeletePlugin() => await DeleteRest();
                         /// <summary>
                         /// Get ACME plugin configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/cluster/acme/plugins/{_id}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/cluster/acme/plugins/{_id}"); }
 
                         /// <summary>
                         /// Get ACME plugin configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetPluginConfig() => GetRest();
+                        public async Task<Result> GetPluginConfig() => await GetRest();
                         /// <summary>
                         /// Update ACME plugin configuration.
                         /// </summary>
@@ -2253,7 +2254,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="nodes">List of cluster node names.</param>
                         /// <param name="validation_delay">Extra delay in seconds to wait before requesting validation. Allows to cope with a long TTL of DNS records.</param>
                         /// <returns></returns>
-                        public Result SetRest(string api = null, string data = null, string delete = null, string digest = null, bool? disable = null, string nodes = null, int? validation_delay = null)
+                        public async Task<Result> SetRest(string api = null, string data = null, string delete = null, string digest = null, bool? disable = null, string nodes = null, int? validation_delay = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("api", api);
@@ -2263,7 +2264,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("disable", disable);
                             parameters.Add("nodes", nodes);
                             parameters.Add("validation-delay", validation_delay);
-                            return _client.Set($"/cluster/acme/plugins/{_id}", parameters);
+                            return await _client.Set($"/cluster/acme/plugins/{_id}", parameters);
                         }
 
                         /// <summary>
@@ -2278,7 +2279,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="nodes">List of cluster node names.</param>
                         /// <param name="validation_delay">Extra delay in seconds to wait before requesting validation. Allows to cope with a long TTL of DNS records.</param>
                         /// <returns></returns>
-                        public Result UpdatePlugin(string api = null, string data = null, string delete = null, string digest = null, bool? disable = null, string nodes = null, int? validation_delay = null) => SetRest(api, data, delete, digest, disable, nodes, validation_delay);
+                        public async Task<Result> UpdatePlugin(string api = null, string data = null, string delete = null, string digest = null, bool? disable = null, string nodes = null, int? validation_delay = null) => await SetRest(api, data, delete, digest, disable, nodes, validation_delay);
                     }
                     /// <summary>
                     /// ACME plugin index.
@@ -2286,11 +2287,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Only list ACME plugins of a specific type
                     ///   Enum: dns,standalone</param>
                     /// <returns></returns>
-                    public Result GetRest(string type = null)
+                    public async Task<Result> GetRest(string type = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("type", type);
-                        return _client.Get($"/cluster/acme/plugins", parameters);
+                        return await _client.Get($"/cluster/acme/plugins", parameters);
                     }
 
                     /// <summary>
@@ -2299,7 +2300,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Only list ACME plugins of a specific type
                     ///   Enum: dns,standalone</param>
                     /// <returns></returns>
-                    public Result Index(string type = null) => GetRest(type);
+                    public async Task<Result> Index(string type = null) => await GetRest(type);
                     /// <summary>
                     /// Add ACME plugin configuration.
                     /// </summary>
@@ -2313,7 +2314,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="nodes">List of cluster node names.</param>
                     /// <param name="validation_delay">Extra delay in seconds to wait before requesting validation. Allows to cope with a long TTL of DNS records.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string id, string type, string api = null, string data = null, bool? disable = null, string nodes = null, int? validation_delay = null)
+                    public async Task<Result> CreateRest(string id, string type, string api = null, string data = null, bool? disable = null, string nodes = null, int? validation_delay = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("id", id);
@@ -2323,7 +2324,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("disable", disable);
                         parameters.Add("nodes", nodes);
                         parameters.Add("validation-delay", validation_delay);
-                        return _client.Create($"/cluster/acme/plugins", parameters);
+                        return await _client.Create($"/cluster/acme/plugins", parameters);
                     }
 
                     /// <summary>
@@ -2339,7 +2340,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="nodes">List of cluster node names.</param>
                     /// <param name="validation_delay">Extra delay in seconds to wait before requesting validation. Allows to cope with a long TTL of DNS records.</param>
                     /// <returns></returns>
-                    public Result AddPlugin(string id, string type, string api = null, string data = null, bool? disable = null, string nodes = null, int? validation_delay = null) => CreateRest(id, type, api, data, disable, nodes, validation_delay);
+                    public async Task<Result> AddPlugin(string id, string type, string api = null, string data = null, bool? disable = null, string nodes = null, int? validation_delay = null) => await CreateRest(id, type, api, data, disable, nodes, validation_delay);
                 }
                 public class PVEAccount
                 {
@@ -2356,34 +2357,34 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Deactivate existing ACME account at CA.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest() { return _client.Delete($"/cluster/acme/account/{_name}"); }
+                        public async Task<Result> DeleteRest() { return await _client.Delete($"/cluster/acme/account/{_name}"); }
 
                         /// <summary>
                         /// Deactivate existing ACME account at CA.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeactivateAccount() => DeleteRest();
+                        public async Task<Result> DeactivateAccount() => await DeleteRest();
                         /// <summary>
                         /// Return existing ACME account information.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/cluster/acme/account/{_name}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/cluster/acme/account/{_name}"); }
 
                         /// <summary>
                         /// Return existing ACME account information.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetAccount() => GetRest();
+                        public async Task<Result> GetAccount() => await GetRest();
                         /// <summary>
                         /// Update existing ACME account information with CA. Note: not specifying any new account information triggers a refresh.
                         /// </summary>
                         /// <param name="contact">Contact email addresses.</param>
                         /// <returns></returns>
-                        public Result SetRest(string contact = null)
+                        public async Task<Result> SetRest(string contact = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("contact", contact);
-                            return _client.Set($"/cluster/acme/account/{_name}", parameters);
+                            return await _client.Set($"/cluster/acme/account/{_name}", parameters);
                         }
 
                         /// <summary>
@@ -2391,19 +2392,19 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="contact">Contact email addresses.</param>
                         /// <returns></returns>
-                        public Result UpdateAccount(string contact = null) => SetRest(contact);
+                        public async Task<Result> UpdateAccount(string contact = null) => await SetRest(contact);
                     }
                     /// <summary>
                     /// ACMEAccount index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/acme/account"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/acme/account"); }
 
                     /// <summary>
                     /// ACMEAccount index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result AccountIndex() => GetRest();
+                    public async Task<Result> AccountIndex() => await GetRest();
                     /// <summary>
                     /// Register a new ACME account with CA.
                     /// </summary>
@@ -2412,14 +2413,14 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="name">ACME account config file name.</param>
                     /// <param name="tos_url">URL of CA TermsOfService - setting this indicates agreement.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string contact, string directory = null, string name = null, string tos_url = null)
+                    public async Task<Result> CreateRest(string contact, string directory = null, string name = null, string tos_url = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("contact", contact);
                         parameters.Add("directory", directory);
                         parameters.Add("name", name);
                         parameters.Add("tos_url", tos_url);
-                        return _client.Create($"/cluster/acme/account", parameters);
+                        return await _client.Create($"/cluster/acme/account", parameters);
                     }
 
                     /// <summary>
@@ -2430,7 +2431,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="name">ACME account config file name.</param>
                     /// <param name="tos_url">URL of CA TermsOfService - setting this indicates agreement.</param>
                     /// <returns></returns>
-                    public Result RegisterAccount(string contact, string directory = null, string name = null, string tos_url = null) => CreateRest(contact, directory, name, tos_url);
+                    public async Task<Result> RegisterAccount(string contact, string directory = null, string name = null, string tos_url = null) => await CreateRest(contact, directory, name, tos_url);
                 }
                 public class PVETos
                 {
@@ -2442,11 +2443,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="directory">URL of ACME CA directory endpoint.</param>
                     /// <returns></returns>
-                    public Result GetRest(string directory = null)
+                    public async Task<Result> GetRest(string directory = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("directory", directory);
-                        return _client.Get($"/cluster/acme/tos", parameters);
+                        return await _client.Get($"/cluster/acme/tos", parameters);
                     }
 
                     /// <summary>
@@ -2454,7 +2455,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="directory">URL of ACME CA directory endpoint.</param>
                     /// <returns></returns>
-                    public Result GetTos(string directory = null) => GetRest(directory);
+                    public async Task<Result> GetTos(string directory = null) => await GetRest(directory);
                 }
                 public class PVEDirectories
                 {
@@ -2465,13 +2466,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Get named known ACME directory endpoints.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/acme/directories"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/acme/directories"); }
 
                     /// <summary>
                     /// Get named known ACME directory endpoints.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetDirectories() => GetRest();
+                    public async Task<Result> GetDirectories() => await GetRest();
                 }
                 public class PVEChallenge_Schema
                 {
@@ -2482,25 +2483,25 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Get schema of ACME challenge types.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/acme/challenge-schema"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/acme/challenge-schema"); }
 
                     /// <summary>
                     /// Get schema of ACME challenge types.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Challengeschema() => GetRest();
+                    public async Task<Result> Challengeschema() => await GetRest();
                 }
                 /// <summary>
                 /// ACMEAccount index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/cluster/acme"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/cluster/acme"); }
 
                 /// <summary>
                 /// ACMEAccount index.
                 /// </summary>
                 /// <returns></returns>
-                public Result Index() => GetRest();
+                public async Task<Result> Index() => await GetRest();
             }
             public class PVECeph
             {
@@ -2524,11 +2525,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="scope">
                     ///   Enum: all,versions</param>
                     /// <returns></returns>
-                    public Result GetRest(string scope = null)
+                    public async Task<Result> GetRest(string scope = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("scope", scope);
-                        return _client.Get($"/cluster/ceph/metadata", parameters);
+                        return await _client.Get($"/cluster/ceph/metadata", parameters);
                     }
 
                     /// <summary>
@@ -2537,7 +2538,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="scope">
                     ///   Enum: all,versions</param>
                     /// <returns></returns>
-                    public Result Metadata(string scope = null) => GetRest(scope);
+                    public async Task<Result> Metadata(string scope = null) => await GetRest(scope);
                 }
                 public class PVEStatus
                 {
@@ -2548,13 +2549,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Get ceph status.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/ceph/status"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/ceph/status"); }
 
                     /// <summary>
                     /// Get ceph status.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Status() => GetRest();
+                    public async Task<Result> Status() => await GetRest();
                 }
                 public class PVEFlags
                 {
@@ -2571,23 +2572,23 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Get the status of a specific ceph flag.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/cluster/ceph/flags/{_flag}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/cluster/ceph/flags/{_flag}"); }
 
                         /// <summary>
                         /// Get the status of a specific ceph flag.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetFlag() => GetRest();
+                        public async Task<Result> GetFlag() => await GetRest();
                         /// <summary>
                         /// Set or clear (unset) a specific ceph flag
                         /// </summary>
                         /// <param name="value">The new value of the flag</param>
                         /// <returns></returns>
-                        public Result SetRest(bool value)
+                        public async Task<Result> SetRest(bool value)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("value", value);
-                            return _client.Set($"/cluster/ceph/flags/{_flag}", parameters);
+                            return await _client.Set($"/cluster/ceph/flags/{_flag}", parameters);
                         }
 
                         /// <summary>
@@ -2595,19 +2596,19 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="value">The new value of the flag</param>
                         /// <returns></returns>
-                        public Result UpdateFlag(bool value) => SetRest(value);
+                        public async Task<Result> UpdateFlag(bool value) => await SetRest(value);
                     }
                     /// <summary>
                     /// get the status of all ceph flags
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/cluster/ceph/flags"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/cluster/ceph/flags"); }
 
                     /// <summary>
                     /// get the status of all ceph flags
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetAllFlags() => GetRest();
+                    public async Task<Result> GetAllFlags() => await GetRest();
                     /// <summary>
                     /// Set/Unset multiple ceph flags at once.
                     /// </summary>
@@ -2623,7 +2624,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="noup">OSDs are not allowed to start.</param>
                     /// <param name="pause">Pauses read and writes.</param>
                     /// <returns></returns>
-                    public Result SetRest(bool? nobackfill = null, bool? nodeep_scrub = null, bool? nodown = null, bool? noin = null, bool? noout = null, bool? norebalance = null, bool? norecover = null, bool? noscrub = null, bool? notieragent = null, bool? noup = null, bool? pause = null)
+                    public async Task<Result> SetRest(bool? nobackfill = null, bool? nodeep_scrub = null, bool? nodown = null, bool? noin = null, bool? noout = null, bool? norebalance = null, bool? norecover = null, bool? noscrub = null, bool? notieragent = null, bool? noup = null, bool? pause = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("nobackfill", nobackfill);
@@ -2637,7 +2638,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("notieragent", notieragent);
                         parameters.Add("noup", noup);
                         parameters.Add("pause", pause);
-                        return _client.Set($"/cluster/ceph/flags", parameters);
+                        return await _client.Set($"/cluster/ceph/flags", parameters);
                     }
 
                     /// <summary>
@@ -2655,19 +2656,19 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="noup">OSDs are not allowed to start.</param>
                     /// <param name="pause">Pauses read and writes.</param>
                     /// <returns></returns>
-                    public Result SetFlags(bool? nobackfill = null, bool? nodeep_scrub = null, bool? nodown = null, bool? noin = null, bool? noout = null, bool? norebalance = null, bool? norecover = null, bool? noscrub = null, bool? notieragent = null, bool? noup = null, bool? pause = null) => SetRest(nobackfill, nodeep_scrub, nodown, noin, noout, norebalance, norecover, noscrub, notieragent, noup, pause);
+                    public async Task<Result> SetFlags(bool? nobackfill = null, bool? nodeep_scrub = null, bool? nodown = null, bool? noin = null, bool? noout = null, bool? norebalance = null, bool? norecover = null, bool? noscrub = null, bool? notieragent = null, bool? noup = null, bool? pause = null) => await SetRest(nobackfill, nodeep_scrub, nodown, noin, noout, norebalance, norecover, noscrub, notieragent, noup, pause);
                 }
                 /// <summary>
                 /// Cluster ceph index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/cluster/ceph"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/cluster/ceph"); }
 
                 /// <summary>
                 /// Cluster ceph index.
                 /// </summary>
                 /// <returns></returns>
-                public Result Cephindex() => GetRest();
+                public async Task<Result> Cephindex() => await GetRest();
             }
             public class PVEJobs
             {
@@ -2688,13 +2689,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="iterations">Number of event-iteration to simulate and return.</param>
                     /// <param name="starttime">UNIX timestamp to start the calculation from. Defaults to the current time.</param>
                     /// <returns></returns>
-                    public Result GetRest(string schedule, int? iterations = null, int? starttime = null)
+                    public async Task<Result> GetRest(string schedule, int? iterations = null, int? starttime = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("schedule", schedule);
                         parameters.Add("iterations", iterations);
                         parameters.Add("starttime", starttime);
-                        return _client.Get($"/cluster/jobs/schedule-analyze", parameters);
+                        return await _client.Get($"/cluster/jobs/schedule-analyze", parameters);
                     }
 
                     /// <summary>
@@ -2704,19 +2705,19 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="iterations">Number of event-iteration to simulate and return.</param>
                     /// <param name="starttime">UNIX timestamp to start the calculation from. Defaults to the current time.</param>
                     /// <returns></returns>
-                    public Result Schedule_Analyze(string schedule, int? iterations = null, int? starttime = null) => GetRest(schedule, iterations, starttime);
+                    public async Task<Result> Schedule_Analyze(string schedule, int? iterations = null, int? starttime = null) => await GetRest(schedule, iterations, starttime);
                 }
                 /// <summary>
                 /// Index for jobs related endpoints.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/cluster/jobs"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/cluster/jobs"); }
 
                 /// <summary>
                 /// Index for jobs related endpoints.
                 /// </summary>
                 /// <returns></returns>
-                public Result Index() => GetRest();
+                public async Task<Result> Index() => await GetRest();
             }
             public class PVESdn
             {
@@ -2766,25 +2767,25 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Delete sdn subnet object configuration.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result DeleteRest() { return _client.Delete($"/cluster/sdn/vnets/{_vnet}/subnets/{_subnet}"); }
+                                public async Task<Result> DeleteRest() { return await _client.Delete($"/cluster/sdn/vnets/{_vnet}/subnets/{_subnet}"); }
 
                                 /// <summary>
                                 /// Delete sdn subnet object configuration.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Delete() => DeleteRest();
+                                public async Task<Result> Delete() => await DeleteRest();
                                 /// <summary>
                                 /// Read sdn subnet configuration.
                                 /// </summary>
                                 /// <param name="pending">Display pending config.</param>
                                 /// <param name="running">Display running config.</param>
                                 /// <returns></returns>
-                                public Result GetRest(bool? pending = null, bool? running = null)
+                                public async Task<Result> GetRest(bool? pending = null, bool? running = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("pending", pending);
                                     parameters.Add("running", running);
-                                    return _client.Get($"/cluster/sdn/vnets/{_vnet}/subnets/{_subnet}", parameters);
+                                    return await _client.Get($"/cluster/sdn/vnets/{_vnet}/subnets/{_subnet}", parameters);
                                 }
 
                                 /// <summary>
@@ -2793,7 +2794,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="pending">Display pending config.</param>
                                 /// <param name="running">Display running config.</param>
                                 /// <returns></returns>
-                                public Result Read(bool? pending = null, bool? running = null) => GetRest(pending, running);
+                                public async Task<Result> Read(bool? pending = null, bool? running = null) => await GetRest(pending, running);
                                 /// <summary>
                                 /// Update sdn subnet object configuration.
                                 /// </summary>
@@ -2803,7 +2804,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="gateway">Subnet Gateway: Will be assign on vnet for layer3 zones</param>
                                 /// <param name="snat">enable masquerade for this subnet if pve-firewall</param>
                                 /// <returns></returns>
-                                public Result SetRest(string delete = null, string digest = null, string dnszoneprefix = null, string gateway = null, bool? snat = null)
+                                public async Task<Result> SetRest(string delete = null, string digest = null, string dnszoneprefix = null, string gateway = null, bool? snat = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("delete", delete);
@@ -2811,7 +2812,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("dnszoneprefix", dnszoneprefix);
                                     parameters.Add("gateway", gateway);
                                     parameters.Add("snat", snat);
-                                    return _client.Set($"/cluster/sdn/vnets/{_vnet}/subnets/{_subnet}", parameters);
+                                    return await _client.Set($"/cluster/sdn/vnets/{_vnet}/subnets/{_subnet}", parameters);
                                 }
 
                                 /// <summary>
@@ -2823,7 +2824,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="gateway">Subnet Gateway: Will be assign on vnet for layer3 zones</param>
                                 /// <param name="snat">enable masquerade for this subnet if pve-firewall</param>
                                 /// <returns></returns>
-                                public Result Update(string delete = null, string digest = null, string dnszoneprefix = null, string gateway = null, bool? snat = null) => SetRest(delete, digest, dnszoneprefix, gateway, snat);
+                                public async Task<Result> Update(string delete = null, string digest = null, string dnszoneprefix = null, string gateway = null, bool? snat = null) => await SetRest(delete, digest, dnszoneprefix, gateway, snat);
                             }
                             /// <summary>
                             /// SDN subnets index.
@@ -2831,12 +2832,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="pending">Display pending config.</param>
                             /// <param name="running">Display running config.</param>
                             /// <returns></returns>
-                            public Result GetRest(bool? pending = null, bool? running = null)
+                            public async Task<Result> GetRest(bool? pending = null, bool? running = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("pending", pending);
                                 parameters.Add("running", running);
-                                return _client.Get($"/cluster/sdn/vnets/{_vnet}/subnets", parameters);
+                                return await _client.Get($"/cluster/sdn/vnets/{_vnet}/subnets", parameters);
                             }
 
                             /// <summary>
@@ -2845,7 +2846,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="pending">Display pending config.</param>
                             /// <param name="running">Display running config.</param>
                             /// <returns></returns>
-                            public Result Index(bool? pending = null, bool? running = null) => GetRest(pending, running);
+                            public async Task<Result> Index(bool? pending = null, bool? running = null) => await GetRest(pending, running);
                             /// <summary>
                             /// Create a new sdn subnet object.
                             /// </summary>
@@ -2856,7 +2857,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="gateway">Subnet Gateway: Will be assign on vnet for layer3 zones</param>
                             /// <param name="snat">enable masquerade for this subnet if pve-firewall</param>
                             /// <returns></returns>
-                            public Result CreateRest(string subnet, string type, string dnszoneprefix = null, string gateway = null, bool? snat = null)
+                            public async Task<Result> CreateRest(string subnet, string type, string dnszoneprefix = null, string gateway = null, bool? snat = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("subnet", subnet);
@@ -2864,7 +2865,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("dnszoneprefix", dnszoneprefix);
                                 parameters.Add("gateway", gateway);
                                 parameters.Add("snat", snat);
-                                return _client.Create($"/cluster/sdn/vnets/{_vnet}/subnets", parameters);
+                                return await _client.Create($"/cluster/sdn/vnets/{_vnet}/subnets", parameters);
                             }
 
                             /// <summary>
@@ -2877,31 +2878,31 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="gateway">Subnet Gateway: Will be assign on vnet for layer3 zones</param>
                             /// <param name="snat">enable masquerade for this subnet if pve-firewall</param>
                             /// <returns></returns>
-                            public Result Create(string subnet, string type, string dnszoneprefix = null, string gateway = null, bool? snat = null) => CreateRest(subnet, type, dnszoneprefix, gateway, snat);
+                            public async Task<Result> Create(string subnet, string type, string dnszoneprefix = null, string gateway = null, bool? snat = null) => await CreateRest(subnet, type, dnszoneprefix, gateway, snat);
                         }
                         /// <summary>
                         /// Delete sdn vnet object configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest() { return _client.Delete($"/cluster/sdn/vnets/{_vnet}"); }
+                        public async Task<Result> DeleteRest() { return await _client.Delete($"/cluster/sdn/vnets/{_vnet}"); }
 
                         /// <summary>
                         /// Delete sdn vnet object configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Delete() => DeleteRest();
+                        public async Task<Result> Delete() => await DeleteRest();
                         /// <summary>
                         /// Read sdn vnet configuration.
                         /// </summary>
                         /// <param name="pending">Display pending config.</param>
                         /// <param name="running">Display running config.</param>
                         /// <returns></returns>
-                        public Result GetRest(bool? pending = null, bool? running = null)
+                        public async Task<Result> GetRest(bool? pending = null, bool? running = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("pending", pending);
                             parameters.Add("running", running);
-                            return _client.Get($"/cluster/sdn/vnets/{_vnet}", parameters);
+                            return await _client.Get($"/cluster/sdn/vnets/{_vnet}", parameters);
                         }
 
                         /// <summary>
@@ -2910,7 +2911,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="pending">Display pending config.</param>
                         /// <param name="running">Display running config.</param>
                         /// <returns></returns>
-                        public Result Read(bool? pending = null, bool? running = null) => GetRest(pending, running);
+                        public async Task<Result> Read(bool? pending = null, bool? running = null) => await GetRest(pending, running);
                         /// <summary>
                         /// Update sdn vnet object configuration.
                         /// </summary>
@@ -2921,7 +2922,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="vlanaware">Allow vm VLANs to pass through this vnet.</param>
                         /// <param name="zone">zone id</param>
                         /// <returns></returns>
-                        public Result SetRest(string alias = null, string delete = null, string digest = null, int? tag = null, bool? vlanaware = null, string zone = null)
+                        public async Task<Result> SetRest(string alias = null, string delete = null, string digest = null, int? tag = null, bool? vlanaware = null, string zone = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("alias", alias);
@@ -2930,7 +2931,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("tag", tag);
                             parameters.Add("vlanaware", vlanaware);
                             parameters.Add("zone", zone);
-                            return _client.Set($"/cluster/sdn/vnets/{_vnet}", parameters);
+                            return await _client.Set($"/cluster/sdn/vnets/{_vnet}", parameters);
                         }
 
                         /// <summary>
@@ -2943,7 +2944,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="vlanaware">Allow vm VLANs to pass through this vnet.</param>
                         /// <param name="zone">zone id</param>
                         /// <returns></returns>
-                        public Result Update(string alias = null, string delete = null, string digest = null, int? tag = null, bool? vlanaware = null, string zone = null) => SetRest(alias, delete, digest, tag, vlanaware, zone);
+                        public async Task<Result> Update(string alias = null, string delete = null, string digest = null, int? tag = null, bool? vlanaware = null, string zone = null) => await SetRest(alias, delete, digest, tag, vlanaware, zone);
                     }
                     /// <summary>
                     /// SDN vnets index.
@@ -2951,12 +2952,12 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="pending">Display pending config.</param>
                     /// <param name="running">Display running config.</param>
                     /// <returns></returns>
-                    public Result GetRest(bool? pending = null, bool? running = null)
+                    public async Task<Result> GetRest(bool? pending = null, bool? running = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("pending", pending);
                         parameters.Add("running", running);
-                        return _client.Get($"/cluster/sdn/vnets", parameters);
+                        return await _client.Get($"/cluster/sdn/vnets", parameters);
                     }
 
                     /// <summary>
@@ -2965,7 +2966,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="pending">Display pending config.</param>
                     /// <param name="running">Display running config.</param>
                     /// <returns></returns>
-                    public Result Index(bool? pending = null, bool? running = null) => GetRest(pending, running);
+                    public async Task<Result> Index(bool? pending = null, bool? running = null) => await GetRest(pending, running);
                     /// <summary>
                     /// Create a new sdn vnet object.
                     /// </summary>
@@ -2977,7 +2978,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     ///   Enum: vnet</param>
                     /// <param name="vlanaware">Allow vm VLANs to pass through this vnet.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string vnet, string zone, string alias = null, int? tag = null, string type = null, bool? vlanaware = null)
+                    public async Task<Result> CreateRest(string vnet, string zone, string alias = null, int? tag = null, string type = null, bool? vlanaware = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("vnet", vnet);
@@ -2986,7 +2987,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("tag", tag);
                         parameters.Add("type", type);
                         parameters.Add("vlanaware", vlanaware);
-                        return _client.Create($"/cluster/sdn/vnets", parameters);
+                        return await _client.Create($"/cluster/sdn/vnets", parameters);
                     }
 
                     /// <summary>
@@ -3000,7 +3001,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     ///   Enum: vnet</param>
                     /// <param name="vlanaware">Allow vm VLANs to pass through this vnet.</param>
                     /// <returns></returns>
-                    public Result Create(string vnet, string zone, string alias = null, int? tag = null, string type = null, bool? vlanaware = null) => CreateRest(vnet, zone, alias, tag, type, vlanaware);
+                    public async Task<Result> Create(string vnet, string zone, string alias = null, int? tag = null, string type = null, bool? vlanaware = null) => await CreateRest(vnet, zone, alias, tag, type, vlanaware);
                 }
                 public class PVEZones
                 {
@@ -3017,25 +3018,25 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Delete sdn zone object configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest() { return _client.Delete($"/cluster/sdn/zones/{_zone}"); }
+                        public async Task<Result> DeleteRest() { return await _client.Delete($"/cluster/sdn/zones/{_zone}"); }
 
                         /// <summary>
                         /// Delete sdn zone object configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Delete() => DeleteRest();
+                        public async Task<Result> Delete() => await DeleteRest();
                         /// <summary>
                         /// Read sdn zone configuration.
                         /// </summary>
                         /// <param name="pending">Display pending config.</param>
                         /// <param name="running">Display running config.</param>
                         /// <returns></returns>
-                        public Result GetRest(bool? pending = null, bool? running = null)
+                        public async Task<Result> GetRest(bool? pending = null, bool? running = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("pending", pending);
                             parameters.Add("running", running);
-                            return _client.Get($"/cluster/sdn/zones/{_zone}", parameters);
+                            return await _client.Get($"/cluster/sdn/zones/{_zone}", parameters);
                         }
 
                         /// <summary>
@@ -3044,7 +3045,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="pending">Display pending config.</param>
                         /// <param name="running">Display running config.</param>
                         /// <returns></returns>
-                        public Result Read(bool? pending = null, bool? running = null) => GetRest(pending, running);
+                        public async Task<Result> Read(bool? pending = null, bool? running = null) => await GetRest(pending, running);
                         /// <summary>
                         /// Update sdn zone object configuration.
                         /// </summary>
@@ -3070,7 +3071,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         ///   Enum: 802.1q,802.1ad</param>
                         /// <param name="vrf_vxlan">l3vni.</param>
                         /// <returns></returns>
-                        public Result SetRest(bool? advertise_subnets = null, string bridge = null, string controller = null, string delete = null, string digest = null, bool? disable_arp_nd_suppression = null, string dns = null, string dnszone = null, int? dp_id = null, string exitnodes = null, bool? exitnodes_local_routing = null, string ipam = null, string mac = null, int? mtu = null, string nodes = null, string peers = null, string reversedns = null, int? tag = null, string vlan_protocol = null, int? vrf_vxlan = null)
+                        public async Task<Result> SetRest(bool? advertise_subnets = null, string bridge = null, string controller = null, string delete = null, string digest = null, bool? disable_arp_nd_suppression = null, string dns = null, string dnszone = null, int? dp_id = null, string exitnodes = null, bool? exitnodes_local_routing = null, string ipam = null, string mac = null, int? mtu = null, string nodes = null, string peers = null, string reversedns = null, int? tag = null, string vlan_protocol = null, int? vrf_vxlan = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("advertise-subnets", advertise_subnets);
@@ -3093,7 +3094,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("tag", tag);
                             parameters.Add("vlan-protocol", vlan_protocol);
                             parameters.Add("vrf-vxlan", vrf_vxlan);
-                            return _client.Set($"/cluster/sdn/zones/{_zone}", parameters);
+                            return await _client.Set($"/cluster/sdn/zones/{_zone}", parameters);
                         }
 
                         /// <summary>
@@ -3121,7 +3122,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         ///   Enum: 802.1q,802.1ad</param>
                         /// <param name="vrf_vxlan">l3vni.</param>
                         /// <returns></returns>
-                        public Result Update(bool? advertise_subnets = null, string bridge = null, string controller = null, string delete = null, string digest = null, bool? disable_arp_nd_suppression = null, string dns = null, string dnszone = null, int? dp_id = null, string exitnodes = null, bool? exitnodes_local_routing = null, string ipam = null, string mac = null, int? mtu = null, string nodes = null, string peers = null, string reversedns = null, int? tag = null, string vlan_protocol = null, int? vrf_vxlan = null) => SetRest(advertise_subnets, bridge, controller, delete, digest, disable_arp_nd_suppression, dns, dnszone, dp_id, exitnodes, exitnodes_local_routing, ipam, mac, mtu, nodes, peers, reversedns, tag, vlan_protocol, vrf_vxlan);
+                        public async Task<Result> Update(bool? advertise_subnets = null, string bridge = null, string controller = null, string delete = null, string digest = null, bool? disable_arp_nd_suppression = null, string dns = null, string dnszone = null, int? dp_id = null, string exitnodes = null, bool? exitnodes_local_routing = null, string ipam = null, string mac = null, int? mtu = null, string nodes = null, string peers = null, string reversedns = null, int? tag = null, string vlan_protocol = null, int? vrf_vxlan = null) => await SetRest(advertise_subnets, bridge, controller, delete, digest, disable_arp_nd_suppression, dns, dnszone, dp_id, exitnodes, exitnodes_local_routing, ipam, mac, mtu, nodes, peers, reversedns, tag, vlan_protocol, vrf_vxlan);
                     }
                     /// <summary>
                     /// SDN zones index.
@@ -3131,13 +3132,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Only list SDN zones of specific type
                     ///   Enum: evpn,faucet,qinq,simple,vlan,vxlan</param>
                     /// <returns></returns>
-                    public Result GetRest(bool? pending = null, bool? running = null, string type = null)
+                    public async Task<Result> GetRest(bool? pending = null, bool? running = null, string type = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("pending", pending);
                         parameters.Add("running", running);
                         parameters.Add("type", type);
-                        return _client.Get($"/cluster/sdn/zones", parameters);
+                        return await _client.Get($"/cluster/sdn/zones", parameters);
                     }
 
                     /// <summary>
@@ -3148,7 +3149,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Only list SDN zones of specific type
                     ///   Enum: evpn,faucet,qinq,simple,vlan,vxlan</param>
                     /// <returns></returns>
-                    public Result Index(bool? pending = null, bool? running = null, string type = null) => GetRest(pending, running, type);
+                    public async Task<Result> Index(bool? pending = null, bool? running = null, string type = null) => await GetRest(pending, running, type);
                     /// <summary>
                     /// Create a new sdn zone object.
                     /// </summary>
@@ -3175,7 +3176,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     ///   Enum: 802.1q,802.1ad</param>
                     /// <param name="vrf_vxlan">l3vni.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string type, string zone, bool? advertise_subnets = null, string bridge = null, string controller = null, bool? disable_arp_nd_suppression = null, string dns = null, string dnszone = null, int? dp_id = null, string exitnodes = null, bool? exitnodes_local_routing = null, string ipam = null, string mac = null, int? mtu = null, string nodes = null, string peers = null, string reversedns = null, int? tag = null, string vlan_protocol = null, int? vrf_vxlan = null)
+                    public async Task<Result> CreateRest(string type, string zone, bool? advertise_subnets = null, string bridge = null, string controller = null, bool? disable_arp_nd_suppression = null, string dns = null, string dnszone = null, int? dp_id = null, string exitnodes = null, bool? exitnodes_local_routing = null, string ipam = null, string mac = null, int? mtu = null, string nodes = null, string peers = null, string reversedns = null, int? tag = null, string vlan_protocol = null, int? vrf_vxlan = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("type", type);
@@ -3198,7 +3199,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("tag", tag);
                         parameters.Add("vlan-protocol", vlan_protocol);
                         parameters.Add("vrf-vxlan", vrf_vxlan);
-                        return _client.Create($"/cluster/sdn/zones", parameters);
+                        return await _client.Create($"/cluster/sdn/zones", parameters);
                     }
 
                     /// <summary>
@@ -3227,7 +3228,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     ///   Enum: 802.1q,802.1ad</param>
                     /// <param name="vrf_vxlan">l3vni.</param>
                     /// <returns></returns>
-                    public Result Create(string type, string zone, bool? advertise_subnets = null, string bridge = null, string controller = null, bool? disable_arp_nd_suppression = null, string dns = null, string dnszone = null, int? dp_id = null, string exitnodes = null, bool? exitnodes_local_routing = null, string ipam = null, string mac = null, int? mtu = null, string nodes = null, string peers = null, string reversedns = null, int? tag = null, string vlan_protocol = null, int? vrf_vxlan = null) => CreateRest(type, zone, advertise_subnets, bridge, controller, disable_arp_nd_suppression, dns, dnszone, dp_id, exitnodes, exitnodes_local_routing, ipam, mac, mtu, nodes, peers, reversedns, tag, vlan_protocol, vrf_vxlan);
+                    public async Task<Result> Create(string type, string zone, bool? advertise_subnets = null, string bridge = null, string controller = null, bool? disable_arp_nd_suppression = null, string dns = null, string dnszone = null, int? dp_id = null, string exitnodes = null, bool? exitnodes_local_routing = null, string ipam = null, string mac = null, int? mtu = null, string nodes = null, string peers = null, string reversedns = null, int? tag = null, string vlan_protocol = null, int? vrf_vxlan = null) => await CreateRest(type, zone, advertise_subnets, bridge, controller, disable_arp_nd_suppression, dns, dnszone, dp_id, exitnodes, exitnodes_local_routing, ipam, mac, mtu, nodes, peers, reversedns, tag, vlan_protocol, vrf_vxlan);
                 }
                 public class PVEControllers
                 {
@@ -3244,25 +3245,25 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Delete sdn controller object configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest() { return _client.Delete($"/cluster/sdn/controllers/{_controller}"); }
+                        public async Task<Result> DeleteRest() { return await _client.Delete($"/cluster/sdn/controllers/{_controller}"); }
 
                         /// <summary>
                         /// Delete sdn controller object configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Delete() => DeleteRest();
+                        public async Task<Result> Delete() => await DeleteRest();
                         /// <summary>
                         /// Read sdn controller configuration.
                         /// </summary>
                         /// <param name="pending">Display pending config.</param>
                         /// <param name="running">Display running config.</param>
                         /// <returns></returns>
-                        public Result GetRest(bool? pending = null, bool? running = null)
+                        public async Task<Result> GetRest(bool? pending = null, bool? running = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("pending", pending);
                             parameters.Add("running", running);
-                            return _client.Get($"/cluster/sdn/controllers/{_controller}", parameters);
+                            return await _client.Get($"/cluster/sdn/controllers/{_controller}", parameters);
                         }
 
                         /// <summary>
@@ -3271,7 +3272,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="pending">Display pending config.</param>
                         /// <param name="running">Display running config.</param>
                         /// <returns></returns>
-                        public Result Read(bool? pending = null, bool? running = null) => GetRest(pending, running);
+                        public async Task<Result> Read(bool? pending = null, bool? running = null) => await GetRest(pending, running);
                         /// <summary>
                         /// Update sdn controller object configuration.
                         /// </summary>
@@ -3284,7 +3285,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="node">The cluster node name.</param>
                         /// <param name="peers">peers address list.</param>
                         /// <returns></returns>
-                        public Result SetRest(int? asn = null, string delete = null, string digest = null, bool? ebgp = null, int? ebgp_multihop = null, string loopback = null, string node = null, string peers = null)
+                        public async Task<Result> SetRest(int? asn = null, string delete = null, string digest = null, bool? ebgp = null, int? ebgp_multihop = null, string loopback = null, string node = null, string peers = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("asn", asn);
@@ -3295,7 +3296,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("loopback", loopback);
                             parameters.Add("node", node);
                             parameters.Add("peers", peers);
-                            return _client.Set($"/cluster/sdn/controllers/{_controller}", parameters);
+                            return await _client.Set($"/cluster/sdn/controllers/{_controller}", parameters);
                         }
 
                         /// <summary>
@@ -3310,7 +3311,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="node">The cluster node name.</param>
                         /// <param name="peers">peers address list.</param>
                         /// <returns></returns>
-                        public Result Update(int? asn = null, string delete = null, string digest = null, bool? ebgp = null, int? ebgp_multihop = null, string loopback = null, string node = null, string peers = null) => SetRest(asn, delete, digest, ebgp, ebgp_multihop, loopback, node, peers);
+                        public async Task<Result> Update(int? asn = null, string delete = null, string digest = null, bool? ebgp = null, int? ebgp_multihop = null, string loopback = null, string node = null, string peers = null) => await SetRest(asn, delete, digest, ebgp, ebgp_multihop, loopback, node, peers);
                     }
                     /// <summary>
                     /// SDN controllers index.
@@ -3320,13 +3321,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Only list sdn controllers of specific type
                     ///   Enum: bgp,evpn,faucet</param>
                     /// <returns></returns>
-                    public Result GetRest(bool? pending = null, bool? running = null, string type = null)
+                    public async Task<Result> GetRest(bool? pending = null, bool? running = null, string type = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("pending", pending);
                         parameters.Add("running", running);
                         parameters.Add("type", type);
-                        return _client.Get($"/cluster/sdn/controllers", parameters);
+                        return await _client.Get($"/cluster/sdn/controllers", parameters);
                     }
 
                     /// <summary>
@@ -3337,7 +3338,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Only list sdn controllers of specific type
                     ///   Enum: bgp,evpn,faucet</param>
                     /// <returns></returns>
-                    public Result Index(bool? pending = null, bool? running = null, string type = null) => GetRest(pending, running, type);
+                    public async Task<Result> Index(bool? pending = null, bool? running = null, string type = null) => await GetRest(pending, running, type);
                     /// <summary>
                     /// Create a new sdn controller object.
                     /// </summary>
@@ -3351,7 +3352,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="node">The cluster node name.</param>
                     /// <param name="peers">peers address list.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string controller, string type, int? asn = null, bool? ebgp = null, int? ebgp_multihop = null, string loopback = null, string node = null, string peers = null)
+                    public async Task<Result> CreateRest(string controller, string type, int? asn = null, bool? ebgp = null, int? ebgp_multihop = null, string loopback = null, string node = null, string peers = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("controller", controller);
@@ -3362,7 +3363,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("loopback", loopback);
                         parameters.Add("node", node);
                         parameters.Add("peers", peers);
-                        return _client.Create($"/cluster/sdn/controllers", parameters);
+                        return await _client.Create($"/cluster/sdn/controllers", parameters);
                     }
 
                     /// <summary>
@@ -3378,7 +3379,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="node">The cluster node name.</param>
                     /// <param name="peers">peers address list.</param>
                     /// <returns></returns>
-                    public Result Create(string controller, string type, int? asn = null, bool? ebgp = null, int? ebgp_multihop = null, string loopback = null, string node = null, string peers = null) => CreateRest(controller, type, asn, ebgp, ebgp_multihop, loopback, node, peers);
+                    public async Task<Result> Create(string controller, string type, int? asn = null, bool? ebgp = null, int? ebgp_multihop = null, string loopback = null, string node = null, string peers = null) => await CreateRest(controller, type, asn, ebgp, ebgp_multihop, loopback, node, peers);
                 }
                 public class PVEIpams
                 {
@@ -3395,24 +3396,24 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Delete sdn ipam object configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest() { return _client.Delete($"/cluster/sdn/ipams/{_ipam}"); }
+                        public async Task<Result> DeleteRest() { return await _client.Delete($"/cluster/sdn/ipams/{_ipam}"); }
 
                         /// <summary>
                         /// Delete sdn ipam object configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Delete() => DeleteRest();
+                        public async Task<Result> Delete() => await DeleteRest();
                         /// <summary>
                         /// Read sdn ipam configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/cluster/sdn/ipams/{_ipam}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/cluster/sdn/ipams/{_ipam}"); }
 
                         /// <summary>
                         /// Read sdn ipam configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Read() => GetRest();
+                        public async Task<Result> Read() => await GetRest();
                         /// <summary>
                         /// Update sdn ipam object configuration.
                         /// </summary>
@@ -3422,7 +3423,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="token"></param>
                         /// <param name="url"></param>
                         /// <returns></returns>
-                        public Result SetRest(string delete = null, string digest = null, int? section = null, string token = null, string url = null)
+                        public async Task<Result> SetRest(string delete = null, string digest = null, int? section = null, string token = null, string url = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("delete", delete);
@@ -3430,7 +3431,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("section", section);
                             parameters.Add("token", token);
                             parameters.Add("url", url);
-                            return _client.Set($"/cluster/sdn/ipams/{_ipam}", parameters);
+                            return await _client.Set($"/cluster/sdn/ipams/{_ipam}", parameters);
                         }
 
                         /// <summary>
@@ -3442,7 +3443,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="token"></param>
                         /// <param name="url"></param>
                         /// <returns></returns>
-                        public Result Update(string delete = null, string digest = null, int? section = null, string token = null, string url = null) => SetRest(delete, digest, section, token, url);
+                        public async Task<Result> Update(string delete = null, string digest = null, int? section = null, string token = null, string url = null) => await SetRest(delete, digest, section, token, url);
                     }
                     /// <summary>
                     /// SDN ipams index.
@@ -3450,11 +3451,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Only list sdn ipams of specific type
                     ///   Enum: netbox,phpipam,pve</param>
                     /// <returns></returns>
-                    public Result GetRest(string type = null)
+                    public async Task<Result> GetRest(string type = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("type", type);
-                        return _client.Get($"/cluster/sdn/ipams", parameters);
+                        return await _client.Get($"/cluster/sdn/ipams", parameters);
                     }
 
                     /// <summary>
@@ -3463,7 +3464,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Only list sdn ipams of specific type
                     ///   Enum: netbox,phpipam,pve</param>
                     /// <returns></returns>
-                    public Result Index(string type = null) => GetRest(type);
+                    public async Task<Result> Index(string type = null) => await GetRest(type);
                     /// <summary>
                     /// Create a new sdn ipam object.
                     /// </summary>
@@ -3474,7 +3475,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="token"></param>
                     /// <param name="url"></param>
                     /// <returns></returns>
-                    public Result CreateRest(string ipam, string type, int? section = null, string token = null, string url = null)
+                    public async Task<Result> CreateRest(string ipam, string type, int? section = null, string token = null, string url = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("ipam", ipam);
@@ -3482,7 +3483,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("section", section);
                         parameters.Add("token", token);
                         parameters.Add("url", url);
-                        return _client.Create($"/cluster/sdn/ipams", parameters);
+                        return await _client.Create($"/cluster/sdn/ipams", parameters);
                     }
 
                     /// <summary>
@@ -3495,7 +3496,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="token"></param>
                     /// <param name="url"></param>
                     /// <returns></returns>
-                    public Result Create(string ipam, string type, int? section = null, string token = null, string url = null) => CreateRest(ipam, type, section, token, url);
+                    public async Task<Result> Create(string ipam, string type, int? section = null, string token = null, string url = null) => await CreateRest(ipam, type, section, token, url);
                 }
                 public class PVEDns
                 {
@@ -3512,24 +3513,24 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Delete sdn dns object configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest() { return _client.Delete($"/cluster/sdn/dns/{_dns}"); }
+                        public async Task<Result> DeleteRest() { return await _client.Delete($"/cluster/sdn/dns/{_dns}"); }
 
                         /// <summary>
                         /// Delete sdn dns object configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Delete() => DeleteRest();
+                        public async Task<Result> Delete() => await DeleteRest();
                         /// <summary>
                         /// Read sdn dns configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/cluster/sdn/dns/{_dns}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/cluster/sdn/dns/{_dns}"); }
 
                         /// <summary>
                         /// Read sdn dns configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Read() => GetRest();
+                        public async Task<Result> Read() => await GetRest();
                         /// <summary>
                         /// Update sdn dns object configuration.
                         /// </summary>
@@ -3540,7 +3541,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="ttl"></param>
                         /// <param name="url"></param>
                         /// <returns></returns>
-                        public Result SetRest(string delete = null, string digest = null, string key = null, int? reversemaskv6 = null, int? ttl = null, string url = null)
+                        public async Task<Result> SetRest(string delete = null, string digest = null, string key = null, int? reversemaskv6 = null, int? ttl = null, string url = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("delete", delete);
@@ -3549,7 +3550,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("reversemaskv6", reversemaskv6);
                             parameters.Add("ttl", ttl);
                             parameters.Add("url", url);
-                            return _client.Set($"/cluster/sdn/dns/{_dns}", parameters);
+                            return await _client.Set($"/cluster/sdn/dns/{_dns}", parameters);
                         }
 
                         /// <summary>
@@ -3562,7 +3563,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="ttl"></param>
                         /// <param name="url"></param>
                         /// <returns></returns>
-                        public Result Update(string delete = null, string digest = null, string key = null, int? reversemaskv6 = null, int? ttl = null, string url = null) => SetRest(delete, digest, key, reversemaskv6, ttl, url);
+                        public async Task<Result> Update(string delete = null, string digest = null, string key = null, int? reversemaskv6 = null, int? ttl = null, string url = null) => await SetRest(delete, digest, key, reversemaskv6, ttl, url);
                     }
                     /// <summary>
                     /// SDN dns index.
@@ -3570,11 +3571,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Only list sdn dns of specific type
                     ///   Enum: powerdns</param>
                     /// <returns></returns>
-                    public Result GetRest(string type = null)
+                    public async Task<Result> GetRest(string type = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("type", type);
-                        return _client.Get($"/cluster/sdn/dns", parameters);
+                        return await _client.Get($"/cluster/sdn/dns", parameters);
                     }
 
                     /// <summary>
@@ -3583,7 +3584,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Only list sdn dns of specific type
                     ///   Enum: powerdns</param>
                     /// <returns></returns>
-                    public Result Index(string type = null) => GetRest(type);
+                    public async Task<Result> Index(string type = null) => await GetRest(type);
                     /// <summary>
                     /// Create a new sdn dns object.
                     /// </summary>
@@ -3596,7 +3597,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="reversev6mask"></param>
                     /// <param name="ttl"></param>
                     /// <returns></returns>
-                    public Result CreateRest(string dns, string key, string type, string url, int? reversemaskv6 = null, int? reversev6mask = null, int? ttl = null)
+                    public async Task<Result> CreateRest(string dns, string key, string type, string url, int? reversemaskv6 = null, int? reversev6mask = null, int? ttl = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("dns", dns);
@@ -3606,7 +3607,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("reversemaskv6", reversemaskv6);
                         parameters.Add("reversev6mask", reversev6mask);
                         parameters.Add("ttl", ttl);
-                        return _client.Create($"/cluster/sdn/dns", parameters);
+                        return await _client.Create($"/cluster/sdn/dns", parameters);
                     }
 
                     /// <summary>
@@ -3621,30 +3622,30 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="reversev6mask"></param>
                     /// <param name="ttl"></param>
                     /// <returns></returns>
-                    public Result Create(string dns, string key, string type, string url, int? reversemaskv6 = null, int? reversev6mask = null, int? ttl = null) => CreateRest(dns, key, type, url, reversemaskv6, reversev6mask, ttl);
+                    public async Task<Result> Create(string dns, string key, string type, string url, int? reversemaskv6 = null, int? reversev6mask = null, int? ttl = null) => await CreateRest(dns, key, type, url, reversemaskv6, reversev6mask, ttl);
                 }
                 /// <summary>
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/cluster/sdn"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/cluster/sdn"); }
 
                 /// <summary>
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
-                public Result Index() => GetRest();
+                public async Task<Result> Index() => await GetRest();
                 /// <summary>
                 /// Apply sdn controller changes &amp;&amp; reload.
                 /// </summary>
                 /// <returns></returns>
-                public Result SetRest() { return _client.Set($"/cluster/sdn"); }
+                public async Task<Result> SetRest() { return await _client.Set($"/cluster/sdn"); }
 
                 /// <summary>
                 /// Apply sdn controller changes &amp;&amp; reload.
                 /// </summary>
                 /// <returns></returns>
-                public Result Reload() => SetRest();
+                public async Task<Result> Reload() => await SetRest();
             }
             public class PVELog
             {
@@ -3656,11 +3657,11 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// </summary>
                 /// <param name="max">Maximum number of entries.</param>
                 /// <returns></returns>
-                public Result GetRest(int? max = null)
+                public async Task<Result> GetRest(int? max = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("max", max);
-                    return _client.Get($"/cluster/log", parameters);
+                    return await _client.Get($"/cluster/log", parameters);
                 }
 
                 /// <summary>
@@ -3668,7 +3669,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// </summary>
                 /// <param name="max">Maximum number of entries.</param>
                 /// <returns></returns>
-                public Result Log(int? max = null) => GetRest(max);
+                public async Task<Result> Log(int? max = null) => await GetRest(max);
             }
             public class PVEResources
             {
@@ -3681,11 +3682,11 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="type">
                 ///   Enum: vm,storage,node,sdn</param>
                 /// <returns></returns>
-                public Result GetRest(string type = null)
+                public async Task<Result> GetRest(string type = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("type", type);
-                    return _client.Get($"/cluster/resources", parameters);
+                    return await _client.Get($"/cluster/resources", parameters);
                 }
 
                 /// <summary>
@@ -3694,7 +3695,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="type">
                 ///   Enum: vm,storage,node,sdn</param>
                 /// <returns></returns>
-                public Result Resources(string type = null) => GetRest(type);
+                public async Task<Result> Resources(string type = null) => await GetRest(type);
             }
             public class PVETasks
             {
@@ -3705,13 +3706,13 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// List recent tasks (cluster wide).
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/cluster/tasks"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/cluster/tasks"); }
 
                 /// <summary>
                 /// List recent tasks (cluster wide).
                 /// </summary>
                 /// <returns></returns>
-                public Result Tasks() => GetRest();
+                public async Task<Result> Tasks() => await GetRest();
             }
             public class PVEOptions
             {
@@ -3722,13 +3723,13 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// Get datacenter options.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/cluster/options"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/cluster/options"); }
 
                 /// <summary>
                 /// Get datacenter options.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetOptions() => GetRest();
+                public async Task<Result> GetOptions() => await GetRest();
                 /// <summary>
                 /// Set datacenter options.
                 /// </summary>
@@ -3753,7 +3754,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="u2f">u2f</param>
                 /// <param name="webauthn">webauthn configuration</param>
                 /// <returns></returns>
-                public Result SetRest(string bwlimit = null, string console = null, string delete = null, string description = null, string email_from = null, string fencing = null, string ha = null, string http_proxy = null, string keyboard = null, string language = null, string mac_prefix = null, int? max_workers = null, string migration = null, bool? migration_unsecure = null, string u2f = null, string webauthn = null)
+                public async Task<Result> SetRest(string bwlimit = null, string console = null, string delete = null, string description = null, string email_from = null, string fencing = null, string ha = null, string http_proxy = null, string keyboard = null, string language = null, string mac_prefix = null, int? max_workers = null, string migration = null, bool? migration_unsecure = null, string u2f = null, string webauthn = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("bwlimit", bwlimit);
@@ -3772,7 +3773,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("migration_unsecure", migration_unsecure);
                     parameters.Add("u2f", u2f);
                     parameters.Add("webauthn", webauthn);
-                    return _client.Set($"/cluster/options", parameters);
+                    return await _client.Set($"/cluster/options", parameters);
                 }
 
                 /// <summary>
@@ -3799,7 +3800,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="u2f">u2f</param>
                 /// <param name="webauthn">webauthn configuration</param>
                 /// <returns></returns>
-                public Result SetOptions(string bwlimit = null, string console = null, string delete = null, string description = null, string email_from = null, string fencing = null, string ha = null, string http_proxy = null, string keyboard = null, string language = null, string mac_prefix = null, int? max_workers = null, string migration = null, bool? migration_unsecure = null, string u2f = null, string webauthn = null) => SetRest(bwlimit, console, delete, description, email_from, fencing, ha, http_proxy, keyboard, language, mac_prefix, max_workers, migration, migration_unsecure, u2f, webauthn);
+                public async Task<Result> SetOptions(string bwlimit = null, string console = null, string delete = null, string description = null, string email_from = null, string fencing = null, string ha = null, string http_proxy = null, string keyboard = null, string language = null, string mac_prefix = null, int? max_workers = null, string migration = null, bool? migration_unsecure = null, string u2f = null, string webauthn = null) => await SetRest(bwlimit, console, delete, description, email_from, fencing, ha, http_proxy, keyboard, language, mac_prefix, max_workers, migration, migration_unsecure, u2f, webauthn);
             }
             public class PVEStatus
             {
@@ -3810,13 +3811,13 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// Get cluster status information.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/cluster/status"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/cluster/status"); }
 
                 /// <summary>
                 /// Get cluster status information.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetStatus() => GetRest();
+                public async Task<Result> GetStatus() => await GetRest();
             }
             public class PVENextid
             {
@@ -3828,11 +3829,11 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// </summary>
                 /// <param name="vmid">The (unique) ID of the VM.</param>
                 /// <returns></returns>
-                public Result GetRest(int? vmid = null)
+                public async Task<Result> GetRest(int? vmid = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("vmid", vmid);
-                    return _client.Get($"/cluster/nextid", parameters);
+                    return await _client.Get($"/cluster/nextid", parameters);
                 }
 
                 /// <summary>
@@ -3840,19 +3841,19 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// </summary>
                 /// <param name="vmid">The (unique) ID of the VM.</param>
                 /// <returns></returns>
-                public Result Nextid(int? vmid = null) => GetRest(vmid);
+                public async Task<Result> Nextid(int? vmid = null) => await GetRest(vmid);
             }
             /// <summary>
             /// Cluster index.
             /// </summary>
             /// <returns></returns>
-            public Result GetRest() { return _client.Get($"/cluster"); }
+            public async Task<Result> GetRest() { return await _client.Get($"/cluster"); }
 
             /// <summary>
             /// Cluster index.
             /// </summary>
             /// <returns></returns>
-            public Result Index() => GetRest();
+            public async Task<Result> Index() => await GetRest();
         }
         public class PVENodes
         {
@@ -4057,11 +4058,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// </summary>
                                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// <returns></returns>
-                                    public Result DeleteRest(string digest = null)
+                                    public async Task<Result> DeleteRest(string digest = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("digest", digest);
-                                        return _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", parameters);
+                                        return await _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", parameters);
                                     }
 
                                     /// <summary>
@@ -4069,18 +4070,18 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// </summary>
                                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// <returns></returns>
-                                    public Result DeleteRule(string digest = null) => DeleteRest(digest);
+                                    public async Task<Result> DeleteRule(string digest = null) => await DeleteRest(digest);
                                     /// <summary>
                                     /// Get single rule data.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}"); }
+                                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}"); }
 
                                     /// <summary>
                                     /// Get single rule data.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetRule() => GetRest();
+                                    public async Task<Result> GetRule() => await GetRest();
                                     /// <summary>
                                     /// Modify rule data.
                                     /// </summary>
@@ -4103,7 +4104,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="type">Rule type.
                                     ///   Enum: in,out,group</param>
                                     /// <returns></returns>
-                                    public Result SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
+                                    public async Task<Result> SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("action", action);
@@ -4122,7 +4123,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                         parameters.Add("source", source);
                                         parameters.Add("sport", sport);
                                         parameters.Add("type", type);
-                                        return _client.Set($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", parameters);
+                                        return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", parameters);
                                     }
 
                                     /// <summary>
@@ -4147,19 +4148,19 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="type">Rule type.
                                     ///   Enum: in,out,group</param>
                                     /// <returns></returns>
-                                    public Result UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => SetRest(action, comment, delete, dest, digest, dport, enable, icmp_type, iface, log, macro, moveto, proto, source, sport, type);
+                                    public async Task<Result> UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => await SetRest(action, comment, delete, dest, digest, dport, enable, icmp_type, iface, log, macro, moveto, proto, source, sport, type);
                                 }
                                 /// <summary>
                                 /// List rules.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/rules"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/rules"); }
 
                                 /// <summary>
                                 /// List rules.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRules() => GetRest();
+                                public async Task<Result> GetRules() => await GetRest();
                                 /// <summary>
                                 /// Create new rule.
                                 /// </summary>
@@ -4181,7 +4182,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                                 /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
+                                public async Task<Result> CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("action", action);
@@ -4199,7 +4200,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("proto", proto);
                                     parameters.Add("source", source);
                                     parameters.Add("sport", sport);
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/firewall/rules", parameters);
+                                    return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/firewall/rules", parameters);
                                 }
 
                                 /// <summary>
@@ -4223,7 +4224,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                                 /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                                 /// <returns></returns>
-                                public Result CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => CreateRest(action, type, comment, dest, digest, dport, enable, icmp_type, iface, log, macro, pos, proto, source, sport);
+                                public async Task<Result> CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => await CreateRest(action, type, comment, dest, digest, dport, enable, icmp_type, iface, log, macro, pos, proto, source, sport);
                             }
                             public class PVEAliases
                             {
@@ -4253,11 +4254,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// </summary>
                                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// <returns></returns>
-                                    public Result DeleteRest(string digest = null)
+                                    public async Task<Result> DeleteRest(string digest = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("digest", digest);
-                                        return _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", parameters);
+                                        return await _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", parameters);
                                     }
 
                                     /// <summary>
@@ -4265,18 +4266,18 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// </summary>
                                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// <returns></returns>
-                                    public Result RemoveAlias(string digest = null) => DeleteRest(digest);
+                                    public async Task<Result> RemoveAlias(string digest = null) => await DeleteRest(digest);
                                     /// <summary>
                                     /// Read alias.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}"); }
+                                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}"); }
 
                                     /// <summary>
                                     /// Read alias.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result ReadAlias() => GetRest();
+                                    public async Task<Result> ReadAlias() => await GetRest();
                                     /// <summary>
                                     /// Update IP or Network alias.
                                     /// </summary>
@@ -4285,14 +4286,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// <param name="rename">Rename an existing alias.</param>
                                     /// <returns></returns>
-                                    public Result SetRest(string cidr, string comment = null, string digest = null, string rename = null)
+                                    public async Task<Result> SetRest(string cidr, string comment = null, string digest = null, string rename = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("cidr", cidr);
                                         parameters.Add("comment", comment);
                                         parameters.Add("digest", digest);
                                         parameters.Add("rename", rename);
-                                        return _client.Set($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", parameters);
+                                        return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", parameters);
                                     }
 
                                     /// <summary>
@@ -4303,19 +4304,19 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// <param name="rename">Rename an existing alias.</param>
                                     /// <returns></returns>
-                                    public Result UpdateAlias(string cidr, string comment = null, string digest = null, string rename = null) => SetRest(cidr, comment, digest, rename);
+                                    public async Task<Result> UpdateAlias(string cidr, string comment = null, string digest = null, string rename = null) => await SetRest(cidr, comment, digest, rename);
                                 }
                                 /// <summary>
                                 /// List aliases
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases"); }
 
                                 /// <summary>
                                 /// List aliases
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetAliases() => GetRest();
+                                public async Task<Result> GetAliases() => await GetRest();
                                 /// <summary>
                                 /// Create IP or Network Alias.
                                 /// </summary>
@@ -4323,13 +4324,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="name">Alias name.</param>
                                 /// <param name="comment"></param>
                                 /// <returns></returns>
-                                public Result CreateRest(string cidr, string name, string comment = null)
+                                public async Task<Result> CreateRest(string cidr, string name, string comment = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("cidr", cidr);
                                     parameters.Add("name", name);
                                     parameters.Add("comment", comment);
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases", parameters);
+                                    return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases", parameters);
                                 }
 
                                 /// <summary>
@@ -4339,7 +4340,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="name">Alias name.</param>
                                 /// <param name="comment"></param>
                                 /// <returns></returns>
-                                public Result CreateAlias(string cidr, string name, string comment = null) => CreateRest(cidr, name, comment);
+                                public async Task<Result> CreateAlias(string cidr, string name, string comment = null) => await CreateRest(cidr, name, comment);
                             }
                             public class PVEIpset
                             {
@@ -4384,11 +4385,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                         /// </summary>
                                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                         /// <returns></returns>
-                                        public Result DeleteRest(string digest = null)
+                                        public async Task<Result> DeleteRest(string digest = null)
                                         {
                                             var parameters = new Dictionary<string, object>();
                                             parameters.Add("digest", digest);
-                                            return _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
+                                            return await _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
                                         }
 
                                         /// <summary>
@@ -4396,18 +4397,18 @@ namespace Corsinvest.ProxmoxVE.Api
                                         /// </summary>
                                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                         /// <returns></returns>
-                                        public Result RemoveIp(string digest = null) => DeleteRest(digest);
+                                        public async Task<Result> RemoveIp(string digest = null) => await DeleteRest(digest);
                                         /// <summary>
                                         /// Read IP or Network settings from IPSet.
                                         /// </summary>
                                         /// <returns></returns>
-                                        public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}"); }
+                                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}"); }
 
                                         /// <summary>
                                         /// Read IP or Network settings from IPSet.
                                         /// </summary>
                                         /// <returns></returns>
-                                        public Result ReadIp() => GetRest();
+                                        public async Task<Result> ReadIp() => await GetRest();
                                         /// <summary>
                                         /// Update IP or Network settings
                                         /// </summary>
@@ -4415,13 +4416,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                         /// <param name="nomatch"></param>
                                         /// <returns></returns>
-                                        public Result SetRest(string comment = null, string digest = null, bool? nomatch = null)
+                                        public async Task<Result> SetRest(string comment = null, string digest = null, bool? nomatch = null)
                                         {
                                             var parameters = new Dictionary<string, object>();
                                             parameters.Add("comment", comment);
                                             parameters.Add("digest", digest);
                                             parameters.Add("nomatch", nomatch);
-                                            return _client.Set($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
+                                            return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
                                         }
 
                                         /// <summary>
@@ -4431,30 +4432,30 @@ namespace Corsinvest.ProxmoxVE.Api
                                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                         /// <param name="nomatch"></param>
                                         /// <returns></returns>
-                                        public Result UpdateIp(string comment = null, string digest = null, bool? nomatch = null) => SetRest(comment, digest, nomatch);
+                                        public async Task<Result> UpdateIp(string comment = null, string digest = null, bool? nomatch = null) => await SetRest(comment, digest, nomatch);
                                     }
                                     /// <summary>
                                     /// Delete IPSet
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}"); }
+                                    public async Task<Result> DeleteRest() { return await _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}"); }
 
                                     /// <summary>
                                     /// Delete IPSet
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result DeleteIpset() => DeleteRest();
+                                    public async Task<Result> DeleteIpset() => await DeleteRest();
                                     /// <summary>
                                     /// List IPSet content
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}"); }
+                                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}"); }
 
                                     /// <summary>
                                     /// List IPSet content
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetIpset() => GetRest();
+                                    public async Task<Result> GetIpset() => await GetRest();
                                     /// <summary>
                                     /// Add IP or Network to IPSet.
                                     /// </summary>
@@ -4462,13 +4463,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="comment"></param>
                                     /// <param name="nomatch"></param>
                                     /// <returns></returns>
-                                    public Result CreateRest(string cidr, string comment = null, bool? nomatch = null)
+                                    public async Task<Result> CreateRest(string cidr, string comment = null, bool? nomatch = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("cidr", cidr);
                                         parameters.Add("comment", comment);
                                         parameters.Add("nomatch", nomatch);
-                                        return _client.Create($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}", parameters);
+                                        return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}", parameters);
                                     }
 
                                     /// <summary>
@@ -4478,19 +4479,19 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="comment"></param>
                                     /// <param name="nomatch"></param>
                                     /// <returns></returns>
-                                    public Result CreateIp(string cidr, string comment = null, bool? nomatch = null) => CreateRest(cidr, comment, nomatch);
+                                    public async Task<Result> CreateIp(string cidr, string comment = null, bool? nomatch = null) => await CreateRest(cidr, comment, nomatch);
                                 }
                                 /// <summary>
                                 /// List IPSets
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset"); }
 
                                 /// <summary>
                                 /// List IPSets
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result IpsetIndex() => GetRest();
+                                public async Task<Result> IpsetIndex() => await GetRest();
                                 /// <summary>
                                 /// Create new IPSet
                                 /// </summary>
@@ -4499,14 +4500,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                 /// <param name="rename">Rename an existing IPSet. You can set 'rename' to the same value as 'name' to update the 'comment' of an existing IPSet.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(string name, string comment = null, string digest = null, string rename = null)
+                                public async Task<Result> CreateRest(string name, string comment = null, string digest = null, string rename = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("name", name);
                                     parameters.Add("comment", comment);
                                     parameters.Add("digest", digest);
                                     parameters.Add("rename", rename);
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset", parameters);
+                                    return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset", parameters);
                                 }
 
                                 /// <summary>
@@ -4517,7 +4518,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                 /// <param name="rename">Rename an existing IPSet. You can set 'rename' to the same value as 'name' to update the 'comment' of an existing IPSet.</param>
                                 /// <returns></returns>
-                                public Result CreateIpset(string name, string comment = null, string digest = null, string rename = null) => CreateRest(name, comment, digest, rename);
+                                public async Task<Result> CreateIpset(string name, string comment = null, string digest = null, string rename = null) => await CreateRest(name, comment, digest, rename);
                             }
                             public class PVEOptions
                             {
@@ -4533,13 +4534,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Get VM firewall options.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/options"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/options"); }
 
                                 /// <summary>
                                 /// Get VM firewall options.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetOptions() => GetRest();
+                                public async Task<Result> GetOptions() => await GetRest();
                                 /// <summary>
                                 /// Set Firewall options.
                                 /// </summary>
@@ -4560,7 +4561,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 ///   Enum: ACCEPT,REJECT,DROP</param>
                                 /// <param name="radv">Allow sending Router Advertisement.</param>
                                 /// <returns></returns>
-                                public Result SetRest(string delete = null, bool? dhcp = null, string digest = null, bool? enable = null, bool? ipfilter = null, string log_level_in = null, string log_level_out = null, bool? macfilter = null, bool? ndp = null, string policy_in = null, string policy_out = null, bool? radv = null)
+                                public async Task<Result> SetRest(string delete = null, bool? dhcp = null, string digest = null, bool? enable = null, bool? ipfilter = null, string log_level_in = null, string log_level_out = null, bool? macfilter = null, bool? ndp = null, string policy_in = null, string policy_out = null, bool? radv = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("delete", delete);
@@ -4575,7 +4576,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("policy_in", policy_in);
                                     parameters.Add("policy_out", policy_out);
                                     parameters.Add("radv", radv);
-                                    return _client.Set($"/nodes/{_node}/qemu/{_vmid}/firewall/options", parameters);
+                                    return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/firewall/options", parameters);
                                 }
 
                                 /// <summary>
@@ -4598,7 +4599,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 ///   Enum: ACCEPT,REJECT,DROP</param>
                                 /// <param name="radv">Allow sending Router Advertisement.</param>
                                 /// <returns></returns>
-                                public Result SetOptions(string delete = null, bool? dhcp = null, string digest = null, bool? enable = null, bool? ipfilter = null, string log_level_in = null, string log_level_out = null, bool? macfilter = null, bool? ndp = null, string policy_in = null, string policy_out = null, bool? radv = null) => SetRest(delete, dhcp, digest, enable, ipfilter, log_level_in, log_level_out, macfilter, ndp, policy_in, policy_out, radv);
+                                public async Task<Result> SetOptions(string delete = null, bool? dhcp = null, string digest = null, bool? enable = null, bool? ipfilter = null, string log_level_in = null, string log_level_out = null, bool? macfilter = null, bool? ndp = null, string policy_in = null, string policy_out = null, bool? radv = null) => await SetRest(delete, dhcp, digest, enable, ipfilter, log_level_in, log_level_out, macfilter, ndp, policy_in, policy_out, radv);
                             }
                             public class PVELog
                             {
@@ -4616,12 +4617,12 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="limit"></param>
                                 /// <param name="start"></param>
                                 /// <returns></returns>
-                                public Result GetRest(int? limit = null, int? start = null)
+                                public async Task<Result> GetRest(int? limit = null, int? start = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("limit", limit);
                                     parameters.Add("start", start);
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/log", parameters);
+                                    return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/log", parameters);
                                 }
 
                                 /// <summary>
@@ -4630,7 +4631,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="limit"></param>
                                 /// <param name="start"></param>
                                 /// <returns></returns>
-                                public Result Log(int? limit = null, int? start = null) => GetRest(limit, start);
+                                public async Task<Result> Log(int? limit = null, int? start = null) => await GetRest(limit, start);
                             }
                             public class PVERefs
                             {
@@ -4648,11 +4649,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="type">Only list references of specified type.
                                 ///   Enum: alias,ipset</param>
                                 /// <returns></returns>
-                                public Result GetRest(string type = null)
+                                public async Task<Result> GetRest(string type = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("type", type);
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/refs", parameters);
+                                    return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/refs", parameters);
                                 }
 
                                 /// <summary>
@@ -4661,19 +4662,19 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="type">Only list references of specified type.
                                 ///   Enum: alias,ipset</param>
                                 /// <returns></returns>
-                                public Result Refs(string type = null) => GetRest(type);
+                                public async Task<Result> Refs(string type = null) => await GetRest(type);
                             }
                             /// <summary>
                             /// Directory index.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall"); }
 
                             /// <summary>
                             /// Directory index.
                             /// </summary>
                             /// <returns></returns>
-                            public Result Index() => GetRest();
+                            public async Task<Result> Index() => await GetRest();
                         }
                         public class PVEAgent
                         {
@@ -4749,13 +4750,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute fsfreeze-freeze.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-freeze"); }
+                                public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-freeze"); }
 
                                 /// <summary>
                                 /// Execute fsfreeze-freeze.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Fsfreeze_Freeze() => CreateRest();
+                                public async Task<Result> Fsfreeze_Freeze() => await CreateRest();
                             }
                             public class PVEFsfreeze_Status
                             {
@@ -4771,13 +4772,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute fsfreeze-status.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-status"); }
+                                public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-status"); }
 
                                 /// <summary>
                                 /// Execute fsfreeze-status.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Fsfreeze_Status() => CreateRest();
+                                public async Task<Result> Fsfreeze_Status() => await CreateRest();
                             }
                             public class PVEFsfreeze_Thaw
                             {
@@ -4793,13 +4794,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute fsfreeze-thaw.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-thaw"); }
+                                public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-thaw"); }
 
                                 /// <summary>
                                 /// Execute fsfreeze-thaw.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Fsfreeze_Thaw() => CreateRest();
+                                public async Task<Result> Fsfreeze_Thaw() => await CreateRest();
                             }
                             public class PVEFstrim
                             {
@@ -4815,13 +4816,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute fstrim.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fstrim"); }
+                                public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fstrim"); }
 
                                 /// <summary>
                                 /// Execute fstrim.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Fstrim() => CreateRest();
+                                public async Task<Result> Fstrim() => await CreateRest();
                             }
                             public class PVEGet_Fsinfo
                             {
@@ -4837,13 +4838,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute get-fsinfo.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-fsinfo"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-fsinfo"); }
 
                                 /// <summary>
                                 /// Execute get-fsinfo.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Get_Fsinfo() => GetRest();
+                                public async Task<Result> Get_Fsinfo() => await GetRest();
                             }
                             public class PVEGet_Host_Name
                             {
@@ -4859,13 +4860,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute get-host-name.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-host-name"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-host-name"); }
 
                                 /// <summary>
                                 /// Execute get-host-name.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Get_Host_Name() => GetRest();
+                                public async Task<Result> Get_Host_Name() => await GetRest();
                             }
                             public class PVEGet_Memory_Block_Info
                             {
@@ -4881,13 +4882,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute get-memory-block-info.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-memory-block-info"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-memory-block-info"); }
 
                                 /// <summary>
                                 /// Execute get-memory-block-info.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Get_Memory_Block_Info() => GetRest();
+                                public async Task<Result> Get_Memory_Block_Info() => await GetRest();
                             }
                             public class PVEGet_Memory_Blocks
                             {
@@ -4903,13 +4904,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute get-memory-blocks.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-memory-blocks"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-memory-blocks"); }
 
                                 /// <summary>
                                 /// Execute get-memory-blocks.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Get_Memory_Blocks() => GetRest();
+                                public async Task<Result> Get_Memory_Blocks() => await GetRest();
                             }
                             public class PVEGet_Osinfo
                             {
@@ -4925,13 +4926,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute get-osinfo.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-osinfo"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-osinfo"); }
 
                                 /// <summary>
                                 /// Execute get-osinfo.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Get_Osinfo() => GetRest();
+                                public async Task<Result> Get_Osinfo() => await GetRest();
                             }
                             public class PVEGet_Time
                             {
@@ -4947,13 +4948,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute get-time.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-time"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-time"); }
 
                                 /// <summary>
                                 /// Execute get-time.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Get_Time() => GetRest();
+                                public async Task<Result> Get_Time() => await GetRest();
                             }
                             public class PVEGet_Timezone
                             {
@@ -4969,13 +4970,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute get-timezone.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-timezone"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-timezone"); }
 
                                 /// <summary>
                                 /// Execute get-timezone.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Get_Timezone() => GetRest();
+                                public async Task<Result> Get_Timezone() => await GetRest();
                             }
                             public class PVEGet_Users
                             {
@@ -4991,13 +4992,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute get-users.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-users"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-users"); }
 
                                 /// <summary>
                                 /// Execute get-users.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Get_Users() => GetRest();
+                                public async Task<Result> Get_Users() => await GetRest();
                             }
                             public class PVEGet_Vcpus
                             {
@@ -5013,13 +5014,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute get-vcpus.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-vcpus"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-vcpus"); }
 
                                 /// <summary>
                                 /// Execute get-vcpus.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Get_Vcpus() => GetRest();
+                                public async Task<Result> Get_Vcpus() => await GetRest();
                             }
                             public class PVEInfo
                             {
@@ -5035,13 +5036,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute info.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/info"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/info"); }
 
                                 /// <summary>
                                 /// Execute info.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Info() => GetRest();
+                                public async Task<Result> Info() => await GetRest();
                             }
                             public class PVENetwork_Get_Interfaces
                             {
@@ -5057,13 +5058,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute network-get-interfaces.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/network-get-interfaces"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/network-get-interfaces"); }
 
                                 /// <summary>
                                 /// Execute network-get-interfaces.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Network_Get_Interfaces() => GetRest();
+                                public async Task<Result> Network_Get_Interfaces() => await GetRest();
                             }
                             public class PVEPing
                             {
@@ -5079,13 +5080,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute ping.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/ping"); }
+                                public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/ping"); }
 
                                 /// <summary>
                                 /// Execute ping.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Ping() => CreateRest();
+                                public async Task<Result> Ping() => await CreateRest();
                             }
                             public class PVEShutdown
                             {
@@ -5101,13 +5102,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute shutdown.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/shutdown"); }
+                                public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/shutdown"); }
 
                                 /// <summary>
                                 /// Execute shutdown.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Shutdown() => CreateRest();
+                                public async Task<Result> Shutdown() => await CreateRest();
                             }
                             public class PVESuspend_Disk
                             {
@@ -5123,13 +5124,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute suspend-disk.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-disk"); }
+                                public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-disk"); }
 
                                 /// <summary>
                                 /// Execute suspend-disk.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Suspend_Disk() => CreateRest();
+                                public async Task<Result> Suspend_Disk() => await CreateRest();
                             }
                             public class PVESuspend_Hybrid
                             {
@@ -5145,13 +5146,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute suspend-hybrid.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-hybrid"); }
+                                public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-hybrid"); }
 
                                 /// <summary>
                                 /// Execute suspend-hybrid.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Suspend_Hybrid() => CreateRest();
+                                public async Task<Result> Suspend_Hybrid() => await CreateRest();
                             }
                             public class PVESuspend_Ram
                             {
@@ -5167,13 +5168,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Execute suspend-ram.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-ram"); }
+                                public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-ram"); }
 
                                 /// <summary>
                                 /// Execute suspend-ram.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Suspend_Ram() => CreateRest();
+                                public async Task<Result> Suspend_Ram() => await CreateRest();
                             }
                             public class PVESet_User_Password
                             {
@@ -5192,13 +5193,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="username">The user to set the password for.</param>
                                 /// <param name="crypted">set to 1 if the password has already been passed through crypt()</param>
                                 /// <returns></returns>
-                                public Result CreateRest(string password, string username, bool? crypted = null)
+                                public async Task<Result> CreateRest(string password, string username, bool? crypted = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("password", password);
                                     parameters.Add("username", username);
                                     parameters.Add("crypted", crypted);
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/set-user-password", parameters);
+                                    return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/set-user-password", parameters);
                                 }
 
                                 /// <summary>
@@ -5208,7 +5209,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="username">The user to set the password for.</param>
                                 /// <param name="crypted">set to 1 if the password has already been passed through crypt()</param>
                                 /// <returns></returns>
-                                public Result Set_User_Password(string password, string username, bool? crypted = null) => CreateRest(password, username, crypted);
+                                public async Task<Result> Set_User_Password(string password, string username, bool? crypted = null) => await CreateRest(password, username, crypted);
                             }
                             public class PVEExec
                             {
@@ -5226,12 +5227,12 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="command">The command as a list of program + arguments</param>
                                 /// <param name="input_data">Data to pass as 'input-data' to the guest. Usually treated as STDIN to 'command'.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(string command = null, string input_data = null)
+                                public async Task<Result> CreateRest(string command = null, string input_data = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("command", command);
                                     parameters.Add("input-data", input_data);
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/exec", parameters);
+                                    return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/exec", parameters);
                                 }
 
                                 /// <summary>
@@ -5240,7 +5241,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="command">The command as a list of program + arguments</param>
                                 /// <param name="input_data">Data to pass as 'input-data' to the guest. Usually treated as STDIN to 'command'.</param>
                                 /// <returns></returns>
-                                public Result Exec(string command = null, string input_data = null) => CreateRest(command, input_data);
+                                public async Task<Result> Exec(string command = null, string input_data = null) => await CreateRest(command, input_data);
                             }
                             public class PVEExec_Status
                             {
@@ -5257,11 +5258,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="pid">The PID to query</param>
                                 /// <returns></returns>
-                                public Result GetRest(int pid)
+                                public async Task<Result> GetRest(int pid)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("pid", pid);
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/exec-status", parameters);
+                                    return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/exec-status", parameters);
                                 }
 
                                 /// <summary>
@@ -5269,7 +5270,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="pid">The PID to query</param>
                                 /// <returns></returns>
-                                public Result Exec_Status(int pid) => GetRest(pid);
+                                public async Task<Result> Exec_Status(int pid) => await GetRest(pid);
                             }
                             public class PVEFile_Read
                             {
@@ -5286,11 +5287,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="file">The path to the file</param>
                                 /// <returns></returns>
-                                public Result GetRest(string file)
+                                public async Task<Result> GetRest(string file)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("file", file);
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/file-read", parameters);
+                                    return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/file-read", parameters);
                                 }
 
                                 /// <summary>
@@ -5298,7 +5299,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="file">The path to the file</param>
                                 /// <returns></returns>
-                                public Result File_Read(string file) => GetRest(file);
+                                public async Task<Result> File_Read(string file) => await GetRest(file);
                             }
                             public class PVEFile_Write
                             {
@@ -5316,12 +5317,12 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="content">The content to write into the file.</param>
                                 /// <param name="file">The path to the file.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(string content, string file)
+                                public async Task<Result> CreateRest(string content, string file)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("content", content);
                                     parameters.Add("file", file);
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/file-write", parameters);
+                                    return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/file-write", parameters);
                                 }
 
                                 /// <summary>
@@ -5330,30 +5331,30 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="content">The content to write into the file.</param>
                                 /// <param name="file">The path to the file.</param>
                                 /// <returns></returns>
-                                public Result File_Write(string content, string file) => CreateRest(content, file);
+                                public async Task<Result> File_Write(string content, string file) => await CreateRest(content, file);
                             }
                             /// <summary>
                             /// Qemu Agent command index.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent"); }
 
                             /// <summary>
                             /// Qemu Agent command index.
                             /// </summary>
                             /// <returns></returns>
-                            public Result Index() => GetRest();
+                            public async Task<Result> Index() => await GetRest();
                             /// <summary>
                             /// Execute Qemu Guest Agent commands.
                             /// </summary>
                             /// <param name="command">The QGA command.
                             ///   Enum: fsfreeze-freeze,fsfreeze-status,fsfreeze-thaw,fstrim,get-fsinfo,get-host-name,get-memory-block-info,get-memory-blocks,get-osinfo,get-time,get-timezone,get-users,get-vcpus,info,network-get-interfaces,ping,shutdown,suspend-disk,suspend-hybrid,suspend-ram</param>
                             /// <returns></returns>
-                            public Result CreateRest(string command)
+                            public async Task<Result> CreateRest(string command)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("command", command);
-                                return _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent", parameters);
+                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent", parameters);
                             }
 
                             /// <summary>
@@ -5362,7 +5363,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="command">The QGA command.
                             ///   Enum: fsfreeze-freeze,fsfreeze-status,fsfreeze-thaw,fstrim,get-fsinfo,get-host-name,get-memory-block-info,get-memory-blocks,get-osinfo,get-time,get-timezone,get-users,get-vcpus,info,network-get-interfaces,ping,shutdown,suspend-disk,suspend-hybrid,suspend-ram</param>
                             /// <returns></returns>
-                            public Result Agent(string command) => CreateRest(command);
+                            public async Task<Result> Agent(string command) => await CreateRest(command);
                         }
                         public class PVERrd
                         {
@@ -5383,13 +5384,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
                             /// <returns></returns>
-                            public Result GetRest(string ds, string timeframe, string cf = null)
+                            public async Task<Result> GetRest(string ds, string timeframe, string cf = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("ds", ds);
                                 parameters.Add("timeframe", timeframe);
                                 parameters.Add("cf", cf);
-                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/rrd", parameters);
+                                return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/rrd", parameters);
                             }
 
                             /// <summary>
@@ -5401,7 +5402,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
                             /// <returns></returns>
-                            public Result Rrd(string ds, string timeframe, string cf = null) => GetRest(ds, timeframe, cf);
+                            public async Task<Result> Rrd(string ds, string timeframe, string cf = null) => await GetRest(ds, timeframe, cf);
                         }
                         public class PVERrddata
                         {
@@ -5421,12 +5422,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
                             /// <returns></returns>
-                            public Result GetRest(string timeframe, string cf = null)
+                            public async Task<Result> GetRest(string timeframe, string cf = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("timeframe", timeframe);
                                 parameters.Add("cf", cf);
-                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/rrddata", parameters);
+                                return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/rrddata", parameters);
                             }
 
                             /// <summary>
@@ -5437,7 +5438,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
                             /// <returns></returns>
-                            public Result Rrddata(string timeframe, string cf = null) => GetRest(timeframe, cf);
+                            public async Task<Result> Rrddata(string timeframe, string cf = null) => await GetRest(timeframe, cf);
                         }
                         public class PVEConfig
                         {
@@ -5455,12 +5456,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="current">Get current values (instead of pending values).</param>
                             /// <param name="snapshot">Fetch config values from given snapshot.</param>
                             /// <returns></returns>
-                            public Result GetRest(bool? current = null, string snapshot = null)
+                            public async Task<Result> GetRest(bool? current = null, string snapshot = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("current", current);
                                 parameters.Add("snapshot", snapshot);
-                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
+                                return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
                             }
 
                             /// <summary>
@@ -5469,7 +5470,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="current">Get current values (instead of pending values).</param>
                             /// <param name="snapshot">Fetch config values from given snapshot.</param>
                             /// <returns></returns>
-                            public Result VmConfig(bool? current = null, string snapshot = null) => GetRest(current, snapshot);
+                            public async Task<Result> VmConfig(bool? current = null, string snapshot = null) => await GetRest(current, snapshot);
                             /// <summary>
                             /// Set virtual machine options (asynchrounous API).
                             /// </summary>
@@ -5563,7 +5564,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result CreateRest(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                            public async Task<Result> CreateRest(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("acpi", acpi);
@@ -5647,7 +5648,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 AddIndexedParameter(parameters, "unused", unusedN);
                                 AddIndexedParameter(parameters, "usb", usbN);
                                 AddIndexedParameter(parameters, "virtio", virtioN);
-                                return _client.Create($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
+                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
                             }
 
                             /// <summary>
@@ -5743,7 +5744,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result UpdateVmAsync(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => CreateRest(acpi, agent, arch, args, audio0, autostart, background_delay, balloon, bios, boot, bootdisk, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, delete, description, digest, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keephugepages, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, rng0, sataN, scsiN, scsihw, searchdomain, serialN, shares, skiplock, smbios1, smp, sockets, spice_enhancements, sshkeys, startdate, startup, tablet, tags, tdf, template, tpmstate0, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
+                            public async Task<Result> UpdateVmAsync(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => await CreateRest(acpi, agent, arch, args, audio0, autostart, background_delay, balloon, bios, boot, bootdisk, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, delete, description, digest, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keephugepages, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, rng0, sataN, scsiN, scsihw, searchdomain, serialN, shares, skiplock, smbios1, smp, sockets, spice_enhancements, sshkeys, startdate, startup, tablet, tags, tdf, template, tpmstate0, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
                             /// <summary>
                             /// Set virtual machine options (synchrounous API) - You should consider using the POST method instead for any actions involving hotplug or storage allocation.
                             /// </summary>
@@ -5836,7 +5837,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result SetRest(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                            public async Task<Result> SetRest(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("acpi", acpi);
@@ -5919,7 +5920,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 AddIndexedParameter(parameters, "unused", unusedN);
                                 AddIndexedParameter(parameters, "usb", usbN);
                                 AddIndexedParameter(parameters, "virtio", virtioN);
-                                return _client.Set($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
+                                return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
                             }
 
                             /// <summary>
@@ -6014,7 +6015,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public Result UpdateVm(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => SetRest(acpi, agent, arch, args, audio0, autostart, balloon, bios, boot, bootdisk, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, delete, description, digest, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keephugepages, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, rng0, sataN, scsiN, scsihw, searchdomain, serialN, shares, skiplock, smbios1, smp, sockets, spice_enhancements, sshkeys, startdate, startup, tablet, tags, tdf, template, tpmstate0, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
+                            public async Task<Result> UpdateVm(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => await SetRest(acpi, agent, arch, args, audio0, autostart, balloon, bios, boot, bootdisk, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, delete, description, digest, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keephugepages, keyboard, kvm, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, protection, reboot, revert, rng0, sataN, scsiN, scsihw, searchdomain, serialN, shares, skiplock, smbios1, smp, sockets, spice_enhancements, sshkeys, startdate, startup, tablet, tags, tdf, template, tpmstate0, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
                         }
                         public class PVEPending
                         {
@@ -6030,13 +6031,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Get the virtual machine configuration with both current and pending values.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/pending"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/pending"); }
 
                             /// <summary>
                             /// Get the virtual machine configuration with both current and pending values.
                             /// </summary>
                             /// <returns></returns>
-                            public Result VmPending() => GetRest();
+                            public async Task<Result> VmPending() => await GetRest();
                         }
                         public class PVEUnlink
                         {
@@ -6054,12 +6055,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="idlist">A list of disk IDs you want to delete.</param>
                             /// <param name="force">Force physical removal. Without this, we simple remove the disk from the config file and create an additional configuration entry called 'unused[n]', which contains the volume ID. Unlink of unused[n] always cause physical removal.</param>
                             /// <returns></returns>
-                            public Result SetRest(string idlist, bool? force = null)
+                            public async Task<Result> SetRest(string idlist, bool? force = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("idlist", idlist);
                                 parameters.Add("force", force);
-                                return _client.Set($"/nodes/{_node}/qemu/{_vmid}/unlink", parameters);
+                                return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/unlink", parameters);
                             }
 
                             /// <summary>
@@ -6068,7 +6069,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="idlist">A list of disk IDs you want to delete.</param>
                             /// <param name="force">Force physical removal. Without this, we simple remove the disk from the config file and create an additional configuration entry called 'unused[n]', which contains the volume ID. Unlink of unused[n] always cause physical removal.</param>
                             /// <returns></returns>
-                            public Result Unlink(string idlist, bool? force = null) => SetRest(idlist, force);
+                            public async Task<Result> Unlink(string idlist, bool? force = null) => await SetRest(idlist, force);
                         }
                         public class PVEVncproxy
                         {
@@ -6086,12 +6087,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="generate_password">Generates a random password to be used as ticket instead of the API ticket.</param>
                             /// <param name="websocket">starts websockify instead of vncproxy</param>
                             /// <returns></returns>
-                            public Result CreateRest(bool? generate_password = null, bool? websocket = null)
+                            public async Task<Result> CreateRest(bool? generate_password = null, bool? websocket = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("generate-password", generate_password);
                                 parameters.Add("websocket", websocket);
-                                return _client.Create($"/nodes/{_node}/qemu/{_vmid}/vncproxy", parameters);
+                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/vncproxy", parameters);
                             }
 
                             /// <summary>
@@ -6100,7 +6101,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="generate_password">Generates a random password to be used as ticket instead of the API ticket.</param>
                             /// <param name="websocket">starts websockify instead of vncproxy</param>
                             /// <returns></returns>
-                            public Result Vncproxy(bool? generate_password = null, bool? websocket = null) => CreateRest(generate_password, websocket);
+                            public async Task<Result> Vncproxy(bool? generate_password = null, bool? websocket = null) => await CreateRest(generate_password, websocket);
                         }
                         public class PVETermproxy
                         {
@@ -6118,11 +6119,11 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="serial">opens a serial terminal (defaults to display)
                             ///   Enum: serial0,serial1,serial2,serial3</param>
                             /// <returns></returns>
-                            public Result CreateRest(string serial = null)
+                            public async Task<Result> CreateRest(string serial = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("serial", serial);
-                                return _client.Create($"/nodes/{_node}/qemu/{_vmid}/termproxy", parameters);
+                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/termproxy", parameters);
                             }
 
                             /// <summary>
@@ -6131,7 +6132,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="serial">opens a serial terminal (defaults to display)
                             ///   Enum: serial0,serial1,serial2,serial3</param>
                             /// <returns></returns>
-                            public Result Termproxy(string serial = null) => CreateRest(serial);
+                            public async Task<Result> Termproxy(string serial = null) => await CreateRest(serial);
                         }
                         public class PVEVncwebsocket
                         {
@@ -6149,12 +6150,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="port">Port number returned by previous vncproxy call.</param>
                             /// <param name="vncticket">Ticket from previous call to vncproxy.</param>
                             /// <returns></returns>
-                            public Result GetRest(int port, string vncticket)
+                            public async Task<Result> GetRest(int port, string vncticket)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("port", port);
                                 parameters.Add("vncticket", vncticket);
-                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/vncwebsocket", parameters);
+                                return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/vncwebsocket", parameters);
                             }
 
                             /// <summary>
@@ -6163,7 +6164,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="port">Port number returned by previous vncproxy call.</param>
                             /// <param name="vncticket">Ticket from previous call to vncproxy.</param>
                             /// <returns></returns>
-                            public Result Vncwebsocket(int port, string vncticket) => GetRest(port, vncticket);
+                            public async Task<Result> Vncwebsocket(int port, string vncticket) => await GetRest(port, vncticket);
                         }
                         public class PVESpiceproxy
                         {
@@ -6180,11 +6181,11 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As reasonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                             /// <returns></returns>
-                            public Result CreateRest(string proxy = null)
+                            public async Task<Result> CreateRest(string proxy = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("proxy", proxy);
-                                return _client.Create($"/nodes/{_node}/qemu/{_vmid}/spiceproxy", parameters);
+                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/spiceproxy", parameters);
                             }
 
                             /// <summary>
@@ -6192,7 +6193,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As reasonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                             /// <returns></returns>
-                            public Result Spiceproxy(string proxy = null) => CreateRest(proxy);
+                            public async Task<Result> Spiceproxy(string proxy = null) => await CreateRest(proxy);
                         }
                         public class PVEStatus
                         {
@@ -6234,13 +6235,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Get virtual machine status.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/status/current"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/status/current"); }
 
                                 /// <summary>
                                 /// Get virtual machine status.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result VmStatus() => GetRest();
+                                public async Task<Result> VmStatus() => await GetRest();
                             }
                             public class PVEStart
                             {
@@ -6266,7 +6267,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="targetstorage">Mapping from source to target storages. Providing only a single storage ID maps all source storages to that storage. Providing the special value '1' will map each source storage to itself.</param>
                                 /// <param name="timeout">Wait maximal timeout seconds.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(string force_cpu = null, string machine = null, string migratedfrom = null, string migration_network = null, string migration_type = null, bool? skiplock = null, string stateuri = null, string targetstorage = null, int? timeout = null)
+                                public async Task<Result> CreateRest(string force_cpu = null, string machine = null, string migratedfrom = null, string migration_network = null, string migration_type = null, bool? skiplock = null, string stateuri = null, string targetstorage = null, int? timeout = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("force-cpu", force_cpu);
@@ -6278,7 +6279,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("stateuri", stateuri);
                                     parameters.Add("targetstorage", targetstorage);
                                     parameters.Add("timeout", timeout);
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/start", parameters);
+                                    return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/start", parameters);
                                 }
 
                                 /// <summary>
@@ -6295,7 +6296,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="targetstorage">Mapping from source to target storages. Providing only a single storage ID maps all source storages to that storage. Providing the special value '1' will map each source storage to itself.</param>
                                 /// <param name="timeout">Wait maximal timeout seconds.</param>
                                 /// <returns></returns>
-                                public Result VmStart(string force_cpu = null, string machine = null, string migratedfrom = null, string migration_network = null, string migration_type = null, bool? skiplock = null, string stateuri = null, string targetstorage = null, int? timeout = null) => CreateRest(force_cpu, machine, migratedfrom, migration_network, migration_type, skiplock, stateuri, targetstorage, timeout);
+                                public async Task<Result> VmStart(string force_cpu = null, string machine = null, string migratedfrom = null, string migration_network = null, string migration_type = null, bool? skiplock = null, string stateuri = null, string targetstorage = null, int? timeout = null) => await CreateRest(force_cpu, machine, migratedfrom, migration_network, migration_type, skiplock, stateuri, targetstorage, timeout);
                             }
                             public class PVEStop
                             {
@@ -6315,14 +6316,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <param name="timeout">Wait maximal timeout seconds.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(bool? keepActive = null, string migratedfrom = null, bool? skiplock = null, int? timeout = null)
+                                public async Task<Result> CreateRest(bool? keepActive = null, string migratedfrom = null, bool? skiplock = null, int? timeout = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("keepActive", keepActive);
                                     parameters.Add("migratedfrom", migratedfrom);
                                     parameters.Add("skiplock", skiplock);
                                     parameters.Add("timeout", timeout);
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/stop", parameters);
+                                    return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/stop", parameters);
                                 }
 
                                 /// <summary>
@@ -6333,7 +6334,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <param name="timeout">Wait maximal timeout seconds.</param>
                                 /// <returns></returns>
-                                public Result VmStop(bool? keepActive = null, string migratedfrom = null, bool? skiplock = null, int? timeout = null) => CreateRest(keepActive, migratedfrom, skiplock, timeout);
+                                public async Task<Result> VmStop(bool? keepActive = null, string migratedfrom = null, bool? skiplock = null, int? timeout = null) => await CreateRest(keepActive, migratedfrom, skiplock, timeout);
                             }
                             public class PVEReset
                             {
@@ -6350,11 +6351,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(bool? skiplock = null)
+                                public async Task<Result> CreateRest(bool? skiplock = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("skiplock", skiplock);
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/reset", parameters);
+                                    return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/reset", parameters);
                                 }
 
                                 /// <summary>
@@ -6362,7 +6363,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <returns></returns>
-                                public Result VmReset(bool? skiplock = null) => CreateRest(skiplock);
+                                public async Task<Result> VmReset(bool? skiplock = null) => await CreateRest(skiplock);
                             }
                             public class PVEShutdown
                             {
@@ -6382,14 +6383,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <param name="timeout">Wait maximal timeout seconds.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(bool? forceStop = null, bool? keepActive = null, bool? skiplock = null, int? timeout = null)
+                                public async Task<Result> CreateRest(bool? forceStop = null, bool? keepActive = null, bool? skiplock = null, int? timeout = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("forceStop", forceStop);
                                     parameters.Add("keepActive", keepActive);
                                     parameters.Add("skiplock", skiplock);
                                     parameters.Add("timeout", timeout);
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/shutdown", parameters);
+                                    return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/shutdown", parameters);
                                 }
 
                                 /// <summary>
@@ -6400,7 +6401,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <param name="timeout">Wait maximal timeout seconds.</param>
                                 /// <returns></returns>
-                                public Result VmShutdown(bool? forceStop = null, bool? keepActive = null, bool? skiplock = null, int? timeout = null) => CreateRest(forceStop, keepActive, skiplock, timeout);
+                                public async Task<Result> VmShutdown(bool? forceStop = null, bool? keepActive = null, bool? skiplock = null, int? timeout = null) => await CreateRest(forceStop, keepActive, skiplock, timeout);
                             }
                             public class PVEReboot
                             {
@@ -6417,11 +6418,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="timeout">Wait maximal timeout seconds for the shutdown.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(int? timeout = null)
+                                public async Task<Result> CreateRest(int? timeout = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("timeout", timeout);
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/reboot", parameters);
+                                    return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/reboot", parameters);
                                 }
 
                                 /// <summary>
@@ -6429,7 +6430,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="timeout">Wait maximal timeout seconds for the shutdown.</param>
                                 /// <returns></returns>
-                                public Result VmReboot(int? timeout = null) => CreateRest(timeout);
+                                public async Task<Result> VmReboot(int? timeout = null) => await CreateRest(timeout);
                             }
                             public class PVESuspend
                             {
@@ -6448,13 +6449,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="statestorage">The storage for the VM state</param>
                                 /// <param name="todisk">If set, suspends the VM to disk. Will be resumed on next VM start.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(bool? skiplock = null, string statestorage = null, bool? todisk = null)
+                                public async Task<Result> CreateRest(bool? skiplock = null, string statestorage = null, bool? todisk = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("skiplock", skiplock);
                                     parameters.Add("statestorage", statestorage);
                                     parameters.Add("todisk", todisk);
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/suspend", parameters);
+                                    return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/suspend", parameters);
                                 }
 
                                 /// <summary>
@@ -6464,7 +6465,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="statestorage">The storage for the VM state</param>
                                 /// <param name="todisk">If set, suspends the VM to disk. Will be resumed on next VM start.</param>
                                 /// <returns></returns>
-                                public Result VmSuspend(bool? skiplock = null, string statestorage = null, bool? todisk = null) => CreateRest(skiplock, statestorage, todisk);
+                                public async Task<Result> VmSuspend(bool? skiplock = null, string statestorage = null, bool? todisk = null) => await CreateRest(skiplock, statestorage, todisk);
                             }
                             public class PVEResume
                             {
@@ -6482,12 +6483,12 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="nocheck"></param>
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(bool? nocheck = null, bool? skiplock = null)
+                                public async Task<Result> CreateRest(bool? nocheck = null, bool? skiplock = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("nocheck", nocheck);
                                     parameters.Add("skiplock", skiplock);
-                                    return _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/resume", parameters);
+                                    return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/resume", parameters);
                                 }
 
                                 /// <summary>
@@ -6496,19 +6497,19 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="nocheck"></param>
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <returns></returns>
-                                public Result VmResume(bool? nocheck = null, bool? skiplock = null) => CreateRest(nocheck, skiplock);
+                                public async Task<Result> VmResume(bool? nocheck = null, bool? skiplock = null) => await CreateRest(nocheck, skiplock);
                             }
                             /// <summary>
                             /// Directory index
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/status"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/status"); }
 
                             /// <summary>
                             /// Directory index
                             /// </summary>
                             /// <returns></returns>
-                            public Result Vmcmdidx() => GetRest();
+                            public async Task<Result> Vmcmdidx() => await GetRest();
                         }
                         public class PVESendkey
                         {
@@ -6526,12 +6527,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="key">The key (qemu monitor encoding).</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                             /// <returns></returns>
-                            public Result SetRest(string key, bool? skiplock = null)
+                            public async Task<Result> SetRest(string key, bool? skiplock = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("key", key);
                                 parameters.Add("skiplock", skiplock);
-                                return _client.Set($"/nodes/{_node}/qemu/{_vmid}/sendkey", parameters);
+                                return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/sendkey", parameters);
                             }
 
                             /// <summary>
@@ -6540,7 +6541,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="key">The key (qemu monitor encoding).</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                             /// <returns></returns>
-                            public Result VmSendkey(string key, bool? skiplock = null) => SetRest(key, skiplock);
+                            public async Task<Result> VmSendkey(string key, bool? skiplock = null) => await SetRest(key, skiplock);
                         }
                         public class PVEFeature
                         {
@@ -6559,12 +6560,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             ///   Enum: snapshot,clone,copy</param>
                             /// <param name="snapname">The name of the snapshot.</param>
                             /// <returns></returns>
-                            public Result GetRest(string feature, string snapname = null)
+                            public async Task<Result> GetRest(string feature, string snapname = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("feature", feature);
                                 parameters.Add("snapname", snapname);
-                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/feature", parameters);
+                                return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/feature", parameters);
                             }
 
                             /// <summary>
@@ -6574,7 +6575,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             ///   Enum: snapshot,clone,copy</param>
                             /// <param name="snapname">The name of the snapshot.</param>
                             /// <returns></returns>
-                            public Result VmFeature(string feature, string snapname = null) => GetRest(feature, snapname);
+                            public async Task<Result> VmFeature(string feature, string snapname = null) => await GetRest(feature, snapname);
                         }
                         public class PVEClone
                         {
@@ -6601,7 +6602,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="storage">Target storage for full clone.</param>
                             /// <param name="target">Target node. Only allowed if the original VM is on shared storage.</param>
                             /// <returns></returns>
-                            public Result CreateRest(int newid, int? bwlimit = null, string description = null, string format = null, bool? full = null, string name = null, string pool = null, string snapname = null, string storage = null, string target = null)
+                            public async Task<Result> CreateRest(int newid, int? bwlimit = null, string description = null, string format = null, bool? full = null, string name = null, string pool = null, string snapname = null, string storage = null, string target = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("newid", newid);
@@ -6614,7 +6615,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("snapname", snapname);
                                 parameters.Add("storage", storage);
                                 parameters.Add("target", target);
-                                return _client.Create($"/nodes/{_node}/qemu/{_vmid}/clone", parameters);
+                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/clone", parameters);
                             }
 
                             /// <summary>
@@ -6632,7 +6633,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="storage">Target storage for full clone.</param>
                             /// <param name="target">Target node. Only allowed if the original VM is on shared storage.</param>
                             /// <returns></returns>
-                            public Result CloneVm(int newid, int? bwlimit = null, string description = null, string format = null, bool? full = null, string name = null, string pool = null, string snapname = null, string storage = null, string target = null) => CreateRest(newid, bwlimit, description, format, full, name, pool, snapname, storage, target);
+                            public async Task<Result> CloneVm(int newid, int? bwlimit = null, string description = null, string format = null, bool? full = null, string name = null, string pool = null, string snapname = null, string storage = null, string target = null) => await CreateRest(newid, bwlimit, description, format, full, name, pool, snapname, storage, target);
                         }
                         public class PVEMoveDisk
                         {
@@ -6660,7 +6661,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0,tpmstate0,unused0,unused1,unused2,unused3,unused4,unused5,unused6,unused7,unused8,unused9,unused10,unused11,unused12,unused13,unused14,unused15,unused16,unused17,unused18,unused19,unused20,unused21,unused22,unused23,unused24,unused25,unused26,unused27,unused28,unused29,unused30,unused31,unused32,unused33,unused34,unused35,unused36,unused37,unused38,unused39,unused40,unused41,unused42,unused43,unused44,unused45,unused46,unused47,unused48,unused49,unused50,unused51,unused52,unused53,unused54,unused55,unused56,unused57,unused58,unused59,unused60,unused61,unused62,unused63,unused64,unused65,unused66,unused67,unused68,unused69,unused70,unused71,unused72,unused73,unused74,unused75,unused76,unused77,unused78,unused79,unused80,unused81,unused82,unused83,unused84,unused85,unused86,unused87,unused88,unused89,unused90,unused91,unused92,unused93,unused94,unused95,unused96,unused97,unused98,unused99,unused100,unused101,unused102,unused103,unused104,unused105,unused106,unused107,unused108,unused109,unused110,unused111,unused112,unused113,unused114,unused115,unused116,unused117,unused118,unused119,unused120,unused121,unused122,unused123,unused124,unused125,unused126,unused127,unused128,unused129,unused130,unused131,unused132,unused133,unused134,unused135,unused136,unused137,unused138,unused139,unused140,unused141,unused142,unused143,unused144,unused145,unused146,unused147,unused148,unused149,unused150,unused151,unused152,unused153,unused154,unused155,unused156,unused157,unused158,unused159,unused160,unused161,unused162,unused163,unused164,unused165,unused166,unused167,unused168,unused169,unused170,unused171,unused172,unused173,unused174,unused175,unused176,unused177,unused178,unused179,unused180,unused181,unused182,unused183,unused184,unused185,unused186,unused187,unused188,unused189,unused190,unused191,unused192,unused193,unused194,unused195,unused196,unused197,unused198,unused199,unused200,unused201,unused202,unused203,unused204,unused205,unused206,unused207,unused208,unused209,unused210,unused211,unused212,unused213,unused214,unused215,unused216,unused217,unused218,unused219,unused220,unused221,unused222,unused223,unused224,unused225,unused226,unused227,unused228,unused229,unused230,unused231,unused232,unused233,unused234,unused235,unused236,unused237,unused238,unused239,unused240,unused241,unused242,unused243,unused244,unused245,unused246,unused247,unused248,unused249,unused250,unused251,unused252,unused253,unused254,unused255</param>
                             /// <param name="target_vmid">The (unique) ID of the VM.</param>
                             /// <returns></returns>
-                            public Result CreateRest(string disk, int? bwlimit = null, bool? delete = null, string digest = null, string format = null, string storage = null, string target_digest = null, string target_disk = null, int? target_vmid = null)
+                            public async Task<Result> CreateRest(string disk, int? bwlimit = null, bool? delete = null, string digest = null, string format = null, string storage = null, string target_digest = null, string target_disk = null, int? target_vmid = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("disk", disk);
@@ -6672,7 +6673,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("target-digest", target_digest);
                                 parameters.Add("target-disk", target_disk);
                                 parameters.Add("target-vmid", target_vmid);
-                                return _client.Create($"/nodes/{_node}/qemu/{_vmid}/move_disk", parameters);
+                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/move_disk", parameters);
                             }
 
                             /// <summary>
@@ -6691,7 +6692,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0,tpmstate0,unused0,unused1,unused2,unused3,unused4,unused5,unused6,unused7,unused8,unused9,unused10,unused11,unused12,unused13,unused14,unused15,unused16,unused17,unused18,unused19,unused20,unused21,unused22,unused23,unused24,unused25,unused26,unused27,unused28,unused29,unused30,unused31,unused32,unused33,unused34,unused35,unused36,unused37,unused38,unused39,unused40,unused41,unused42,unused43,unused44,unused45,unused46,unused47,unused48,unused49,unused50,unused51,unused52,unused53,unused54,unused55,unused56,unused57,unused58,unused59,unused60,unused61,unused62,unused63,unused64,unused65,unused66,unused67,unused68,unused69,unused70,unused71,unused72,unused73,unused74,unused75,unused76,unused77,unused78,unused79,unused80,unused81,unused82,unused83,unused84,unused85,unused86,unused87,unused88,unused89,unused90,unused91,unused92,unused93,unused94,unused95,unused96,unused97,unused98,unused99,unused100,unused101,unused102,unused103,unused104,unused105,unused106,unused107,unused108,unused109,unused110,unused111,unused112,unused113,unused114,unused115,unused116,unused117,unused118,unused119,unused120,unused121,unused122,unused123,unused124,unused125,unused126,unused127,unused128,unused129,unused130,unused131,unused132,unused133,unused134,unused135,unused136,unused137,unused138,unused139,unused140,unused141,unused142,unused143,unused144,unused145,unused146,unused147,unused148,unused149,unused150,unused151,unused152,unused153,unused154,unused155,unused156,unused157,unused158,unused159,unused160,unused161,unused162,unused163,unused164,unused165,unused166,unused167,unused168,unused169,unused170,unused171,unused172,unused173,unused174,unused175,unused176,unused177,unused178,unused179,unused180,unused181,unused182,unused183,unused184,unused185,unused186,unused187,unused188,unused189,unused190,unused191,unused192,unused193,unused194,unused195,unused196,unused197,unused198,unused199,unused200,unused201,unused202,unused203,unused204,unused205,unused206,unused207,unused208,unused209,unused210,unused211,unused212,unused213,unused214,unused215,unused216,unused217,unused218,unused219,unused220,unused221,unused222,unused223,unused224,unused225,unused226,unused227,unused228,unused229,unused230,unused231,unused232,unused233,unused234,unused235,unused236,unused237,unused238,unused239,unused240,unused241,unused242,unused243,unused244,unused245,unused246,unused247,unused248,unused249,unused250,unused251,unused252,unused253,unused254,unused255</param>
                             /// <param name="target_vmid">The (unique) ID of the VM.</param>
                             /// <returns></returns>
-                            public Result MoveVmDisk(string disk, int? bwlimit = null, bool? delete = null, string digest = null, string format = null, string storage = null, string target_digest = null, string target_disk = null, int? target_vmid = null) => CreateRest(disk, bwlimit, delete, digest, format, storage, target_digest, target_disk, target_vmid);
+                            public async Task<Result> MoveVmDisk(string disk, int? bwlimit = null, bool? delete = null, string digest = null, string format = null, string storage = null, string target_digest = null, string target_disk = null, int? target_vmid = null) => await CreateRest(disk, bwlimit, delete, digest, format, storage, target_digest, target_disk, target_vmid);
                         }
                         public class PVEMigrate
                         {
@@ -6708,11 +6709,11 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="target">Target node.</param>
                             /// <returns></returns>
-                            public Result GetRest(string target = null)
+                            public async Task<Result> GetRest(string target = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("target", target);
-                                return _client.Get($"/nodes/{_node}/qemu/{_vmid}/migrate", parameters);
+                                return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/migrate", parameters);
                             }
 
                             /// <summary>
@@ -6720,7 +6721,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="target">Target node.</param>
                             /// <returns></returns>
-                            public Result MigrateVmPrecondition(string target = null) => GetRest(target);
+                            public async Task<Result> MigrateVmPrecondition(string target = null) => await GetRest(target);
                             /// <summary>
                             /// Migrate virtual machine. Creates a new migration task.
                             /// </summary>
@@ -6734,7 +6735,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="targetstorage">Mapping from source to target storages. Providing only a single storage ID maps all source storages to that storage. Providing the special value '1' will map each source storage to itself.</param>
                             /// <param name="with_local_disks">Enable live storage migration for local disk</param>
                             /// <returns></returns>
-                            public Result CreateRest(string target, int? bwlimit = null, bool? force = null, string migration_network = null, string migration_type = null, bool? online = null, string targetstorage = null, bool? with_local_disks = null)
+                            public async Task<Result> CreateRest(string target, int? bwlimit = null, bool? force = null, string migration_network = null, string migration_type = null, bool? online = null, string targetstorage = null, bool? with_local_disks = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("target", target);
@@ -6745,7 +6746,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("online", online);
                                 parameters.Add("targetstorage", targetstorage);
                                 parameters.Add("with-local-disks", with_local_disks);
-                                return _client.Create($"/nodes/{_node}/qemu/{_vmid}/migrate", parameters);
+                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/migrate", parameters);
                             }
 
                             /// <summary>
@@ -6761,7 +6762,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="targetstorage">Mapping from source to target storages. Providing only a single storage ID maps all source storages to that storage. Providing the special value '1' will map each source storage to itself.</param>
                             /// <param name="with_local_disks">Enable live storage migration for local disk</param>
                             /// <returns></returns>
-                            public Result MigrateVm(string target, int? bwlimit = null, bool? force = null, string migration_network = null, string migration_type = null, bool? online = null, string targetstorage = null, bool? with_local_disks = null) => CreateRest(target, bwlimit, force, migration_network, migration_type, online, targetstorage, with_local_disks);
+                            public async Task<Result> MigrateVm(string target, int? bwlimit = null, bool? force = null, string migration_network = null, string migration_type = null, bool? online = null, string targetstorage = null, bool? with_local_disks = null) => await CreateRest(target, bwlimit, force, migration_network, migration_type, online, targetstorage, with_local_disks);
                         }
                         public class PVEMonitor
                         {
@@ -6778,11 +6779,11 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="command">The monitor command.</param>
                             /// <returns></returns>
-                            public Result CreateRest(string command)
+                            public async Task<Result> CreateRest(string command)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("command", command);
-                                return _client.Create($"/nodes/{_node}/qemu/{_vmid}/monitor", parameters);
+                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/monitor", parameters);
                             }
 
                             /// <summary>
@@ -6790,7 +6791,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="command">The monitor command.</param>
                             /// <returns></returns>
-                            public Result Monitor(string command) => CreateRest(command);
+                            public async Task<Result> Monitor(string command) => await CreateRest(command);
                         }
                         public class PVEResize
                         {
@@ -6811,14 +6812,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                             /// <returns></returns>
-                            public Result SetRest(string disk, string size, string digest = null, bool? skiplock = null)
+                            public async Task<Result> SetRest(string disk, string size, string digest = null, bool? skiplock = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("disk", disk);
                                 parameters.Add("size", size);
                                 parameters.Add("digest", digest);
                                 parameters.Add("skiplock", skiplock);
-                                return _client.Set($"/nodes/{_node}/qemu/{_vmid}/resize", parameters);
+                                return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/resize", parameters);
                             }
 
                             /// <summary>
@@ -6830,7 +6831,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                             /// <returns></returns>
-                            public Result ResizeVm(string disk, string size, string digest = null, bool? skiplock = null) => SetRest(disk, size, digest, skiplock);
+                            public async Task<Result> ResizeVm(string disk, string size, string digest = null, bool? skiplock = null) => await SetRest(disk, size, digest, skiplock);
                         }
                         public class PVESnapshot
                         {
@@ -6875,23 +6876,23 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// Get snapshot configuration
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config"); }
+                                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config"); }
 
                                     /// <summary>
                                     /// Get snapshot configuration
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetSnapshotConfig() => GetRest();
+                                    public async Task<Result> GetSnapshotConfig() => await GetRest();
                                     /// <summary>
                                     /// Update snapshot metadata.
                                     /// </summary>
                                     /// <param name="description">A textual description or comment.</param>
                                     /// <returns></returns>
-                                    public Result SetRest(string description = null)
+                                    public async Task<Result> SetRest(string description = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("description", description);
-                                        return _client.Set($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config", parameters);
+                                        return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config", parameters);
                                     }
 
                                     /// <summary>
@@ -6899,7 +6900,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// </summary>
                                     /// <param name="description">A textual description or comment.</param>
                                     /// <returns></returns>
-                                    public Result UpdateSnapshotConfig(string description = null) => SetRest(description);
+                                    public async Task<Result> UpdateSnapshotConfig(string description = null) => await SetRest(description);
                                 }
                                 public class PVERollback
                                 {
@@ -6917,24 +6918,24 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// Rollback VM state to specified snapshot.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result CreateRest() { return _client.Create($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/rollback"); }
+                                    public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/rollback"); }
 
                                     /// <summary>
                                     /// Rollback VM state to specified snapshot.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result Rollback() => CreateRest();
+                                    public async Task<Result> Rollback() => await CreateRest();
                                 }
                                 /// <summary>
                                 /// Delete a VM snapshot.
                                 /// </summary>
                                 /// <param name="force">For removal from config file, even if removing disk snapshots fails.</param>
                                 /// <returns></returns>
-                                public Result DeleteRest(bool? force = null)
+                                public async Task<Result> DeleteRest(bool? force = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("force", force);
-                                    return _client.Delete($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}", parameters);
+                                    return await _client.Delete($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}", parameters);
                                 }
 
                                 /// <summary>
@@ -6942,30 +6943,30 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="force">For removal from config file, even if removing disk snapshots fails.</param>
                                 /// <returns></returns>
-                                public Result Delsnapshot(bool? force = null) => DeleteRest(force);
+                                public async Task<Result> Delsnapshot(bool? force = null) => await DeleteRest(force);
                                 /// <summary>
                                 ///
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}"); }
 
                                 /// <summary>
                                 ///
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result SnapshotCmdIdx() => GetRest();
+                                public async Task<Result> SnapshotCmdIdx() => await GetRest();
                             }
                             /// <summary>
                             /// List all snapshots.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}/snapshot"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/snapshot"); }
 
                             /// <summary>
                             /// List all snapshots.
                             /// </summary>
                             /// <returns></returns>
-                            public Result SnapshotList() => GetRest();
+                            public async Task<Result> SnapshotList() => await GetRest();
                             /// <summary>
                             /// Snapshot a VM.
                             /// </summary>
@@ -6973,13 +6974,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="description">A textual description or comment.</param>
                             /// <param name="vmstate">Save the vmstate</param>
                             /// <returns></returns>
-                            public Result CreateRest(string snapname, string description = null, bool? vmstate = null)
+                            public async Task<Result> CreateRest(string snapname, string description = null, bool? vmstate = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("snapname", snapname);
                                 parameters.Add("description", description);
                                 parameters.Add("vmstate", vmstate);
-                                return _client.Create($"/nodes/{_node}/qemu/{_vmid}/snapshot", parameters);
+                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/snapshot", parameters);
                             }
 
                             /// <summary>
@@ -6989,7 +6990,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="description">A textual description or comment.</param>
                             /// <param name="vmstate">Save the vmstate</param>
                             /// <returns></returns>
-                            public Result Snapshot(string snapname, string description = null, bool? vmstate = null) => CreateRest(snapname, description, vmstate);
+                            public async Task<Result> Snapshot(string snapname, string description = null, bool? vmstate = null) => await CreateRest(snapname, description, vmstate);
                         }
                         public class PVETemplate
                         {
@@ -7007,11 +7008,11 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="disk">If you want to convert only 1 disk to base image.
                             ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0,tpmstate0</param>
                             /// <returns></returns>
-                            public Result CreateRest(string disk = null)
+                            public async Task<Result> CreateRest(string disk = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("disk", disk);
-                                return _client.Create($"/nodes/{_node}/qemu/{_vmid}/template", parameters);
+                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/template", parameters);
                             }
 
                             /// <summary>
@@ -7020,7 +7021,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="disk">If you want to convert only 1 disk to base image.
                             ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0,tpmstate0</param>
                             /// <returns></returns>
-                            public Result Template(string disk = null) => CreateRest(disk);
+                            public async Task<Result> Template(string disk = null) => await CreateRest(disk);
                         }
                         public class PVECloudinit
                         {
@@ -7050,11 +7051,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="type">Config type.
                                 ///   Enum: user,network,meta</param>
                                 /// <returns></returns>
-                                public Result GetRest(string type)
+                                public async Task<Result> GetRest(string type)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("type", type);
-                                    return _client.Get($"/nodes/{_node}/qemu/{_vmid}/cloudinit/dump", parameters);
+                                    return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/cloudinit/dump", parameters);
                                 }
 
                                 /// <summary>
@@ -7063,7 +7064,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="type">Config type.
                                 ///   Enum: user,network,meta</param>
                                 /// <returns></returns>
-                                public Result CloudinitGeneratedConfigDump(string type) => GetRest(type);
+                                public async Task<Result> CloudinitGeneratedConfigDump(string type) => await GetRest(type);
                             }
                         }
                         /// <summary>
@@ -7073,13 +7074,13 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="purge">Remove VMID from configurations, like backup &amp; replication jobs and HA.</param>
                         /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                         /// <returns></returns>
-                        public Result DeleteRest(bool? destroy_unreferenced_disks = null, bool? purge = null, bool? skiplock = null)
+                        public async Task<Result> DeleteRest(bool? destroy_unreferenced_disks = null, bool? purge = null, bool? skiplock = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("destroy-unreferenced-disks", destroy_unreferenced_disks);
                             parameters.Add("purge", purge);
                             parameters.Add("skiplock", skiplock);
-                            return _client.Delete($"/nodes/{_node}/qemu/{_vmid}", parameters);
+                            return await _client.Delete($"/nodes/{_node}/qemu/{_vmid}", parameters);
                         }
 
                         /// <summary>
@@ -7089,29 +7090,29 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="purge">Remove VMID from configurations, like backup &amp; replication jobs and HA.</param>
                         /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                         /// <returns></returns>
-                        public Result DestroyVm(bool? destroy_unreferenced_disks = null, bool? purge = null, bool? skiplock = null) => DeleteRest(destroy_unreferenced_disks, purge, skiplock);
+                        public async Task<Result> DestroyVm(bool? destroy_unreferenced_disks = null, bool? purge = null, bool? skiplock = null) => await DeleteRest(destroy_unreferenced_disks, purge, skiplock);
                         /// <summary>
                         /// Directory index
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/qemu/{_vmid}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}"); }
 
                         /// <summary>
                         /// Directory index
                         /// </summary>
                         /// <returns></returns>
-                        public Result Vmdiridx() => GetRest();
+                        public async Task<Result> Vmdiridx() => await GetRest();
                     }
                     /// <summary>
                     /// Virtual machine index (per node).
                     /// </summary>
                     /// <param name="full">Determine the full status of active VMs.</param>
                     /// <returns></returns>
-                    public Result GetRest(bool? full = null)
+                    public async Task<Result> GetRest(bool? full = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("full", full);
-                        return _client.Get($"/nodes/{_node}/qemu", parameters);
+                        return await _client.Get($"/nodes/{_node}/qemu", parameters);
                     }
 
                     /// <summary>
@@ -7119,7 +7120,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="full">Determine the full status of active VMs.</param>
                     /// <returns></returns>
-                    public Result Vmlist(bool? full = null) => GetRest(full);
+                    public async Task<Result> Vmlist(bool? full = null) => await GetRest(full);
                     /// <summary>
                     /// Create or restore a virtual machine.
                     /// </summary>
@@ -7216,7 +7217,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                     /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                     /// <returns></returns>
-                    public Result CreateRest(int vmid, bool? acpi = null, string agent = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? live_restore = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                    public async Task<Result> CreateRest(int vmid, bool? acpi = null, string agent = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? live_restore = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("vmid", vmid);
@@ -7303,7 +7304,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         AddIndexedParameter(parameters, "unused", unusedN);
                         AddIndexedParameter(parameters, "usb", usbN);
                         AddIndexedParameter(parameters, "virtio", virtioN);
-                        return _client.Create($"/nodes/{_node}/qemu", parameters);
+                        return await _client.Create($"/nodes/{_node}/qemu", parameters);
                     }
 
                     /// <summary>
@@ -7402,7 +7403,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                     /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                     /// <returns></returns>
-                    public Result CreateVm(int vmid, bool? acpi = null, string agent = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? live_restore = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => CreateRest(vmid, acpi, agent, arch, archive, args, audio0, autostart, balloon, bios, boot, bootdisk, bwlimit, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, description, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keephugepages, keyboard, kvm, live_restore, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, pool, protection, reboot, rng0, sataN, scsiN, scsihw, searchdomain, serialN, shares, smbios1, smp, sockets, spice_enhancements, sshkeys, start, startdate, startup, storage, tablet, tags, tdf, template, tpmstate0, unique, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
+                    public async Task<Result> CreateVm(int vmid, bool? acpi = null, string agent = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? live_restore = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null) => await CreateRest(vmid, acpi, agent, arch, archive, args, audio0, autostart, balloon, bios, boot, bootdisk, bwlimit, cdrom, cicustom, cipassword, citype, ciuser, cores, cpu, cpulimit, cpuunits, description, efidisk0, force, freeze, hookscript, hostpciN, hotplug, hugepages, ideN, ipconfigN, ivshmem, keephugepages, keyboard, kvm, live_restore, localtime, lock_, machine, memory, migrate_downtime, migrate_speed, name, nameserver, netN, numa, numaN, onboot, ostype, parallelN, pool, protection, reboot, rng0, sataN, scsiN, scsihw, searchdomain, serialN, shares, smbios1, smp, sockets, spice_enhancements, sshkeys, start, startdate, startup, storage, tablet, tags, tdf, template, tpmstate0, unique, unusedN, usbN, vcpus, vga, virtioN, vmgenid, vmstatestorage, watchdog);
                 }
                 public class PVELxc
                 {
@@ -7470,12 +7471,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="current">Get current values (instead of pending values).</param>
                             /// <param name="snapshot">Fetch config values from given snapshot.</param>
                             /// <returns></returns>
-                            public Result GetRest(bool? current = null, string snapshot = null)
+                            public async Task<Result> GetRest(bool? current = null, string snapshot = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("current", current);
                                 parameters.Add("snapshot", snapshot);
-                                return _client.Get($"/nodes/{_node}/lxc/{_vmid}/config", parameters);
+                                return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/config", parameters);
                             }
 
                             /// <summary>
@@ -7484,7 +7485,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="current">Get current values (instead of pending values).</param>
                             /// <param name="snapshot">Fetch config values from given snapshot.</param>
                             /// <returns></returns>
-                            public Result VmConfig(bool? current = null, string snapshot = null) => GetRest(current, snapshot);
+                            public async Task<Result> VmConfig(bool? current = null, string snapshot = null) => await GetRest(current, snapshot);
                             /// <summary>
                             /// Set container options.
                             /// </summary>
@@ -7525,7 +7526,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
                             /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                             /// <returns></returns>
-                            public Result SetRest(string arch = null, string cmode = null, bool? console = null, int? cores = null, float? cpulimit = null, int? cpuunits = null, bool? debug = null, string delete = null, string description = null, string digest = null, string features = null, string hookscript = null, string hostname = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, bool? protection = null, string revert = null, string rootfs = null, string searchdomain = null, string startup = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
+                            public async Task<Result> SetRest(string arch = null, string cmode = null, bool? console = null, int? cores = null, float? cpulimit = null, int? cpuunits = null, bool? debug = null, string delete = null, string description = null, string digest = null, string features = null, string hookscript = null, string hostname = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, bool? protection = null, string revert = null, string rootfs = null, string searchdomain = null, string startup = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("arch", arch);
@@ -7560,7 +7561,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 AddIndexedParameter(parameters, "mp", mpN);
                                 AddIndexedParameter(parameters, "net", netN);
                                 AddIndexedParameter(parameters, "unused", unusedN);
-                                return _client.Set($"/nodes/{_node}/lxc/{_vmid}/config", parameters);
+                                return await _client.Set($"/nodes/{_node}/lxc/{_vmid}/config", parameters);
                             }
 
                             /// <summary>
@@ -7603,7 +7604,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
                             /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                             /// <returns></returns>
-                            public Result UpdateVm(string arch = null, string cmode = null, bool? console = null, int? cores = null, float? cpulimit = null, int? cpuunits = null, bool? debug = null, string delete = null, string description = null, string digest = null, string features = null, string hookscript = null, string hostname = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, bool? protection = null, string revert = null, string rootfs = null, string searchdomain = null, string startup = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null) => SetRest(arch, cmode, console, cores, cpulimit, cpuunits, debug, delete, description, digest, features, hookscript, hostname, lock_, memory, mpN, nameserver, netN, onboot, ostype, protection, revert, rootfs, searchdomain, startup, swap, tags, template, timezone, tty, unprivileged, unusedN);
+                            public async Task<Result> UpdateVm(string arch = null, string cmode = null, bool? console = null, int? cores = null, float? cpulimit = null, int? cpuunits = null, bool? debug = null, string delete = null, string description = null, string digest = null, string features = null, string hookscript = null, string hostname = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, bool? protection = null, string revert = null, string rootfs = null, string searchdomain = null, string startup = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null) => await SetRest(arch, cmode, console, cores, cpulimit, cpuunits, debug, delete, description, digest, features, hookscript, hostname, lock_, memory, mpN, nameserver, netN, onboot, ostype, protection, revert, rootfs, searchdomain, startup, swap, tags, template, timezone, tty, unprivileged, unusedN);
                         }
                         public class PVEStatus
                         {
@@ -7643,13 +7644,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Get virtual machine status.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/status/current"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/status/current"); }
 
                                 /// <summary>
                                 /// Get virtual machine status.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result VmStatus() => GetRest();
+                                public async Task<Result> VmStatus() => await GetRest();
                             }
                             public class PVEStart
                             {
@@ -7667,12 +7668,12 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="debug">If set, enables very verbose debug log-level on start.</param>
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(bool? debug = null, bool? skiplock = null)
+                                public async Task<Result> CreateRest(bool? debug = null, bool? skiplock = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("debug", debug);
                                     parameters.Add("skiplock", skiplock);
-                                    return _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/start", parameters);
+                                    return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/start", parameters);
                                 }
 
                                 /// <summary>
@@ -7681,7 +7682,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="debug">If set, enables very verbose debug log-level on start.</param>
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <returns></returns>
-                                public Result VmStart(bool? debug = null, bool? skiplock = null) => CreateRest(debug, skiplock);
+                                public async Task<Result> VmStart(bool? debug = null, bool? skiplock = null) => await CreateRest(debug, skiplock);
                             }
                             public class PVEStop
                             {
@@ -7698,11 +7699,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(bool? skiplock = null)
+                                public async Task<Result> CreateRest(bool? skiplock = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("skiplock", skiplock);
-                                    return _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/stop", parameters);
+                                    return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/stop", parameters);
                                 }
 
                                 /// <summary>
@@ -7710,7 +7711,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                                 /// <returns></returns>
-                                public Result VmStop(bool? skiplock = null) => CreateRest(skiplock);
+                                public async Task<Result> VmStop(bool? skiplock = null) => await CreateRest(skiplock);
                             }
                             public class PVEShutdown
                             {
@@ -7728,12 +7729,12 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="forceStop">Make sure the Container stops.</param>
                                 /// <param name="timeout">Wait maximal timeout seconds.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(bool? forceStop = null, int? timeout = null)
+                                public async Task<Result> CreateRest(bool? forceStop = null, int? timeout = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("forceStop", forceStop);
                                     parameters.Add("timeout", timeout);
-                                    return _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/shutdown", parameters);
+                                    return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/shutdown", parameters);
                                 }
 
                                 /// <summary>
@@ -7742,7 +7743,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="forceStop">Make sure the Container stops.</param>
                                 /// <param name="timeout">Wait maximal timeout seconds.</param>
                                 /// <returns></returns>
-                                public Result VmShutdown(bool? forceStop = null, int? timeout = null) => CreateRest(forceStop, timeout);
+                                public async Task<Result> VmShutdown(bool? forceStop = null, int? timeout = null) => await CreateRest(forceStop, timeout);
                             }
                             public class PVESuspend
                             {
@@ -7758,13 +7759,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Suspend the container. This is experimental.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/suspend"); }
+                                public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/suspend"); }
 
                                 /// <summary>
                                 /// Suspend the container. This is experimental.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result VmSuspend() => CreateRest();
+                                public async Task<Result> VmSuspend() => await CreateRest();
                             }
                             public class PVEResume
                             {
@@ -7780,13 +7781,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Resume the container.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/resume"); }
+                                public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/resume"); }
 
                                 /// <summary>
                                 /// Resume the container.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result VmResume() => CreateRest();
+                                public async Task<Result> VmResume() => await CreateRest();
                             }
                             public class PVEReboot
                             {
@@ -7803,11 +7804,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="timeout">Wait maximal timeout seconds for the shutdown.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(int? timeout = null)
+                                public async Task<Result> CreateRest(int? timeout = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("timeout", timeout);
-                                    return _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/reboot", parameters);
+                                    return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/reboot", parameters);
                                 }
 
                                 /// <summary>
@@ -7815,19 +7816,19 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="timeout">Wait maximal timeout seconds for the shutdown.</param>
                                 /// <returns></returns>
-                                public Result VmReboot(int? timeout = null) => CreateRest(timeout);
+                                public async Task<Result> VmReboot(int? timeout = null) => await CreateRest(timeout);
                             }
                             /// <summary>
                             /// Directory index
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/status"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/status"); }
 
                             /// <summary>
                             /// Directory index
                             /// </summary>
                             /// <returns></returns>
-                            public Result Vmcmdidx() => GetRest();
+                            public async Task<Result> Vmcmdidx() => await GetRest();
                         }
                         public class PVESnapshot
                         {
@@ -7872,13 +7873,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// Rollback LXC state to specified snapshot.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result CreateRest() { return _client.Create($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/rollback"); }
+                                    public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/rollback"); }
 
                                     /// <summary>
                                     /// Rollback LXC state to specified snapshot.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result Rollback() => CreateRest();
+                                    public async Task<Result> Rollback() => await CreateRest();
                                 }
                                 public class PVEConfig
                                 {
@@ -7896,23 +7897,23 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// Get snapshot configuration
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config"); }
+                                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config"); }
 
                                     /// <summary>
                                     /// Get snapshot configuration
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetSnapshotConfig() => GetRest();
+                                    public async Task<Result> GetSnapshotConfig() => await GetRest();
                                     /// <summary>
                                     /// Update snapshot metadata.
                                     /// </summary>
                                     /// <param name="description">A textual description or comment.</param>
                                     /// <returns></returns>
-                                    public Result SetRest(string description = null)
+                                    public async Task<Result> SetRest(string description = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("description", description);
-                                        return _client.Set($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config", parameters);
+                                        return await _client.Set($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config", parameters);
                                     }
 
                                     /// <summary>
@@ -7920,18 +7921,18 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// </summary>
                                     /// <param name="description">A textual description or comment.</param>
                                     /// <returns></returns>
-                                    public Result UpdateSnapshotConfig(string description = null) => SetRest(description);
+                                    public async Task<Result> UpdateSnapshotConfig(string description = null) => await SetRest(description);
                                 }
                                 /// <summary>
                                 /// Delete a LXC snapshot.
                                 /// </summary>
                                 /// <param name="force">For removal from config file, even if removing disk snapshots fails.</param>
                                 /// <returns></returns>
-                                public Result DeleteRest(bool? force = null)
+                                public async Task<Result> DeleteRest(bool? force = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("force", force);
-                                    return _client.Delete($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}", parameters);
+                                    return await _client.Delete($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}", parameters);
                                 }
 
                                 /// <summary>
@@ -7939,42 +7940,42 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="force">For removal from config file, even if removing disk snapshots fails.</param>
                                 /// <returns></returns>
-                                public Result Delsnapshot(bool? force = null) => DeleteRest(force);
+                                public async Task<Result> Delsnapshot(bool? force = null) => await DeleteRest(force);
                                 /// <summary>
                                 ///
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}"); }
 
                                 /// <summary>
                                 ///
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result SnapshotCmdIdx() => GetRest();
+                                public async Task<Result> SnapshotCmdIdx() => await GetRest();
                             }
                             /// <summary>
                             /// List all snapshots.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/snapshot"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/snapshot"); }
 
                             /// <summary>
                             /// List all snapshots.
                             /// </summary>
                             /// <returns></returns>
-                            public Result List() => GetRest();
+                            public async Task<Result> List() => await GetRest();
                             /// <summary>
                             /// Snapshot a container.
                             /// </summary>
                             /// <param name="snapname">The name of the snapshot.</param>
                             /// <param name="description">A textual description or comment.</param>
                             /// <returns></returns>
-                            public Result CreateRest(string snapname, string description = null)
+                            public async Task<Result> CreateRest(string snapname, string description = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("snapname", snapname);
                                 parameters.Add("description", description);
-                                return _client.Create($"/nodes/{_node}/lxc/{_vmid}/snapshot", parameters);
+                                return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/snapshot", parameters);
                             }
 
                             /// <summary>
@@ -7983,7 +7984,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="snapname">The name of the snapshot.</param>
                             /// <param name="description">A textual description or comment.</param>
                             /// <returns></returns>
-                            public Result Snapshot(string snapname, string description = null) => CreateRest(snapname, description);
+                            public async Task<Result> Snapshot(string snapname, string description = null) => await CreateRest(snapname, description);
                         }
                         public class PVEFirewall
                         {
@@ -8035,11 +8036,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// </summary>
                                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// <returns></returns>
-                                    public Result DeleteRest(string digest = null)
+                                    public async Task<Result> DeleteRest(string digest = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("digest", digest);
-                                        return _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", parameters);
+                                        return await _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", parameters);
                                     }
 
                                     /// <summary>
@@ -8047,18 +8048,18 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// </summary>
                                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// <returns></returns>
-                                    public Result DeleteRule(string digest = null) => DeleteRest(digest);
+                                    public async Task<Result> DeleteRule(string digest = null) => await DeleteRest(digest);
                                     /// <summary>
                                     /// Get single rule data.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}"); }
+                                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}"); }
 
                                     /// <summary>
                                     /// Get single rule data.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetRule() => GetRest();
+                                    public async Task<Result> GetRule() => await GetRest();
                                     /// <summary>
                                     /// Modify rule data.
                                     /// </summary>
@@ -8081,7 +8082,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="type">Rule type.
                                     ///   Enum: in,out,group</param>
                                     /// <returns></returns>
-                                    public Result SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
+                                    public async Task<Result> SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("action", action);
@@ -8100,7 +8101,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                         parameters.Add("source", source);
                                         parameters.Add("sport", sport);
                                         parameters.Add("type", type);
-                                        return _client.Set($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", parameters);
+                                        return await _client.Set($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", parameters);
                                     }
 
                                     /// <summary>
@@ -8125,19 +8126,19 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="type">Rule type.
                                     ///   Enum: in,out,group</param>
                                     /// <returns></returns>
-                                    public Result UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => SetRest(action, comment, delete, dest, digest, dport, enable, icmp_type, iface, log, macro, moveto, proto, source, sport, type);
+                                    public async Task<Result> UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => await SetRest(action, comment, delete, dest, digest, dport, enable, icmp_type, iface, log, macro, moveto, proto, source, sport, type);
                                 }
                                 /// <summary>
                                 /// List rules.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/rules"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/rules"); }
 
                                 /// <summary>
                                 /// List rules.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRules() => GetRest();
+                                public async Task<Result> GetRules() => await GetRest();
                                 /// <summary>
                                 /// Create new rule.
                                 /// </summary>
@@ -8159,7 +8160,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                                 /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
+                                public async Task<Result> CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("action", action);
@@ -8177,7 +8178,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("proto", proto);
                                     parameters.Add("source", source);
                                     parameters.Add("sport", sport);
-                                    return _client.Create($"/nodes/{_node}/lxc/{_vmid}/firewall/rules", parameters);
+                                    return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/firewall/rules", parameters);
                                 }
 
                                 /// <summary>
@@ -8201,7 +8202,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                                 /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                                 /// <returns></returns>
-                                public Result CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => CreateRest(action, type, comment, dest, digest, dport, enable, icmp_type, iface, log, macro, pos, proto, source, sport);
+                                public async Task<Result> CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => await CreateRest(action, type, comment, dest, digest, dport, enable, icmp_type, iface, log, macro, pos, proto, source, sport);
                             }
                             public class PVEAliases
                             {
@@ -8231,11 +8232,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// </summary>
                                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// <returns></returns>
-                                    public Result DeleteRest(string digest = null)
+                                    public async Task<Result> DeleteRest(string digest = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("digest", digest);
-                                        return _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", parameters);
+                                        return await _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", parameters);
                                     }
 
                                     /// <summary>
@@ -8243,18 +8244,18 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// </summary>
                                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// <returns></returns>
-                                    public Result RemoveAlias(string digest = null) => DeleteRest(digest);
+                                    public async Task<Result> RemoveAlias(string digest = null) => await DeleteRest(digest);
                                     /// <summary>
                                     /// Read alias.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}"); }
+                                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}"); }
 
                                     /// <summary>
                                     /// Read alias.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result ReadAlias() => GetRest();
+                                    public async Task<Result> ReadAlias() => await GetRest();
                                     /// <summary>
                                     /// Update IP or Network alias.
                                     /// </summary>
@@ -8263,14 +8264,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// <param name="rename">Rename an existing alias.</param>
                                     /// <returns></returns>
-                                    public Result SetRest(string cidr, string comment = null, string digest = null, string rename = null)
+                                    public async Task<Result> SetRest(string cidr, string comment = null, string digest = null, string rename = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("cidr", cidr);
                                         parameters.Add("comment", comment);
                                         parameters.Add("digest", digest);
                                         parameters.Add("rename", rename);
-                                        return _client.Set($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", parameters);
+                                        return await _client.Set($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", parameters);
                                     }
 
                                     /// <summary>
@@ -8281,19 +8282,19 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                     /// <param name="rename">Rename an existing alias.</param>
                                     /// <returns></returns>
-                                    public Result UpdateAlias(string cidr, string comment = null, string digest = null, string rename = null) => SetRest(cidr, comment, digest, rename);
+                                    public async Task<Result> UpdateAlias(string cidr, string comment = null, string digest = null, string rename = null) => await SetRest(cidr, comment, digest, rename);
                                 }
                                 /// <summary>
                                 /// List aliases
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases"); }
 
                                 /// <summary>
                                 /// List aliases
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetAliases() => GetRest();
+                                public async Task<Result> GetAliases() => await GetRest();
                                 /// <summary>
                                 /// Create IP or Network Alias.
                                 /// </summary>
@@ -8301,13 +8302,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="name">Alias name.</param>
                                 /// <param name="comment"></param>
                                 /// <returns></returns>
-                                public Result CreateRest(string cidr, string name, string comment = null)
+                                public async Task<Result> CreateRest(string cidr, string name, string comment = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("cidr", cidr);
                                     parameters.Add("name", name);
                                     parameters.Add("comment", comment);
-                                    return _client.Create($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases", parameters);
+                                    return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases", parameters);
                                 }
 
                                 /// <summary>
@@ -8317,7 +8318,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="name">Alias name.</param>
                                 /// <param name="comment"></param>
                                 /// <returns></returns>
-                                public Result CreateAlias(string cidr, string name, string comment = null) => CreateRest(cidr, name, comment);
+                                public async Task<Result> CreateAlias(string cidr, string name, string comment = null) => await CreateRest(cidr, name, comment);
                             }
                             public class PVEIpset
                             {
@@ -8362,11 +8363,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                         /// </summary>
                                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                         /// <returns></returns>
-                                        public Result DeleteRest(string digest = null)
+                                        public async Task<Result> DeleteRest(string digest = null)
                                         {
                                             var parameters = new Dictionary<string, object>();
                                             parameters.Add("digest", digest);
-                                            return _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
+                                            return await _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
                                         }
 
                                         /// <summary>
@@ -8374,18 +8375,18 @@ namespace Corsinvest.ProxmoxVE.Api
                                         /// </summary>
                                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                         /// <returns></returns>
-                                        public Result RemoveIp(string digest = null) => DeleteRest(digest);
+                                        public async Task<Result> RemoveIp(string digest = null) => await DeleteRest(digest);
                                         /// <summary>
                                         /// Read IP or Network settings from IPSet.
                                         /// </summary>
                                         /// <returns></returns>
-                                        public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}"); }
+                                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}"); }
 
                                         /// <summary>
                                         /// Read IP or Network settings from IPSet.
                                         /// </summary>
                                         /// <returns></returns>
-                                        public Result ReadIp() => GetRest();
+                                        public async Task<Result> ReadIp() => await GetRest();
                                         /// <summary>
                                         /// Update IP or Network settings
                                         /// </summary>
@@ -8393,13 +8394,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                         /// <param name="nomatch"></param>
                                         /// <returns></returns>
-                                        public Result SetRest(string comment = null, string digest = null, bool? nomatch = null)
+                                        public async Task<Result> SetRest(string comment = null, string digest = null, bool? nomatch = null)
                                         {
                                             var parameters = new Dictionary<string, object>();
                                             parameters.Add("comment", comment);
                                             parameters.Add("digest", digest);
                                             parameters.Add("nomatch", nomatch);
-                                            return _client.Set($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
+                                            return await _client.Set($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
                                         }
 
                                         /// <summary>
@@ -8409,30 +8410,30 @@ namespace Corsinvest.ProxmoxVE.Api
                                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                         /// <param name="nomatch"></param>
                                         /// <returns></returns>
-                                        public Result UpdateIp(string comment = null, string digest = null, bool? nomatch = null) => SetRest(comment, digest, nomatch);
+                                        public async Task<Result> UpdateIp(string comment = null, string digest = null, bool? nomatch = null) => await SetRest(comment, digest, nomatch);
                                     }
                                     /// <summary>
                                     /// Delete IPSet
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}"); }
+                                    public async Task<Result> DeleteRest() { return await _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}"); }
 
                                     /// <summary>
                                     /// Delete IPSet
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result DeleteIpset() => DeleteRest();
+                                    public async Task<Result> DeleteIpset() => await DeleteRest();
                                     /// <summary>
                                     /// List IPSet content
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}"); }
+                                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}"); }
 
                                     /// <summary>
                                     /// List IPSet content
                                     /// </summary>
                                     /// <returns></returns>
-                                    public Result GetIpset() => GetRest();
+                                    public async Task<Result> GetIpset() => await GetRest();
                                     /// <summary>
                                     /// Add IP or Network to IPSet.
                                     /// </summary>
@@ -8440,13 +8441,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="comment"></param>
                                     /// <param name="nomatch"></param>
                                     /// <returns></returns>
-                                    public Result CreateRest(string cidr, string comment = null, bool? nomatch = null)
+                                    public async Task<Result> CreateRest(string cidr, string comment = null, bool? nomatch = null)
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("cidr", cidr);
                                         parameters.Add("comment", comment);
                                         parameters.Add("nomatch", nomatch);
-                                        return _client.Create($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}", parameters);
+                                        return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}", parameters);
                                     }
 
                                     /// <summary>
@@ -8456,19 +8457,19 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <param name="comment"></param>
                                     /// <param name="nomatch"></param>
                                     /// <returns></returns>
-                                    public Result CreateIp(string cidr, string comment = null, bool? nomatch = null) => CreateRest(cidr, comment, nomatch);
+                                    public async Task<Result> CreateIp(string cidr, string comment = null, bool? nomatch = null) => await CreateRest(cidr, comment, nomatch);
                                 }
                                 /// <summary>
                                 /// List IPSets
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset"); }
 
                                 /// <summary>
                                 /// List IPSets
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result IpsetIndex() => GetRest();
+                                public async Task<Result> IpsetIndex() => await GetRest();
                                 /// <summary>
                                 /// Create new IPSet
                                 /// </summary>
@@ -8477,14 +8478,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                 /// <param name="rename">Rename an existing IPSet. You can set 'rename' to the same value as 'name' to update the 'comment' of an existing IPSet.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(string name, string comment = null, string digest = null, string rename = null)
+                                public async Task<Result> CreateRest(string name, string comment = null, string digest = null, string rename = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("name", name);
                                     parameters.Add("comment", comment);
                                     parameters.Add("digest", digest);
                                     parameters.Add("rename", rename);
-                                    return _client.Create($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset", parameters);
+                                    return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset", parameters);
                                 }
 
                                 /// <summary>
@@ -8495,7 +8496,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                                 /// <param name="rename">Rename an existing IPSet. You can set 'rename' to the same value as 'name' to update the 'comment' of an existing IPSet.</param>
                                 /// <returns></returns>
-                                public Result CreateIpset(string name, string comment = null, string digest = null, string rename = null) => CreateRest(name, comment, digest, rename);
+                                public async Task<Result> CreateIpset(string name, string comment = null, string digest = null, string rename = null) => await CreateRest(name, comment, digest, rename);
                             }
                             public class PVEOptions
                             {
@@ -8511,13 +8512,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// Get VM firewall options.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/options"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/options"); }
 
                                 /// <summary>
                                 /// Get VM firewall options.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetOptions() => GetRest();
+                                public async Task<Result> GetOptions() => await GetRest();
                                 /// <summary>
                                 /// Set Firewall options.
                                 /// </summary>
@@ -8538,7 +8539,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 ///   Enum: ACCEPT,REJECT,DROP</param>
                                 /// <param name="radv">Allow sending Router Advertisement.</param>
                                 /// <returns></returns>
-                                public Result SetRest(string delete = null, bool? dhcp = null, string digest = null, bool? enable = null, bool? ipfilter = null, string log_level_in = null, string log_level_out = null, bool? macfilter = null, bool? ndp = null, string policy_in = null, string policy_out = null, bool? radv = null)
+                                public async Task<Result> SetRest(string delete = null, bool? dhcp = null, string digest = null, bool? enable = null, bool? ipfilter = null, string log_level_in = null, string log_level_out = null, bool? macfilter = null, bool? ndp = null, string policy_in = null, string policy_out = null, bool? radv = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("delete", delete);
@@ -8553,7 +8554,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                     parameters.Add("policy_in", policy_in);
                                     parameters.Add("policy_out", policy_out);
                                     parameters.Add("radv", radv);
-                                    return _client.Set($"/nodes/{_node}/lxc/{_vmid}/firewall/options", parameters);
+                                    return await _client.Set($"/nodes/{_node}/lxc/{_vmid}/firewall/options", parameters);
                                 }
 
                                 /// <summary>
@@ -8576,7 +8577,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 ///   Enum: ACCEPT,REJECT,DROP</param>
                                 /// <param name="radv">Allow sending Router Advertisement.</param>
                                 /// <returns></returns>
-                                public Result SetOptions(string delete = null, bool? dhcp = null, string digest = null, bool? enable = null, bool? ipfilter = null, string log_level_in = null, string log_level_out = null, bool? macfilter = null, bool? ndp = null, string policy_in = null, string policy_out = null, bool? radv = null) => SetRest(delete, dhcp, digest, enable, ipfilter, log_level_in, log_level_out, macfilter, ndp, policy_in, policy_out, radv);
+                                public async Task<Result> SetOptions(string delete = null, bool? dhcp = null, string digest = null, bool? enable = null, bool? ipfilter = null, string log_level_in = null, string log_level_out = null, bool? macfilter = null, bool? ndp = null, string policy_in = null, string policy_out = null, bool? radv = null) => await SetRest(delete, dhcp, digest, enable, ipfilter, log_level_in, log_level_out, macfilter, ndp, policy_in, policy_out, radv);
                             }
                             public class PVELog
                             {
@@ -8594,12 +8595,12 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="limit"></param>
                                 /// <param name="start"></param>
                                 /// <returns></returns>
-                                public Result GetRest(int? limit = null, int? start = null)
+                                public async Task<Result> GetRest(int? limit = null, int? start = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("limit", limit);
                                     parameters.Add("start", start);
-                                    return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/log", parameters);
+                                    return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/log", parameters);
                                 }
 
                                 /// <summary>
@@ -8608,7 +8609,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="limit"></param>
                                 /// <param name="start"></param>
                                 /// <returns></returns>
-                                public Result Log(int? limit = null, int? start = null) => GetRest(limit, start);
+                                public async Task<Result> Log(int? limit = null, int? start = null) => await GetRest(limit, start);
                             }
                             public class PVERefs
                             {
@@ -8626,11 +8627,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="type">Only list references of specified type.
                                 ///   Enum: alias,ipset</param>
                                 /// <returns></returns>
-                                public Result GetRest(string type = null)
+                                public async Task<Result> GetRest(string type = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("type", type);
-                                    return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/refs", parameters);
+                                    return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/refs", parameters);
                                 }
 
                                 /// <summary>
@@ -8639,19 +8640,19 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="type">Only list references of specified type.
                                 ///   Enum: alias,ipset</param>
                                 /// <returns></returns>
-                                public Result Refs(string type = null) => GetRest(type);
+                                public async Task<Result> Refs(string type = null) => await GetRest(type);
                             }
                             /// <summary>
                             /// Directory index.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall"); }
 
                             /// <summary>
                             /// Directory index.
                             /// </summary>
                             /// <returns></returns>
-                            public Result Index() => GetRest();
+                            public async Task<Result> Index() => await GetRest();
                         }
                         public class PVERrd
                         {
@@ -8672,13 +8673,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
                             /// <returns></returns>
-                            public Result GetRest(string ds, string timeframe, string cf = null)
+                            public async Task<Result> GetRest(string ds, string timeframe, string cf = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("ds", ds);
                                 parameters.Add("timeframe", timeframe);
                                 parameters.Add("cf", cf);
-                                return _client.Get($"/nodes/{_node}/lxc/{_vmid}/rrd", parameters);
+                                return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/rrd", parameters);
                             }
 
                             /// <summary>
@@ -8690,7 +8691,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
                             /// <returns></returns>
-                            public Result Rrd(string ds, string timeframe, string cf = null) => GetRest(ds, timeframe, cf);
+                            public async Task<Result> Rrd(string ds, string timeframe, string cf = null) => await GetRest(ds, timeframe, cf);
                         }
                         public class PVERrddata
                         {
@@ -8710,12 +8711,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
                             /// <returns></returns>
-                            public Result GetRest(string timeframe, string cf = null)
+                            public async Task<Result> GetRest(string timeframe, string cf = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("timeframe", timeframe);
                                 parameters.Add("cf", cf);
-                                return _client.Get($"/nodes/{_node}/lxc/{_vmid}/rrddata", parameters);
+                                return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/rrddata", parameters);
                             }
 
                             /// <summary>
@@ -8726,7 +8727,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
                             /// <returns></returns>
-                            public Result Rrddata(string timeframe, string cf = null) => GetRest(timeframe, cf);
+                            public async Task<Result> Rrddata(string timeframe, string cf = null) => await GetRest(timeframe, cf);
                         }
                         public class PVEVncproxy
                         {
@@ -8745,13 +8746,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="websocket">use websocket instead of standard VNC.</param>
                             /// <param name="width">sets the width of the console in pixels.</param>
                             /// <returns></returns>
-                            public Result CreateRest(int? height = null, bool? websocket = null, int? width = null)
+                            public async Task<Result> CreateRest(int? height = null, bool? websocket = null, int? width = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("height", height);
                                 parameters.Add("websocket", websocket);
                                 parameters.Add("width", width);
-                                return _client.Create($"/nodes/{_node}/lxc/{_vmid}/vncproxy", parameters);
+                                return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/vncproxy", parameters);
                             }
 
                             /// <summary>
@@ -8761,7 +8762,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="websocket">use websocket instead of standard VNC.</param>
                             /// <param name="width">sets the width of the console in pixels.</param>
                             /// <returns></returns>
-                            public Result Vncproxy(int? height = null, bool? websocket = null, int? width = null) => CreateRest(height, websocket, width);
+                            public async Task<Result> Vncproxy(int? height = null, bool? websocket = null, int? width = null) => await CreateRest(height, websocket, width);
                         }
                         public class PVETermproxy
                         {
@@ -8777,13 +8778,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Creates a TCP proxy connection.
                             /// </summary>
                             /// <returns></returns>
-                            public Result CreateRest() { return _client.Create($"/nodes/{_node}/lxc/{_vmid}/termproxy"); }
+                            public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/termproxy"); }
 
                             /// <summary>
                             /// Creates a TCP proxy connection.
                             /// </summary>
                             /// <returns></returns>
-                            public Result Termproxy() => CreateRest();
+                            public async Task<Result> Termproxy() => await CreateRest();
                         }
                         public class PVEVncwebsocket
                         {
@@ -8801,12 +8802,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="port">Port number returned by previous vncproxy call.</param>
                             /// <param name="vncticket">Ticket from previous call to vncproxy.</param>
                             /// <returns></returns>
-                            public Result GetRest(int port, string vncticket)
+                            public async Task<Result> GetRest(int port, string vncticket)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("port", port);
                                 parameters.Add("vncticket", vncticket);
-                                return _client.Get($"/nodes/{_node}/lxc/{_vmid}/vncwebsocket", parameters);
+                                return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/vncwebsocket", parameters);
                             }
 
                             /// <summary>
@@ -8815,7 +8816,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="port">Port number returned by previous vncproxy call.</param>
                             /// <param name="vncticket">Ticket from previous call to vncproxy.</param>
                             /// <returns></returns>
-                            public Result Vncwebsocket(int port, string vncticket) => GetRest(port, vncticket);
+                            public async Task<Result> Vncwebsocket(int port, string vncticket) => await GetRest(port, vncticket);
                         }
                         public class PVESpiceproxy
                         {
@@ -8832,11 +8833,11 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As reasonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                             /// <returns></returns>
-                            public Result CreateRest(string proxy = null)
+                            public async Task<Result> CreateRest(string proxy = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("proxy", proxy);
-                                return _client.Create($"/nodes/{_node}/lxc/{_vmid}/spiceproxy", parameters);
+                                return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/spiceproxy", parameters);
                             }
 
                             /// <summary>
@@ -8844,7 +8845,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As reasonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                             /// <returns></returns>
-                            public Result Spiceproxy(string proxy = null) => CreateRest(proxy);
+                            public async Task<Result> Spiceproxy(string proxy = null) => await CreateRest(proxy);
                         }
                         public class PVEMigrate
                         {
@@ -8865,7 +8866,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="restart">Use restart migration</param>
                             /// <param name="timeout">Timeout in seconds for shutdown for restart migration</param>
                             /// <returns></returns>
-                            public Result CreateRest(string target, float? bwlimit = null, bool? online = null, bool? restart = null, int? timeout = null)
+                            public async Task<Result> CreateRest(string target, float? bwlimit = null, bool? online = null, bool? restart = null, int? timeout = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("target", target);
@@ -8873,7 +8874,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("online", online);
                                 parameters.Add("restart", restart);
                                 parameters.Add("timeout", timeout);
-                                return _client.Create($"/nodes/{_node}/lxc/{_vmid}/migrate", parameters);
+                                return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/migrate", parameters);
                             }
 
                             /// <summary>
@@ -8885,7 +8886,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="restart">Use restart migration</param>
                             /// <param name="timeout">Timeout in seconds for shutdown for restart migration</param>
                             /// <returns></returns>
-                            public Result MigrateVm(string target, float? bwlimit = null, bool? online = null, bool? restart = null, int? timeout = null) => CreateRest(target, bwlimit, online, restart, timeout);
+                            public async Task<Result> MigrateVm(string target, float? bwlimit = null, bool? online = null, bool? restart = null, int? timeout = null) => await CreateRest(target, bwlimit, online, restart, timeout);
                         }
                         public class PVEFeature
                         {
@@ -8904,12 +8905,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             ///   Enum: snapshot,clone,copy</param>
                             /// <param name="snapname">The name of the snapshot.</param>
                             /// <returns></returns>
-                            public Result GetRest(string feature, string snapname = null)
+                            public async Task<Result> GetRest(string feature, string snapname = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("feature", feature);
                                 parameters.Add("snapname", snapname);
-                                return _client.Get($"/nodes/{_node}/lxc/{_vmid}/feature", parameters);
+                                return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/feature", parameters);
                             }
 
                             /// <summary>
@@ -8919,7 +8920,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             ///   Enum: snapshot,clone,copy</param>
                             /// <param name="snapname">The name of the snapshot.</param>
                             /// <returns></returns>
-                            public Result VmFeature(string feature, string snapname = null) => GetRest(feature, snapname);
+                            public async Task<Result> VmFeature(string feature, string snapname = null) => await GetRest(feature, snapname);
                         }
                         public class PVETemplate
                         {
@@ -8935,13 +8936,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Create a Template.
                             /// </summary>
                             /// <returns></returns>
-                            public Result CreateRest() { return _client.Create($"/nodes/{_node}/lxc/{_vmid}/template"); }
+                            public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/template"); }
 
                             /// <summary>
                             /// Create a Template.
                             /// </summary>
                             /// <returns></returns>
-                            public Result Template() => CreateRest();
+                            public async Task<Result> Template() => await CreateRest();
                         }
                         public class PVEClone
                         {
@@ -8966,7 +8967,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="storage">Target storage for full clone.</param>
                             /// <param name="target">Target node. Only allowed if the original VM is on shared storage.</param>
                             /// <returns></returns>
-                            public Result CreateRest(int newid, float? bwlimit = null, string description = null, bool? full = null, string hostname = null, string pool = null, string snapname = null, string storage = null, string target = null)
+                            public async Task<Result> CreateRest(int newid, float? bwlimit = null, string description = null, bool? full = null, string hostname = null, string pool = null, string snapname = null, string storage = null, string target = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("newid", newid);
@@ -8978,7 +8979,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("snapname", snapname);
                                 parameters.Add("storage", storage);
                                 parameters.Add("target", target);
-                                return _client.Create($"/nodes/{_node}/lxc/{_vmid}/clone", parameters);
+                                return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/clone", parameters);
                             }
 
                             /// <summary>
@@ -8994,7 +8995,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="storage">Target storage for full clone.</param>
                             /// <param name="target">Target node. Only allowed if the original VM is on shared storage.</param>
                             /// <returns></returns>
-                            public Result CloneVm(int newid, float? bwlimit = null, string description = null, bool? full = null, string hostname = null, string pool = null, string snapname = null, string storage = null, string target = null) => CreateRest(newid, bwlimit, description, full, hostname, pool, snapname, storage, target);
+                            public async Task<Result> CloneVm(int newid, float? bwlimit = null, string description = null, bool? full = null, string hostname = null, string pool = null, string snapname = null, string storage = null, string target = null) => await CreateRest(newid, bwlimit, description, full, hostname, pool, snapname, storage, target);
                         }
                         public class PVEResize
                         {
@@ -9014,13 +9015,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="size">The new size. With the '+' sign the value is added to the actual size of the volume and without it, the value is taken as an absolute one. Shrinking disk size is not supported.</param>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <returns></returns>
-                            public Result SetRest(string disk, string size, string digest = null)
+                            public async Task<Result> SetRest(string disk, string size, string digest = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("disk", disk);
                                 parameters.Add("size", size);
                                 parameters.Add("digest", digest);
-                                return _client.Set($"/nodes/{_node}/lxc/{_vmid}/resize", parameters);
+                                return await _client.Set($"/nodes/{_node}/lxc/{_vmid}/resize", parameters);
                             }
 
                             /// <summary>
@@ -9031,7 +9032,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="size">The new size. With the '+' sign the value is added to the actual size of the volume and without it, the value is taken as an absolute one. Shrinking disk size is not supported.</param>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <returns></returns>
-                            public Result ResizeVm(string disk, string size, string digest = null) => SetRest(disk, size, digest);
+                            public async Task<Result> ResizeVm(string disk, string size, string digest = null) => await SetRest(disk, size, digest);
                         }
                         public class PVEMoveVolume
                         {
@@ -9057,7 +9058,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="target_volume">The config key the volume will be moved to. Default is the source volume key.
                             ///   Enum: rootfs,mp0,mp1,mp2,mp3,mp4,mp5,mp6,mp7,mp8,mp9,mp10,mp11,mp12,mp13,mp14,mp15,mp16,mp17,mp18,mp19,mp20,mp21,mp22,mp23,mp24,mp25,mp26,mp27,mp28,mp29,mp30,mp31,mp32,mp33,mp34,mp35,mp36,mp37,mp38,mp39,mp40,mp41,mp42,mp43,mp44,mp45,mp46,mp47,mp48,mp49,mp50,mp51,mp52,mp53,mp54,mp55,mp56,mp57,mp58,mp59,mp60,mp61,mp62,mp63,mp64,mp65,mp66,mp67,mp68,mp69,mp70,mp71,mp72,mp73,mp74,mp75,mp76,mp77,mp78,mp79,mp80,mp81,mp82,mp83,mp84,mp85,mp86,mp87,mp88,mp89,mp90,mp91,mp92,mp93,mp94,mp95,mp96,mp97,mp98,mp99,mp100,mp101,mp102,mp103,mp104,mp105,mp106,mp107,mp108,mp109,mp110,mp111,mp112,mp113,mp114,mp115,mp116,mp117,mp118,mp119,mp120,mp121,mp122,mp123,mp124,mp125,mp126,mp127,mp128,mp129,mp130,mp131,mp132,mp133,mp134,mp135,mp136,mp137,mp138,mp139,mp140,mp141,mp142,mp143,mp144,mp145,mp146,mp147,mp148,mp149,mp150,mp151,mp152,mp153,mp154,mp155,mp156,mp157,mp158,mp159,mp160,mp161,mp162,mp163,mp164,mp165,mp166,mp167,mp168,mp169,mp170,mp171,mp172,mp173,mp174,mp175,mp176,mp177,mp178,mp179,mp180,mp181,mp182,mp183,mp184,mp185,mp186,mp187,mp188,mp189,mp190,mp191,mp192,mp193,mp194,mp195,mp196,mp197,mp198,mp199,mp200,mp201,mp202,mp203,mp204,mp205,mp206,mp207,mp208,mp209,mp210,mp211,mp212,mp213,mp214,mp215,mp216,mp217,mp218,mp219,mp220,mp221,mp222,mp223,mp224,mp225,mp226,mp227,mp228,mp229,mp230,mp231,mp232,mp233,mp234,mp235,mp236,mp237,mp238,mp239,mp240,mp241,mp242,mp243,mp244,mp245,mp246,mp247,mp248,mp249,mp250,mp251,mp252,mp253,mp254,mp255,unused0,unused1,unused2,unused3,unused4,unused5,unused6,unused7,unused8,unused9,unused10,unused11,unused12,unused13,unused14,unused15,unused16,unused17,unused18,unused19,unused20,unused21,unused22,unused23,unused24,unused25,unused26,unused27,unused28,unused29,unused30,unused31,unused32,unused33,unused34,unused35,unused36,unused37,unused38,unused39,unused40,unused41,unused42,unused43,unused44,unused45,unused46,unused47,unused48,unused49,unused50,unused51,unused52,unused53,unused54,unused55,unused56,unused57,unused58,unused59,unused60,unused61,unused62,unused63,unused64,unused65,unused66,unused67,unused68,unused69,unused70,unused71,unused72,unused73,unused74,unused75,unused76,unused77,unused78,unused79,unused80,unused81,unused82,unused83,unused84,unused85,unused86,unused87,unused88,unused89,unused90,unused91,unused92,unused93,unused94,unused95,unused96,unused97,unused98,unused99,unused100,unused101,unused102,unused103,unused104,unused105,unused106,unused107,unused108,unused109,unused110,unused111,unused112,unused113,unused114,unused115,unused116,unused117,unused118,unused119,unused120,unused121,unused122,unused123,unused124,unused125,unused126,unused127,unused128,unused129,unused130,unused131,unused132,unused133,unused134,unused135,unused136,unused137,unused138,unused139,unused140,unused141,unused142,unused143,unused144,unused145,unused146,unused147,unused148,unused149,unused150,unused151,unused152,unused153,unused154,unused155,unused156,unused157,unused158,unused159,unused160,unused161,unused162,unused163,unused164,unused165,unused166,unused167,unused168,unused169,unused170,unused171,unused172,unused173,unused174,unused175,unused176,unused177,unused178,unused179,unused180,unused181,unused182,unused183,unused184,unused185,unused186,unused187,unused188,unused189,unused190,unused191,unused192,unused193,unused194,unused195,unused196,unused197,unused198,unused199,unused200,unused201,unused202,unused203,unused204,unused205,unused206,unused207,unused208,unused209,unused210,unused211,unused212,unused213,unused214,unused215,unused216,unused217,unused218,unused219,unused220,unused221,unused222,unused223,unused224,unused225,unused226,unused227,unused228,unused229,unused230,unused231,unused232,unused233,unused234,unused235,unused236,unused237,unused238,unused239,unused240,unused241,unused242,unused243,unused244,unused245,unused246,unused247,unused248,unused249,unused250,unused251,unused252,unused253,unused254,unused255</param>
                             /// <returns></returns>
-                            public Result CreateRest(string volume, float? bwlimit = null, bool? delete = null, string digest = null, string storage = null, string target_digest = null, int? target_vmid = null, string target_volume = null)
+                            public async Task<Result> CreateRest(string volume, float? bwlimit = null, bool? delete = null, string digest = null, string storage = null, string target_digest = null, int? target_vmid = null, string target_volume = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("volume", volume);
@@ -9068,7 +9069,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("target-digest", target_digest);
                                 parameters.Add("target-vmid", target_vmid);
                                 parameters.Add("target-volume", target_volume);
-                                return _client.Create($"/nodes/{_node}/lxc/{_vmid}/move_volume", parameters);
+                                return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/move_volume", parameters);
                             }
 
                             /// <summary>
@@ -9085,7 +9086,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="target_volume">The config key the volume will be moved to. Default is the source volume key.
                             ///   Enum: rootfs,mp0,mp1,mp2,mp3,mp4,mp5,mp6,mp7,mp8,mp9,mp10,mp11,mp12,mp13,mp14,mp15,mp16,mp17,mp18,mp19,mp20,mp21,mp22,mp23,mp24,mp25,mp26,mp27,mp28,mp29,mp30,mp31,mp32,mp33,mp34,mp35,mp36,mp37,mp38,mp39,mp40,mp41,mp42,mp43,mp44,mp45,mp46,mp47,mp48,mp49,mp50,mp51,mp52,mp53,mp54,mp55,mp56,mp57,mp58,mp59,mp60,mp61,mp62,mp63,mp64,mp65,mp66,mp67,mp68,mp69,mp70,mp71,mp72,mp73,mp74,mp75,mp76,mp77,mp78,mp79,mp80,mp81,mp82,mp83,mp84,mp85,mp86,mp87,mp88,mp89,mp90,mp91,mp92,mp93,mp94,mp95,mp96,mp97,mp98,mp99,mp100,mp101,mp102,mp103,mp104,mp105,mp106,mp107,mp108,mp109,mp110,mp111,mp112,mp113,mp114,mp115,mp116,mp117,mp118,mp119,mp120,mp121,mp122,mp123,mp124,mp125,mp126,mp127,mp128,mp129,mp130,mp131,mp132,mp133,mp134,mp135,mp136,mp137,mp138,mp139,mp140,mp141,mp142,mp143,mp144,mp145,mp146,mp147,mp148,mp149,mp150,mp151,mp152,mp153,mp154,mp155,mp156,mp157,mp158,mp159,mp160,mp161,mp162,mp163,mp164,mp165,mp166,mp167,mp168,mp169,mp170,mp171,mp172,mp173,mp174,mp175,mp176,mp177,mp178,mp179,mp180,mp181,mp182,mp183,mp184,mp185,mp186,mp187,mp188,mp189,mp190,mp191,mp192,mp193,mp194,mp195,mp196,mp197,mp198,mp199,mp200,mp201,mp202,mp203,mp204,mp205,mp206,mp207,mp208,mp209,mp210,mp211,mp212,mp213,mp214,mp215,mp216,mp217,mp218,mp219,mp220,mp221,mp222,mp223,mp224,mp225,mp226,mp227,mp228,mp229,mp230,mp231,mp232,mp233,mp234,mp235,mp236,mp237,mp238,mp239,mp240,mp241,mp242,mp243,mp244,mp245,mp246,mp247,mp248,mp249,mp250,mp251,mp252,mp253,mp254,mp255,unused0,unused1,unused2,unused3,unused4,unused5,unused6,unused7,unused8,unused9,unused10,unused11,unused12,unused13,unused14,unused15,unused16,unused17,unused18,unused19,unused20,unused21,unused22,unused23,unused24,unused25,unused26,unused27,unused28,unused29,unused30,unused31,unused32,unused33,unused34,unused35,unused36,unused37,unused38,unused39,unused40,unused41,unused42,unused43,unused44,unused45,unused46,unused47,unused48,unused49,unused50,unused51,unused52,unused53,unused54,unused55,unused56,unused57,unused58,unused59,unused60,unused61,unused62,unused63,unused64,unused65,unused66,unused67,unused68,unused69,unused70,unused71,unused72,unused73,unused74,unused75,unused76,unused77,unused78,unused79,unused80,unused81,unused82,unused83,unused84,unused85,unused86,unused87,unused88,unused89,unused90,unused91,unused92,unused93,unused94,unused95,unused96,unused97,unused98,unused99,unused100,unused101,unused102,unused103,unused104,unused105,unused106,unused107,unused108,unused109,unused110,unused111,unused112,unused113,unused114,unused115,unused116,unused117,unused118,unused119,unused120,unused121,unused122,unused123,unused124,unused125,unused126,unused127,unused128,unused129,unused130,unused131,unused132,unused133,unused134,unused135,unused136,unused137,unused138,unused139,unused140,unused141,unused142,unused143,unused144,unused145,unused146,unused147,unused148,unused149,unused150,unused151,unused152,unused153,unused154,unused155,unused156,unused157,unused158,unused159,unused160,unused161,unused162,unused163,unused164,unused165,unused166,unused167,unused168,unused169,unused170,unused171,unused172,unused173,unused174,unused175,unused176,unused177,unused178,unused179,unused180,unused181,unused182,unused183,unused184,unused185,unused186,unused187,unused188,unused189,unused190,unused191,unused192,unused193,unused194,unused195,unused196,unused197,unused198,unused199,unused200,unused201,unused202,unused203,unused204,unused205,unused206,unused207,unused208,unused209,unused210,unused211,unused212,unused213,unused214,unused215,unused216,unused217,unused218,unused219,unused220,unused221,unused222,unused223,unused224,unused225,unused226,unused227,unused228,unused229,unused230,unused231,unused232,unused233,unused234,unused235,unused236,unused237,unused238,unused239,unused240,unused241,unused242,unused243,unused244,unused245,unused246,unused247,unused248,unused249,unused250,unused251,unused252,unused253,unused254,unused255</param>
                             /// <returns></returns>
-                            public Result MoveVolume(string volume, float? bwlimit = null, bool? delete = null, string digest = null, string storage = null, string target_digest = null, int? target_vmid = null, string target_volume = null) => CreateRest(volume, bwlimit, delete, digest, storage, target_digest, target_vmid, target_volume);
+                            public async Task<Result> MoveVolume(string volume, float? bwlimit = null, bool? delete = null, string digest = null, string storage = null, string target_digest = null, int? target_vmid = null, string target_volume = null) => await CreateRest(volume, bwlimit, delete, digest, storage, target_digest, target_vmid, target_volume);
                         }
                         public class PVEPending
                         {
@@ -9101,13 +9102,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Get container configuration, including pending changes.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}/pending"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/pending"); }
 
                             /// <summary>
                             /// Get container configuration, including pending changes.
                             /// </summary>
                             /// <returns></returns>
-                            public Result VmPending() => GetRest();
+                            public async Task<Result> VmPending() => await GetRest();
                         }
                         /// <summary>
                         /// Destroy the container (also delete all uses files).
@@ -9116,13 +9117,13 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="force">Force destroy, even if running.</param>
                         /// <param name="purge">Remove container from all related configurations. For example, backup jobs, replication jobs or HA. Related ACLs and Firewall entries will *always* be removed.</param>
                         /// <returns></returns>
-                        public Result DeleteRest(bool? destroy_unreferenced_disks = null, bool? force = null, bool? purge = null)
+                        public async Task<Result> DeleteRest(bool? destroy_unreferenced_disks = null, bool? force = null, bool? purge = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("destroy-unreferenced-disks", destroy_unreferenced_disks);
                             parameters.Add("force", force);
                             parameters.Add("purge", purge);
-                            return _client.Delete($"/nodes/{_node}/lxc/{_vmid}", parameters);
+                            return await _client.Delete($"/nodes/{_node}/lxc/{_vmid}", parameters);
                         }
 
                         /// <summary>
@@ -9132,30 +9133,30 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="force">Force destroy, even if running.</param>
                         /// <param name="purge">Remove container from all related configurations. For example, backup jobs, replication jobs or HA. Related ACLs and Firewall entries will *always* be removed.</param>
                         /// <returns></returns>
-                        public Result DestroyVm(bool? destroy_unreferenced_disks = null, bool? force = null, bool? purge = null) => DeleteRest(destroy_unreferenced_disks, force, purge);
+                        public async Task<Result> DestroyVm(bool? destroy_unreferenced_disks = null, bool? force = null, bool? purge = null) => await DeleteRest(destroy_unreferenced_disks, force, purge);
                         /// <summary>
                         /// Directory index
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc/{_vmid}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}"); }
 
                         /// <summary>
                         /// Directory index
                         /// </summary>
                         /// <returns></returns>
-                        public Result Vmdiridx() => GetRest();
+                        public async Task<Result> Vmdiridx() => await GetRest();
                     }
                     /// <summary>
                     /// LXC container index (per node).
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/lxc"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/lxc"); }
 
                     /// <summary>
                     /// LXC container index (per node).
                     /// </summary>
                     /// <returns></returns>
-                    public Result Vmlist() => GetRest();
+                    public async Task<Result> Vmlist() => await GetRest();
                     /// <summary>
                     /// Create or restore a container.
                     /// </summary>
@@ -9205,7 +9206,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
                     /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string ostemplate, int vmid, string arch = null, float? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, float? cpulimit = null, int? cpuunits = null, bool? debug = null, string description = null, string features = null, bool? force = null, string hookscript = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, bool? start = null, string startup = null, string storage = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unique = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
+                    public async Task<Result> CreateRest(string ostemplate, int vmid, string arch = null, float? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, float? cpulimit = null, int? cpuunits = null, bool? debug = null, string description = null, string features = null, bool? force = null, string hookscript = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, bool? start = null, string startup = null, string storage = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unique = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("ostemplate", ostemplate);
@@ -9249,7 +9250,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         AddIndexedParameter(parameters, "mp", mpN);
                         AddIndexedParameter(parameters, "net", netN);
                         AddIndexedParameter(parameters, "unused", unusedN);
-                        return _client.Create($"/nodes/{_node}/lxc", parameters);
+                        return await _client.Create($"/nodes/{_node}/lxc", parameters);
                     }
 
                     /// <summary>
@@ -9301,7 +9302,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
                     /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                     /// <returns></returns>
-                    public Result CreateVm(string ostemplate, int vmid, string arch = null, float? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, float? cpulimit = null, int? cpuunits = null, bool? debug = null, string description = null, string features = null, bool? force = null, string hookscript = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, bool? start = null, string startup = null, string storage = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unique = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null) => CreateRest(ostemplate, vmid, arch, bwlimit, cmode, console, cores, cpulimit, cpuunits, debug, description, features, force, hookscript, hostname, ignore_unpack_errors, lock_, memory, mpN, nameserver, netN, onboot, ostype, password, pool, protection, restore, rootfs, searchdomain, ssh_public_keys, start, startup, storage, swap, tags, template, timezone, tty, unique, unprivileged, unusedN);
+                    public async Task<Result> CreateVm(string ostemplate, int vmid, string arch = null, float? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, float? cpulimit = null, int? cpuunits = null, bool? debug = null, string description = null, string features = null, bool? force = null, string hookscript = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, bool? start = null, string startup = null, string storage = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unique = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null) => await CreateRest(ostemplate, vmid, arch, bwlimit, cmode, console, cores, cpulimit, cpuunits, debug, description, features, force, hookscript, hostname, ignore_unpack_errors, lock_, memory, mpN, nameserver, netN, onboot, ostype, password, pool, protection, restore, rootfs, searchdomain, ssh_public_keys, start, startup, storage, swap, tags, template, timezone, tty, unique, unprivileged, unusedN);
                 }
                 public class PVECeph
                 {
@@ -9376,13 +9377,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// ceph osd in
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/ceph/osd/{_osdid}/in"); }
+                                public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/ceph/osd/{_osdid}/in"); }
 
                                 /// <summary>
                                 /// ceph osd in
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result In() => CreateRest();
+                                public async Task<Result> In() => await CreateRest();
                             }
                             public class PVEOut
                             {
@@ -9398,13 +9399,13 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// ceph osd out
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result CreateRest() { return _client.Create($"/nodes/{_node}/ceph/osd/{_osdid}/out"); }
+                                public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/ceph/osd/{_osdid}/out"); }
 
                                 /// <summary>
                                 /// ceph osd out
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Out() => CreateRest();
+                                public async Task<Result> Out() => await CreateRest();
                             }
                             public class PVEScrub
                             {
@@ -9421,11 +9422,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="deep">If set, instructs a deep scrub instead of a normal one.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(bool? deep = null)
+                                public async Task<Result> CreateRest(bool? deep = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("deep", deep);
-                                    return _client.Create($"/nodes/{_node}/ceph/osd/{_osdid}/scrub", parameters);
+                                    return await _client.Create($"/nodes/{_node}/ceph/osd/{_osdid}/scrub", parameters);
                                 }
 
                                 /// <summary>
@@ -9433,18 +9434,18 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="deep">If set, instructs a deep scrub instead of a normal one.</param>
                                 /// <returns></returns>
-                                public Result Scrub(bool? deep = null) => CreateRest(deep);
+                                public async Task<Result> Scrub(bool? deep = null) => await CreateRest(deep);
                             }
                             /// <summary>
                             /// Destroy OSD
                             /// </summary>
                             /// <param name="cleanup">If set, we remove partition table entries.</param>
                             /// <returns></returns>
-                            public Result DeleteRest(bool? cleanup = null)
+                            public async Task<Result> DeleteRest(bool? cleanup = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("cleanup", cleanup);
-                                return _client.Delete($"/nodes/{_node}/ceph/osd/{_osdid}", parameters);
+                                return await _client.Delete($"/nodes/{_node}/ceph/osd/{_osdid}", parameters);
                             }
 
                             /// <summary>
@@ -9452,19 +9453,19 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="cleanup">If set, we remove partition table entries.</param>
                             /// <returns></returns>
-                            public Result Destroyosd(bool? cleanup = null) => DeleteRest(cleanup);
+                            public async Task<Result> Destroyosd(bool? cleanup = null) => await DeleteRest(cleanup);
                         }
                         /// <summary>
                         /// Get Ceph osd list/tree.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/osd"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/ceph/osd"); }
 
                         /// <summary>
                         /// Get Ceph osd list/tree.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Index() => GetRest();
+                        public async Task<Result> Index() => await GetRest();
                         /// <summary>
                         /// Create OSD
                         /// </summary>
@@ -9476,7 +9477,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="wal_dev">Block device name for block.wal.</param>
                         /// <param name="wal_dev_size">Size in GiB for block.wal.</param>
                         /// <returns></returns>
-                        public Result CreateRest(string dev, string crush_device_class = null, string db_dev = null, float? db_dev_size = null, bool? encrypted = null, string wal_dev = null, float? wal_dev_size = null)
+                        public async Task<Result> CreateRest(string dev, string crush_device_class = null, string db_dev = null, float? db_dev_size = null, bool? encrypted = null, string wal_dev = null, float? wal_dev_size = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("dev", dev);
@@ -9486,7 +9487,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("encrypted", encrypted);
                             parameters.Add("wal_dev", wal_dev);
                             parameters.Add("wal_dev_size", wal_dev_size);
-                            return _client.Create($"/nodes/{_node}/ceph/osd", parameters);
+                            return await _client.Create($"/nodes/{_node}/ceph/osd", parameters);
                         }
 
                         /// <summary>
@@ -9500,7 +9501,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="wal_dev">Block device name for block.wal.</param>
                         /// <param name="wal_dev_size">Size in GiB for block.wal.</param>
                         /// <returns></returns>
-                        public Result Createosd(string dev, string crush_device_class = null, string db_dev = null, float? db_dev_size = null, bool? encrypted = null, string wal_dev = null, float? wal_dev_size = null) => CreateRest(dev, crush_device_class, db_dev, db_dev_size, encrypted, wal_dev, wal_dev_size);
+                        public async Task<Result> Createosd(string dev, string crush_device_class = null, string db_dev = null, float? db_dev_size = null, bool? encrypted = null, string wal_dev = null, float? wal_dev_size = null) => await CreateRest(dev, crush_device_class, db_dev, db_dev_size, encrypted, wal_dev, wal_dev_size);
                     }
                     public class PVEMds
                     {
@@ -9522,23 +9523,23 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Destroy Ceph Metadata Server
                             /// </summary>
                             /// <returns></returns>
-                            public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/ceph/mds/{_name}"); }
+                            public async Task<Result> DeleteRest() { return await _client.Delete($"/nodes/{_node}/ceph/mds/{_name}"); }
 
                             /// <summary>
                             /// Destroy Ceph Metadata Server
                             /// </summary>
                             /// <returns></returns>
-                            public Result Destroymds() => DeleteRest();
+                            public async Task<Result> Destroymds() => await DeleteRest();
                             /// <summary>
                             /// Create Ceph Metadata Server (MDS)
                             /// </summary>
                             /// <param name="hotstandby">Determines whether a ceph-mds daemon should poll and replay the log of an active MDS. Faster switch on MDS failure, but needs more idle resources.</param>
                             /// <returns></returns>
-                            public Result CreateRest(bool? hotstandby = null)
+                            public async Task<Result> CreateRest(bool? hotstandby = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("hotstandby", hotstandby);
-                                return _client.Create($"/nodes/{_node}/ceph/mds/{_name}", parameters);
+                                return await _client.Create($"/nodes/{_node}/ceph/mds/{_name}", parameters);
                             }
 
                             /// <summary>
@@ -9546,19 +9547,19 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="hotstandby">Determines whether a ceph-mds daemon should poll and replay the log of an active MDS. Faster switch on MDS failure, but needs more idle resources.</param>
                             /// <returns></returns>
-                            public Result Createmds(bool? hotstandby = null) => CreateRest(hotstandby);
+                            public async Task<Result> Createmds(bool? hotstandby = null) => await CreateRest(hotstandby);
                         }
                         /// <summary>
                         /// MDS directory index.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/mds"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/ceph/mds"); }
 
                         /// <summary>
                         /// MDS directory index.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Index() => GetRest();
+                        public async Task<Result> Index() => await GetRest();
                     }
                     public class PVEMgr
                     {
@@ -9580,36 +9581,36 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Destroy Ceph Manager.
                             /// </summary>
                             /// <returns></returns>
-                            public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/ceph/mgr/{_id}"); }
+                            public async Task<Result> DeleteRest() { return await _client.Delete($"/nodes/{_node}/ceph/mgr/{_id}"); }
 
                             /// <summary>
                             /// Destroy Ceph Manager.
                             /// </summary>
                             /// <returns></returns>
-                            public Result Destroymgr() => DeleteRest();
+                            public async Task<Result> Destroymgr() => await DeleteRest();
                             /// <summary>
                             /// Create Ceph Manager
                             /// </summary>
                             /// <returns></returns>
-                            public Result CreateRest() { return _client.Create($"/nodes/{_node}/ceph/mgr/{_id}"); }
+                            public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/ceph/mgr/{_id}"); }
 
                             /// <summary>
                             /// Create Ceph Manager
                             /// </summary>
                             /// <returns></returns>
-                            public Result Createmgr() => CreateRest();
+                            public async Task<Result> Createmgr() => await CreateRest();
                         }
                         /// <summary>
                         /// MGR directory index.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/mgr"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/ceph/mgr"); }
 
                         /// <summary>
                         /// MGR directory index.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Index() => GetRest();
+                        public async Task<Result> Index() => await GetRest();
                     }
                     public class PVEMon
                     {
@@ -9631,23 +9632,23 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Destroy Ceph Monitor and Manager.
                             /// </summary>
                             /// <returns></returns>
-                            public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/ceph/mon/{_monid}"); }
+                            public async Task<Result> DeleteRest() { return await _client.Delete($"/nodes/{_node}/ceph/mon/{_monid}"); }
 
                             /// <summary>
                             /// Destroy Ceph Monitor and Manager.
                             /// </summary>
                             /// <returns></returns>
-                            public Result Destroymon() => DeleteRest();
+                            public async Task<Result> Destroymon() => await DeleteRest();
                             /// <summary>
                             /// Create Ceph Monitor and Manager
                             /// </summary>
                             /// <param name="mon_address">Overwrites autodetected monitor IP address(es). Must be in the public network(s) of Ceph.</param>
                             /// <returns></returns>
-                            public Result CreateRest(string mon_address = null)
+                            public async Task<Result> CreateRest(string mon_address = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("mon-address", mon_address);
-                                return _client.Create($"/nodes/{_node}/ceph/mon/{_monid}", parameters);
+                                return await _client.Create($"/nodes/{_node}/ceph/mon/{_monid}", parameters);
                             }
 
                             /// <summary>
@@ -9655,19 +9656,19 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="mon_address">Overwrites autodetected monitor IP address(es). Must be in the public network(s) of Ceph.</param>
                             /// <returns></returns>
-                            public Result Createmon(string mon_address = null) => CreateRest(mon_address);
+                            public async Task<Result> Createmon(string mon_address = null) => await CreateRest(mon_address);
                         }
                         /// <summary>
                         /// Get Ceph monitor list.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/mon"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/ceph/mon"); }
 
                         /// <summary>
                         /// Get Ceph monitor list.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Listmon() => GetRest();
+                        public async Task<Result> Listmon() => await GetRest();
                     }
                     public class PVEFs
                     {
@@ -9691,12 +9692,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="add_storage">Configure the created CephFS as storage for this cluster.</param>
                             /// <param name="pg_num">Number of placement groups for the backing data pool. The metadata pool will use a quarter of this.</param>
                             /// <returns></returns>
-                            public Result CreateRest(bool? add_storage = null, int? pg_num = null)
+                            public async Task<Result> CreateRest(bool? add_storage = null, int? pg_num = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("add-storage", add_storage);
                                 parameters.Add("pg_num", pg_num);
-                                return _client.Create($"/nodes/{_node}/ceph/fs/{_name}", parameters);
+                                return await _client.Create($"/nodes/{_node}/ceph/fs/{_name}", parameters);
                             }
 
                             /// <summary>
@@ -9705,19 +9706,19 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="add_storage">Configure the created CephFS as storage for this cluster.</param>
                             /// <param name="pg_num">Number of placement groups for the backing data pool. The metadata pool will use a quarter of this.</param>
                             /// <returns></returns>
-                            public Result Createfs(bool? add_storage = null, int? pg_num = null) => CreateRest(add_storage, pg_num);
+                            public async Task<Result> Createfs(bool? add_storage = null, int? pg_num = null) => await CreateRest(add_storage, pg_num);
                         }
                         /// <summary>
                         /// Directory index.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/fs"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/ceph/fs"); }
 
                         /// <summary>
                         /// Directory index.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Index() => GetRest();
+                        public async Task<Result> Index() => await GetRest();
                     }
                     public class PVEPools
                     {
@@ -9741,12 +9742,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="force">If true, destroys pool even if in use</param>
                             /// <param name="remove_storages">Remove all pveceph-managed storages configured for this pool</param>
                             /// <returns></returns>
-                            public Result DeleteRest(bool? force = null, bool? remove_storages = null)
+                            public async Task<Result> DeleteRest(bool? force = null, bool? remove_storages = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("force", force);
                                 parameters.Add("remove_storages", remove_storages);
-                                return _client.Delete($"/nodes/{_node}/ceph/pools/{_name}", parameters);
+                                return await _client.Delete($"/nodes/{_node}/ceph/pools/{_name}", parameters);
                             }
 
                             /// <summary>
@@ -9755,17 +9756,17 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="force">If true, destroys pool even if in use</param>
                             /// <param name="remove_storages">Remove all pveceph-managed storages configured for this pool</param>
                             /// <returns></returns>
-                            public Result Destroypool(bool? force = null, bool? remove_storages = null) => DeleteRest(force, remove_storages);
+                            public async Task<Result> Destroypool(bool? force = null, bool? remove_storages = null) => await DeleteRest(force, remove_storages);
                             /// <summary>
                             /// List pool settings.
                             /// </summary>
                             /// <param name="verbose">If enabled, will display additional data(eg. statistics).</param>
                             /// <returns></returns>
-                            public Result GetRest(bool? verbose = null)
+                            public async Task<Result> GetRest(bool? verbose = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("verbose", verbose);
-                                return _client.Get($"/nodes/{_node}/ceph/pools/{_name}", parameters);
+                                return await _client.Get($"/nodes/{_node}/ceph/pools/{_name}", parameters);
                             }
 
                             /// <summary>
@@ -9773,7 +9774,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="verbose">If enabled, will display additional data(eg. statistics).</param>
                             /// <returns></returns>
-                            public Result Getpool(bool? verbose = null) => GetRest(verbose);
+                            public async Task<Result> Getpool(bool? verbose = null) => await GetRest(verbose);
                             /// <summary>
                             /// Change POOL settings
                             /// </summary>
@@ -9789,7 +9790,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="target_size">The estimated target size of the pool for the PG autoscaler.</param>
                             /// <param name="target_size_ratio">The estimated target ratio of the pool for the PG autoscaler.</param>
                             /// <returns></returns>
-                            public Result SetRest(string application = null, string crush_rule = null, int? min_size = null, string pg_autoscale_mode = null, int? pg_num = null, int? pg_num_min = null, int? size = null, string target_size = null, float? target_size_ratio = null)
+                            public async Task<Result> SetRest(string application = null, string crush_rule = null, int? min_size = null, string pg_autoscale_mode = null, int? pg_num = null, int? pg_num_min = null, int? size = null, string target_size = null, float? target_size_ratio = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("application", application);
@@ -9801,7 +9802,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("size", size);
                                 parameters.Add("target_size", target_size);
                                 parameters.Add("target_size_ratio", target_size_ratio);
-                                return _client.Set($"/nodes/{_node}/ceph/pools/{_name}", parameters);
+                                return await _client.Set($"/nodes/{_node}/ceph/pools/{_name}", parameters);
                             }
 
                             /// <summary>
@@ -9819,19 +9820,19 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="target_size">The estimated target size of the pool for the PG autoscaler.</param>
                             /// <param name="target_size_ratio">The estimated target ratio of the pool for the PG autoscaler.</param>
                             /// <returns></returns>
-                            public Result Setpool(string application = null, string crush_rule = null, int? min_size = null, string pg_autoscale_mode = null, int? pg_num = null, int? pg_num_min = null, int? size = null, string target_size = null, float? target_size_ratio = null) => SetRest(application, crush_rule, min_size, pg_autoscale_mode, pg_num, pg_num_min, size, target_size, target_size_ratio);
+                            public async Task<Result> Setpool(string application = null, string crush_rule = null, int? min_size = null, string pg_autoscale_mode = null, int? pg_num = null, int? pg_num_min = null, int? size = null, string target_size = null, float? target_size_ratio = null) => await SetRest(application, crush_rule, min_size, pg_autoscale_mode, pg_num, pg_num_min, size, target_size, target_size_ratio);
                         }
                         /// <summary>
                         /// List all pools.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/pools"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/ceph/pools"); }
 
                         /// <summary>
                         /// List all pools.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Lspools() => GetRest();
+                        public async Task<Result> Lspools() => await GetRest();
                         /// <summary>
                         /// Create POOL
                         /// </summary>
@@ -9849,7 +9850,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="target_size">The estimated target size of the pool for the PG autoscaler.</param>
                         /// <param name="target_size_ratio">The estimated target ratio of the pool for the PG autoscaler.</param>
                         /// <returns></returns>
-                        public Result CreateRest(string name, bool? add_storages = null, string application = null, string crush_rule = null, int? min_size = null, string pg_autoscale_mode = null, int? pg_num = null, int? pg_num_min = null, int? size = null, string target_size = null, float? target_size_ratio = null)
+                        public async Task<Result> CreateRest(string name, bool? add_storages = null, string application = null, string crush_rule = null, int? min_size = null, string pg_autoscale_mode = null, int? pg_num = null, int? pg_num_min = null, int? size = null, string target_size = null, float? target_size_ratio = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("name", name);
@@ -9863,7 +9864,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("size", size);
                             parameters.Add("target_size", target_size);
                             parameters.Add("target_size_ratio", target_size_ratio);
-                            return _client.Create($"/nodes/{_node}/ceph/pools", parameters);
+                            return await _client.Create($"/nodes/{_node}/ceph/pools", parameters);
                         }
 
                         /// <summary>
@@ -9883,7 +9884,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="target_size">The estimated target size of the pool for the PG autoscaler.</param>
                         /// <param name="target_size_ratio">The estimated target ratio of the pool for the PG autoscaler.</param>
                         /// <returns></returns>
-                        public Result Createpool(string name, bool? add_storages = null, string application = null, string crush_rule = null, int? min_size = null, string pg_autoscale_mode = null, int? pg_num = null, int? pg_num_min = null, int? size = null, string target_size = null, float? target_size_ratio = null) => CreateRest(name, add_storages, application, crush_rule, min_size, pg_autoscale_mode, pg_num, pg_num_min, size, target_size, target_size_ratio);
+                        public async Task<Result> Createpool(string name, bool? add_storages = null, string application = null, string crush_rule = null, int? min_size = null, string pg_autoscale_mode = null, int? pg_num = null, int? pg_num_min = null, int? size = null, string target_size = null, float? target_size_ratio = null) => await CreateRest(name, add_storages, application, crush_rule, min_size, pg_autoscale_mode, pg_num, pg_num_min, size, target_size, target_size_ratio);
                     }
                     public class PVEConfig
                     {
@@ -9894,13 +9895,13 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Get Ceph configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/config"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/ceph/config"); }
 
                         /// <summary>
                         /// Get Ceph configuration.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Config() => GetRest();
+                        public async Task<Result> Config() => await GetRest();
                     }
                     public class PVEConfigdb
                     {
@@ -9911,13 +9912,13 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Get Ceph configuration database.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/configdb"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/ceph/configdb"); }
 
                         /// <summary>
                         /// Get Ceph configuration database.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Configdb() => GetRest();
+                        public async Task<Result> Configdb() => await GetRest();
                     }
                     public class PVEInit
                     {
@@ -9934,7 +9935,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="pg_bits">Placement group bits, used to specify the default number of placement groups.  NOTE: 'osd pool default pg num' does not work for default pools.</param>
                         /// <param name="size">Targeted number of replicas per object</param>
                         /// <returns></returns>
-                        public Result CreateRest(string cluster_network = null, bool? disable_cephx = null, int? min_size = null, string network = null, int? pg_bits = null, int? size = null)
+                        public async Task<Result> CreateRest(string cluster_network = null, bool? disable_cephx = null, int? min_size = null, string network = null, int? pg_bits = null, int? size = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("cluster-network", cluster_network);
@@ -9943,7 +9944,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("network", network);
                             parameters.Add("pg_bits", pg_bits);
                             parameters.Add("size", size);
-                            return _client.Create($"/nodes/{_node}/ceph/init", parameters);
+                            return await _client.Create($"/nodes/{_node}/ceph/init", parameters);
                         }
 
                         /// <summary>
@@ -9956,7 +9957,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="pg_bits">Placement group bits, used to specify the default number of placement groups.  NOTE: 'osd pool default pg num' does not work for default pools.</param>
                         /// <param name="size">Targeted number of replicas per object</param>
                         /// <returns></returns>
-                        public Result Init(string cluster_network = null, bool? disable_cephx = null, int? min_size = null, string network = null, int? pg_bits = null, int? size = null) => CreateRest(cluster_network, disable_cephx, min_size, network, pg_bits, size);
+                        public async Task<Result> Init(string cluster_network = null, bool? disable_cephx = null, int? min_size = null, string network = null, int? pg_bits = null, int? size = null) => await CreateRest(cluster_network, disable_cephx, min_size, network, pg_bits, size);
                     }
                     public class PVEStop
                     {
@@ -9968,11 +9969,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="service">Ceph service name.</param>
                         /// <returns></returns>
-                        public Result CreateRest(string service = null)
+                        public async Task<Result> CreateRest(string service = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("service", service);
-                            return _client.Create($"/nodes/{_node}/ceph/stop", parameters);
+                            return await _client.Create($"/nodes/{_node}/ceph/stop", parameters);
                         }
 
                         /// <summary>
@@ -9980,7 +9981,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="service">Ceph service name.</param>
                         /// <returns></returns>
-                        public Result Stop(string service = null) => CreateRest(service);
+                        public async Task<Result> Stop(string service = null) => await CreateRest(service);
                     }
                     public class PVEStart
                     {
@@ -9992,11 +9993,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="service">Ceph service name.</param>
                         /// <returns></returns>
-                        public Result CreateRest(string service = null)
+                        public async Task<Result> CreateRest(string service = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("service", service);
-                            return _client.Create($"/nodes/{_node}/ceph/start", parameters);
+                            return await _client.Create($"/nodes/{_node}/ceph/start", parameters);
                         }
 
                         /// <summary>
@@ -10004,7 +10005,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="service">Ceph service name.</param>
                         /// <returns></returns>
-                        public Result Start(string service = null) => CreateRest(service);
+                        public async Task<Result> Start(string service = null) => await CreateRest(service);
                     }
                     public class PVERestart
                     {
@@ -10016,11 +10017,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="service">Ceph service name.</param>
                         /// <returns></returns>
-                        public Result CreateRest(string service = null)
+                        public async Task<Result> CreateRest(string service = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("service", service);
-                            return _client.Create($"/nodes/{_node}/ceph/restart", parameters);
+                            return await _client.Create($"/nodes/{_node}/ceph/restart", parameters);
                         }
 
                         /// <summary>
@@ -10028,7 +10029,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="service">Ceph service name.</param>
                         /// <returns></returns>
-                        public Result Restart(string service = null) => CreateRest(service);
+                        public async Task<Result> Restart(string service = null) => await CreateRest(service);
                     }
                     public class PVEStatus
                     {
@@ -10039,13 +10040,13 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Get ceph status.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/status"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/ceph/status"); }
 
                         /// <summary>
                         /// Get ceph status.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Status() => GetRest();
+                        public async Task<Result> Status() => await GetRest();
                     }
                     public class PVECrush
                     {
@@ -10056,13 +10057,13 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Get OSD crush map
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/crush"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/ceph/crush"); }
 
                         /// <summary>
                         /// Get OSD crush map
                         /// </summary>
                         /// <returns></returns>
-                        public Result Crush() => GetRest();
+                        public async Task<Result> Crush() => await GetRest();
                     }
                     public class PVELog
                     {
@@ -10075,12 +10076,12 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="limit"></param>
                         /// <param name="start"></param>
                         /// <returns></returns>
-                        public Result GetRest(int? limit = null, int? start = null)
+                        public async Task<Result> GetRest(int? limit = null, int? start = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("limit", limit);
                             parameters.Add("start", start);
-                            return _client.Get($"/nodes/{_node}/ceph/log", parameters);
+                            return await _client.Get($"/nodes/{_node}/ceph/log", parameters);
                         }
 
                         /// <summary>
@@ -10089,7 +10090,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="limit"></param>
                         /// <param name="start"></param>
                         /// <returns></returns>
-                        public Result Log(int? limit = null, int? start = null) => GetRest(limit, start);
+                        public async Task<Result> Log(int? limit = null, int? start = null) => await GetRest(limit, start);
                     }
                     public class PVERules
                     {
@@ -10100,25 +10101,25 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// List ceph rules.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph/rules"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/ceph/rules"); }
 
                         /// <summary>
                         /// List ceph rules.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Rules() => GetRest();
+                        public async Task<Result> Rules() => await GetRest();
                     }
                     /// <summary>
                     /// Directory index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/ceph"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/ceph"); }
 
                     /// <summary>
                     /// Directory index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Index() => GetRest();
+                    public async Task<Result> Index() => await GetRest();
                 }
                 public class PVEVzdump
                 {
@@ -10139,11 +10140,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="storage">The storage identifier.</param>
                         /// <returns></returns>
-                        public Result GetRest(string storage = null)
+                        public async Task<Result> GetRest(string storage = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("storage", storage);
-                            return _client.Get($"/nodes/{_node}/vzdump/defaults", parameters);
+                            return await _client.Get($"/nodes/{_node}/vzdump/defaults", parameters);
                         }
 
                         /// <summary>
@@ -10151,7 +10152,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="storage">The storage identifier.</param>
                         /// <returns></returns>
-                        public Result Defaults(string storage = null) => GetRest(storage);
+                        public async Task<Result> Defaults(string storage = null) => await GetRest(storage);
                     }
                     public class PVEExtractconfig
                     {
@@ -10163,11 +10164,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="volume">Volume identifier</param>
                         /// <returns></returns>
-                        public Result GetRest(string volume)
+                        public async Task<Result> GetRest(string volume)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("volume", volume);
-                            return _client.Get($"/nodes/{_node}/vzdump/extractconfig", parameters);
+                            return await _client.Get($"/nodes/{_node}/vzdump/extractconfig", parameters);
                         }
 
                         /// <summary>
@@ -10175,7 +10176,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="volume">Volume identifier</param>
                         /// <returns></returns>
-                        public Result Extractconfig(string volume) => GetRest(volume);
+                        public async Task<Result> Extractconfig(string volume) => await GetRest(volume);
                     }
                     /// <summary>
                     /// Create backup.
@@ -10210,7 +10211,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
                     /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                     /// <returns></returns>
-                    public Result CreateRest(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
+                    public async Task<Result> CreateRest(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("all", all);
@@ -10239,7 +10240,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("tmpdir", tmpdir);
                         parameters.Add("vmid", vmid);
                         parameters.Add("zstd", zstd);
-                        return _client.Create($"/nodes/{_node}/vzdump", parameters);
+                        return await _client.Create($"/nodes/{_node}/vzdump", parameters);
                     }
 
                     /// <summary>
@@ -10275,7 +10276,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
                     /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                     /// <returns></returns>
-                    public Result Vzdump(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null) => CreateRest(all, bwlimit, compress, dumpdir, exclude, exclude_path, ionice, lockwait, mailnotification, mailto, maxfiles, mode, pigz, pool, prune_backups, quiet, remove, script, stdexcludes, stdout, stop, stopwait, storage, tmpdir, vmid, zstd);
+                    public async Task<Result> Vzdump(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, int? pigz = null, string pool = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null) => await CreateRest(all, bwlimit, compress, dumpdir, exclude, exclude_path, ionice, lockwait, mailnotification, mailto, maxfiles, mode, pigz, pool, prune_backups, quiet, remove, script, stdexcludes, stdout, stop, stopwait, storage, tmpdir, vmid, zstd);
                 }
                 public class PVEServices
                 {
@@ -10317,13 +10318,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Read service properties
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/nodes/{_node}/services/{_service}/state"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/services/{_service}/state"); }
 
                             /// <summary>
                             /// Read service properties
                             /// </summary>
                             /// <returns></returns>
-                            public Result ServiceState() => GetRest();
+                            public async Task<Result> ServiceState() => await GetRest();
                         }
                         public class PVEStart
                         {
@@ -10339,13 +10340,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Start service.
                             /// </summary>
                             /// <returns></returns>
-                            public Result CreateRest() { return _client.Create($"/nodes/{_node}/services/{_service}/start"); }
+                            public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/services/{_service}/start"); }
 
                             /// <summary>
                             /// Start service.
                             /// </summary>
                             /// <returns></returns>
-                            public Result ServiceStart() => CreateRest();
+                            public async Task<Result> ServiceStart() => await CreateRest();
                         }
                         public class PVEStop
                         {
@@ -10361,13 +10362,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Stop service.
                             /// </summary>
                             /// <returns></returns>
-                            public Result CreateRest() { return _client.Create($"/nodes/{_node}/services/{_service}/stop"); }
+                            public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/services/{_service}/stop"); }
 
                             /// <summary>
                             /// Stop service.
                             /// </summary>
                             /// <returns></returns>
-                            public Result ServiceStop() => CreateRest();
+                            public async Task<Result> ServiceStop() => await CreateRest();
                         }
                         public class PVERestart
                         {
@@ -10383,13 +10384,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Hard restart service. Use reload if you want to reduce interruptions.
                             /// </summary>
                             /// <returns></returns>
-                            public Result CreateRest() { return _client.Create($"/nodes/{_node}/services/{_service}/restart"); }
+                            public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/services/{_service}/restart"); }
 
                             /// <summary>
                             /// Hard restart service. Use reload if you want to reduce interruptions.
                             /// </summary>
                             /// <returns></returns>
-                            public Result ServiceRestart() => CreateRest();
+                            public async Task<Result> ServiceRestart() => await CreateRest();
                         }
                         public class PVEReload
                         {
@@ -10405,37 +10406,37 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Reload service. Falls back to restart if service cannot be reloaded.
                             /// </summary>
                             /// <returns></returns>
-                            public Result CreateRest() { return _client.Create($"/nodes/{_node}/services/{_service}/reload"); }
+                            public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/services/{_service}/reload"); }
 
                             /// <summary>
                             /// Reload service. Falls back to restart if service cannot be reloaded.
                             /// </summary>
                             /// <returns></returns>
-                            public Result ServiceReload() => CreateRest();
+                            public async Task<Result> ServiceReload() => await CreateRest();
                         }
                         /// <summary>
                         /// Directory index
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/services/{_service}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/services/{_service}"); }
 
                         /// <summary>
                         /// Directory index
                         /// </summary>
                         /// <returns></returns>
-                        public Result Srvcmdidx() => GetRest();
+                        public async Task<Result> Srvcmdidx() => await GetRest();
                     }
                     /// <summary>
                     /// Service list.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/services"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/services"); }
 
                     /// <summary>
                     /// Service list.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Index() => GetRest();
+                    public async Task<Result> Index() => await GetRest();
                 }
                 public class PVESubscription
                 {
@@ -10446,34 +10447,34 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Delete subscription key of this node.
                     /// </summary>
                     /// <returns></returns>
-                    public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/subscription"); }
+                    public async Task<Result> DeleteRest() { return await _client.Delete($"/nodes/{_node}/subscription"); }
 
                     /// <summary>
                     /// Delete subscription key of this node.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Delete() => DeleteRest();
+                    public async Task<Result> Delete() => await DeleteRest();
                     /// <summary>
                     /// Read subscription info.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/subscription"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/subscription"); }
 
                     /// <summary>
                     /// Read subscription info.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Get() => GetRest();
+                    public async Task<Result> Get() => await GetRest();
                     /// <summary>
                     /// Update subscription info.
                     /// </summary>
                     /// <param name="force">Always connect to server, even if we have up to date info inside local cache.</param>
                     /// <returns></returns>
-                    public Result CreateRest(bool? force = null)
+                    public async Task<Result> CreateRest(bool? force = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("force", force);
-                        return _client.Create($"/nodes/{_node}/subscription", parameters);
+                        return await _client.Create($"/nodes/{_node}/subscription", parameters);
                     }
 
                     /// <summary>
@@ -10481,17 +10482,17 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="force">Always connect to server, even if we have up to date info inside local cache.</param>
                     /// <returns></returns>
-                    public Result Update(bool? force = null) => CreateRest(force);
+                    public async Task<Result> Update(bool? force = null) => await CreateRest(force);
                     /// <summary>
                     /// Set subscription key.
                     /// </summary>
                     /// <param name="key">Proxmox VE subscription key</param>
                     /// <returns></returns>
-                    public Result SetRest(string key)
+                    public async Task<Result> SetRest(string key)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("key", key);
-                        return _client.Set($"/nodes/{_node}/subscription", parameters);
+                        return await _client.Set($"/nodes/{_node}/subscription", parameters);
                     }
 
                     /// <summary>
@@ -10499,7 +10500,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="key">Proxmox VE subscription key</param>
                     /// <returns></returns>
-                    public Result Set(string key) => SetRest(key);
+                    public async Task<Result> Set(string key) => await SetRest(key);
                 }
                 public class PVENetwork
                 {
@@ -10521,24 +10522,24 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Delete network device configuration
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/network/{_iface}"); }
+                        public async Task<Result> DeleteRest() { return await _client.Delete($"/nodes/{_node}/network/{_iface}"); }
 
                         /// <summary>
                         /// Delete network device configuration
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteNetwork() => DeleteRest();
+                        public async Task<Result> DeleteNetwork() => await DeleteRest();
                         /// <summary>
                         /// Read network device configuration
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/network/{_iface}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/network/{_iface}"); }
 
                         /// <summary>
                         /// Read network device configuration
                         /// </summary>
                         /// <returns></returns>
-                        public Result NetworkConfig() => GetRest();
+                        public async Task<Result> NetworkConfig() => await GetRest();
                         /// <summary>
                         /// Update network device configuration
                         /// </summary>
@@ -10573,7 +10574,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="vlan_id">vlan-id for a custom named vlan interface (ifupdown2 only).</param>
                         /// <param name="vlan_raw_device">Specify the raw interface for the vlan interface.</param>
                         /// <returns></returns>
-                        public Result SetRest(string type, string address = null, string address6 = null, bool? autostart = null, string bond_primary = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string delete = null, string gateway = null, string gateway6 = null, int? mtu = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null, int? vlan_id = null, string vlan_raw_device = null)
+                        public async Task<Result> SetRest(string type, string address = null, string address6 = null, bool? autostart = null, string bond_primary = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string delete = null, string gateway = null, string gateway6 = null, int? mtu = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null, int? vlan_id = null, string vlan_raw_device = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("type", type);
@@ -10603,7 +10604,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("slaves", slaves);
                             parameters.Add("vlan-id", vlan_id);
                             parameters.Add("vlan-raw-device", vlan_raw_device);
-                            return _client.Set($"/nodes/{_node}/network/{_iface}", parameters);
+                            return await _client.Set($"/nodes/{_node}/network/{_iface}", parameters);
                         }
 
                         /// <summary>
@@ -10640,30 +10641,30 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="vlan_id">vlan-id for a custom named vlan interface (ifupdown2 only).</param>
                         /// <param name="vlan_raw_device">Specify the raw interface for the vlan interface.</param>
                         /// <returns></returns>
-                        public Result UpdateNetwork(string type, string address = null, string address6 = null, bool? autostart = null, string bond_primary = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string delete = null, string gateway = null, string gateway6 = null, int? mtu = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null, int? vlan_id = null, string vlan_raw_device = null) => SetRest(type, address, address6, autostart, bond_primary, bond_mode, bond_xmit_hash_policy, bridge_ports, bridge_vlan_aware, cidr, cidr6, comments, comments6, delete, gateway, gateway6, mtu, netmask, netmask6, ovs_bonds, ovs_bridge, ovs_options, ovs_ports, ovs_tag, slaves, vlan_id, vlan_raw_device);
+                        public async Task<Result> UpdateNetwork(string type, string address = null, string address6 = null, bool? autostart = null, string bond_primary = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string delete = null, string gateway = null, string gateway6 = null, int? mtu = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null, int? vlan_id = null, string vlan_raw_device = null) => await SetRest(type, address, address6, autostart, bond_primary, bond_mode, bond_xmit_hash_policy, bridge_ports, bridge_vlan_aware, cidr, cidr6, comments, comments6, delete, gateway, gateway6, mtu, netmask, netmask6, ovs_bonds, ovs_bridge, ovs_options, ovs_ports, ovs_tag, slaves, vlan_id, vlan_raw_device);
                     }
                     /// <summary>
                     /// Revert network configuration changes.
                     /// </summary>
                     /// <returns></returns>
-                    public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/network"); }
+                    public async Task<Result> DeleteRest() { return await _client.Delete($"/nodes/{_node}/network"); }
 
                     /// <summary>
                     /// Revert network configuration changes.
                     /// </summary>
                     /// <returns></returns>
-                    public Result RevertNetworkChanges() => DeleteRest();
+                    public async Task<Result> RevertNetworkChanges() => await DeleteRest();
                     /// <summary>
                     /// List available networks
                     /// </summary>
                     /// <param name="type">Only list specific interface types.
                     ///   Enum: bridge,bond,eth,alias,vlan,OVSBridge,OVSBond,OVSPort,OVSIntPort,any_bridge</param>
                     /// <returns></returns>
-                    public Result GetRest(string type = null)
+                    public async Task<Result> GetRest(string type = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("type", type);
-                        return _client.Get($"/nodes/{_node}/network", parameters);
+                        return await _client.Get($"/nodes/{_node}/network", parameters);
                     }
 
                     /// <summary>
@@ -10672,7 +10673,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="type">Only list specific interface types.
                     ///   Enum: bridge,bond,eth,alias,vlan,OVSBridge,OVSBond,OVSPort,OVSIntPort,any_bridge</param>
                     /// <returns></returns>
-                    public Result Index(string type = null) => GetRest(type);
+                    public async Task<Result> Index(string type = null) => await GetRest(type);
                     /// <summary>
                     /// Create network device configuration
                     /// </summary>
@@ -10707,7 +10708,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vlan_id">vlan-id for a custom named vlan interface (ifupdown2 only).</param>
                     /// <param name="vlan_raw_device">Specify the raw interface for the vlan interface.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string iface, string type, string address = null, string address6 = null, bool? autostart = null, string bond_primary = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string gateway = null, string gateway6 = null, int? mtu = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null, int? vlan_id = null, string vlan_raw_device = null)
+                    public async Task<Result> CreateRest(string iface, string type, string address = null, string address6 = null, bool? autostart = null, string bond_primary = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string gateway = null, string gateway6 = null, int? mtu = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null, int? vlan_id = null, string vlan_raw_device = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("iface", iface);
@@ -10737,7 +10738,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("slaves", slaves);
                         parameters.Add("vlan-id", vlan_id);
                         parameters.Add("vlan-raw-device", vlan_raw_device);
-                        return _client.Create($"/nodes/{_node}/network", parameters);
+                        return await _client.Create($"/nodes/{_node}/network", parameters);
                     }
 
                     /// <summary>
@@ -10774,18 +10775,18 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vlan_id">vlan-id for a custom named vlan interface (ifupdown2 only).</param>
                     /// <param name="vlan_raw_device">Specify the raw interface for the vlan interface.</param>
                     /// <returns></returns>
-                    public Result CreateNetwork(string iface, string type, string address = null, string address6 = null, bool? autostart = null, string bond_primary = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string gateway = null, string gateway6 = null, int? mtu = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null, int? vlan_id = null, string vlan_raw_device = null) => CreateRest(iface, type, address, address6, autostart, bond_primary, bond_mode, bond_xmit_hash_policy, bridge_ports, bridge_vlan_aware, cidr, cidr6, comments, comments6, gateway, gateway6, mtu, netmask, netmask6, ovs_bonds, ovs_bridge, ovs_options, ovs_ports, ovs_tag, slaves, vlan_id, vlan_raw_device);
+                    public async Task<Result> CreateNetwork(string iface, string type, string address = null, string address6 = null, bool? autostart = null, string bond_primary = null, string bond_mode = null, string bond_xmit_hash_policy = null, string bridge_ports = null, bool? bridge_vlan_aware = null, string cidr = null, string cidr6 = null, string comments = null, string comments6 = null, string gateway = null, string gateway6 = null, int? mtu = null, string netmask = null, int? netmask6 = null, string ovs_bonds = null, string ovs_bridge = null, string ovs_options = null, string ovs_ports = null, int? ovs_tag = null, string slaves = null, int? vlan_id = null, string vlan_raw_device = null) => await CreateRest(iface, type, address, address6, autostart, bond_primary, bond_mode, bond_xmit_hash_policy, bridge_ports, bridge_vlan_aware, cidr, cidr6, comments, comments6, gateway, gateway6, mtu, netmask, netmask6, ovs_bonds, ovs_bridge, ovs_options, ovs_ports, ovs_tag, slaves, vlan_id, vlan_raw_device);
                     /// <summary>
                     /// Reload network configuration
                     /// </summary>
                     /// <returns></returns>
-                    public Result SetRest() { return _client.Set($"/nodes/{_node}/network"); }
+                    public async Task<Result> SetRest() { return await _client.Set($"/nodes/{_node}/network"); }
 
                     /// <summary>
                     /// Reload network configuration
                     /// </summary>
                     /// <returns></returns>
-                    public Result ReloadNetworkConfig() => SetRest();
+                    public async Task<Result> ReloadNetworkConfig() => await SetRest();
                 }
                 public class PVETasks
                 {
@@ -10823,12 +10824,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="limit">The maximum amount of lines that should be printed.</param>
                             /// <param name="start">The line number to start printing at.</param>
                             /// <returns></returns>
-                            public Result GetRest(int? limit = null, int? start = null)
+                            public async Task<Result> GetRest(int? limit = null, int? start = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("limit", limit);
                                 parameters.Add("start", start);
-                                return _client.Get($"/nodes/{_node}/tasks/{_upid}/log", parameters);
+                                return await _client.Get($"/nodes/{_node}/tasks/{_upid}/log", parameters);
                             }
 
                             /// <summary>
@@ -10837,7 +10838,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="limit">The maximum amount of lines that should be printed.</param>
                             /// <param name="start">The line number to start printing at.</param>
                             /// <returns></returns>
-                            public Result ReadTaskLog(int? limit = null, int? start = null) => GetRest(limit, start);
+                            public async Task<Result> ReadTaskLog(int? limit = null, int? start = null) => await GetRest(limit, start);
                         }
                         public class PVEStatus
                         {
@@ -10853,36 +10854,36 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Read task status.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/nodes/{_node}/tasks/{_upid}/status"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/tasks/{_upid}/status"); }
 
                             /// <summary>
                             /// Read task status.
                             /// </summary>
                             /// <returns></returns>
-                            public Result ReadTaskStatus() => GetRest();
+                            public async Task<Result> ReadTaskStatus() => await GetRest();
                         }
                         /// <summary>
                         /// Stop a task.
                         /// </summary>
                         /// <returns></returns>
-                        public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/tasks/{_upid}"); }
+                        public async Task<Result> DeleteRest() { return await _client.Delete($"/nodes/{_node}/tasks/{_upid}"); }
 
                         /// <summary>
                         /// Stop a task.
                         /// </summary>
                         /// <returns></returns>
-                        public Result StopTask() => DeleteRest();
+                        public async Task<Result> StopTask() => await DeleteRest();
                         /// <summary>
                         ///
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/tasks/{_upid}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/tasks/{_upid}"); }
 
                         /// <summary>
                         ///
                         /// </summary>
                         /// <returns></returns>
-                        public Result UpidIndex() => GetRest();
+                        public async Task<Result> UpidIndex() => await GetRest();
                     }
                     /// <summary>
                     /// Read task list for one node (finished tasks).
@@ -10899,7 +10900,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="userfilter">Only list tasks from this user.</param>
                     /// <param name="vmid">Only list tasks for this VM.</param>
                     /// <returns></returns>
-                    public Result GetRest(bool? errors = null, int? limit = null, int? since = null, string source = null, int? start = null, string statusfilter = null, string typefilter = null, int? until = null, string userfilter = null, int? vmid = null)
+                    public async Task<Result> GetRest(bool? errors = null, int? limit = null, int? since = null, string source = null, int? start = null, string statusfilter = null, string typefilter = null, int? until = null, string userfilter = null, int? vmid = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("errors", errors);
@@ -10912,7 +10913,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("until", until);
                         parameters.Add("userfilter", userfilter);
                         parameters.Add("vmid", vmid);
-                        return _client.Get($"/nodes/{_node}/tasks", parameters);
+                        return await _client.Get($"/nodes/{_node}/tasks", parameters);
                     }
 
                     /// <summary>
@@ -10930,7 +10931,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="userfilter">Only list tasks from this user.</param>
                     /// <param name="vmid">Only list tasks for this VM.</param>
                     /// <returns></returns>
-                    public Result NodeTasks(bool? errors = null, int? limit = null, int? since = null, string source = null, int? start = null, string statusfilter = null, string typefilter = null, int? until = null, string userfilter = null, int? vmid = null) => GetRest(errors, limit, since, source, start, statusfilter, typefilter, until, userfilter, vmid);
+                    public async Task<Result> NodeTasks(bool? errors = null, int? limit = null, int? since = null, string source = null, int? start = null, string statusfilter = null, string typefilter = null, int? until = null, string userfilter = null, int? vmid = null) => await GetRest(errors, limit, since, source, start, statusfilter, typefilter, until, userfilter, vmid);
                 }
                 public class PVEScan
                 {
@@ -10963,11 +10964,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="server">The server address (name or IP).</param>
                         /// <returns></returns>
-                        public Result GetRest(string server)
+                        public async Task<Result> GetRest(string server)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("server", server);
-                            return _client.Get($"/nodes/{_node}/scan/nfs", parameters);
+                            return await _client.Get($"/nodes/{_node}/scan/nfs", parameters);
                         }
 
                         /// <summary>
@@ -10975,7 +10976,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="server">The server address (name or IP).</param>
                         /// <returns></returns>
-                        public Result Nfsscan(string server) => GetRest(server);
+                        public async Task<Result> Nfsscan(string server) => await GetRest(server);
                     }
                     public class PVECifs
                     {
@@ -10990,14 +10991,14 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="password">User password.</param>
                         /// <param name="username">User name.</param>
                         /// <returns></returns>
-                        public Result GetRest(string server, string domain = null, string password = null, string username = null)
+                        public async Task<Result> GetRest(string server, string domain = null, string password = null, string username = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("server", server);
                             parameters.Add("domain", domain);
                             parameters.Add("password", password);
                             parameters.Add("username", username);
-                            return _client.Get($"/nodes/{_node}/scan/cifs", parameters);
+                            return await _client.Get($"/nodes/{_node}/scan/cifs", parameters);
                         }
 
                         /// <summary>
@@ -11008,7 +11009,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="password">User password.</param>
                         /// <param name="username">User name.</param>
                         /// <returns></returns>
-                        public Result Cifsscan(string server, string domain = null, string password = null, string username = null) => GetRest(server, domain, password, username);
+                        public async Task<Result> Cifsscan(string server, string domain = null, string password = null, string username = null) => await GetRest(server, domain, password, username);
                     }
                     public class PVEPbs
                     {
@@ -11024,7 +11025,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="fingerprint">Certificate SHA 256 fingerprint.</param>
                         /// <param name="port">Optional port.</param>
                         /// <returns></returns>
-                        public Result GetRest(string password, string server, string username, string fingerprint = null, int? port = null)
+                        public async Task<Result> GetRest(string password, string server, string username, string fingerprint = null, int? port = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("password", password);
@@ -11032,7 +11033,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("username", username);
                             parameters.Add("fingerprint", fingerprint);
                             parameters.Add("port", port);
-                            return _client.Get($"/nodes/{_node}/scan/pbs", parameters);
+                            return await _client.Get($"/nodes/{_node}/scan/pbs", parameters);
                         }
 
                         /// <summary>
@@ -11044,7 +11045,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="fingerprint">Certificate SHA 256 fingerprint.</param>
                         /// <param name="port">Optional port.</param>
                         /// <returns></returns>
-                        public Result Pbsscan(string password, string server, string username, string fingerprint = null, int? port = null) => GetRest(password, server, username, fingerprint, port);
+                        public async Task<Result> Pbsscan(string password, string server, string username, string fingerprint = null, int? port = null) => await GetRest(password, server, username, fingerprint, port);
                     }
                     public class PVEGlusterfs
                     {
@@ -11056,11 +11057,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="server">The server address (name or IP).</param>
                         /// <returns></returns>
-                        public Result GetRest(string server)
+                        public async Task<Result> GetRest(string server)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("server", server);
-                            return _client.Get($"/nodes/{_node}/scan/glusterfs", parameters);
+                            return await _client.Get($"/nodes/{_node}/scan/glusterfs", parameters);
                         }
 
                         /// <summary>
@@ -11068,7 +11069,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="server">The server address (name or IP).</param>
                         /// <returns></returns>
-                        public Result Glusterfsscan(string server) => GetRest(server);
+                        public async Task<Result> Glusterfsscan(string server) => await GetRest(server);
                     }
                     public class PVEIscsi
                     {
@@ -11080,11 +11081,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="portal">The iSCSI portal (IP or DNS name with optional port).</param>
                         /// <returns></returns>
-                        public Result GetRest(string portal)
+                        public async Task<Result> GetRest(string portal)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("portal", portal);
-                            return _client.Get($"/nodes/{_node}/scan/iscsi", parameters);
+                            return await _client.Get($"/nodes/{_node}/scan/iscsi", parameters);
                         }
 
                         /// <summary>
@@ -11092,7 +11093,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="portal">The iSCSI portal (IP or DNS name with optional port).</param>
                         /// <returns></returns>
-                        public Result Iscsiscan(string portal) => GetRest(portal);
+                        public async Task<Result> Iscsiscan(string portal) => await GetRest(portal);
                     }
                     public class PVELvm
                     {
@@ -11103,13 +11104,13 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// List local LVM volume groups.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/scan/lvm"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/scan/lvm"); }
 
                         /// <summary>
                         /// List local LVM volume groups.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Lvmscan() => GetRest();
+                        public async Task<Result> Lvmscan() => await GetRest();
                     }
                     public class PVELvmthin
                     {
@@ -11121,11 +11122,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="vg"></param>
                         /// <returns></returns>
-                        public Result GetRest(string vg)
+                        public async Task<Result> GetRest(string vg)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("vg", vg);
-                            return _client.Get($"/nodes/{_node}/scan/lvmthin", parameters);
+                            return await _client.Get($"/nodes/{_node}/scan/lvmthin", parameters);
                         }
 
                         /// <summary>
@@ -11133,7 +11134,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="vg"></param>
                         /// <returns></returns>
-                        public Result Lvmthinscan(string vg) => GetRest(vg);
+                        public async Task<Result> Lvmthinscan(string vg) => await GetRest(vg);
                     }
                     public class PVEZfs
                     {
@@ -11144,25 +11145,25 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Scan zfs pool list on local node.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/scan/zfs"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/scan/zfs"); }
 
                         /// <summary>
                         /// Scan zfs pool list on local node.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Zfsscan() => GetRest();
+                        public async Task<Result> Zfsscan() => await GetRest();
                     }
                     /// <summary>
                     /// Index of available scan methods
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/scan"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/scan"); }
 
                     /// <summary>
                     /// Index of available scan methods
                     /// </summary>
                     /// <returns></returns>
-                    public Result Index() => GetRest();
+                    public async Task<Result> Index() => await GetRest();
                 }
                 public class PVEHardware
                 {
@@ -11205,25 +11206,25 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// List mediated device types for given PCI device.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/hardware/pci/{_pciid}/mdev"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/hardware/pci/{_pciid}/mdev"); }
 
                                 /// <summary>
                                 /// List mediated device types for given PCI device.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Mdevscan() => GetRest();
+                                public async Task<Result> Mdevscan() => await GetRest();
                             }
                             /// <summary>
                             /// Index of available pci methods
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/nodes/{_node}/hardware/pci/{_pciid}"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/hardware/pci/{_pciid}"); }
 
                             /// <summary>
                             /// Index of available pci methods
                             /// </summary>
                             /// <returns></returns>
-                            public Result Pciindex() => GetRest();
+                            public async Task<Result> Pciindex() => await GetRest();
                         }
                         /// <summary>
                         /// List local PCI devices.
@@ -11231,12 +11232,12 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="pci_class_blacklist">A list of blacklisted PCI classes, which will not be returned. Following are filtered by default: Memory Controller (05), Bridge (06) and Processor (0b).</param>
                         /// <param name="verbose">If disabled, does only print the PCI IDs. Otherwise, additional information like vendor and device will be returned.</param>
                         /// <returns></returns>
-                        public Result GetRest(string pci_class_blacklist = null, bool? verbose = null)
+                        public async Task<Result> GetRest(string pci_class_blacklist = null, bool? verbose = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("pci-class-blacklist", pci_class_blacklist);
                             parameters.Add("verbose", verbose);
-                            return _client.Get($"/nodes/{_node}/hardware/pci", parameters);
+                            return await _client.Get($"/nodes/{_node}/hardware/pci", parameters);
                         }
 
                         /// <summary>
@@ -11245,7 +11246,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="pci_class_blacklist">A list of blacklisted PCI classes, which will not be returned. Following are filtered by default: Memory Controller (05), Bridge (06) and Processor (0b).</param>
                         /// <param name="verbose">If disabled, does only print the PCI IDs. Otherwise, additional information like vendor and device will be returned.</param>
                         /// <returns></returns>
-                        public Result Pciscan(string pci_class_blacklist = null, bool? verbose = null) => GetRest(pci_class_blacklist, verbose);
+                        public async Task<Result> Pciscan(string pci_class_blacklist = null, bool? verbose = null) => await GetRest(pci_class_blacklist, verbose);
                     }
                     public class PVEUsb
                     {
@@ -11256,25 +11257,25 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// List local USB devices.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/hardware/usb"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/hardware/usb"); }
 
                         /// <summary>
                         /// List local USB devices.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Usbscan() => GetRest();
+                        public async Task<Result> Usbscan() => await GetRest();
                     }
                     /// <summary>
                     /// Index of hardware types
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/hardware"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/hardware"); }
 
                     /// <summary>
                     /// Index of hardware types
                     /// </summary>
                     /// <returns></returns>
-                    public Result Index() => GetRest();
+                    public async Task<Result> Index() => await GetRest();
                 }
                 public class PVECapabilities
                 {
@@ -11301,13 +11302,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// List all custom and default CPU models.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/nodes/{_node}/capabilities/qemu/cpu"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/capabilities/qemu/cpu"); }
 
                             /// <summary>
                             /// List all custom and default CPU models.
                             /// </summary>
                             /// <returns></returns>
-                            public Result Index() => GetRest();
+                            public async Task<Result> Index() => await GetRest();
                         }
                         public class PVEMachines
                         {
@@ -11318,37 +11319,37 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Get available QEMU/KVM machine types.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/nodes/{_node}/capabilities/qemu/machines"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/capabilities/qemu/machines"); }
 
                             /// <summary>
                             /// Get available QEMU/KVM machine types.
                             /// </summary>
                             /// <returns></returns>
-                            public Result Types() => GetRest();
+                            public async Task<Result> Types() => await GetRest();
                         }
                         /// <summary>
                         /// QEMU capabilities index.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/capabilities/qemu"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/capabilities/qemu"); }
 
                         /// <summary>
                         /// QEMU capabilities index.
                         /// </summary>
                         /// <returns></returns>
-                        public Result QemuCapsIndex() => GetRest();
+                        public async Task<Result> QemuCapsIndex() => await GetRest();
                     }
                     /// <summary>
                     /// Node capabilities index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/capabilities"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/capabilities"); }
 
                     /// <summary>
                     /// Node capabilities index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Index() => GetRest();
+                    public async Task<Result> Index() => await GetRest();
                 }
                 public class PVEStorage
                 {
@@ -11400,13 +11401,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             ///   Enum: qemu,lxc</param>
                             /// <param name="vmid">Only prune backups for this VM.</param>
                             /// <returns></returns>
-                            public Result DeleteRest(string prune_backups = null, string type = null, int? vmid = null)
+                            public async Task<Result> DeleteRest(string prune_backups = null, string type = null, int? vmid = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("prune-backups", prune_backups);
                                 parameters.Add("type", type);
                                 parameters.Add("vmid", vmid);
-                                return _client.Delete($"/nodes/{_node}/storage/{_storage}/prunebackups", parameters);
+                                return await _client.Delete($"/nodes/{_node}/storage/{_storage}/prunebackups", parameters);
                             }
 
                             /// <summary>
@@ -11417,7 +11418,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             ///   Enum: qemu,lxc</param>
                             /// <param name="vmid">Only prune backups for this VM.</param>
                             /// <returns></returns>
-                            public Result Delete(string prune_backups = null, string type = null, int? vmid = null) => DeleteRest(prune_backups, type, vmid);
+                            public async Task<Result> Delete(string prune_backups = null, string type = null, int? vmid = null) => await DeleteRest(prune_backups, type, vmid);
                             /// <summary>
                             /// Get prune information for backups. NOTE: this is only a preview and might not be what a subsequent prune call does if backups are removed/added in the meantime.
                             /// </summary>
@@ -11426,13 +11427,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             ///   Enum: qemu,lxc</param>
                             /// <param name="vmid">Only consider backups for this guest.</param>
                             /// <returns></returns>
-                            public Result GetRest(string prune_backups = null, string type = null, int? vmid = null)
+                            public async Task<Result> GetRest(string prune_backups = null, string type = null, int? vmid = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("prune-backups", prune_backups);
                                 parameters.Add("type", type);
                                 parameters.Add("vmid", vmid);
-                                return _client.Get($"/nodes/{_node}/storage/{_storage}/prunebackups", parameters);
+                                return await _client.Get($"/nodes/{_node}/storage/{_storage}/prunebackups", parameters);
                             }
 
                             /// <summary>
@@ -11443,7 +11444,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             ///   Enum: qemu,lxc</param>
                             /// <param name="vmid">Only consider backups for this guest.</param>
                             /// <returns></returns>
-                            public Result Dryrun(string prune_backups = null, string type = null, int? vmid = null) => GetRest(prune_backups, type, vmid);
+                            public async Task<Result> Dryrun(string prune_backups = null, string type = null, int? vmid = null) => await GetRest(prune_backups, type, vmid);
                         }
                         public class PVEContent
                         {
@@ -11473,11 +11474,11 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="delay">Time to wait for the task to finish. We return 'null' if the task finish within that time.</param>
                                 /// <returns></returns>
-                                public Result DeleteRest(int? delay = null)
+                                public async Task<Result> DeleteRest(int? delay = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("delay", delay);
-                                    return _client.Delete($"/nodes/{_node}/storage/{_storage}/content/{_volume}", parameters);
+                                    return await _client.Delete($"/nodes/{_node}/storage/{_storage}/content/{_volume}", parameters);
                                 }
 
                                 /// <summary>
@@ -11485,30 +11486,30 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// </summary>
                                 /// <param name="delay">Time to wait for the task to finish. We return 'null' if the task finish within that time.</param>
                                 /// <returns></returns>
-                                public Result Delete(int? delay = null) => DeleteRest(delay);
+                                public async Task<Result> Delete(int? delay = null) => await DeleteRest(delay);
                                 /// <summary>
                                 /// Get volume attributes
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/storage/{_storage}/content/{_volume}"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/storage/{_storage}/content/{_volume}"); }
 
                                 /// <summary>
                                 /// Get volume attributes
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Info() => GetRest();
+                                public async Task<Result> Info() => await GetRest();
                                 /// <summary>
                                 /// Copy a volume. This is experimental code - do not use.
                                 /// </summary>
                                 /// <param name="target">Target volume identifier</param>
                                 /// <param name="target_node">Target node. Default is local node.</param>
                                 /// <returns></returns>
-                                public Result CreateRest(string target, string target_node = null)
+                                public async Task<Result> CreateRest(string target, string target_node = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("target", target);
                                     parameters.Add("target_node", target_node);
-                                    return _client.Create($"/nodes/{_node}/storage/{_storage}/content/{_volume}", parameters);
+                                    return await _client.Create($"/nodes/{_node}/storage/{_storage}/content/{_volume}", parameters);
                                 }
 
                                 /// <summary>
@@ -11517,19 +11518,19 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="target">Target volume identifier</param>
                                 /// <param name="target_node">Target node. Default is local node.</param>
                                 /// <returns></returns>
-                                public Result Copy(string target, string target_node = null) => CreateRest(target, target_node);
+                                public async Task<Result> Copy(string target, string target_node = null) => await CreateRest(target, target_node);
                                 /// <summary>
                                 /// Update volume attributes
                                 /// </summary>
                                 /// <param name="notes">The new notes.</param>
                                 /// <param name="protected_">Protection status. Currently only supported for backups.</param>
                                 /// <returns></returns>
-                                public Result SetRest(string notes = null, bool? protected_ = null)
+                                public async Task<Result> SetRest(string notes = null, bool? protected_ = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("notes", notes);
                                     parameters.Add("protected", protected_);
-                                    return _client.Set($"/nodes/{_node}/storage/{_storage}/content/{_volume}", parameters);
+                                    return await _client.Set($"/nodes/{_node}/storage/{_storage}/content/{_volume}", parameters);
                                 }
 
                                 /// <summary>
@@ -11538,7 +11539,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="notes">The new notes.</param>
                                 /// <param name="protected_">Protection status. Currently only supported for backups.</param>
                                 /// <returns></returns>
-                                public Result Updateattributes(string notes = null, bool? protected_ = null) => SetRest(notes, protected_);
+                                public async Task<Result> Updateattributes(string notes = null, bool? protected_ = null) => await SetRest(notes, protected_);
                             }
                             /// <summary>
                             /// List storage content.
@@ -11546,12 +11547,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="content">Only list content of this type.</param>
                             /// <param name="vmid">Only list images for this VM</param>
                             /// <returns></returns>
-                            public Result GetRest(string content = null, int? vmid = null)
+                            public async Task<Result> GetRest(string content = null, int? vmid = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("content", content);
                                 parameters.Add("vmid", vmid);
-                                return _client.Get($"/nodes/{_node}/storage/{_storage}/content", parameters);
+                                return await _client.Get($"/nodes/{_node}/storage/{_storage}/content", parameters);
                             }
 
                             /// <summary>
@@ -11560,7 +11561,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="content">Only list content of this type.</param>
                             /// <param name="vmid">Only list images for this VM</param>
                             /// <returns></returns>
-                            public Result Index(string content = null, int? vmid = null) => GetRest(content, vmid);
+                            public async Task<Result> Index(string content = null, int? vmid = null) => await GetRest(content, vmid);
                             /// <summary>
                             /// Allocate disk images.
                             /// </summary>
@@ -11570,14 +11571,14 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="format">
                             ///   Enum: raw,qcow2,subvol</param>
                             /// <returns></returns>
-                            public Result CreateRest(string filename, string size, int vmid, string format = null)
+                            public async Task<Result> CreateRest(string filename, string size, int vmid, string format = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("filename", filename);
                                 parameters.Add("size", size);
                                 parameters.Add("vmid", vmid);
                                 parameters.Add("format", format);
-                                return _client.Create($"/nodes/{_node}/storage/{_storage}/content", parameters);
+                                return await _client.Create($"/nodes/{_node}/storage/{_storage}/content", parameters);
                             }
 
                             /// <summary>
@@ -11589,7 +11590,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="format">
                             ///   Enum: raw,qcow2,subvol</param>
                             /// <returns></returns>
-                            public Result Create(string filename, string size, int vmid, string format = null) => CreateRest(filename, size, vmid, format);
+                            public async Task<Result> Create(string filename, string size, int vmid, string format = null) => await CreateRest(filename, size, vmid, format);
                         }
                         public class PVEFile_Restore
                         {
@@ -11621,12 +11622,12 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="filepath">base64-path to the directory or file being listed, or "/".</param>
                                 /// <param name="volume">Backup volume ID or name. Currently only PBS snapshots are supported.</param>
                                 /// <returns></returns>
-                                public Result GetRest(string filepath, string volume)
+                                public async Task<Result> GetRest(string filepath, string volume)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("filepath", filepath);
                                     parameters.Add("volume", volume);
-                                    return _client.Get($"/nodes/{_node}/storage/{_storage}/file-restore/list", parameters);
+                                    return await _client.Get($"/nodes/{_node}/storage/{_storage}/file-restore/list", parameters);
                                 }
 
                                 /// <summary>
@@ -11635,7 +11636,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="filepath">base64-path to the directory or file being listed, or "/".</param>
                                 /// <param name="volume">Backup volume ID or name. Currently only PBS snapshots are supported.</param>
                                 /// <returns></returns>
-                                public Result List(string filepath, string volume) => GetRest(filepath, volume);
+                                public async Task<Result> List(string filepath, string volume) => await GetRest(filepath, volume);
                             }
                             public class PVEDownload
                             {
@@ -11653,12 +11654,12 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="filepath">base64-path to the directory or file to download.</param>
                                 /// <param name="volume">Backup volume ID or name. Currently only PBS snapshots are supported.</param>
                                 /// <returns></returns>
-                                public Result GetRest(string filepath, string volume)
+                                public async Task<Result> GetRest(string filepath, string volume)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("filepath", filepath);
                                     parameters.Add("volume", volume);
-                                    return _client.Get($"/nodes/{_node}/storage/{_storage}/file-restore/download", parameters);
+                                    return await _client.Get($"/nodes/{_node}/storage/{_storage}/file-restore/download", parameters);
                                 }
 
                                 /// <summary>
@@ -11667,7 +11668,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="filepath">base64-path to the directory or file to download.</param>
                                 /// <param name="volume">Backup volume ID or name. Currently only PBS snapshots are supported.</param>
                                 /// <returns></returns>
-                                public Result Download(string filepath, string volume) => GetRest(filepath, volume);
+                                public async Task<Result> Download(string filepath, string volume) => await GetRest(filepath, volume);
                             }
                         }
                         public class PVEStatus
@@ -11684,13 +11685,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Read storage status.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/nodes/{_node}/storage/{_storage}/status"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/storage/{_storage}/status"); }
 
                             /// <summary>
                             /// Read storage status.
                             /// </summary>
                             /// <returns></returns>
-                            public Result ReadStatus() => GetRest();
+                            public async Task<Result> ReadStatus() => await GetRest();
                         }
                         public class PVERrd
                         {
@@ -11711,13 +11712,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
                             /// <returns></returns>
-                            public Result GetRest(string ds, string timeframe, string cf = null)
+                            public async Task<Result> GetRest(string ds, string timeframe, string cf = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("ds", ds);
                                 parameters.Add("timeframe", timeframe);
                                 parameters.Add("cf", cf);
-                                return _client.Get($"/nodes/{_node}/storage/{_storage}/rrd", parameters);
+                                return await _client.Get($"/nodes/{_node}/storage/{_storage}/rrd", parameters);
                             }
 
                             /// <summary>
@@ -11729,7 +11730,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
                             /// <returns></returns>
-                            public Result Rrd(string ds, string timeframe, string cf = null) => GetRest(ds, timeframe, cf);
+                            public async Task<Result> Rrd(string ds, string timeframe, string cf = null) => await GetRest(ds, timeframe, cf);
                         }
                         public class PVERrddata
                         {
@@ -11749,12 +11750,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
                             /// <returns></returns>
-                            public Result GetRest(string timeframe, string cf = null)
+                            public async Task<Result> GetRest(string timeframe, string cf = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("timeframe", timeframe);
                                 parameters.Add("cf", cf);
-                                return _client.Get($"/nodes/{_node}/storage/{_storage}/rrddata", parameters);
+                                return await _client.Get($"/nodes/{_node}/storage/{_storage}/rrddata", parameters);
                             }
 
                             /// <summary>
@@ -11765,7 +11766,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cf">The RRD consolidation function
                             ///   Enum: AVERAGE,MAX</param>
                             /// <returns></returns>
-                            public Result Rrddata(string timeframe, string cf = null) => GetRest(timeframe, cf);
+                            public async Task<Result> Rrddata(string timeframe, string cf = null) => await GetRest(timeframe, cf);
                         }
                         public class PVEUpload
                         {
@@ -11788,7 +11789,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             ///   Enum: md5,sha1,sha224,sha256,sha384,sha512</param>
                             /// <param name="tmpfilename">The source file name. This parameter is usually set by the REST handler. You can only overwrite it when connecting to the trusted port on localhost.</param>
                             /// <returns></returns>
-                            public Result CreateRest(string content, string filename, string checksum = null, string checksum_algorithm = null, string tmpfilename = null)
+                            public async Task<Result> CreateRest(string content, string filename, string checksum = null, string checksum_algorithm = null, string tmpfilename = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("content", content);
@@ -11796,7 +11797,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("checksum", checksum);
                                 parameters.Add("checksum-algorithm", checksum_algorithm);
                                 parameters.Add("tmpfilename", tmpfilename);
-                                return _client.Create($"/nodes/{_node}/storage/{_storage}/upload", parameters);
+                                return await _client.Create($"/nodes/{_node}/storage/{_storage}/upload", parameters);
                             }
 
                             /// <summary>
@@ -11810,7 +11811,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             ///   Enum: md5,sha1,sha224,sha256,sha384,sha512</param>
                             /// <param name="tmpfilename">The source file name. This parameter is usually set by the REST handler. You can only overwrite it when connecting to the trusted port on localhost.</param>
                             /// <returns></returns>
-                            public Result Upload(string content, string filename, string checksum = null, string checksum_algorithm = null, string tmpfilename = null) => CreateRest(content, filename, checksum, checksum_algorithm, tmpfilename);
+                            public async Task<Result> Upload(string content, string filename, string checksum = null, string checksum_algorithm = null, string tmpfilename = null) => await CreateRest(content, filename, checksum, checksum_algorithm, tmpfilename);
                         }
                         public class PVEDownload_Url
                         {
@@ -11834,7 +11835,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             ///   Enum: md5,sha1,sha224,sha256,sha384,sha512</param>
                             /// <param name="verify_certificates">If false, no SSL/TLS certificates will be verified.</param>
                             /// <returns></returns>
-                            public Result CreateRest(string content, string filename, string url, string checksum = null, string checksum_algorithm = null, bool? verify_certificates = null)
+                            public async Task<Result> CreateRest(string content, string filename, string url, string checksum = null, string checksum_algorithm = null, bool? verify_certificates = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("content", content);
@@ -11843,7 +11844,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("checksum", checksum);
                                 parameters.Add("checksum-algorithm", checksum_algorithm);
                                 parameters.Add("verify-certificates", verify_certificates);
-                                return _client.Create($"/nodes/{_node}/storage/{_storage}/download-url", parameters);
+                                return await _client.Create($"/nodes/{_node}/storage/{_storage}/download-url", parameters);
                             }
 
                             /// <summary>
@@ -11858,19 +11859,19 @@ namespace Corsinvest.ProxmoxVE.Api
                             ///   Enum: md5,sha1,sha224,sha256,sha384,sha512</param>
                             /// <param name="verify_certificates">If false, no SSL/TLS certificates will be verified.</param>
                             /// <returns></returns>
-                            public Result DownloadUrl(string content, string filename, string url, string checksum = null, string checksum_algorithm = null, bool? verify_certificates = null) => CreateRest(content, filename, url, checksum, checksum_algorithm, verify_certificates);
+                            public async Task<Result> DownloadUrl(string content, string filename, string url, string checksum = null, string checksum_algorithm = null, bool? verify_certificates = null) => await CreateRest(content, filename, url, checksum, checksum_algorithm, verify_certificates);
                         }
                         /// <summary>
                         ///
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/storage/{_storage}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/storage/{_storage}"); }
 
                         /// <summary>
                         ///
                         /// </summary>
                         /// <returns></returns>
-                        public Result Diridx() => GetRest();
+                        public async Task<Result> Diridx() => await GetRest();
                     }
                     /// <summary>
                     /// Get status for all datastores.
@@ -11881,7 +11882,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="storage">Only list status for  specified storage</param>
                     /// <param name="target">If target is different to 'node', we only lists shared storages which content is accessible on this 'node' and the specified 'target' node.</param>
                     /// <returns></returns>
-                    public Result GetRest(string content = null, bool? enabled = null, bool? format = null, string storage = null, string target = null)
+                    public async Task<Result> GetRest(string content = null, bool? enabled = null, bool? format = null, string storage = null, string target = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("content", content);
@@ -11889,7 +11890,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("format", format);
                         parameters.Add("storage", storage);
                         parameters.Add("target", target);
-                        return _client.Get($"/nodes/{_node}/storage", parameters);
+                        return await _client.Get($"/nodes/{_node}/storage", parameters);
                     }
 
                     /// <summary>
@@ -11901,7 +11902,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="storage">Only list status for  specified storage</param>
                     /// <param name="target">If target is different to 'node', we only lists shared storages which content is accessible on this 'node' and the specified 'target' node.</param>
                     /// <returns></returns>
-                    public Result Index(string content = null, bool? enabled = null, bool? format = null, string storage = null, string target = null) => GetRest(content, enabled, format, storage, target);
+                    public async Task<Result> Index(string content = null, bool? enabled = null, bool? format = null, string storage = null, string target = null) => await GetRest(content, enabled, format, storage, target);
                 }
                 public class PVEDisks
                 {
@@ -11946,12 +11947,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cleanup_config">Marks associated storage(s) as not available on this node anymore or removes them from the configuration (if configured for this node only).</param>
                             /// <param name="cleanup_disks">Also wipe disks so they can be repurposed afterwards.</param>
                             /// <returns></returns>
-                            public Result DeleteRest(bool? cleanup_config = null, bool? cleanup_disks = null)
+                            public async Task<Result> DeleteRest(bool? cleanup_config = null, bool? cleanup_disks = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("cleanup-config", cleanup_config);
                                 parameters.Add("cleanup-disks", cleanup_disks);
-                                return _client.Delete($"/nodes/{_node}/disks/lvm/{_name}", parameters);
+                                return await _client.Delete($"/nodes/{_node}/disks/lvm/{_name}", parameters);
                             }
 
                             /// <summary>
@@ -11960,19 +11961,19 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cleanup_config">Marks associated storage(s) as not available on this node anymore or removes them from the configuration (if configured for this node only).</param>
                             /// <param name="cleanup_disks">Also wipe disks so they can be repurposed afterwards.</param>
                             /// <returns></returns>
-                            public Result Delete(bool? cleanup_config = null, bool? cleanup_disks = null) => DeleteRest(cleanup_config, cleanup_disks);
+                            public async Task<Result> Delete(bool? cleanup_config = null, bool? cleanup_disks = null) => await DeleteRest(cleanup_config, cleanup_disks);
                         }
                         /// <summary>
                         /// List LVM Volume Groups
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/disks/lvm"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/disks/lvm"); }
 
                         /// <summary>
                         /// List LVM Volume Groups
                         /// </summary>
                         /// <returns></returns>
-                        public Result Index() => GetRest();
+                        public async Task<Result> Index() => await GetRest();
                         /// <summary>
                         /// Create an LVM Volume Group
                         /// </summary>
@@ -11980,13 +11981,13 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="name">The storage identifier.</param>
                         /// <param name="add_storage">Configure storage using the Volume Group</param>
                         /// <returns></returns>
-                        public Result CreateRest(string device, string name, bool? add_storage = null)
+                        public async Task<Result> CreateRest(string device, string name, bool? add_storage = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("device", device);
                             parameters.Add("name", name);
                             parameters.Add("add_storage", add_storage);
-                            return _client.Create($"/nodes/{_node}/disks/lvm", parameters);
+                            return await _client.Create($"/nodes/{_node}/disks/lvm", parameters);
                         }
 
                         /// <summary>
@@ -11996,7 +11997,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="name">The storage identifier.</param>
                         /// <param name="add_storage">Configure storage using the Volume Group</param>
                         /// <returns></returns>
-                        public Result Create(string device, string name, bool? add_storage = null) => CreateRest(device, name, add_storage);
+                        public async Task<Result> Create(string device, string name, bool? add_storage = null) => await CreateRest(device, name, add_storage);
                     }
                     public class PVELvmthin
                     {
@@ -12021,13 +12022,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cleanup_config">Marks associated storage(s) as not available on this node anymore or removes them from the configuration (if configured for this node only).</param>
                             /// <param name="cleanup_disks">Also wipe disks so they can be repurposed afterwards.</param>
                             /// <returns></returns>
-                            public Result DeleteRest(string volume_group, bool? cleanup_config = null, bool? cleanup_disks = null)
+                            public async Task<Result> DeleteRest(string volume_group, bool? cleanup_config = null, bool? cleanup_disks = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("volume-group", volume_group);
                                 parameters.Add("cleanup-config", cleanup_config);
                                 parameters.Add("cleanup-disks", cleanup_disks);
-                                return _client.Delete($"/nodes/{_node}/disks/lvmthin/{_name}", parameters);
+                                return await _client.Delete($"/nodes/{_node}/disks/lvmthin/{_name}", parameters);
                             }
 
                             /// <summary>
@@ -12037,19 +12038,19 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cleanup_config">Marks associated storage(s) as not available on this node anymore or removes them from the configuration (if configured for this node only).</param>
                             /// <param name="cleanup_disks">Also wipe disks so they can be repurposed afterwards.</param>
                             /// <returns></returns>
-                            public Result Delete(string volume_group, bool? cleanup_config = null, bool? cleanup_disks = null) => DeleteRest(volume_group, cleanup_config, cleanup_disks);
+                            public async Task<Result> Delete(string volume_group, bool? cleanup_config = null, bool? cleanup_disks = null) => await DeleteRest(volume_group, cleanup_config, cleanup_disks);
                         }
                         /// <summary>
                         /// List LVM thinpools
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/disks/lvmthin"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/disks/lvmthin"); }
 
                         /// <summary>
                         /// List LVM thinpools
                         /// </summary>
                         /// <returns></returns>
-                        public Result Index() => GetRest();
+                        public async Task<Result> Index() => await GetRest();
                         /// <summary>
                         /// Create an LVM thinpool
                         /// </summary>
@@ -12057,13 +12058,13 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="name">The storage identifier.</param>
                         /// <param name="add_storage">Configure storage using the thinpool.</param>
                         /// <returns></returns>
-                        public Result CreateRest(string device, string name, bool? add_storage = null)
+                        public async Task<Result> CreateRest(string device, string name, bool? add_storage = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("device", device);
                             parameters.Add("name", name);
                             parameters.Add("add_storage", add_storage);
-                            return _client.Create($"/nodes/{_node}/disks/lvmthin", parameters);
+                            return await _client.Create($"/nodes/{_node}/disks/lvmthin", parameters);
                         }
 
                         /// <summary>
@@ -12073,7 +12074,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="name">The storage identifier.</param>
                         /// <param name="add_storage">Configure storage using the thinpool.</param>
                         /// <returns></returns>
-                        public Result Create(string device, string name, bool? add_storage = null) => CreateRest(device, name, add_storage);
+                        public async Task<Result> Create(string device, string name, bool? add_storage = null) => await CreateRest(device, name, add_storage);
                     }
                     public class PVEDirectory
                     {
@@ -12097,12 +12098,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cleanup_config">Marks associated storage(s) as not available on this node anymore or removes them from the configuration (if configured for this node only).</param>
                             /// <param name="cleanup_disks">Also wipe disk so it can be repurposed afterwards.</param>
                             /// <returns></returns>
-                            public Result DeleteRest(bool? cleanup_config = null, bool? cleanup_disks = null)
+                            public async Task<Result> DeleteRest(bool? cleanup_config = null, bool? cleanup_disks = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("cleanup-config", cleanup_config);
                                 parameters.Add("cleanup-disks", cleanup_disks);
-                                return _client.Delete($"/nodes/{_node}/disks/directory/{_name}", parameters);
+                                return await _client.Delete($"/nodes/{_node}/disks/directory/{_name}", parameters);
                             }
 
                             /// <summary>
@@ -12111,19 +12112,19 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cleanup_config">Marks associated storage(s) as not available on this node anymore or removes them from the configuration (if configured for this node only).</param>
                             /// <param name="cleanup_disks">Also wipe disk so it can be repurposed afterwards.</param>
                             /// <returns></returns>
-                            public Result Delete(bool? cleanup_config = null, bool? cleanup_disks = null) => DeleteRest(cleanup_config, cleanup_disks);
+                            public async Task<Result> Delete(bool? cleanup_config = null, bool? cleanup_disks = null) => await DeleteRest(cleanup_config, cleanup_disks);
                         }
                         /// <summary>
                         /// PVE Managed Directory storages.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/disks/directory"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/disks/directory"); }
 
                         /// <summary>
                         /// PVE Managed Directory storages.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Index() => GetRest();
+                        public async Task<Result> Index() => await GetRest();
                         /// <summary>
                         /// Create a Filesystem on an unused disk. Will be mounted under '/mnt/pve/NAME'.
                         /// </summary>
@@ -12133,14 +12134,14 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="filesystem">The desired filesystem.
                         ///   Enum: ext4,xfs</param>
                         /// <returns></returns>
-                        public Result CreateRest(string device, string name, bool? add_storage = null, string filesystem = null)
+                        public async Task<Result> CreateRest(string device, string name, bool? add_storage = null, string filesystem = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("device", device);
                             parameters.Add("name", name);
                             parameters.Add("add_storage", add_storage);
                             parameters.Add("filesystem", filesystem);
-                            return _client.Create($"/nodes/{_node}/disks/directory", parameters);
+                            return await _client.Create($"/nodes/{_node}/disks/directory", parameters);
                         }
 
                         /// <summary>
@@ -12152,7 +12153,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="filesystem">The desired filesystem.
                         ///   Enum: ext4,xfs</param>
                         /// <returns></returns>
-                        public Result Create(string device, string name, bool? add_storage = null, string filesystem = null) => CreateRest(device, name, add_storage, filesystem);
+                        public async Task<Result> Create(string device, string name, bool? add_storage = null, string filesystem = null) => await CreateRest(device, name, add_storage, filesystem);
                     }
                     public class PVEZfs
                     {
@@ -12176,12 +12177,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cleanup_config">Marks associated storage(s) as not available on this node anymore or removes them from the configuration (if configured for this node only).</param>
                             /// <param name="cleanup_disks">Also wipe disks so they can be repurposed afterwards.</param>
                             /// <returns></returns>
-                            public Result DeleteRest(bool? cleanup_config = null, bool? cleanup_disks = null)
+                            public async Task<Result> DeleteRest(bool? cleanup_config = null, bool? cleanup_disks = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("cleanup-config", cleanup_config);
                                 parameters.Add("cleanup-disks", cleanup_disks);
-                                return _client.Delete($"/nodes/{_node}/disks/zfs/{_name}", parameters);
+                                return await _client.Delete($"/nodes/{_node}/disks/zfs/{_name}", parameters);
                             }
 
                             /// <summary>
@@ -12190,30 +12191,30 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="cleanup_config">Marks associated storage(s) as not available on this node anymore or removes them from the configuration (if configured for this node only).</param>
                             /// <param name="cleanup_disks">Also wipe disks so they can be repurposed afterwards.</param>
                             /// <returns></returns>
-                            public Result Delete(bool? cleanup_config = null, bool? cleanup_disks = null) => DeleteRest(cleanup_config, cleanup_disks);
+                            public async Task<Result> Delete(bool? cleanup_config = null, bool? cleanup_disks = null) => await DeleteRest(cleanup_config, cleanup_disks);
                             /// <summary>
                             /// Get details about a zpool.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/nodes/{_node}/disks/zfs/{_name}"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/disks/zfs/{_name}"); }
 
                             /// <summary>
                             /// Get details about a zpool.
                             /// </summary>
                             /// <returns></returns>
-                            public Result Detail() => GetRest();
+                            public async Task<Result> Detail() => await GetRest();
                         }
                         /// <summary>
                         /// List Zpools.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/disks/zfs"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/disks/zfs"); }
 
                         /// <summary>
                         /// List Zpools.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Index() => GetRest();
+                        public async Task<Result> Index() => await GetRest();
                         /// <summary>
                         /// Create a ZFS pool.
                         /// </summary>
@@ -12226,7 +12227,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="compression">The compression algorithm to use.
                         ///   Enum: on,off,gzip,lz4,lzjb,zle,zstd</param>
                         /// <returns></returns>
-                        public Result CreateRest(string devices, string name, string raidlevel, bool? add_storage = null, int? ashift = null, string compression = null)
+                        public async Task<Result> CreateRest(string devices, string name, string raidlevel, bool? add_storage = null, int? ashift = null, string compression = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("devices", devices);
@@ -12235,7 +12236,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("add_storage", add_storage);
                             parameters.Add("ashift", ashift);
                             parameters.Add("compression", compression);
-                            return _client.Create($"/nodes/{_node}/disks/zfs", parameters);
+                            return await _client.Create($"/nodes/{_node}/disks/zfs", parameters);
                         }
 
                         /// <summary>
@@ -12250,7 +12251,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="compression">The compression algorithm to use.
                         ///   Enum: on,off,gzip,lz4,lzjb,zle,zstd</param>
                         /// <returns></returns>
-                        public Result Create(string devices, string name, string raidlevel, bool? add_storage = null, int? ashift = null, string compression = null) => CreateRest(devices, name, raidlevel, add_storage, ashift, compression);
+                        public async Task<Result> Create(string devices, string name, string raidlevel, bool? add_storage = null, int? ashift = null, string compression = null) => await CreateRest(devices, name, raidlevel, add_storage, ashift, compression);
                     }
                     public class PVEList
                     {
@@ -12265,13 +12266,13 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="type">Only list specific types of disks.
                         ///   Enum: unused,journal_disks</param>
                         /// <returns></returns>
-                        public Result GetRest(bool? include_partitions = null, bool? skipsmart = null, string type = null)
+                        public async Task<Result> GetRest(bool? include_partitions = null, bool? skipsmart = null, string type = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("include-partitions", include_partitions);
                             parameters.Add("skipsmart", skipsmart);
                             parameters.Add("type", type);
-                            return _client.Get($"/nodes/{_node}/disks/list", parameters);
+                            return await _client.Get($"/nodes/{_node}/disks/list", parameters);
                         }
 
                         /// <summary>
@@ -12282,7 +12283,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="type">Only list specific types of disks.
                         ///   Enum: unused,journal_disks</param>
                         /// <returns></returns>
-                        public Result List(bool? include_partitions = null, bool? skipsmart = null, string type = null) => GetRest(include_partitions, skipsmart, type);
+                        public async Task<Result> List(bool? include_partitions = null, bool? skipsmart = null, string type = null) => await GetRest(include_partitions, skipsmart, type);
                     }
                     public class PVESmart
                     {
@@ -12295,12 +12296,12 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="disk">Block device name</param>
                         /// <param name="healthonly">If true returns only the health status</param>
                         /// <returns></returns>
-                        public Result GetRest(string disk, bool? healthonly = null)
+                        public async Task<Result> GetRest(string disk, bool? healthonly = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("disk", disk);
                             parameters.Add("healthonly", healthonly);
-                            return _client.Get($"/nodes/{_node}/disks/smart", parameters);
+                            return await _client.Get($"/nodes/{_node}/disks/smart", parameters);
                         }
 
                         /// <summary>
@@ -12309,7 +12310,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="disk">Block device name</param>
                         /// <param name="healthonly">If true returns only the health status</param>
                         /// <returns></returns>
-                        public Result Smart(string disk, bool? healthonly = null) => GetRest(disk, healthonly);
+                        public async Task<Result> Smart(string disk, bool? healthonly = null) => await GetRest(disk, healthonly);
                     }
                     public class PVEInitgpt
                     {
@@ -12322,12 +12323,12 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="disk">Block device name</param>
                         /// <param name="uuid">UUID for the GPT table</param>
                         /// <returns></returns>
-                        public Result CreateRest(string disk, string uuid = null)
+                        public async Task<Result> CreateRest(string disk, string uuid = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("disk", disk);
                             parameters.Add("uuid", uuid);
-                            return _client.Create($"/nodes/{_node}/disks/initgpt", parameters);
+                            return await _client.Create($"/nodes/{_node}/disks/initgpt", parameters);
                         }
 
                         /// <summary>
@@ -12336,7 +12337,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="disk">Block device name</param>
                         /// <param name="uuid">UUID for the GPT table</param>
                         /// <returns></returns>
-                        public Result Initgpt(string disk, string uuid = null) => CreateRest(disk, uuid);
+                        public async Task<Result> Initgpt(string disk, string uuid = null) => await CreateRest(disk, uuid);
                     }
                     public class PVEWipedisk
                     {
@@ -12348,11 +12349,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="disk">Block device name</param>
                         /// <returns></returns>
-                        public Result SetRest(string disk)
+                        public async Task<Result> SetRest(string disk)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("disk", disk);
-                            return _client.Set($"/nodes/{_node}/disks/wipedisk", parameters);
+                            return await _client.Set($"/nodes/{_node}/disks/wipedisk", parameters);
                         }
 
                         /// <summary>
@@ -12360,19 +12361,19 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="disk">Block device name</param>
                         /// <returns></returns>
-                        public Result WipeDisk(string disk) => SetRest(disk);
+                        public async Task<Result> WipeDisk(string disk) => await SetRest(disk);
                     }
                     /// <summary>
                     /// Node index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/disks"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/disks"); }
 
                     /// <summary>
                     /// Node index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Index() => GetRest();
+                    public async Task<Result> Index() => await GetRest();
                 }
                 public class PVEApt
                 {
@@ -12396,25 +12397,25 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// List available updates.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/apt/update"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/apt/update"); }
 
                         /// <summary>
                         /// List available updates.
                         /// </summary>
                         /// <returns></returns>
-                        public Result ListUpdates() => GetRest();
+                        public async Task<Result> ListUpdates() => await GetRest();
                         /// <summary>
                         /// This is used to resynchronize the package index files from their sources (apt-get update).
                         /// </summary>
                         /// <param name="notify">Send notification mail about new packages (to email address specified for user 'root@pam').</param>
                         /// <param name="quiet">Only produces output suitable for logging, omitting progress indicators.</param>
                         /// <returns></returns>
-                        public Result CreateRest(bool? notify = null, bool? quiet = null)
+                        public async Task<Result> CreateRest(bool? notify = null, bool? quiet = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("notify", notify);
                             parameters.Add("quiet", quiet);
-                            return _client.Create($"/nodes/{_node}/apt/update", parameters);
+                            return await _client.Create($"/nodes/{_node}/apt/update", parameters);
                         }
 
                         /// <summary>
@@ -12423,7 +12424,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="notify">Send notification mail about new packages (to email address specified for user 'root@pam').</param>
                         /// <param name="quiet">Only produces output suitable for logging, omitting progress indicators.</param>
                         /// <returns></returns>
-                        public Result UpdateDatabase(bool? notify = null, bool? quiet = null) => CreateRest(notify, quiet);
+                        public async Task<Result> UpdateDatabase(bool? notify = null, bool? quiet = null) => await CreateRest(notify, quiet);
                     }
                     public class PVEChangelog
                     {
@@ -12436,12 +12437,12 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="name">Package name.</param>
                         /// <param name="version">Package version.</param>
                         /// <returns></returns>
-                        public Result GetRest(string name, string version = null)
+                        public async Task<Result> GetRest(string name, string version = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("name", name);
                             parameters.Add("version", version);
-                            return _client.Get($"/nodes/{_node}/apt/changelog", parameters);
+                            return await _client.Get($"/nodes/{_node}/apt/changelog", parameters);
                         }
 
                         /// <summary>
@@ -12450,7 +12451,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="name">Package name.</param>
                         /// <param name="version">Package version.</param>
                         /// <returns></returns>
-                        public Result Changelog(string name, string version = null) => GetRest(name, version);
+                        public async Task<Result> Changelog(string name, string version = null) => await GetRest(name, version);
                     }
                     public class PVERepositories
                     {
@@ -12461,13 +12462,13 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Get APT repository information.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/apt/repositories"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/apt/repositories"); }
 
                         /// <summary>
                         /// Get APT repository information.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Repositories() => GetRest();
+                        public async Task<Result> Repositories() => await GetRest();
                         /// <summary>
                         /// Change the properties of a repository. Currently only allows enabling/disabling.
                         /// </summary>
@@ -12476,14 +12477,14 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="digest">Digest to detect modifications.</param>
                         /// <param name="enabled">Whether the repository should be enabled or not.</param>
                         /// <returns></returns>
-                        public Result CreateRest(int index, string path, string digest = null, bool? enabled = null)
+                        public async Task<Result> CreateRest(int index, string path, string digest = null, bool? enabled = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("index", index);
                             parameters.Add("path", path);
                             parameters.Add("digest", digest);
                             parameters.Add("enabled", enabled);
-                            return _client.Create($"/nodes/{_node}/apt/repositories", parameters);
+                            return await _client.Create($"/nodes/{_node}/apt/repositories", parameters);
                         }
 
                         /// <summary>
@@ -12494,19 +12495,19 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="digest">Digest to detect modifications.</param>
                         /// <param name="enabled">Whether the repository should be enabled or not.</param>
                         /// <returns></returns>
-                        public Result ChangeRepository(int index, string path, string digest = null, bool? enabled = null) => CreateRest(index, path, digest, enabled);
+                        public async Task<Result> ChangeRepository(int index, string path, string digest = null, bool? enabled = null) => await CreateRest(index, path, digest, enabled);
                         /// <summary>
                         /// Add a standard repository to the configuration
                         /// </summary>
                         /// <param name="handle">Handle that identifies a repository.</param>
                         /// <param name="digest">Digest to detect modifications.</param>
                         /// <returns></returns>
-                        public Result SetRest(string handle, string digest = null)
+                        public async Task<Result> SetRest(string handle, string digest = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("handle", handle);
                             parameters.Add("digest", digest);
-                            return _client.Set($"/nodes/{_node}/apt/repositories", parameters);
+                            return await _client.Set($"/nodes/{_node}/apt/repositories", parameters);
                         }
 
                         /// <summary>
@@ -12515,7 +12516,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="handle">Handle that identifies a repository.</param>
                         /// <param name="digest">Digest to detect modifications.</param>
                         /// <returns></returns>
-                        public Result AddRepository(string handle, string digest = null) => SetRest(handle, digest);
+                        public async Task<Result> AddRepository(string handle, string digest = null) => await SetRest(handle, digest);
                     }
                     public class PVEVersions
                     {
@@ -12526,25 +12527,25 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Get package information for important Proxmox packages.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/apt/versions"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/apt/versions"); }
 
                         /// <summary>
                         /// Get package information for important Proxmox packages.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Versions() => GetRest();
+                        public async Task<Result> Versions() => await GetRest();
                     }
                     /// <summary>
                     /// Directory index for apt (Advanced Package Tool).
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/apt"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/apt"); }
 
                     /// <summary>
                     /// Directory index for apt (Advanced Package Tool).
                     /// </summary>
                     /// <returns></returns>
-                    public Result Index() => GetRest();
+                    public async Task<Result> Index() => await GetRest();
                 }
                 public class PVEFirewall
                 {
@@ -12578,11 +12579,11 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <returns></returns>
-                            public Result DeleteRest(string digest = null)
+                            public async Task<Result> DeleteRest(string digest = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("digest", digest);
-                                return _client.Delete($"/nodes/{_node}/firewall/rules/{_pos}", parameters);
+                                return await _client.Delete($"/nodes/{_node}/firewall/rules/{_pos}", parameters);
                             }
 
                             /// <summary>
@@ -12590,18 +12591,18 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                             /// <returns></returns>
-                            public Result DeleteRule(string digest = null) => DeleteRest(digest);
+                            public async Task<Result> DeleteRule(string digest = null) => await DeleteRest(digest);
                             /// <summary>
                             /// Get single rule data.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/nodes/{_node}/firewall/rules/{_pos}"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/firewall/rules/{_pos}"); }
 
                             /// <summary>
                             /// Get single rule data.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRule() => GetRest();
+                            public async Task<Result> GetRule() => await GetRest();
                             /// <summary>
                             /// Modify rule data.
                             /// </summary>
@@ -12624,7 +12625,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="type">Rule type.
                             ///   Enum: in,out,group</param>
                             /// <returns></returns>
-                            public Result SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
+                            public async Task<Result> SetRest(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("action", action);
@@ -12643,7 +12644,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 parameters.Add("source", source);
                                 parameters.Add("sport", sport);
                                 parameters.Add("type", type);
-                                return _client.Set($"/nodes/{_node}/firewall/rules/{_pos}", parameters);
+                                return await _client.Set($"/nodes/{_node}/firewall/rules/{_pos}", parameters);
                             }
 
                             /// <summary>
@@ -12668,19 +12669,19 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="type">Rule type.
                             ///   Enum: in,out,group</param>
                             /// <returns></returns>
-                            public Result UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => SetRest(action, comment, delete, dest, digest, dport, enable, icmp_type, iface, log, macro, moveto, proto, source, sport, type);
+                            public async Task<Result> UpdateRule(string action = null, string comment = null, string delete = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? moveto = null, string proto = null, string source = null, string sport = null, string type = null) => await SetRest(action, comment, delete, dest, digest, dport, enable, icmp_type, iface, log, macro, moveto, proto, source, sport, type);
                         }
                         /// <summary>
                         /// List rules.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/firewall/rules"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/firewall/rules"); }
 
                         /// <summary>
                         /// List rules.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRules() => GetRest();
+                        public async Task<Result> GetRules() => await GetRest();
                         /// <summary>
                         /// Create new rule.
                         /// </summary>
@@ -12702,7 +12703,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                         /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                         /// <returns></returns>
-                        public Result CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
+                        public async Task<Result> CreateRest(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("action", action);
@@ -12720,7 +12721,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("proto", proto);
                             parameters.Add("source", source);
                             parameters.Add("sport", sport);
-                            return _client.Create($"/nodes/{_node}/firewall/rules", parameters);
+                            return await _client.Create($"/nodes/{_node}/firewall/rules", parameters);
                         }
 
                         /// <summary>
@@ -12744,7 +12745,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                         /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
                         /// <returns></returns>
-                        public Result CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => CreateRest(action, type, comment, dest, digest, dport, enable, icmp_type, iface, log, macro, pos, proto, source, sport);
+                        public async Task<Result> CreateRule(string action, string type, string comment = null, string dest = null, string digest = null, string dport = null, int? enable = null, string icmp_type = null, string iface = null, string log = null, string macro = null, int? pos = null, string proto = null, string source = null, string sport = null) => await CreateRest(action, type, comment, dest, digest, dport, enable, icmp_type, iface, log, macro, pos, proto, source, sport);
                     }
                     public class PVEOptions
                     {
@@ -12755,13 +12756,13 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Get host firewall options.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/firewall/options"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/firewall/options"); }
 
                         /// <summary>
                         /// Get host firewall options.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetOptions() => GetRest();
+                        public async Task<Result> GetOptions() => await GetRest();
                         /// <summary>
                         /// Set Firewall options.
                         /// </summary>
@@ -12788,7 +12789,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                         /// <param name="tcpflags">Filter illegal combinations of TCP flags.</param>
                         /// <returns></returns>
-                        public Result SetRest(string delete = null, string digest = null, bool? enable = null, string log_level_in = null, string log_level_out = null, bool? log_nf_conntrack = null, bool? ndp = null, bool? nf_conntrack_allow_invalid = null, int? nf_conntrack_max = null, int? nf_conntrack_tcp_timeout_established = null, int? nf_conntrack_tcp_timeout_syn_recv = null, bool? nosmurfs = null, bool? protection_synflood = null, int? protection_synflood_burst = null, int? protection_synflood_rate = null, string smurf_log_level = null, string tcp_flags_log_level = null, bool? tcpflags = null)
+                        public async Task<Result> SetRest(string delete = null, string digest = null, bool? enable = null, string log_level_in = null, string log_level_out = null, bool? log_nf_conntrack = null, bool? ndp = null, bool? nf_conntrack_allow_invalid = null, int? nf_conntrack_max = null, int? nf_conntrack_tcp_timeout_established = null, int? nf_conntrack_tcp_timeout_syn_recv = null, bool? nosmurfs = null, bool? protection_synflood = null, int? protection_synflood_burst = null, int? protection_synflood_rate = null, string smurf_log_level = null, string tcp_flags_log_level = null, bool? tcpflags = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("delete", delete);
@@ -12809,7 +12810,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("smurf_log_level", smurf_log_level);
                             parameters.Add("tcp_flags_log_level", tcp_flags_log_level);
                             parameters.Add("tcpflags", tcpflags);
-                            return _client.Set($"/nodes/{_node}/firewall/options", parameters);
+                            return await _client.Set($"/nodes/{_node}/firewall/options", parameters);
                         }
 
                         /// <summary>
@@ -12838,7 +12839,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                         /// <param name="tcpflags">Filter illegal combinations of TCP flags.</param>
                         /// <returns></returns>
-                        public Result SetOptions(string delete = null, string digest = null, bool? enable = null, string log_level_in = null, string log_level_out = null, bool? log_nf_conntrack = null, bool? ndp = null, bool? nf_conntrack_allow_invalid = null, int? nf_conntrack_max = null, int? nf_conntrack_tcp_timeout_established = null, int? nf_conntrack_tcp_timeout_syn_recv = null, bool? nosmurfs = null, bool? protection_synflood = null, int? protection_synflood_burst = null, int? protection_synflood_rate = null, string smurf_log_level = null, string tcp_flags_log_level = null, bool? tcpflags = null) => SetRest(delete, digest, enable, log_level_in, log_level_out, log_nf_conntrack, ndp, nf_conntrack_allow_invalid, nf_conntrack_max, nf_conntrack_tcp_timeout_established, nf_conntrack_tcp_timeout_syn_recv, nosmurfs, protection_synflood, protection_synflood_burst, protection_synflood_rate, smurf_log_level, tcp_flags_log_level, tcpflags);
+                        public async Task<Result> SetOptions(string delete = null, string digest = null, bool? enable = null, string log_level_in = null, string log_level_out = null, bool? log_nf_conntrack = null, bool? ndp = null, bool? nf_conntrack_allow_invalid = null, int? nf_conntrack_max = null, int? nf_conntrack_tcp_timeout_established = null, int? nf_conntrack_tcp_timeout_syn_recv = null, bool? nosmurfs = null, bool? protection_synflood = null, int? protection_synflood_burst = null, int? protection_synflood_rate = null, string smurf_log_level = null, string tcp_flags_log_level = null, bool? tcpflags = null) => await SetRest(delete, digest, enable, log_level_in, log_level_out, log_nf_conntrack, ndp, nf_conntrack_allow_invalid, nf_conntrack_max, nf_conntrack_tcp_timeout_established, nf_conntrack_tcp_timeout_syn_recv, nosmurfs, protection_synflood, protection_synflood_burst, protection_synflood_rate, smurf_log_level, tcp_flags_log_level, tcpflags);
                     }
                     public class PVELog
                     {
@@ -12851,12 +12852,12 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="limit"></param>
                         /// <param name="start"></param>
                         /// <returns></returns>
-                        public Result GetRest(int? limit = null, int? start = null)
+                        public async Task<Result> GetRest(int? limit = null, int? start = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("limit", limit);
                             parameters.Add("start", start);
-                            return _client.Get($"/nodes/{_node}/firewall/log", parameters);
+                            return await _client.Get($"/nodes/{_node}/firewall/log", parameters);
                         }
 
                         /// <summary>
@@ -12865,19 +12866,19 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="limit"></param>
                         /// <param name="start"></param>
                         /// <returns></returns>
-                        public Result Log(int? limit = null, int? start = null) => GetRest(limit, start);
+                        public async Task<Result> Log(int? limit = null, int? start = null) => await GetRest(limit, start);
                     }
                     /// <summary>
                     /// Directory index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/firewall"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/firewall"); }
 
                     /// <summary>
                     /// Directory index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Index() => GetRest();
+                    public async Task<Result> Index() => await GetRest();
                 }
                 public class PVEReplication
                 {
@@ -12915,13 +12916,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Get replication job status.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/nodes/{_node}/replication/{_id}/status"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/replication/{_id}/status"); }
 
                             /// <summary>
                             /// Get replication job status.
                             /// </summary>
                             /// <returns></returns>
-                            public Result JobStatus() => GetRest();
+                            public async Task<Result> JobStatus() => await GetRest();
                         }
                         public class PVELog
                         {
@@ -12939,12 +12940,12 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="limit"></param>
                             /// <param name="start"></param>
                             /// <returns></returns>
-                            public Result GetRest(int? limit = null, int? start = null)
+                            public async Task<Result> GetRest(int? limit = null, int? start = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("limit", limit);
                                 parameters.Add("start", start);
-                                return _client.Get($"/nodes/{_node}/replication/{_id}/log", parameters);
+                                return await _client.Get($"/nodes/{_node}/replication/{_id}/log", parameters);
                             }
 
                             /// <summary>
@@ -12953,7 +12954,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="limit"></param>
                             /// <param name="start"></param>
                             /// <returns></returns>
-                            public Result ReadJobLog(int? limit = null, int? start = null) => GetRest(limit, start);
+                            public async Task<Result> ReadJobLog(int? limit = null, int? start = null) => await GetRest(limit, start);
                         }
                         public class PVEScheduleNow
                         {
@@ -12969,36 +12970,36 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Schedule replication job to start as soon as possible.
                             /// </summary>
                             /// <returns></returns>
-                            public Result CreateRest() { return _client.Create($"/nodes/{_node}/replication/{_id}/schedule_now"); }
+                            public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/replication/{_id}/schedule_now"); }
 
                             /// <summary>
                             /// Schedule replication job to start as soon as possible.
                             /// </summary>
                             /// <returns></returns>
-                            public Result ScheduleNow() => CreateRest();
+                            public async Task<Result> ScheduleNow() => await CreateRest();
                         }
                         /// <summary>
                         /// Directory index.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/replication/{_id}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/replication/{_id}"); }
 
                         /// <summary>
                         /// Directory index.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Index() => GetRest();
+                        public async Task<Result> Index() => await GetRest();
                     }
                     /// <summary>
                     /// List status of all replication jobs on this node.
                     /// </summary>
                     /// <param name="guest">Only list replication jobs for this guest.</param>
                     /// <returns></returns>
-                    public Result GetRest(int? guest = null)
+                    public async Task<Result> GetRest(int? guest = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("guest", guest);
-                        return _client.Get($"/nodes/{_node}/replication", parameters);
+                        return await _client.Get($"/nodes/{_node}/replication", parameters);
                     }
 
                     /// <summary>
@@ -13006,7 +13007,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="guest">Only list replication jobs for this guest.</param>
                     /// <returns></returns>
-                    public Result Status(int? guest = null) => GetRest(guest);
+                    public async Task<Result> Status(int? guest = null) => await GetRest(guest);
                 }
                 public class PVECertificates
                 {
@@ -13035,23 +13036,23 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Revoke existing certificate from CA.
                             /// </summary>
                             /// <returns></returns>
-                            public Result DeleteRest() { return _client.Delete($"/nodes/{_node}/certificates/acme/certificate"); }
+                            public async Task<Result> DeleteRest() { return await _client.Delete($"/nodes/{_node}/certificates/acme/certificate"); }
 
                             /// <summary>
                             /// Revoke existing certificate from CA.
                             /// </summary>
                             /// <returns></returns>
-                            public Result RevokeCertificate() => DeleteRest();
+                            public async Task<Result> RevokeCertificate() => await DeleteRest();
                             /// <summary>
                             /// Order a new certificate from ACME-compatible CA.
                             /// </summary>
                             /// <param name="force">Overwrite existing custom certificate.</param>
                             /// <returns></returns>
-                            public Result CreateRest(bool? force = null)
+                            public async Task<Result> CreateRest(bool? force = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("force", force);
-                                return _client.Create($"/nodes/{_node}/certificates/acme/certificate", parameters);
+                                return await _client.Create($"/nodes/{_node}/certificates/acme/certificate", parameters);
                             }
 
                             /// <summary>
@@ -13059,17 +13060,17 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="force">Overwrite existing custom certificate.</param>
                             /// <returns></returns>
-                            public Result NewCertificate(bool? force = null) => CreateRest(force);
+                            public async Task<Result> NewCertificate(bool? force = null) => await CreateRest(force);
                             /// <summary>
                             /// Renew existing certificate from CA.
                             /// </summary>
                             /// <param name="force">Force renewal even if expiry is more than 30 days away.</param>
                             /// <returns></returns>
-                            public Result SetRest(bool? force = null)
+                            public async Task<Result> SetRest(bool? force = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("force", force);
-                                return _client.Set($"/nodes/{_node}/certificates/acme/certificate", parameters);
+                                return await _client.Set($"/nodes/{_node}/certificates/acme/certificate", parameters);
                             }
 
                             /// <summary>
@@ -13077,19 +13078,19 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <param name="force">Force renewal even if expiry is more than 30 days away.</param>
                             /// <returns></returns>
-                            public Result RenewCertificate(bool? force = null) => SetRest(force);
+                            public async Task<Result> RenewCertificate(bool? force = null) => await SetRest(force);
                         }
                         /// <summary>
                         /// ACME index.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/certificates/acme"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/certificates/acme"); }
 
                         /// <summary>
                         /// ACME index.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Index() => GetRest();
+                        public async Task<Result> Index() => await GetRest();
                     }
                     public class PVEInfo
                     {
@@ -13100,13 +13101,13 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Get information about node's certificates.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/certificates/info"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/certificates/info"); }
 
                         /// <summary>
                         /// Get information about node's certificates.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Info() => GetRest();
+                        public async Task<Result> Info() => await GetRest();
                     }
                     public class PVECustom
                     {
@@ -13118,11 +13119,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="restart">Restart pveproxy.</param>
                         /// <returns></returns>
-                        public Result DeleteRest(bool? restart = null)
+                        public async Task<Result> DeleteRest(bool? restart = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("restart", restart);
-                            return _client.Delete($"/nodes/{_node}/certificates/custom", parameters);
+                            return await _client.Delete($"/nodes/{_node}/certificates/custom", parameters);
                         }
 
                         /// <summary>
@@ -13130,7 +13131,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="restart">Restart pveproxy.</param>
                         /// <returns></returns>
-                        public Result RemoveCustomCert(bool? restart = null) => DeleteRest(restart);
+                        public async Task<Result> RemoveCustomCert(bool? restart = null) => await DeleteRest(restart);
                         /// <summary>
                         /// Upload or update custom certificate chain and key.
                         /// </summary>
@@ -13139,14 +13140,14 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="key">PEM encoded private key.</param>
                         /// <param name="restart">Restart pveproxy.</param>
                         /// <returns></returns>
-                        public Result CreateRest(string certificates, bool? force = null, string key = null, bool? restart = null)
+                        public async Task<Result> CreateRest(string certificates, bool? force = null, string key = null, bool? restart = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("certificates", certificates);
                             parameters.Add("force", force);
                             parameters.Add("key", key);
                             parameters.Add("restart", restart);
-                            return _client.Create($"/nodes/{_node}/certificates/custom", parameters);
+                            return await _client.Create($"/nodes/{_node}/certificates/custom", parameters);
                         }
 
                         /// <summary>
@@ -13157,19 +13158,19 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="key">PEM encoded private key.</param>
                         /// <param name="restart">Restart pveproxy.</param>
                         /// <returns></returns>
-                        public Result UploadCustomCert(string certificates, bool? force = null, string key = null, bool? restart = null) => CreateRest(certificates, force, key, restart);
+                        public async Task<Result> UploadCustomCert(string certificates, bool? force = null, string key = null, bool? restart = null) => await CreateRest(certificates, force, key, restart);
                     }
                     /// <summary>
                     /// Node index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/certificates"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/certificates"); }
 
                     /// <summary>
                     /// Node index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Index() => GetRest();
+                    public async Task<Result> Index() => await GetRest();
                 }
                 public class PVEConfig
                 {
@@ -13182,11 +13183,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="property">Return only a specific property from the node configuration.
                     ///   Enum: acme,acmedomain0,acmedomain1,acmedomain2,acmedomain3,acmedomain4,acmedomain5,description,startall-onboot-delay,wakeonlan</param>
                     /// <returns></returns>
-                    public Result GetRest(string property = null)
+                    public async Task<Result> GetRest(string property = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("property", property);
-                        return _client.Get($"/nodes/{_node}/config", parameters);
+                        return await _client.Get($"/nodes/{_node}/config", parameters);
                     }
 
                     /// <summary>
@@ -13195,7 +13196,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="property">Return only a specific property from the node configuration.
                     ///   Enum: acme,acmedomain0,acmedomain1,acmedomain2,acmedomain3,acmedomain4,acmedomain5,description,startall-onboot-delay,wakeonlan</param>
                     /// <returns></returns>
-                    public Result GetConfig(string property = null) => GetRest(property);
+                    public async Task<Result> GetConfig(string property = null) => await GetRest(property);
                     /// <summary>
                     /// Set node configuration options.
                     /// </summary>
@@ -13207,7 +13208,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="startall_onboot_delay">Initial delay in seconds, before starting all the Virtual Guests with on-boot enabled.</param>
                     /// <param name="wakeonlan">MAC address for wake on LAN</param>
                     /// <returns></returns>
-                    public Result SetRest(string acme = null, IDictionary<int, string> acmedomainN = null, string delete = null, string description = null, string digest = null, int? startall_onboot_delay = null, string wakeonlan = null)
+                    public async Task<Result> SetRest(string acme = null, IDictionary<int, string> acmedomainN = null, string delete = null, string description = null, string digest = null, int? startall_onboot_delay = null, string wakeonlan = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("acme", acme);
@@ -13217,7 +13218,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("startall-onboot-delay", startall_onboot_delay);
                         parameters.Add("wakeonlan", wakeonlan);
                         AddIndexedParameter(parameters, "acmedomain", acmedomainN);
-                        return _client.Set($"/nodes/{_node}/config", parameters);
+                        return await _client.Set($"/nodes/{_node}/config", parameters);
                     }
 
                     /// <summary>
@@ -13231,7 +13232,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="startall_onboot_delay">Initial delay in seconds, before starting all the Virtual Guests with on-boot enabled.</param>
                     /// <param name="wakeonlan">MAC address for wake on LAN</param>
                     /// <returns></returns>
-                    public Result SetOptions(string acme = null, IDictionary<int, string> acmedomainN = null, string delete = null, string description = null, string digest = null, int? startall_onboot_delay = null, string wakeonlan = null) => SetRest(acme, acmedomainN, delete, description, digest, startall_onboot_delay, wakeonlan);
+                    public async Task<Result> SetOptions(string acme = null, IDictionary<int, string> acmedomainN = null, string delete = null, string description = null, string digest = null, int? startall_onboot_delay = null, string wakeonlan = null) => await SetRest(acme, acmedomainN, delete, description, digest, startall_onboot_delay, wakeonlan);
                 }
                 public class PVESdn
                 {
@@ -13272,49 +13273,49 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// List zone content.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result GetRest() { return _client.Get($"/nodes/{_node}/sdn/zones/{_zone}/content"); }
+                                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/sdn/zones/{_zone}/content"); }
 
                                 /// <summary>
                                 /// List zone content.
                                 /// </summary>
                                 /// <returns></returns>
-                                public Result Index() => GetRest();
+                                public async Task<Result> Index() => await GetRest();
                             }
                             /// <summary>
                             ///
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/nodes/{_node}/sdn/zones/{_zone}"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/sdn/zones/{_zone}"); }
 
                             /// <summary>
                             ///
                             /// </summary>
                             /// <returns></returns>
-                            public Result Diridx() => GetRest();
+                            public async Task<Result> Diridx() => await GetRest();
                         }
                         /// <summary>
                         /// Get status for all zones.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/nodes/{_node}/sdn/zones"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/sdn/zones"); }
 
                         /// <summary>
                         /// Get status for all zones.
                         /// </summary>
                         /// <returns></returns>
-                        public Result Index() => GetRest();
+                        public async Task<Result> Index() => await GetRest();
                     }
                     /// <summary>
                     /// SDN index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/sdn"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/sdn"); }
 
                     /// <summary>
                     /// SDN index.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Sdnindex() => GetRest();
+                    public async Task<Result> Sdnindex() => await GetRest();
                 }
                 public class PVEVersion
                 {
@@ -13325,13 +13326,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// API version details
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/version"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/version"); }
 
                     /// <summary>
                     /// API version details
                     /// </summary>
                     /// <returns></returns>
-                    public Result Version() => GetRest();
+                    public async Task<Result> Version() => await GetRest();
                 }
                 public class PVEStatus
                 {
@@ -13342,24 +13343,24 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Read node status
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/status"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/status"); }
 
                     /// <summary>
                     /// Read node status
                     /// </summary>
                     /// <returns></returns>
-                    public Result Status() => GetRest();
+                    public async Task<Result> Status() => await GetRest();
                     /// <summary>
                     /// Reboot or shutdown a node.
                     /// </summary>
                     /// <param name="command">Specify the command.
                     ///   Enum: reboot,shutdown</param>
                     /// <returns></returns>
-                    public Result CreateRest(string command)
+                    public async Task<Result> CreateRest(string command)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("command", command);
-                        return _client.Create($"/nodes/{_node}/status", parameters);
+                        return await _client.Create($"/nodes/{_node}/status", parameters);
                     }
 
                     /// <summary>
@@ -13368,7 +13369,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="command">Specify the command.
                     ///   Enum: reboot,shutdown</param>
                     /// <returns></returns>
-                    public Result NodeCmd(string command) => CreateRest(command);
+                    public async Task<Result> NodeCmd(string command) => await CreateRest(command);
                 }
                 public class PVENetstat
                 {
@@ -13379,13 +13380,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Read tap/vm network device interface counters
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/netstat"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/netstat"); }
 
                     /// <summary>
                     /// Read tap/vm network device interface counters
                     /// </summary>
                     /// <returns></returns>
-                    public Result Netstat() => GetRest();
+                    public async Task<Result> Netstat() => await GetRest();
                 }
                 public class PVEExecute
                 {
@@ -13397,11 +13398,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="commands">JSON encoded array of commands.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string commands)
+                    public async Task<Result> CreateRest(string commands)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("commands", commands);
-                        return _client.Create($"/nodes/{_node}/execute", parameters);
+                        return await _client.Create($"/nodes/{_node}/execute", parameters);
                     }
 
                     /// <summary>
@@ -13409,7 +13410,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="commands">JSON encoded array of commands.</param>
                     /// <returns></returns>
-                    public Result Execute(string commands) => CreateRest(commands);
+                    public async Task<Result> Execute(string commands) => await CreateRest(commands);
                 }
                 public class PVEWakeonlan
                 {
@@ -13420,13 +13421,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Try to wake a node via 'wake on LAN' network packet.
                     /// </summary>
                     /// <returns></returns>
-                    public Result CreateRest() { return _client.Create($"/nodes/{_node}/wakeonlan"); }
+                    public async Task<Result> CreateRest() { return await _client.Create($"/nodes/{_node}/wakeonlan"); }
 
                     /// <summary>
                     /// Try to wake a node via 'wake on LAN' network packet.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Wakeonlan() => CreateRest();
+                    public async Task<Result> Wakeonlan() => await CreateRest();
                 }
                 public class PVERrd
                 {
@@ -13442,13 +13443,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="cf">The RRD consolidation function
                     ///   Enum: AVERAGE,MAX</param>
                     /// <returns></returns>
-                    public Result GetRest(string ds, string timeframe, string cf = null)
+                    public async Task<Result> GetRest(string ds, string timeframe, string cf = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("ds", ds);
                         parameters.Add("timeframe", timeframe);
                         parameters.Add("cf", cf);
-                        return _client.Get($"/nodes/{_node}/rrd", parameters);
+                        return await _client.Get($"/nodes/{_node}/rrd", parameters);
                     }
 
                     /// <summary>
@@ -13460,7 +13461,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="cf">The RRD consolidation function
                     ///   Enum: AVERAGE,MAX</param>
                     /// <returns></returns>
-                    public Result Rrd(string ds, string timeframe, string cf = null) => GetRest(ds, timeframe, cf);
+                    public async Task<Result> Rrd(string ds, string timeframe, string cf = null) => await GetRest(ds, timeframe, cf);
                 }
                 public class PVERrddata
                 {
@@ -13475,12 +13476,12 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="cf">The RRD consolidation function
                     ///   Enum: AVERAGE,MAX</param>
                     /// <returns></returns>
-                    public Result GetRest(string timeframe, string cf = null)
+                    public async Task<Result> GetRest(string timeframe, string cf = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("timeframe", timeframe);
                         parameters.Add("cf", cf);
-                        return _client.Get($"/nodes/{_node}/rrddata", parameters);
+                        return await _client.Get($"/nodes/{_node}/rrddata", parameters);
                     }
 
                     /// <summary>
@@ -13491,7 +13492,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="cf">The RRD consolidation function
                     ///   Enum: AVERAGE,MAX</param>
                     /// <returns></returns>
-                    public Result Rrddata(string timeframe, string cf = null) => GetRest(timeframe, cf);
+                    public async Task<Result> Rrddata(string timeframe, string cf = null) => await GetRest(timeframe, cf);
                 }
                 public class PVESyslog
                 {
@@ -13507,7 +13508,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="start"></param>
                     /// <param name="until">Display all log until this date-time string.</param>
                     /// <returns></returns>
-                    public Result GetRest(int? limit = null, string service = null, string since = null, int? start = null, string until = null)
+                    public async Task<Result> GetRest(int? limit = null, string service = null, string since = null, int? start = null, string until = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("limit", limit);
@@ -13515,7 +13516,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("since", since);
                         parameters.Add("start", start);
                         parameters.Add("until", until);
-                        return _client.Get($"/nodes/{_node}/syslog", parameters);
+                        return await _client.Get($"/nodes/{_node}/syslog", parameters);
                     }
 
                     /// <summary>
@@ -13527,7 +13528,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="start"></param>
                     /// <param name="until">Display all log until this date-time string.</param>
                     /// <returns></returns>
-                    public Result Syslog(int? limit = null, string service = null, string since = null, int? start = null, string until = null) => GetRest(limit, service, since, start, until);
+                    public async Task<Result> Syslog(int? limit = null, string service = null, string since = null, int? start = null, string until = null) => await GetRest(limit, service, since, start, until);
                 }
                 public class PVEJournal
                 {
@@ -13543,7 +13544,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="startcursor">Start after the given Cursor. Conflicts with 'since'</param>
                     /// <param name="until">Display all log until this UNIX epoch. Conflicts with 'endcursor'.</param>
                     /// <returns></returns>
-                    public Result GetRest(string endcursor = null, int? lastentries = null, int? since = null, string startcursor = null, int? until = null)
+                    public async Task<Result> GetRest(string endcursor = null, int? lastentries = null, int? since = null, string startcursor = null, int? until = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("endcursor", endcursor);
@@ -13551,7 +13552,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("since", since);
                         parameters.Add("startcursor", startcursor);
                         parameters.Add("until", until);
-                        return _client.Get($"/nodes/{_node}/journal", parameters);
+                        return await _client.Get($"/nodes/{_node}/journal", parameters);
                     }
 
                     /// <summary>
@@ -13563,7 +13564,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="startcursor">Start after the given Cursor. Conflicts with 'since'</param>
                     /// <param name="until">Display all log until this UNIX epoch. Conflicts with 'endcursor'.</param>
                     /// <returns></returns>
-                    public Result Journal(string endcursor = null, int? lastentries = null, int? since = null, string startcursor = null, int? until = null) => GetRest(endcursor, lastentries, since, startcursor, until);
+                    public async Task<Result> Journal(string endcursor = null, int? lastentries = null, int? since = null, string startcursor = null, int? until = null) => await GetRest(endcursor, lastentries, since, startcursor, until);
                 }
                 public class PVEVncshell
                 {
@@ -13580,7 +13581,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="websocket">use websocket instead of standard vnc.</param>
                     /// <param name="width">sets the width of the console in pixels.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string cmd = null, string cmd_opts = null, int? height = null, bool? websocket = null, int? width = null)
+                    public async Task<Result> CreateRest(string cmd = null, string cmd_opts = null, int? height = null, bool? websocket = null, int? width = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("cmd", cmd);
@@ -13588,7 +13589,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("height", height);
                         parameters.Add("websocket", websocket);
                         parameters.Add("width", width);
-                        return _client.Create($"/nodes/{_node}/vncshell", parameters);
+                        return await _client.Create($"/nodes/{_node}/vncshell", parameters);
                     }
 
                     /// <summary>
@@ -13601,7 +13602,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="websocket">use websocket instead of standard vnc.</param>
                     /// <param name="width">sets the width of the console in pixels.</param>
                     /// <returns></returns>
-                    public Result Vncshell(string cmd = null, string cmd_opts = null, int? height = null, bool? websocket = null, int? width = null) => CreateRest(cmd, cmd_opts, height, websocket, width);
+                    public async Task<Result> Vncshell(string cmd = null, string cmd_opts = null, int? height = null, bool? websocket = null, int? width = null) => await CreateRest(cmd, cmd_opts, height, websocket, width);
                 }
                 public class PVETermproxy
                 {
@@ -13615,12 +13616,12 @@ namespace Corsinvest.ProxmoxVE.Api
                     ///   Enum: ceph_install,upgrade,login</param>
                     /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string cmd = null, string cmd_opts = null)
+                    public async Task<Result> CreateRest(string cmd = null, string cmd_opts = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("cmd", cmd);
                         parameters.Add("cmd-opts", cmd_opts);
-                        return _client.Create($"/nodes/{_node}/termproxy", parameters);
+                        return await _client.Create($"/nodes/{_node}/termproxy", parameters);
                     }
 
                     /// <summary>
@@ -13630,7 +13631,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     ///   Enum: ceph_install,upgrade,login</param>
                     /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                     /// <returns></returns>
-                    public Result Termproxy(string cmd = null, string cmd_opts = null) => CreateRest(cmd, cmd_opts);
+                    public async Task<Result> Termproxy(string cmd = null, string cmd_opts = null) => await CreateRest(cmd, cmd_opts);
                 }
                 public class PVEVncwebsocket
                 {
@@ -13643,12 +13644,12 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="port">Port number returned by previous vncproxy call.</param>
                     /// <param name="vncticket">Ticket from previous call to vncproxy.</param>
                     /// <returns></returns>
-                    public Result GetRest(int port, string vncticket)
+                    public async Task<Result> GetRest(int port, string vncticket)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("port", port);
                         parameters.Add("vncticket", vncticket);
-                        return _client.Get($"/nodes/{_node}/vncwebsocket", parameters);
+                        return await _client.Get($"/nodes/{_node}/vncwebsocket", parameters);
                     }
 
                     /// <summary>
@@ -13657,7 +13658,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="port">Port number returned by previous vncproxy call.</param>
                     /// <param name="vncticket">Ticket from previous call to vncproxy.</param>
                     /// <returns></returns>
-                    public Result Vncwebsocket(int port, string vncticket) => GetRest(port, vncticket);
+                    public async Task<Result> Vncwebsocket(int port, string vncticket) => await GetRest(port, vncticket);
                 }
                 public class PVESpiceshell
                 {
@@ -13672,13 +13673,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                     /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As reasonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                     /// <returns></returns>
-                    public Result CreateRest(string cmd = null, string cmd_opts = null, string proxy = null)
+                    public async Task<Result> CreateRest(string cmd = null, string cmd_opts = null, string proxy = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("cmd", cmd);
                         parameters.Add("cmd-opts", cmd_opts);
                         parameters.Add("proxy", proxy);
-                        return _client.Create($"/nodes/{_node}/spiceshell", parameters);
+                        return await _client.Create($"/nodes/{_node}/spiceshell", parameters);
                     }
 
                     /// <summary>
@@ -13689,7 +13690,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                     /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As reasonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                     /// <returns></returns>
-                    public Result Spiceshell(string cmd = null, string cmd_opts = null, string proxy = null) => CreateRest(cmd, cmd_opts, proxy);
+                    public async Task<Result> Spiceshell(string cmd = null, string cmd_opts = null, string proxy = null) => await CreateRest(cmd, cmd_opts, proxy);
                 }
                 public class PVEDns
                 {
@@ -13700,13 +13701,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Read DNS settings.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/dns"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/dns"); }
 
                     /// <summary>
                     /// Read DNS settings.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Dns() => GetRest();
+                    public async Task<Result> Dns() => await GetRest();
                     /// <summary>
                     /// Write DNS settings.
                     /// </summary>
@@ -13715,14 +13716,14 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="dns2">Second name server IP address.</param>
                     /// <param name="dns3">Third name server IP address.</param>
                     /// <returns></returns>
-                    public Result SetRest(string search, string dns1 = null, string dns2 = null, string dns3 = null)
+                    public async Task<Result> SetRest(string search, string dns1 = null, string dns2 = null, string dns3 = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("search", search);
                         parameters.Add("dns1", dns1);
                         parameters.Add("dns2", dns2);
                         parameters.Add("dns3", dns3);
-                        return _client.Set($"/nodes/{_node}/dns", parameters);
+                        return await _client.Set($"/nodes/{_node}/dns", parameters);
                     }
 
                     /// <summary>
@@ -13733,7 +13734,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="dns2">Second name server IP address.</param>
                     /// <param name="dns3">Third name server IP address.</param>
                     /// <returns></returns>
-                    public Result UpdateDns(string search, string dns1 = null, string dns2 = null, string dns3 = null) => SetRest(search, dns1, dns2, dns3);
+                    public async Task<Result> UpdateDns(string search, string dns1 = null, string dns2 = null, string dns3 = null) => await SetRest(search, dns1, dns2, dns3);
                 }
                 public class PVETime
                 {
@@ -13744,23 +13745,23 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Read server time and time zone settings.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/time"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/time"); }
 
                     /// <summary>
                     /// Read server time and time zone settings.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Time() => GetRest();
+                    public async Task<Result> Time() => await GetRest();
                     /// <summary>
                     /// Set time zone.
                     /// </summary>
                     /// <param name="timezone">Time zone. The file '/usr/share/zoneinfo/zone.tab' contains the list of valid names.</param>
                     /// <returns></returns>
-                    public Result SetRest(string timezone)
+                    public async Task<Result> SetRest(string timezone)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("timezone", timezone);
-                        return _client.Set($"/nodes/{_node}/time", parameters);
+                        return await _client.Set($"/nodes/{_node}/time", parameters);
                     }
 
                     /// <summary>
@@ -13768,7 +13769,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="timezone">Time zone. The file '/usr/share/zoneinfo/zone.tab' contains the list of valid names.</param>
                     /// <returns></returns>
-                    public Result SetTimezone(string timezone) => SetRest(timezone);
+                    public async Task<Result> SetTimezone(string timezone) => await SetRest(timezone);
                 }
                 public class PVEAplinfo
                 {
@@ -13779,25 +13780,25 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Get list of appliances.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/aplinfo"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/aplinfo"); }
 
                     /// <summary>
                     /// Get list of appliances.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Aplinfo() => GetRest();
+                    public async Task<Result> Aplinfo() => await GetRest();
                     /// <summary>
                     /// Download appliance templates.
                     /// </summary>
                     /// <param name="storage">The storage where the template will be stored</param>
                     /// <param name="template">The template which will downloaded</param>
                     /// <returns></returns>
-                    public Result CreateRest(string storage, string template)
+                    public async Task<Result> CreateRest(string storage, string template)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("storage", storage);
                         parameters.Add("template", template);
-                        return _client.Create($"/nodes/{_node}/aplinfo", parameters);
+                        return await _client.Create($"/nodes/{_node}/aplinfo", parameters);
                     }
 
                     /// <summary>
@@ -13806,7 +13807,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="storage">The storage where the template will be stored</param>
                     /// <param name="template">The template which will downloaded</param>
                     /// <returns></returns>
-                    public Result AplDownload(string storage, string template) => CreateRest(storage, template);
+                    public async Task<Result> AplDownload(string storage, string template) => await CreateRest(storage, template);
                 }
                 public class PVEQuery_Url_Metadata
                 {
@@ -13819,12 +13820,12 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="url">The URL to query the metadata from.</param>
                     /// <param name="verify_certificates">If false, no SSL/TLS certificates will be verified.</param>
                     /// <returns></returns>
-                    public Result GetRest(string url, bool? verify_certificates = null)
+                    public async Task<Result> GetRest(string url, bool? verify_certificates = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("url", url);
                         parameters.Add("verify-certificates", verify_certificates);
-                        return _client.Get($"/nodes/{_node}/query-url-metadata", parameters);
+                        return await _client.Get($"/nodes/{_node}/query-url-metadata", parameters);
                     }
 
                     /// <summary>
@@ -13833,7 +13834,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="url">The URL to query the metadata from.</param>
                     /// <param name="verify_certificates">If false, no SSL/TLS certificates will be verified.</param>
                     /// <returns></returns>
-                    public Result QueryUrlMetadata(string url, bool? verify_certificates = null) => GetRest(url, verify_certificates);
+                    public async Task<Result> QueryUrlMetadata(string url, bool? verify_certificates = null) => await GetRest(url, verify_certificates);
                 }
                 public class PVEReport
                 {
@@ -13844,13 +13845,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Gather various systems information about a node
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/report"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/report"); }
 
                     /// <summary>
                     /// Gather various systems information about a node
                     /// </summary>
                     /// <returns></returns>
-                    public Result Report() => GetRest();
+                    public async Task<Result> Report() => await GetRest();
                 }
                 public class PVEStartall
                 {
@@ -13863,12 +13864,12 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="force">Issue start command even if virtual guest have 'onboot' not set or set to off.</param>
                     /// <param name="vms">Only consider guests from this comma separated list of VMIDs.</param>
                     /// <returns></returns>
-                    public Result CreateRest(bool? force = null, string vms = null)
+                    public async Task<Result> CreateRest(bool? force = null, string vms = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("force", force);
                         parameters.Add("vms", vms);
-                        return _client.Create($"/nodes/{_node}/startall", parameters);
+                        return await _client.Create($"/nodes/{_node}/startall", parameters);
                     }
 
                     /// <summary>
@@ -13877,7 +13878,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="force">Issue start command even if virtual guest have 'onboot' not set or set to off.</param>
                     /// <param name="vms">Only consider guests from this comma separated list of VMIDs.</param>
                     /// <returns></returns>
-                    public Result Startall(bool? force = null, string vms = null) => CreateRest(force, vms);
+                    public async Task<Result> Startall(bool? force = null, string vms = null) => await CreateRest(force, vms);
                 }
                 public class PVEStopall
                 {
@@ -13889,11 +13890,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="vms">Only consider Guests with these IDs.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string vms = null)
+                    public async Task<Result> CreateRest(string vms = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("vms", vms);
-                        return _client.Create($"/nodes/{_node}/stopall", parameters);
+                        return await _client.Create($"/nodes/{_node}/stopall", parameters);
                     }
 
                     /// <summary>
@@ -13901,7 +13902,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="vms">Only consider Guests with these IDs.</param>
                     /// <returns></returns>
-                    public Result Stopall(string vms = null) => CreateRest(vms);
+                    public async Task<Result> Stopall(string vms = null) => await CreateRest(vms);
                 }
                 public class PVEMigrateall
                 {
@@ -13916,14 +13917,14 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vms">Only consider Guests with these IDs.</param>
                     /// <param name="with_local_disks">Enable live storage migration for local disk</param>
                     /// <returns></returns>
-                    public Result CreateRest(string target, int? maxworkers = null, string vms = null, bool? with_local_disks = null)
+                    public async Task<Result> CreateRest(string target, int? maxworkers = null, string vms = null, bool? with_local_disks = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("target", target);
                         parameters.Add("maxworkers", maxworkers);
                         parameters.Add("vms", vms);
                         parameters.Add("with-local-disks", with_local_disks);
-                        return _client.Create($"/nodes/{_node}/migrateall", parameters);
+                        return await _client.Create($"/nodes/{_node}/migrateall", parameters);
                     }
 
                     /// <summary>
@@ -13934,7 +13935,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vms">Only consider Guests with these IDs.</param>
                     /// <param name="with_local_disks">Enable live storage migration for local disk</param>
                     /// <returns></returns>
-                    public Result Migrateall(string target, int? maxworkers = null, string vms = null, bool? with_local_disks = null) => CreateRest(target, maxworkers, vms, with_local_disks);
+                    public async Task<Result> Migrateall(string target, int? maxworkers = null, string vms = null, bool? with_local_disks = null) => await CreateRest(target, maxworkers, vms, with_local_disks);
                 }
                 public class PVEHosts
                 {
@@ -13945,25 +13946,25 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Get the content of /etc/hosts.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/nodes/{_node}/hosts"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}/hosts"); }
 
                     /// <summary>
                     /// Get the content of /etc/hosts.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetEtcHosts() => GetRest();
+                    public async Task<Result> GetEtcHosts() => await GetRest();
                     /// <summary>
                     /// Write /etc/hosts.
                     /// </summary>
                     /// <param name="data">The target content of /etc/hosts.</param>
                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string data, string digest = null)
+                    public async Task<Result> CreateRest(string data, string digest = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("data", data);
                         parameters.Add("digest", digest);
-                        return _client.Create($"/nodes/{_node}/hosts", parameters);
+                        return await _client.Create($"/nodes/{_node}/hosts", parameters);
                     }
 
                     /// <summary>
@@ -13972,31 +13973,31 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="data">The target content of /etc/hosts.</param>
                     /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                     /// <returns></returns>
-                    public Result WriteEtcHosts(string data, string digest = null) => CreateRest(data, digest);
+                    public async Task<Result> WriteEtcHosts(string data, string digest = null) => await CreateRest(data, digest);
                 }
                 /// <summary>
                 /// Node index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/nodes/{_node}"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/nodes/{_node}"); }
 
                 /// <summary>
                 /// Node index.
                 /// </summary>
                 /// <returns></returns>
-                public Result Index() => GetRest();
+                public async Task<Result> Index() => await GetRest();
             }
             /// <summary>
             /// Cluster node index.
             /// </summary>
             /// <returns></returns>
-            public Result GetRest() { return _client.Get($"/nodes"); }
+            public async Task<Result> GetRest() { return await _client.Get($"/nodes"); }
 
             /// <summary>
             /// Cluster node index.
             /// </summary>
             /// <returns></returns>
-            public Result Index() => GetRest();
+            public async Task<Result> Index() => await GetRest();
         }
         public class PVEStorage
         {
@@ -14013,24 +14014,24 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// Delete storage configuration.
                 /// </summary>
                 /// <returns></returns>
-                public Result DeleteRest() { return _client.Delete($"/storage/{_storage}"); }
+                public async Task<Result> DeleteRest() { return await _client.Delete($"/storage/{_storage}"); }
 
                 /// <summary>
                 /// Delete storage configuration.
                 /// </summary>
                 /// <returns></returns>
-                public Result Delete() => DeleteRest();
+                public async Task<Result> Delete() => await DeleteRest();
                 /// <summary>
                 /// Read storage configuration.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/storage/{_storage}"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/storage/{_storage}"); }
 
                 /// <summary>
                 /// Read storage configuration.
                 /// </summary>
                 /// <returns></returns>
-                public Result Read() => GetRest();
+                public async Task<Result> Read() => await GetRest();
                 /// <summary>
                 /// Update storage configuration.
                 /// </summary>
@@ -14082,7 +14083,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 ///   Enum: tcp,rdma,unix</param>
                 /// <param name="username">RBD Id.</param>
                 /// <returns></returns>
-                public Result SetRest(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? port = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null)
+                public async Task<Result> SetRest(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? port = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("blocksize", blocksize);
@@ -14129,7 +14130,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("tagged_only", tagged_only);
                     parameters.Add("transport", transport);
                     parameters.Add("username", username);
-                    return _client.Set($"/storage/{_storage}", parameters);
+                    return await _client.Set($"/storage/{_storage}", parameters);
                 }
 
                 /// <summary>
@@ -14183,7 +14184,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 ///   Enum: tcp,rdma,unix</param>
                 /// <param name="username">RBD Id.</param>
                 /// <returns></returns>
-                public Result Update(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? port = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null) => SetRest(blocksize, bwlimit, comstar_hg, comstar_tg, content, delete, digest, disable, domain, encryption_key, fingerprint, format, fs_name, fuse, is_mountpoint, keyring, krbd, lio_tpg, master_pubkey, maxfiles, mkdir, monhost, mountpoint, namespace_, nocow, nodes, nowritecache, options, password, pool, port, preallocation, prune_backups, saferemove, saferemove_throughput, server, server2, shared, smbversion, sparse, subdir, tagged_only, transport, username);
+                public async Task<Result> Update(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? port = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null) => await SetRest(blocksize, bwlimit, comstar_hg, comstar_tg, content, delete, digest, disable, domain, encryption_key, fingerprint, format, fs_name, fuse, is_mountpoint, keyring, krbd, lio_tpg, master_pubkey, maxfiles, mkdir, monhost, mountpoint, namespace_, nocow, nodes, nowritecache, options, password, pool, port, preallocation, prune_backups, saferemove, saferemove_throughput, server, server2, shared, smbversion, sparse, subdir, tagged_only, transport, username);
             }
             /// <summary>
             /// Storage index.
@@ -14191,11 +14192,11 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="type">Only list storage of specific type
             ///   Enum: btrfs,cephfs,cifs,dir,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,pbs,rbd,zfs,zfspool</param>
             /// <returns></returns>
-            public Result GetRest(string type = null)
+            public async Task<Result> GetRest(string type = null)
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("type", type);
-                return _client.Get($"/storage", parameters);
+                return await _client.Get($"/storage", parameters);
             }
 
             /// <summary>
@@ -14204,7 +14205,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="type">Only list storage of specific type
             ///   Enum: btrfs,cephfs,cifs,dir,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,pbs,rbd,zfs,zfspool</param>
             /// <returns></returns>
-            public Result Index(string type = null) => GetRest(type);
+            public async Task<Result> Index(string type = null) => await GetRest(type);
             /// <summary>
             /// Create a new storage.
             /// </summary>
@@ -14269,7 +14270,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="vgname">Volume group name.</param>
             /// <param name="volume">Glusterfs Volume.</param>
             /// <returns></returns>
-            public Result CreateRest(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, int? port = null, string portal = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null)
+            public async Task<Result> CreateRest(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, int? port = null, string portal = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null)
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("storage", storage);
@@ -14328,7 +14329,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 parameters.Add("username", username);
                 parameters.Add("vgname", vgname);
                 parameters.Add("volume", volume);
-                return _client.Create($"/storage", parameters);
+                return await _client.Create($"/storage", parameters);
             }
 
             /// <summary>
@@ -14395,7 +14396,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="vgname">Volume group name.</param>
             /// <param name="volume">Glusterfs Volume.</param>
             /// <returns></returns>
-            public Result Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, int? port = null, string portal = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null) => CreateRest(storage, type, authsupported, base_, blocksize, bwlimit, comstar_hg, comstar_tg, content, datastore, disable, domain, encryption_key, export, fingerprint, format, fs_name, fuse, is_mountpoint, iscsiprovider, keyring, krbd, lio_tpg, master_pubkey, maxfiles, mkdir, monhost, mountpoint, namespace_, nocow, nodes, nowritecache, options, password, path, pool, port, portal, preallocation, prune_backups, saferemove, saferemove_throughput, server, server2, share, shared, smbversion, sparse, subdir, tagged_only, target, thinpool, transport, username, vgname, volume);
+            public async Task<Result> Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, int? port = null, string portal = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null) => await CreateRest(storage, type, authsupported, base_, blocksize, bwlimit, comstar_hg, comstar_tg, content, datastore, disable, domain, encryption_key, export, fingerprint, format, fs_name, fuse, is_mountpoint, iscsiprovider, keyring, krbd, lio_tpg, master_pubkey, maxfiles, mkdir, monhost, mountpoint, namespace_, nocow, nodes, nowritecache, options, password, path, pool, port, portal, preallocation, prune_backups, saferemove, saferemove_throughput, server, server2, share, shared, smbversion, sparse, subdir, tagged_only, target, thinpool, transport, username, vgname, volume);
         }
         public class PVEAccess
         {
@@ -14447,11 +14448,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="multiple">Request all entries as an array.</param>
                         /// <returns></returns>
-                        public Result GetRest(bool? multiple = null)
+                        public async Task<Result> GetRest(bool? multiple = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("multiple", multiple);
-                            return _client.Get($"/access/users/{_userid}/tfa", parameters);
+                            return await _client.Get($"/access/users/{_userid}/tfa", parameters);
                         }
 
                         /// <summary>
@@ -14459,7 +14460,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="multiple">Request all entries as an array.</param>
                         /// <returns></returns>
-                        public Result ReadUserTfaType(bool? multiple = null) => GetRest(multiple);
+                        public async Task<Result> ReadUserTfaType(bool? multiple = null) => await GetRest(multiple);
                     }
                     public class PVEToken
                     {
@@ -14481,24 +14482,24 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Remove API token for a specific user.
                             /// </summary>
                             /// <returns></returns>
-                            public Result DeleteRest() { return _client.Delete($"/access/users/{_userid}/token/{_tokenid}"); }
+                            public async Task<Result> DeleteRest() { return await _client.Delete($"/access/users/{_userid}/token/{_tokenid}"); }
 
                             /// <summary>
                             /// Remove API token for a specific user.
                             /// </summary>
                             /// <returns></returns>
-                            public Result RemoveToken() => DeleteRest();
+                            public async Task<Result> RemoveToken() => await DeleteRest();
                             /// <summary>
                             /// Get specific API token information.
                             /// </summary>
                             /// <returns></returns>
-                            public Result GetRest() { return _client.Get($"/access/users/{_userid}/token/{_tokenid}"); }
+                            public async Task<Result> GetRest() { return await _client.Get($"/access/users/{_userid}/token/{_tokenid}"); }
 
                             /// <summary>
                             /// Get specific API token information.
                             /// </summary>
                             /// <returns></returns>
-                            public Result ReadToken() => GetRest();
+                            public async Task<Result> ReadToken() => await GetRest();
                             /// <summary>
                             /// Generate a new API token for a specific user. NOTE: returns API token value, which needs to be stored as it cannot be retrieved afterwards!
                             /// </summary>
@@ -14506,13 +14507,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="expire">API token expiration date (seconds since epoch). '0' means no expiration date.</param>
                             /// <param name="privsep">Restrict API token privileges with separate ACLs (default), or give full privileges of corresponding user.</param>
                             /// <returns></returns>
-                            public Result CreateRest(string comment = null, int? expire = null, bool? privsep = null)
+                            public async Task<Result> CreateRest(string comment = null, int? expire = null, bool? privsep = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("comment", comment);
                                 parameters.Add("expire", expire);
                                 parameters.Add("privsep", privsep);
-                                return _client.Create($"/access/users/{_userid}/token/{_tokenid}", parameters);
+                                return await _client.Create($"/access/users/{_userid}/token/{_tokenid}", parameters);
                             }
 
                             /// <summary>
@@ -14522,7 +14523,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="expire">API token expiration date (seconds since epoch). '0' means no expiration date.</param>
                             /// <param name="privsep">Restrict API token privileges with separate ACLs (default), or give full privileges of corresponding user.</param>
                             /// <returns></returns>
-                            public Result GenerateToken(string comment = null, int? expire = null, bool? privsep = null) => CreateRest(comment, expire, privsep);
+                            public async Task<Result> GenerateToken(string comment = null, int? expire = null, bool? privsep = null) => await CreateRest(comment, expire, privsep);
                             /// <summary>
                             /// Update API token for a specific user.
                             /// </summary>
@@ -14530,13 +14531,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="expire">API token expiration date (seconds since epoch). '0' means no expiration date.</param>
                             /// <param name="privsep">Restrict API token privileges with separate ACLs (default), or give full privileges of corresponding user.</param>
                             /// <returns></returns>
-                            public Result SetRest(string comment = null, int? expire = null, bool? privsep = null)
+                            public async Task<Result> SetRest(string comment = null, int? expire = null, bool? privsep = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("comment", comment);
                                 parameters.Add("expire", expire);
                                 parameters.Add("privsep", privsep);
-                                return _client.Set($"/access/users/{_userid}/token/{_tokenid}", parameters);
+                                return await _client.Set($"/access/users/{_userid}/token/{_tokenid}", parameters);
                             }
 
                             /// <summary>
@@ -14546,42 +14547,42 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="expire">API token expiration date (seconds since epoch). '0' means no expiration date.</param>
                             /// <param name="privsep">Restrict API token privileges with separate ACLs (default), or give full privileges of corresponding user.</param>
                             /// <returns></returns>
-                            public Result UpdateTokenInfo(string comment = null, int? expire = null, bool? privsep = null) => SetRest(comment, expire, privsep);
+                            public async Task<Result> UpdateTokenInfo(string comment = null, int? expire = null, bool? privsep = null) => await SetRest(comment, expire, privsep);
                         }
                         /// <summary>
                         /// Get user API tokens.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/access/users/{_userid}/token"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/access/users/{_userid}/token"); }
 
                         /// <summary>
                         /// Get user API tokens.
                         /// </summary>
                         /// <returns></returns>
-                        public Result TokenIndex() => GetRest();
+                        public async Task<Result> TokenIndex() => await GetRest();
                     }
                     /// <summary>
                     /// Delete user.
                     /// </summary>
                     /// <returns></returns>
-                    public Result DeleteRest() { return _client.Delete($"/access/users/{_userid}"); }
+                    public async Task<Result> DeleteRest() { return await _client.Delete($"/access/users/{_userid}"); }
 
                     /// <summary>
                     /// Delete user.
                     /// </summary>
                     /// <returns></returns>
-                    public Result DeleteUser() => DeleteRest();
+                    public async Task<Result> DeleteUser() => await DeleteRest();
                     /// <summary>
                     /// Get user configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/access/users/{_userid}"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/access/users/{_userid}"); }
 
                     /// <summary>
                     /// Get user configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public Result ReadUser() => GetRest();
+                    public async Task<Result> ReadUser() => await GetRest();
                     /// <summary>
                     /// Update user configuration.
                     /// </summary>
@@ -14595,7 +14596,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="keys">Keys for two factor auth (yubico).</param>
                     /// <param name="lastname"></param>
                     /// <returns></returns>
-                    public Result SetRest(bool? append = null, string comment = null, string email = null, bool? enable = null, int? expire = null, string firstname = null, string groups = null, string keys = null, string lastname = null)
+                    public async Task<Result> SetRest(bool? append = null, string comment = null, string email = null, bool? enable = null, int? expire = null, string firstname = null, string groups = null, string keys = null, string lastname = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("append", append);
@@ -14607,7 +14608,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("groups", groups);
                         parameters.Add("keys", keys);
                         parameters.Add("lastname", lastname);
-                        return _client.Set($"/access/users/{_userid}", parameters);
+                        return await _client.Set($"/access/users/{_userid}", parameters);
                     }
 
                     /// <summary>
@@ -14623,7 +14624,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="keys">Keys for two factor auth (yubico).</param>
                     /// <param name="lastname"></param>
                     /// <returns></returns>
-                    public Result UpdateUser(bool? append = null, string comment = null, string email = null, bool? enable = null, int? expire = null, string firstname = null, string groups = null, string keys = null, string lastname = null) => SetRest(append, comment, email, enable, expire, firstname, groups, keys, lastname);
+                    public async Task<Result> UpdateUser(bool? append = null, string comment = null, string email = null, bool? enable = null, int? expire = null, string firstname = null, string groups = null, string keys = null, string lastname = null) => await SetRest(append, comment, email, enable, expire, firstname, groups, keys, lastname);
                 }
                 /// <summary>
                 /// User index.
@@ -14631,12 +14632,12 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="enabled">Optional filter for enable property.</param>
                 /// <param name="full">Include group and token information.</param>
                 /// <returns></returns>
-                public Result GetRest(bool? enabled = null, bool? full = null)
+                public async Task<Result> GetRest(bool? enabled = null, bool? full = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("enabled", enabled);
                     parameters.Add("full", full);
-                    return _client.Get($"/access/users", parameters);
+                    return await _client.Get($"/access/users", parameters);
                 }
 
                 /// <summary>
@@ -14645,7 +14646,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="enabled">Optional filter for enable property.</param>
                 /// <param name="full">Include group and token information.</param>
                 /// <returns></returns>
-                public Result Index(bool? enabled = null, bool? full = null) => GetRest(enabled, full);
+                public async Task<Result> Index(bool? enabled = null, bool? full = null) => await GetRest(enabled, full);
                 /// <summary>
                 /// Create new user.
                 /// </summary>
@@ -14660,7 +14661,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="lastname"></param>
                 /// <param name="password">Initial password.</param>
                 /// <returns></returns>
-                public Result CreateRest(string userid, string comment = null, string email = null, bool? enable = null, int? expire = null, string firstname = null, string groups = null, string keys = null, string lastname = null, string password = null)
+                public async Task<Result> CreateRest(string userid, string comment = null, string email = null, bool? enable = null, int? expire = null, string firstname = null, string groups = null, string keys = null, string lastname = null, string password = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("userid", userid);
@@ -14673,7 +14674,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("keys", keys);
                     parameters.Add("lastname", lastname);
                     parameters.Add("password", password);
-                    return _client.Create($"/access/users", parameters);
+                    return await _client.Create($"/access/users", parameters);
                 }
 
                 /// <summary>
@@ -14690,7 +14691,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="lastname"></param>
                 /// <param name="password">Initial password.</param>
                 /// <returns></returns>
-                public Result CreateUser(string userid, string comment = null, string email = null, bool? enable = null, int? expire = null, string firstname = null, string groups = null, string keys = null, string lastname = null, string password = null) => CreateRest(userid, comment, email, enable, expire, firstname, groups, keys, lastname, password);
+                public async Task<Result> CreateUser(string userid, string comment = null, string email = null, bool? enable = null, int? expire = null, string firstname = null, string groups = null, string keys = null, string lastname = null, string password = null) => await CreateRest(userid, comment, email, enable, expire, firstname, groups, keys, lastname, password);
             }
             public class PVEGroups
             {
@@ -14707,34 +14708,34 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Delete group.
                     /// </summary>
                     /// <returns></returns>
-                    public Result DeleteRest() { return _client.Delete($"/access/groups/{_groupid}"); }
+                    public async Task<Result> DeleteRest() { return await _client.Delete($"/access/groups/{_groupid}"); }
 
                     /// <summary>
                     /// Delete group.
                     /// </summary>
                     /// <returns></returns>
-                    public Result DeleteGroup() => DeleteRest();
+                    public async Task<Result> DeleteGroup() => await DeleteRest();
                     /// <summary>
                     /// Get group configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/access/groups/{_groupid}"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/access/groups/{_groupid}"); }
 
                     /// <summary>
                     /// Get group configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public Result ReadGroup() => GetRest();
+                    public async Task<Result> ReadGroup() => await GetRest();
                     /// <summary>
                     /// Update group data.
                     /// </summary>
                     /// <param name="comment"></param>
                     /// <returns></returns>
-                    public Result SetRest(string comment = null)
+                    public async Task<Result> SetRest(string comment = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("comment", comment);
-                        return _client.Set($"/access/groups/{_groupid}", parameters);
+                        return await _client.Set($"/access/groups/{_groupid}", parameters);
                     }
 
                     /// <summary>
@@ -14742,31 +14743,31 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="comment"></param>
                     /// <returns></returns>
-                    public Result UpdateGroup(string comment = null) => SetRest(comment);
+                    public async Task<Result> UpdateGroup(string comment = null) => await SetRest(comment);
                 }
                 /// <summary>
                 /// Group index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/access/groups"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/access/groups"); }
 
                 /// <summary>
                 /// Group index.
                 /// </summary>
                 /// <returns></returns>
-                public Result Index() => GetRest();
+                public async Task<Result> Index() => await GetRest();
                 /// <summary>
                 /// Create new group.
                 /// </summary>
                 /// <param name="groupid"></param>
                 /// <param name="comment"></param>
                 /// <returns></returns>
-                public Result CreateRest(string groupid, string comment = null)
+                public async Task<Result> CreateRest(string groupid, string comment = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("groupid", groupid);
                     parameters.Add("comment", comment);
-                    return _client.Create($"/access/groups", parameters);
+                    return await _client.Create($"/access/groups", parameters);
                 }
 
                 /// <summary>
@@ -14775,7 +14776,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="groupid"></param>
                 /// <param name="comment"></param>
                 /// <returns></returns>
-                public Result CreateGroup(string groupid, string comment = null) => CreateRest(groupid, comment);
+                public async Task<Result> CreateGroup(string groupid, string comment = null) => await CreateRest(groupid, comment);
             }
             public class PVERoles
             {
@@ -14792,36 +14793,36 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Delete role.
                     /// </summary>
                     /// <returns></returns>
-                    public Result DeleteRest() { return _client.Delete($"/access/roles/{_roleid}"); }
+                    public async Task<Result> DeleteRest() { return await _client.Delete($"/access/roles/{_roleid}"); }
 
                     /// <summary>
                     /// Delete role.
                     /// </summary>
                     /// <returns></returns>
-                    public Result DeleteRole() => DeleteRest();
+                    public async Task<Result> DeleteRole() => await DeleteRest();
                     /// <summary>
                     /// Get role configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/access/roles/{_roleid}"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/access/roles/{_roleid}"); }
 
                     /// <summary>
                     /// Get role configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public Result ReadRole() => GetRest();
+                    public async Task<Result> ReadRole() => await GetRest();
                     /// <summary>
                     /// Update an existing role.
                     /// </summary>
                     /// <param name="append"></param>
                     /// <param name="privs"></param>
                     /// <returns></returns>
-                    public Result SetRest(bool? append = null, string privs = null)
+                    public async Task<Result> SetRest(bool? append = null, string privs = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("append", append);
                         parameters.Add("privs", privs);
-                        return _client.Set($"/access/roles/{_roleid}", parameters);
+                        return await _client.Set($"/access/roles/{_roleid}", parameters);
                     }
 
                     /// <summary>
@@ -14830,31 +14831,31 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="append"></param>
                     /// <param name="privs"></param>
                     /// <returns></returns>
-                    public Result UpdateRole(bool? append = null, string privs = null) => SetRest(append, privs);
+                    public async Task<Result> UpdateRole(bool? append = null, string privs = null) => await SetRest(append, privs);
                 }
                 /// <summary>
                 /// Role index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/access/roles"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/access/roles"); }
 
                 /// <summary>
                 /// Role index.
                 /// </summary>
                 /// <returns></returns>
-                public Result Index() => GetRest();
+                public async Task<Result> Index() => await GetRest();
                 /// <summary>
                 /// Create new role.
                 /// </summary>
                 /// <param name="roleid"></param>
                 /// <param name="privs"></param>
                 /// <returns></returns>
-                public Result CreateRest(string roleid, string privs = null)
+                public async Task<Result> CreateRest(string roleid, string privs = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("roleid", roleid);
                     parameters.Add("privs", privs);
-                    return _client.Create($"/access/roles", parameters);
+                    return await _client.Create($"/access/roles", parameters);
                 }
 
                 /// <summary>
@@ -14863,7 +14864,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="roleid"></param>
                 /// <param name="privs"></param>
                 /// <returns></returns>
-                public Result CreateRole(string roleid, string privs = null) => CreateRest(roleid, privs);
+                public async Task<Result> CreateRole(string roleid, string privs = null) => await CreateRest(roleid, privs);
             }
             public class PVEAcl
             {
@@ -14874,13 +14875,13 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// Get Access Control List (ACLs).
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/access/acl"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/access/acl"); }
 
                 /// <summary>
                 /// Get Access Control List (ACLs).
                 /// </summary>
                 /// <returns></returns>
-                public Result ReadAcl() => GetRest();
+                public async Task<Result> ReadAcl() => await GetRest();
                 /// <summary>
                 /// Update Access Control List (add or remove permissions).
                 /// </summary>
@@ -14892,7 +14893,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="tokens">List of API tokens.</param>
                 /// <param name="users">List of users.</param>
                 /// <returns></returns>
-                public Result SetRest(string path, string roles, bool? delete = null, string groups = null, bool? propagate = null, string tokens = null, string users = null)
+                public async Task<Result> SetRest(string path, string roles, bool? delete = null, string groups = null, bool? propagate = null, string tokens = null, string users = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("path", path);
@@ -14902,7 +14903,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("propagate", propagate);
                     parameters.Add("tokens", tokens);
                     parameters.Add("users", users);
-                    return _client.Set($"/access/acl", parameters);
+                    return await _client.Set($"/access/acl", parameters);
                 }
 
                 /// <summary>
@@ -14916,7 +14917,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="tokens">List of API tokens.</param>
                 /// <param name="users">List of users.</param>
                 /// <returns></returns>
-                public Result UpdateAcl(string path, string roles, bool? delete = null, string groups = null, bool? propagate = null, string tokens = null, string users = null) => SetRest(path, roles, delete, groups, propagate, tokens, users);
+                public async Task<Result> UpdateAcl(string path, string roles, bool? delete = null, string groups = null, bool? propagate = null, string tokens = null, string users = null) => await SetRest(path, roles, delete, groups, propagate, tokens, users);
             }
             public class PVEDomains
             {
@@ -14946,7 +14947,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="scope">Select what to sync.
                         ///   Enum: users,groups,both</param>
                         /// <returns></returns>
-                        public Result CreateRest(bool? dry_run = null, bool? enable_new = null, bool? full = null, bool? purge = null, string scope = null)
+                        public async Task<Result> CreateRest(bool? dry_run = null, bool? enable_new = null, bool? full = null, bool? purge = null, string scope = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("dry-run", dry_run);
@@ -14954,7 +14955,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("full", full);
                             parameters.Add("purge", purge);
                             parameters.Add("scope", scope);
-                            return _client.Create($"/access/domains/{_realm}/sync", parameters);
+                            return await _client.Create($"/access/domains/{_realm}/sync", parameters);
                         }
 
                         /// <summary>
@@ -14967,30 +14968,30 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="scope">Select what to sync.
                         ///   Enum: users,groups,both</param>
                         /// <returns></returns>
-                        public Result Sync(bool? dry_run = null, bool? enable_new = null, bool? full = null, bool? purge = null, string scope = null) => CreateRest(dry_run, enable_new, full, purge, scope);
+                        public async Task<Result> Sync(bool? dry_run = null, bool? enable_new = null, bool? full = null, bool? purge = null, string scope = null) => await CreateRest(dry_run, enable_new, full, purge, scope);
                     }
                     /// <summary>
                     /// Delete an authentication server.
                     /// </summary>
                     /// <returns></returns>
-                    public Result DeleteRest() { return _client.Delete($"/access/domains/{_realm}"); }
+                    public async Task<Result> DeleteRest() { return await _client.Delete($"/access/domains/{_realm}"); }
 
                     /// <summary>
                     /// Delete an authentication server.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Delete() => DeleteRest();
+                    public async Task<Result> Delete() => await DeleteRest();
                     /// <summary>
                     /// Get auth server configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/access/domains/{_realm}"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/access/domains/{_realm}"); }
 
                     /// <summary>
                     /// Get auth server configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public Result Read() => GetRest();
+                    public async Task<Result> Read() => await GetRest();
                     /// <summary>
                     /// Update authentication server settings.
                     /// </summary>
@@ -15030,7 +15031,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="user_classes">The objectclasses for users.</param>
                     /// <param name="verify">Verify the server's SSL certificate</param>
                     /// <returns></returns>
-                    public Result SetRest(bool? autocreate = null, string base_dn = null, string bind_dn = null, string capath = null, bool? case_sensitive = null, string cert = null, string certkey = null, string client_id = null, string client_key = null, string comment = null, bool? default_ = null, string delete = null, string digest = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, string issuer_url = null, string mode = null, string password = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, bool? verify = null)
+                    public async Task<Result> SetRest(bool? autocreate = null, string base_dn = null, string bind_dn = null, string capath = null, bool? case_sensitive = null, string cert = null, string certkey = null, string client_id = null, string client_key = null, string comment = null, bool? default_ = null, string delete = null, string digest = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, string issuer_url = null, string mode = null, string password = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, bool? verify = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("autocreate", autocreate);
@@ -15066,7 +15067,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("user_attr", user_attr);
                         parameters.Add("user_classes", user_classes);
                         parameters.Add("verify", verify);
-                        return _client.Set($"/access/domains/{_realm}", parameters);
+                        return await _client.Set($"/access/domains/{_realm}", parameters);
                     }
 
                     /// <summary>
@@ -15108,19 +15109,19 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="user_classes">The objectclasses for users.</param>
                     /// <param name="verify">Verify the server's SSL certificate</param>
                     /// <returns></returns>
-                    public Result Update(bool? autocreate = null, string base_dn = null, string bind_dn = null, string capath = null, bool? case_sensitive = null, string cert = null, string certkey = null, string client_id = null, string client_key = null, string comment = null, bool? default_ = null, string delete = null, string digest = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, string issuer_url = null, string mode = null, string password = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, bool? verify = null) => SetRest(autocreate, base_dn, bind_dn, capath, case_sensitive, cert, certkey, client_id, client_key, comment, default_, delete, digest, domain, filter, group_classes, group_dn, group_filter, group_name_attr, issuer_url, mode, password, port, secure, server1, server2, sslversion, sync_defaults_options, sync_attributes, tfa, user_attr, user_classes, verify);
+                    public async Task<Result> Update(bool? autocreate = null, string base_dn = null, string bind_dn = null, string capath = null, bool? case_sensitive = null, string cert = null, string certkey = null, string client_id = null, string client_key = null, string comment = null, bool? default_ = null, string delete = null, string digest = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, string issuer_url = null, string mode = null, string password = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, bool? verify = null) => await SetRest(autocreate, base_dn, bind_dn, capath, case_sensitive, cert, certkey, client_id, client_key, comment, default_, delete, digest, domain, filter, group_classes, group_dn, group_filter, group_name_attr, issuer_url, mode, password, port, secure, server1, server2, sslversion, sync_defaults_options, sync_attributes, tfa, user_attr, user_classes, verify);
                 }
                 /// <summary>
                 /// Authentication domain index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/access/domains"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/access/domains"); }
 
                 /// <summary>
                 /// Authentication domain index.
                 /// </summary>
                 /// <returns></returns>
-                public Result Index() => GetRest();
+                public async Task<Result> Index() => await GetRest();
                 /// <summary>
                 /// Add an authentication server.
                 /// </summary>
@@ -15163,7 +15164,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 ///   Enum: subject,username,email</param>
                 /// <param name="verify">Verify the server's SSL certificate</param>
                 /// <returns></returns>
-                public Result CreateRest(string realm, string type, bool? autocreate = null, string base_dn = null, string bind_dn = null, string capath = null, bool? case_sensitive = null, string cert = null, string certkey = null, string client_id = null, string client_key = null, string comment = null, bool? default_ = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, string issuer_url = null, string mode = null, string password = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, string username_claim = null, bool? verify = null)
+                public async Task<Result> CreateRest(string realm, string type, bool? autocreate = null, string base_dn = null, string bind_dn = null, string capath = null, bool? case_sensitive = null, string cert = null, string certkey = null, string client_id = null, string client_key = null, string comment = null, bool? default_ = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, string issuer_url = null, string mode = null, string password = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, string username_claim = null, bool? verify = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("realm", realm);
@@ -15200,7 +15201,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("user_classes", user_classes);
                     parameters.Add("username-claim", username_claim);
                     parameters.Add("verify", verify);
-                    return _client.Create($"/access/domains", parameters);
+                    return await _client.Create($"/access/domains", parameters);
                 }
 
                 /// <summary>
@@ -15245,7 +15246,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 ///   Enum: subject,username,email</param>
                 /// <param name="verify">Verify the server's SSL certificate</param>
                 /// <returns></returns>
-                public Result Create(string realm, string type, bool? autocreate = null, string base_dn = null, string bind_dn = null, string capath = null, bool? case_sensitive = null, string cert = null, string certkey = null, string client_id = null, string client_key = null, string comment = null, bool? default_ = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, string issuer_url = null, string mode = null, string password = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, string username_claim = null, bool? verify = null) => CreateRest(realm, type, autocreate, base_dn, bind_dn, capath, case_sensitive, cert, certkey, client_id, client_key, comment, default_, domain, filter, group_classes, group_dn, group_filter, group_name_attr, issuer_url, mode, password, port, secure, server1, server2, sslversion, sync_defaults_options, sync_attributes, tfa, user_attr, user_classes, username_claim, verify);
+                public async Task<Result> Create(string realm, string type, bool? autocreate = null, string base_dn = null, string bind_dn = null, string capath = null, bool? case_sensitive = null, string cert = null, string certkey = null, string client_id = null, string client_key = null, string comment = null, bool? default_ = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, string issuer_url = null, string mode = null, string password = null, int? port = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, string username_claim = null, bool? verify = null) => await CreateRest(realm, type, autocreate, base_dn, bind_dn, capath, case_sensitive, cert, certkey, client_id, client_key, comment, default_, domain, filter, group_classes, group_dn, group_filter, group_name_attr, issuer_url, mode, password, port, secure, server1, server2, sslversion, sync_defaults_options, sync_attributes, tfa, user_attr, user_classes, username_claim, verify);
             }
             public class PVEOpenid
             {
@@ -15267,12 +15268,12 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="realm">Authentication domain ID</param>
                     /// <param name="redirect_url">Redirection Url. The client should set this to the used server url (location.origin).</param>
                     /// <returns></returns>
-                    public Result CreateRest(string realm, string redirect_url)
+                    public async Task<Result> CreateRest(string realm, string redirect_url)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("realm", realm);
                         parameters.Add("redirect-url", redirect_url);
-                        return _client.Create($"/access/openid/auth-url", parameters);
+                        return await _client.Create($"/access/openid/auth-url", parameters);
                     }
 
                     /// <summary>
@@ -15281,7 +15282,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="realm">Authentication domain ID</param>
                     /// <param name="redirect_url">Redirection Url. The client should set this to the used server url (location.origin).</param>
                     /// <returns></returns>
-                    public Result AuthUrl(string realm, string redirect_url) => CreateRest(realm, redirect_url);
+                    public async Task<Result> AuthUrl(string realm, string redirect_url) => await CreateRest(realm, redirect_url);
                 }
                 public class PVELogin
                 {
@@ -15295,13 +15296,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="redirect_url">Redirection Url. The client should set this to the used server url (location.origin).</param>
                     /// <param name="state">OpenId state.</param>
                     /// <returns></returns>
-                    public Result CreateRest(string code, string redirect_url, string state)
+                    public async Task<Result> CreateRest(string code, string redirect_url, string state)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("code", code);
                         parameters.Add("redirect-url", redirect_url);
                         parameters.Add("state", state);
-                        return _client.Create($"/access/openid/login", parameters);
+                        return await _client.Create($"/access/openid/login", parameters);
                     }
 
                     /// <summary>
@@ -15311,19 +15312,19 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="redirect_url">Redirection Url. The client should set this to the used server url (location.origin).</param>
                     /// <param name="state">OpenId state.</param>
                     /// <returns></returns>
-                    public Result Login(string code, string redirect_url, string state) => CreateRest(code, redirect_url, state);
+                    public async Task<Result> Login(string code, string redirect_url, string state) => await CreateRest(code, redirect_url, state);
                 }
                 /// <summary>
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/access/openid"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/access/openid"); }
 
                 /// <summary>
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
-                public Result Index() => GetRest();
+                public async Task<Result> Index() => await GetRest();
             }
             public class PVETfa
             {
@@ -15352,11 +15353,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="password">The current password.</param>
                         /// <returns></returns>
-                        public Result DeleteRest(string password = null)
+                        public async Task<Result> DeleteRest(string password = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("password", password);
-                            return _client.Delete($"/access/tfa/{_userid}/{_id}", parameters);
+                            return await _client.Delete($"/access/tfa/{_userid}/{_id}", parameters);
                         }
 
                         /// <summary>
@@ -15364,18 +15365,18 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// </summary>
                         /// <param name="password">The current password.</param>
                         /// <returns></returns>
-                        public Result DeleteTfa(string password = null) => DeleteRest(password);
+                        public async Task<Result> DeleteTfa(string password = null) => await DeleteRest(password);
                         /// <summary>
                         /// Fetch a requested TFA entry if present.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetRest() { return _client.Get($"/access/tfa/{_userid}/{_id}"); }
+                        public async Task<Result> GetRest() { return await _client.Get($"/access/tfa/{_userid}/{_id}"); }
 
                         /// <summary>
                         /// Fetch a requested TFA entry if present.
                         /// </summary>
                         /// <returns></returns>
-                        public Result GetTfaEntry() => GetRest();
+                        public async Task<Result> GetTfaEntry() => await GetRest();
                         /// <summary>
                         /// Add a TFA entry for a user.
                         /// </summary>
@@ -15383,13 +15384,13 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="enable">Whether the entry should be enabled for login.</param>
                         /// <param name="password">The current password.</param>
                         /// <returns></returns>
-                        public Result SetRest(string description = null, bool? enable = null, string password = null)
+                        public async Task<Result> SetRest(string description = null, bool? enable = null, string password = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("description", description);
                             parameters.Add("enable", enable);
                             parameters.Add("password", password);
-                            return _client.Set($"/access/tfa/{_userid}/{_id}", parameters);
+                            return await _client.Set($"/access/tfa/{_userid}/{_id}", parameters);
                         }
 
                         /// <summary>
@@ -15399,19 +15400,19 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="enable">Whether the entry should be enabled for login.</param>
                         /// <param name="password">The current password.</param>
                         /// <returns></returns>
-                        public Result UpdateTfaEntry(string description = null, bool? enable = null, string password = null) => SetRest(description, enable, password);
+                        public async Task<Result> UpdateTfaEntry(string description = null, bool? enable = null, string password = null) => await SetRest(description, enable, password);
                     }
                     /// <summary>
                     /// List TFA configurations of users.
                     /// </summary>
                     /// <returns></returns>
-                    public Result GetRest() { return _client.Get($"/access/tfa/{_userid}"); }
+                    public async Task<Result> GetRest() { return await _client.Get($"/access/tfa/{_userid}"); }
 
                     /// <summary>
                     /// List TFA configurations of users.
                     /// </summary>
                     /// <returns></returns>
-                    public Result ListUserTfa() => GetRest();
+                    public async Task<Result> ListUserTfa() => await GetRest();
                     /// <summary>
                     /// Add a TFA entry for a user.
                     /// </summary>
@@ -15423,7 +15424,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="totp">A totp URI.</param>
                     /// <param name="value">The current value for the provided totp URI, or a Webauthn/U2F challenge response</param>
                     /// <returns></returns>
-                    public Result CreateRest(string type, string challenge = null, string description = null, string password = null, string totp = null, string value = null)
+                    public async Task<Result> CreateRest(string type, string challenge = null, string description = null, string password = null, string totp = null, string value = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("type", type);
@@ -15432,7 +15433,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("password", password);
                         parameters.Add("totp", totp);
                         parameters.Add("value", value);
-                        return _client.Create($"/access/tfa/{_userid}", parameters);
+                        return await _client.Create($"/access/tfa/{_userid}", parameters);
                     }
 
                     /// <summary>
@@ -15446,29 +15447,29 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="totp">A totp URI.</param>
                     /// <param name="value">The current value for the provided totp URI, or a Webauthn/U2F challenge response</param>
                     /// <returns></returns>
-                    public Result AddTfaEntry(string type, string challenge = null, string description = null, string password = null, string totp = null, string value = null) => CreateRest(type, challenge, description, password, totp, value);
+                    public async Task<Result> AddTfaEntry(string type, string challenge = null, string description = null, string password = null, string totp = null, string value = null) => await CreateRest(type, challenge, description, password, totp, value);
                 }
                 /// <summary>
                 /// List TFA configurations of users.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/access/tfa"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/access/tfa"); }
 
                 /// <summary>
                 /// List TFA configurations of users.
                 /// </summary>
                 /// <returns></returns>
-                public Result ListTfa() => GetRest();
+                public async Task<Result> ListTfa() => await GetRest();
                 /// <summary>
                 /// Finish a u2f challenge.
                 /// </summary>
                 /// <param name="response">The response to the current authentication challenge.</param>
                 /// <returns></returns>
-                public Result CreateRest(string response)
+                public async Task<Result> CreateRest(string response)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("response", response);
-                    return _client.Create($"/access/tfa", parameters);
+                    return await _client.Create($"/access/tfa", parameters);
                 }
 
                 /// <summary>
@@ -15476,7 +15477,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// </summary>
                 /// <param name="response">The response to the current authentication challenge.</param>
                 /// <returns></returns>
-                public Result VerifyTfa(string response) => CreateRest(response);
+                public async Task<Result> VerifyTfa(string response) => await CreateRest(response);
             }
             public class PVETicket
             {
@@ -15487,13 +15488,13 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// Dummy. Useful for formatters which want to provide a login page.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/access/ticket"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/access/ticket"); }
 
                 /// <summary>
                 /// Dummy. Useful for formatters which want to provide a login page.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetTicket() => GetRest();
+                public async Task<Result> GetTicket() => await GetRest();
                 /// <summary>
                 /// Create or verify authentication ticket.
                 /// </summary>
@@ -15506,7 +15507,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="realm">You can optionally pass the realm using this parameter. Normally the realm is simply added to the username &amp;lt;username&amp;gt;@&amp;lt;relam&amp;gt;.</param>
                 /// <param name="tfa_challenge">The signed TFA challenge string the user wants to respond to.</param>
                 /// <returns></returns>
-                public Result CreateRest(string password, string username, bool? new_format = null, string otp = null, string path = null, string privs = null, string realm = null, string tfa_challenge = null)
+                public async Task<Result> CreateRest(string password, string username, bool? new_format = null, string otp = null, string path = null, string privs = null, string realm = null, string tfa_challenge = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("password", password);
@@ -15517,7 +15518,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("privs", privs);
                     parameters.Add("realm", realm);
                     parameters.Add("tfa-challenge", tfa_challenge);
-                    return _client.Create($"/access/ticket", parameters);
+                    return await _client.Create($"/access/ticket", parameters);
                 }
 
                 /// <summary>
@@ -15532,7 +15533,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="realm">You can optionally pass the realm using this parameter. Normally the realm is simply added to the username &amp;lt;username&amp;gt;@&amp;lt;relam&amp;gt;.</param>
                 /// <param name="tfa_challenge">The signed TFA challenge string the user wants to respond to.</param>
                 /// <returns></returns>
-                public Result CreateTicket(string password, string username, bool? new_format = null, string otp = null, string path = null, string privs = null, string realm = null, string tfa_challenge = null) => CreateRest(password, username, new_format, otp, path, privs, realm, tfa_challenge);
+                public async Task<Result> CreateTicket(string password, string username, bool? new_format = null, string otp = null, string path = null, string privs = null, string realm = null, string tfa_challenge = null) => await CreateRest(password, username, new_format, otp, path, privs, realm, tfa_challenge);
             }
             public class PVEPassword
             {
@@ -15545,12 +15546,12 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="password">The new password.</param>
                 /// <param name="userid">User ID</param>
                 /// <returns></returns>
-                public Result SetRest(string password, string userid)
+                public async Task<Result> SetRest(string password, string userid)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("password", password);
                     parameters.Add("userid", userid);
-                    return _client.Set($"/access/password", parameters);
+                    return await _client.Set($"/access/password", parameters);
                 }
 
                 /// <summary>
@@ -15559,7 +15560,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="password">The new password.</param>
                 /// <param name="userid">User ID</param>
                 /// <returns></returns>
-                public Result ChangePassword(string password, string userid) => SetRest(password, userid);
+                public async Task<Result> ChangePassword(string password, string userid) => await SetRest(password, userid);
             }
             public class PVEPermissions
             {
@@ -15572,12 +15573,12 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="path">Only dump this specific path, not the whole tree.</param>
                 /// <param name="userid">User ID or full API token ID</param>
                 /// <returns></returns>
-                public Result GetRest(string path = null, string userid = null)
+                public async Task<Result> GetRest(string path = null, string userid = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("path", path);
                     parameters.Add("userid", userid);
-                    return _client.Get($"/access/permissions", parameters);
+                    return await _client.Get($"/access/permissions", parameters);
                 }
 
                 /// <summary>
@@ -15586,19 +15587,19 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="path">Only dump this specific path, not the whole tree.</param>
                 /// <param name="userid">User ID or full API token ID</param>
                 /// <returns></returns>
-                public Result Permissions(string path = null, string userid = null) => GetRest(path, userid);
+                public async Task<Result> Permissions(string path = null, string userid = null) => await GetRest(path, userid);
             }
             /// <summary>
             /// Directory index.
             /// </summary>
             /// <returns></returns>
-            public Result GetRest() { return _client.Get($"/access"); }
+            public async Task<Result> GetRest() { return await _client.Get($"/access"); }
 
             /// <summary>
             /// Directory index.
             /// </summary>
             /// <returns></returns>
-            public Result Index() => GetRest();
+            public async Task<Result> Index() => await GetRest();
         }
         public class PVEPools
         {
@@ -15615,24 +15616,24 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// Delete pool.
                 /// </summary>
                 /// <returns></returns>
-                public Result DeleteRest() { return _client.Delete($"/pools/{_poolid}"); }
+                public async Task<Result> DeleteRest() { return await _client.Delete($"/pools/{_poolid}"); }
 
                 /// <summary>
                 /// Delete pool.
                 /// </summary>
                 /// <returns></returns>
-                public Result DeletePool() => DeleteRest();
+                public async Task<Result> DeletePool() => await DeleteRest();
                 /// <summary>
                 /// Get pool configuration.
                 /// </summary>
                 /// <returns></returns>
-                public Result GetRest() { return _client.Get($"/pools/{_poolid}"); }
+                public async Task<Result> GetRest() { return await _client.Get($"/pools/{_poolid}"); }
 
                 /// <summary>
                 /// Get pool configuration.
                 /// </summary>
                 /// <returns></returns>
-                public Result ReadPool() => GetRest();
+                public async Task<Result> ReadPool() => await GetRest();
                 /// <summary>
                 /// Update pool data.
                 /// </summary>
@@ -15641,14 +15642,14 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="storage">List of storage IDs.</param>
                 /// <param name="vms">List of virtual machines.</param>
                 /// <returns></returns>
-                public Result SetRest(string comment = null, bool? delete = null, string storage = null, string vms = null)
+                public async Task<Result> SetRest(string comment = null, bool? delete = null, string storage = null, string vms = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("comment", comment);
                     parameters.Add("delete", delete);
                     parameters.Add("storage", storage);
                     parameters.Add("vms", vms);
-                    return _client.Set($"/pools/{_poolid}", parameters);
+                    return await _client.Set($"/pools/{_poolid}", parameters);
                 }
 
                 /// <summary>
@@ -15659,31 +15660,31 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="storage">List of storage IDs.</param>
                 /// <param name="vms">List of virtual machines.</param>
                 /// <returns></returns>
-                public Result UpdatePool(string comment = null, bool? delete = null, string storage = null, string vms = null) => SetRest(comment, delete, storage, vms);
+                public async Task<Result> UpdatePool(string comment = null, bool? delete = null, string storage = null, string vms = null) => await SetRest(comment, delete, storage, vms);
             }
             /// <summary>
             /// Pool index.
             /// </summary>
             /// <returns></returns>
-            public Result GetRest() { return _client.Get($"/pools"); }
+            public async Task<Result> GetRest() { return await _client.Get($"/pools"); }
 
             /// <summary>
             /// Pool index.
             /// </summary>
             /// <returns></returns>
-            public Result Index() => GetRest();
+            public async Task<Result> Index() => await GetRest();
             /// <summary>
             /// Create new pool.
             /// </summary>
             /// <param name="poolid"></param>
             /// <param name="comment"></param>
             /// <returns></returns>
-            public Result CreateRest(string poolid, string comment = null)
+            public async Task<Result> CreateRest(string poolid, string comment = null)
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("poolid", poolid);
                 parameters.Add("comment", comment);
-                return _client.Create($"/pools", parameters);
+                return await _client.Create($"/pools", parameters);
             }
 
             /// <summary>
@@ -15692,7 +15693,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="poolid"></param>
             /// <param name="comment"></param>
             /// <returns></returns>
-            public Result CreatePool(string poolid, string comment = null) => CreateRest(poolid, comment);
+            public async Task<Result> CreatePool(string poolid, string comment = null) => await CreateRest(poolid, comment);
         }
         public class PVEVersion
         {
@@ -15703,13 +15704,13 @@ namespace Corsinvest.ProxmoxVE.Api
             /// API version details, including some parts of the global datacenter config.
             /// </summary>
             /// <returns></returns>
-            public Result GetRest() { return _client.Get($"/version"); }
+            public async Task<Result> GetRest() { return await _client.Get($"/version"); }
 
             /// <summary>
             /// API version details, including some parts of the global datacenter config.
             /// </summary>
             /// <returns></returns>
-            public Result Version() => GetRest();
+            public async Task<Result> Version() => await GetRest();
         }
 
     }

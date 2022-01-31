@@ -11,6 +11,7 @@
  */
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Storage
 {
@@ -24,10 +25,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Storage
         /// </summary>
         /// <param name="client"></param>
         /// <returns></returns>
-        public static IReadOnlyList<StorageInfo> GetStorages(this PveClient client)
+        public static async Task<IReadOnlyList<StorageInfo>> GetStorages(this PveClient client)
         {
             var storages = new List<StorageInfo>();
-            foreach (var apiData in client.Storage.GetRest().Response.data)
+            foreach (var apiData in (await client.Storage.GetRest()).Response.data)
             {
                 switch (apiData.type)
                 {

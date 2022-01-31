@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
@@ -51,8 +52,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         public Result Config
             => VM.Type switch
             {
-                VMTypeEnum.Qemu => VM.QemuApi.Snapshot[Name].Config.GetRest(),
-                VMTypeEnum.Lxc => VM.LxcApi.Snapshot[Name].Config.GetRest(),
+                VMTypeEnum.Qemu => VM.QemuApi.Snapshot[Name].Config.GetRest().GetAwaiter().GetResult(),
+                VMTypeEnum.Lxc => VM.LxcApi.Snapshot[Name].Config.GetRest().GetAwaiter().GetResult(),
                 _ => null,
             };
 
@@ -61,11 +62,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// </summary>
         /// <param name="description"></param>
         /// <returns></returns>
-        public Result Update(string description)
+        public async Task<Result> Update(string description)
             => VM.Type switch
             {
-                VMTypeEnum.Qemu => VM.QemuApi.Snapshot[Name].Config.SetRest(description),
-                VMTypeEnum.Lxc => VM.LxcApi.Snapshot[Name].Config.SetRest(description),
+                VMTypeEnum.Qemu => await VM.QemuApi.Snapshot[Name].Config.SetRest(description),
+                VMTypeEnum.Lxc => await VM.LxcApi.Snapshot[Name].Config.SetRest(description),
                 _ => null,
             };
 
@@ -74,16 +75,16 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// </summary>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public Result Rollback(long timeout)
+        public async Task<Result> Rollback(long timeout)
         {
             Result result = null;
             switch (VM.Type)
             {
-                case VMTypeEnum.Qemu: result = VM.QemuApi.Snapshot[Name].Rollback.CreateRest(); break;
-                case VMTypeEnum.Lxc: result = VM.LxcApi.Snapshot[Name].Rollback.CreateRest(); break;
+                case VMTypeEnum.Qemu: result = await VM.QemuApi.Snapshot[Name].Rollback.CreateRest(); break;
+                case VMTypeEnum.Lxc: result = await VM.LxcApi.Snapshot[Name].Rollback.CreateRest(); break;
                 default: break;
             }
-            result.WaitForTaskToFinish(VM, timeout);
+            await result.WaitForTaskToFinish(VM, timeout);
             return result;
         }
 

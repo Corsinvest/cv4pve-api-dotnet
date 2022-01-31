@@ -4,7 +4,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>8.0</LangVersion>
 
-    <Version>7.1.0</Version>
+    <Version>7.2.0</Version>
     <Company>Corsinvest Srl</Company>
     <Authors>Daniele Corsini</Authors>
     <Copyright>Corsinvest Srl</Copyright>
@@ -27,9 +27,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\LICENSE.md" Pack="true" PackagePath=""/>
-    <None Include="..\..\icon.png" Pack="true" PackagePath=""/>
-    <none Include="..\..\README.md" Pack="true" PackagePath=""/>
+    <None Include="..\..\LICENSE.md" Pack="true" PackagePath="" />
+    <None Include="..\..\icon.png" Pack="true" PackagePath="" />
+    <none Include="..\..\README.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>

@@ -10,6 +10,8 @@
  * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
  */
 
+using System.Threading.Tasks;
+
 namespace Corsinvest.ProxmoxVE.Api.Extension.VM
 {
     /// <summary>
@@ -26,7 +28,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// </summary>
         /// <param name="volume"></param>
         /// <returns></returns>
-        public Result Info(string volume) => _vm.NodeApi.Vzdump.Extractconfig.GetRest(volume);
+        public async Task<Result> Info(string volume) => await _vm.NodeApi.Vzdump.Extractconfig.GetRest(volume);
 
         /// <summary>
         /// Create backup.
@@ -38,22 +40,22 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// <param name="storage"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public Result Create(string mode,
-                             string compress,
-                             string mailTo,
-                             BackupMailNotificationEnum mailnotification,
-                             string storage,
-                             long timeout)
+        public async Task<Result> Create(string mode,
+                                         string compress,
+                                         string mailTo,
+                                         BackupMailNotificationEnum mailnotification,
+                                         string storage,
+                                         long timeout)
         {
-            var result = _vm.NodeApi.Vzdump.CreateRest(vmid: _vm.Id,
-                                                       mode: mode,
-                                                       compress: compress,
-                                                       remove: false,
-                                                       mailto: mailTo,
-                                                       mailnotification: (mailnotification + "").ToLower(),
-                                                       storage: storage);
+            var result = await _vm.NodeApi.Vzdump.CreateRest(vmid: _vm.Id,
+                                                             mode: mode,
+                                                             compress: compress,
+                                                             remove: false,
+                                                             mailto: mailTo,
+                                                             mailnotification: (mailnotification + "").ToLower(),
+                                                             storage: storage);
 
-            result.WaitForTaskToFinish(_vm, timeout);
+            await result.WaitForTaskToFinish(_vm, timeout);
             return result;
         }
     }

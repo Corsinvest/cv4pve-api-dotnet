@@ -72,6 +72,7 @@ The client is generated from a JSON Api on Proxmox VE.
 * Return Result class more information
 * ClientBase lite function
 * Form Proxmox VE 6.2 support Api Token for user
+* Async/Await
 
 ## Api token
 
@@ -124,25 +125,25 @@ Example result:
 //if you want use lite version only get/set/create/delete use PveClientBase
 
 var client = new PveClient("10.92.90.91");
-if (client.Login("root", "password"))
+if (await client.Login("root", "password"))
 {
-    var vm = client.Nodes["pve1"].Qemu[100];
+    var vm = await client.Nodes["pve1"].Qemu[100];
 
     //config vm
-    var config = vm.Config.VmConfig();
+    var config = await vm.Config.VmConfig();
     Console.WriteLine(JsonConvert.SerializeObject(config.Response,Formatting.Indented));
 
     //create snapshot
-    var response = vm.Snapshot.Snapshot("pippo2311");
+    var response = await vm.Snapshot.Snapshot("pippo2311");
 
     //update snapshot description
-    vm.Snapshot["pippo2311"].Config.UpdateSnapshotConfig("description");
+    await vm.Snapshot["pippo2311"].Config.UpdateSnapshotConfig("description");
 
     //delete snapshot
-    vm.Snapshot["pippo2311"].Delsnapshot();
+    await vm.Snapshot["pippo2311"].Delsnapshot();
 
     //list of snapshot
-    foreach (var snapshot in vm.Snapshot.SnapshotList().Response.data)
+    foreach (var snapshot in (await vm.Snapshot.SnapshotList()).Response.data)
     {
         Console.WriteLine(JsonConvert.SerializeObject(snapshot,Formatting.Indented));
         Console.WriteLine(snapshot.name);
@@ -157,7 +158,6 @@ if (client.Login("root", "password"))
 //using Api Token
 var client = new PveClient("10.92.100.33");
 client.ApiToken = "root@pam!qqqqqq=8a8c1cd4-d373-43f1-b366-05ce4cb8061f";
-var version = client.Version.Version();
+var version = await client.Version.Version();
 Console.WriteLine(JsonConvert.SerializeObject(version.Response.data, Formatting.Indented));
-
 ```
