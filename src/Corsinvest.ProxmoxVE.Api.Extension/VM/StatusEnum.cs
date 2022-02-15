@@ -41,5 +41,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
         /// Suspend
         /// </summary>
         Suspend,
+                
+        /// <summary>
+        /// Resume
+        /// </summary>
+        Resume,
     }
 }
