@@ -185,6 +185,14 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.VM
                         case VMTypeEnum.Lxc: result = await LxcApi.Status.Suspend.VmSuspend(); break;
                     }
                     break;
+                                
+                case StatusEnum.Resume:
+                    switch (Type)
+                    {
+                        case VMTypeEnum.Qemu: result = await QemuApi.Status.Resume.VmResume(); break;
+                        case VMTypeEnum.Lxc: result = await LxcApi.Status.Resume.VmResume(); break;
+                    }
+                    break;
             }
 
             await result.WaitForTaskToFinish(this, timeout);
