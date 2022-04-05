@@ -1,23 +1,13 @@
 ﻿/*
- * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
- *
- * This source file is available under two different licenses:
- * - GNU General Public License version 3 (GPLv3)
- * - Corsinvest Enterprise License (CEL)
- * Full copyright and license information is available in
- * LICENSE.md which is distributed with this source code.
- *
- * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
+ * SPDX-FileCopyrightText: 2022 Daniele Corsini <daniele.corsini@corsinvest.it>
+ * SPDX-FileCopyrightText: Copyright Corsinvest Srl
+ * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using McMaster.Extensions.CommandLineUtils;
 
 namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers
 {
@@ -26,40 +16,6 @@ namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers
     /// </summary>
     public static class ShellHelper
     {
-        /// <summary>
-        /// Logo Corsinvest art ascii.
-        /// </summary>
-        /// <returns></returns>
-        public static readonly string LOGO = @"
-    ______                _                      __
-   / ____/___  __________(_)___ _   _____  _____/ /_
-  / /   / __ \/ ___/ ___/ / __ \ | / / _ \/ ___/ __/
- / /___/ /_/ / /  (__  ) / / / / |/ /  __(__  ) /_
- \____/\____/_/  /____/_/_/ /_/|___/\___/____/\__/
-";
-
-        /// <summary>
-        /// Remember these things
-        /// </summary>
-        public static readonly string REMEMBER_THESE_THINGS = @"Remember these things:
-- Think before typing.
-- From great power comes great responsibility.
-
-Good job";
-
-        /// <summary>
-        /// Make string logo and title.
-        /// </summary>
-        /// <param name="title"></param>
-        /// <returns></returns>
-        public static string MakeLogoAndTitle(string title)
-        {
-            title += new string(' ', 47 - title.Length);
-
-            return $@"{LOGO}
-
-{title}(Made in Italy)";
-        }
 
         /// <summary>
         /// Execute shell command
@@ -150,120 +106,6 @@ Good job";
                 }
 
                 return (standardOutput, exitCode);
-            }
-        }
-
-        /// <summary>
-        /// Get current version application
-        /// </summary>
-        /// <returns></returns>
-        public static string GetCurrentVersionApp()
-        {
-            return Assembly.GetEntryAssembly()
-                  .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                  .InformationalVersion;
-        }
-
-        /// <summary>
-        /// Create console application.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="description"></param>
-        /// <returns></returns>
-        public static CommandLineApplication CreateConsoleApp(string name, string description)
-        {
-            var app = new CommandLineApplication
-            {
-                Name = name,
-                Description = description,
-                UsePagerForHelpText = false,
-            };
-
-            app.AddFullNameLogo();
-            app.HelpOption(true);
-            app.VersionOption("--version", GetCurrentVersionApp());
-            app.DebugOption();
-            app.DryRunOption();
-            app.AddLoginOptions();
-            app.CheckUpdateApp();
-            app.UpgradeApp();
-
-            //execute this
-            app.OnExecute(() =>
-            {
-                app.ShowHint();
-                return 1;
-            });
-
-            return app;
-        }
-
-        /// <summary>
-        /// Execute console application.
-        /// </summary>
-        /// <param name="app"></param>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        public static int ExecuteConsoleApp(this CommandLineApplication app, string[] args)
-        {
-            //execute command
-            try
-            {
-                Version webVersion = null;
-
-                //check new version available
-                var taskInfo = new Task(() =>
-                {
-                    try
-                    {
-                        var version = UpdateHelper.GetInfoLastReleaseAssetFromGitHub(app.Name).Version;
-                        if (version.ToString() != GetCurrentVersionApp())
-                        {
-                            webVersion = version;
-                        }
-                    }
-                    catch { }
-                });
-                taskInfo.Start();
-
-                var ret = app.Execute(args);
-
-                taskInfo.Wait(1000);
-
-                if ((app.OptionHelp.HasValue() || app.OptionVersion.HasValue()) &&
-                     webVersion != null &&
-                     webVersion > new Version(GetCurrentVersionApp()))
-                {
-                    app.Out.WriteLine("====================================");
-                    app.Out.WriteLine($"New version available: {webVersion}");
-                    app.Out.WriteLine("====================================");
-                }
-
-                return ret;
-            }
-            catch (Exception ex)
-            {
-                if (ex is CommandParsingException || ex is ApplicationException) //|| ex is ArgumentException)
-                {
-                    app.Out.WriteLine(ex.Message);
-                }
-                else
-                {
-                    app.Out.WriteLine("================ EXCEPTION ================ ");
-                    app.Out.WriteLine(ex.GetType().FullName);
-                    app.Out.WriteLine(ex.Message);
-                    app.Out.WriteLine(ex.StackTrace);
-                }
-
-                if (app.DebugIsActive())
-                {
-                    app.Out.WriteLine("================ EXCEPTION ================ ");
-                    app.Out.WriteLine(ex.GetType().FullName);
-                    app.Out.WriteLine(ex.Message);
-                    app.Out.WriteLine(ex.StackTrace);
-                }
-
-                return 1;
             }
         }
     }

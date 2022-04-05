@@ -1,23 +1,20 @@
 ﻿/*
- * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
- *
- * This source file is available under two different licenses:
- * - GNU General Public License version 3 (GPLv3)
- * - Corsinvest Enterprise License (CEL)
- * Full copyright and license information is available in
- * LICENSE.md which is distributed with this source code.
- *
- * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
+ * SPDX-FileCopyrightText: 2019 Daniele Corsini <daniele.corsini@corsinvest.it>
+ * SPDX-FileCopyrightText: Copyright Corsinvest Srl
+ * SPDX-License-Identifier: GPL-3.0-only
  */
 
 using System;
+using System.CommandLine;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Corsinvest.ProxmoxVE.Api.Extension.Helpers;
-using Corsinvest.ProxmoxVE.Api.Extension.VM;
-using McMaster.Extensions.CommandLineUtils;
+using Corsinvest.ProxmoxVE.Api.Extension.Utils;
+using Corsinvest.ProxmoxVE.Api.Shared;
+using Corsinvest.ProxmoxVE.Api.Shared.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers
 {
@@ -30,14 +27,11 @@ namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers
         /// Add fullname and logo
         /// </summary>
         /// <param name="command"></param>
-        public static void AddFullNameLogo(this CommandLineApplication command)
+        public static void AddFullNameLogo(this Command command)
         {
-            var parent = command;
-            while (parent.Parent != null) { parent = parent.Parent; }
+            command.Description = ConsoleHelper.MakeLogoAndTitle(command.Description) + $@"
 
-            command.FullName = ShellHelper.MakeLogoAndTitle(parent.Description);
-            command.ExtendedHelpText = $@"
-{parent.Name} is a part of suite cv4pve-tools.
+{command.Name} is a part of suite cv4pve.
 For more information visit https://www.cv4pve-tools.com";
         }
 
@@ -45,92 +39,57 @@ For more information visit https://www.cv4pve-tools.com";
         /// Get option
         /// </summary>
         /// <param name="command"></param>
-        /// <param name="optionName"></param>
-        /// <param name="searchInParent"></param>
+        /// <param name="name"></param>
         /// <returns></returns>
-        public static CommandOption GetOption(this CommandLineApplication command,
-                                              string optionName,
-                                              bool searchInParent = false)
-        {
-            foreach (var option in command.GetOptions())
-            {
-                if (option.ShortName == optionName || option.LongName == optionName) { return option; }
-            }
-
-            //found in parent
-            if (searchInParent && command.Parent != null) { return command.Parent.GetOption(optionName, true); }
-
-            return null;
-        }
+        public static Option GetOption(this Command command, string name)
+            => command.Options.FirstOrDefault(a => a.Name == name || a.Aliases.Contains(name));
 
         /// <summary>
-        /// Debug is active
+        /// Get option
         /// </summary>
         /// <param name="command"></param>
+        /// <param name="name"></param>
+        /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static bool DebugIsActive(this CommandLineApplication command)
-            => command.GetOption(DEBUG_OPTION_NAME).HasValue();
+        public static Option<T> GetOption<T>(this Command command, string name) => (Option<T>)command.GetOption(name);
 
-        /// <summary>
-        /// Debug value
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        public static int DebugValue(this CommandLineApplication command)
-        {
-            var ret = 0;
-            if (command.DebugIsActive())
-            {
-                var value = command.GetOption(DEBUG_OPTION_NAME).Value() ?? "99";
-                ret = int.Parse(value);
-            }
-            return ret;
-        }
 
         /// <summary>
         /// Dryrun is active
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static bool DryRunIsActive(this CommandLineApplication command)
-            => command.GetOption("dry-run").HasValue();
+        public static bool DryRunIsActive(this Command command) => command.GetOption<bool>("dry-run").GetValue();
 
         /// <summary>
-        /// Node option
+        /// Debug is active
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static CommandOption NodeOption(this CommandLineApplication command)
-            => command.Option("--node", "Node of cluster", CommandOptionType.SingleValue);
+        public static bool DebugIsActive(this Command command) => command.GetOption<bool>(DebugOptionName).GetValue();
 
         /// <summary>
-        /// Node argument
+        /// Get LogLevel from debug
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static CommandArgument NodeArgument(this CommandLineApplication command)
-            => command.Argument("node", "Node of cluster").IsRequired();
-
-        /// <summary>
-        /// Output type
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        public static CommandOption<TableOutputType> OutputTypeArgument(this CommandLineApplication command)
-            => command.OptionEnum<TableOutputType>("--output|-o", "Type output (default: text)");
+        public static LogLevel GetLogLevelFromDebug(this Command command)
+            => command.DebugIsActive()
+                ? LogLevel.Trace
+                : LogLevel.Warning;
 
         /// <summary>
         /// Debug option
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static CommandOption<int> DebugOption(this CommandLineApplication command)
+        public static Option<bool> DebugOption(this Command command)
         {
-            var opt = command.Option<int>($"--{DEBUG_OPTION_NAME}",
-                                          "Debug application",
-                                          CommandOptionType.SingleOrNoValue);
-            opt.ShowInHelpText = false;
-            opt.Inherited = true;
+            var opt = new Option<bool>($"--{DebugOptionName}", "Debug application")
+            {
+                IsHidden = true
+            };
+            command.AddGlobalOption(opt);
             return opt;
         }
 
@@ -139,28 +98,78 @@ For more information visit https://www.cv4pve-tools.com";
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static CommandOption DryRunOption(this CommandLineApplication command)
+        public static Option<bool> DryRunOption(this Command command)
         {
-            var opt = command.Option("--dry-run", "Dry run application", CommandOptionType.NoValue);
-            opt.ShowInHelpText = false;
-            opt.Inherited = true;
+            var opt = new Option<bool>("--dry-run", "Dry run application")
+            {
+                IsHidden = true,
+            };
+            command.AddGlobalOption(opt);
             return opt;
         }
+
+        /// <summary>
+        /// Get Value from option
+        /// </summary>
+        /// <param name="option"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T GetValue<T>(this Option<T> option)
+            => option.Parse(Environment.GetCommandLineArgs()).GetValueForOption(option);
+
+        /// <summary>
+        /// Get value
+        /// </summary>
+        /// <param name="option"></param>
+        /// <returns></returns>
+        public static string GetValue(this Option option)
+            => option.Parse(Environment.GetCommandLineArgs()).GetValueForOption(option) + "";
+
+        /// <summary>
+        /// Get value
+        /// </summary>
+        /// <param name="argument"></param>
+        /// <returns></returns>
+        public static string GetValue(this Argument argument)
+            => argument.Parse(Environment.GetCommandLineArgs()).GetValueForArgument(argument) + "";
+
+        /// <summary>
+        /// Get value
+        /// </summary>
+        /// <param name="argument"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T GetValue<T>(this Argument<T> argument)
+            => argument.Parse(Environment.GetCommandLineArgs()).GetValueForArgument(argument);
+
+        /// <summary>
+        /// Return if a option has value
+        /// </summary>
+        /// <param name="option"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static bool HasValue<T>(this Option<T> option) => option.GetValue() != null;
+
+        /// <summary>
+        /// Has value
+        /// </summary>
+        /// <param name="option"></param>
+        /// <returns></returns>
+        public static bool HasValue(this Option option) => !string.IsNullOrWhiteSpace(option.GetValue());
 
         /// <summary>
         /// Id or name option
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static CommandOption VmIdOrNameOption(this CommandLineApplication command)
-            => command.Option("--vmid", "The id or name VM/CT", CommandOptionType.SingleValue);
+        public static Option VmIdOrNameOption(this Command command) => command.AddOption("--vmid", "The id or name VM/CT");
 
         /// <summary>
         /// Ids or names option
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static CommandOption VmIdsOrNamesOption(this CommandLineApplication command)
+        public static Option VmIdsOrNamesOption(this Command command)
         {
             var opt = command.VmIdOrNameOption();
             opt.Description = @"The id or name VM/CT comma separated (eg. 100,101,102,TestDebian)
@@ -178,174 +187,141 @@ range 100:107,-105,200:204
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static CommandOption GetApiToken(this CommandLineApplication command) => command.GetOption(API_TOKEN_OPTION_NAME, true);
+        public static Option GetApiToken(this Command command) => command.GetOption(ApiTokenOptionName);
 
         /// <summary>
         /// Get username
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static CommandOption GetUsername(this CommandLineApplication command) => command.GetOption(USERNAME_OPTION_NAME, true);
+        public static Option GetUsername(this Command command) => command.GetOption(UsernameOptionName);
 
         /// <summary>
         /// Get password
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static CommandOption GetPassword(this CommandLineApplication command) => command.GetOption(PASSWORD_OPTION_NAME, true);
+        public static Option GetPassword(this Command command) => command.GetOption(PasswordOptionName);
 
         /// <summary>
         /// Get host
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static CommandOption GetHost(this CommandLineApplication command) => command.GetOption(HOST_OPTION_NAME, true);
-
-        /// <summary>
-        /// VM State option
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        public static CommandOption VmStateOption(this CommandLineApplication command)
-            => command.Option("--state", "Save the vmstate", CommandOptionType.NoValue);
-
-        /// <summary>
-        /// Script hook option
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        public static CommandOption ScriptHookOption(this CommandLineApplication command)
-        {
-            var opt = command.Option("--script", "Use specified hook script", CommandOptionType.SingleValue);
-            opt.Accepts().ExistingFile();
-            return opt;
-        }
-
-        /// <summary>
-        /// Timeout operation
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        public static CommandOption<long> TimeoutOption(this CommandLineApplication command)
-            => command.Option<long>("--timeout", "Timeout operation in seconds", CommandOptionType.SingleValue);
+        public static Option GetHost(this Command command) => command.GetOption(HostOptionName);
 
         #region Login option
         /// <summary>
         /// Add options login
         /// </summary>
         /// <param name="command"></param>
-        public static void AddLoginOptions(this CommandLineApplication command)
+        public static void AddLoginOptions(this Command command)
         {
-            command.HostOption();
-            //    .DependOn(command, USERNAME_OPTION_NAME)
-            //  .DependOn(command, PASSWORD_OPTION_NAME)
+            var optApiToken = command.AddOption($"--{ApiTokenOptionName}", "Api token format 'USER@REALM!TOKENID=UUID'. Require Proxmox VE 6.2 or later");
+            var optUsername = command.AddOption($"--{UsernameOptionName}", "User name <username>@<realm>");
+            var optPassword = command.AddOption($"--{PasswordOptionName}", "The password. Specify 'file:path_file' to store password in file.");
 
-            command.ApiTokenOption();
-            //.DependOn(command, HOST_OPTION_NAME);
+            var optHost = new Option<string>($"--{HostOptionName}",
+                                             parseArgument: (e) =>
+                                             {
+                                                 if (e.FindResultFor(optApiToken) == null && e.FindResultFor(optUsername) == null)
+                                                 {
+                                                     e.ErrorMessage = $"Option '--{optUsername.Name}' or '--{optApiToken.Name}' is required!";
+                                                 }
+                                                 else if (e.FindResultFor(optUsername) != null && e.FindResultFor(optPassword) == null)
+                                                 {
+                                                     e.ErrorMessage = $"Option '--{optPassword.Name}' is required!";
+                                                 }
 
-            command.UsernameRealOption()
-                   //.DependOn(command, HOST_OPTION_NAME)
-                   .DependOn(command, PASSWORD_OPTION_NAME);
-
-            command.PasswordOption()
-                   //.DependOn(command, HOST_OPTION_NAME)
-                   .DependOn(command, USERNAME_OPTION_NAME);
+                                                 return e.Tokens.Single().Value;
+                                             }, description: "The host name host[:port],host1[:port],host2[:port]")
+            {
+                IsRequired = true
+            };
+            command.AddOption(optHost);
         }
 
         /// <summary>
         /// Api Token
         /// </summary>
-        public static readonly string API_TOKEN_OPTION_NAME = "api-token";
+        public static readonly string ApiTokenOptionName = "api-token";
 
         /// <summary>
         /// Host option
         /// </summary>
-        public static readonly string HOST_OPTION_NAME = "host";
+        public static readonly string HostOptionName = "host";
 
         /// <summary>
         /// Username option
         /// </summary>
-        public static readonly string USERNAME_OPTION_NAME = "username";
+        public static readonly string UsernameOptionName = "username";
 
         /// <summary>
         /// Password option
         /// </summary>
-        public static readonly string PASSWORD_OPTION_NAME = "password";
+        public static readonly string PasswordOptionName = "password";
 
         /// <summary>
         /// Password option
         /// </summary>
-        public static readonly string DEBUG_OPTION_NAME = "debug";
+        public static readonly string DebugOptionName = "debug";
 
         /// <summary>
         /// Host option
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static CommandOption HostOption(this CommandLineApplication command)
-            => command.Option($"--{HOST_OPTION_NAME}",
-                              "The host name host[:port],host1[:port],host2[:port]",
-                              CommandOptionType.SingleValue);
+        public static Option HostOption(this Command command)
+        {
+            var option = command.AddOption($"--{HostOptionName}", "The host name host[:port],host1[:port],host2[:port]");
+            option.IsRequired = true;
+            return option;
+        }
 
         /// <summary>
-        /// Api token option
+        /// Table output enum
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static CommandOption ApiTokenOption(this CommandLineApplication command)
-            => command.Option($"--{API_TOKEN_OPTION_NAME}",
-                              "Api token format 'USER@REALM!TOKENID=UUID'. Require Proxmox VE 6.2 or later",
-                              CommandOptionType.SingleValue);
-
-        /// <summary>
-        /// Username real option
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        public static CommandOption UsernameRealOption(this CommandLineApplication command)
-            => command.Option($"--{USERNAME_OPTION_NAME}",
-                              "User name <username>@<realm>",
-                              CommandOptionType.SingleValue);
+        public static Option<TableGenerator.Output> TableOutputOption(this Command command)
+        {
+            var opt = command.AddOption<TableGenerator.Output>("--output|-o", "Type output");
+            opt.SetDefaultValue(TableGenerator.Output.Text);
+            return opt;
+        }
 
         /// <summary>
         /// username options
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static CommandOption Username(this CommandLineApplication command)
-            => command.Option($"--{USERNAME_OPTION_NAME}",
-                              "User name",
-                              CommandOptionType.SingleValue);
+        public static Option Username(this Command command) => command.AddOption($"--{UsernameOptionName}", "User name");
 
         /// <summary>
-        /// Password option
+        /// Verbose
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static CommandOption PasswordOption(this CommandLineApplication command)
-            => command.Option($"--{PASSWORD_OPTION_NAME}",
-                              "The password. Specify 'file:path_file' to store password in file.",
-                              CommandOptionType.SingleValue);
+        public static Option<bool> VerboseOption(this Command command) => command.AddOption<bool>($"--verbose|-v", "Verbose.");
 
         /// <summary>
         /// Try login client api
         /// </summary>
         /// <param name="command"></param>
+        /// <param name="loggerFactory"></param>
         /// <returns></returns>
-        public static async Task<PveClient> ClientTryLogin(this CommandLineApplication command)
+        public static async Task<PveClient> ClientTryLogin(this Command command, ILoggerFactory loggerFactory)
         {
             var error = "Problem connection!";
             try
             {
-                var client = ClientHelper.GetClientFromHA(command.GetHost().Value(), command.Out);
-
-                //debug level
-                client.DebugLevel = command.DebugValue();
+                var client = ClientHelper.GetClientFromHA(command.GetHost().GetValue());
+                client.LoggerFactory = loggerFactory;
 
                 if (command.GetApiToken().HasValue())
                 {
                     //use api token
-                    client.ApiToken = command.GetApiToken().Value();
+                    client.ApiToken = command.GetApiToken().GetValue();
 
                     //check is valid API
                     var ver = await client.Version.Version();
@@ -355,7 +331,7 @@ range 100:107,-105,200:204
                 {
                     //use user and password
                     //try login
-                    if (await client.Login(command.GetUsername().Value(), GetPasswordFromOption(command)))
+                    if (await client.Login(command.GetUsername().GetValue(), GetPasswordFromOption(command)))
                     {
                         return client;
                     }
@@ -366,10 +342,10 @@ range 100:107,-105,200:204
             }
             catch (Exception ex)
             {
-                throw new ApplicationException(error, ex);
+                throw new PveException(error, ex);
             }
 
-            throw new ApplicationException(error);
+            throw new PveException(error);
         }
 
         /// <summary>
@@ -377,11 +353,11 @@ range 100:107,-105,200:204
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static string GetPasswordFromOption(this CommandLineApplication command)
+        public static string GetPasswordFromOption(this Command command)
         {
-            const string KEY = "012345678901234567890123";
+            const string key = "012345678901234567890123";
 
-            var password = command.GetPassword().Value();
+            var password = command.GetPassword().GetValue();
             if (!string.IsNullOrWhiteSpace(password))
             {
                 password = password.Trim();
@@ -389,15 +365,16 @@ range 100:107,-105,200:204
                 //check if file
                 if (password.StartsWith("file:"))
                 {
-                    var fileName = password.Substring(5);
+                    var fileName = password[5..];
                     if (File.Exists(fileName))
                     {
-                        password = StringHelper.Decrypt(File.ReadAllText(fileName, Encoding.UTF8), KEY, false);
+                        password = StringHelper.Decrypt(File.ReadAllText(fileName, Encoding.UTF8), key);
                     }
                     else
                     {
-                        password = Prompt.GetPassword("Password:");
-                        File.WriteAllText(fileName, StringHelper.Encrypt(password, KEY, false), Encoding.UTF8);
+                        Console.WriteLine("Password:");
+                        password = ConsoleHelper.ReadPassword();
+                        File.WriteAllText(fileName, StringHelper.Encrypt(password, key), Encoding.UTF8);
                     }
                 }
             }
@@ -407,207 +384,209 @@ range 100:107,-105,200:204
         #endregion
 
         /// <summary>
-        /// Label option
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        public static CommandOption LabelOption(this CommandLineApplication command)
-            => command.Option("--label",
-                              "Is usually 'hourly', 'daily', 'weekly', or 'monthly'",
-                              CommandOptionType.SingleValue);
-
-        /// <summary>
-        /// Keep option
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        public static CommandOption<int> KeepOption(this CommandLineApplication command)
-            => command.Option<int>("--keep",
-                                   "Specify the number which should will keep",
-                                   CommandOptionType.SingleValue);
-
-        /// <summary>
-        /// Mail to option
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        public static CommandOption MailToOption(this CommandLineApplication command)
-            => command.Option("--mail-to",
-                                  "Comma-separated list of email addresses that should receive email notifications",
-                                  CommandOptionType.SingleValue)
-                      .Accepts(v => v.EmailAddress());
-
-        /// <summary>
         /// Vm Id option
         /// </summary>
         /// <param name="command"></param>
-        /// <param name="dependOn"></param>
         /// <returns></returns>
-        public static CommandOption<int> VmIdOption(this CommandLineApplication command, string dependOn)
-            => command.Option<int>("--vmid", "The id VM/CT", CommandOptionType.SingleValue)
-                      .DependOn(command, dependOn);
+        public static Option<int> VmIdOption(this Command command) => command.AddOption<int>("--vmid", "The id VM/CT");
 
         /// <summary>
-        /// Wait option
+        /// Add option
         /// </summary>
         /// <param name="command"></param>
-        /// <returns></returns>
-        public static CommandOption WaitOption(this CommandLineApplication command)
-            => command.Option("--wait", "Wait for task finish", CommandOptionType.NoValue);
-
-        /// <summary>
-        /// Option from enum
-        /// </summary>
-        public static CommandOption<TEnum> OptionEnum<TEnum>(this CommandLineApplication command,
-                                                      string template,
-                                                      string description) where TEnum : struct, IConvertible
-        {
-            if (!typeof(TEnum).IsEnum) { throw new ArgumentException("T must be an enumerated type"); }
-
-            var ret = command.Option<TEnum>(template,
-                                            description + " " + string.Join(",", Enum.GetNames(typeof(TEnum))),
-                                            CommandOptionType.SingleValue);
-            ret.Accepts().Enum<TEnum>(true);
-            return ret;
-        }
-
-        /// <summary>
-        /// Get value form enum option
-        /// </summary>
-        /// <param name="command"></param>
-        /// <typeparam name="TEnum"></typeparam>
-        /// <returns></returns>
-        public static TEnum GetEnumValue<TEnum>(this CommandOption command)
-            where TEnum : struct, IConvertible
-        {
-            if (!typeof(TEnum).IsEnum) { throw new ArgumentException("T must be an enumerated type"); }
-
-            Enum.TryParse<TEnum>(command.Value(), true, out var value);
-            return value;
-        }
-
-        /// <summary>
-        /// Option form string values
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="template"></param>
+        /// <param name="name"></param>
         /// <param name="description"></param>
-        /// <param name="allowedValues"></param>
         /// <returns></returns>
-        public static CommandOption OptionEnum(this CommandLineApplication command,
-                                               string template,
-                                               string description,
-                                               params string[] allowedValues)
-        {
-            var ret = command.Option(template,
-                                     description + " " + string.Join(",", allowedValues),
-                                     CommandOptionType.SingleValue);
+        public static Option AddOption(this Command command, string name, string description)
+            => command.AddOption<string>(name, description);
 
-            ret.Accepts().Values(true, allowedValues);
-            return ret;
+        /// <summary>
+        /// Add argument
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        /// <returns></returns>
+        public static Argument AddArgument(this Command command, string name, string description)
+            => command.AddArgument<string>(name, description);
+
+        /// <summary>
+        /// Add argument
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static Argument<T> AddArgument<T>(this Command command, string name, string description)
+        {
+            var argument = new Argument<T>(name, description);
+            command.AddArgument(argument);
+            return argument;
+        }
+
+
+        /// <summary>
+        /// Add command
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        /// <returns></returns>
+        public static Command AddCommand(this Command command, string name, string description)
+        {
+            var cmd = CreateObject<Command>(name, description);
+            command.AddCommand(cmd);
+            return cmd;
+        }
+
+        private static T CreateObject<T>(string name, string description) where T : IdentifierSymbol
+        {
+            var names = name.Split("|");
+            var obj = (T)Activator.CreateInstance(typeof(T), new[] { names[0], description });
+            for (int i = 1; i < names.Length; i++) { obj.AddAlias(names[i]); }
+            return obj;
         }
 
         /// <summary>
-        /// VM type option
+        /// Add option
         /// </summary>
         /// <param name="command"></param>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static CommandOption<VMTypeEnum> VMTypeOption(this CommandLineApplication command)
-            => command.OptionEnum<VMTypeEnum>("--vmType", "VM type");
+        public static Option<T> AddOption<T>(this Command command, string name, string description)
+        {
+            var option = CreateObject<Option<T>>(name, description);
+            command.AddOption(option);
+            return option;
+        }
 
         /// <summary>
-        /// Snapshot name option
+        /// Add validator range
         /// </summary>
-        /// <param name="command"></param>
-        /// <param name="dependOn"></param>
+        /// <param name="option"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
         /// <returns></returns>
-        public static CommandOption SnapshotNameOption(this CommandLineApplication command, string dependOn)
-            => command.Option("--snapname", "The name of the snapshot", CommandOptionType.SingleValue)
-                      .DependOn(command, dependOn);
+        public static Option<int> AddValidatorRange(this Option<int> option, int min, int max)
+        {
+            option.AddValidator(e =>
+            {
+                var value = e.GetValueOrDefault<int>();
+                if (value < min || value > max) { e.ErrorMessage = $"Option {e.Token.Value} whit value '{value}' is not in range!"; }
+            });
+
+            return option;
+        }
 
         /// <summary>
-        /// Description option
+        /// Add validator exist file
         /// </summary>
-        /// <param name="command"></param>
-        /// <param name="dependOn"></param>
-        /// <returns></returns>
-        public static CommandOption DescriptionOption(this CommandLineApplication command, string dependOn)
-            => command.Option("--description", "A textual description or comment", CommandOptionType.SingleValue)
-                      .DependOn(command, dependOn);
+        /// <param name="option"></param>
+        public static Option AddValidatorExistFile(this Option option)
+        {
+            option.AddValidator(e =>
+            {
+                var value = e.GetValueOrDefault<string>();
+                if (!File.Exists(value)) { e.ErrorMessage = $"Option {e.Token.Value} whit value '{value}' is not a valid file!"; }
+            });
+
+            return option;
+        }
+
+        /// <summary>
+        /// Add validator exist directory
+        /// </summary>
+        /// <param name="option"></param>
+        public static Option AddValidatorExistDirectory(this Option option)
+        {
+            option.AddValidator(e =>
+            {
+                var value = e.GetValueOrDefault<string>();
+                if (!Directory.Exists(value)) { e.ErrorMessage = $"Option {e.Token.Value} whit value '{value}' is not a valid file!"; }
+            });
+
+            return option;
+        }
 
         /// <summary>
         /// Command check update application
         /// </summary>
-        /// <param name="app"></param>
-        public static void CheckUpdateApp(this CommandLineApplication app)
+        /// <param name="rootCommand"></param>
+        public static void CheckUpdateApp(this RootCommand rootCommand)
         {
-            app.Command("app-check-update", cmd =>
+            var cmd = new Command("app-check-update", "Check update application");
+            cmd.SetHandler(async () =>
             {
-                cmd.Description = "Check update application";
-                cmd.AddFullNameLogo();
-
-                cmd.OnExecute(() => app.Out.WriteLine(UpdateHelper.GetInfo(app.Name).Info));
+                Console.Out.Write((await UpdateHelper.GetInfo(rootCommand.Name)).Info);
             });
+            rootCommand.AddCommand(cmd);
         }
 
         /// <summary>
         /// Upgrade application
         /// </summary>
-        /// <param name="app"></param>
-        public static void UpgradeApp(this CommandLineApplication app)
+        /// <param name="rootCommand"></param>
+        public static void UpgradeApp(this RootCommand rootCommand)
         {
-            const string APP_UPGRADE_FINISH = "app-upgrade-finish";
+            const string appUpgradeFinish = "app-upgrade-finish";
 
-            app.Command("app-upgrade", cmd =>
+            var optQuiet = new Option<bool>("--quiet", "Non-interactive mode, does not request confirmation");
+            var cmdUpgrade = new Command("app-upgrade", "Upgrade application")
             {
-                cmd.Description = "Upgrade application";
-                cmd.AddFullNameLogo();
-                var optQuiet = cmd.Option("--quiet|-q",
-                                          "Non-interactive mode, does not request confirmation",
-                                          CommandOptionType.NoValue);
+                optQuiet
+            };
 
-                cmd.OnExecute(() =>
+            cmdUpgrade.SetHandler(async () =>
+            {
+                var (Info, IsNewVersion, BrowserDownloadUrl) = await UpdateHelper.GetInfo(rootCommand.Name);
+                Console.Out.WriteLine(Info);
+
+                if (IsNewVersion)
                 {
-                    var (Info, IsNewVersion, BrowserDownloadUrl) = UpdateHelper.GetInfo(app.Name);
-                    app.Out.WriteLine(Info);
-
-                    if (IsNewVersion)
+                    if (!optQuiet.HasValue() && !ConsoleHelper.ReadYesNo("Confirm upgrade application?", false))
                     {
-                        if (!optQuiet.HasValue())
-                        {
-                            if (!Prompt.GetYesNo("Confirm upgrade application?", false))
-                            {
-                                app.Out.WriteLine("Upgrade abort!");
-                                return 1;
-                            }
-                        }
-
-                        app.Out.WriteLine($"Download {BrowserDownloadUrl} ....");
-
-                        var fileNameNew = UpdateHelper.UpgradePrepare(BrowserDownloadUrl,
-                                                                      Process.GetCurrentProcess().MainModule.FileName);
-
-                        Process.Start(fileNameNew, APP_UPGRADE_FINISH);
+                        Console.Out.WriteLine("Upgrade abort!");
+                        return;
                     }
 
-                    return 0;
-                });
+                    Console.Out.WriteLine($"Download {BrowserDownloadUrl} ....");
+
+                    var fileNameNew = await UpdateHelper.UpgradePrepare(BrowserDownloadUrl, Environment.ProcessPath);
+
+                    Process.Start(fileNameNew, appUpgradeFinish);
+                }
             });
+            rootCommand.AddCommand(cmdUpgrade);
 
             //finish upgrade application
-            app.Command(APP_UPGRADE_FINISH, cmd =>
+            var cmdUpgradeFinish = new Command(appUpgradeFinish)
             {
-                cmd.ShowInHelpText = false;
-                cmd.OnExecute(() =>
-                {
-                    var fileNameNew = Process.GetCurrentProcess().MainModule.FileName;
-                    UpdateHelper.UpgradeFinish(fileNameNew);
+                IsHidden = true
+            };
+            cmdUpgradeFinish.SetHandler(() =>
+            {
+                UpdateHelper.UpgradeFinish(Environment.ProcessPath);
 
-                    app.Out.WriteLine("Upgrade completed!");
-
-                    return 0;
-                });
+                Console.Out.WriteLine("Upgrade completed!");
             });
         }
+
+        /// <summary>
+        /// Script file option
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public static Option ScriptFileOption(this Command command)
+            => command.AddOption("--script", "Use specified hook script").AddValidatorExistFile();
+
+        /// <summary>
+        /// Timeout operation
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public static Option<long> TimeoutOption(this Command command) => command.AddOption<long>("--timeout", "Timeout operation in seconds");
     }
 }

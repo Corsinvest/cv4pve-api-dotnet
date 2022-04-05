@@ -1,0 +1,39 @@
+﻿/*
+ * SPDX-FileCopyrightText: 2022 Daniele Corsini <daniele.corsini@corsinvest.it>
+ * SPDX-FileCopyrightText: Copyright Corsinvest Srl
+ * SPDX-License-Identifier: GPL-3.0-only
+ */
+
+using System.ComponentModel.DataAnnotations;
+using Corsinvest.ProxmoxVE.Api.Shared.Utils;
+using Newtonsoft.Json;
+
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
+{
+    /// <summary>
+    /// Storage RrdData 
+    /// </summary>
+    public class NodeStorageRrdData
+    {
+        /// <summary>
+        /// Used
+        /// </summary>
+        [JsonProperty("used")]
+        [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+        public long Used { get; set; }
+
+        /// <summary>
+        /// Time
+        /// </summary>
+        [JsonProperty("time")]
+        [DisplayFormat(DataFormatString = FormatHelper.FormatUnixTime)]
+        public int Time { get; set; }
+
+        /// <summary>
+        /// Size
+        /// </summary>
+        [JsonProperty("total")]
+        [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+        public long Size { get; set; }
+    }
+}

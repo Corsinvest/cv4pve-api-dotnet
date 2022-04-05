@@ -1,49 +1,56 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <LangVersion>8.0</LangVersion>
+﻿<!--
+SPDX-FileCopyrightText: 2019 Daniele Corsini <daniele.corsini@corsinvest.it>
+SPDX-FileCopyrightText: Copyright Corsinvest Srl
+SPDX-License-Identifier: GPL-3.0-only
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<LangVersion>9.0</LangVersion>
 
-    <Version>3.2.0</Version>
-    <Company>Corsinvest Srl</Company>
-    <Authors>Daniele Corsini</Authors>
-    <Copyright>Corsinvest Srl</Copyright>
-    <Product>Corsinvest for Proxmox VE Api Client Extension</Product>
-    <AssemblyTitle>Corsinvest for Proxmox VE Api Client Extension</AssemblyTitle>
-    <Description>Corsinvest for Proxmox VE Api Client Extension</Description>
+		<Version>7.3.0</Version>
+		<Company>Corsinvest Srl</Company>
+		<Authors>Daniele Corsini</Authors>
+		<Copyright>Corsinvest Srl</Copyright>
+		<Product>Corsinvest for Proxmox VE Api Client Extension</Product>
+		<AssemblyTitle>Corsinvest for Proxmox VE Api Client Extension</AssemblyTitle>
+		<Description>Corsinvest for Proxmox VE Api Client Extension</Description>
 
-    <PackageTags>ProxmoxVE;Api,Client;Rest;Corsinvest;</PackageTags>
-    <PackageIcon>icon.png</PackageIcon>
-    <PackageReleaseNotes>
-    </PackageReleaseNotes>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageIcon>icon.png</PackageIcon>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <RepositoryType>Github</RepositoryType>
-    <RepositoryUrl>https://github.com/Corsinvest/cv4pve-api-dotnet</RepositoryUrl>
+		<PackageTags>ProxmoxVE;Api,Client;Rest;Corsinvest;</PackageTags>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageReleaseNotes>
+		</PackageReleaseNotes>
+		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageIcon>icon.png</PackageIcon>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<RepositoryType>Github</RepositoryType>
+		<RepositoryUrl>https://github.com/Corsinvest/cv4pve-api-dotnet</RepositoryUrl>
 
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-  </PropertyGroup>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<OutputType>Library</OutputType>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Include="..\..\LICENSE.md" Pack="true" PackagePath="" />
-    <None Include="..\..\icon.png" Pack="true" PackagePath="" />
-    <none Include="..\..\README.md" Pack="true" PackagePath="" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\LICENSE.md" Pack="true" PackagePath="" />
+		<None Include="..\..\icon.png" Pack="true" PackagePath="" />
+		<none Include="..\..\README.md" Pack="true" PackagePath="" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="BetterConsoleTables" Version="1.1.3" />
-    <!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api\Corsinvest.ProxmoxVE.Api.csproj" /> -->
-    <PackageReference Include="Corsinvest.ProxmoxVE.Api" Version="7.2.0" />
-    <!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Metadata\Corsinvest.ProxmoxVE.Api.Metadata.csproj" /> -->
-    <PackageReference Include="Corsinvest.ProxmoxVE.Api.Metadata" Version="3.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api\Corsinvest.ProxmoxVE.Api.csproj" /> -->
+		<PackageReference Include="Corsinvest.ProxmoxVE.Api" Version="7.3.0" />
+		<!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Shared\Corsinvest.ProxmoxVE.Api.Shared.csproj" /> -->
+		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Shared" Version="7.3.0" />
+		<!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Metadata\Corsinvest.ProxmoxVE.Api.Metadata.csproj" /> -->
+		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Metadata" Version="3.0.1" />
+	</ItemGroup>
 
-  <Target Name="SpicNSpan" AfterTargets="Clean">
-    <RemoveDir Directories="$(TargetDir)" />
-    <RemoveDir Directories="$(ProjectDir)$(BaseIntermediateOutputPath)" />
-    <RemoveDir Directories="$(ProjectDir)$(BaseOutputPath)" />
-  </Target>
+	<Target Name="SpicNSpan" AfterTargets="Clean">
+		<RemoveDir Directories="$(TargetDir)" />
+		<RemoveDir Directories="$(ProjectDir)$(BaseIntermediateOutputPath)" />
+		<RemoveDir Directories="$(ProjectDir)$(BaseOutputPath)" />
+	</Target>
 </Project>

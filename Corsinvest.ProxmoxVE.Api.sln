@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Corsinvest.ProxmoxVE.Api.Me
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Corsinvest.ProxmoxVE.Api.Shell", "src\Corsinvest.ProxmoxVE.Api.Shell\Corsinvest.ProxmoxVE.Api.Shell.csproj", "{CAFEC2C7-A2F5-4923-B1B7-003633324105}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Corsinvest.ProxmoxVE.Api.Shared", "src\Corsinvest.ProxmoxVE.Api.Shared\Corsinvest.ProxmoxVE.Api.Shared.csproj", "{3DD1BFAA-31B2-45EA-8C26-9C6BA32AC16D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,18 @@ Global
 		{CAFEC2C7-A2F5-4923-B1B7-003633324105}.Release|x64.Build.0 = Release|Any CPU
 		{CAFEC2C7-A2F5-4923-B1B7-003633324105}.Release|x86.ActiveCfg = Release|Any CPU
 		{CAFEC2C7-A2F5-4923-B1B7-003633324105}.Release|x86.Build.0 = Release|Any CPU
+		{3DD1BFAA-31B2-45EA-8C26-9C6BA32AC16D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DD1BFAA-31B2-45EA-8C26-9C6BA32AC16D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DD1BFAA-31B2-45EA-8C26-9C6BA32AC16D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3DD1BFAA-31B2-45EA-8C26-9C6BA32AC16D}.Debug|x64.Build.0 = Debug|Any CPU
+		{3DD1BFAA-31B2-45EA-8C26-9C6BA32AC16D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3DD1BFAA-31B2-45EA-8C26-9C6BA32AC16D}.Debug|x86.Build.0 = Debug|Any CPU
+		{3DD1BFAA-31B2-45EA-8C26-9C6BA32AC16D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DD1BFAA-31B2-45EA-8C26-9C6BA32AC16D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DD1BFAA-31B2-45EA-8C26-9C6BA32AC16D}.Release|x64.ActiveCfg = Release|Any CPU
+		{3DD1BFAA-31B2-45EA-8C26-9C6BA32AC16D}.Release|x64.Build.0 = Release|Any CPU
+		{3DD1BFAA-31B2-45EA-8C26-9C6BA32AC16D}.Release|x86.ActiveCfg = Release|Any CPU
+		{3DD1BFAA-31B2-45EA-8C26-9C6BA32AC16D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,6 +94,7 @@ Global
 		{0E746DA1-8683-486A-B520-85A2E46E3DD9} = {6719F1A5-0108-4DDE-BE5B-50D75DF7DC3A}
 		{692CCB0F-FC3F-47A6-858A-D08C9191CB38} = {6719F1A5-0108-4DDE-BE5B-50D75DF7DC3A}
 		{CAFEC2C7-A2F5-4923-B1B7-003633324105} = {6719F1A5-0108-4DDE-BE5B-50D75DF7DC3A}
+		{3DD1BFAA-31B2-45EA-8C26-9C6BA32AC16D} = {6719F1A5-0108-4DDE-BE5B-50D75DF7DC3A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {43B65FF1-2FD4-4A68-B5D5-2980AB851E57}

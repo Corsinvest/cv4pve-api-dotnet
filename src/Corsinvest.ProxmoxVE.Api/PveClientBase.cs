@@ -1,13 +1,7 @@
 ﻿/*
- * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
- *
- * This source file is available under two different licenses:
- * - GNU General Public License version 3 (GPLv3)
- * - Corsinvest Enterprise License (CEL)
- * Full copyright and license information is available in
- * LICENSE.md which is distributed with this source code.
- *
- * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
+ * SPDX-FileCopyrightText: 2019 Daniele Corsini <daniele.corsini@corsinvest.it>
+ * SPDX-FileCopyrightText: Copyright Corsinvest Srl
+ * SPDX-License-Identifier: GPL-3.0-only
  */
 
 using System;
@@ -20,6 +14,8 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 
 namespace Corsinvest.ProxmoxVE.Api
@@ -29,27 +25,41 @@ namespace Corsinvest.ProxmoxVE.Api
     /// </summary>
     public class PveClientBase
     {
-        private string _ticketCSRFPreventionToken;
-        private string _ticketPVEAuthCookie;
+        private ILogger<PveClientBase> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="hostname"></param>
+        /// <param name="host"></param>
         /// <param name="port"></param>
-        public PveClientBase(string hostname, int port = 8006)
+        public PveClientBase(string host, int port = 8006)
         {
-            Hostname = hostname;
+            Host = host;
             Port = port;
+            _logger = NullLoggerFactory.Instance.CreateLogger<PveClientBase>();
+        }
+
+        private ILoggerFactory _loggerFactory;
+        /// <summary>
+        /// Logger Factory
+        /// </summary>
+        public ILoggerFactory LoggerFactory
+        {
+            get => _loggerFactory;
+            set
+            {
+                _loggerFactory = value;
+                _logger = _loggerFactory.CreateLogger<PveClientBase>();
+            }
         }
 
         /// <summary>
-        /// Get hostname configured.
+        /// Host
         /// </summary>
-        public string Hostname { get; }
+        public string Host { get; }
 
         /// <summary>
-        /// Get port configured.
+        /// Port
         /// </summary>
         public int Port { get; }
 
@@ -59,30 +69,24 @@ namespace Corsinvest.ProxmoxVE.Api
         public ResponseType ResponseType { get; set; } = ResponseType.Json;
 
         /// <summary>
-        /// Get/Set level console output debug.
-        /// 0 - nothing
-        /// 1 - Url and method
-        /// 2 - Url and method and result
-        /// </summary>
-        public int DebugLevel { get; set; }
-
-        /// <summary>
         /// Returns the base URL used to interact with the Proxmox VE API.
         /// </summary>
-        public string GetApiUrl()
-        {
-            var url = $"https://{Hostname}:{Port}/api2";
-            if (ResponseType != ResponseType.None)
-            {
-                url += $"/{Enum.GetName(typeof(ResponseType), ResponseType).ToLower()}";
-            }
-            return url;
-        }
+        public string GetApiUrl() => $"https://{Host}:{Port}/api2/{Enum.GetName(typeof(ResponseType), ResponseType).ToLower()}";
 
         /// <summary>
         /// Api Token format USER@REALM!TOKENID=UUID
         /// </summary>
         public string ApiToken { get; set; }
+
+        /// <summary>
+        /// Ticket CSRFPreventionToken
+        /// </summary>
+        public string CSRFPreventionToken { get; private set; }
+
+        /// <summary>
+        /// Ticket PVEAuthCookie
+        /// </summary>
+        public string PVEAuthCookie { get; private set; }
 
         /// <summary>
         /// Creation ticket from login.
@@ -102,8 +106,8 @@ namespace Corsinvest.ProxmoxVE.Api
 
             if (ticket.IsSuccessStatusCode)
             {
-                _ticketCSRFPreventionToken = ticket.Response.data.CSRFPreventionToken;
-                _ticketPVEAuthCookie = ticket.Response.data.ticket;
+                CSRFPreventionToken = ticket.Response.data.CSRFPreventionToken;
+                PVEAuthCookie = ticket.Response.data.ticket;
             }
             return ticket.IsSuccessStatusCode;
         }
@@ -115,6 +119,8 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="password"></param>
         public async Task<bool> Login(string userName, string password)
         {
+            _logger.LogDebug($"Login: {userName}");
+
             var realm = "pam";
 
             //check username
@@ -155,6 +161,37 @@ namespace Corsinvest.ProxmoxVE.Api
             => await ExecuteAction(resource, MethodType.Set, parameters);
 
         /// <summary>
+        /// Het http client
+        /// </summary>
+        /// <returns></returns>
+        public HttpClient GetHttpClient()
+        {
+#pragma warning disable S4830 // Server certificates should be verified during SSL/TLS connections
+            var handler = new HttpClientHandler()
+            {
+                CookieContainer = new CookieContainer(),
+                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+            };
+#pragma warning restore S4830 // Server certificates should be verified during SSL/TLS connections
+
+            var client = new HttpClient(handler);
+
+            //ticket login
+            if (CSRFPreventionToken != null)
+            {
+                handler.CookieContainer.Add(new Cookie("PVEAuthCookie", PVEAuthCookie, "/", Host));
+                client.DefaultRequestHeaders.Add("CSRFPreventionToken", CSRFPreventionToken);
+            }
+
+            if (!string.IsNullOrWhiteSpace(ApiToken))
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("PVEAPIToken", ApiToken);
+            }
+
+            return client;
+        }
+
+        /// <summary>
         /// Execute Execute method DELETE
         /// </summary>
         /// <param name="resource">Url request</param>
@@ -163,19 +200,9 @@ namespace Corsinvest.ProxmoxVE.Api
         public async Task<Result> Delete(string resource, IDictionary<string, object> parameters = null)
             => await ExecuteAction(resource, MethodType.Delete, parameters);
 
-        private async Task<Result> ExecuteAction(string resource,
-                                                 MethodType methodType,
-                                                 IDictionary<string, object> parameters = null)
+        private async Task<Result> ExecuteAction(string resource, MethodType methodType, IDictionary<string, object> parameters = null)
         {
-            using var handler = new HttpClientHandler()
-            {
-                CookieContainer = new CookieContainer(),
-                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; }
-            };
-            using var client = new HttpClient(handler)
-            {
-                BaseAddress = new Uri(GetApiUrl())
-            };
+            using var client = GetHttpClient();
 
             var httpMethod = methodType switch
             {
@@ -204,14 +231,14 @@ namespace Corsinvest.ProxmoxVE.Api
                 uriString += "?" + string.Join("&", @params.Select(a => $"{a.Key}={HttpUtility.UrlEncode(a.Value)}"));
             }
 
-            if (DebugLevel >= 1)
+            if (_logger.IsEnabled(LogLevel.Debug))
             {
-                Console.Out.WriteLine($"Method: {httpMethod}, Url: {uriString}");
+                _logger.LogDebug($"Method: {httpMethod}, Url: {uriString}");
                 if (httpMethod != HttpMethod.Get)
                 {
-                    Console.Out.WriteLine("Parameters:");
-                    Console.Out.WriteLine(string.Join(Environment.NewLine,
-                                                      @params.Select(a => $"{a.Key} : {a.Value}")));
+                    _logger.LogDebug("Parameters:" +
+                                     Environment.NewLine +
+                                     string.Join(Environment.NewLine, @params.Select(a => $"{a.Key} : {a.Value}")));
                 }
             }
 
@@ -221,53 +248,36 @@ namespace Corsinvest.ProxmoxVE.Api
                 request.Content = new FormUrlEncodedContent(@params);
             }
 
-            //ticket login
-            if (_ticketCSRFPreventionToken != null)
-            {
-                handler.CookieContainer.Add(request.RequestUri, new Cookie("PVEAuthCookie", _ticketPVEAuthCookie));
-                request.Headers.Add("CSRFPreventionToken", _ticketCSRFPreventionToken);
-            }
-
-            if (!string.IsNullOrWhiteSpace(ApiToken))
-            {
-                request.Headers.Authorization = new AuthenticationHeaderValue("PVEAPIToken", ApiToken);
-            }
-
             var response = await client.SendAsync(request);
-
-            if (DebugLevel >= 2)
+            if (_logger.IsEnabled(LogLevel.Debug))
             {
-                Console.Out.WriteLine($"StatusCode:          {response.StatusCode}");
-                Console.Out.WriteLine($"ReasonPhrase:        {response.ReasonPhrase}");
-                Console.Out.WriteLine($"IsSuccessStatusCode: {response.IsSuccessStatusCode}");
+                _logger.LogDebug($"StatusCode:          {response.StatusCode}" +
+                             Environment.NewLine +
+                             $"ReasonPhrase:        {response.ReasonPhrase}" +
+                             Environment.NewLine +
+                             $"IsSuccessStatusCode: {response.IsSuccessStatusCode}");
             }
 
             dynamic result = null;
             switch (ResponseType)
             {
                 case ResponseType.Json:
-                    var stringContent = await response.Content.ReadAsStringAsync();
-                    result = JsonConvert.DeserializeObject<ExpandoObject>(stringContent);
-                    if (DebugLevel >= 2) { Console.Out.WriteLine(JsonConvert.SerializeObject(result, Formatting.Indented)); }
+                    result = JsonConvert.DeserializeObject<ExpandoObject>(await response.Content.ReadAsStringAsync());
+                    if (_logger.IsEnabled(LogLevel.Trace))
+                    {
+                        _logger.LogTrace(JsonConvert.SerializeObject(result, Formatting.Indented) as string);
+                    }
                     break;
 
                 case ResponseType.Png:
                     result = "data:image/png;base64," + Convert.ToBase64String(await response.Content.ReadAsByteArrayAsync());
-
-                    if (DebugLevel >= 2) { Console.Out.WriteLine(result); }
-                    break;
-
-                case ResponseType.None:
-                    result = await response.Content.ReadAsStringAsync();
-                    if (DebugLevel >= 2) { Console.Out.WriteLine(result); }
+                    if (_logger.IsEnabled(LogLevel.Trace)) { _logger.LogTrace(result as string); }
                     break;
 
                 default: break;
             }
 
             if (result == null) { result = new ExpandoObject(); }
-
-            if (DebugLevel > 0) { Console.Out.WriteLine("============================="); }
 
             LastResult = new Result(result,
                                     response.StatusCode,
@@ -302,63 +312,69 @@ namespace Corsinvest.ProxmoxVE.Api
         }
 
         /// <summary>
-        /// Wait for task to finish
+        /// Get node from task
         /// </summary>
-        /// <param name="task">Task identifier</param>
-        /// <param name="wait">Millisecond wait next check</param>
-        /// <param name="timeOut">Millisecond timeout</param>
-        /// <return></return>
-        public async Task<bool> WaitForTaskToFinish(string task, int wait = 500, long timeOut = 10000)
-            => await WaitForTaskToFinish(task.Split(':')[1], task, wait, timeOut);
+        /// <param name="task"></param>
+        /// <returns></returns>
+        public static string GetNodeFromTask(string task) => task.Split(':')[1];
 
         /// <summary>
         /// Wait for task to finish
         /// </summary>
-        /// <param name="node">Node identifier</param>
+        /// <param name="result"></param>
+        /// <param name="wait"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
+        public async Task<bool> WaitForTaskToFinish(Result result, int wait = 500, long timeout = 10000)
+            => !(result != null && !result.ResponseInError && timeout > 0) ||
+                    await WaitForTaskToFinish(result.ToData(), wait, timeout);
+
+        /// <summary>
+        /// Wait for task to finish
+        /// </summary>
         /// <param name="task">Task identifier</param>
         /// <param name="wait">Millisecond wait next check</param>
-        /// <param name="timeOut">Millisecond timeout</param>
+        /// <param name="timeout">Millisecond timeout</param>
         /// <return></return>
-        public async Task<bool> WaitForTaskToFinish(string node, string task, int wait = 500, long timeOut = 10000)
+        public async Task<bool> WaitForTaskToFinish(string task, int wait = 500, long timeout = 10000)
         {
             var isRunning = true;
             if (wait <= 0) { wait = 500; }
-            if (timeOut < wait) { timeOut = wait + 5000; }
+            if (timeout < wait) { timeout = wait + 5000; }
             var timeStart = DateTime.Now;
 
-            while (isRunning && (DateTime.Now - timeStart).Milliseconds < timeOut)
+            while (isRunning && (DateTime.Now - timeStart).Milliseconds < timeout)
             {
                 Thread.Sleep(wait);
-                isRunning = await TaskIsRunning(node, task);
+                isRunning = await TaskIsRunning(task);
             }
 
             //check timeout
-            return (DateTime.Now - timeStart).Milliseconds < timeOut;
+            return (DateTime.Now - timeStart).Milliseconds < timeout;
         }
 
         /// <summary>
         /// Get exists status task.
         /// </summary>
-        /// <param name="node"></param>
         /// <param name="task"></param>
         /// <returns></returns>
-        public async Task<bool> TaskIsRunning(string node, string task)
-            => (await ReadTaskStatus(node, task)).Response.data.status == "running";
+        public async Task<bool> TaskIsRunning(string task)
+            => (await ReadTaskStatus(task)).Response.data.status == "running";
 
         /// <summary>
         /// Get exists status task.
         /// </summary>
-        /// <param name="node"></param>
         /// <param name="task"></param>
         /// <returns></returns>
-        public async Task<string> GetExitStatusTask(string node, string task) =>
-            (await ReadTaskStatus(node, task)).Response.data.exitstatus;
+        public async Task<string> GetExitStatusTask(string task)
+            => (await ReadTaskStatus(task)).Response.data.exitstatus;
 
         /// <summary>
         /// Read task status.
         /// </summary>
+        /// <param name="task"></param>
         /// <returns></returns>
-        private async Task<Result> ReadTaskStatus(string node, string task)
-            => await Get($"/nodes/{node}/tasks/{task}/status");
+        private async Task<Result> ReadTaskStatus(string task)
+            => await Get($"/nodes/{GetNodeFromTask(task)}/tasks/{task}/status");
     }
 }

@@ -1,18 +1,20 @@
 # Corsinvest.ProxmoxVE.Api
 
-[![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg)](LICENSE.md) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.svg?label=Nuget%20%20Api) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Extension.svg?label=Nuget%20%20Extension) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Metadata.svg?label=Nuget%20%20Metadata) ![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Shell.svg?label=Nuget%20%20Shell)
+[![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg)](LICENSE.md)
+
+[![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.svg?label=Nuget%20%20Api)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api)
+
+[![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Extension.svg?label=Nuget%20%20Extension)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Extension)
+
+[![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Metadata.svg?label=Nuget%20%20Metadata)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Metadata)
+
+[![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Shell.svg?label=Nuget%20%20Shell)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shell)
+
+[![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Shared.svg?label=Nuget%20%20Shared)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shared)
 
 Proxmox VE Client API .Net
 
 [Proxmox VE Api](https://pve.proxmox.com/pve-docs/api-viewer/)
-
-[Nuget Api](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api)
-
-[Nuget Extension](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Extension)
-
-[Nuget Metadata](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Metadata)
-
-[Nuget Shell](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shell)
 
 ```text
    ______                _                      __
@@ -31,7 +33,7 @@ For licensing details please visit [LICENSE.md](LICENSE.md)
 
 ## Commercial Support
 
-This software is part of a suite of tools called cv4pve-tools. If you want commercial support, visit the [site](https://www.cv4pve-tools.com)
+This software is part of a suite of tools called cv4pve. If you want commercial support send mail support@corsinvest.it
 
 ## General
 
@@ -41,11 +43,6 @@ The client is generated from a JSON Api on Proxmox VE.
 
 * Easy to learn
 * Method named
-* Method native suffix Rest (prevent)
-  * GetRest
-  * CreateRest (Post)
-  * SetRest (Put)
-  * DeleteRest
 * Set ResponseType json, png
 * Full class and method generated from documentation (about client)
 * Comment any method and parameters
@@ -53,7 +50,7 @@ The client is generated from a JSON Api on Proxmox VE.
 * Tree structure
   * client.Nodes["pve1"].Qemu[100].Snapshot().snapshotList().Response.data
 * Return data Proxmox VE
-* Debug Level show to console information REST call
+* Logger with MicrosMicrosoft.Extensions.Logging 
 * Return result
   * Request
   * Response
@@ -72,7 +69,9 @@ The client is generated from a JSON Api on Proxmox VE.
 * Return Result class more information
 * ClientBase lite function
 * Form Proxmox VE 6.2 support Api Token for user
-* Async/Await
+* Async / Await
+* Add model in Shared library for decode json
+* Add Extension method **Get** to decode in json from result in Extension library
 
 ## Api token
 
@@ -161,3 +160,25 @@ client.ApiToken = "root@pam!qqqqqq=8a8c1cd4-d373-43f1-b366-05ce4cb8061f";
 var version = await client.Version.Version();
 Console.WriteLine(JsonConvert.SerializeObject(version.Response.data, Formatting.Indented));
 ```
+
+## Corsinvest.ProxmoxVE.Extension
+
+Extension add functionality on Api.
+
+* ApiExplorer
+* Retrive VM/CT data from name or id
+* Simplify management of VM/CT e.g snapshot
+* Extension method **Get** to decode json from result
+  e.g Client.Cluster.Status.Get() return **IEnumerable<IClusterStatus>**
+
+## Corsinvest.ProxmoxVE.Shared
+
+Contain model for Json conversion and utility.
+
+## Corsinvest.ProxmoxVE.Metadata
+
+Read documentation ProxmoxVE API and extract structure.
+
+## Corsinvest.ProxmoxVE.Shell
+
+Utility for console application.

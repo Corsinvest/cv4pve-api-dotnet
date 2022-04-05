@@ -1,13 +1,7 @@
 /*
- * This file is part of the cv4pve-api-dotnet https://github.com/Corsinvest/cv4pve-api-dotnet,
- *
- * This source file is available under two different licenses:
- * - GNU General Public License version 3 (GPLv3)
- * - Corsinvest Enterprise License (CEL)
- * Full copyright and license information is available in
- * LICENSE.md which is distributed with this source code.
- *
- * Copyright (C) 2016 Corsinvest Srl	GPLv3 and CEL
+ * SPDX-FileCopyrightText: 2019 Daniele Corsini <daniele.corsini@corsinvest.it>
+ * SPDX-FileCopyrightText: Copyright Corsinvest Srl
+ * SPDX-License-Identifier: GPL-3.0-only
  */
 
 using System.Collections.Generic;
@@ -53,7 +47,7 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
             //tree children
             if (token["children"] != null)
             {
-                foreach (var child in token["children"]) { new ClassApi(child, this); }
+                foreach (var child in token["children"]) { _ = new ClassApi(child, this); }
             }
         }
 
@@ -80,8 +74,8 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
             {
                 if (string.IsNullOrWhiteSpace(item)) { continue; }
                 var oldClassApi = classApi;
-                classApi = classApi.SubClasses.Where(a => a.Resource == classApi.Resource + "/" + item).FirstOrDefault();
-                if (classApi == null) { classApi = oldClassApi.SubClasses.Where(a => a.IsIndexed).FirstOrDefault(); }
+                classApi = classApi.SubClasses.FirstOrDefault(a => a.Resource == classApi.Resource + "/" + item);
+                if (classApi == null) { classApi = oldClassApi.SubClasses.FirstOrDefault(a => a.IsIndexed); }
                 if (classApi == null) { break; }
             }
 
