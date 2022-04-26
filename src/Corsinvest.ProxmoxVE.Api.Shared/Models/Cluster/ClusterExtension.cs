@@ -4,14 +4,14 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster
 {
@@ -140,14 +140,12 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster
         public static IEnumerable<string> GetDefaultColumns()
             => new[]
             {
-                nameof(Type),
+                nameof(ClusterResource.Type),
                 nameof(ClusterResource.Description),
                 nameof(ClusterResource.DiskUsagePercentage),
                 nameof(ClusterResource.MemoryUsagePercentage),
                 nameof(ClusterResource.CpuUsagePercentage),
-                nameof(ClusterResource.Uptime),
-                nameof(ClusterResource.HostCpuUsage),
-                nameof(ClusterResource.HostMemoryUsage),
+                nameof(ClusterResource.Uptime)
             };
 
         /// <summary>

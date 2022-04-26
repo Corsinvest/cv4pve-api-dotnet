@@ -27,10 +27,10 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         [JsonProperty("subsystem_vendor")]
         public string SubsystemVendor { get; set; }
 
-    /// <summary>
-    /// Device Name
-    /// </summary>
-    /// <value></value>
+        /// <summary>
+        /// Device Name
+        /// </summary>
+        /// <value></value>
         [JsonProperty("device_name")]
         public string DeviceName { get; set; }
 
@@ -41,10 +41,10 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         [JsonProperty("vendor")]
         public string Vendor { get; set; }
 
-    /// <summary>
-    /// Vendor Name
-    /// </summary>
-    /// <value></value>
+        /// <summary>
+        /// Vendor Name
+        /// </summary>
+        /// <value></value>
         [JsonProperty("vendor_name")]
         public string VendorName { get; set; }
 

@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using System;
 using Humanizer.Bytes;
+using System;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Utils
 {
@@ -71,7 +71,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Utils
         /// Memory info
         /// </summary>
         public static string UsageInfo(long usage, long size)
-            => $"{Math.Round(CalculatePercentage(usage, size) * 100 , 1)}% ({FromBytes(usage)} of {FromBytes(size)})";
+            => $"{Math.Round(CalculatePercentage(usage, size) * 100, 1)}% ({FromBytes(usage)} of {FromBytes(size)})";
 
         /// <summary>
         /// Calculate percentage

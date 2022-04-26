@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-3.0-only
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<LangVersion>9.0</LangVersion>
 
-		<Version>7.3.0</Version>
+		<Version>7.3.1</Version>
 		<Company>Corsinvest Srl</Company>
 		<Authors>Daniele Corsini</Authors>
 		<Copyright>Corsinvest Srl</Copyright>
@@ -17,6 +17,7 @@ SPDX-License-Identifier: GPL-3.0-only
 		<AssemblyTitle>Corsinvest for Proxmox VE Api Client Extension</AssemblyTitle>
 		<Description>Corsinvest for Proxmox VE Api Client Extension</Description>
 
+		<PackageProjectUrl>https://github.com/Corsinvest/cv4pve-api-dotnet</PackageProjectUrl>
 		<PackageTags>ProxmoxVE;Api,Client;Rest;Corsinvest;</PackageTags>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageReleaseNotes>
@@ -41,9 +42,9 @@ SPDX-License-Identifier: GPL-3.0-only
 
 	<ItemGroup>
 		<!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api\Corsinvest.ProxmoxVE.Api.csproj" /> -->
-		<PackageReference Include="Corsinvest.ProxmoxVE.Api" Version="7.3.0" />
+		<PackageReference Include="Corsinvest.ProxmoxVE.Api" Version="7.3.1" />
 		<!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Shared\Corsinvest.ProxmoxVE.Api.Shared.csproj" /> -->
-		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Shared" Version="7.3.0" />
+		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Shared" Version="7.3.1" />
 		<!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Metadata\Corsinvest.ProxmoxVE.Api.Metadata.csproj" /> -->
 		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Metadata" Version="3.0.1" />
 	</ItemGroup>

@@ -13,7 +13,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
     /// <summary>
     /// interface uptime
     /// </summary>
-    public interface IUptimeItem 
+    public interface IUptimeItem
     {
         /// <summary>
         /// Uptime

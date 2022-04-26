@@ -44,7 +44,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
         /// <summary>
         /// Supported Command
         /// </summary>
-                public class SupportedCommand
+        public class SupportedCommand
         {
             /// <summary>
             /// Enabled

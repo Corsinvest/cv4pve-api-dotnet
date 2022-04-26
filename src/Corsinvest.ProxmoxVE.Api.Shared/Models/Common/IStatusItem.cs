@@ -12,7 +12,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
     /// <summary>
     /// Interface status
     /// </summary>
-    public interface IStatusItem 
+    public interface IStatusItem
     {
         /// <summary>
         /// Status

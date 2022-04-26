@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using System;
-using System.ComponentModel.DataAnnotations;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using Newtonsoft.Json;
+using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
 {
@@ -109,7 +109,6 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// Used
         /// </summary>
         [JsonProperty("used")]
-        [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
         public string Used { get; set; }
 
         /// <summary>

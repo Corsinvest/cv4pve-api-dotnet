@@ -4,11 +4,6 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Access;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
@@ -16,6 +11,11 @@ using Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Pool;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Storage;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
 {
@@ -919,7 +919,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
 
                 //TODO cpu, aplinfo, capabilities, ceph, config,  journal, syslog
 
-
                 node.Storages = await ReadStorages(nodeApi);
                 node.Lxc = await ReadLxc(nodeApi);
                 node.Qemu = await ReadQemu(nodeApi, removeSecurity);
@@ -940,11 +939,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
                 {
                     Detail = item,
                     Status = await storageNode.Status.Get(),
-                };
-
-                storage.Content = item.Active
+                    Content = item.Active
                                     ? await storageNode.Content.Get()
-                                    : new List<NodeStorageContent>();
+                                    : new List<NodeStorageContent>()
+                };
 
                 storage.RrdData.Day = await storageNode.Rrddata.Get(RrdDataTimeFrame.Day, RrdDataConsolidation.Average);
                 storage.RrdData.Week = await storageNode.Rrddata.Get(RrdDataTimeFrame.Week, RrdDataConsolidation.Average);

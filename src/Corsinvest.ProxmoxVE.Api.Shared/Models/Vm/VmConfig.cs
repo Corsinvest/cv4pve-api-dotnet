@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
 {
@@ -18,16 +18,16 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
     public class VmConfig
     {
         /// <summary>
+        /// Architecture type.
+        /// </summary>
+        [JsonProperty("arch")]
+        public string Arch { get; set; }
+
+        /// <summary>
         /// Parent
         /// </summary>
         [JsonProperty("parent")]
         public string Parent { get; set; }
-
-        /// <summary>
-        /// Cores assigned.
-        /// </summary>
-        [JsonProperty("cores")]
-        public int Cores { get; set; }
 
         /// <summary>
         /// Memory
@@ -116,7 +116,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
             {
                 var def = ExtensionData[key] + "";
                 if (key == "rootfs"
-                    || (Regex.IsMatch(key, @"(ide|sata|virtio|scsi)\d+") && !Regex.IsMatch(def, "cdrom|none"))) //bus match
+                    || (Regex.IsMatch(key, @"(ide|sata|virtio|scsi)\d+") && !Regex.IsMatch(def, "media=cdrom"))) //bus match
                 {
                     var info1 = def.Split(':');
                     var info2 = info1[1].Split(',');

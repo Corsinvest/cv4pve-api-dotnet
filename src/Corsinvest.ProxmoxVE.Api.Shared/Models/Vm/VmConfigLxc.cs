@@ -44,10 +44,10 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
         public int Swap { get; set; }
 
         /// <summary>
-        /// Arch
+        /// The number of cores per socket.
         /// </summary>
-        [JsonProperty("arch")]
-        public string Arch { get; set; }
+        [JsonProperty("cores")]
+        public int Cores { get; set; }
 
         /// <summary>
         /// Unprivileged

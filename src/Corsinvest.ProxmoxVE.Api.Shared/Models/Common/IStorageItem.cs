@@ -11,7 +11,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
     /// <summary>
     /// Storage Item
     /// </summary>
-    public interface IStorageItem 
+    public interface IStorageItem
     {
         /// <summary>
         /// Storage
