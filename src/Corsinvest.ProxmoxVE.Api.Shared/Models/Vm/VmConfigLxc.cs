@@ -14,12 +14,6 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
     public class VmConfigLxc : VmConfig
     {
         /// <summary>
-        /// Arch
-        /// </summary>
-        [JsonProperty("rootfs")]
-        public string RootFs { get; set; }
-
-        /// <summary>
         /// Hostname
         /// </summary>
         [JsonProperty("hostname")]
