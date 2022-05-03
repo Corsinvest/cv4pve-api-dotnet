@@ -17,7 +17,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
 {
     /// <summary>
     /// Models extensions
-    /// </summary> 
+    /// </summary>
     public static class ModelsExtensions
     {
         /// <summary>
@@ -45,7 +45,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         public static async Task<IEnumerable<NodeStorageRrdData>> Get(this PveClient.PveNodes.PveNodeItem.PveStorage.PveStorageItem.PveRrddata item,
                                                                       RrdDataTimeFrame dataTimeFrame,
                                                                       RrdDataConsolidation dataConsolidation)
-            => await item.Get(dataTimeFrame.ToString().ToLower(), dataConsolidation.ToString().ToUpper());
+            => await item.Get(dataTimeFrame.GetValue(), dataConsolidation.GetValue());
 
         /// <summary>
         /// Read node RRD statistics
@@ -57,7 +57,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         public static async Task<IEnumerable<NodeRrdData>> Get(this PveClient.PveNodes.PveNodeItem.PveRrddata item,
                                                                RrdDataTimeFrame dataTimeFrame,
                                                                RrdDataConsolidation dataConsolidation)
-            => await item.Get(dataTimeFrame.ToString().ToLower(), dataConsolidation.ToString().ToUpper());
+            => await item.Get(dataTimeFrame.GetValue(), dataConsolidation.GetValue());
 
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         public static async Task<IEnumerable<VmRrdData>> Get(this PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveRrddata item,
                                                              RrdDataTimeFrame dataTimeFrame,
                                                              RrdDataConsolidation dataConsolidation)
-            => await item.Get(dataTimeFrame.ToString().ToLower(), dataConsolidation.ToString().ToUpper());
+            => await item.Get(dataTimeFrame.GetValue(), dataConsolidation.GetValue());
 
         /// <summary>
         /// Read VM RRD statistics
@@ -112,6 +112,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         public static async Task<IEnumerable<VmRrdData>> Get(this PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveRrddata item,
                                                              RrdDataTimeFrame dataTimeFrame,
                                                              RrdDataConsolidation dataConsolidation)
-            => await item.Get(dataTimeFrame.ToString().ToLower(), dataConsolidation.ToString().ToUpper());
+            => await item.Get(dataTimeFrame.GetValue(), dataConsolidation.GetValue());
     }
 }

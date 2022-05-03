@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using System.ComponentModel;
+using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
 {
@@ -50,5 +50,37 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
             data.MemoryInfo = FormatHelper.UsageInfo(data.MemoryUsage, data.MemorySize);
             data.MemoryUsagePercentage = FormatHelper.CalculatePercentage(data.MemoryUsage, data.MemorySize);
         }
+
+
+
+        //hour,day,week,month year
+        /// <summary>
+        /// Get value for RrdDataTimeFrame
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string GetValue(this RrdDataTimeFrame value)
+            => value switch
+            {
+                RrdDataTimeFrame.Day => "day",
+                RrdDataTimeFrame.Hour => "hour",
+                RrdDataTimeFrame.Month => "month",
+                RrdDataTimeFrame.Week => "week",
+                RrdDataTimeFrame.Year => "year",
+                _ => throw new InvalidEnumArgumentException(),
+            };
+
+        /// <summary>
+        /// Get value for RrdDataConsolidation
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string GetValue(this RrdDataConsolidation value)
+            => value switch
+            {
+                RrdDataConsolidation.Average => "AVERAGE",
+                RrdDataConsolidation.Maximum => "MAX",
+                _ => throw new InvalidEnumArgumentException(),
+            };
     }
 }
