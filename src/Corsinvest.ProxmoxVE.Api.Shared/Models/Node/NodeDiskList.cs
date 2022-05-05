@@ -115,7 +115,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// Size
         /// </summary>
         [JsonProperty("size")]
-        [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long Size { get; set; }
     }
 }

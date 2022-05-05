@@ -62,7 +62,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// Uptime
         /// </summary>
         [JsonProperty("uptime")]
-        [DisplayFormat(DataFormatString = FormatHelper.FormatUptimeUnixTime)]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUptimeUnixTime + "}")]
         public int Uptime { get; set; }
 
         /// <summary>
@@ -98,21 +98,21 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
             /// Free
             /// </summary>
             [JsonProperty("free")]
-            [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+           [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
             public long Free { get; set; }
 
             /// <summary>
             /// Used
             /// </summary>
             [JsonProperty("used")]
-            [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+           [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
             public long Used { get; set; }
 
             /// <summary>
             /// Total
             /// </summary>
             [JsonProperty("total")]
-            [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+           [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
             public long Total { get; set; }
         }
 
@@ -179,21 +179,21 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
             /// Free
             /// </summary>
             [JsonProperty("free")]
-            [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+           [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
             public long Free { get; set; }
 
             /// <summary>
             /// Used
             /// </summary>
             [JsonProperty("used")]
-            [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+           [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
             public long Used { get; set; }
 
             /// <summary>
             /// Total
             /// </summary>
             [JsonProperty("total")]
-            [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+           [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
             public long Total { get; set; }
         }
 
@@ -218,28 +218,28 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
             /// Available
             /// </summary>
             [JsonProperty("avail")]
-            [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+           [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
             public long Available { get; set; }
 
             /// <summary>
             /// Total
             /// </summary>
             [JsonProperty("total")]
-            [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+           [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
             public long Total { get; set; }
 
             /// <summary>
             /// Used
             /// </summary>
             [JsonProperty("used")]
-            [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+           [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
             public long Used { get; set; }
 
             /// <summary>
             /// Free
             /// </summary>
             [JsonProperty("free")]
-            [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+           [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
             public long Free { get; set; }
         }
     }

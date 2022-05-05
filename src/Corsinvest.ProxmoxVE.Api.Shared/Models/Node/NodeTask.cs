@@ -44,7 +44,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// StartTime unix time
         /// </summary>
         [JsonProperty("starttime")]
-        [DisplayFormat(DataFormatString = FormatHelper.FormatUnixTime)]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
         public long StartTime { get; set; }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// EndTime unix time
         /// </summary>
         [JsonProperty("endtime")]
-        [DisplayFormat(DataFormatString = FormatHelper.FormatUnixTime)]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
         public long EndTime { get; set; }
 
         /// <summary>

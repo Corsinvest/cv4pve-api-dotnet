@@ -91,7 +91,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
             /// </summary>
             /// <value></value>
             [JsonProperty("netin")]
-            [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+           [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
             public long NetIn { get; set; }
 
             /// <summary>
@@ -99,7 +99,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
             /// </summary>
             /// <value></value>
             [JsonProperty("netout")]
-            [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+           [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
             public long NetOut { get; set; }
         }
 
@@ -139,7 +139,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
             public long FlushTotalTimeNs { get; set; }
 
             /// <summary>
-            /// Failed Wr Operations 
+            /// Failed Wr Operations
             /// </summary>
             [JsonProperty("failed_wr_operations")]
             public long FailedWrOperations { get; set; }
@@ -223,13 +223,13 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
             public long InvalidWrOperations { get; set; }
 
             /// <summary>
-            /// Wr Highest Offset 
+            /// Wr Highest Offset
             /// </summary>
             [JsonProperty("wr_highest_offset")]
             public long WrHighestOffset { get; set; }
 
             /// <summary>
-            /// Unmap Merged 
+            /// Unmap Merged
             /// </summary>
             [JsonProperty("unmap_merged")]
             public long UnmapMerged { get; set; }

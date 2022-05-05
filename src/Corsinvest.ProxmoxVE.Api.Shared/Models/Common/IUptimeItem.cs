@@ -20,7 +20,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
         /// </summary>
         /// <value></value>
         [JsonProperty("uptime")]
-        [DisplayFormat(DataFormatString = FormatHelper.FormatUptimeUnixTime)]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUptimeUnixTime + "}")]
         long Uptime { get; set; }
     }
 }

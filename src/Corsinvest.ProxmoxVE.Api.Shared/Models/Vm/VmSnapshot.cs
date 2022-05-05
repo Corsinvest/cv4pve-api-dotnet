@@ -23,7 +23,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
         /// Time
         /// </summary>
         [JsonProperty("snaptime")]
-        [DisplayFormat(DataFormatString = FormatHelper.FormatUnixTime)]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
         public long Time
         {
             get => _time == 0 ? DateTimeOffset.Now.ToUnixTimeSeconds() : _time;

@@ -27,7 +27,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// Creation unix
         /// </summary>
         [JsonProperty("ctime")]
-        [DisplayFormat(DataFormatString = FormatHelper.FormatUnixTime)]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
         public long Creation { get; set; }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// File size
         /// </summary>
         [JsonProperty("size")]
-        [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long Size { get; set; }
 
         /// <summary>

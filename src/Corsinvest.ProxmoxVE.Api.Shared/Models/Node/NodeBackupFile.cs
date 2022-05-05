@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using Corsinvest.ProxmoxVE.Api.Shared.Utils;
-using Newtonsoft.Json;
 using System;
 using System.ComponentModel.DataAnnotations;
+using Corsinvest.ProxmoxVE.Api.Shared.Utils;
+using Newtonsoft.Json;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
 {
@@ -49,7 +49,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// Modified Time Unix
         /// </summary>
         [JsonProperty("mtime")]
-        [DisplayFormat(DataFormatString = FormatHelper.FormatUnixTime)]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
         public long ModifiedTime { get; set; }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// Size
         /// </summary>
         [JsonProperty("size")]
-        [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long Size { get; set; }
     }
 }

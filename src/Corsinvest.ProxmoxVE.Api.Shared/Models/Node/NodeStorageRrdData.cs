@@ -11,7 +11,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
 {
     /// <summary>
-    /// Storage RrdData 
+    /// Storage RrdData
     /// </summary>
     public class NodeStorageRrdData
     {
@@ -19,21 +19,21 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// Used
         /// </summary>
         [JsonProperty("used")]
-        [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long Used { get; set; }
 
         /// <summary>
         /// Time
         /// </summary>
         [JsonProperty("time")]
-        [DisplayFormat(DataFormatString = FormatHelper.FormatUnixTime)]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
         public int Time { get; set; }
 
         /// <summary>
         /// Size
         /// </summary>
         [JsonProperty("total")]
-        [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long Size { get; set; }
     }
 }

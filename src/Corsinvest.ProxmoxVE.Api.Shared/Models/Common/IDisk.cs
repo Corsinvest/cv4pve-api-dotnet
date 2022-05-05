@@ -22,7 +22,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
         /// <value></value>
         [JsonProperty("disk")]
         [Display(Name = "Disk usage")]
-        [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         long DiskUsage { get; set; }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
         /// <value></value>
         [JsonProperty("maxdisk")]
         [Display(Name = "Disk size")]
-        [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         long DiskSize { get; set; }
 
         /// <summary>

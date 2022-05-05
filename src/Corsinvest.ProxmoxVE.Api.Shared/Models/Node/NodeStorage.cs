@@ -26,14 +26,14 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// Used
         /// </summary>
         [JsonProperty("used")]
-        [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long Used { get; set; }
 
         /// <summary>
         /// Available
         /// </summary>
         [JsonProperty("avail")]
-        [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long Available { get; set; }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         public bool Active { get; set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [JsonProperty("used_fraction")]
         [Display(Name = "Usage %")]
@@ -66,7 +66,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// Size
         /// </summary>
         [JsonProperty("total")]
-        [DisplayFormat(DataFormatString = FormatHelper.FormatBytes)]
+       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long Size { get; set; }
 
         /// <summary>
