@@ -33,7 +33,7 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
             Optional = (token["optional"] ?? 0).ToString() == "1";
             Type = token["type"] + "";
             TypeText = token["typetext"] + "";
-            Maximum = token["maximum"] == null ? null : (int?)token["maximum"];
+            Maximum = token["maximum"] == null ? null : (long?)token["maximum"];
             Minimum = token["minimum"] == null ? null : (int?)token["minimum"];
             Renderer = token["renderer"] + "";
             Default = token["default"] == null ? null : token["default"] + "";
@@ -245,6 +245,6 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
         /// Maximum
         /// </summary>
         /// <value></value>
-        public int? Maximum { get; }
+        public long? Maximum { get; }
     }
 }
