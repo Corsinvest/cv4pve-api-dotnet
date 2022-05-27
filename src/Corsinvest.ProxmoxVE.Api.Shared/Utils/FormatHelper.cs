@@ -37,25 +37,6 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Utils
         /// <summary>
         /// From bytes
         /// </summary>
-        /// <returns></returns>
-        public static string Format(string format, object value)
-        {
-            return format switch
-            {
-                FormatBytes => FromBytes(Convert.ToDouble(value)),
-                FormatBits => FromBits(Convert.ToInt64(value)),
-                FormatUnixTime => DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(value)).ToString("R"),
-                FormatUptimeUnixTime
-                    => Convert.ToDouble(value) == 0
-                        ? "" :
-                        string.Format($"{TimeSpan.FromSeconds(Convert.ToDouble(value)):d' days 'hh':'mm':'ss}"),
-                _ => string.Format(format, value),
-            };
-        }
-
-        /// <summary>
-        /// From bytes
-        /// </summary>
         /// <param name="bytes"></param>
         /// <returns></returns>
         public static string FromBytes(double bytes) => ByteSize.FromBytes(bytes).ToString();

@@ -34,7 +34,19 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Utils
         {
             // Check whether this is an appropriate callback
             if (!this.Equals(formatProvider)) { return null; }
-            return FormatHelper.Format(format, arg);
+            //return FormatHelper.Format(format, arg);
+
+            return format switch
+            {
+                FormatHelper.FormatBytes => FormatHelper.FromBytes(Convert.ToDouble(arg)),
+                FormatHelper.FormatBits => FormatHelper.FromBits(Convert.ToInt64(arg)),
+                FormatHelper.FormatUnixTime => DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(arg)).ToString("R"),
+                FormatHelper.FormatUptimeUnixTime
+                    => Convert.ToDouble(arg) == 0
+                        ? "" :
+                        string.Format($"{TimeSpan.FromSeconds(Convert.ToDouble(arg)):d' days 'hh':'mm':'ss}"),
+                _ => string.Format("{0:" + format +"}", arg),
+            };
         }
     }
 }
