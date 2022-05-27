@@ -1,5 +1,4 @@
 ﻿/*
- * SPDX-FileCopyrightText: 2020 Daniele Corsini <daniele.corsini@corsinvest.it>
  * SPDX-FileCopyrightText: Copyright Corsinvest Srl
  * SPDX-License-Identifier: GPL-3.0-only
  */
