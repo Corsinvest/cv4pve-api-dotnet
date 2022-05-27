@@ -116,7 +116,8 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
             {
                 var def = ExtensionData[key] + "";
                 if (key == "rootfs"
-                    || (Regex.IsMatch(key, @"(ide|sata|virtio|scsi)\d+") && !Regex.IsMatch(def, "media=cdrom"))) //bus match
+                    || (Regex.IsMatch(key, @"(ide|sata|virtio|scsi)\d+") && !Regex.IsMatch(def, "media=cdrom")) //bus match
+                    || key == "efidisk0")
                 {
                     var info1 = def.Split(':');
                     var info2 = info1[1].Split(',');
