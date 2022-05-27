@@ -136,7 +136,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         /// <para>vmid id vm</para>
         /// <para>Range 100:104 return vm with id in range</para>
         /// <para>start with '-' exclude vm</para>
-        /// <para>comma reparated</para>
+        /// <para>comma separated</para>
         /// </param>
         /// <returns></returns>
         public static async Task<IEnumerable<IClusterResourceVm>> GetVms(this PveClient client, string jolly)
