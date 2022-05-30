@@ -552,6 +552,14 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
 
 
         /// <summary>
+        /// API version details, including some parts of the global datacenter config.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public static async Task<NodeVersion> Get(this PveClient.PveVersion item)
+            => (await item.Version()).ToModel<NodeVersion>();
+
+        /// <summary>
         /// Get datacenter options.
         /// </summary>
         /// <param name="item"></param>
@@ -662,9 +670,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         /// Get pool configuration.
         /// </summary>
         /// <param name="item"></param>
+        /// <param name="type">
+        ///   Enum: qemu,lxc,storage</param>
         /// <returns></returns>
-        public static async Task<Shared.Models.Pool.PoolDetail> Get(this PveClient.PvePools.PvePoolidItem item)
-            => (await item.ReadPool()).ToModel<Shared.Models.Pool.PoolDetail>();
+        public static async Task<Shared.Models.Pool.PoolDetail> Get(this PveClient.PvePools.PvePoolidItem item, string type = null)
+            => (await item.ReadPool(type)).ToModel<Shared.Models.Pool.PoolDetail>();
 
         /// <summary>
         /// Get the virtual machine configuration with pending configuration changes applied. Set the 'current' parameter to get the current configuration instead.
