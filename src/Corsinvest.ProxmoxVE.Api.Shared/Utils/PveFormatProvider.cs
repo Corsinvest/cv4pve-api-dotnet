@@ -40,10 +40,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Utils
                 FormatHelper.FormatBytes => FormatHelper.FromBytes(Convert.ToDouble(arg)),
                 FormatHelper.FormatBits => FormatHelper.FromBits(Convert.ToInt64(arg)),
                 FormatHelper.FormatUnixTime => DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(arg)).ToString("R"),
-                FormatHelper.FormatUptimeUnixTime
-                    => Convert.ToDouble(arg) == 0
-                        ? "" :
-                        string.Format($"{TimeSpan.FromSeconds(Convert.ToDouble(arg)):d' days 'hh':'mm':'ss}"),
+                FormatHelper.FormatUptimeUnixTime => FormatHelper.UptimeInfo(Convert.ToDouble(arg)),
                 _ => string.Format("{0:" + format +"}", arg),
             };
         }

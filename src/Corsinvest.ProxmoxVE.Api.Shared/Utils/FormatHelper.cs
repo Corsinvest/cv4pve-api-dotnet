@@ -62,5 +62,16 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Utils
         /// CPU info
         /// </summary>
         public static string CpuInfo(double cpuUsage, long cpuSize) => $"{cpuUsage:P1} of {cpuSize} CPU(s)";
+
+        /// <summary>
+        /// Uptime
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string UptimeInfo(double value)
+            => value == 0
+                ? "" :
+                string.Format($"{TimeSpan.FromSeconds(Convert.ToDouble(value)):d' days 'hh':'mm':'ss}");
+
     }
 }
