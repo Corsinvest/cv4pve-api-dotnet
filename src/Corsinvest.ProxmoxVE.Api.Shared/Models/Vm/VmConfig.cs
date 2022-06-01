@@ -47,7 +47,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
             => OsType switch
             {
                 "l26" or "l24" => VmOsType.Linux,
-                "win10" or "win8" or "win7" or "w2k8" or "wxp" or "w2k" => VmOsType.Windows,
+                "win11" or "win10" or "win8" or "win7" or "w2k8" or "wxp" or "w2k" => VmOsType.Windows,
                 "solaris" => VmOsType.Solaris,
                 "other" => VmOsType.Other,
                 _ => VmOsType.Linux,
