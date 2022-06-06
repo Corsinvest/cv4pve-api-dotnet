@@ -32,7 +32,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
         /// Memory
         /// </summary>
         [JsonProperty("memory")]
-        public int Memory { get; set; }
+        public long Memory { get; set; }
 
         /// <summary>
         /// Os type
