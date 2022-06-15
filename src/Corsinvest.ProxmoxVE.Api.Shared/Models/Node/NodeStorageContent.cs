@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using Corsinvest.ProxmoxVE.Api.Shared.Utils;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Corsinvest.ProxmoxVE.Api.Shared.Utils;
+using Newtonsoft.Json;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
 {
@@ -55,7 +55,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// File size
         /// </summary>
         [JsonProperty("size")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long Size { get; set; }
 
         /// <summary>
@@ -102,7 +102,9 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// <summary>
         /// Verified
         /// </summary>
-        public bool Verified => AllData.TryGetValue("verification", out dynamic verification) && verification.state == "ok";
+        [JsonIgnore]
+        public bool Verified
+            => AllData != null && AllData.TryGetValue("verification", out dynamic verification) && verification.state == "ok";
 
         /// <summary>
         /// All Data

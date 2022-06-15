@@ -87,12 +87,6 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         public string Wearout { get; set; }
 
         /// <summary>
-        /// Wearout Value
-        /// </summary>
-        /// <returns></returns>
-        public double WearoutValue => Convert.ToDouble(Wearout);
-
-        /// <summary>
         /// Rpm
         /// </summary>
         [JsonProperty("rpm")]
