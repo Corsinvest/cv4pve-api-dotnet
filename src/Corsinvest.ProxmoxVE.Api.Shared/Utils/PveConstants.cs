@@ -21,7 +21,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Utils
         public static string KeyApiLxc => "lxc";
 
         /// <summary>
-        /// Key api stirage
+        /// Key api storage
         /// </summary>
         public static string KeyApiStorage => "storage";
 
