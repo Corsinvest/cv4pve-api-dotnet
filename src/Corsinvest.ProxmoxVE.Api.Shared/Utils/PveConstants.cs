@@ -41,6 +41,11 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Utils
         public static string KeyApiPool => "pool";
 
         /// <summary>
+        /// Key api template
+        /// </summary>
+        public static string KeyApiTemplate => "template";
+
+        /// <summary>
         /// Status Online
         /// </summary>
         public static string StatusOnline => "online";
