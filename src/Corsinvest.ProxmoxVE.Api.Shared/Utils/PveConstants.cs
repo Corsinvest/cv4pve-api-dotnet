@@ -46,6 +46,11 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Utils
         public static string StatusOnline => "online";
 
         /// <summary>
+        /// Status Offline
+        /// </summary>
+        public static string StatusOffline => "offline";
+
+        /// <summary>
         /// Status Available
         /// </summary>
         public static string StatusAvailable => "available";
