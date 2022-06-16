@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-3.0-only
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<LangVersion>9.0</LangVersion>
 
-		<Version>7.3.5</Version>
+		<Version>7.3.6</Version>
 		<Company>Corsinvest Srl</Company>
 		<Authors>Daniele Corsini</Authors>
 		<Copyright>Corsinvest Srl</Copyright>
@@ -43,9 +43,9 @@ SPDX-License-Identifier: GPL-3.0-only
 	<ItemGroup>
 		<!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api\Corsinvest.ProxmoxVE.Api.csproj" /> -->
 		<PackageReference Include="Corsinvest.ProxmoxVE.Api" Version="7.3.2" />
-		<!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Shared\Corsinvest.ProxmoxVE.Api.Shared.csproj" />  -->
-		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Shared" Version="7.3.5" />
-		<!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Metadata\Corsinvest.ProxmoxVE.Api.Metadata.csproj" /> -->
+		<ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Shared\Corsinvest.ProxmoxVE.Api.Shared.csproj" />
+		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Shared" Version="7.3.6" />
+		<ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Metadata\Corsinvest.ProxmoxVE.Api.Metadata.csproj" />
 		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Metadata" Version="3.0.1" />
 	</ItemGroup>
 
