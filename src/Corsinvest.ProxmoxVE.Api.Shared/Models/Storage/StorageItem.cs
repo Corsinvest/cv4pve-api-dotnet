@@ -102,7 +102,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Storage
         /// </summary>
         /// <value></value>
         [JsonProperty("disable")]
-        public int? Disable { get; set; }
+        public bool Disable { get; set; }
 
         /// <summary>
         /// Nodes

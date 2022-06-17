@@ -84,5 +84,12 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster
         /// </summary>
         [JsonProperty("id")]
         public string Id { get; set; }
+
+        /// <summary>
+        /// Compress
+        /// </summary>
+        [JsonProperty("compress")]
+        public string Compress { get; set; }
+
     }
 }
