@@ -131,5 +131,26 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Storage
         /// <value></value>
         [JsonProperty("datastore")]
         public string Datastore { get; set; }
-    }
+
+        /// <summary>
+        /// Krbd
+        /// </summary>
+        /// <value></value>
+        [JsonProperty("krbd")]
+        public bool Krbd { get; set; }
+
+        /// <summary>
+        /// Mon host
+        /// </summary>
+        /// <value></value>
+        [JsonProperty("monhost")]
+        public string Monhost { get; set; }
+
+        /// <summary>
+        /// Preallocation
+        /// </summary>
+        /// <value></value>
+        [JsonProperty("preallocation")]
+        public string Preallocation { get; set; }
+     }
 }
