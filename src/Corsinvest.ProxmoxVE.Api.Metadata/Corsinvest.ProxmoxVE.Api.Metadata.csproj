@@ -1,5 +1,4 @@
 ﻿<!--
-SPDX-FileCopyrightText: 2019 Daniele Corsini <daniele.corsini@corsinvest.it>
 SPDX-FileCopyrightText: Copyright Corsinvest Srl
 SPDX-License-Identifier: GPL-3.0-only
 -->
@@ -9,7 +8,7 @@ SPDX-License-Identifier: GPL-3.0-only
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<LangVersion>9.0</LangVersion>
 
-		<Version>3.0.1</Version>
+		<Version>3.0.2</Version>
 		<Company>Corsinvest Srl</Company>
 		<Authors>Daniele Corsini</Authors>
 		<Copyright>Corsinvest Srl</Copyright>
