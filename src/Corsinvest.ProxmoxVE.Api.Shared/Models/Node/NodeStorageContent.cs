@@ -23,6 +23,12 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         public string Content { get; set; }
 
         /// <summary>
+        /// Content Description
+        /// </summary>
+        /// <value></value>
+        public string ContentDescription => FormatHelper.ContentToDescription(Content);
+
+        /// <summary>
         /// Creation unix
         /// </summary>
         [JsonProperty("ctime")]
