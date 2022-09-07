@@ -58,7 +58,7 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
         /// <param name="resource"></param>
         /// <returns></returns>
         public static async Task<ClassApi> GetFromResource(string host, int port, string resource)
-            => GetFromResource(await GeneretorClassApi.Generate(host, port), resource);
+            => GetFromResource(await GeneratorClassApi.Generate(host, port), resource);
 
         /// <summary>
         /// Get From Resource

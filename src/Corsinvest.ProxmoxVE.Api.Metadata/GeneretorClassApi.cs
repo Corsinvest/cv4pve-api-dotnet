@@ -13,7 +13,7 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
     /// <summary>
     /// Generator class Api
     /// </summary>
-    public static class GeneretorClassApi
+    public static class GeneratorClassApi
     {
         /// <summary>
         /// Generate class Api
