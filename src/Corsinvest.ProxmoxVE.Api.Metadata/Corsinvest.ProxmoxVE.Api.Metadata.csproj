@@ -8,7 +8,7 @@ SPDX-License-Identifier: GPL-3.0-only
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<LangVersion>9.0</LangVersion>
 
-		<Version>3.0.2</Version>
+		<Version>3.1.0</Version>
 		<Company>Corsinvest Srl</Company>
 		<Authors>Daniele Corsini</Authors>
 		<Copyright>Corsinvest Srl</Copyright>
@@ -31,13 +31,13 @@ SPDX-License-Identifier: GPL-3.0-only
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="..\..\LICENSE.md" Pack="true" PackagePath=""/>
-		<None Include="..\..\icon.png" Pack="true" PackagePath=""/>
-		<none Include="..\..\README.md" Pack="true" PackagePath=""/>
+		<None Include="..\..\LICENSE.md" Pack="true" PackagePath="" />
+		<None Include="..\..\icon.png" Pack="true" PackagePath="" />
+		<none Include="..\..\README.md" Pack="true" PackagePath="" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	</ItemGroup>
 
 	<Target Name="SpicNSpan" AfterTargets="Clean">
