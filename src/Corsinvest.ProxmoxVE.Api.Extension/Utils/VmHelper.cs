@@ -3,14 +3,16 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
-using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
-using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
+using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
 {
@@ -150,6 +152,83 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
                 },
                 _ => throw new InvalidEnumArgumentException(),
             };
+        }
+
+
+        /// <summary>
+        /// GetVmRrdData
+        /// </summary>
+        /// <param name="pveClient"></param>
+        /// <param name="vm"></param>
+        /// <param name="rrdDataTimeFrame"></param>
+        /// <param name="rrdDataConsolidation"></param>
+        /// <returns></returns>
+        /// <exception cref="IndexOutOfRangeException"></exception>
+        public static async Task<IEnumerable<VmRrdData>> GetVmRrdData(PveClient pveClient,
+                                                                      IClusterResourceVm vm,
+                                                                      RrdDataTimeFrame rrdDataTimeFrame,
+                                                                      RrdDataConsolidation rrdDataConsolidation)
+            => vm.VmType switch
+            {
+                VmType.Qemu => await pveClient.Nodes[vm.Node].Qemu[vm.VmId].Rrddata.Get(rrdDataTimeFrame, rrdDataConsolidation),
+                VmType.Lxc => await pveClient.Nodes[vm.Node].Lxc[vm.VmId].Rrddata.Get(rrdDataTimeFrame, rrdDataConsolidation),
+                _ => throw new IndexOutOfRangeException(),
+            };
+
+        /// <summary>
+        /// Get vm status
+        /// </summary>
+        /// <param name="pveClient"></param>
+        /// <param name="vm"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        public static async Task<VmBaseStatusCurrent> GetVmStatus(PveClient pveClient, IClusterResourceVm vm)
+            => vm.VmType switch
+            {
+                VmType.Qemu => await pveClient.Nodes[vm.Node].Qemu[vm.VmId].Status.Current.Get(),
+                VmType.Lxc => await pveClient.Nodes[vm.Node].Lxc[vm.VmId].Status.Current.Get(),
+                _ => throw new ArgumentOutOfRangeException(),
+            };
+
+        /// <summary>
+        /// Get Vms Jolly Keys <see cref="Corsinvest.ProxmoxVE.Api.Extension.ClientExtension.GetVms(PveClient, string)"/>
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="addAll"></param>
+        /// <param name="addNodes"></param>
+        /// <param name="addPools"></param>
+        /// <param name="addVmId"></param>
+        /// <param name="addVmName"></param>
+        /// <returns></returns>
+        public static async Task<IEnumerable<string>> GetVmsJollyKeys(PveClient client,
+                                                                      bool addAll,
+                                                                      bool addNodes,
+                                                                      bool addPools,
+                                                                      bool addVmId,
+                                                                      bool addVmName)
+        {
+            var vmIds = new List<string>();
+            var resources = await client.GetResources(ClusterResourceType.All);
+
+            if (addAll) { vmIds.Add("@all"); }
+
+            if (addPools)
+            {
+                vmIds.AddRange(resources.Where(a => a.ResourceType == ClusterResourceType.Pool)
+                                        .Select(a => $"@pool-{a.Pool}"));
+            }
+
+            if (addNodes)
+            {
+                vmIds.AddRange(resources.Where(a => a.ResourceType == ClusterResourceType.Node && a.IsOnline)
+                                        .Select(a => $"@all-{a.Node}"));
+            }
+
+            var vms = resources.Where(a => a.ResourceType == ClusterResourceType.Vm && !a.IsUnknown);
+            if (addVmId) { vmIds.AddRange(vms.Select(a => a.VmId + "").OrderBy(a => a)); }
+            if (addVmName) { vmIds.AddRange(vms.Select(a => a.Name).OrderBy(a => a)); }
+
+            return vmIds.Distinct();
         }
     }
 }

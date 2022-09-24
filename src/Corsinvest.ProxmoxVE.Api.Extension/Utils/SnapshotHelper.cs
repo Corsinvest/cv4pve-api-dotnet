@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
 {
     /// <summary>
-    /// Snaopshot helper
+    /// Snapshot helper
     /// </summary>
     public static class SnapshotHelper
     {
@@ -144,7 +144,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
             };
 
         /// <summary>
-        /// Roolback snapshot
+        /// Rollback snapshot
         /// </summary>
         /// <param name="client"></param>
         /// <param name="node"></param>
