@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
-using Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
-using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
-using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
+using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster
 {
@@ -93,14 +93,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster
             ((IDisk)data).ImproveData();
             ((IClusterResourceBase)data).ImproveData();
 
-            data.NodeLevel = data.Level switch
-            {
-                "c" => NodeLevel.Community,
-                "p" => NodeLevel.Premium,
-                "b" => NodeLevel.Basic,
-                "s" => NodeLevel.Standard,
-                _ => NodeLevel.None,
-            };
+            data.NodeLevel = PveHelper.DecodeLevelSupport(data.Level);
         }
 
         /// <summary>

@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using System.ComponentModel;
+using System.Security;
 using System.Web;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Utils
 {
@@ -88,7 +90,22 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Utils
         /// <returns></returns>
         public static string GetDownloadBackupFileName(string type, string fileName)
             => type == "d"
-                ? fileName + ".zip"  //for forlder add zip compression
+                ? fileName + ".zip"  //for folder add zip compression
                 : fileName;
+
+        /// <summary>
+        /// Decode level support
+        /// </summary>
+        /// <param name="level"></param>
+        /// <returns></returns>
+        public static NodeLevel DecodeLevelSupport(string level)
+            => level switch
+            {
+                "c" => NodeLevel.Community,
+                "p" => NodeLevel.Premium,
+                "b" => NodeLevel.Basic,
+                "s" => NodeLevel.Standard,
+                _ => NodeLevel.None,
+            };
     }
 }
