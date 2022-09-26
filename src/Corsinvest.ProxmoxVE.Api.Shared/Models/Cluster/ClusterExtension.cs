@@ -99,7 +99,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster
                 "p" => NodeLevel.Premium,
                 "b" => NodeLevel.Basic,
                 "s" => NodeLevel.Standard,
-                _ => NodeLevel.Community,
+                _ => NodeLevel.None,
             };
         }
 

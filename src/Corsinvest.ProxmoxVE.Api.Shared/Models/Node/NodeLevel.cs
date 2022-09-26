@@ -11,6 +11,11 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
     public enum NodeLevel
     {
         /// <summary>
+        /// None
+        /// </summary>
+        None,
+
+        /// <summary>
         /// Community
         /// </summary>
         Community,
