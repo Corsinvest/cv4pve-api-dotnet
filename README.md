@@ -43,6 +43,7 @@ The client is generated from a JSON Api on Proxmox VE.
 
 * Easy to learn
 * Method named
+* Implementation respect the [Api structure of Proxmox VE](https://pve.proxmox.com/pve-docs/api-viewer/)
 * Set ResponseType json, png
 * Full class and method generated from documentation (about client)
 * Comment any method and parameters
@@ -50,7 +51,7 @@ The client is generated from a JSON Api on Proxmox VE.
 * Tree structure
   * client.Nodes["pve1"].Qemu[100].Snapshot().snapshotList().Response.data
 * Return data Proxmox VE
-* Logger with MicrosMicrosoft.Extensions.Logging 
+* Logger with MicrosMicrosoft.Extensions.Logging
 * Return result
   * Request
   * Response
