@@ -61,6 +61,23 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
             => (await item.Index()).ToModel<IEnumerable<AccessDomain>>();
 
         /// <summary>
+        /// List recent tasks (cluster wide).
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public static async Task<IEnumerable<NodeTask>> Get(this PveClient.PveCluster.PveTasks item)
+            => (await item.Tasks()).ToModel<IEnumerable<NodeTask>>();
+
+        /// <summary>
+        /// Read cluster log
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="max">Maximum number of entries.</param>
+        /// <returns></returns>
+        public static async Task<IEnumerable<ClusterLog>> Get(this PveClient.PveCluster.PveLog item, int? max = null)
+            => (await item.Log(max)).ToModel<IEnumerable<ClusterLog>>();
+
+        /// <summary>
         /// Get cluster status information.
         /// </summary>
         /// <param name="item"></param>

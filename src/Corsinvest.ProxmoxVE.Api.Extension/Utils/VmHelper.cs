@@ -191,7 +191,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
             };
 
         /// <summary>
-        /// Get Vms Jolly Keys <see cref="Corsinvest.ProxmoxVE.Api.Extension.ClientExtension.GetVms(PveClient, string)"/>
+        /// Get Vms Jolly Keys <see cref="ClientExtension.GetVms(PveClient, string)"/>
         /// </summary>
         /// <param name="client"></param>
         /// <param name="addAll"></param>

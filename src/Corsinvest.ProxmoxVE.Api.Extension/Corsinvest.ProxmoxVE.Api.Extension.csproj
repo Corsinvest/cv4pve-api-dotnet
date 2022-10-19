@@ -39,12 +39,15 @@ SPDX-License-Identifier: GPL-3.0-only
 		<none Include="..\..\README.md" Pack="true" PackagePath="" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api\Corsinvest.ProxmoxVE.Api.csproj" /> -->
+	<ItemGroup Condition="'$(Configuration)' == 'Debug'">
+		<ProjectReference Include="..\Corsinvest.ProxmoxVE.Api\Corsinvest.ProxmoxVE.Api.csproj" />
+		<ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Shared\Corsinvest.ProxmoxVE.Api.Shared.csproj" />
+		<ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Metadata\Corsinvest.ProxmoxVE.Api.Metadata.csproj" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)' == 'Release'">
 		<PackageReference Include="Corsinvest.ProxmoxVE.Api" Version="7.3.2" />
-		<!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Shared\Corsinvest.ProxmoxVE.Api.Shared.csproj" /> -->
 		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Shared" Version="7.3.7" />
-		<!-- <ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Metadata\Corsinvest.ProxmoxVE.Api.Metadata.csproj" /> -->
 		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Metadata" Version="3.1.0" />
 	</ItemGroup>
 
