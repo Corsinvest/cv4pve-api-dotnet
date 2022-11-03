@@ -8,7 +8,7 @@ SPDX-License-Identifier: GPL-3.0-only
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<LangVersion>9.0</LangVersion>
 
-		<Version>7.3.7</Version>
+		<Version>7.3.8</Version>
 		<Company>Corsinvest Srl</Company>
 		<Authors>Daniele Corsini</Authors>
 		<Copyright>Corsinvest Srl</Copyright>
@@ -48,7 +48,7 @@ SPDX-License-Identifier: GPL-3.0-only
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)' == 'Release'">
-		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Extension" Version="7.3.7" />
+		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Extension" Version="7.3.8" />
 	</ItemGroup>
 
 	<Target Name="SpicNSpan" AfterTargets="Clean">

@@ -51,6 +51,12 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster
         public int Severity { get; set; }
 
         /// <summary>
+        /// Severity
+        /// </summary>
+        [Display(Name ="Severity")]
+        public ClusterLogSeverity SeverityEnum => (ClusterLogSeverity)Severity;
+
+        /// <summary>
         /// Id
         /// </summary>
         /// <value></value>
