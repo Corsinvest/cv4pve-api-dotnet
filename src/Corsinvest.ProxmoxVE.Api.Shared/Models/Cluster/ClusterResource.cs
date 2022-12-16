@@ -310,6 +310,13 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster
         /// </summary>
         public bool IsAvailable { get; set; }
 
+        /// <summary>
+        /// Tags
+        /// </summary>
+        /// <value></value>
+        [JsonProperty("tags")]
+        public string Tags { get; set; }
+
         [OnDeserialized]
         internal void OnSerializedMethod(StreamingContext context) => this.ImproveData();
     }

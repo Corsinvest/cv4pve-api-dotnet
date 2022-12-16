@@ -1,0 +1,39 @@
+<Project>
+	<PropertyGroup>
+		<LangVersion>latest</LangVersion>
+		<Version>7.3.9</Version>
+		<!--<NoWarn>$(NoWarn);CS1591;CS0436</NoWarn>-->
+
+		<Company>Corsinvest Srl</Company>
+		<Authors>Corsinvest Srl</Authors>
+		<Copyright>Corsinvest Srl</Copyright>
+
+		<PackageProjectUrl>https://github.com/Corsinvest/cv4pve-api-dotnet</PackageProjectUrl>
+		<PackageTags>ProxmoxVE;Api,Client;Rest;Corsinvest;</PackageTags>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+		<PackageOutputPath>..\..\.nupkgs\</PackageOutputPath>
+		<RepositoryType>Github</RepositoryType>
+		<RepositoryUrl>https://github.com/Corsinvest/cv4net-apphero</RepositoryUrl>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<OutputType>Library</OutputType>
+		<!-- Include symbol files (*.pdb) in the built .nupkg -->
+		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\LICENSE.md" Pack="true" PackagePath="" />
+		<None Include="..\..\icon.png" Pack="true" PackagePath="" />
+		<none Include="..\..\README.md" Pack="true" PackagePath="" />
+	</ItemGroup>
+
+	<Target Name="SpicNSpan" AfterTargets="Clean">
+		<RemoveDir Directories="$(TargetDir)" />
+		<RemoveDir Directories="$(ProjectDir)$(BaseIntermediateOutputPath)" />
+		<RemoveDir Directories="$(ProjectDir)$(BaseOutputPath)" />
+	</Target>
+</Project>

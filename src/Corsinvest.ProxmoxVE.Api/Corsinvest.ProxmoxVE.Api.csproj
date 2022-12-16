@@ -3,48 +3,18 @@ SPDX-FileCopyrightText: Copyright Corsinvest Srl
 SPDX-License-Identifier: GPL-3.0-only
 -->
 <Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\common.props" />
+
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<LangVersion>9.0</LangVersion>
-
-		<Version>7.3.4</Version>
-		<Company>Corsinvest Srl</Company>
-		<Authors>Daniele Corsini</Authors>
-		<Copyright>Corsinvest Srl</Copyright>
 		<Product>Corsinvest for Proxmox VE Api Client</Product>
 		<AssemblyTitle>Corsinvest for Proxmox VE Api Client</AssemblyTitle>
 		<Description>Corsinvest for Proxmox VE Api Client</Description>
-
-		<PackageProjectUrl>https://github.com/Corsinvest/cv4pve-api-dotnet</PackageProjectUrl>
-		<PackageTags>ProxmoxVE;Api,Client;Rest;Corsinvest;</PackageTags>
-		<PackageReleaseNotes></PackageReleaseNotes>
-		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageIcon>icon.png</PackageIcon>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<RepositoryType>Github</RepositoryType>
-		<RepositoryUrl>https://github.com/Corsinvest/cv4pve-api-dotnet</RepositoryUrl>
-
-		<IncludeSymbols>true</IncludeSymbols>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<None Include="..\..\LICENSE.md" Pack="true" PackagePath="" />
-		<None Include="..\..\icon.png" Pack="true" PackagePath="" />
-		<none Include="..\..\README.md" Pack="true" PackagePath="" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	</ItemGroup>
-
-	<Target Name="SpicNSpan" AfterTargets="Clean">
-		<RemoveDir Directories="$(TargetDir)" />
-		<RemoveDir Directories="$(ProjectDir)$(BaseIntermediateOutputPath)" />
-		<RemoveDir Directories="$(ProjectDir)$(BaseOutputPath)" />
-	</Target>
 </Project>

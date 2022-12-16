@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster
@@ -17,6 +18,13 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster
         /// </summary>
         [JsonProperty("keyboard")]
         public string Keyboard { get; set; }
+
+        /// <summary>
+        /// Allowed Tags
+        /// </summary>
+        /// <value></value>
+        [JsonProperty("allowed-tags")]
+        public List<string> AllowedTags { get; set; }
 
         /// <summary>
         /// Migration

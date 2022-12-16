@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
+using System.ComponentModel.DataAnnotations;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster
 {
@@ -48,5 +48,11 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster
         [Display(Name = "Host Memory Usage %")]
         [DisplayFormat(DataFormatString = "{0:P1}")]
         double HostMemoryUsage { get; set; }
+
+        /// <summary>
+        /// Tags
+        /// </summary>
+        /// <value></value>
+        string Tags { get; set; }
     }
 }
