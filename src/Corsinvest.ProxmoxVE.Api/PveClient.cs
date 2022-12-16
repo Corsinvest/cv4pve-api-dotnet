@@ -996,8 +996,14 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <summary>
                         /// Delete IPSet
                         /// </summary>
+                        /// <param name="force">Delete all members of the IPSet, if there are any.</param>
                         /// <returns></returns>
-                        public async Task<Result> DeleteIpset() { return await _client.Delete($"/cluster/firewall/ipset/{_name}"); }
+                        public async Task<Result> DeleteIpset(bool? force = null)
+                        {
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("force", force);
+                            return await _client.Delete($"/cluster/firewall/ipset/{_name}", parameters);
+                        }
                         /// <summary>
                         /// List IPSet content
                         /// </summary>
@@ -1269,13 +1275,15 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="mode">Backup mode.
                     ///   Enum: snapshot,suspend,stop</param>
                     /// <param name="node">Only run if executed on this node.</param>
-                    /// <param name="notes_template">Template string for generating notes for the backup(s). It can contain variables which will be replaced by their values. Currently supported are {{cluster}}, {{guestname}}, {{node}}, and {{vmid}}, but more might be added in the future.</param>
+                    /// <param name="notes_template">Template string for generating notes for the backup(s). It can contain variables which will be replaced by their values. Currently supported are {{cluster}}, {{guestname}}, {{node}}, and {{vmid}}, but more might be added in the future. Needs to be a single line, newline and backslash need to be escaped as '\n' and '\\' respectively.</param>
+                    /// <param name="performance">Other performance-related settings.</param>
                     /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
                     /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
                     /// <param name="protected_">If true, mark backup(s) as protected.</param>
                     /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
                     /// <param name="quiet">Be quiet.</param>
                     /// <param name="remove">Prune older backups according to 'prune-backups'.</param>
+                    /// <param name="repeat_missed">If true, the job will be run as soon as possible if it was missed while the scheduler was not running.</param>
                     /// <param name="schedule">Backup schedule. The format is a subset of `systemd` calendar events.</param>
                     /// <param name="script">Use specified hook script.</param>
                     /// <param name="starttime">Job Start time.</param>
@@ -1287,7 +1295,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
                     /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                     /// <returns></returns>
-                    public async Task<Result> UpdateJob(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, string notes_template = null, int? pigz = null, string pool = null, bool? protected_ = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
+                    public async Task<Result> UpdateJob(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, string notes_template = null, string performance = null, int? pigz = null, string pool = null, bool? protected_ = null, string prune_backups = null, bool? quiet = null, bool? remove = null, bool? repeat_missed = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("all", all);
@@ -1308,12 +1316,14 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("mode", mode);
                         parameters.Add("node", node);
                         parameters.Add("notes-template", notes_template);
+                        parameters.Add("performance", performance);
                         parameters.Add("pigz", pigz);
                         parameters.Add("pool", pool);
                         parameters.Add("protected", protected_);
                         parameters.Add("prune-backups", prune_backups);
                         parameters.Add("quiet", quiet);
                         parameters.Add("remove", remove);
+                        parameters.Add("repeat-missed", repeat_missed);
                         parameters.Add("schedule", schedule);
                         parameters.Add("script", script);
                         parameters.Add("starttime", starttime);
@@ -1355,13 +1365,15 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="mode">Backup mode.
                 ///   Enum: snapshot,suspend,stop</param>
                 /// <param name="node">Only run if executed on this node.</param>
-                /// <param name="notes_template">Template string for generating notes for the backup(s). It can contain variables which will be replaced by their values. Currently supported are {{cluster}}, {{guestname}}, {{node}}, and {{vmid}}, but more might be added in the future.</param>
+                /// <param name="notes_template">Template string for generating notes for the backup(s). It can contain variables which will be replaced by their values. Currently supported are {{cluster}}, {{guestname}}, {{node}}, and {{vmid}}, but more might be added in the future. Needs to be a single line, newline and backslash need to be escaped as '\n' and '\\' respectively.</param>
+                /// <param name="performance">Other performance-related settings.</param>
                 /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
                 /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
                 /// <param name="protected_">If true, mark backup(s) as protected.</param>
                 /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
                 /// <param name="quiet">Be quiet.</param>
                 /// <param name="remove">Prune older backups according to 'prune-backups'.</param>
+                /// <param name="repeat_missed">If true, the job will be run as soon as possible if it was missed while the scheduler was not running.</param>
                 /// <param name="schedule">Backup schedule. The format is a subset of `systemd` calendar events.</param>
                 /// <param name="script">Use specified hook script.</param>
                 /// <param name="starttime">Job Start time.</param>
@@ -1373,7 +1385,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="vmid">The ID of the guest system you want to backup.</param>
                 /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                 /// <returns></returns>
-                public async Task<Result> CreateJob(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, string id = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, string notes_template = null, int? pigz = null, string pool = null, bool? protected_ = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
+                public async Task<Result> CreateJob(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, string id = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, string notes_template = null, string performance = null, int? pigz = null, string pool = null, bool? protected_ = null, string prune_backups = null, bool? quiet = null, bool? remove = null, bool? repeat_missed = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("all", all);
@@ -1394,12 +1406,14 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("mode", mode);
                     parameters.Add("node", node);
                     parameters.Add("notes-template", notes_template);
+                    parameters.Add("performance", performance);
                     parameters.Add("pigz", pigz);
                     parameters.Add("pool", pool);
                     parameters.Add("protected", protected_);
                     parameters.Add("prune-backups", prune_backups);
                     parameters.Add("quiet", quiet);
                     parameters.Add("remove", remove);
+                    parameters.Add("repeat-missed", repeat_missed);
                     parameters.Add("schedule", schedule);
                     parameters.Add("script", script);
                     parameters.Add("starttime", starttime);
@@ -2934,7 +2948,7 @@ namespace Corsinvest.ProxmoxVE.Api
 
                 internal PveOptions(PveClient client) { _client = client; }
                 /// <summary>
-                /// Get datacenter options.
+                /// Get datacenter options. Without 'Sys.Audit' on '/' not all options are returned.
                 /// </summary>
                 /// <returns></returns>
                 public async Task<Result> GetOptions() { return await _client.Get($"/cluster/options"); }
@@ -2944,6 +2958,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="bwlimit">Set bandwidth/io limits various operations.</param>
                 /// <param name="console">Select the default Console viewer. You can either use the builtin java applet (VNC; deprecated and maps to html5), an external virt-viewer comtatible application (SPICE), an HTML5 based vnc viewer (noVNC), or an HTML5 based console client (xtermjs). If the selected viewer is not available (e.g. SPICE not activated for the VM), the fallback is noVNC.
                 ///   Enum: applet,vv,html5,xtermjs</param>
+                /// <param name="crs">Cluster resource scheduling settings.</param>
                 /// <param name="delete">A list of settings you want to delete.</param>
                 /// <param name="description">Datacenter description. Shown in the web-interface datacenter notes panel. This is saved as comment inside the configuration file.</param>
                 /// <param name="email_from">Specify email address to send notification from (default is root@$hostname)</param>
@@ -2960,14 +2975,18 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="migration">For cluster wide migration settings.</param>
                 /// <param name="migration_unsecure">Migration is secure using SSH tunnel by default. For secure private networks you can disable it to speed up migration. Deprecated, use the 'migration' property instead!</param>
                 /// <param name="next_id">Control the range for the free VMID auto-selection pool.</param>
+                /// <param name="registered_tags">A list of tags that require a `Sys.Modify` on '/' to set and delete. Tags set here that are also in 'user-tag-access' also require `Sys.Modify`.</param>
+                /// <param name="tag_style">Tag style options.</param>
                 /// <param name="u2f">u2f</param>
+                /// <param name="user_tag_access">Privilege options for user-settable tags</param>
                 /// <param name="webauthn">webauthn configuration</param>
                 /// <returns></returns>
-                public async Task<Result> SetOptions(string bwlimit = null, string console = null, string delete = null, string description = null, string email_from = null, string fencing = null, string ha = null, string http_proxy = null, string keyboard = null, string language = null, string mac_prefix = null, int? max_workers = null, string migration = null, bool? migration_unsecure = null, string next_id = null, string u2f = null, string webauthn = null)
+                public async Task<Result> SetOptions(string bwlimit = null, string console = null, string crs = null, string delete = null, string description = null, string email_from = null, string fencing = null, string ha = null, string http_proxy = null, string keyboard = null, string language = null, string mac_prefix = null, int? max_workers = null, string migration = null, bool? migration_unsecure = null, string next_id = null, string registered_tags = null, string tag_style = null, string u2f = null, string user_tag_access = null, string webauthn = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("bwlimit", bwlimit);
                     parameters.Add("console", console);
+                    parameters.Add("crs", crs);
                     parameters.Add("delete", delete);
                     parameters.Add("description", description);
                     parameters.Add("email_from", email_from);
@@ -2981,7 +3000,10 @@ namespace Corsinvest.ProxmoxVE.Api
                     parameters.Add("migration", migration);
                     parameters.Add("migration_unsecure", migration_unsecure);
                     parameters.Add("next-id", next_id);
+                    parameters.Add("registered-tags", registered_tags);
+                    parameters.Add("tag-style", tag_style);
                     parameters.Add("u2f", u2f);
+                    parameters.Add("user-tag-access", user_tag_access);
                     parameters.Add("webauthn", webauthn);
                     return await _client.Set($"/cluster/options", parameters);
                 }
@@ -3306,6 +3328,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Pending
                         /// </summary>
                         public PvePending Pending => _pending ??= new(_client, _node, _vmid);
+                        private PveCloudinit _cloudinit;
+                        /// <summary>
+                        /// Cloudinit
+                        /// </summary>
+                        public PveCloudinit Cloudinit => _cloudinit ??= new(_client, _node, _vmid);
                         private PveUnlink _unlink;
                         /// <summary>
                         /// Unlink
@@ -3361,6 +3388,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Migrate
                         /// </summary>
                         public PveMigrate Migrate => _migrate ??= new(_client, _node, _vmid);
+                        private PveRemoteMigrate _remoteMigrate;
+                        /// <summary>
+                        /// RemoteMigrate
+                        /// </summary>
+                        public PveRemoteMigrate RemoteMigrate => _remoteMigrate ??= new(_client, _node, _vmid);
                         private PveMonitor _monitor;
                         /// <summary>
                         /// Monitor
@@ -3381,11 +3413,16 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Template
                         /// </summary>
                         public PveTemplate Template => _template ??= new(_client, _node, _vmid);
-                        private PveCloudinit _cloudinit;
+                        private PveMtunnel _mtunnel;
                         /// <summary>
-                        /// Cloudinit
+                        /// Mtunnel
                         /// </summary>
-                        public PveCloudinit Cloudinit => _cloudinit ??= new(_client, _node, _vmid);
+                        public PveMtunnel Mtunnel => _mtunnel ??= new(_client, _node, _vmid);
+                        private PveMtunnelwebsocket _mtunnelwebsocket;
+                        /// <summary>
+                        /// Mtunnelwebsocket
+                        /// </summary>
+                        public PveMtunnelwebsocket Mtunnelwebsocket => _mtunnelwebsocket ??= new(_client, _node, _vmid);
                         /// <summary>
                         /// Firewall
                         /// </summary>
@@ -3743,8 +3780,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <summary>
                                     /// Delete IPSet
                                     /// </summary>
+                                    /// <param name="force">Delete all members of the IPSet, if there are any.</param>
                                     /// <returns></returns>
-                                    public async Task<Result> DeleteIpset() { return await _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}"); }
+                                    public async Task<Result> DeleteIpset(bool? force = null)
+                                    {
+                                        var parameters = new Dictionary<string, object>();
+                                        parameters.Add("force", force);
+                                        return await _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}", parameters);
+                                    }
                                     /// <summary>
                                     /// List IPSet content
                                     /// </summary>
@@ -4665,6 +4708,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Set virtual machine options (asynchrounous API).
                             /// </summary>
                             /// <param name="acpi">Enable/disable ACPI.</param>
+                            /// <param name="affinity">List of host cores used to execute guest processes, for example: 0,5,8-11</param>
                             /// <param name="agent">Enable/disable communication with the Qemu Guest Agent and its properties.</param>
                             /// <param name="arch">Virtual processor architecture. Defaults to the host.
                             ///   Enum: x86_64,aarch64</param>
@@ -4695,7 +4739,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="freeze">Freeze CPU at startup (use 'c' monitor command to start execution).</param>
                             /// <param name="hookscript">Script that will be executed during various steps in the vms lifetime.</param>
                             /// <param name="hostpciN">Map host PCI devices into guest.</param>
-                            /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory' and 'usb'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`.</param>
+                            /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory', 'usb' and 'cloudinit'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`. USB hotplugging is possible for guests with machine version &amp;gt;= 7.1 and ostype l26 or windows &amp;gt; 7.</param>
                             /// <param name="hugepages">Enable/disable hugepages memory.
                             ///   Enum: any,2,1024</param>
                             /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
@@ -4713,7 +4757,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="migrate_downtime">Set maximum tolerated downtime (in seconds) for migrations.</param>
                             /// <param name="migrate_speed">Set maximum speed (in MB/s) for migrations. Value 0 is no limit.</param>
                             /// <param name="name">Set a name for the VM. Only used on the configuration web interface.</param>
-                            /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will' 	    .' automatically use the setting from the host if neither searchdomain nor nameserver' 	    .' are set.</param>
+                            /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                             /// <param name="netN">Specify network devices.</param>
                             /// <param name="numa">Enable/disable NUMA.</param>
                             /// <param name="numaN">NUMA topology.</param>
@@ -4729,7 +4773,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 30). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
                             /// <param name="scsihw">SCSI controller model
                             ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
-                            /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will' 	    .' automatically use the setting from the host if neither searchdomain nor nameserver' 	    .' are set.</param>
+                            /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                             /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
                             /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning. Auto-ballooning is done by pvestatd.</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
@@ -4746,7 +4790,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="template">Enable/disable Template.</param>
                             /// <param name="tpmstate0">Configure a Disk for storing TPM state. The format is fixed to 'raw'. Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Note that SIZE_IN_GiB is ignored here and 4 MiB will be used instead. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
                             /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
-                            /// <param name="usbN">Configure an USB device (n is 0 to 4).</param>
+                            /// <param name="usbN">Configure an USB device (n is 0 to 4, for machine version &amp;gt;= 7.1 and ostype l26 or windows &amp;gt; 7, n can be up to 14).</param>
                             /// <param name="vcpus">Number of hotplugged vcpus.</param>
                             /// <param name="vga">Configure the VGA hardware.</param>
                             /// <param name="virtioN">Use volume as VIRTIO hard disk (n is 0 to 15). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
@@ -4754,10 +4798,11 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public async Task<Result> UpdateVmAsync(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                            public async Task<Result> UpdateVmAsync(bool? acpi = null, string affinity = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("acpi", acpi);
+                                parameters.Add("affinity", affinity);
                                 parameters.Add("agent", agent);
                                 parameters.Add("arch", arch);
                                 parameters.Add("args", args);
@@ -4844,6 +4889,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// Set virtual machine options (synchrounous API) - You should consider using the POST method instead for any actions involving hotplug or storage allocation.
                             /// </summary>
                             /// <param name="acpi">Enable/disable ACPI.</param>
+                            /// <param name="affinity">List of host cores used to execute guest processes, for example: 0,5,8-11</param>
                             /// <param name="agent">Enable/disable communication with the Qemu Guest Agent and its properties.</param>
                             /// <param name="arch">Virtual processor architecture. Defaults to the host.
                             ///   Enum: x86_64,aarch64</param>
@@ -4873,7 +4919,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="freeze">Freeze CPU at startup (use 'c' monitor command to start execution).</param>
                             /// <param name="hookscript">Script that will be executed during various steps in the vms lifetime.</param>
                             /// <param name="hostpciN">Map host PCI devices into guest.</param>
-                            /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory' and 'usb'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`.</param>
+                            /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory', 'usb' and 'cloudinit'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`. USB hotplugging is possible for guests with machine version &amp;gt;= 7.1 and ostype l26 or windows &amp;gt; 7.</param>
                             /// <param name="hugepages">Enable/disable hugepages memory.
                             ///   Enum: any,2,1024</param>
                             /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
@@ -4891,7 +4937,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="migrate_downtime">Set maximum tolerated downtime (in seconds) for migrations.</param>
                             /// <param name="migrate_speed">Set maximum speed (in MB/s) for migrations. Value 0 is no limit.</param>
                             /// <param name="name">Set a name for the VM. Only used on the configuration web interface.</param>
-                            /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will' 	    .' automatically use the setting from the host if neither searchdomain nor nameserver' 	    .' are set.</param>
+                            /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                             /// <param name="netN">Specify network devices.</param>
                             /// <param name="numa">Enable/disable NUMA.</param>
                             /// <param name="numaN">NUMA topology.</param>
@@ -4907,7 +4953,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 30). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
                             /// <param name="scsihw">SCSI controller model
                             ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
-                            /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will' 	    .' automatically use the setting from the host if neither searchdomain nor nameserver' 	    .' are set.</param>
+                            /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                             /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
                             /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning. Auto-ballooning is done by pvestatd.</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
@@ -4924,7 +4970,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="template">Enable/disable Template.</param>
                             /// <param name="tpmstate0">Configure a Disk for storing TPM state. The format is fixed to 'raw'. Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Note that SIZE_IN_GiB is ignored here and 4 MiB will be used instead. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
                             /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
-                            /// <param name="usbN">Configure an USB device (n is 0 to 4).</param>
+                            /// <param name="usbN">Configure an USB device (n is 0 to 4, for machine version &amp;gt;= 7.1 and ostype l26 or windows &amp;gt; 7, n can be up to 14).</param>
                             /// <param name="vcpus">Number of hotplugged vcpus.</param>
                             /// <param name="vga">Configure the VGA hardware.</param>
                             /// <param name="virtioN">Use volume as VIRTIO hard disk (n is 0 to 15). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
@@ -4932,10 +4978,11 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                             /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                             /// <returns></returns>
-                            public async Task<Result> UpdateVm(bool? acpi = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                            public async Task<Result> UpdateVm(bool? acpi = null, string affinity = null, string agent = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("acpi", acpi);
+                                parameters.Add("affinity", affinity);
                                 parameters.Add("agent", agent);
                                 parameters.Add("arch", arch);
                                 parameters.Add("args", args);
@@ -5036,6 +5083,61 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// </summary>
                             /// <returns></returns>
                             public async Task<Result> VmPending() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/pending"); }
+                        }
+                        /// <summary>
+                        /// Cloudinit
+                        /// </summary>
+                        public class PveCloudinit
+                        {
+                            private readonly PveClient _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
+                            internal PveCloudinit(PveClient client, object node, object vmid)
+                            {
+                                _client = client; _node = node;
+                                _vmid = vmid;
+                            }
+                            private PveDump _dump;
+                            /// <summary>
+                            /// Dump
+                            /// </summary>
+                            public PveDump Dump => _dump ??= new(_client, _node, _vmid);
+                            /// <summary>
+                            /// Dump
+                            /// </summary>
+                            public class PveDump
+                            {
+                                private readonly PveClient _client;
+                                private readonly object _node;
+                                private readonly object _vmid;
+                                internal PveDump(PveClient client, object node, object vmid)
+                                {
+                                    _client = client; _node = node;
+                                    _vmid = vmid;
+                                }
+                                /// <summary>
+                                /// Get automatically generated cloudinit config.
+                                /// </summary>
+                                /// <param name="type">Config type.
+                                ///   Enum: user,network,meta</param>
+                                /// <returns></returns>
+                                public async Task<Result> CloudinitGeneratedConfigDump(string type)
+                                {
+                                    var parameters = new Dictionary<string, object>();
+                                    parameters.Add("type", type);
+                                    return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/cloudinit/dump", parameters);
+                                }
+                            }
+                            /// <summary>
+                            /// Get the cloudinit configuration with both current and pending values.
+                            /// </summary>
+                            /// <returns></returns>
+                            public async Task<Result> CloudinitPending() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/cloudinit"); }
+                            /// <summary>
+                            /// Regenerate and change cloudinit config drive.
+                            /// </summary>
+                            /// <returns></returns>
+                            public async Task<Result> CloudinitUpdate() { return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/cloudinit"); }
                         }
                         /// <summary>
                         /// Unlink
@@ -5652,6 +5754,43 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                         }
                         /// <summary>
+                        /// RemoteMigrate
+                        /// </summary>
+                        public class PveRemoteMigrate
+                        {
+                            private readonly PveClient _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
+                            internal PveRemoteMigrate(PveClient client, object node, object vmid)
+                            {
+                                _client = client; _node = node;
+                                _vmid = vmid;
+                            }
+                            /// <summary>
+                            /// Migrate virtual machine to a remote cluster. Creates a new migration task. EXPERIMENTAL feature!
+                            /// </summary>
+                            /// <param name="target_bridge">Mapping from source to target bridges. Providing only a single bridge ID maps all source bridges to that bridge. Providing the special value '1' will map each source bridge to itself.</param>
+                            /// <param name="target_endpoint">Remote target endpoint</param>
+                            /// <param name="target_storage">Mapping from source to target storages. Providing only a single storage ID maps all source storages to that storage. Providing the special value '1' will map each source storage to itself.</param>
+                            /// <param name="bwlimit">Override I/O bandwidth limit (in KiB/s).</param>
+                            /// <param name="delete">Delete the original VM and related data after successful migration. By default the original VM is kept on the source cluster in a stopped state.</param>
+                            /// <param name="online">Use online/live migration if VM is running. Ignored if VM is stopped.</param>
+                            /// <param name="target_vmid">The (unique) ID of the VM.</param>
+                            /// <returns></returns>
+                            public async Task<Result> RemoteMigrateVm(string target_bridge, string target_endpoint, string target_storage, int? bwlimit = null, bool? delete = null, bool? online = null, int? target_vmid = null)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("target-bridge", target_bridge);
+                                parameters.Add("target-endpoint", target_endpoint);
+                                parameters.Add("target-storage", target_storage);
+                                parameters.Add("bwlimit", bwlimit);
+                                parameters.Add("delete", delete);
+                                parameters.Add("online", online);
+                                parameters.Add("target-vmid", target_vmid);
+                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/remote_migrate", parameters);
+                            }
+                        }
+                        /// <summary>
                         /// Monitor
                         /// </summary>
                         public class PveMonitor
@@ -5800,8 +5939,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <summary>
                                     /// Rollback VM state to specified snapshot.
                                     /// </summary>
+                                    /// <param name="start">Whether the VM should get started after rolling back successfully</param>
                                     /// <returns></returns>
-                                    public async Task<Result> Rollback() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/rollback"); }
+                                    public async Task<Result> Rollback(bool? start = null)
+                                    {
+                                        var parameters = new Dictionary<string, object>();
+                                        parameters.Add("start", start);
+                                        return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/rollback", parameters);
+                                    }
                                 }
                                 /// <summary>
                                 /// Delete a VM snapshot.
@@ -5868,48 +6013,57 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                         }
                         /// <summary>
-                        /// Cloudinit
+                        /// Mtunnel
                         /// </summary>
-                        public class PveCloudinit
+                        public class PveMtunnel
                         {
                             private readonly PveClient _client;
                             private readonly object _node;
                             private readonly object _vmid;
-                            internal PveCloudinit(PveClient client, object node, object vmid)
+                            internal PveMtunnel(PveClient client, object node, object vmid)
                             {
                                 _client = client; _node = node;
                                 _vmid = vmid;
                             }
-                            private PveDump _dump;
                             /// <summary>
-                            /// Dump
+                            /// Migration tunnel endpoint - only for internal use by VM migration.
                             /// </summary>
-                            public PveDump Dump => _dump ??= new(_client, _node, _vmid);
-                            /// <summary>
-                            /// Dump
-                            /// </summary>
-                            public class PveDump
+                            /// <param name="bridges">List of network bridges to check availability. Will be checked again for actually used bridges during migration.</param>
+                            /// <param name="storages">List of storages to check permission and availability. Will be checked again for all actually used storages during migration.</param>
+                            /// <returns></returns>
+                            public async Task<Result> Mtunnel(string bridges = null, string storages = null)
                             {
-                                private readonly PveClient _client;
-                                private readonly object _node;
-                                private readonly object _vmid;
-                                internal PveDump(PveClient client, object node, object vmid)
-                                {
-                                    _client = client; _node = node;
-                                    _vmid = vmid;
-                                }
-                                /// <summary>
-                                /// Get automatically generated cloudinit config.
-                                /// </summary>
-                                /// <param name="type">Config type.
-                                ///   Enum: user,network,meta</param>
-                                /// <returns></returns>
-                                public async Task<Result> CloudinitGeneratedConfigDump(string type)
-                                {
-                                    var parameters = new Dictionary<string, object>();
-                                    parameters.Add("type", type);
-                                    return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/cloudinit/dump", parameters);
-                                }
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("bridges", bridges);
+                                parameters.Add("storages", storages);
+                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/mtunnel", parameters);
+                            }
+                        }
+                        /// <summary>
+                        /// Mtunnelwebsocket
+                        /// </summary>
+                        public class PveMtunnelwebsocket
+                        {
+                            private readonly PveClient _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
+                            internal PveMtunnelwebsocket(PveClient client, object node, object vmid)
+                            {
+                                _client = client; _node = node;
+                                _vmid = vmid;
+                            }
+                            /// <summary>
+                            /// Migration tunnel endpoint for websocket upgrade - only for internal use by VM migration.
+                            /// </summary>
+                            /// <param name="socket">unix socket to forward to</param>
+                            /// <param name="ticket">ticket return by initial 'mtunnel' API call, or retrieved via 'ticket' tunnel command</param>
+                            /// <returns></returns>
+                            public async Task<Result> Mtunnelwebsocket(string socket, string ticket)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("socket", socket);
+                                parameters.Add("ticket", ticket);
+                                return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/mtunnelwebsocket", parameters);
                             }
                         }
                         /// <summary>
@@ -5949,6 +6103,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// </summary>
                     /// <param name="vmid">The (unique) ID of the VM.</param>
                     /// <param name="acpi">Enable/disable ACPI.</param>
+                    /// <param name="affinity">List of host cores used to execute guest processes, for example: 0,5,8-11</param>
                     /// <param name="agent">Enable/disable communication with the Qemu Guest Agent and its properties.</param>
                     /// <param name="arch">Virtual processor architecture. Defaults to the host.
                     ///   Enum: x86_64,aarch64</param>
@@ -5978,7 +6133,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="freeze">Freeze CPU at startup (use 'c' monitor command to start execution).</param>
                     /// <param name="hookscript">Script that will be executed during various steps in the vms lifetime.</param>
                     /// <param name="hostpciN">Map host PCI devices into guest.</param>
-                    /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory' and 'usb'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`.</param>
+                    /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory', 'usb' and 'cloudinit'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`. USB hotplugging is possible for guests with machine version &amp;gt;= 7.1 and ostype l26 or windows &amp;gt; 7.</param>
                     /// <param name="hugepages">Enable/disable hugepages memory.
                     ///   Enum: any,2,1024</param>
                     /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
@@ -5997,7 +6152,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="migrate_downtime">Set maximum tolerated downtime (in seconds) for migrations.</param>
                     /// <param name="migrate_speed">Set maximum speed (in MB/s) for migrations. Value 0 is no limit.</param>
                     /// <param name="name">Set a name for the VM. Only used on the configuration web interface.</param>
-                    /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will' 	    .' automatically use the setting from the host if neither searchdomain nor nameserver' 	    .' are set.</param>
+                    /// <param name="nameserver">cloud-init: Sets DNS server IP address for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                     /// <param name="netN">Specify network devices.</param>
                     /// <param name="numa">Enable/disable NUMA.</param>
                     /// <param name="numaN">NUMA topology.</param>
@@ -6013,7 +6168,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="scsiN">Use volume as SCSI hard disk or CD-ROM (n is 0 to 30). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
                     /// <param name="scsihw">SCSI controller model
                     ///   Enum: lsi,lsi53c810,virtio-scsi-pci,virtio-scsi-single,megasas,pvscsi</param>
-                    /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will' 	    .' automatically use the setting from the host if neither searchdomain nor nameserver' 	    .' are set.</param>
+                    /// <param name="searchdomain">cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.</param>
                     /// <param name="serialN">Create a serial device inside the VM (n is 0 to 3)</param>
                     /// <param name="shares">Amount of memory shares for auto-ballooning. The larger the number is, the more memory this VM gets. Number is relative to weights of all other running VMs. Using zero disables auto-ballooning. Auto-ballooning is done by pvestatd.</param>
                     /// <param name="smbios1">Specify SMBIOS type 1 fields.</param>
@@ -6032,7 +6187,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="tpmstate0">Configure a Disk for storing TPM state. The format is fixed to 'raw'. Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Note that SIZE_IN_GiB is ignored here and 4 MiB will be used instead. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
                     /// <param name="unique">Assign a unique random ethernet address.</param>
                     /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
-                    /// <param name="usbN">Configure an USB device (n is 0 to 4).</param>
+                    /// <param name="usbN">Configure an USB device (n is 0 to 4, for machine version &amp;gt;= 7.1 and ostype l26 or windows &amp;gt; 7, n can be up to 14).</param>
                     /// <param name="vcpus">Number of hotplugged vcpus.</param>
                     /// <param name="vga">Configure the VGA hardware.</param>
                     /// <param name="virtioN">Use volume as VIRTIO hard disk (n is 0 to 15). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
@@ -6040,11 +6195,12 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                     /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                     /// <returns></returns>
-                    public async Task<Result> CreateVm(int vmid, bool? acpi = null, string agent = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? live_restore = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                    public async Task<Result> CreateVm(int vmid, bool? acpi = null, string affinity = null, string agent = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? live_restore = null, bool? localtime = null, string lock_ = null, string machine = null, int? memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("vmid", vmid);
                         parameters.Add("acpi", acpi);
+                        parameters.Add("affinity", affinity);
                         parameters.Add("agent", agent);
                         parameters.Add("arch", arch);
                         parameters.Add("archive", archive);
@@ -6205,6 +6361,11 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Spiceproxy
                         /// </summary>
                         public PveSpiceproxy Spiceproxy => _spiceproxy ??= new(_client, _node, _vmid);
+                        private PveRemoteMigrate _remoteMigrate;
+                        /// <summary>
+                        /// RemoteMigrate
+                        /// </summary>
+                        public PveRemoteMigrate RemoteMigrate => _remoteMigrate ??= new(_client, _node, _vmid);
                         private PveMigrate _migrate;
                         /// <summary>
                         /// Migrate
@@ -6240,6 +6401,16 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// Pending
                         /// </summary>
                         public PvePending Pending => _pending ??= new(_client, _node, _vmid);
+                        private PveMtunnel _mtunnel;
+                        /// <summary>
+                        /// Mtunnel
+                        /// </summary>
+                        public PveMtunnel Mtunnel => _mtunnel ??= new(_client, _node, _vmid);
+                        private PveMtunnelwebsocket _mtunnelwebsocket;
+                        /// <summary>
+                        /// Mtunnelwebsocket
+                        /// </summary>
+                        public PveMtunnelwebsocket Mtunnelwebsocket => _mtunnelwebsocket ??= new(_client, _node, _vmid);
                         /// <summary>
                         /// Config
                         /// </summary>
@@ -6276,7 +6447,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="console">Attach a console device (/dev/console) to the container.</param>
                             /// <param name="cores">The number of cores assigned to the container. A container can use all available cores by default.</param>
                             /// <param name="cpulimit">Limit of CPU usage.  NOTE: If the computer has 2 CPUs, it has a total of '2' CPU time. Value '0' indicates no CPU limit.</param>
-                            /// <param name="cpuunits">CPU weight for a VM. Argument is used in the kernel fair scheduler. The larger the number is, the more CPU time this VM gets. Number is relative to the weights of all the other running VMs.  NOTE: You can disable fair-scheduler configuration by setting this to 0.</param>
+                            /// <param name="cpuunits">CPU weight for a container, will be clamped to [1, 10000] in cgroup v2.</param>
                             /// <param name="debug">Try to be more verbose. For now this only enables debug log-level on start.</param>
                             /// <param name="delete">A list of settings you want to delete.</param>
                             /// <param name="description">Description for the Container. Shown in the web-interface CT's summary. This is saved as comment inside the configuration file.</param>
@@ -6284,13 +6455,13 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="features">Allow containers access to advanced features.</param>
                             /// <param name="hookscript">Script that will be exectued during various steps in the containers lifetime.</param>
                             /// <param name="hostname">Set a host name for the container.</param>
-                            /// <param name="lock_">Lock/unlock the VM.
+                            /// <param name="lock_">Lock/unlock the container.
                             ///   Enum: backup,create,destroyed,disk,fstrim,migrate,mounted,rollback,snapshot,snapshot-delete</param>
-                            /// <param name="memory">Amount of RAM for the VM in MB.</param>
+                            /// <param name="memory">Amount of RAM for the container in MB.</param>
                             /// <param name="mpN">Use volume as container mount point. Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume.</param>
                             /// <param name="nameserver">Sets DNS server IP address for a container. Create will automatically use the setting from the host if you neither set searchdomain nor nameserver.</param>
                             /// <param name="netN">Specifies network interfaces for the container.</param>
-                            /// <param name="onboot">Specifies whether a VM will be started during system bootup.</param>
+                            /// <param name="onboot">Specifies whether a container will be started during system bootup.</param>
                             /// <param name="ostype">OS type. This is used to setup configuration inside the container, and corresponds to lxc setup scripts in /usr/share/lxc/config/&amp;lt;ostype&amp;gt;.common.conf. Value 'unmanaged' can be used to skip and OS specific setup.
                             ///   Enum: debian,devuan,ubuntu,centos,fedora,opensuse,archlinux,alpine,gentoo,nixos,unmanaged</param>
                             /// <param name="protection">Sets the protection flag of the container. This will prevent the CT or CT's disk remove/update operation.</param>
@@ -6298,7 +6469,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="rootfs">Use volume as container root.</param>
                             /// <param name="searchdomain">Sets DNS search domains for a container. Create will automatically use the setting from the host if you neither set searchdomain nor nameserver.</param>
                             /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
-                            /// <param name="swap">Amount of SWAP for the VM in MB.</param>
+                            /// <param name="swap">Amount of SWAP for the container in MB.</param>
                             /// <param name="tags">Tags of the Container. This is only meta information.</param>
                             /// <param name="template">Enable/disable Template.</param>
                             /// <param name="timezone">Time zone to use in the container. If option isn't set, then nothing will be done. Can be set to 'host' to match the host time zone, or an arbitrary time zone option from /usr/share/zoneinfo/zone.tab</param>
@@ -6619,8 +6790,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <summary>
                                     /// Rollback LXC state to specified snapshot.
                                     /// </summary>
+                                    /// <param name="start">Whether the container should get started after rolling back successfully</param>
                                     /// <returns></returns>
-                                    public async Task<Result> Rollback() { return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/rollback"); }
+                                    public async Task<Result> Rollback(bool? start = null)
+                                    {
+                                        var parameters = new Dictionary<string, object>();
+                                        parameters.Add("start", start);
+                                        return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/rollback", parameters);
+                                    }
                                 }
                                 /// <summary>
                                 /// Config
@@ -7047,8 +7224,14 @@ namespace Corsinvest.ProxmoxVE.Api
                                     /// <summary>
                                     /// Delete IPSet
                                     /// </summary>
+                                    /// <param name="force">Delete all members of the IPSet, if there are any.</param>
                                     /// <returns></returns>
-                                    public async Task<Result> DeleteIpset() { return await _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}"); }
+                                    public async Task<Result> DeleteIpset(bool? force = null)
+                                    {
+                                        var parameters = new Dictionary<string, object>();
+                                        parameters.Add("force", force);
+                                        return await _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}", parameters);
+                                    }
                                     /// <summary>
                                     /// List IPSet content
                                     /// </summary>
@@ -7369,6 +7552,47 @@ namespace Corsinvest.ProxmoxVE.Api
                             }
                         }
                         /// <summary>
+                        /// RemoteMigrate
+                        /// </summary>
+                        public class PveRemoteMigrate
+                        {
+                            private readonly PveClient _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
+                            internal PveRemoteMigrate(PveClient client, object node, object vmid)
+                            {
+                                _client = client; _node = node;
+                                _vmid = vmid;
+                            }
+                            /// <summary>
+                            /// Migrate the container to another cluster. Creates a new migration task. EXPERIMENTAL feature!
+                            /// </summary>
+                            /// <param name="target_bridge">Mapping from source to target bridges. Providing only a single bridge ID maps all source bridges to that bridge. Providing the special value '1' will map each source bridge to itself.</param>
+                            /// <param name="target_endpoint">Remote target endpoint</param>
+                            /// <param name="target_storage">Mapping from source to target storages. Providing only a single storage ID maps all source storages to that storage. Providing the special value '1' will map each source storage to itself.</param>
+                            /// <param name="bwlimit">Override I/O bandwidth limit (in KiB/s).</param>
+                            /// <param name="delete">Delete the original CT and related data after successful migration. By default the original CT is kept on the source cluster in a stopped state.</param>
+                            /// <param name="online">Use online/live migration.</param>
+                            /// <param name="restart">Use restart migration</param>
+                            /// <param name="target_vmid">The (unique) ID of the VM.</param>
+                            /// <param name="timeout">Timeout in seconds for shutdown for restart migration</param>
+                            /// <returns></returns>
+                            public async Task<Result> RemoteMigrateVm(string target_bridge, string target_endpoint, string target_storage, float? bwlimit = null, bool? delete = null, bool? online = null, bool? restart = null, int? target_vmid = null, int? timeout = null)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("target-bridge", target_bridge);
+                                parameters.Add("target-endpoint", target_endpoint);
+                                parameters.Add("target-storage", target_storage);
+                                parameters.Add("bwlimit", bwlimit);
+                                parameters.Add("delete", delete);
+                                parameters.Add("online", online);
+                                parameters.Add("restart", restart);
+                                parameters.Add("target-vmid", target_vmid);
+                                parameters.Add("timeout", timeout);
+                                return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/remote_migrate", parameters);
+                            }
+                        }
+                        /// <summary>
                         /// Migrate
                         /// </summary>
                         public class PveMigrate
@@ -7582,6 +7806,60 @@ namespace Corsinvest.ProxmoxVE.Api
                             public async Task<Result> VmPending() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/pending"); }
                         }
                         /// <summary>
+                        /// Mtunnel
+                        /// </summary>
+                        public class PveMtunnel
+                        {
+                            private readonly PveClient _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
+                            internal PveMtunnel(PveClient client, object node, object vmid)
+                            {
+                                _client = client; _node = node;
+                                _vmid = vmid;
+                            }
+                            /// <summary>
+                            /// Migration tunnel endpoint - only for internal use by CT migration.
+                            /// </summary>
+                            /// <param name="bridges">List of network bridges to check availability. Will be checked again for actually used bridges during migration.</param>
+                            /// <param name="storages">List of storages to check permission and availability. Will be checked again for all actually used storages during migration.</param>
+                            /// <returns></returns>
+                            public async Task<Result> Mtunnel(string bridges = null, string storages = null)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("bridges", bridges);
+                                parameters.Add("storages", storages);
+                                return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/mtunnel", parameters);
+                            }
+                        }
+                        /// <summary>
+                        /// Mtunnelwebsocket
+                        /// </summary>
+                        public class PveMtunnelwebsocket
+                        {
+                            private readonly PveClient _client;
+                            private readonly object _node;
+                            private readonly object _vmid;
+                            internal PveMtunnelwebsocket(PveClient client, object node, object vmid)
+                            {
+                                _client = client; _node = node;
+                                _vmid = vmid;
+                            }
+                            /// <summary>
+                            /// Migration tunnel endpoint for websocket upgrade - only for internal use by VM migration.
+                            /// </summary>
+                            /// <param name="socket">unix socket to forward to</param>
+                            /// <param name="ticket">ticket return by initial 'mtunnel' API call, or retrieved via 'ticket' tunnel command</param>
+                            /// <returns></returns>
+                            public async Task<Result> Mtunnelwebsocket(string socket, string ticket)
+                            {
+                                var parameters = new Dictionary<string, object>();
+                                parameters.Add("socket", socket);
+                                parameters.Add("ticket", ticket);
+                                return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/mtunnelwebsocket", parameters);
+                            }
+                        }
+                        /// <summary>
                         /// Destroy the container (also delete all uses files).
                         /// </summary>
                         /// <param name="destroy_unreferenced_disks">If set, destroy additionally all disks with the VMID from all enabled storages which are not referenced in the config.</param>
@@ -7620,7 +7898,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="console">Attach a console device (/dev/console) to the container.</param>
                     /// <param name="cores">The number of cores assigned to the container. A container can use all available cores by default.</param>
                     /// <param name="cpulimit">Limit of CPU usage.  NOTE: If the computer has 2 CPUs, it has a total of '2' CPU time. Value '0' indicates no CPU limit.</param>
-                    /// <param name="cpuunits">CPU weight for a VM. Argument is used in the kernel fair scheduler. The larger the number is, the more CPU time this VM gets. Number is relative to the weights of all the other running VMs.  NOTE: You can disable fair-scheduler configuration by setting this to 0.</param>
+                    /// <param name="cpuunits">CPU weight for a container, will be clamped to [1, 10000] in cgroup v2.</param>
                     /// <param name="debug">Try to be more verbose. For now this only enables debug log-level on start.</param>
                     /// <param name="description">Description for the Container. Shown in the web-interface CT's summary. This is saved as comment inside the configuration file.</param>
                     /// <param name="features">Allow containers access to advanced features.</param>
@@ -7628,13 +7906,13 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="hookscript">Script that will be exectued during various steps in the containers lifetime.</param>
                     /// <param name="hostname">Set a host name for the container.</param>
                     /// <param name="ignore_unpack_errors">Ignore errors when extracting the template.</param>
-                    /// <param name="lock_">Lock/unlock the VM.
+                    /// <param name="lock_">Lock/unlock the container.
                     ///   Enum: backup,create,destroyed,disk,fstrim,migrate,mounted,rollback,snapshot,snapshot-delete</param>
-                    /// <param name="memory">Amount of RAM for the VM in MB.</param>
+                    /// <param name="memory">Amount of RAM for the container in MB.</param>
                     /// <param name="mpN">Use volume as container mount point. Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume.</param>
                     /// <param name="nameserver">Sets DNS server IP address for a container. Create will automatically use the setting from the host if you neither set searchdomain nor nameserver.</param>
                     /// <param name="netN">Specifies network interfaces for the container.</param>
-                    /// <param name="onboot">Specifies whether a VM will be started during system bootup.</param>
+                    /// <param name="onboot">Specifies whether a container will be started during system bootup.</param>
                     /// <param name="ostype">OS type. This is used to setup configuration inside the container, and corresponds to lxc setup scripts in /usr/share/lxc/config/&amp;lt;ostype&amp;gt;.common.conf. Value 'unmanaged' can be used to skip and OS specific setup.
                     ///   Enum: debian,devuan,ubuntu,centos,fedora,opensuse,archlinux,alpine,gentoo,nixos,unmanaged</param>
                     /// <param name="password">Sets root password inside container.</param>
@@ -7647,7 +7925,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="start">Start the CT after its creation finished successfully.</param>
                     /// <param name="startup">Startup and shutdown behavior. Order is a non-negative number defining the general startup order. Shutdown in done with reverse ordering. Additionally you can set the 'up' or 'down' delay in seconds, which specifies a delay to wait before the next VM is started or stopped.</param>
                     /// <param name="storage">Default Storage.</param>
-                    /// <param name="swap">Amount of SWAP for the VM in MB.</param>
+                    /// <param name="swap">Amount of SWAP for the container in MB.</param>
                     /// <param name="tags">Tags of the Container. This is only meta information.</param>
                     /// <param name="template">Enable/disable Template.</param>
                     /// <param name="timezone">Time zone to use in the container. If option isn't set, then nothing will be done. Can be set to 'host' to match the host time zone, or an arbitrary time zone option from /usr/share/zoneinfo/zone.tab</param>
@@ -7791,6 +8069,11 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Rules
                     /// </summary>
                     public PveRules Rules => _rules ??= new(_client, _node);
+                    private PveCmdSafety _cmdSafety;
+                    /// <summary>
+                    /// CmdSafety
+                    /// </summary>
+                    public PveCmdSafety CmdSafety => _cmdSafety ??= new(_client, _node);
                     /// <summary>
                     /// Osd
                     /// </summary>
@@ -8423,6 +8706,32 @@ namespace Corsinvest.ProxmoxVE.Api
                         public async Task<Result> Rules() { return await _client.Get($"/nodes/{_node}/ceph/rules"); }
                     }
                     /// <summary>
+                    /// CmdSafety
+                    /// </summary>
+                    public class PveCmdSafety
+                    {
+                        private readonly PveClient _client;
+                        private readonly object _node;
+                        internal PveCmdSafety(PveClient client, object node) { _client = client; _node = node; }
+                        /// <summary>
+                        /// Heuristical check if it is safe to perform an action.
+                        /// </summary>
+                        /// <param name="action">Action to check
+                        ///   Enum: stop,destroy</param>
+                        /// <param name="id">ID of the service</param>
+                        /// <param name="service">Service type
+                        ///   Enum: osd,mon,mds</param>
+                        /// <returns></returns>
+                        public async Task<Result> CmdSafety(string action, string id, string service)
+                        {
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("action", action);
+                            parameters.Add("id", id);
+                            parameters.Add("service", service);
+                            return await _client.Get($"/nodes/{_node}/ceph/cmd-safety", parameters);
+                        }
+                    }
+                    /// <summary>
                     /// Directory index.
                     /// </summary>
                     /// <returns></returns>
@@ -8504,7 +8813,8 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="maxfiles">Deprecated: use 'prune-backups' instead. Maximal number of backup files per guest system.</param>
                     /// <param name="mode">Backup mode.
                     ///   Enum: snapshot,suspend,stop</param>
-                    /// <param name="notes_template">Template string for generating notes for the backup(s). It can contain variables which will be replaced by their values. Currently supported are {{cluster}}, {{guestname}}, {{node}}, and {{vmid}}, but more might be added in the future.</param>
+                    /// <param name="notes_template">Template string for generating notes for the backup(s). It can contain variables which will be replaced by their values. Currently supported are {{cluster}}, {{guestname}}, {{node}}, and {{vmid}}, but more might be added in the future. Needs to be a single line, newline and backslash need to be escaped as '\n' and '\\' respectively.</param>
+                    /// <param name="performance">Other performance-related settings.</param>
                     /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
                     /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
                     /// <param name="protected_">If true, mark backup(s) as protected.</param>
@@ -8521,7 +8831,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
                     /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                     /// <returns></returns>
-                    public async Task<Result> Vzdump(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string notes_template = null, int? pigz = null, string pool = null, bool? protected_ = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
+                    public async Task<Result> Vzdump(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string notes_template = null, string performance = null, int? pigz = null, string pool = null, bool? protected_ = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("all", all);
@@ -8537,6 +8847,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         parameters.Add("maxfiles", maxfiles);
                         parameters.Add("mode", mode);
                         parameters.Add("notes-template", notes_template);
+                        parameters.Add("performance", performance);
                         parameters.Add("pigz", pigz);
                         parameters.Add("pool", pool);
                         parameters.Add("protected", protected_);
@@ -10222,13 +10533,14 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="devices">The block devices you want to create the zpool on.</param>
                         /// <param name="name">The storage identifier.</param>
                         /// <param name="raidlevel">The RAID level to use.
-                        ///   Enum: single,mirror,raid10,raidz,raidz2,raidz3</param>
+                        ///   Enum: single,mirror,raid10,raidz,raidz2,raidz3,draid,draid2,draid3</param>
                         /// <param name="add_storage">Configure storage using the zpool.</param>
                         /// <param name="ashift">Pool sector size exponent.</param>
                         /// <param name="compression">The compression algorithm to use.
                         ///   Enum: on,off,gzip,lz4,lzjb,zle,zstd</param>
+                        /// <param name="draid_config"></param>
                         /// <returns></returns>
-                        public async Task<Result> Create(string devices, string name, string raidlevel, bool? add_storage = null, int? ashift = null, string compression = null)
+                        public async Task<Result> Create(string devices, string name, string raidlevel, bool? add_storage = null, int? ashift = null, string compression = null, string draid_config = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("devices", devices);
@@ -10237,6 +10549,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             parameters.Add("add_storage", add_storage);
                             parameters.Add("ashift", ashift);
                             parameters.Add("compression", compression);
+                            parameters.Add("draid-config", draid_config);
                             return await _client.Create($"/nodes/{_node}/disks/zfs", parameters);
                         }
                     }
@@ -11310,7 +11623,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a VNC Shell proxy.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: ceph_install,upgrade,login</param>
+                    ///   Enum: ceph_install,login,upgrade</param>
                     /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                     /// <param name="height">sets the height of the console in pixels.</param>
                     /// <param name="websocket">use websocket instead of standard vnc.</param>
@@ -11339,7 +11652,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a VNC Shell proxy.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: ceph_install,upgrade,login</param>
+                    ///   Enum: ceph_install,login,upgrade</param>
                     /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                     /// <returns></returns>
                     public async Task<Result> Termproxy(string cmd = null, string cmd_opts = null)
@@ -11384,7 +11697,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// Creates a SPICE shell.
                     /// </summary>
                     /// <param name="cmd">Run specific command or default to login.
-                    ///   Enum: ceph_install,upgrade,login</param>
+                    ///   Enum: ceph_install,login,upgrade</param>
                     /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                     /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As reasonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                     /// <returns></returns>
@@ -11681,7 +11994,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="mkdir">Create the directory if it doesn't exist.</param>
                 /// <param name="monhost">IP addresses of monitors (for external clusters).</param>
                 /// <param name="mountpoint">mount point</param>
-                /// <param name="namespace_">RBD Namespace.</param>
+                /// <param name="namespace_">Namespace.</param>
                 /// <param name="nocow">Set the NOCOW flag on files. Disables data checksumming and causes data errors to be unrecoverable from while allowing direct I/O. Only use this if data does not need to be any more safe than on a single ext4 formatted disk with no underlying raid system.</param>
                 /// <param name="nodes">List of cluster node names.</param>
                 /// <param name="nowritecache">disable write caching on the target</param>
@@ -11804,7 +12117,7 @@ namespace Corsinvest.ProxmoxVE.Api
             /// <param name="mkdir">Create the directory if it doesn't exist.</param>
             /// <param name="monhost">IP addresses of monitors (for external clusters).</param>
             /// <param name="mountpoint">mount point</param>
-            /// <param name="namespace_">RBD Namespace.</param>
+            /// <param name="namespace_">Namespace.</param>
             /// <param name="nocow">Set the NOCOW flag on files. Disables data checksumming and causes data errors to be unrecoverable from while allowing direct I/O. Only use this if data does not need to be any more safe than on a single ext4 formatted disk with no underlying raid system.</param>
             /// <param name="nodes">List of cluster node names.</param>
             /// <param name="nowritecache">disable write caching on the target</param>
