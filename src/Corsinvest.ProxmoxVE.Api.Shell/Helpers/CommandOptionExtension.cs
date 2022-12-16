@@ -3,10 +3,6 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using Corsinvest.ProxmoxVE.Api.Extension.Utils;
-using Corsinvest.ProxmoxVE.Api.Shared;
-using Corsinvest.ProxmoxVE.Api.Shared.Utils;
-using Microsoft.Extensions.Logging;
 using System;
 using System.CommandLine;
 using System.Diagnostics;
@@ -14,6 +10,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Corsinvest.ProxmoxVE.Api.Extension.Utils;
+using Corsinvest.ProxmoxVE.Api.Shared;
+using Corsinvest.ProxmoxVE.Api.Shared.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers
 {
@@ -54,7 +54,7 @@ For more information visit https://www.cv4pve-tools.com";
 
 
         /// <summary>
-        /// Dryrun is active
+        /// Dry run is active
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
@@ -175,6 +175,7 @@ For more information visit https://www.cv4pve-tools.com";
 -vmid or -name exclude (e.g. -200,-TestUbuntu)
 range 100:107,-105,200:204
 '@pool-???' for all VM/CT in specific pool (e.g. @pool-customer1),
+'@tag-???' for all VM/CT in specific tags (e.g. @tag-customerA),
 '@all-???' for all VM/CT in specific host (e.g. @all-pve1, @all-\$(hostname)),
 '@all' for all VM/CT in cluster";
 

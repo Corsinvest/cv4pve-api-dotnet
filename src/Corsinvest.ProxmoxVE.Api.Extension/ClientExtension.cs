@@ -3,15 +3,15 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using Corsinvest.ProxmoxVE.Api.Extension.Utils;
-using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
-using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
-using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Corsinvest.ProxmoxVE.Api.Extension.Utils;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
+using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension
 {
@@ -131,7 +131,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         /// <param name="client"></param>
         /// <param name="jolly">all for all vm,
         /// <para>@all-nodename all vm in host,</para>
-        /// <para>@pool-name all vm in host,</para>
+        /// <para>@pool-name all vm in pool,</para>
+        /// <para>@tag-name all vm contain tags,</para>
         /// <para>vmid id vm</para>
         /// <para>Range 100:104 return vm with id in range</para>
         /// <para>start with '-' exclude vm</para>
@@ -164,6 +165,13 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
                     {
                         ret.AddRange((await client.Pools[poolName].Get()).Members.Where(a => allVms.Any(b => b.Id == a.Id)));
                     }
+                }
+                else if (id.StartsWith("@tag-"))
+                {
+                    //all in specific tag
+                    var tagName = id.ToLower().Substring(5);
+
+                    ret.AddRange(allVms.Where(a => (a.Tags + "").Split(';').Contains(tagName)));
                 }
                 else
                 {
