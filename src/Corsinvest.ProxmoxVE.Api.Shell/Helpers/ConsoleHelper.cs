@@ -139,8 +139,6 @@ Good job";
             rc.DebugOption();
             rc.DryRunOption();
             rc.AddLoginOptions();
-            rc.CheckUpdateApp();
-            rc.UpgradeApp();
 
             return rc;
         }
@@ -174,34 +172,7 @@ Good job";
             //execute command
             try
             {
-                Version webVersion = null;
-
-                //check new version available
-                var taskInfo = new Task(async () =>
-                {
-                    try
-                    {
-                        var version = (await UpdateHelper.GetInfoLastReleaseAssetFromGitHub(rootCommand.Name)).Version;
-                        if (version.ToString() != GetCurrentVersionApp()) { webVersion = version; }
-                    }
-                    catch { }
-                });
-                taskInfo.Start();
-
-                var ret = await rootCommand.InvokeAsync(args);
-
-                taskInfo.Wait(1000);
-
-                if ((rootCommand.GetOption("help").HasValue() || rootCommand.GetOption("version").HasValue())
-                    && webVersion != null
-                    && webVersion > new Version(GetCurrentVersionApp()))
-                {
-                    Console.Out.WriteLine("====================================");
-                    Console.Out.WriteLine($"New version available: {webVersion}");
-                    Console.Out.WriteLine("====================================");
-                }
-
-                return ret;
+                return await rootCommand.InvokeAsync(args);
             }
             catch (Exception ex)
             {

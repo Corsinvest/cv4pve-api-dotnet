@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
-using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
-using Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
-using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension
 {
@@ -69,7 +69,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         public static async Task<IEnumerable<string>> Get(this PveClient.PveNodes.PveNodeItem.PveTasks.PveUpidItem.PveLog item,
                                                           int? limit = null,
                                                           int? start = null)
-            => (await item.ReadTaskLog(limit, start)).ToEnumerable().OrderBy(a => a.n).Select(a => a.t as string);
+            => (await item.ReadTaskLog(false, limit, start)).ToEnumerable().OrderBy(a => a.n).Select(a => a.t as string);
 
         /// <summary>
         /// Get backups in all storages

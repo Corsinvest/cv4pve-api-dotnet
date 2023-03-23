@@ -5,7 +5,6 @@
 
 using System;
 using System.CommandLine;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -31,7 +30,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers
             command.Description = ConsoleHelper.MakeLogoAndTitle(command.Description) + $@"
 
 {command.Name} is a part of suite cv4pve.
-For more information visit https://www.cv4pve-tools.com";
+For more information visit https://www.corsinvest.it/cv4pve";
         }
 
         /// <summary>
@@ -51,7 +50,6 @@ For more information visit https://www.cv4pve-tools.com";
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public static Option<T> GetOption<T>(this Command command, string name) => (Option<T>)command.GetOption(name);
-
 
         /// <summary>
         /// Dry run is active
@@ -161,14 +159,15 @@ For more information visit https://www.cv4pve-tools.com";
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static Option VmIdOrNameOption(this Command command) => command.AddOption("--vmid", "The id or name VM/CT");
+        public static Option<string> VmIdOrNameOption(this Command command)
+            => command.AddOption<string>("--vmid", "The id or name VM/CT");
 
         /// <summary>
         /// Ids or names option
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static Option VmIdsOrNamesOption(this Command command)
+        public static Option<string> VmIdsOrNamesOption(this Command command)
         {
             var opt = command.VmIdOrNameOption();
             opt.Description = @"The id or name VM/CT comma separated (eg. 100,101,102,TestDebian)
@@ -187,28 +186,28 @@ range 100:107,-105,200:204
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static Option GetApiToken(this Command command) => command.GetOption(ApiTokenOptionName);
+        public static Option<string> GetApiToken(this Command command) => command.GetOption<string>(ApiTokenOptionName);
 
         /// <summary>
         /// Get username
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static Option GetUsername(this Command command) => command.GetOption(UsernameOptionName);
+        public static Option<string> GetUsername(this Command command) => command.GetOption<string>(UsernameOptionName);
 
         /// <summary>
         /// Get password
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static Option GetPassword(this Command command) => command.GetOption(PasswordOptionName);
+        public static Option<string> GetPassword(this Command command) => command.GetOption<string>(PasswordOptionName);
 
         /// <summary>
         /// Get host
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static Option GetHost(this Command command) => command.GetOption(HostOptionName);
+        public static Option<string> GetHost(this Command command) => command.GetOption<string>(HostOptionName);
 
         #region Login option
         /// <summary>
@@ -217,9 +216,9 @@ range 100:107,-105,200:204
         /// <param name="command"></param>
         public static void AddLoginOptions(this Command command)
         {
-            var optApiToken = command.AddOption($"--{ApiTokenOptionName}", "Api token format 'USER@REALM!TOKENID=UUID'. Require Proxmox VE 6.2 or later");
-            var optUsername = command.AddOption($"--{UsernameOptionName}", "User name <username>@<realm>");
-            var optPassword = command.AddOption($"--{PasswordOptionName}", "The password. Specify 'file:path_file' to store password in file.");
+            var optApiToken = command.AddOption<string>($"--{ApiTokenOptionName}", "Api token format 'USER@REALM!TOKENID=UUID'. Require Proxmox VE 6.2 or later");
+            var optUsername = command.AddOption<string>($"--{UsernameOptionName}", "User name <username>@<realm>");
+            var optPassword = command.AddOption<string>($"--{PasswordOptionName}", "The password. Specify 'file:path_file' to store password in file.");
 
             var optHost = new Option<string>($"--{HostOptionName}",
                                              parseArgument: (e) =>
@@ -271,9 +270,9 @@ range 100:107,-105,200:204
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static Option HostOption(this Command command)
+        public static Option<string> HostOption(this Command command)
         {
-            var option = command.AddOption($"--{HostOptionName}", "The host name host[:port],host1[:port],host2[:port]");
+            var option = command.AddOption<string>($"--{HostOptionName}", "The host name host[:port],host1[:port],host2[:port]");
             option.IsRequired = true;
             return option;
         }
@@ -295,7 +294,7 @@ range 100:107,-105,200:204
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static Option Username(this Command command) => command.AddOption($"--{UsernameOptionName}", "User name");
+        public static Option<string> Username(this Command command) => command.AddOption<string>($"--{UsernameOptionName}", "User name");
 
         /// <summary>
         /// Verbose
@@ -397,7 +396,7 @@ range 100:107,-105,200:204
         /// <param name="name"></param>
         /// <param name="description"></param>
         /// <returns></returns>
-        public static Option AddOption(this Command command, string name, string description)
+        public static Option<string> AddOption(this Command command, string name, string description)
             => command.AddOption<string>(name, description);
 
         /// <summary>
@@ -407,7 +406,7 @@ range 100:107,-105,200:204
         /// <param name="name"></param>
         /// <param name="description"></param>
         /// <returns></returns>
-        public static Argument AddArgument(this Command command, string name, string description)
+        public static Argument<string> AddArgument(this Command command, string name, string description)
             => command.AddArgument<string>(name, description);
 
         /// <summary>
@@ -424,7 +423,6 @@ range 100:107,-105,200:204
             command.AddArgument(argument);
             return argument;
         }
-
 
         /// <summary>
         /// Add command
@@ -509,69 +507,6 @@ range 100:107,-105,200:204
             });
 
             return option;
-        }
-
-        /// <summary>
-        /// Command check update application
-        /// </summary>
-        /// <param name="rootCommand"></param>
-        public static void CheckUpdateApp(this RootCommand rootCommand)
-        {
-            var cmd = new Command("app-check-update", "Check update application");
-            cmd.SetHandler(async () =>
-            {
-                Console.Out.Write((await UpdateHelper.GetInfo(rootCommand.Name)).Info);
-            });
-            rootCommand.AddCommand(cmd);
-        }
-
-        /// <summary>
-        /// Upgrade application
-        /// </summary>
-        /// <param name="rootCommand"></param>
-        public static void UpgradeApp(this RootCommand rootCommand)
-        {
-            const string appUpgradeFinish = "app-upgrade-finish";
-
-            var optQuiet = new Option<bool>("--quiet", "Non-interactive mode, does not request confirmation");
-            var cmdUpgrade = new Command("app-upgrade", "Upgrade application")
-            {
-                optQuiet
-            };
-
-            cmdUpgrade.SetHandler(async () =>
-            {
-                var (Info, IsNewVersion, BrowserDownloadUrl) = await UpdateHelper.GetInfo(rootCommand.Name);
-                Console.Out.WriteLine(Info);
-
-                if (IsNewVersion)
-                {
-                    if (!optQuiet.HasValue() && !ConsoleHelper.ReadYesNo("Confirm upgrade application?", false))
-                    {
-                        Console.Out.WriteLine("Upgrade abort!");
-                        return;
-                    }
-
-                    Console.Out.WriteLine($"Download {BrowserDownloadUrl} ....");
-
-                    var fileNameNew = await UpdateHelper.UpgradePrepare(BrowserDownloadUrl, Environment.ProcessPath);
-
-                    Process.Start(fileNameNew, appUpgradeFinish);
-                }
-            });
-            rootCommand.AddCommand(cmdUpgrade);
-
-            //finish upgrade application
-            var cmdUpgradeFinish = new Command(appUpgradeFinish)
-            {
-                IsHidden = true
-            };
-            cmdUpgradeFinish.SetHandler(() =>
-            {
-                UpdateHelper.UpgradeFinish(Environment.ProcessPath);
-
-                Console.Out.WriteLine("Upgrade completed!");
-            });
         }
 
         /// <summary>
