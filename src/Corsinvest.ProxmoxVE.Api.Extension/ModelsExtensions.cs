@@ -58,7 +58,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
                                                                RrdDataConsolidation dataConsolidation)
             => await item.Get(dataTimeFrame.GetValue(), dataConsolidation.GetValue());
 
-
         /// <summary>
         /// Read task log
         /// </summary>
@@ -69,7 +68,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         public static async Task<IEnumerable<string>> Get(this PveClient.PveNodes.PveNodeItem.PveTasks.PveUpidItem.PveLog item,
                                                           int? limit = null,
                                                           int? start = null)
-            => (await item.ReadTaskLog(false, limit, start)).ToEnumerable().OrderBy(a => a.n).Select(a => a.t as string);
+            => (await item.ReadTaskLog(null, limit, start)).ToEnumerable().OrderBy(a => a.n).Select(a => a.t as string);
 
         /// <summary>
         /// Get backups in all storages

@@ -276,7 +276,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 default: break;
             }
 
-            if (result == null) { result = new ExpandoObject(); }
+            result ??= new ExpandoObject();
 
             LastResult = new Result(result,
                                     response.StatusCode,

@@ -410,10 +410,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
                 columns.Add("key");
                 columns.Add("value");
 
-                if (keys == null)
-                {
-                    keys = dic.Select(a => a.Key).ToArray();
-                }
+                keys ??= dic.Select(a => a.Key).ToArray();
 
                 foreach (var key in keys.OrderBy(a => a))
                 {
@@ -446,7 +443,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
                         {
                             value = GetValue(value, title, returnParameters);
                         }
-                        if (value == null) { value = ""; }
+
+                        value ??= "";
                         row.Add(value);
                     }
 

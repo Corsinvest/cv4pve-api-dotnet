@@ -31,6 +31,12 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         public string Dns2 { get; set; }
 
         /// <summary>
+        /// DNS 3
+        /// </summary>
+        [JsonProperty("dns3")]
+        public string Dns3 { get; set; }
+
+        /// <summary>
         /// Is equal
         /// </summary>
         /// <param name="dns"></param>
@@ -38,6 +44,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         public bool IsEqual(NodeDns dns)
             => Search == dns.Search
                 && Dns1 == dns.Dns1
-                && Dns2 == dns.Dns2;
+                && Dns2 == dns.Dns2
+                && Dns3 == dns.Dns3;
     }
 }

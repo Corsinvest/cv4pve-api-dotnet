@@ -74,7 +74,7 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
                 if (string.IsNullOrWhiteSpace(item)) { continue; }
                 var oldClassApi = classApi;
                 classApi = classApi.SubClasses.FirstOrDefault(a => a.Resource == classApi.Resource + "/" + item);
-                if (classApi == null) { classApi = oldClassApi.SubClasses.FirstOrDefault(a => a.IsIndexed); }
+                classApi ??= oldClassApi.SubClasses.FirstOrDefault(a => a.IsIndexed);
                 if (classApi == null) { break; }
             }
 
