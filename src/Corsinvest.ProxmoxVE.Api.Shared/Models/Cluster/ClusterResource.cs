@@ -143,7 +143,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster
         /// <summary>
         /// Shared storage
         /// </summary>
-        [JsonProperty("share")]
+        [JsonProperty("shared")]
         public bool Shared { get; set; }
 
         /// <summary>
