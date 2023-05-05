@@ -175,6 +175,7 @@ For more information visit https://www.corsinvest.it/cv4pve";
 range 100:107,-105,200:204
 '@pool-???' for all VM/CT in specific pool (e.g. @pool-customer1),
 '@tag-???' for all VM/CT in specific tags (e.g. @tag-customerA),
+'@node-???' for all VM/CT in specific node (e.g. @node-pve1, @node-\$(hostname)),
 '@all-???' for all VM/CT in specific host (e.g. @all-pve1, @all-\$(hostname)),
 '@all' for all VM/CT in cluster";
 

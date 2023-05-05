@@ -130,7 +130,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
         /// </summary>
         /// <param name="client"></param>
         /// <param name="jolly">all for all vm,
-        /// <para>@all-nodename all vm in host,</para>
+        /// <para>@all-nodeName all vm in host,</para>
+        /// <para>@node-nodeName all vm in host,</para>
         /// <para>@pool-name all vm in pool,</para>
         /// <para>@tag-name all vm contain tags,</para>
         /// <para>vmid id vm</para>
@@ -156,6 +157,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
                     var idx = id.StartsWith("all-") ? 4 : 5;
                     ret.AddRange(allVms.Where(a => a.Node.ToLower() == id.ToLower().Substring(idx)));
                 }
+                else if (id.StartsWith("@node-"))
+                {
+                    //all in specific node
+                    var nodeName = id.ToLower().Substring(6);
+                    ret.AddRange(allVms.Where(a => a.Node.ToLower() == nodeName.ToLower()));
+                }
                 else if (id.StartsWith("@pool-"))
                 {
                     //all in specific pool
@@ -170,8 +177,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
                 {
                     //all in specific tag
                     var tagName = id.ToLower().Substring(5);
-
-                    ret.AddRange(allVms.Where(a => (a.Tags + "").Split(';').Contains(tagName)));
+                    ret.AddRange(allVms.Where(a => (a.Tags + "").ToLower().Split(';').Contains(tagName)));
                 }
                 else
                 {
