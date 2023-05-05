@@ -90,6 +90,5 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster
         /// </summary>
         [JsonProperty("compress")]
         public string Compress { get; set; }
-
     }
 }
