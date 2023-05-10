@@ -3,6 +3,11 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Access;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
@@ -10,11 +15,6 @@ using Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Pool;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Storage;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
 {
@@ -901,7 +901,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
                 //zfs
                 var zfs = new List<Info.NodeInfo.DisksInfo.ZfsInfo>();
                 node.Disks.Zfs = zfs;
-                foreach (var item in await nodeApi.Disks.Zfs.Get())
+                foreach (var item in await nodeApi.Disks.Zfs.Get() ?? Enumerable.Empty<NodeDiskZfs>())
                 {
                     zfs.Add(new Info.NodeInfo.DisksInfo.ZfsInfo
                     {
