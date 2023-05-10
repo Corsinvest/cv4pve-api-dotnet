@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using Corsinvest.ProxmoxVE.Api.Metadata;
-using Corsinvest.ProxmoxVE.Api.Shared.Utils;
-using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,6 +14,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Corsinvest.ProxmoxVE.Api.Metadata;
+using Corsinvest.ProxmoxVE.Api.Shared.Utils;
+using Newtonsoft.Json;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
 {
@@ -119,6 +119,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
                 new("node-storage-content,nstoc", "Node storage content", "get /nodes/{node}/storage/{storage}/content", true),
                 new("node-report,nrpt", "Node report", "get /nodes/{node}/report", true),
                 new("node-shutdown,nreb", "Node reboot or shutdown", "create /nodes/{node}/status command:cmd", true),
+                new("node-vzdump-list,nvlst", "Node list backup", "/get /nodes/{node}/storage/{storage}/content vmid:{vmid} content:backup", true),
                 new("node-vzdump-config,nvcfg", "Node Extract configuration from vzdump backup archive",
                              "get /nodes/{node}/vzdump/extractconfig volume:{volume}", true),
 
@@ -146,7 +147,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
                 //LXC
                 new("lxc-list,llst", "LXC list vm", "get /nodes/{node}/lxc", true),
                 new("lxc-migrate,lmig", "LXC migrate vm other node", "get /nodes/{node}/lxc/{vmid}/migrate target:{target}", true),
-                new("lxc-vzdump-restore,lvrst", "LXC restore vzdump", "create /nodes/{node}/lxc vmid:{vmid} ostemplate:{archive}", true),
+                new("lxc-vzdump-restore,lvrst", "LXC restore vzdump", "create /nodes/{node}/lxc vmid:{vmid} ostemplate:{archive} restore:1", true),
 
                 //status
                 new("lxc-status,lsts", "LXC current status vm", "get /nodes/{node}/lxc/{vmid}/status/current", true),
