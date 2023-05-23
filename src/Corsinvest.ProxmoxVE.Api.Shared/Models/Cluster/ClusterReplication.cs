@@ -53,5 +53,11 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster
         /// </summary>
         [JsonProperty("target")]
         public string Target { get; set; }
+
+        /// <summary>
+        /// Disable
+        /// </summary>
+        [JsonProperty("disable")]
+        public bool Disable { get; set; }
     }
 }

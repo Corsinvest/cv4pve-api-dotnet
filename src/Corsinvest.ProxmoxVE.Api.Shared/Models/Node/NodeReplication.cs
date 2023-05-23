@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using Newtonsoft.Json;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
 {
@@ -13,6 +13,18 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
     /// </summary>
     public class NodeReplication
     {
+        /// <summary>
+        /// Comment
+        /// </summary>
+        [JsonProperty("comment")]
+        public string Comment { get; set; }
+
+        /// <summary>
+        /// Disable
+        /// </summary>
+        [JsonProperty("disable")]
+        public bool Disable { get; set; }
+
         /// <summary>
         /// Source
         /// </summary>
@@ -90,6 +102,12 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// </summary>
         [JsonProperty("target")]
         public string Target { get; set; }
+
+        /// <summary>
+        /// Error
+        /// </summary>
+        [JsonProperty("error")]
+        public string Error { get; set; }
 
         /// <summary>
         /// Extension Data
