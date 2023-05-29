@@ -176,7 +176,7 @@ Good job";
             }
             catch (Exception ex)
             {
-                if (ex is PveException)
+                if (ex is PveException || ex is PveExceptionResult)
                 {
                     Console.Out.WriteLine(ex.Message);
                 }

@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace Corsinvest.ProxmoxVE.Api
 {
@@ -50,11 +50,13 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <param name="result"></param>
         /// <returns></returns>
         public static T ToModel<T>(this Result result)
-            => JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(result.ToData()), new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                Converters = new JsonConverter[] { new CustomBooleanJsonConverter() }.ToList()
-            });
+            => result.InError() || !result.IsSuccessStatusCode //check exists error
+                ? throw new PveExceptionResult(result, !result.IsSuccessStatusCode ? result.ReasonPhrase : result.GetError())
+                : JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(result.ToData()), new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    Converters = new JsonConverter[] { new CustomBooleanJsonConverter() }.ToList()
+                });
 
         class CustomBooleanJsonConverter : JsonConverter
         {
