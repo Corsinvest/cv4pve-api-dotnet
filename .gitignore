@@ -353,3 +353,4 @@ MigrationBackup/
 
 #niget paxkge generated
 .nupkgs/
+setKey.ps1
