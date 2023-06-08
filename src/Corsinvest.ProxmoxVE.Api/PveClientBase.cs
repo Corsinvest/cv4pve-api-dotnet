@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -16,6 +13,9 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Newtonsoft.Json;
 
 namespace Corsinvest.ProxmoxVE.Api
 {
@@ -209,7 +209,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 MethodType.Set => HttpMethod.Put,
                 MethodType.Create => HttpMethod.Post,
                 MethodType.Delete => HttpMethod.Delete,
-                _ => HttpMethod.Get,
+                _ => throw new ArgumentOutOfRangeException(nameof(methodType)),
             };
 
             //load parameters

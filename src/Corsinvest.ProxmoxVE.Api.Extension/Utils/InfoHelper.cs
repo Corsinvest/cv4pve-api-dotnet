@@ -96,12 +96,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
                 /// <summary>
                 /// RrdData Day
                 /// </summary>
-                public IEnumerable<T> Day { get; set; }
+                public IEnumerable<T> Day { get; set; } = Enumerable.Empty<T>();
 
                 /// <summary>
                 /// RrdData week
                 /// </summary>
-                public IEnumerable<T> Week { get; set; }
+                public IEnumerable<T> Week { get; set; } = Enumerable.Empty<T>();
             }
 
 
@@ -767,7 +767,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
                 {
                     Id = item.Id,
                     Comment = item.Comment,
-                    Detail = await client.Pools[item].Get()
+                    Detail = await client.Pools[item.Id].Get()
                 });
             }
             #endregion
@@ -943,8 +943,11 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
                                     : new List<NodeStorageContent>()
                 };
 
-                storage.RrdData.Day = await storageNode.Rrddata.Get(RrdDataTimeFrame.Day, RrdDataConsolidation.Average);
-                storage.RrdData.Week = await storageNode.Rrddata.Get(RrdDataTimeFrame.Week, RrdDataConsolidation.Average);
+                if (storage.Detail.Enabled)
+                {
+                    storage.RrdData.Day = await storageNode.Rrddata.Get(RrdDataTimeFrame.Day, RrdDataConsolidation.Average);
+                    storage.RrdData.Week = await storageNode.Rrddata.Get(RrdDataTimeFrame.Week, RrdDataConsolidation.Average);
+                }
 
                 storages.Add(storage);
             }
@@ -1030,7 +1033,14 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
 
                 //TODO agent get-memory-block-info,get-memory-blocks,get-time,get-users
                 // vm.Agent.GetFsInfo = await qemuApi.Agent.GetFsinfo.Get();
-                vm.Agent.GetHostName = await vmApi.Agent.GetHostName.Get();
+
+                try
+                {
+                    vm.Agent.GetHostName = await vmApi.Agent.GetHostName.Get();
+                }
+                catch //(PveExceptionResult ex)
+                { }
+
                 // vm.Agent.NetworkGetInterfaces = await qemuApi.Agent.NetworkGetInterfaces.Get();
                 // vm.Agent.Info = await qemuApi.Agent.Info.Get();
                 // vm.Agent.GetOsInfo = await qemuApi.Agent.GetOsinfo.Get();
