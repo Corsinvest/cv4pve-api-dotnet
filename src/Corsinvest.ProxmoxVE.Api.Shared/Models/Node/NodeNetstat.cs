@@ -24,14 +24,14 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// In
         /// </summary>
         [JsonProperty("in")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long In { get; set; }
 
         /// <summary>
         /// Out
         /// </summary>
         [JsonProperty("out")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long Out { get; set; }
 
         /// <summary>

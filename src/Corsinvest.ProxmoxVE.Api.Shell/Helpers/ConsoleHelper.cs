@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
+using Corsinvest.ProxmoxVE.Api.Shared;
+using Microsoft.Extensions.Logging;
 using System;
 using System.CommandLine;
 using System.Reflection;
 using System.Threading.Tasks;
-using Corsinvest.ProxmoxVE.Api.Shared;
-using Microsoft.Extensions.Logging;
 
 namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers
 {

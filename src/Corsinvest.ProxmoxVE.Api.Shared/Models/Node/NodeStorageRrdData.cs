@@ -18,7 +18,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// Used
         /// </summary>
         [JsonProperty("used")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long Used { get; set; }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// Size
         /// </summary>
         [JsonProperty("total")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long Size { get; set; }
     }
 }

@@ -74,21 +74,21 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Utils
                 string.Format($"{TimeSpan.FromSeconds(Convert.ToDouble(value)):d' days 'hh':'mm':'ss}");
 
 
-    /// <summary>
-    /// Content To Description
-    /// </summary>
-    /// <param name="content"></param>
-    /// <returns></returns>
-    public static string ContentToDescription(string content)
-        => content switch
-        {
-            "images" => "Disk image",
-            "backup" => "VZDump backup file",
-            "vztmpl" => "Container template",
-            "iso" => "ISO image",
-            "rootdir" => "Container",
-            "snippets" => "Snippets",
-            _ => "",
-        };
+        /// <summary>
+        /// Content To Description
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public static string ContentToDescription(string content)
+            => content switch
+            {
+                "images" => "Disk image",
+                "backup" => "VZDump backup file",
+                "vztmpl" => "Container template",
+                "iso" => "ISO image",
+                "rootdir" => "Container",
+                "snippets" => "Snippets",
+                _ => "",
+            };
     }
 }

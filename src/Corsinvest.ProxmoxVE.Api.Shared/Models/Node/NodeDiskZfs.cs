@@ -24,7 +24,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// </summary>
         /// <value></value>
         [JsonProperty("dedup")]
-        public int Dedup { get; set; }
+        public double Dedup { get; set; }
 
         /// <summary>
         /// Health
@@ -59,6 +59,6 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// </summary>
         /// <value></value>
         [JsonProperty("frag")]
-        public int Frag { get; set; }
+        public long Frag { get; set; }
     }
 }

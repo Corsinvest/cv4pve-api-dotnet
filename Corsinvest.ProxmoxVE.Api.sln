@@ -13,7 +13,20 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Corsinvest.ProxmoxVE.Api.Me
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Corsinvest.ProxmoxVE.Api.Shell", "src\Corsinvest.ProxmoxVE.Api.Shell\Corsinvest.ProxmoxVE.Api.Shell.csproj", "{CAFEC2C7-A2F5-4923-B1B7-003633324105}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Corsinvest.ProxmoxVE.Api.Shared", "src\Corsinvest.ProxmoxVE.Api.Shared\Corsinvest.ProxmoxVE.Api.Shared.csproj", "{3DD1BFAA-31B2-45EA-8C26-9C6BA32AC16D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Corsinvest.ProxmoxVE.Api.Shared", "src\Corsinvest.ProxmoxVE.Api.Shared\Corsinvest.ProxmoxVE.Api.Shared.csproj", "{3DD1BFAA-31B2-45EA-8C26-9C6BA32AC16D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Elementi di soluzione", "Elementi di soluzione", "{5CFC84CF-5201-4775-9E77-708A9561EA93}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		3rd-party-licenses.md = 3rd-party-licenses.md
+		common.props = common.props
+		Corsinvest.ProxmoxVE.Api.sln.licenseheader = Corsinvest.ProxmoxVE.Api.sln.licenseheader
+		icon.png = icon.png
+		LICENSE.md = LICENSE.md
+		publish-nuget.ps1 = publish-nuget.ps1
+		README.md = README.md
+		setKey.ps1 = setKey.ps1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

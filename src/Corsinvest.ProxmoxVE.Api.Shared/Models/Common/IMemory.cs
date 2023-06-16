@@ -20,7 +20,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
         /// <value></value>
         [JsonProperty("mem")]
         [Display(Name = "Memory")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         long MemoryUsage { get; set; }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
         /// <value></value>
         [JsonProperty("maxmem")]
         [Display(Name = "Max Memory")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         long MemorySize { get; set; }
 
         /// <summary>

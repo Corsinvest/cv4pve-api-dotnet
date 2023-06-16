@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster
 {

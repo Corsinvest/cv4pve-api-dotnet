@@ -18,14 +18,14 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// Swap size
         /// </summary>
         [JsonProperty("maxswap")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long SwapSize { get; set; }
 
         /// <summary>
         /// Swap
         /// </summary>
         [JsonProperty("swap")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long Swap { get; set; }
 
         /// <summary>

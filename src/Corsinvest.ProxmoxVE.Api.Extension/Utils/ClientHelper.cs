@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
+using Corsinvest.ProxmoxVE.Api.Shared;
 using System;
 using System.Net.Sockets;
-using Corsinvest.ProxmoxVE.Api.Shared;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
 {

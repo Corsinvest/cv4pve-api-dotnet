@@ -22,7 +22,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// </summary>
         /// <value></value>
         [JsonProperty("netin")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long NetIn { get; set; }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// </summary>
         /// <value></value>
         [JsonProperty("netout")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long NetOut { get; set; }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// <value></value>
         [JsonProperty("memtotal")]
         [Display(Name = "Max Memory")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long MemorySize { get; set; }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// <value></value>
         [JsonProperty("memused")]
         [Display(Name = "Memory")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long MemoryUsage { get; set; }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// </summary>
         /// <value></value>
         [JsonProperty("swaptotal")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long SwapSize { get; set; }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// </summary>
         /// <value></value>
         [JsonProperty("swapused")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public double SwapUsage { get; set; }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// </summary>
         /// <value></value>
         [JsonProperty("roottotal")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public double RootSize { get; set; }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// </summary>
         /// <value></value>
         [JsonProperty("rootused")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public double RootUsage { get; set; }
 
         [OnDeserialized]

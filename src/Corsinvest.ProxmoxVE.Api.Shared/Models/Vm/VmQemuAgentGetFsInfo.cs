@@ -48,7 +48,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
             /// Total Bytes
             /// </summary>
             [JsonProperty("total-bytes")]
-           [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+            [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
             public long TotalBytes { get; set; }
 
             /// <summary>

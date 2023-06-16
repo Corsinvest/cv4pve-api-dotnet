@@ -19,7 +19,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
         /// </summary>
         /// <value></value>
         [JsonProperty("netin")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         long NetIn { get; set; }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
         /// </summary>
         /// <value></value>
         [JsonProperty("netout")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         long NetOut { get; set; }
     }
 }

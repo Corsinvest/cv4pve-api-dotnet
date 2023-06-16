@@ -19,7 +19,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
         /// </summary>
         /// <value></value>
         [JsonProperty("diskread")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         long DiskRead { get; set; }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
         /// </summary>
         /// <value></value>
         [JsonProperty("diskwrite")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         long DiskWrite { get; set; }
     }
 }

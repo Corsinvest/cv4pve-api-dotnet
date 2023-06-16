@@ -66,7 +66,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// <value></value>
         [JsonProperty("disk")]
         [Display(Name = "Disk usage")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long DiskUsage { get; set; }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// <value></value>
         [JsonProperty("maxdisk")]
         [Display(Name = "Disk size")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long DiskSize { get; set; }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// <value></value>
         [JsonProperty("mem")]
         [Display(Name = "Memory")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long MemoryUsage { get; set; }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
         /// <value></value>
         [JsonProperty("maxmem")]
         [Display(Name = "Max Memory")]
-       [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
         public long MemorySize { get; set; }
 
         /// <summary>

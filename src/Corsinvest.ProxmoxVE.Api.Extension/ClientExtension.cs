@@ -3,15 +3,16 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
+using Corsinvest.ProxmoxVE.Api.Extension.Utils;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
+using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Corsinvest.ProxmoxVE.Api.Extension.Utils;
-using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
-using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
-using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension
 {
@@ -222,6 +223,42 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
             var vm = await client.GetVm(vmId);
             return await VmHelper.ChangeStatusVm(client, vm.Node, vm.VmType, vm.VmId, status);
         }
+
+        /// <summary>
+        /// Get Vm Status
+        /// </summary>
+        /// <param name="pveClient"></param>
+        /// <param name="vm"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidEnumArgumentException"></exception>
+        public static async Task<VmBaseStatusCurrent> GetVmStatus(this PveClient pveClient, IClusterResourceVm vm)
+            => vm.VmType switch
+            {
+                VmType.Qemu => await pveClient.Nodes[vm.Node].Qemu[vm.VmId].Status.Current.Get(),
+                VmType.Lxc => await pveClient.Nodes[vm.Node].Lxc[vm.VmId].Status.Current.Get(),
+                _ => throw new InvalidEnumArgumentException(),
+            };
+
+
+        /// <summary>
+        /// Get Vm RrdData
+        /// </summary>
+        /// <param name="pveClient"></param>
+        /// <param name="vm"></param>
+        /// <param name="rrdDataTimeFrame"></param>
+        /// <param name="rrdDataConsolidation"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidEnumArgumentException"></exception>
+        public static async Task<IEnumerable<VmRrdData>> GetVmRrdData(this PveClient pveClient,
+                                                                      IClusterResourceVm vm,
+                                                                      RrdDataTimeFrame rrdDataTimeFrame,
+                                                                      RrdDataConsolidation rrdDataConsolidation)
+            => vm.VmType switch
+            {
+                VmType.Qemu => await pveClient.Nodes[vm.Node].Qemu[vm.VmId].Rrddata.Get(rrdDataTimeFrame, rrdDataConsolidation),
+                VmType.Lxc => await pveClient.Nodes[vm.Node].Lxc[vm.VmId].Rrddata.Get(rrdDataTimeFrame, rrdDataConsolidation),
+                _ => throw new InvalidEnumArgumentException(),
+            };
         #endregion
     }
 }

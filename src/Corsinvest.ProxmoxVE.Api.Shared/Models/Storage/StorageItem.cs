@@ -152,5 +152,5 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Storage
         /// <value></value>
         [JsonProperty("preallocation")]
         public string Preallocation { get; set; }
-     }
+    }
 }
