@@ -1,16 +1,6 @@
 # Corsinvest.ProxmoxVE.Api
 
-[![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg)](LICENSE.md)
-
-[![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.svg?label=Nuget%20%20Api)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api)
-
-[![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Extension.svg?label=Nuget%20%20Extension)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Extension)
-
-[![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Metadata.svg?label=Nuget%20%20Metadata)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Metadata)
-
-[![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Shell.svg?label=Nuget%20%20Shell)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shell)
-
-[![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Shared.svg?label=Nuget%20%20Shared)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shared)
+[![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.svg?label=Nuget%20%20Api)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api) [![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Extension.svg?label=Nuget%20%20Extension)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Extension) [![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Metadata.svg?label=Nuget%20%20Metadata)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Metadata) [![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Shell.svg?label=Nuget%20%20Shell)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shell) [![Nuget](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Shared.svg?label=Nuget%20%20Shared)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shared)
 
 Proxmox VE Client API .Net
 
