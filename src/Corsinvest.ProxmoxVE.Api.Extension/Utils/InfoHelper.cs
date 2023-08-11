@@ -897,11 +897,32 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
                 var disksAll = await nodeApi.Disks.List.Get(include_partitions: true);
                 foreach (var item in disksAll.Where(a => string.IsNullOrWhiteSpace(a.Parent)))
                 {
+                    NodeDiskSmart smart = null;
+
+                    try
+                    {
+                        smart = await nodeApi.Disks.Smart.Get(item.DevPath);
+                    }
+                    catch (Exception exSmart)
+                    {
+                        smart = new();
+                        smart.Attributes = new List<NodeDiskSmart.NodeDiskSmartAttribute>()
+                        {
+                            new()
+                            {
+                                Id = "0",
+                                Name = "Error",
+                                Raw = exSmart.Message,
+                                Value = -1
+                            }
+                        };
+                    }
+
                     disks.Add(new()
                     {
                         Disk = item,
                         Partitions = disksAll.Where(a => a.Type == "partition" && a.Parent == item.DevPath).ToList(),
-                        Smart = await nodeApi.Disks.Smart.Get(item.DevPath)
+                        Smart = smart
                     });
                 }
 
