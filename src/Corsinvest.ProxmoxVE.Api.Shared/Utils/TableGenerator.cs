@@ -51,10 +51,17 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Utils
 
         private static readonly IEnumerable<Type> _numericTypes = new[]
         {
-            typeof(int),  typeof(double),  typeof(decimal),
-            typeof(long), typeof(short),   typeof(sbyte),
-            typeof(byte), typeof(ulong),   typeof(ushort),
-            typeof(uint), typeof(float)
+            typeof(int),
+            typeof(double),
+            typeof(decimal),
+            typeof(long),
+            typeof(short),
+            typeof(sbyte),
+            typeof(byte),
+            typeof(ulong),
+            typeof(ushort),
+            typeof(uint),
+            typeof(float)
         };
 
         private static void CheckData(IEnumerable<string> columns, IEnumerable<IEnumerable<object>> rows)
@@ -70,10 +77,10 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Utils
             var cols = columns.ToArray();
 
             var columnLengths = cols.Select((t, index) => rows.Select(r => r.ToArray()[index])
-                                       .Union(new[] { cols[index] })
-                                       .Where(x => x != null)
-                                       .Select(x => (x + "").Length).Max())
-                                       .ToList();
+                                    .Union(new[] { cols[index] })
+                                    .Where(x => x != null)
+                                    .Select(x => (x + "").Length).Max())
+                                    .ToList();
 
             var columnAlignment = Enumerable.Range(0, cols.Length)
                                             .Select(a => _numericTypes.Contains(cols[a].GetType()) ? "" : "-")

@@ -4,7 +4,6 @@
  */
 
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
-using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using System;
@@ -21,30 +20,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
     /// </summary>
     public static class VmHelper
     {
-        /// <summary>
-        /// Get file for SPICE client using spiceconfig
-        /// </summary>
-        /// <param name="client"></param>
-        /// <param name="node"></param>
-        /// <param name="vmId"></param>
-        /// <param name="proxy"></param>
-        /// <returns></returns>
-        public static async Task<(bool Success, string ReasonPhrase, string Content)> GetQemuSpiceFileVV(PveClient client,
-                                                                                                         string node,
-                                                                                                         long vmId,
-                                                                                                         string proxy)
-        {
-            using var httpClient = client.GetHttpClient();
-            var url = PveHelper.GetSpiceUrlFileVV(client.Host, client.Port, node, vmId);
-
-            var parameters = new Dictionary<string, string>();
-            if (!string.IsNullOrWhiteSpace(proxy)) { parameters.Add("proxy", proxy); }
-            var response = await httpClient.PostAsync(new Uri(url), new FormUrlEncodedContent(parameters));
-            return (response.IsSuccessStatusCode,
-                    response.ReasonPhrase,
-                    await response.Content.ReadAsStringAsync());
-        }
-
+        #region NoVnc
         /// <summary>
         /// Get console NoVnc
         /// </summary>
@@ -55,7 +31,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
         /// <param name="vmType"></param>
         /// <returns></returns>
         public static async Task<HttpResponseMessage> GetConsoleNoVnc(PveClient client, string node, long vmId, string vmName, VmType vmType)
-            => await GetConsoleNoVnc(client, node, vmId, vmName, PveHelper.GetNoVncConsoleType(vmType));
+            => await GetConsoleNoVnc(client, node, vmId, vmName, NoVncHelper.GetConsoleType(vmType));
 
         /// <summary>
         /// Get console NoVnc
@@ -69,13 +45,14 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
         public static async Task<HttpResponseMessage> GetConsoleNoVnc(PveClient client, string node, long vmId, string vmName, string console)
         {
             using var httpClient = client.GetHttpClient();
-            return await httpClient.GetAsync(PveHelper.GetNoVncConsoleUrl(client.Host,
+            return await httpClient.GetAsync(NoVncHelper.GetConsoleUrl(client.Host,
                                                                           client.Port,
                                                                           console,
                                                                           node,
                                                                           vmId,
                                                                           vmName));
         }
+        #endregion
 
         /// <summary>
         /// Vm check Id or Name
@@ -154,39 +131,18 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
             };
         }
 
-
-        /// <summary>
-        /// GetVmRrdData
-        /// </summary>
-        /// <param name="pveClient"></param>
-        /// <param name="vm"></param>
-        /// <param name="rrdDataTimeFrame"></param>
-        /// <param name="rrdDataConsolidation"></param>
-        /// <returns></returns>
-        /// <exception cref="IndexOutOfRangeException"></exception>
-        public static async Task<IEnumerable<VmRrdData>> GetVmRrdData(PveClient pveClient,
-                                                                      IClusterResourceVm vm,
-                                                                      RrdDataTimeFrame rrdDataTimeFrame,
-                                                                      RrdDataConsolidation rrdDataConsolidation)
-            => vm.VmType switch
-            {
-                VmType.Qemu => await pveClient.Nodes[vm.Node].Qemu[vm.VmId].Rrddata.Get(rrdDataTimeFrame, rrdDataConsolidation),
-                VmType.Lxc => await pveClient.Nodes[vm.Node].Lxc[vm.VmId].Rrddata.Get(rrdDataTimeFrame, rrdDataConsolidation),
-                _ => throw new IndexOutOfRangeException(),
-            };
-
         /// <summary>
         /// Get vm status
         /// </summary>
-        /// <param name="pveClient"></param>
+        /// <param name="client"></param>
         /// <param name="vm"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public static async Task<VmBaseStatusCurrent> GetVmStatus(PveClient pveClient, IClusterResourceVm vm)
+        public static async Task<VmBaseStatusCurrent> GetVmStatus(PveClient client, IClusterResourceVm vm)
             => vm.VmType switch
             {
-                VmType.Qemu => await pveClient.Nodes[vm.Node].Qemu[vm.VmId].Status.Current.Get(),
-                VmType.Lxc => await pveClient.Nodes[vm.Node].Lxc[vm.VmId].Status.Current.Get(),
+                VmType.Qemu => await client.Nodes[vm.Node].Qemu[vm.VmId].Status.Current.Get(),
+                VmType.Lxc => await client.Nodes[vm.Node].Lxc[vm.VmId].Status.Current.Get(),
                 _ => throw new ArgumentOutOfRangeException(),
             };
 

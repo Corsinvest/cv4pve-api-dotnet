@@ -120,8 +120,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
                 new("node-report,nrpt", "Node report", "get /nodes/{node}/report", true),
                 new("node-shutdown,nreb", "Node reboot or shutdown", "create /nodes/{node}/status command:cmd", true),
                 new("node-vzdump-list,nvlst", "Node list backup", "/get /nodes/{node}/storage/{storage}/content vmid:{vmid} content:backup", true),
-                new("node-vzdump-config,nvcfg", "Node Extract configuration from vzdump backup archive",
-                             "get /nodes/{node}/vzdump/extractconfig volume:{volume}", true),
+                new("node-vzdump-config,nvcfg", "Node Extract configuration from vzdump backup archive", "get /nodes/{node}/vzdump/extractconfig volume:{volume}", true),
 
                 //Qemu
                 new("qemu-list,qlst", "Qemu list vm", "get /nodes/{node}/qemu", true),

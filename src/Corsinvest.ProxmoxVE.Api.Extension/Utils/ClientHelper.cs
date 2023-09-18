@@ -25,7 +25,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
                     ? new PveClient(host, port)
                     : null;
 
-
         /// <summary>
         /// Try host and port. Format 10.1.1.90:8006,10.1.1.91:8006,10.1.1.92:8006
         /// </summary>

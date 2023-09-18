@@ -19,7 +19,7 @@ Corsinvest for Proxmox VE Api Client  (Made in Italy)
 ## Copyright and License
 
 Copyright: Corsinvest Srl
-For licensing details please visit [LICENSE.md](LICENSE.md)
+For licensing details please visit [LICENSE](LICENSE)
 
 ## Commercial Support
 
@@ -63,6 +63,7 @@ The client is generated from a JSON Api on Proxmox VE.
 * Async / Await
 * Add model in Shared library for decode json
 * Add Extension method **Get** to decode in json from result in Extension library
+* Login with One-time password for Two-factor authentication
 
 ## Api token
 

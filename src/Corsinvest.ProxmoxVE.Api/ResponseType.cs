@@ -18,6 +18,11 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <summary>
         /// Png
         /// </summary>
-        Png
+        Png,
+
+        /// <summary>
+        /// Response
+        /// </summary>
+        Response
     }
 }

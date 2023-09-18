@@ -1,7 +1,7 @@
 <Project>
 	<PropertyGroup>
 		<LangVersion>latest</LangVersion>
-		<Version>8.0.1</Version>
+		<Version>8.0.2</Version>
 		<!--<NoWarn>$(NoWarn);CS1591;CS0436</NoWarn>-->
 
 		<Company>Corsinvest Srl</Company>
@@ -27,7 +27,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="..\..\LICENSE.md" Pack="true" PackagePath="" />
+		<None Include="..\..\LICENSE" Pack="true" PackagePath="" />
 		<None Include="..\..\icon.png" Pack="true" PackagePath="" />
 		<none Include="..\..\README.md" Pack="true" PackagePath="" />
 	</ItemGroup>

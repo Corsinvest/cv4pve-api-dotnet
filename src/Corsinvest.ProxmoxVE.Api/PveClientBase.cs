@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Dynamic;
 using System.Linq;
 using System.Net;
@@ -90,33 +91,42 @@ namespace Corsinvest.ProxmoxVE.Api
         /// <summary>
         /// Creation ticket from login.
         /// </summary>
-        /// <param name="userName"></param>
-        /// <param name="password"></param>
-        /// <param name="realm"></param>
-        public async Task<bool> Login(string userName, string password, string realm)
+        /// <param name="userName">User name</param>
+        /// <param name="password">The secret password. This can also be a valid ticket.</param>
+        /// <param name="realm">You can optionally pass the realm using this parameter.
+        /// Normally the realm is simply added to the username &lt;username&gt;@&lt;relam&gt;.</param>
+        /// <param name="otp">One-time password for Two-factor authentication.</param>
+        public async Task<bool> Login(string userName, string password, string realm, string otp = null)
         {
-            var ticket = await Create("/access/ticket",
+            var result = await Create("/access/ticket",
                                       new Dictionary<string, object>
                                       {
                                           {"password", password},
                                           {"username", userName},
                                           {"realm", realm},
+                                          {"otp", otp},
                                       });
 
-            if (ticket.IsSuccessStatusCode)
+            if (result.IsSuccessStatusCode)
             {
-                CSRFPreventionToken = ticket.Response.data.CSRFPreventionToken;
-                PVEAuthCookie = ticket.Response.data.ticket;
+                if (((IDictionary<string, object>)result.Response.data).ContainsKey("NeedTFA"))
+                {
+                    throw new PveExceptionAuthentication(result, "Couldn't authenticate user: missing Two Factor Authentication (TFA)");
+                }
+
+                CSRFPreventionToken = result.Response.data.CSRFPreventionToken;
+                PVEAuthCookie = result.Response.data.ticket;
             }
-            return ticket.IsSuccessStatusCode;
+            return result.IsSuccessStatusCode;
         }
 
         /// <summary>
         /// Creation ticket from login username &lt;username&gt;@&lt;realm&gt;.
         /// </summary>
-        /// <param name="userName"></param>
-        /// <param name="password"></param>
-        public async Task<bool> Login(string userName, string password)
+        /// <param name="userName">User name</param>
+        /// <param name="password">The secret password. This can also be a valid ticket.</param>
+        /// <param name="opt">One-time password for Two-factor authentication.</param>
+        public async Task<bool> Login(string userName, string password, string opt = null)
         {
             _logger.LogDebug($"Login: {userName}");
 
@@ -129,7 +139,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 userName = data[0];
                 realm = data[1];
             }
-            return await Login(userName, password, realm);
+            return await Login(userName, password, realm, opt);
         }
 
         /// <summary>
@@ -146,6 +156,7 @@ namespace Corsinvest.ProxmoxVE.Api
         /// </summary>
         /// <param name="resource">Url request</param>
         /// <param name="parameters">Additional parameters</param>
+        /// <param name="content"></param>
         /// <returns>Result</returns>
         public async Task<Result> Create(string resource, IDictionary<string, object> parameters = null)
             => await ExecuteAction(resource, MethodType.Create, parameters);
@@ -199,7 +210,9 @@ namespace Corsinvest.ProxmoxVE.Api
         public async Task<Result> Delete(string resource, IDictionary<string, object> parameters = null)
             => await ExecuteAction(resource, MethodType.Delete, parameters);
 
-        private async Task<Result> ExecuteAction(string resource, MethodType methodType, IDictionary<string, object> parameters = null)
+        private async Task<Result> ExecuteAction(string resource,
+                                                 MethodType methodType,
+                                                 IDictionary<string, object> parameters = null)
         {
             using var client = GetHttpClient();
 
@@ -251,10 +264,10 @@ namespace Corsinvest.ProxmoxVE.Api
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug($"StatusCode:          {response.StatusCode}" +
-                             Environment.NewLine +
-                             $"ReasonPhrase:        {response.ReasonPhrase}" +
-                             Environment.NewLine +
-                             $"IsSuccessStatusCode: {response.IsSuccessStatusCode}");
+                                 Environment.NewLine +
+                                 $"ReasonPhrase:        {response.ReasonPhrase}" +
+                                 Environment.NewLine +
+                                 $"IsSuccessStatusCode: {response.IsSuccessStatusCode}");
             }
 
             dynamic result = null;
@@ -273,7 +286,9 @@ namespace Corsinvest.ProxmoxVE.Api
                     if (_logger.IsEnabled(LogLevel.Trace)) { _logger.LogTrace(result as string); }
                     break;
 
-                default: break;
+                case ResponseType.Response: result = response; break;
+
+                default: throw new InvalidEnumArgumentException();
             }
 
             result ??= new ExpandoObject();

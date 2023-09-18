@@ -11,7 +11,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Utils
     /// <summary>
     /// Application helper
     /// </summary>
-    public static class FilesystemHelper
+    public static class CommonHelper
     {
         /// <summary>
         /// Get application data directory. If not exists create.

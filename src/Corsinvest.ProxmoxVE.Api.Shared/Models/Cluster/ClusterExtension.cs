@@ -92,7 +92,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster
             ((IDisk)data).ImproveData();
             ((IClusterResourceBase)data).ImproveData();
 
-            data.NodeLevel = PveHelper.DecodeLevelSupport(data.Level);
+            data.NodeLevel = NodeHelper.DecodeLevelSupport(data.Level);
         }
 
         /// <summary>

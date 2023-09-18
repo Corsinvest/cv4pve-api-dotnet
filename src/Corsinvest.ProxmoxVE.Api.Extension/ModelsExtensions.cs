@@ -7,6 +7,7 @@ using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -111,5 +112,74 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
                                                              RrdDataTimeFrame dataTimeFrame,
                                                              RrdDataConsolidation dataConsolidation)
             => await item.Get(dataTimeFrame.GetValue(), dataConsolidation.GetValue());
+
+        #region Spice
+        /// <summary>
+        /// Get file for SPICE client using spice config
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="proxy"></param>
+        /// <returns></returns>
+        public static async Task<(bool Success, string ReasonPhrase, string Content)> GetSpiceFileVV(this PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveSpiceproxy item,
+                                                                                                     string proxy)
+            => CreateSpiceFileVV(await item.Spiceproxy(proxy));
+
+        /// <summary>
+        /// Get file for SPICE client using spice config
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="proxy"></param>
+        /// <returns></returns>
+        public static async Task<(bool Success, string ReasonPhrase, string Content)> GetSpiceFileVV(this PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveSpiceproxy item,
+                                                                                                     string proxy)
+            => CreateSpiceFileVV(await item.Spiceproxy(proxy));
+
+        /// <summary>
+        /// Get file for SPICE client using spice config
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="proxy"></param>
+        /// <returns></returns>
+        public static async Task<(bool Success, string ReasonPhrase, string Content)> GetSpiceFileVV(this PveClient.PveNodes.PveNodeItem.PveSpiceshell item, string proxy)
+            => CreateSpiceFileVV(await item.Spiceshell(proxy: proxy));
+
+        private static (bool Success, string ReasonPhrase, string Content) CreateSpiceFileVV(Result response)
+        {
+            var content = response.IsSuccessStatusCode
+                            ? "[virt-viewer]" +
+                                Environment.NewLine +
+                                string.Join(Environment.NewLine, ((IDictionary<string, object>)response.ToData()).Select(a => $"{a.Key}={a.Value}"))
+                            : string.Empty;
+
+            return (response.IsSuccessStatusCode, response.ReasonPhrase, content);
+        }
+        #endregion
+
+        /// <summary>
+        /// Retrieve effective permissions of given user/token.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="path">Only dump this specific path, not the whole tree.</param>
+        /// <param name="userid">User ID or full API token ID</param>
+        /// <returns></returns>
+        public static async Task<IReadOnlyDictionary<string, IReadOnlyList<string>>> GetPermissions(this PveClient.PveAccess.PvePermissions item,
+                                                                                                    string path = null,
+                                                                                                    string userid = null)
+        {
+            var result = await item.Permissions(path, userid);
+
+            var permissions = new Dictionary<string, IReadOnlyList<string>>();
+
+            foreach (var data in (IDictionary<string, object>)result.ToData())
+            {
+                permissions.Add(data.Key,
+                                ((IDictionary<string, object>)data.Value)
+                                    .Select(a => a.Key)
+                                    .ToList()
+                                    .AsReadOnly());
+            }
+
+            return permissions;
+        }
     }
 }
