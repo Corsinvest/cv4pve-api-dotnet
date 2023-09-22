@@ -83,7 +83,10 @@ namespace Corsinvest.ProxmoxVE.Api.Extension
             var ret = new List<NodeStorageContent>();
             foreach (var item1 in await item.Storage.Get(enabled: true, content: "backup"))
             {
-                ret.AddRange(await item.Storage[item1.Storage].Content.Get("backup", vmId));
+                if (item1.Active)
+                {
+                    ret.AddRange(await item.Storage[item1.Storage].Content.Get("backup", vmId));
+                }
             }
 
             return ret;
