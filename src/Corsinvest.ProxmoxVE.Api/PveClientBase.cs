@@ -156,7 +156,6 @@ namespace Corsinvest.ProxmoxVE.Api
         /// </summary>
         /// <param name="resource">Url request</param>
         /// <param name="parameters">Additional parameters</param>
-        /// <param name="content"></param>
         /// <returns>Result</returns>
         public async Task<Result> Create(string resource, IDictionary<string, object> parameters = null)
             => await ExecuteAction(resource, MethodType.Create, parameters);

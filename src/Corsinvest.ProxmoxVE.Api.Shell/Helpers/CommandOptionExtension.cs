@@ -171,7 +171,7 @@ For more information visit https://www.corsinvest.it/cv4pve";
         {
             var opt = command.VmIdOrNameOption();
             opt.Description = @"The id or name VM/CT comma separated (eg. 100,101,102,TestDebian)
--vmid,-name,-@node-???,-@tag-?? exclude (e.g. -200,-TestUbuntu,-@tag-customer1)
+-vmid,-name,-@node-???,-@tag-?? exclude from list (e.g. @all,-200,-TestUbuntu,-@tag-customer1)
 range 100:107,-105,200:204
 '@pool-???' for all VM/CT in specific pool (e.g. @pool-customer1),
 '@tag-???' for all VM/CT in specific tags (e.g. @tag-customerA),
