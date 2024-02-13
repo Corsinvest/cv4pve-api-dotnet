@@ -14,6 +14,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -225,21 +226,21 @@ namespace Corsinvest.ProxmoxVE.Api
             };
 
             //load parameters
-            var @params = new Dictionary<string, string>();
+            var @params = new Dictionary<string, object>();
             if (parameters != null)
             {
                 foreach (var parameter in parameters.Where(a => a.Value != null))
                 {
                     var value = parameter.Value;
                     if (value is bool valueBool) { value = valueBool ? 1 : 0; }
-                    @params.Add(parameter.Key, value.ToString());
+                    @params.Add(parameter.Key, value);
                 }
             }
 
             var uriString = GetApiUrl() + resource;
             if ((httpMethod == HttpMethod.Get || httpMethod == HttpMethod.Delete) && @params.Count > 0)
             {
-                uriString += "?" + string.Join("&", @params.Select(a => $"{a.Key}={HttpUtility.UrlEncode(a.Value)}"));
+                uriString += "?" + string.Join("&", @params.Select(a => $"{a.Key}={HttpUtility.UrlEncode(a.Value.ToString())}"));
             }
 
             if (_logger.IsEnabled(LogLevel.Debug))
@@ -256,7 +257,7 @@ namespace Corsinvest.ProxmoxVE.Api
             var request = new HttpRequestMessage(httpMethod, new Uri(uriString));
             if (httpMethod != HttpMethod.Get && httpMethod != HttpMethod.Delete)
             {
-                request.Content = new FormUrlEncodedContent(@params);
+                request.Content = new StringContent(JsonConvert.SerializeObject(@params), Encoding.UTF8, "application/json");
             }
 
             var response = await client.SendAsync(request);

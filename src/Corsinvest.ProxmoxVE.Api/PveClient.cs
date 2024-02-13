@@ -486,7 +486,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="mailto">List of email recipients</param>
                             /// <param name="mailto_user">List of users</param>
                             /// <returns></returns>
-                            public async Task<Result> UpdateSendmailEndpoint(string author = null, string comment = null, string delete = null, string digest = null, bool? disable = null, string from_address = null, string mailto = null, string mailto_user = null)
+                            public async Task<Result> UpdateSendmailEndpoint(string author = null, string comment = null, IEnumerable<object> delete = null, string digest = null, bool? disable = null, string from_address = null, IEnumerable<object> mailto = null, IEnumerable<object> mailto_user = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("author", author);
@@ -516,7 +516,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="mailto">List of email recipients</param>
                         /// <param name="mailto_user">List of users</param>
                         /// <returns></returns>
-                        public async Task<Result> CreateSendmailEndpoint(string name, string author = null, string comment = null, bool? disable = null, string from_address = null, string mailto = null, string mailto_user = null)
+                        public async Task<Result> CreateSendmailEndpoint(string name, string author = null, string comment = null, bool? disable = null, string from_address = null, IEnumerable<object> mailto = null, IEnumerable<object> mailto_user = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("name", name);
@@ -569,7 +569,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="server">Server URL</param>
                             /// <param name="token">Secret token</param>
                             /// <returns></returns>
-                            public async Task<Result> UpdateGotifyEndpoint(string comment = null, string delete = null, string digest = null, bool? disable = null, string server = null, string token = null)
+                            public async Task<Result> UpdateGotifyEndpoint(string comment = null, IEnumerable<object> delete = null, string digest = null, bool? disable = null, string server = null, string token = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("comment", comment);
@@ -654,7 +654,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="server">The address of the SMTP server.</param>
                             /// <param name="username">Username for SMTP authentication</param>
                             /// <returns></returns>
-                            public async Task<Result> UpdateSmtpEndpoint(string author = null, string comment = null, string delete = null, string digest = null, bool? disable = null, string from_address = null, string mailto = null, string mailto_user = null, string mode = null, string password = null, int? port = null, string server = null, string username = null)
+                            public async Task<Result> UpdateSmtpEndpoint(string author = null, string comment = null, IEnumerable<object> delete = null, string digest = null, bool? disable = null, string from_address = null, IEnumerable<object> mailto = null, IEnumerable<object> mailto_user = null, string mode = null, string password = null, int? port = null, string server = null, string username = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("author", author);
@@ -695,7 +695,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="port">The port to be used. Defaults to 465 for TLS based connections, 587 for STARTTLS based connections and port 25 for insecure plain-text connections.</param>
                         /// <param name="username">Username for SMTP authentication</param>
                         /// <returns></returns>
-                        public async Task<Result> CreateSmtpEndpoint(string from_address, string name, string server, string author = null, string comment = null, bool? disable = null, string mailto = null, string mailto_user = null, string mode = null, string password = null, int? port = null, string username = null)
+                        public async Task<Result> CreateSmtpEndpoint(string from_address, string name, string server, string author = null, string comment = null, bool? disable = null, IEnumerable<object> mailto = null, IEnumerable<object> mailto_user = null, string mode = null, string password = null, int? port = null, string username = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("from-address", from_address);
@@ -810,7 +810,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         ///   Enum: all,any</param>
                         /// <param name="target">Targets to notify on match</param>
                         /// <returns></returns>
-                        public async Task<Result> UpdateMatcher(string comment = null, string delete = null, string digest = null, bool? disable = null, bool? invert_match = null, string match_calendar = null, string match_field = null, string match_severity = null, string mode = null, string target = null)
+                        public async Task<Result> UpdateMatcher(string comment = null, IEnumerable<object> delete = null, string digest = null, bool? disable = null, bool? invert_match = null, IEnumerable<object> match_calendar = null, IEnumerable<object> match_field = null, IEnumerable<object> match_severity = null, string mode = null, IEnumerable<object> target = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("comment", comment);
@@ -845,7 +845,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     ///   Enum: all,any</param>
                     /// <param name="target">Targets to notify on match</param>
                     /// <returns></returns>
-                    public async Task<Result> CreateMatcher(string name, string comment = null, bool? disable = null, bool? invert_match = null, string match_calendar = null, string match_field = null, string match_severity = null, string mode = null, string target = null)
+                    public async Task<Result> CreateMatcher(string name, string comment = null, bool? disable = null, bool? invert_match = null, IEnumerable<object> match_calendar = null, IEnumerable<object> match_field = null, IEnumerable<object> match_severity = null, string mode = null, IEnumerable<object> target = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("name", name);
@@ -1776,7 +1776,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
                     /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                     /// <returns></returns>
-                    public async Task<Result> UpdateJob(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, string notes_template = null, string notification_policy = null, string notification_target = null, string performance = null, int? pigz = null, string pool = null, bool? protected_ = null, string prune_backups = null, bool? quiet = null, bool? remove = null, bool? repeat_missed = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
+                    public async Task<Result> UpdateJob(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, IEnumerable<object> exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, string notes_template = null, string notification_policy = null, string notification_target = null, string performance = null, int? pigz = null, string pool = null, bool? protected_ = null, string prune_backups = null, bool? quiet = null, bool? remove = null, bool? repeat_missed = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("all", all);
@@ -1871,7 +1871,7 @@ namespace Corsinvest.ProxmoxVE.Api
                 /// <param name="vmid">The ID of the guest system you want to backup.</param>
                 /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                 /// <returns></returns>
-                public async Task<Result> CreateJob(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, string exclude_path = null, string id = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, string notes_template = null, string notification_policy = null, string notification_target = null, string performance = null, int? pigz = null, string pool = null, bool? protected_ = null, string prune_backups = null, bool? quiet = null, bool? remove = null, bool? repeat_missed = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
+                public async Task<Result> CreateJob(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, IEnumerable<object> exclude_path = null, string id = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, string notes_template = null, string notification_policy = null, string notification_target = null, string performance = null, int? pigz = null, string pool = null, bool? protected_ = null, string prune_backups = null, bool? quiet = null, bool? remove = null, bool? repeat_missed = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("all", all);
@@ -2854,7 +2854,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="map">A list of maps for the cluster nodes.</param>
                         /// <param name="mdev"></param>
                         /// <returns></returns>
-                        public async Task<Result> Update(string delete = null, string description = null, string digest = null, string map = null, bool? mdev = null)
+                        public async Task<Result> Update(string delete = null, string description = null, string digest = null, IEnumerable<object> map = null, bool? mdev = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("delete", delete);
@@ -2884,7 +2884,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="description">Description of the logical PCI device.</param>
                     /// <param name="mdev"></param>
                     /// <returns></returns>
-                    public async Task<Result> Create(string id, string map, string description = null, bool? mdev = null)
+                    public async Task<Result> Create(string id, IEnumerable<object> map, string description = null, bool? mdev = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("id", id);
@@ -2932,7 +2932,7 @@ namespace Corsinvest.ProxmoxVE.Api
                         /// <param name="description">Description of the logical USB device.</param>
                         /// <param name="digest">Prevent changes if current configuration file has a different digest. This can be used to prevent concurrent modifications.</param>
                         /// <returns></returns>
-                        public async Task<Result> Update(string map, string delete = null, string description = null, string digest = null)
+                        public async Task<Result> Update(IEnumerable<object> map, string delete = null, string description = null, string digest = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("map", map);
@@ -2960,7 +2960,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="map">A list of maps for the cluster nodes.</param>
                     /// <param name="description">Description of the logical USB device.</param>
                     /// <returns></returns>
-                    public async Task<Result> Create(string id, string map, string description = null)
+                    public async Task<Result> Create(string id, IEnumerable<object> map, string description = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("id", id);
@@ -3092,7 +3092,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="gateway">Subnet Gateway: Will be assign on vnet for layer3 zones</param>
                                 /// <param name="snat">enable masquerade for this subnet if pve-firewall</param>
                                 /// <returns></returns>
-                                public async Task<Result> Update(string delete = null, string dhcp_dns_server = null, string dhcp_range = null, string digest = null, string dnszoneprefix = null, string gateway = null, bool? snat = null)
+                                public async Task<Result> Update(string delete = null, string dhcp_dns_server = null, IEnumerable<object> dhcp_range = null, string digest = null, string dnszoneprefix = null, string gateway = null, bool? snat = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("delete", delete);
@@ -3130,7 +3130,7 @@ namespace Corsinvest.ProxmoxVE.Api
                             /// <param name="gateway">Subnet Gateway: Will be assign on vnet for layer3 zones</param>
                             /// <param name="snat">enable masquerade for this subnet if pve-firewall</param>
                             /// <returns></returns>
-                            public async Task<Result> Create(string subnet, string type, string dhcp_dns_server = null, string dhcp_range = null, string dnszoneprefix = null, string gateway = null, bool? snat = null)
+                            public async Task<Result> Create(string subnet, string type, string dhcp_dns_server = null, IEnumerable<object> dhcp_range = null, string dnszoneprefix = null, string gateway = null, bool? snat = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("subnet", subnet);
@@ -5419,7 +5419,7 @@ namespace Corsinvest.ProxmoxVE.Api
                                 /// <param name="command">The command as a list of program + arguments.</param>
                                 /// <param name="input_data">Data to pass as 'input-data' to the guest. Usually treated as STDIN to 'command'.</param>
                                 /// <returns></returns>
-                                public async Task<Result> Exec(string command, string input_data = null)
+                                public async Task<Result> Exec(IEnumerable<object> command, string input_data = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("command", command);
@@ -9908,7 +9908,7 @@ namespace Corsinvest.ProxmoxVE.Api
                     /// <param name="vmid">The ID of the guest system you want to backup.</param>
                     /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
                     /// <returns></returns>
-                    public async Task<Result> Vzdump(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, string exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string notes_template = null, string notification_policy = null, string notification_target = null, string performance = null, int? pigz = null, string pool = null, bool? protected_ = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
+                    public async Task<Result> Vzdump(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, IEnumerable<object> exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string notes_template = null, string notification_policy = null, string notification_target = null, string performance = null, int? pigz = null, string pool = null, bool? protected_ = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("all", all);

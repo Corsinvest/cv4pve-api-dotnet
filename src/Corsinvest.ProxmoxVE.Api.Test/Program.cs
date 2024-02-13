@@ -1,22 +1,26 @@
 ﻿using Corsinvest.ProxmoxVE.Api;
 
-var fileName = @"C:\Users\Daniele\Downloads\gparted-live-1.5.0-6-amd64.iso";
-
-var client = new PveClient("10.92.90.70");
+var client = new PveClient("192.168.0.2");
 if (await client.Login("root", Environment.GetEnvironmentVariable("pve_password")))
 {
-    var mpfdContent = new MultipartFormDataContent()
-    {
-        { new StringContent("iso"),"content"},
-        { new ByteArrayContent(File.ReadAllBytes(fileName)), "filename",  Path.GetFileName(fileName)}
-    };
+    Console.WriteLine("pippo");
 
-    var httpClient = client.GetHttpClient();
-    httpClient.DefaultRequestHeaders.Add("User-Agent", "pveClient/8.0.1");
+    var aa  = await client.Nodes["cc01"].Qemu[1006].Agent.Exec.Exec(new string[]{"powershell", "-command", "echo", "test"});
+
+    Console.WriteLine(aa.ReasonPhrase);
+
+    //var mpfdContent = new MultipartFormDataContent()
+    // {
+    //     { new StringContent("iso"),"content"},
+    //     { new ByteArrayContent(File.ReadAllBytes(fileName)), "filename",  Path.GetFileName(fileName)}
+    // };
+
+    // var httpClient = client.GetHttpClient();
+    // httpClient.DefaultRequestHeaders.Add("User-Agent", "pveClient/8.0.1");
 
     //httpClient.DefaultRequestHeaders.ExpectContinue = true;
     //httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("multipart/form-data"));
-    var message = await httpClient.PostAsync($"{client.GetApiUrl()}/nodes/pve8/storage/local/upload", mpfdContent);
+    // var message = await httpClient.PostAsync($"{client.GetApiUrl()}/nodes/pve8/storage/local/upload", mpfdContent);
 }
 
 // var client = new PveClient("10.92.90.101");
