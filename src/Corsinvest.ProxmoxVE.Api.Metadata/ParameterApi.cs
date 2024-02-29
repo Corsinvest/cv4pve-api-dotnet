@@ -118,36 +118,41 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
             switch (Renderer)
             {
                 case "fraction_as_percentage":
-                    if (double.TryParse(value.ToString(), out var perValue) && perValue > 0)
-                    {
-                        value = Math.Round(perValue * 100, 2) + "%";
-                    }
-                    else
-                    {
-                        value = "";
-                    }
+                    value = double.TryParse(value.ToString(), out var perValue) && perValue > 0
+                            ? Math.Round(perValue * 100, 2) + "%"
+                            : "";
                     break;
 
                 case "bytes":
                     if (long.TryParse(value.ToString(), out var bytesValue) && bytesValue > 0)
                     {
-                        if (bytesValue > Math.Pow(1024, 4))
+                        var sizes = new string[] { "B", "KiB", "MiB", "GiB", "TiB" };
+                        var order = 0;
+                        while (bytesValue >= 1024 && order < sizes.Length - 1)
                         {
-                            value = Math.Round(bytesValue / Math.Pow(1024, 4), 2) + " TiB";
+                            order++;
+                            bytesValue /= 1024;
                         }
-                        else if (bytesValue > Math.Pow(1024, 3))
-                        {
-                            value = Math.Round(bytesValue / Math.Pow(1024, 3), 2) + " GiB";
-                        }
-                        else if (bytesValue > Math.Pow(1024, 2))
-                        {
-                            value = Math.Round(bytesValue / Math.Pow(1024, 2), 2) + " MiB";
-                        }
-                        else if (bytesValue > 1024)
-                        {
-                            value = Math.Round(bytesValue / 1024.0, 0) + " KiB";
-                        }
-                        else { value = bytesValue + " B"; }
+                        value = $"{bytesValue} {sizes[order]}";
+
+
+                        // if (bytesValue > Math.Pow(1024, 4))
+                        // {
+                        //     value = Math.Round(bytesValue / Math.Pow(1024, 4), 2) + " TiB";
+                        // }
+                        // else if (bytesValue > Math.Pow(1024, 3))
+                        // {
+                        //     value = Math.Round(bytesValue / Math.Pow(1024, 3), 2) + " GiB";
+                        // }
+                        // else if (bytesValue > Math.Pow(1024, 2))
+                        // {
+                        //     value = Math.Round(bytesValue / Math.Pow(1024, 2), 2) + " MiB";
+                        // }
+                        // else if (bytesValue > 1024)
+                        // {
+                        //     value = Math.Round(bytesValue / 1024.0, 0) + " KiB";
+                        // }
+                        // else { value = bytesValue + " B"; }
                     }
                     else
                     {
@@ -156,14 +161,9 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
                     break;
 
                 case "duration":
-                    if (int.TryParse(value.ToString(), out var duration) && duration > 0)
-                    {
-                        value = new TimeSpan(0, 0, duration).ToString(@"d\d\ h\h\ m\m\ ss\s");
-                    }
-                    else
-                    {
-                        value = "";
-                    }
+                    value = int.TryParse(value.ToString(), out var duration) && duration > 0
+                                ? new TimeSpan(0, 0, duration).ToString(@"d\d\ h\h\ m\m\ ss\s")
+                                : "";
                     break;
 
                 case "timestamp": break;
@@ -205,7 +205,7 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
         public string Description { get; }
 
         /// <summary>
-        /// Verbose descritpion
+        /// Verbose description
         /// </summary>
         /// <value></value>
         public string VerboseDescription { get; }

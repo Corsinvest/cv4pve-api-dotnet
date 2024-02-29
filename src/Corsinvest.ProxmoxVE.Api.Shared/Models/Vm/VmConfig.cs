@@ -115,19 +115,19 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
             {
                 var def = ExtensionData[key] + "";
                 if (key == "rootfs"
-                    || (Regex.IsMatch(key, @"(efidisk|virtio|ide|scsi|sata|mp)\d+") && !Regex.IsMatch(def, "media=cdrom")) //bus match
-                    || key == "efidisk0")
+                    //bus match
+                    || (Regex.IsMatch(key, @"(efidisk|tpmstate|virtio|ide|scsi|sata|mp)\d+") && !Regex.IsMatch(def, "media=cdrom")))
                 {
-                    var info1 = def.Split(':');
-                    var info2 = info1[1].Split(',');
+                    var infos = def.Split(',');
+                    var storages = infos[0].Split(':');
 
                     disks.Add(new VmDisk
                     {
                         Id = key,
-                        Storage = info1[0],
-                        FileName = info2[0],
-                        Size = info2.Where(a => a.StartsWith("size=")).Select(a => a.Substring(5)).FirstOrDefault(),
-                        Backup = !info2.Contains("backup=0")
+                        Storage = storages[0],
+                        FileName = storages[1],
+                        Size = infos.Where(a => a.StartsWith("size=")).Select(a => a.Substring(5)).FirstOrDefault(),
+                        Backup = !infos.Contains("backup=0")
                     });
                 }
             }

@@ -64,6 +64,7 @@ The client is generated from a JSON Api on Proxmox VE.
 * Add model in Shared library for decode json
 * Add Extension method **Get** to decode in json from result in Extension library
 * Login with One-time password for Two-factor authentication
+* Set Timeout for the Connection.
 
 ## Api token
 

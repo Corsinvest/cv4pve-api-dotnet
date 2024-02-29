@@ -81,7 +81,7 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata
         public List<ParameterApi> Parameters { get; } = new List<ParameterApi>();
 
         /// <summary>
-        /// Retrun parameter
+        /// Return parameter
         /// </summary>
         /// <returns></returns>
         public List<ParameterApi> ReturnParameters { get; } = new List<ParameterApi>();

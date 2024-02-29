@@ -65,6 +65,11 @@ namespace Corsinvest.ProxmoxVE.Api
         public int Port { get; }
 
         /// <summary>
+        /// Timeout
+        /// </summary>
+        public TimeSpan? Timeout { get; set; } = null;
+
+        /// <summary>
         /// Get/Set the response type that is going to be returned when doing requests (json, png).
         /// </summary>
         public ResponseType ResponseType { get; set; } = ResponseType.Json;
@@ -185,6 +190,7 @@ namespace Corsinvest.ProxmoxVE.Api
 #pragma warning restore S4830 // Server certificates should be verified during SSL/TLS connections
 
             var client = new HttpClient(handler);
+            if (Timeout.HasValue) { client.Timeout = Timeout.Value; }
 
             //ticket login
             if (CSRFPreventionToken != null)
