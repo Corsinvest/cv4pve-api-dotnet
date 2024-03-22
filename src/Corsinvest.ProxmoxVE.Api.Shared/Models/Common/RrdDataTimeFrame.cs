@@ -3,36 +3,35 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
+
+/// <summary>
+/// Rrd time frame
+/// </summary>
+public enum RrdDataTimeFrame
 {
     /// <summary>
-    /// Rrd time frame
+    /// Hour
     /// </summary>
-    public enum RrdDataTimeFrame
-    {
-        /// <summary>
-        /// Hour
-        /// </summary>
-        Hour,
+    Hour,
 
-        /// <summary>
-        /// Day
-        /// </summary>
-        Day,
+    /// <summary>
+    /// Day
+    /// </summary>
+    Day,
 
-        /// <summary>
-        /// Week
-        /// </summary>
-        Week,
+    /// <summary>
+    /// Week
+    /// </summary>
+    Week,
 
-        /// <summary>
-        /// Month
-        /// </summary>
-        Month,
+    /// <summary>
+    /// Month
+    /// </summary>
+    Month,
 
-        /// <summary>
-        /// Year
-        /// </summary>
-        Year
-    }
+    /// <summary>
+    /// Year
+    /// </summary>
+    Year
 }

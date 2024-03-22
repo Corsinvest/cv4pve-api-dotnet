@@ -1,4 +1,9 @@
-﻿using Corsinvest.ProxmoxVE.Api;
+﻿/*
+ * SPDX-FileCopyrightText: Copyright Corsinvest Srl
+ * SPDX-License-Identifier: GPL-3.0-only
+ */
+
+using Corsinvest.ProxmoxVE.Api;
 
 var client = new PveClient("192.168.0.2");
 if (await client.Login("root", Environment.GetEnvironmentVariable("pve_password")))

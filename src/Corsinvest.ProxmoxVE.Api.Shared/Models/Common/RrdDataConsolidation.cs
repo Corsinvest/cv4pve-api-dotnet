@@ -3,21 +3,20 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
+
+/// <summary>
+/// Rrd data consolidation
+/// </summary>
+public enum RrdDataConsolidation
 {
     /// <summary>
-    /// Rrd data consolidation
+    /// Average
     /// </summary>
-    public enum RrdDataConsolidation
-    {
-        /// <summary>
-        /// Average
-        /// </summary>
-        Average,
+    Average,
 
-        /// <summary>
-        /// Maximum
-        /// </summary>
-        Maximum
-    }
+    /// <summary>
+    /// Maximum
+    /// </summary>
+    Maximum
 }

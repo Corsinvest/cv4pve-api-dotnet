@@ -7,19 +7,18 @@ using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
+
+/// <summary>
+/// interface uptime
+/// </summary>
+public interface IUptimeItem
 {
     /// <summary>
-    /// interface uptime
+    /// Uptime
     /// </summary>
-    public interface IUptimeItem
-    {
-        /// <summary>
-        /// Uptime
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("uptime")]
-        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUptimeUnixTime + "}")]
-        long Uptime { get; set; }
-    }
+    /// <value></value>
+    [JsonProperty("uptime")]
+    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUptimeUnixTime + "}")]
+    long Uptime { get; set; }
 }

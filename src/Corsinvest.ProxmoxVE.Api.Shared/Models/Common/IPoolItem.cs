@@ -5,18 +5,17 @@
 
 using Newtonsoft.Json;
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
+
+/// <summary>
+/// Pool item
+/// </summary>
+public interface IPoolItem
 {
     /// <summary>
-    /// Pool item
+    /// Pool
     /// </summary>
-    public interface IPoolItem
-    {
-        /// <summary>
-        /// Pool
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("pool")]
-        string Pool { get; set; }
-    }
+    /// <value></value>
+    [JsonProperty("pool")]
+    string Pool { get; set; }
 }

@@ -5,17 +5,16 @@
 
 using Newtonsoft.Json;
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
+
+/// <summary>
+/// Storage Item
+/// </summary>
+public interface IStorageItem
 {
     /// <summary>
-    /// Storage Item
+    /// Storage
     /// </summary>
-    public interface IStorageItem
-    {
-        /// <summary>
-        /// Storage
-        /// </summary>
-        [JsonProperty("storage")]
-        string Storage { get; set; }
-    }
+    [JsonProperty("storage")]
+    string Storage { get; set; }
 }

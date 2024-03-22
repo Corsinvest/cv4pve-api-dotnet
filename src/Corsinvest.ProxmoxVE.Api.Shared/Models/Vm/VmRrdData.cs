@@ -10,146 +10,145 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
+
+/// <summary>
+/// rrd data structure
+/// </summary>
+public class VmRrdData : IDisk, INetIO, IDiskIO, ICpu, IMemory
 {
     /// <summary>
-    /// rrd data structure
+    /// Time unix time
     /// </summary>
-    public class VmRrdData : IDisk, INetIO, IDiskIO, ICpu, IMemory
+    /// <value></value>
+    [JsonProperty("time")]
+    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
+    public long Time { get; set; }
+
+    /// <summary>
+    /// Time
+    /// </summary>
+    public DateTime TimeDate => DateTimeOffset.FromUnixTimeSeconds(Time).DateTime;
+
+    /// <summary>
+    /// Disk usage
+    /// </summary>
+    /// <value></value>
+    [JsonProperty("disk")]
+    [Display(Name = "Disk usage")]
+    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    public long DiskUsage { get; set; }
+
+    /// <summary>
+    /// Disk size
+    /// </summary>
+    /// <value></value>
+    [JsonProperty("maxdisk")]
+    [Display(Name = "Disk size")]
+    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    public long DiskSize { get; set; }
+
+    /// <summary>
+    /// Disk usage percentage
+    /// </summary>
+    /// <value></value>
+    [Display(Name = "Disk usage %")]
+    [DisplayFormat(DataFormatString = "{0:P1}")]
+    public double DiskUsagePercentage { get; set; }
+
+    /// <summary>
+    /// Net in
+    /// </summary>
+    /// <value></value>
+    [JsonProperty("netin")]
+    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    public long NetIn { get; set; }
+
+    /// <summary>
+    /// Net out
+    /// </summary>
+    /// <value></value>
+    [JsonProperty("netout")]
+    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    public long NetOut { get; set; }
+
+    /// <summary>
+    /// Disk read
+    /// </summary>
+    /// <value></value>
+    [JsonProperty("diskread")]
+    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    public long DiskRead { get; set; }
+
+    /// <summary>
+    /// Disk write
+    /// </summary>
+    /// <value></value>
+    [JsonProperty("diskwrite")]
+    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    public long DiskWrite { get; set; }
+
+    /// <summary>
+    /// Cpu usage
+    /// </summary>
+    /// <value></value>
+    [Display(Name = "CPU Usage %")]
+    [DisplayFormat(DataFormatString = "{0:P1}")]
+    [JsonProperty("cpu")]
+    public double CpuUsagePercentage { get; set; }
+
+    /// <summary>
+    /// Cpu size
+    /// </summary>
+    /// <value></value>
+    [JsonProperty("maxcpu")]
+    public long CpuSize { get; set; }
+
+    /// <summary>
+    /// Cpu info
+    /// </summary>
+    /// <value></value>
+    [Display(Name = "Cpu")]
+    public string CpuInfo { get; set; }
+
+    /// <summary>
+    /// Memory usage
+    /// </summary>
+    /// <value></value>
+    [JsonProperty("mem")]
+    [Display(Name = "Memory")]
+    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    public long MemoryUsage { get; set; }
+
+    /// <summary>
+    ///Memory size
+    /// </summary>
+    /// <value></value>
+    [JsonProperty("maxmem")]
+    [Display(Name = "Max Memory")]
+    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    public long MemorySize { get; set; }
+
+    /// <summary>
+    /// Memory info
+    /// </summary>
+    /// <value></value>
+    [Display(Name = "Memory")]
+    public string MemoryInfo { get; set; }
+
+    /// <summary>
+    /// Memory usage percentage
+    /// </summary>
+    /// <value></value>
+    [Display(Name = "Memory Usage %")]
+    [DisplayFormat(DataFormatString = "{0:P1}")]
+    public double MemoryUsagePercentage { get; set; }
+
+    [OnDeserialized]
+    internal void OnSerializedMethod(StreamingContext context)
     {
-        /// <summary>
-        /// Time unix time
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("time")]
-        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
-        public long Time { get; set; }
-
-        /// <summary>
-        /// Time
-        /// </summary>
-        public DateTime TimeDate => DateTimeOffset.FromUnixTimeSeconds(Time).DateTime;
-
-        /// <summary>
-        /// Disk usage
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("disk")]
-        [Display(Name = "Disk usage")]
-        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-        public long DiskUsage { get; set; }
-
-        /// <summary>
-        /// Disk size
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("maxdisk")]
-        [Display(Name = "Disk size")]
-        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-        public long DiskSize { get; set; }
-
-        /// <summary>
-        /// Disk usage percentage
-        /// </summary>
-        /// <value></value>
-        [Display(Name = "Disk usage %")]
-        [DisplayFormat(DataFormatString = "{0:P1}")]
-        public double DiskUsagePercentage { get; set; }
-
-        /// <summary>
-        /// Net in
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("netin")]
-        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-        public long NetIn { get; set; }
-
-        /// <summary>
-        /// Net out
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("netout")]
-        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-        public long NetOut { get; set; }
-
-        /// <summary>
-        /// Disk read
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("diskread")]
-        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-        public long DiskRead { get; set; }
-
-        /// <summary>
-        /// Disk write
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("diskwrite")]
-        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-        public long DiskWrite { get; set; }
-
-        /// <summary>
-        /// Cpu usage
-        /// </summary>
-        /// <value></value>
-        [Display(Name = "CPU Usage %")]
-        [DisplayFormat(DataFormatString = "{0:P1}")]
-        [JsonProperty("cpu")]
-        public double CpuUsagePercentage { get; set; }
-
-        /// <summary>
-        /// Cpu size
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("maxcpu")]
-        public long CpuSize { get; set; }
-
-        /// <summary>
-        /// Cpu info
-        /// </summary>
-        /// <value></value>
-        [Display(Name = "Cpu")]
-        public string CpuInfo { get; set; }
-
-        /// <summary>
-        /// Memory usage
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("mem")]
-        [Display(Name = "Memory")]
-        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-        public long MemoryUsage { get; set; }
-
-        /// <summary>
-        ///Memory size
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("maxmem")]
-        [Display(Name = "Max Memory")]
-        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-        public long MemorySize { get; set; }
-
-        /// <summary>
-        /// Memory info
-        /// </summary>
-        /// <value></value>
-        [Display(Name = "Memory")]
-        public string MemoryInfo { get; set; }
-
-        /// <summary>
-        /// Memory usage percentage
-        /// </summary>
-        /// <value></value>
-        [Display(Name = "Memory Usage %")]
-        [DisplayFormat(DataFormatString = "{0:P1}")]
-        public double MemoryUsagePercentage { get; set; }
-
-        [OnDeserialized]
-        internal void OnSerializedMethod(StreamingContext context)
-        {
-            ((ICpu)this).ImproveData();
-            ((IMemory)this).ImproveData();
-            ((IDisk)this).ImproveData();
-        }
+        ((ICpu)this).ImproveData();
+        ((IMemory)this).ImproveData();
+        ((IDisk)this).ImproveData();
     }
 }

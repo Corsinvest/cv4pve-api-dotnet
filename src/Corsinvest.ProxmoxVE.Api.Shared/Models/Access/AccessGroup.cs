@@ -5,32 +5,31 @@
 
 using Newtonsoft.Json;
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Access
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Access;
+
+/// <summary>
+/// Group
+/// </summary>
+public class AccessGroup
 {
     /// <summary>
-    /// Group
+    /// Group Id
     /// </summary>
-    public class AccessGroup
-    {
-        /// <summary>
-        /// Group Id
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("groupid")]
-        public string Id { get; set; }
+    /// <value></value>
+    [JsonProperty("groupid")]
+    public string Id { get; set; }
 
-        /// <summary>
-        /// Users
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("users")]
-        public string Users { get; set; }
+    /// <summary>
+    /// Users
+    /// </summary>
+    /// <value></value>
+    [JsonProperty("users")]
+    public string Users { get; set; }
 
-        /// <summary>
-        /// Comment
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("comment")]
-        public string Comment { get; set; }
-    }
+    /// <summary>
+    /// Comment
+    /// </summary>
+    /// <value></value>
+    [JsonProperty("comment")]
+    public string Comment { get; set; }
 }

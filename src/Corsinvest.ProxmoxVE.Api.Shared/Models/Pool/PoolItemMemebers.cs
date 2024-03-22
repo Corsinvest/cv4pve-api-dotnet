@@ -7,25 +7,24 @@ using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Pool
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Pool;
+
+/// <summary>
+/// Pool detail
+/// </summary>
+public class PoolDetail
 {
     /// <summary>
-    /// Pool detail
+    /// Comment
     /// </summary>
-    public class PoolDetail
-    {
-        /// <summary>
-        /// Comment
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("comment")]
-        public string Comment { get; set; }
+    /// <value></value>
+    [JsonProperty("comment")]
+    public string Comment { get; set; }
 
-        /// <summary>
-        /// Id
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("members")]
-        public IEnumerable<ClusterResource> Members { get; set; }
-    }
+    /// <summary>
+    /// Id
+    /// </summary>
+    /// <value></value>
+    [JsonProperty("members")]
+    public IEnumerable<ClusterResource> Members { get; set; }
 }

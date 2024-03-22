@@ -5,18 +5,17 @@
 
 using Newtonsoft.Json;
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
-{
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
 
+
+/// <summary>
+/// Interface status
+/// </summary>
+public interface IStatusItem
+{
     /// <summary>
-    /// Interface status
+    /// Status
     /// </summary>
-    public interface IStatusItem
-    {
-        /// <summary>
-        /// Status
-        /// </summary>
-        [JsonProperty("status")]
-        string Status { get; set; }
-    }
+    [JsonProperty("status")]
+    string Status { get; set; }
 }

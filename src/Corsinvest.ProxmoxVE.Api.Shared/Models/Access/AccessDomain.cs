@@ -5,32 +5,31 @@
 
 using Newtonsoft.Json;
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Access
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Access;
+
+/// <summary>
+/// Domain
+/// </summary>
+public class AccessDomain
 {
     /// <summary>
-    /// Domain
+    /// Realm
     /// </summary>
-    public class AccessDomain
-    {
-        /// <summary>
-        /// Realm
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("realm")]
-        public string Realm { get; set; }
+    /// <value></value>
+    [JsonProperty("realm")]
+    public string Realm { get; set; }
 
-        /// <summary>
-        /// Comment
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("comment")]
-        public string Comment { get; set; }
+    /// <summary>
+    /// Comment
+    /// </summary>
+    /// <value></value>
+    [JsonProperty("comment")]
+    public string Comment { get; set; }
 
-        /// <summary>
-        /// Type
-        /// </summary>
-        /// <value></value>
-        [JsonProperty("type")]
-        public string Type { get; set; }
-    }
+    /// <summary>
+    /// Type
+    /// </summary>
+    /// <value></value>
+    [JsonProperty("type")]
+    public string Type { get; set; }
 }

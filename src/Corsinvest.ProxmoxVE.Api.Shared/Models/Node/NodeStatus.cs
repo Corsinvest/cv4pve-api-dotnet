@@ -8,238 +8,237 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
+
+/// <summary>
+/// Node status
+/// </summary>
+public class NodeStatus
 {
     /// <summary>
-    /// Node status
+    /// Proxmox VE Version
     /// </summary>
-    public class NodeStatus
+    [JsonProperty("pveversion")]
+    public string PveVersion { get; set; }
+
+    /// <summary>
+    /// Swap
+    /// </summary>
+    [JsonProperty("swap")]
+    public NodeStatusSwap Swap { get; set; }
+
+    /// <summary>
+    /// Cpu Info
+    /// </summary>
+    [JsonProperty("cpuinfo")]
+    public NodeStatusCpuInfo CpuInfo { get; set; }
+
+    /// <summary>
+    /// K version
+    /// </summary>
+    [JsonProperty("kversion")]
+    public string Kversion { get; set; }
+
+    /// <summary>
+    /// Memory
+    /// </summary>
+    [JsonProperty("memory")]
+    public NodeStatusMemory Memory { get; set; }
+
+    /// <summary>
+    /// Ksm
+    /// </summary>
+    [JsonProperty("ksm")]
+    public NodeStatusKsm Ksm { get; set; }
+
+    /// <summary>
+    /// Wait
+    /// </summary>
+    [JsonProperty("wait")]
+    public double Wait { get; set; }
+
+    /// <summary>
+    /// Uptime
+    /// </summary>
+    [JsonProperty("uptime")]
+    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUptimeUnixTime + "}")]
+    public int Uptime { get; set; }
+
+    /// <summary>
+    /// Load average
+    /// </summary>
+    [JsonProperty("loadavg")]
+    public IEnumerable<string> LoadAvg { get; set; }
+
+    /// <summary>
+    /// Root fs
+    /// </summary>
+    [JsonProperty("rootfs")]
+    public NodeStatusRootFs RootFs { get; set; }
+
+    /// <summary>
+    /// Cpu
+    /// </summary>
+    [JsonProperty("cpu")]
+    public double Cpu { get; set; }
+
+    /// <summary>
+    /// Idle
+    /// </summary>
+    [JsonProperty("idle")]
+    public int Idle { get; set; }
+
+    /// <summary>
+    /// Node status Swap
+    /// </summary>
+    public class NodeStatusSwap
     {
         /// <summary>
-        /// Proxmox VE Version
+        /// Free
         /// </summary>
-        [JsonProperty("pveversion")]
-        public string PveVersion { get; set; }
+        [JsonProperty("free")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        public long Free { get; set; }
 
         /// <summary>
-        /// Swap
+        /// Used
         /// </summary>
-        [JsonProperty("swap")]
-        public NodeStatusSwap Swap { get; set; }
+        [JsonProperty("used")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        public long Used { get; set; }
 
         /// <summary>
-        /// Cpu Info
+        /// Total
         /// </summary>
-        [JsonProperty("cpuinfo")]
-        public NodeStatusCpuInfo CpuInfo { get; set; }
+        [JsonProperty("total")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        public long Total { get; set; }
+    }
+
+    /// <summary>
+    /// Node status Cpu Info
+    /// </summary>
+    public class NodeStatusCpuInfo
+    {
+        /// <summary>
+        /// Models
+        /// </summary>
+        [JsonProperty("model")]
+        public string Model { get; set; }
 
         /// <summary>
-        /// K version
+        /// Cpus
         /// </summary>
-        [JsonProperty("kversion")]
-        public string Kversion { get; set; }
+        [JsonProperty("cpus")]
+        public int Cpus { get; set; }
 
         /// <summary>
-        /// Memory
+        /// Hvm
         /// </summary>
-        [JsonProperty("memory")]
-        public NodeStatusMemory Memory { get; set; }
+        [JsonProperty("hvm")]
+        public string Hvm { get; set; }
 
         /// <summary>
-        /// Ksm
+        /// UserHz
         /// </summary>
-        [JsonProperty("ksm")]
-        public NodeStatusKsm Ksm { get; set; }
+        [JsonProperty("user_hz")]
+        public int UserHz { get; set; }
 
         /// <summary>
-        /// Wait
+        /// Flags
         /// </summary>
-        [JsonProperty("wait")]
-        public double Wait { get; set; }
+        [JsonProperty("flags")]
+        public string Flags { get; set; }
 
         /// <summary>
-        /// Uptime
+        /// Cores
         /// </summary>
-        [JsonProperty("uptime")]
-        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUptimeUnixTime + "}")]
-        public int Uptime { get; set; }
+        [JsonProperty("cores")]
+        public int Cores { get; set; }
 
         /// <summary>
-        /// Load average
+        /// Sockets
         /// </summary>
-        [JsonProperty("loadavg")]
-        public IEnumerable<string> LoadAvg { get; set; }
+        [JsonProperty("sockets")]
+        public int Sockets { get; set; }
 
         /// <summary>
-        /// Root fs
+        /// Mhz
         /// </summary>
-        [JsonProperty("rootfs")]
-        public NodeStatusRootFs RootFs { get; set; }
+        [JsonProperty("mhz")]
+        public string Mhz { get; set; }
+    }
+
+    /// <summary>
+    /// Node status Memory
+    /// </summary>
+    public class NodeStatusMemory
+    {
+        /// <summary>
+        /// Free
+        /// </summary>
+        [JsonProperty("free")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        public long Free { get; set; }
 
         /// <summary>
-        /// Cpu
+        /// Used
         /// </summary>
-        [JsonProperty("cpu")]
-        public double Cpu { get; set; }
+        [JsonProperty("used")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        public long Used { get; set; }
 
         /// <summary>
-        /// Idle
+        /// Total
         /// </summary>
-        [JsonProperty("idle")]
-        public int Idle { get; set; }
+        [JsonProperty("total")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        public long Total { get; set; }
+    }
+
+    /// <summary>
+    /// Ksm
+    /// </summary>
+    public class NodeStatusKsm
+    {
+        /// <summary>
+        /// Shared
+        /// </summary>
+        [JsonProperty("shared")]
+        public long Shared { get; set; }
+    }
+
+    /// <summary>
+    /// Root Fs
+    /// </summary>
+    public class NodeStatusRootFs
+    {
+        /// <summary>
+        /// Available
+        /// </summary>
+        [JsonProperty("avail")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        public long Available { get; set; }
 
         /// <summary>
-        /// Node status Swap
+        /// Total
         /// </summary>
-        public class NodeStatusSwap
-        {
-            /// <summary>
-            /// Free
-            /// </summary>
-            [JsonProperty("free")]
-            [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-            public long Free { get; set; }
-
-            /// <summary>
-            /// Used
-            /// </summary>
-            [JsonProperty("used")]
-            [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-            public long Used { get; set; }
-
-            /// <summary>
-            /// Total
-            /// </summary>
-            [JsonProperty("total")]
-            [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-            public long Total { get; set; }
-        }
+        [JsonProperty("total")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        public long Total { get; set; }
 
         /// <summary>
-        /// Node status Cpu Info
+        /// Used
         /// </summary>
-        public class NodeStatusCpuInfo
-        {
-            /// <summary>
-            /// Models
-            /// </summary>
-            [JsonProperty("model")]
-            public string Model { get; set; }
-
-            /// <summary>
-            /// Cpus
-            /// </summary>
-            [JsonProperty("cpus")]
-            public int Cpus { get; set; }
-
-            /// <summary>
-            /// Hvm
-            /// </summary>
-            [JsonProperty("hvm")]
-            public string Hvm { get; set; }
-
-            /// <summary>
-            /// UserHz
-            /// </summary>
-            [JsonProperty("user_hz")]
-            public int UserHz { get; set; }
-
-            /// <summary>
-            /// Flags
-            /// </summary>
-            [JsonProperty("flags")]
-            public string Flags { get; set; }
-
-            /// <summary>
-            /// Cores
-            /// </summary>
-            [JsonProperty("cores")]
-            public int Cores { get; set; }
-
-            /// <summary>
-            /// Sockets
-            /// </summary>
-            [JsonProperty("sockets")]
-            public int Sockets { get; set; }
-
-            /// <summary>
-            /// Mhz
-            /// </summary>
-            [JsonProperty("mhz")]
-            public string Mhz { get; set; }
-        }
+        [JsonProperty("used")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        public long Used { get; set; }
 
         /// <summary>
-        /// Node status Memory
+        /// Free
         /// </summary>
-        public class NodeStatusMemory
-        {
-            /// <summary>
-            /// Free
-            /// </summary>
-            [JsonProperty("free")]
-            [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-            public long Free { get; set; }
-
-            /// <summary>
-            /// Used
-            /// </summary>
-            [JsonProperty("used")]
-            [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-            public long Used { get; set; }
-
-            /// <summary>
-            /// Total
-            /// </summary>
-            [JsonProperty("total")]
-            [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-            public long Total { get; set; }
-        }
-
-        /// <summary>
-        /// Ksm
-        /// </summary>
-        public class NodeStatusKsm
-        {
-            /// <summary>
-            /// Shared
-            /// </summary>
-            [JsonProperty("shared")]
-            public long Shared { get; set; }
-        }
-
-        /// <summary>
-        /// Root Fs
-        /// </summary>
-        public class NodeStatusRootFs
-        {
-            /// <summary>
-            /// Available
-            /// </summary>
-            [JsonProperty("avail")]
-            [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-            public long Available { get; set; }
-
-            /// <summary>
-            /// Total
-            /// </summary>
-            [JsonProperty("total")]
-            [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-            public long Total { get; set; }
-
-            /// <summary>
-            /// Used
-            /// </summary>
-            [JsonProperty("used")]
-            [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-            public long Used { get; set; }
-
-            /// <summary>
-            /// Free
-            /// </summary>
-            [JsonProperty("free")]
-            [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-            public long Free { get; set; }
-        }
+        [JsonProperty("free")]
+        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        public long Free { get; set; }
     }
 }

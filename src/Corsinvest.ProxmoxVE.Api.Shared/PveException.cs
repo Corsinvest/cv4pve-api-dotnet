@@ -5,29 +5,28 @@
 
 using System;
 
-namespace Corsinvest.ProxmoxVE.Api.Shared
+namespace Corsinvest.ProxmoxVE.Api.Shared;
+
+/// <summary>
+/// Pve exception
+/// </summary>
+public class PveException : Exception
 {
     /// <summary>
-    /// Pve exception
+    /// Constructor
     /// </summary>
-    public class PveException : Exception
-    {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public PveException() { }
+    public PveException() { }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="message"></param>
-        public PveException(string message) : base(message) { }
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="message"></param>
+    public PveException(string message) : base(message) { }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="message"></param>
-        /// <param name="innerException"></param>
-        public PveException(string message, Exception innerException) : base(message, innerException) { }
-    }
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="innerException"></param>
+    public PveException(string message, Exception innerException) : base(message, innerException) { }
 }

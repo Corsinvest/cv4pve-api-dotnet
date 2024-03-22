@@ -3,86 +3,85 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Utils
+namespace Corsinvest.ProxmoxVE.Api.Shared.Utils;
+
+/// <summary>
+/// Constant
+/// </summary>
+public static class PveConstants
 {
     /// <summary>
-    /// Constant
+    /// Key api qemu
     /// </summary>
-    public static class PveConstants
-    {
-        /// <summary>
-        /// Key api qemu
-        /// </summary>
-        public static string KeyApiQemu => "qemu";
+    public static string KeyApiQemu => "qemu";
 
-        /// <summary>
-        /// Key api lxc container
-        /// </summary>
-        public static string KeyApiLxc => "lxc";
+    /// <summary>
+    /// Key api lxc container
+    /// </summary>
+    public static string KeyApiLxc => "lxc";
 
-        /// <summary>
-        /// Key api storage
-        /// </summary>
-        public static string KeyApiStorage => "storage";
+    /// <summary>
+    /// Key api storage
+    /// </summary>
+    public static string KeyApiStorage => "storage";
 
-        /// <summary>
-        /// Key api node
-        /// </summary>
-        public static string KeyApiNode => "node";
+    /// <summary>
+    /// Key api node
+    /// </summary>
+    public static string KeyApiNode => "node";
 
-        /// <summary>
-        /// Key api cluster
-        /// </summary>
-        public static string KeyApiCluster => "cluster";
+    /// <summary>
+    /// Key api cluster
+    /// </summary>
+    public static string KeyApiCluster => "cluster";
 
-        /// <summary>
-        /// Key api pool
-        /// </summary>
-        public static string KeyApiPool => "pool";
+    /// <summary>
+    /// Key api pool
+    /// </summary>
+    public static string KeyApiPool => "pool";
 
-        /// <summary>
-        /// Key api template
-        /// </summary>
-        public static string KeyApiTemplate => "template";
+    /// <summary>
+    /// Key api template
+    /// </summary>
+    public static string KeyApiTemplate => "template";
 
-        /// <summary>
-        /// Status Online
-        /// </summary>
-        public static string StatusOnline => "online";
+    /// <summary>
+    /// Status Online
+    /// </summary>
+    public static string StatusOnline => "online";
 
-        /// <summary>
-        /// Status Offline
-        /// </summary>
-        public static string StatusOffline => "offline";
+    /// <summary>
+    /// Status Offline
+    /// </summary>
+    public static string StatusOffline => "offline";
 
-        /// <summary>
-        /// Status Available
-        /// </summary>
-        public static string StatusAvailable => "available";
+    /// <summary>
+    /// Status Available
+    /// </summary>
+    public static string StatusAvailable => "available";
 
-        /// <summary>
-        /// Status unknown
-        /// </summary>
-        public static string StatusUnknown => "unknown";
+    /// <summary>
+    /// Status unknown
+    /// </summary>
+    public static string StatusUnknown => "unknown";
 
-        /// <summary>
-        /// Status stopped
-        /// </summary>
-        public static string StatusVmStopped => "stopped";
+    /// <summary>
+    /// Status stopped
+    /// </summary>
+    public static string StatusVmStopped => "stopped";
 
-        /// <summary>
-        /// Status running
-        /// </summary>
-        public static string StatusVmRunning => "running";
+    /// <summary>
+    /// Status running
+    /// </summary>
+    public static string StatusVmRunning => "running";
 
-        /// <summary>
-        /// Status paused
-        /// </summary>
-        public static string StatusVmPaused => "paused";
+    /// <summary>
+    /// Status paused
+    /// </summary>
+    public static string StatusVmPaused => "paused";
 
-        /// <summary>
-        /// Content backup
-        /// </summary>
-        public static string StorageContentBackup => "backup";
-    }
+    /// <summary>
+    /// Content backup
+    /// </summary>
+    public static string StorageContentBackup => "backup";
 }

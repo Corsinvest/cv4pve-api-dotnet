@@ -1,4 +1,4 @@
-﻿/*
+/*
  * SPDX-FileCopyrightText: Copyright Corsinvest Srl
  * SPDX-License-Identifier: GPL-3.0-only
  */
@@ -6,34 +6,31 @@
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 
 /// <summary>
-/// Disk
+/// VM/CT extra Info
 /// </summary>
-public class VmDisk
+public interface IClusterResourceVmOsInfo
 {
     /// <summary>
-    /// Identifier
-    /// </summary>
-    public string Id { get; set; }
-
-    /// <summary>
-    /// Storage
+    /// Qemu Agent OsInfo
     /// </summary>
     /// <value></value>
-    public string Storage { get; set; }
+    VmQemuAgentOsInfo VmQemuAgentOsInfo { get; set; }
 
     /// <summary>
-    /// Name
+    /// HostName
     /// </summary>
     /// <value></value>
-    public string FileName { get; set; }
+    string HostName { get; set; }
 
     /// <summary>
-    /// Size
+    /// OsVersion
     /// </summary>
-    public string Size { get; set; }
+    /// <value></value>
+    string OsVersion { get; set; }
 
     /// <summary>
-    /// Backup enabled.
+    /// OsType
     /// </summary>
-    public bool Backup { get; set; }
+    /// <value></value>
+    VmOsType? OsType { get; set; }
 }

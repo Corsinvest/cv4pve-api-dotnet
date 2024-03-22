@@ -7,32 +7,31 @@ using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
+
+/// <summary>
+/// Storage RrdData
+/// </summary>
+public class NodeStorageRrdData
 {
     /// <summary>
-    /// Storage RrdData
+    /// Used
     /// </summary>
-    public class NodeStorageRrdData
-    {
-        /// <summary>
-        /// Used
-        /// </summary>
-        [JsonProperty("used")]
-        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-        public long Used { get; set; }
+    [JsonProperty("used")]
+    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    public long Used { get; set; }
 
-        /// <summary>
-        /// Time
-        /// </summary>
-        [JsonProperty("time")]
-        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
-        public int Time { get; set; }
+    /// <summary>
+    /// Time
+    /// </summary>
+    [JsonProperty("time")]
+    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
+    public int Time { get; set; }
 
-        /// <summary>
-        /// Size
-        /// </summary>
-        [JsonProperty("total")]
-        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-        public long Size { get; set; }
-    }
+    /// <summary>
+    /// Size
+    /// </summary>
+    [JsonProperty("total")]
+    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    public long Size { get; set; }
 }

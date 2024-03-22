@@ -5,29 +5,28 @@
 
 using Newtonsoft.Json;
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
+
+/// <summary>
+/// Vm Qemu Agent GetHostName
+/// </summary>
+public class VmQemuAgentGetHostName
 {
     /// <summary>
-    /// Vm Qemu Agent GetHostName
+    /// Result
     /// </summary>
-    public class VmQemuAgentGetHostName
+    [JsonProperty("result")]
+    public ResultInt Result { get; set; }
+
+    /// <summary>
+    /// Result
+    /// </summary>
+    public class ResultInt
     {
         /// <summary>
-        /// Result
+        /// Hostname
         /// </summary>
-        [JsonProperty("result")]
-        public ResultInt Result { get; set; }
-
-        /// <summary>
-        /// Result
-        /// </summary>
-        public class ResultInt
-        {
-            /// <summary>
-            /// Hostname
-            /// </summary>
-            [JsonProperty("host-name")]
-            public string HostName { get; set; }
-        }
+        [JsonProperty("host-name")]
+        public string HostName { get; set; }
     }
 }

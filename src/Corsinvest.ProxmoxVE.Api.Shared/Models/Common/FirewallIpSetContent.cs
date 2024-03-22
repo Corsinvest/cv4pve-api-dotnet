@@ -5,29 +5,28 @@
 
 using Newtonsoft.Json;
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
+
+/// <summary>
+/// Firewall IpSet content
+/// </summary>
+public class FirewallIpSetContent
 {
     /// <summary>
-    /// Firewall IpSet content
+    /// Digest
     /// </summary>
-    public class FirewallIpSetContent
-    {
-        /// <summary>
-        /// Digest
-        /// </summary>
-        [JsonProperty("digest")]
-        public string Digest { get; set; }
+    [JsonProperty("digest")]
+    public string Digest { get; set; }
 
-        /// <summary>
-        /// Cidr
-        /// </summary>
-        [JsonProperty("cidr")]
-        public string Cidr { get; set; }
+    /// <summary>
+    /// Cidr
+    /// </summary>
+    [JsonProperty("cidr")]
+    public string Cidr { get; set; }
 
-        /// <summary>
-        /// Comment
-        /// </summary>
-        [JsonProperty("comment")]
-        public string Comment { get; set; }
-    }
+    /// <summary>
+    /// Comment
+    /// </summary>
+    [JsonProperty("comment")]
+    public string Comment { get; set; }
 }

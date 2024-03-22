@@ -5,35 +5,34 @@
 
 using Newtonsoft.Json;
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
+
+/// <summary>
+/// Vm Qemu Agent Get TimeZone
+/// </summary>
+public class VmQemuAgentGetTimeZone
 {
     /// <summary>
-    /// Vm Qemu Agent Get TimeZone
+    /// Result
     /// </summary>
-    public class VmQemuAgentGetTimeZone
+    [JsonProperty("result")]
+    public ResultInt Result { get; set; }
+
+    /// <summary>
+    /// Result
+    /// </summary>
+    public class ResultInt
     {
         /// <summary>
-        /// Result
+        /// Offset
         /// </summary>
-        [JsonProperty("result")]
-        public ResultInt Result { get; set; }
+        [JsonProperty("offset")]
+        public int Offset { get; set; }
 
         /// <summary>
-        /// Result
+        /// ZOne
         /// </summary>
-        public class ResultInt
-        {
-            /// <summary>
-            /// Offset
-            /// </summary>
-            [JsonProperty("offset")]
-            public int Offset { get; set; }
-
-            /// <summary>
-            /// ZOne
-            /// </summary>
-            [JsonProperty("zone")]
-            public string Zone { get; set; }
-        }
+        [JsonProperty("zone")]
+        public string Zone { get; set; }
     }
 }

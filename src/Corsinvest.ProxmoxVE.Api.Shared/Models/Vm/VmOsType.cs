@@ -3,31 +3,30 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
+
+/// <summary>
+/// VmOsType
+/// </summary>
+public enum VmOsType
 {
     /// <summary>
-    /// VmOsType
+    /// Windows
     /// </summary>
-    public enum VmOsType
-    {
-        /// <summary>
-        /// Windows
-        /// </summary>
-        Windows,
+    Windows,
 
-        /// <summary>
-        /// Linux
-        /// </summary>
-        Linux,
+    /// <summary>
+    /// Linux
+    /// </summary>
+    Linux,
 
-        /// <summary>
-        /// Solarix
-        /// </summary>
-        Solaris,
+    /// <summary>
+    /// Solarix
+    /// </summary>
+    Solaris,
 
-        /// <summary>
-        /// Other
-        /// </summary>
-        Other
-    }
+    /// <summary>
+    /// Other
+    /// </summary>
+    Other
 }

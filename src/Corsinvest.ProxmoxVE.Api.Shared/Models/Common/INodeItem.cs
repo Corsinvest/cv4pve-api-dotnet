@@ -5,17 +5,16 @@
 
 using Newtonsoft.Json;
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
+
+/// <summary>
+/// Node item
+/// </summary>
+public interface INodeItem
 {
     /// <summary>
-    /// Node item
+    /// Node
     /// </summary>
-    public interface INodeItem
-    {
-        /// <summary>
-        /// Node
-        /// </summary>
-        [JsonProperty("node")]
-        public string Node { get; set; }
-    }
+    [JsonProperty("node")]
+    public string Node { get; set; }
 }

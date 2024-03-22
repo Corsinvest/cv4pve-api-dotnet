@@ -6,45 +6,44 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
+
+/// <summary>
+/// Vm Qemu Agent GetVCpus
+/// </summary>
+public class VmQemuAgentGetVCpus
 {
     /// <summary>
-    /// Vm Qemu Agent GetVCpus
+    /// Data
     /// </summary>
-    public class VmQemuAgentGetVCpus
+    /// <value></value>
+    [JsonProperty("result")]
+    public IEnumerable<ResultInt> Result { get; set; }
+
+    /// <summary>
+    /// Result
+    /// </summary>
+    public class ResultInt
     {
         /// <summary>
-        /// Data
+        /// Can Offline
         /// </summary>
         /// <value></value>
-        [JsonProperty("result")]
-        public IEnumerable<ResultInt> Result { get; set; }
+        [JsonProperty("can-offline")]
+        public bool CanOffline { get; set; }
 
         /// <summary>
-        /// Result
+        /// Logical Id
         /// </summary>
-        public class ResultInt
-        {
-            /// <summary>
-            /// Can Offline
-            /// </summary>
-            /// <value></value>
-            [JsonProperty("can-offline")]
-            public bool CanOffline { get; set; }
+        /// <value></value>
+        [JsonProperty("logical-id")]
+        public int LogicalId { get; set; }
 
-            /// <summary>
-            /// Logical Id
-            /// </summary>
-            /// <value></value>
-            [JsonProperty("logical-id")]
-            public int LogicalId { get; set; }
-
-            /// <summary>
-            /// Online
-            /// </summary>
-            /// <value></value>
-            [JsonProperty("online")]
-            public bool Online { get; set; }
-        }
+        /// <summary>
+        /// Online
+        /// </summary>
+        /// <value></value>
+        [JsonProperty("online")]
+        public bool Online { get; set; }
     }
 }

@@ -5,35 +5,34 @@
 
 using Newtonsoft.Json;
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
+
+/// <summary>
+/// Firewall Refs
+/// </summary>
+public class FirewallRef
 {
     /// <summary>
-    /// Firewall Refs
+    /// Comment
     /// </summary>
-    public class FirewallRef
-    {
-        /// <summary>
-        /// Comment
-        /// </summary>
-        [JsonProperty("comment")]
-        public string Comment { get; set; }
+    [JsonProperty("comment")]
+    public string Comment { get; set; }
 
-        /// <summary>
-        /// Name
-        /// </summary>
-        [JsonProperty("name")]
-        public string Name { get; set; }
+    /// <summary>
+    /// Name
+    /// </summary>
+    [JsonProperty("name")]
+    public string Name { get; set; }
 
-        /// <summary>
-        /// Ref
-        /// </summary>
-        [JsonProperty("ref")]
-        public string Ref { get; set; }
+    /// <summary>
+    /// Ref
+    /// </summary>
+    [JsonProperty("ref")]
+    public string Ref { get; set; }
 
-        /// <summary>
-        /// Type
-        /// </summary>
-        [JsonProperty("type")]
-        public string Type { get; set; }
-    }
+    /// <summary>
+    /// Type
+    /// </summary>
+    [JsonProperty("type")]
+    public string Type { get; set; }
 }
