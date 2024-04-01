@@ -70,6 +70,11 @@ public class PveClientBase
     public TimeSpan? Timeout { get; set; } = null;
 
     /// <summary>
+    /// If set to true verifies the certificate of the Proxmox API server.
+    /// </summary>
+    public bool VerifyCertificate { get; set; } = false;
+
+    /// <summary>
     /// Get/Set the response type that is going to be returned when doing requests (json, png).
     /// </summary>
     public ResponseType ResponseType { get; set; } = ResponseType.Json;
@@ -181,12 +186,12 @@ public class PveClientBase
     /// <returns></returns>
     public HttpClient GetHttpClient()
     {
-#pragma warning disable S4830 // Server certificates should be verified during SSL/TLS connections
         var handler = new HttpClientHandler()
         {
-            CookieContainer = new CookieContainer(),
-            ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+            CookieContainer = new CookieContainer()
         };
+#pragma warning disable S4830 // Server certificates should be verified during SSL/TLS connections
+        if (!VerifyCertificate) handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
 #pragma warning restore S4830 // Server certificates should be verified during SSL/TLS connections
 
         var client = new HttpClient(handler);
