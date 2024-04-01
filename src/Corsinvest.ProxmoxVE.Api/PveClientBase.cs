@@ -184,7 +184,7 @@ public class PveClientBase
     /// Het http client
     /// </summary>
     /// <returns></returns>
-    public HttpClient GetHttpClient()
+    public virtual HttpClient GetHttpClient()
     {
         var handler = new HttpClientHandler()
         {
