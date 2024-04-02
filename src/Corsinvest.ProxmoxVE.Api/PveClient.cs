@@ -1743,20 +1743,22 @@ public class PveClient : PveClientBase
                 /// <param name="dumpdir">Store resulting files to specified directory.</param>
                 /// <param name="enabled">Enable or disable the job.</param>
                 /// <param name="exclude">Exclude specified guest systems (assumes --all)</param>
-                /// <param name="exclude_path">Exclude certain files/directories (shell globs). Paths starting with '/' are anchored to the container's root,  other paths match relative to each subdirectory.</param>
+                /// <param name="exclude_path">Exclude certain files/directories (shell globs). Paths starting with '/' are anchored to the container's root, other paths match relative to each subdirectory.</param>
                 /// <param name="ionice">Set IO priority when using the BFQ scheduler. For snapshot and suspend mode backups of VMs, this only affects the compressor. A value of 8 means the idle priority is used, otherwise the best-effort priority is used with the specified value.</param>
                 /// <param name="lockwait">Maximal time to wait for the global lock (minutes).</param>
-                /// <param name="mailnotification">Deprecated: use 'notification-policy' instead.
+                /// <param name="mailnotification">Deprecated: use notification targets/matchers instead. Specify when to send a notification mail
                 ///   Enum: always,failure</param>
-                /// <param name="mailto">Comma-separated list of email addresses or users that should receive email notifications. Has no effect if the 'notification-target' option  is set at the same time.</param>
+                /// <param name="mailto">Deprecated: Use notification targets/matchers instead. Comma-separated list of email addresses or users that should receive email notifications.</param>
                 /// <param name="maxfiles">Deprecated: use 'prune-backups' instead. Maximal number of backup files per guest system.</param>
                 /// <param name="mode">Backup mode.
                 ///   Enum: snapshot,suspend,stop</param>
                 /// <param name="node">Only run if executed on this node.</param>
                 /// <param name="notes_template">Template string for generating notes for the backup(s). It can contain variables which will be replaced by their values. Currently supported are {{cluster}}, {{guestname}}, {{node}}, and {{vmid}}, but more might be added in the future. Needs to be a single line, newline and backslash need to be escaped as '\n' and '\\' respectively.</param>
-                /// <param name="notification_policy">Specify when to send a notification
+                /// <param name="notification_mode">Determine which notification system to use. If set to 'legacy-sendmail', vzdump will consider the mailto/mailnotification parameters and send emails to the specified address(es) via the 'sendmail' command. If set to 'notification-system', a notification will be sent via PVE's notification system, and the mailto and mailnotification will be ignored. If set to 'auto' (default setting), an email will be sent if mailto is set, and the notification system will be used if not.
+                ///   Enum: auto,legacy-sendmail,notification-system</param>
+                /// <param name="notification_policy">Deprecated: Do not use
                 ///   Enum: always,failure,never</param>
-                /// <param name="notification_target">Determine the target to which notifications should be sent. Can either be a notification endpoint or a notification group. This option takes precedence over 'mailto', meaning that if both are  set, the 'mailto' option will be ignored.</param>
+                /// <param name="notification_target">Deprecated: Do not use</param>
                 /// <param name="performance">Other performance-related settings.</param>
                 /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
                 /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
@@ -1774,9 +1776,9 @@ public class PveClient : PveClientBase
                 /// <param name="storage">Store resulting file to this storage.</param>
                 /// <param name="tmpdir">Store temporary files to specified directory.</param>
                 /// <param name="vmid">The ID of the guest system you want to backup.</param>
-                /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
+                /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, if N is set to a value bigger than 0, N is used as thread count.</param>
                 /// <returns></returns>
-                public async Task<Result> UpdateJob(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, IEnumerable<object> exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, string notes_template = null, string notification_policy = null, string notification_target = null, string performance = null, int? pigz = null, string pool = null, bool? protected_ = null, string prune_backups = null, bool? quiet = null, bool? remove = null, bool? repeat_missed = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
+                public async Task<Result> UpdateJob(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string delete = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, IEnumerable<object> exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, string notes_template = null, string notification_mode = null, string notification_policy = null, string notification_target = null, string performance = null, int? pigz = null, string pool = null, bool? protected_ = null, string prune_backups = null, bool? quiet = null, bool? remove = null, bool? repeat_missed = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("all", all);
@@ -1797,6 +1799,7 @@ public class PveClient : PveClientBase
                     parameters.Add("mode", mode);
                     parameters.Add("node", node);
                     parameters.Add("notes-template", notes_template);
+                    parameters.Add("notification-mode", notification_mode);
                     parameters.Add("notification-policy", notification_policy);
                     parameters.Add("notification-target", notification_target);
                     parameters.Add("performance", performance);
@@ -1837,21 +1840,23 @@ public class PveClient : PveClientBase
             /// <param name="dumpdir">Store resulting files to specified directory.</param>
             /// <param name="enabled">Enable or disable the job.</param>
             /// <param name="exclude">Exclude specified guest systems (assumes --all)</param>
-            /// <param name="exclude_path">Exclude certain files/directories (shell globs). Paths starting with '/' are anchored to the container's root,  other paths match relative to each subdirectory.</param>
+            /// <param name="exclude_path">Exclude certain files/directories (shell globs). Paths starting with '/' are anchored to the container's root, other paths match relative to each subdirectory.</param>
             /// <param name="id">Job ID (will be autogenerated).</param>
             /// <param name="ionice">Set IO priority when using the BFQ scheduler. For snapshot and suspend mode backups of VMs, this only affects the compressor. A value of 8 means the idle priority is used, otherwise the best-effort priority is used with the specified value.</param>
             /// <param name="lockwait">Maximal time to wait for the global lock (minutes).</param>
-            /// <param name="mailnotification">Deprecated: use 'notification-policy' instead.
+            /// <param name="mailnotification">Deprecated: use notification targets/matchers instead. Specify when to send a notification mail
             ///   Enum: always,failure</param>
-            /// <param name="mailto">Comma-separated list of email addresses or users that should receive email notifications. Has no effect if the 'notification-target' option  is set at the same time.</param>
+            /// <param name="mailto">Deprecated: Use notification targets/matchers instead. Comma-separated list of email addresses or users that should receive email notifications.</param>
             /// <param name="maxfiles">Deprecated: use 'prune-backups' instead. Maximal number of backup files per guest system.</param>
             /// <param name="mode">Backup mode.
             ///   Enum: snapshot,suspend,stop</param>
             /// <param name="node">Only run if executed on this node.</param>
             /// <param name="notes_template">Template string for generating notes for the backup(s). It can contain variables which will be replaced by their values. Currently supported are {{cluster}}, {{guestname}}, {{node}}, and {{vmid}}, but more might be added in the future. Needs to be a single line, newline and backslash need to be escaped as '\n' and '\\' respectively.</param>
-            /// <param name="notification_policy">Specify when to send a notification
+            /// <param name="notification_mode">Determine which notification system to use. If set to 'legacy-sendmail', vzdump will consider the mailto/mailnotification parameters and send emails to the specified address(es) via the 'sendmail' command. If set to 'notification-system', a notification will be sent via PVE's notification system, and the mailto and mailnotification will be ignored. If set to 'auto' (default setting), an email will be sent if mailto is set, and the notification system will be used if not.
+            ///   Enum: auto,legacy-sendmail,notification-system</param>
+            /// <param name="notification_policy">Deprecated: Do not use
             ///   Enum: always,failure,never</param>
-            /// <param name="notification_target">Determine the target to which notifications should be sent. Can either be a notification endpoint or a notification group. This option takes precedence over 'mailto', meaning that if both are  set, the 'mailto' option will be ignored.</param>
+            /// <param name="notification_target">Deprecated: Do not use</param>
             /// <param name="performance">Other performance-related settings.</param>
             /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
             /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
@@ -1869,9 +1874,9 @@ public class PveClient : PveClientBase
             /// <param name="storage">Store resulting file to this storage.</param>
             /// <param name="tmpdir">Store temporary files to specified directory.</param>
             /// <param name="vmid">The ID of the guest system you want to backup.</param>
-            /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
+            /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, if N is set to a value bigger than 0, N is used as thread count.</param>
             /// <returns></returns>
-            public async Task<Result> CreateJob(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, IEnumerable<object> exclude_path = null, string id = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, string notes_template = null, string notification_policy = null, string notification_target = null, string performance = null, int? pigz = null, string pool = null, bool? protected_ = null, string prune_backups = null, bool? quiet = null, bool? remove = null, bool? repeat_missed = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
+            public async Task<Result> CreateJob(bool? all = null, int? bwlimit = null, string comment = null, string compress = null, string dow = null, string dumpdir = null, bool? enabled = null, string exclude = null, IEnumerable<object> exclude_path = null, string id = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string node = null, string notes_template = null, string notification_mode = null, string notification_policy = null, string notification_target = null, string performance = null, int? pigz = null, string pool = null, bool? protected_ = null, string prune_backups = null, bool? quiet = null, bool? remove = null, bool? repeat_missed = null, string schedule = null, string script = null, string starttime = null, bool? stdexcludes = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("all", all);
@@ -1892,6 +1897,7 @@ public class PveClient : PveClientBase
                 parameters.Add("mode", mode);
                 parameters.Add("node", node);
                 parameters.Add("notes-template", notes_template);
+                parameters.Add("notification-mode", notification_mode);
                 parameters.Add("notification-policy", notification_policy);
                 parameters.Add("notification-target", notification_target);
                 parameters.Add("performance", performance);
@@ -7054,7 +7060,7 @@ public class PveClient : PveClientBase
                 /// <param name="keyboard">Keyboard layout for VNC server. This option is generally not required and is often better handled from within the guest OS.
                 ///   Enum: de,de-ch,da,en-gb,en-us,es,fi,fr,fr-be,fr-ca,fr-ch,hu,is,it,ja,lt,mk,nl,no,pl,pt,pt-br,sv,sl,tr</param>
                 /// <param name="kvm">Enable/disable KVM hardware virtualization.</param>
-                /// <param name="live_restore">Start the VM immediately from the backup and restore in background. PBS only.</param>
+                /// <param name="live_restore">Start the VM immediately while importing or restoring in the background.</param>
                 /// <param name="localtime">Set the real time clock (RTC) to local time. This is enabled by default if the `ostype` indicates a Microsoft Windows OS.</param>
                 /// <param name="lock_">Lock/unlock the VM.
                 ///   Enum: backup,clone,create,migrate,rollback,snapshot,snapshot-delete,suspending,suspended</param>
@@ -9878,19 +9884,21 @@ public class PveClient : PveClientBase
                 ///   Enum: 0,1,gzip,lzo,zstd</param>
                 /// <param name="dumpdir">Store resulting files to specified directory.</param>
                 /// <param name="exclude">Exclude specified guest systems (assumes --all)</param>
-                /// <param name="exclude_path">Exclude certain files/directories (shell globs). Paths starting with '/' are anchored to the container's root,  other paths match relative to each subdirectory.</param>
+                /// <param name="exclude_path">Exclude certain files/directories (shell globs). Paths starting with '/' are anchored to the container's root, other paths match relative to each subdirectory.</param>
                 /// <param name="ionice">Set IO priority when using the BFQ scheduler. For snapshot and suspend mode backups of VMs, this only affects the compressor. A value of 8 means the idle priority is used, otherwise the best-effort priority is used with the specified value.</param>
                 /// <param name="lockwait">Maximal time to wait for the global lock (minutes).</param>
-                /// <param name="mailnotification">Deprecated: use 'notification-policy' instead.
+                /// <param name="mailnotification">Deprecated: use notification targets/matchers instead. Specify when to send a notification mail
                 ///   Enum: always,failure</param>
-                /// <param name="mailto">Comma-separated list of email addresses or users that should receive email notifications. Has no effect if the 'notification-target' option  is set at the same time.</param>
+                /// <param name="mailto">Deprecated: Use notification targets/matchers instead. Comma-separated list of email addresses or users that should receive email notifications.</param>
                 /// <param name="maxfiles">Deprecated: use 'prune-backups' instead. Maximal number of backup files per guest system.</param>
                 /// <param name="mode">Backup mode.
                 ///   Enum: snapshot,suspend,stop</param>
                 /// <param name="notes_template">Template string for generating notes for the backup(s). It can contain variables which will be replaced by their values. Currently supported are {{cluster}}, {{guestname}}, {{node}}, and {{vmid}}, but more might be added in the future. Needs to be a single line, newline and backslash need to be escaped as '\n' and '\\' respectively.</param>
-                /// <param name="notification_policy">Specify when to send a notification
+                /// <param name="notification_mode">Determine which notification system to use. If set to 'legacy-sendmail', vzdump will consider the mailto/mailnotification parameters and send emails to the specified address(es) via the 'sendmail' command. If set to 'notification-system', a notification will be sent via PVE's notification system, and the mailto and mailnotification will be ignored. If set to 'auto' (default setting), an email will be sent if mailto is set, and the notification system will be used if not.
+                ///   Enum: auto,legacy-sendmail,notification-system</param>
+                /// <param name="notification_policy">Deprecated: Do not use
                 ///   Enum: always,failure,never</param>
-                /// <param name="notification_target">Determine the target to which notifications should be sent. Can either be a notification endpoint or a notification group. This option takes precedence over 'mailto', meaning that if both are  set, the 'mailto' option will be ignored.</param>
+                /// <param name="notification_target">Deprecated: Do not use</param>
                 /// <param name="performance">Other performance-related settings.</param>
                 /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
                 /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
@@ -9906,9 +9914,9 @@ public class PveClient : PveClientBase
                 /// <param name="storage">Store resulting file to this storage.</param>
                 /// <param name="tmpdir">Store temporary files to specified directory.</param>
                 /// <param name="vmid">The ID of the guest system you want to backup.</param>
-                /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, N&amp;gt;0 uses N as thread count.</param>
+                /// <param name="zstd">Zstd threads. N=0 uses half of the available cores, if N is set to a value bigger than 0, N is used as thread count.</param>
                 /// <returns></returns>
-                public async Task<Result> Vzdump(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, IEnumerable<object> exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string notes_template = null, string notification_policy = null, string notification_target = null, string performance = null, int? pigz = null, string pool = null, bool? protected_ = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
+                public async Task<Result> Vzdump(bool? all = null, int? bwlimit = null, string compress = null, string dumpdir = null, string exclude = null, IEnumerable<object> exclude_path = null, int? ionice = null, int? lockwait = null, string mailnotification = null, string mailto = null, int? maxfiles = null, string mode = null, string notes_template = null, string notification_mode = null, string notification_policy = null, string notification_target = null, string performance = null, int? pigz = null, string pool = null, bool? protected_ = null, string prune_backups = null, bool? quiet = null, bool? remove = null, string script = null, bool? stdexcludes = null, bool? stdout = null, bool? stop = null, int? stopwait = null, string storage = null, string tmpdir = null, string vmid = null, int? zstd = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("all", all);
@@ -9924,6 +9932,7 @@ public class PveClient : PveClientBase
                     parameters.Add("maxfiles", maxfiles);
                     parameters.Add("mode", mode);
                     parameters.Add("notes-template", notes_template);
+                    parameters.Add("notification-mode", notification_mode);
                     parameters.Add("notification-policy", notification_policy);
                     parameters.Add("notification-target", notification_target);
                     parameters.Add("performance", performance);
@@ -10918,6 +10927,11 @@ public class PveClient : PveClientBase
                     /// DownloadUrl
                     /// </summary>
                     public PveDownloadUrl DownloadUrl => _downloadUrl ??= new(_client, _node, _storage);
+                    private PveImportMetadata _importMetadata;
+                    /// <summary>
+                    /// ImportMetadata
+                    /// </summary>
+                    public PveImportMetadata ImportMetadata => _importMetadata ??= new(_client, _node, _storage);
                     /// <summary>
                     /// Prunebackups
                     /// </summary>
@@ -11302,6 +11316,31 @@ public class PveClient : PveClientBase
                             parameters.Add("compression", compression);
                             parameters.Add("verify-certificates", verify_certificates);
                             return await _client.Create($"/nodes/{_node}/storage/{_storage}/download-url", parameters);
+                        }
+                    }
+                    /// <summary>
+                    /// ImportMetadata
+                    /// </summary>
+                    public class PveImportMetadata
+                    {
+                        private readonly PveClient _client;
+                        private readonly object _node;
+                        private readonly object _storage;
+                        internal PveImportMetadata(PveClient client, object node, object storage)
+                        {
+                            _client = client; _node = node;
+                            _storage = storage;
+                        }
+                        /// <summary>
+                        /// Get the base parameters for creating a guest which imports data from a foreign importable guest, like an ESXi VM
+                        /// </summary>
+                        /// <param name="volume">Volume identifier for the guest archive/entry.</param>
+                        /// <returns></returns>
+                        public async Task<Result> GetImportMetadata(string volume)
+                        {
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("volume", volume);
+                            return await _client.Get($"/nodes/{_node}/storage/{_storage}/import-metadata", parameters);
                         }
                     }
                     /// <summary>
@@ -12714,7 +12753,7 @@ public class PveClient : PveClientBase
                 /// Creates a VNC Shell proxy.
                 /// </summary>
                 /// <param name="cmd">Run specific command or default to login (requires 'root@pam')
-                ///   Enum: ceph_install,login,upgrade</param>
+                ///   Enum: login,upgrade,ceph_install</param>
                 /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                 /// <param name="height">sets the height of the console in pixels.</param>
                 /// <param name="websocket">use websocket instead of standard vnc.</param>
@@ -12743,7 +12782,7 @@ public class PveClient : PveClientBase
                 /// Creates a VNC Shell proxy.
                 /// </summary>
                 /// <param name="cmd">Run specific command or default to login (requires 'root@pam')
-                ///   Enum: ceph_install,login,upgrade</param>
+                ///   Enum: login,upgrade,ceph_install</param>
                 /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                 /// <returns></returns>
                 public async Task<Result> Termproxy(string cmd = null, string cmd_opts = null)
@@ -12788,7 +12827,7 @@ public class PveClient : PveClientBase
                 /// Creates a SPICE shell.
                 /// </summary>
                 /// <param name="cmd">Run specific command or default to login (requires 'root@pam')
-                ///   Enum: ceph_install,login,upgrade</param>
+                ///   Enum: login,upgrade,ceph_install</param>
                 /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                 /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As reasonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                 /// <returns></returns>
@@ -13114,7 +13153,7 @@ public class PveClient : PveClientBase
             /// <param name="mountpoint">mount point</param>
             /// <param name="namespace_">Namespace.</param>
             /// <param name="nocow">Set the NOCOW flag on files. Disables data checksumming and causes data errors to be unrecoverable from while allowing direct I/O. Only use this if data does not need to be any more safe than on a single ext4 formatted disk with no underlying raid system.</param>
-            /// <param name="nodes">List of cluster node names.</param>
+            /// <param name="nodes">List of nodes for which the storage configuration applies.</param>
             /// <param name="nowritecache">disable write caching on the target</param>
             /// <param name="options">NFS/CIFS mount options (see 'man nfs' or 'man mount.cifs')</param>
             /// <param name="password">Password for accessing the share/datastore.</param>
@@ -13127,7 +13166,8 @@ public class PveClient : PveClientBase
             /// <param name="saferemove_throughput">Wipe throughput (cstream -t parameter value).</param>
             /// <param name="server">Server IP or DNS name.</param>
             /// <param name="server2">Backup volfile server IP or DNS name.</param>
-            /// <param name="shared">Mark storage as shared.</param>
+            /// <param name="shared">Indicate that this is a single storage with the same contents on all nodes (or all listed in the 'nodes' option). It will not make the contents of a local storage automatically accessible to other nodes, it just marks an already shared storage as such!</param>
+            /// <param name="skip_cert_verification">Disable TLS certificate verification, only enable on fully trusted networks!</param>
             /// <param name="smbversion">SMB protocol version. 'default' if not set, negotiates the highest SMB2+ version supported by both the client and server.
             ///   Enum: default,2.0,2.1,3,3.0,3.11</param>
             /// <param name="sparse">use sparse volumes</param>
@@ -13137,7 +13177,7 @@ public class PveClient : PveClientBase
             ///   Enum: tcp,rdma,unix</param>
             /// <param name="username">RBD Id.</param>
             /// <returns></returns>
-            public async Task<Result> Update(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string content_dirs = null, bool? create_base_path = null, bool? create_subdirs = null, string data_pool = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? max_protected_backups = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? port = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null)
+            public async Task<Result> Update(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string content_dirs = null, bool? create_base_path = null, bool? create_subdirs = null, string data_pool = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? max_protected_backups = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? port = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, bool? shared = null, bool? skip_cert_verification = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string transport = null, string username = null)
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("blocksize", blocksize);
@@ -13183,6 +13223,7 @@ public class PveClient : PveClientBase
                 parameters.Add("server", server);
                 parameters.Add("server2", server2);
                 parameters.Add("shared", shared);
+                parameters.Add("skip-cert-verification", skip_cert_verification);
                 parameters.Add("smbversion", smbversion);
                 parameters.Add("sparse", sparse);
                 parameters.Add("subdir", subdir);
@@ -13196,7 +13237,7 @@ public class PveClient : PveClientBase
         /// Storage index.
         /// </summary>
         /// <param name="type">Only list storage of specific type
-        ///   Enum: btrfs,cephfs,cifs,dir,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,pbs,rbd,zfs,zfspool</param>
+        ///   Enum: btrfs,cephfs,cifs,dir,esxi,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,pbs,rbd,zfs,zfspool</param>
         /// <returns></returns>
         public async Task<Result> Index(string type = null)
         {
@@ -13209,7 +13250,7 @@ public class PveClient : PveClientBase
         /// </summary>
         /// <param name="storage">The storage identifier.</param>
         /// <param name="type">Storage type.
-        ///   Enum: btrfs,cephfs,cifs,dir,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,pbs,rbd,zfs,zfspool</param>
+        ///   Enum: btrfs,cephfs,cifs,dir,esxi,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,pbs,rbd,zfs,zfspool</param>
         /// <param name="authsupported">Authsupported.</param>
         /// <param name="base_">Base volume. This volume is automatically activated.</param>
         /// <param name="blocksize">block size</param>
@@ -13243,7 +13284,7 @@ public class PveClient : PveClientBase
         /// <param name="mountpoint">mount point</param>
         /// <param name="namespace_">Namespace.</param>
         /// <param name="nocow">Set the NOCOW flag on files. Disables data checksumming and causes data errors to be unrecoverable from while allowing direct I/O. Only use this if data does not need to be any more safe than on a single ext4 formatted disk with no underlying raid system.</param>
-        /// <param name="nodes">List of cluster node names.</param>
+        /// <param name="nodes">List of nodes for which the storage configuration applies.</param>
         /// <param name="nowritecache">disable write caching on the target</param>
         /// <param name="options">NFS/CIFS mount options (see 'man nfs' or 'man mount.cifs')</param>
         /// <param name="password">Password for accessing the share/datastore.</param>
@@ -13259,7 +13300,8 @@ public class PveClient : PveClientBase
         /// <param name="server">Server IP or DNS name.</param>
         /// <param name="server2">Backup volfile server IP or DNS name.</param>
         /// <param name="share">CIFS share.</param>
-        /// <param name="shared">Mark storage as shared.</param>
+        /// <param name="shared">Indicate that this is a single storage with the same contents on all nodes (or all listed in the 'nodes' option). It will not make the contents of a local storage automatically accessible to other nodes, it just marks an already shared storage as such!</param>
+        /// <param name="skip_cert_verification">Disable TLS certificate verification, only enable on fully trusted networks!</param>
         /// <param name="smbversion">SMB protocol version. 'default' if not set, negotiates the highest SMB2+ version supported by both the client and server.
         ///   Enum: default,2.0,2.1,3,3.0,3.11</param>
         /// <param name="sparse">use sparse volumes</param>
@@ -13273,7 +13315,7 @@ public class PveClient : PveClientBase
         /// <param name="vgname">Volume group name.</param>
         /// <param name="volume">Glusterfs Volume.</param>
         /// <returns></returns>
-        public async Task<Result> Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string content_dirs = null, bool? create_base_path = null, bool? create_subdirs = null, string data_pool = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? max_protected_backups = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, int? port = null, string portal = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null)
+        public async Task<Result> Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string content_dirs = null, bool? create_base_path = null, bool? create_subdirs = null, string data_pool = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? max_protected_backups = null, int? maxfiles = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, int? port = null, string portal = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string server2 = null, string share = null, bool? shared = null, bool? skip_cert_verification = null, string smbversion = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string transport = null, string username = null, string vgname = null, string volume = null)
         {
             var parameters = new Dictionary<string, object>();
             parameters.Add("storage", storage);
@@ -13327,6 +13369,7 @@ public class PveClient : PveClientBase
             parameters.Add("server2", server2);
             parameters.Add("share", share);
             parameters.Add("shared", shared);
+            parameters.Add("skip-cert-verification", skip_cert_verification);
             parameters.Add("smbversion", smbversion);
             parameters.Add("sparse", sparse);
             parameters.Add("subdir", subdir);
@@ -14137,7 +14180,7 @@ public class PveClient : PveClientBase
                     /// <summary>
                     /// Delete a TFA entry by ID.
                     /// </summary>
-                    /// <param name="password">The current password.</param>
+                    /// <param name="password">The current password of the user performing the change.</param>
                     /// <returns></returns>
                     public async Task<Result> DeleteTfa(string password = null)
                     {
@@ -14155,7 +14198,7 @@ public class PveClient : PveClientBase
                     /// </summary>
                     /// <param name="description">A description to distinguish multiple entries from one another</param>
                     /// <param name="enable">Whether the entry should be enabled for login.</param>
-                    /// <param name="password">The current password.</param>
+                    /// <param name="password">The current password of the user performing the change.</param>
                     /// <returns></returns>
                     public async Task<Result> UpdateTfaEntry(string description = null, bool? enable = null, string password = null)
                     {
@@ -14178,7 +14221,7 @@ public class PveClient : PveClientBase
                 ///   Enum: totp,u2f,webauthn,recovery,yubico</param>
                 /// <param name="challenge">When responding to a u2f challenge: the original challenge string</param>
                 /// <param name="description">A description to distinguish multiple entries from one another</param>
-                /// <param name="password">The current password.</param>
+                /// <param name="password">The current password of the user performing the change.</param>
                 /// <param name="totp">A totp URI.</param>
                 /// <param name="value">The current value for the provided totp URI, or a Webauthn/U2F challenge response</param>
                 /// <returns></returns>
@@ -14252,12 +14295,14 @@ public class PveClient : PveClientBase
             /// </summary>
             /// <param name="password">The new password.</param>
             /// <param name="userid">Full User ID, in the `name@realm` format.</param>
+            /// <param name="confirmation_password">The current password of the user performing the change.</param>
             /// <returns></returns>
-            public async Task<Result> ChangePassword(string password, string userid)
+            public async Task<Result> ChangePassword(string password, string userid, string confirmation_password = null)
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("password", password);
                 parameters.Add("userid", userid);
+                parameters.Add("confirmation-password", confirmation_password);
                 return await _client.Set($"/access/password", parameters);
             }
         }
