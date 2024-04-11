@@ -72,7 +72,7 @@ public class PveClientBase
     /// <summary>
     /// If set to true verifies the certificate of the Proxmox API server.
     /// </summary>
-    public bool VerifyCertificate { get; set; } = false;
+    public bool ValidateCertificate { get; set; } = false;
 
     /// <summary>
     /// Get/Set the response type that is going to be returned when doing requests (json, png).
@@ -191,7 +191,7 @@ public class PveClientBase
             CookieContainer = new CookieContainer()
         };
 #pragma warning disable S4830 // Server certificates should be verified during SSL/TLS connections
-        if (!VerifyCertificate) handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+        if (!ValidateCertificate) handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
 #pragma warning restore S4830 // Server certificates should be verified during SSL/TLS connections
 
         var client = new HttpClient(handler);
