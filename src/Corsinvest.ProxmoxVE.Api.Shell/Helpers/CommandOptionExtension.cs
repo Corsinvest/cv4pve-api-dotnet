@@ -4,13 +4,13 @@
  */
 
 using Corsinvest.ProxmoxVE.Api.Extension.Utils;
-using Corsinvest.ProxmoxVE.Api.Shared;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using Microsoft.Extensions.Logging;
 using System;
 using System.CommandLine;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -38,25 +38,17 @@ For more information visit https://www.corsinvest.it/cv4pve";
     /// </summary>
     /// <param name="command"></param>
     /// <param name="name"></param>
-    /// <returns></returns>
-    public static Option GetOption(this Command command, string name)
-        => command.Options.FirstOrDefault(a => a.Name == name || a.Aliases.Contains(name));
-
-    /// <summary>
-    /// Get option
-    /// </summary>
-    /// <param name="command"></param>
-    /// <param name="name"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static Option<T> GetOption<T>(this Command command, string name) => (Option<T>)command.GetOption(name);
+    public static Option<T> GetOption<T>(this Command command, string name)
+        => (Option<T>)command.Options.FirstOrDefault(a => a.Name == name || a.Aliases.Contains(name));
 
     /// <summary>
     /// Dry run is active
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public static bool DryRunIsActive(this Command command) => command.GetOption<bool>("dry-run").GetValue();
+    public static bool DryRunIsActive(this Command command) => command.GetOption<bool>(DryRunOptionName).GetValue();
 
     /// <summary>
     /// Debug is active
@@ -97,7 +89,7 @@ For more information visit https://www.corsinvest.it/cv4pve";
     /// <returns></returns>
     public static Option<bool> DryRunOption(this Command command)
     {
-        var opt = new Option<bool>("--dry-run", "Dry run application")
+        var opt = new Option<bool>($"--{DryRunOptionName}", "Dry run application")
         {
             IsHidden = true,
         };
@@ -111,33 +103,15 @@ For more information visit https://www.corsinvest.it/cv4pve";
     /// <param name="option"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static T GetValue<T>(this Option<T> option)
-        => option.Parse(Environment.GetCommandLineArgs()).GetValueForOption(option);
+    private static T GetValue<T>(this Option<T> option) => option.Parse(Environment.GetCommandLineArgs()).GetValueForOption(option);
 
-    /// <summary>
-    /// Get value
-    /// </summary>
-    /// <param name="option"></param>
-    /// <returns></returns>
-    public static string GetValue(this Option option)
-        => option.Parse(Environment.GetCommandLineArgs()).GetValueForOption(option) + "";
-
-    /// <summary>
-    /// Get value
-    /// </summary>
-    /// <param name="argument"></param>
-    /// <returns></returns>
-    public static string GetValue(this Argument argument)
-        => argument.Parse(Environment.GetCommandLineArgs()).GetValueForArgument(argument) + "";
-
-    /// <summary>
-    /// Get value
-    /// </summary>
-    /// <param name="argument"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    public static T GetValue<T>(this Argument<T> argument)
-        => argument.Parse(Environment.GetCommandLineArgs()).GetValueForArgument(argument);
+    // /// <summary>
+    // /// Get value
+    // /// </summary>
+    // /// <param name="argument"></param>
+    // /// <typeparam name="T"></typeparam>
+    // /// <returns></returns>
+    // public static T GetValue<T>(this Argument<T> argument) => argument.Parse(Environment.GetCommandLineArgs()).GetValueForArgument(argument);
 
     /// <summary>
     /// Return if a option has value
@@ -148,19 +122,11 @@ For more information visit https://www.corsinvest.it/cv4pve";
     public static bool HasValue<T>(this Option<T> option) => option.GetValue() != null;
 
     /// <summary>
-    /// Has value
-    /// </summary>
-    /// <param name="option"></param>
-    /// <returns></returns>
-    public static bool HasValue(this Option option) => !string.IsNullOrWhiteSpace(option.GetValue());
-
-    /// <summary>
     /// Id or name option
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public static Option<string> VmIdOrNameOption(this Command command)
-        => command.AddOption<string>("--vmid", "The id or name VM/CT");
+    public static Option<string> VmIdOrNameOption(this Command command) => command.AddOption<string>("--vmid", "The id or name VM/CT");
 
     /// <summary>
     /// Ids or names option
@@ -183,32 +149,39 @@ range 100:107,-105,200:204
     }
 
     /// <summary>
-    /// Get Api token
+    /// Get Api token option
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public static Option<string> GetApiToken(this Command command) => command.GetOption<string>(ApiTokenOptionName);
+    public static Option<string> GetApiTokenOption(this Command command) => command.GetOption<string>(ApiTokenOptionName);
 
     /// <summary>
-    /// Get username
+    /// Get Validate Certificate option
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public static Option<string> GetUsername(this Command command) => command.GetOption<string>(UsernameOptionName);
+    public static Option<bool> GetValidateCertificateOption(this Command command) => command.GetOption<bool>(ValidateCertificateOptionName);
 
     /// <summary>
-    /// Get password
+    /// Get username option
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public static Option<string> GetPassword(this Command command) => command.GetOption<string>(PasswordOptionName);
+    public static Option<string> GetUsernameOption(this Command command) => command.GetOption<string>(UsernameOptionName);
 
     /// <summary>
-    /// Get host
+    /// Get password option
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public static Option<string> GetHost(this Command command) => command.GetOption<string>(HostOptionName);
+    public static Option<string> GetPasswordOption(this Command command) => command.GetOption<string>(PasswordOptionName);
+
+    /// <summary>
+    /// Get host option
+    /// </summary>
+    /// <param name="command"></param>
+    /// <returns></returns>
+    public static Option<string> GetHostOption(this Command command) => command.GetOption<string>(HostOptionName);
 
     #region Login option
     /// <summary>
@@ -220,6 +193,7 @@ range 100:107,-105,200:204
         var optApiToken = command.AddOption<string>($"--{ApiTokenOptionName}", "Api token format 'USER@REALM!TOKENID=UUID'. Require Proxmox VE 6.2 or later");
         var optUsername = command.AddOption<string>($"--{UsernameOptionName}", "User name <username>@<realm>");
         var optPassword = command.AddOption<string>($"--{PasswordOptionName}", "The password. Specify 'file:path_file' to store password in file.");
+        command.ValidateCertificateOption();
 
         var optHost = new Option<string>($"--{HostOptionName}",
                                          parseArgument: (e) =>
@@ -247,6 +221,11 @@ range 100:107,-105,200:204
     public static readonly string ApiTokenOptionName = "api-token";
 
     /// <summary>
+    /// Validate Certificate
+    /// </summary>
+    public static readonly string ValidateCertificateOptionName = "validate-certificate";
+
+    /// <summary>
     /// Host option
     /// </summary>
     public static readonly string HostOptionName = "host";
@@ -265,6 +244,11 @@ range 100:107,-105,200:204
     /// Password option
     /// </summary>
     public static readonly string DebugOptionName = "debug";
+
+    /// <summary>
+    /// Dry run
+    /// </summary>
+    public static readonly string DryRunOptionName = "dry-run";
 
     /// <summary>
     /// Host option
@@ -295,7 +279,7 @@ range 100:107,-105,200:204
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public static Option<string> Username(this Command command) => command.AddOption<string>($"--{UsernameOptionName}", "User name");
+    public static Option<string> UsernameOption(this Command command) => command.AddOption<string>($"--{UsernameOptionName}", "User name");
 
     /// <summary>
     /// Verbose
@@ -305,55 +289,28 @@ range 100:107,-105,200:204
     public static Option<bool> VerboseOption(this Command command) => command.AddOption<bool>($"--verbose|-v", "Verbose.");
 
     /// <summary>
+    /// Validate Certificate
+    /// </summary>
+    /// <param name="command"></param>
+    /// <returns></returns>
+    public static Option<bool> ValidateCertificateOption(this Command command)
+        => command.AddOption<bool>($"--{ValidateCertificateOptionName}", "Validate SSL Certificate Proxmox VE node.");
+
+    /// <summary>
     /// Try login client api
     /// </summary>
     /// <param name="command"></param>
     /// <param name="loggerFactory"></param>
     /// <returns></returns>
-    public static async Task<PveClient> ClientTryLogin(this Command command, ILoggerFactory loggerFactory)
+    public static async Task<PveClient> ClientTryLoginAsync(this Command command, ILoggerFactory loggerFactory)
     {
-        // var inApiToken= command.GetApiToken().HasValue();
-
-        // return await ClientHelper.GetClientAndTryLogin(command.GetHost().GetValue(),
-        //                                                inApiToken ? string.Empty :command.GetUsername().GetValue(),
-        //                                                inApiToken ? string.Empty : command.GetPassword().GetValue(),
-        //                                                inApiToken ? command.GetApiToken().GetValue() : string.Empty,
-        //                                                loggerFactory);
-
-        var error = "Problem connection!";
-        try
-        {
-            var client = ClientHelper.GetClientFromHA(command.GetHost().GetValue());
-            client.LoggerFactory = loggerFactory;
-
-            if (command.GetApiToken().HasValue())
-            {
-                //use api token
-                client.ApiToken = command.GetApiToken().GetValue();
-
-                //check is valid API
-                var ver = await client.Version.Version();
-                if (ver.IsSuccessStatusCode) { return client; }
-            }
-            else
-            {
-                //use user and password
-                //try login
-                if (await client.Login(command.GetUsername().GetValue(), GetPasswordFromOption(command)))
-                {
-                    return client;
-                }
-
-            }
-
-            if (!client.LastResult.IsSuccessStatusCode) { error += " " + client.LastResult.ReasonPhrase; }
-        }
-        catch (Exception ex)
-        {
-            throw new PveException(error, ex);
-        }
-
-        throw new PveException(error);
+        var inApiToken = command.GetApiTokenOption().HasValue();
+        return await ClientHelper.GetClientAndTryLoginAsync(command.GetHostOption().GetValue(),
+                                                            inApiToken ? string.Empty : command.GetUsernameOption().GetValue(),
+                                                            inApiToken ? string.Empty : command.GetPasswordOption().GetValue(),
+                                                            inApiToken ? command.GetApiTokenOption().GetValue() : string.Empty,
+                                                            command.GetValidateCertificateOption().GetValue(),
+                                                            loggerFactory);
     }
 
     /// <summary>
@@ -365,7 +322,7 @@ range 100:107,-105,200:204
     {
         const string key = "012345678901234567890123";
 
-        var password = command.GetPassword().GetValue();
+        var password = command.GetPasswordOption().GetValue();
         if (!string.IsNullOrWhiteSpace(password))
         {
             password = password.Trim();
@@ -397,16 +354,6 @@ range 100:107,-105,200:204
     /// <param name="command"></param>
     /// <returns></returns>
     public static Option<int> VmIdOption(this Command command) => command.AddOption<int>("--vmid", "The id VM/CT");
-
-    /// <summary>
-    /// Add option
-    /// </summary>
-    /// <param name="command"></param>
-    /// <param name="name"></param>
-    /// <param name="description"></param>
-    /// <returns></returns>
-    public static Option<string> AddOption(this Command command, string name, string description)
-        => command.AddOption<string>(name, description);
 
     /// <summary>
     /// Add argument
@@ -450,7 +397,7 @@ range 100:107,-105,200:204
     private static T CreateObject<T>(string name, string description) where T : IdentifierSymbol
     {
         var names = name.Split("|");
-        var obj = (T)Activator.CreateInstance(typeof(T), new[] { names[0], description });
+        var obj = (T)Activator.CreateInstance(typeof(T), [names[0], description]);
         for (int i = 1; i < names.Length; i++) { obj.AddAlias(names[i]); }
         return obj;
     }
@@ -477,12 +424,15 @@ range 100:107,-105,200:204
     /// <param name="min"></param>
     /// <param name="max"></param>
     /// <returns></returns>
-    public static Option<int> AddValidatorRange(this Option<int> option, int min, int max)
+    public static Option<T> AddValidatorRange<T>(this Option<T> option, T min, T max) where T : INumber<T>
     {
         option.AddValidator(e =>
         {
-            var value = e.GetValueOrDefault<int>();
-            if (value < min || value > max) { e.ErrorMessage = $"Option {e.Token.Value} whit value '{value}' is not in range!"; }
+            var range = e.GetValueOrDefault<T>();
+            if (range < min || range > max)
+            {
+                e.ErrorMessage = $"Option {e.Token.Value} whit value '{range}' is not in range!";
+            }
         });
 
         return option;
@@ -492,12 +442,15 @@ range 100:107,-105,200:204
     /// Add validator exist file
     /// </summary>
     /// <param name="option"></param>
-    public static Option AddValidatorExistFile(this Option option)
+    public static Option<string> AddValidatorExistFile(this Option<string> option)
     {
         option.AddValidator(e =>
         {
-            var value = e.GetValueOrDefault<string>();
-            if (!File.Exists(value)) { e.ErrorMessage = $"Option {e.Token.Value} whit value '{value}' is not a valid file!"; }
+            var fileName = e.GetValueOrDefault<string>();
+            if (!File.Exists(fileName))
+            {
+                e.ErrorMessage = $"Option {e.Token.Value} whit value '{fileName}' is not a valid file!";
+            }
         });
 
         return option;
@@ -507,12 +460,15 @@ range 100:107,-105,200:204
     /// Add validator exist directory
     /// </summary>
     /// <param name="option"></param>
-    public static Option AddValidatorExistDirectory(this Option option)
+    public static Option<string> AddValidatorExistDirectory(this Option<string> option)
     {
         option.AddValidator(e =>
         {
-            var value = e.GetValueOrDefault<string>();
-            if (!Directory.Exists(value)) { e.ErrorMessage = $"Option {e.Token.Value} whit value '{value}' is not a valid file!"; }
+            var directoryName = e.GetValueOrDefault<string>();
+            if (!Directory.Exists(directoryName))
+            {
+                e.ErrorMessage = $"Option {e.Token.Value} whit value '{directoryName}' is not a valid file!";
+            }
         });
 
         return option;
@@ -523,8 +479,9 @@ range 100:107,-105,200:204
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public static Option ScriptFileOption(this Command command)
-        => command.AddOption("--script", "Use specified hook script").AddValidatorExistFile();
+    public static Option<string> ScriptFileOption(this Command command)
+        => command.AddOption<string>("--script", "Use specified hook script")
+                  .AddValidatorExistFile();
 
     /// <summary>
     /// Timeout operation

@@ -30,8 +30,8 @@ public static class VmHelper
     /// <param name="vmName"></param>
     /// <param name="vmType"></param>
     /// <returns></returns>
-    public static async Task<HttpResponseMessage> GetConsoleNoVnc(PveClient client, string node, long vmId, string vmName, VmType vmType)
-        => await GetConsoleNoVnc(client, node, vmId, vmName, NoVncHelper.GetConsoleType(vmType));
+    public static async Task<HttpResponseMessage> GetConsoleNoVncAsync(PveClient client, string node, long vmId, string vmName, VmType vmType)
+        => await GetConsoleNoVncAsync(client, node, vmId, vmName, NoVncHelper.GetConsoleType(vmType));
 
     /// <summary>
     /// Get console NoVnc
@@ -42,7 +42,7 @@ public static class VmHelper
     /// <param name="vmName"></param>
     /// <param name="console"></param>
     /// <returns></returns>
-    public static async Task<HttpResponseMessage> GetConsoleNoVnc(PveClient client, string node, long vmId, string vmName, string console)
+    public static async Task<HttpResponseMessage> GetConsoleNoVncAsync(PveClient client, string node, long vmId, string vmName, string console)
     {
         using var httpClient = client.GetHttpClient();
         return await httpClient.GetAsync(NoVncHelper.GetConsoleUrl(client.Host,
@@ -105,7 +105,7 @@ public static class VmHelper
     /// <param name="status"></param>
     /// <returns></returns>
     /// <exception cref="InvalidEnumArgumentException"></exception>
-    public static async Task<Result> ChangeStatusVm(PveClient client, string node, VmType vmType, long vmId, VmStatus status)
+    public static async Task<Result> ChangeStatusVmAsync(PveClient client, string node, VmType vmType, long vmId, VmStatus status)
         => vmType switch
         {
             VmType.Qemu => status switch
@@ -140,16 +140,16 @@ public static class VmHelper
     /// <param name="vm"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static async Task<VmBaseStatusCurrent> GetVmStatus(PveClient client, IClusterResourceVm vm)
+    public static async Task<VmBaseStatusCurrent> GetVmStatusAsync(PveClient client, IClusterResourceVm vm)
         => vm.VmType switch
         {
-            VmType.Qemu => await client.Nodes[vm.Node].Qemu[vm.VmId].Status.Current.Get(),
-            VmType.Lxc => await client.Nodes[vm.Node].Lxc[vm.VmId].Status.Current.Get(),
+            VmType.Qemu => await client.Nodes[vm.Node].Qemu[vm.VmId].Status.Current.GetAsync(),
+            VmType.Lxc => await client.Nodes[vm.Node].Lxc[vm.VmId].Status.Current.GetAsync(),
             _ => throw new ArgumentOutOfRangeException("vm.VmType"),
         };
 
     /// <summary>
-    /// Get Vms Jolly Keys <see cref="ClientExtension.GetVms(PveClient, string)"/>
+    /// Get Vms Jolly Keys
     /// </summary>
     /// <param name="client"></param>
     /// <param name="addAll"></param>
@@ -158,15 +158,15 @@ public static class VmHelper
     /// <param name="addVmId"></param>
     /// <param name="addVmName"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<string>> GetVmsJollyKeys(PveClient client,
-                                                                  bool addAll,
-                                                                  bool addNodes,
-                                                                  bool addPools,
-                                                                  bool addVmId,
-                                                                  bool addVmName)
+    public static async Task<IEnumerable<string>> GetVmsJollyKeysAsync(PveClient client,
+                                                                       bool addAll,
+                                                                       bool addNodes,
+                                                                       bool addPools,
+                                                                       bool addVmId,
+                                                                       bool addVmName)
     {
         var vmIds = new List<string>();
-        var resources = await client.GetResources(ClusterResourceType.All);
+        var resources = await client.GetResourcesAsync(ClusterResourceType.All);
 
         if (addAll) { vmIds.Add("@all"); }
 
@@ -197,7 +197,7 @@ public static class VmHelper
     /// <param name="vms"></param>
     /// <returns></returns>
     /// <exception cref="InvalidEnumArgumentException"></exception>
-    public static async Task PopulateVmOsInfo<T>(PveClient client, IEnumerable<T> vms)
+    public static async Task PopulateVmOsInfoAsync<T>(PveClient client, IEnumerable<T> vms)
          where T : IClusterResourceVm, IClusterResourceVmOsInfo
     {
         foreach (var vm in vms)
@@ -207,7 +207,7 @@ public static class VmHelper
             {
                 case VmType.Qemu:
                     var qemuApi = client.Nodes[vm.Node].Qemu[vm.VmId];
-                    var qemuConfig = await qemuApi.Config.Get();
+                    var qemuConfig = await qemuApi.Config.GetAsync();
                     vm.OsType = qemuConfig.VmOsType;
                     vm.OsVersion = qemuConfig.OsTypeDecode;
 
@@ -217,9 +217,9 @@ public static class VmHelper
                         {
                             try
                             {
-                                vm.VmQemuAgentOsInfo = await qemuApi.Agent.GetOsinfo.Get();
+                                vm.VmQemuAgentOsInfo = await qemuApi.Agent.GetOsinfo.GetAsync();
                                 vm.OsVersion = vm.VmQemuAgentOsInfo?.Result?.OsVersion;
-                                vm.HostName = (await qemuApi.Agent.GetHostName.Get())?.Result?.HostName ?? "Error Agent data!";
+                                vm.HostName = (await qemuApi.Agent.GetHostName.GetAsync())?.Result?.HostName ?? "Error Agent data!";
                             }
                             catch
                             {
@@ -235,7 +235,7 @@ public static class VmHelper
 
                 case VmType.Lxc:
                     var lxcApi = client.Nodes[vm.Node].Lxc[vm.VmId];
-                    var lxcConfig = await lxcApi.Config.Get(true);
+                    var lxcConfig = await lxcApi.Config.GetAsync(true);
                     vm.HostName = lxcConfig.Hostname;
                     vm.OsVersion = lxcConfig.OsTypeDecode;
                     vm.OsType = lxcConfig.VmOsType;

@@ -20,7 +20,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="enabled">Optional filter for enable property.</param>
     /// <param name="full">Include group and token information.</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessUser>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveAccess.PveUsers item, bool? enabled = null, bool? full = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessUser>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveAccess.PveUsers item, bool? enabled = null, bool? full = null)
         => (await item.Index(enabled, full)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessUser>>();
 
     /// <summary>
@@ -28,7 +28,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessGroup>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveAccess.PveGroups item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessGroup>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveAccess.PveGroups item)
         => (await item.Index()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessGroup>>();
 
     /// <summary>
@@ -36,7 +36,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessRole>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveAccess.PveRoles item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessRole>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveAccess.PveRoles item)
         => (await item.Index()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessRole>>();
 
     /// <summary>
@@ -44,7 +44,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessAcl>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveAccess.PveAcl item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessAcl>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveAccess.PveAcl item)
         => (await item.ReadAcl()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessAcl>>();
 
     /// <summary>
@@ -52,7 +52,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessDomain>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveAccess.PveDomains item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessDomain>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveAccess.PveDomains item)
         => (await item.Index()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessDomain>>();
 
     /// <summary>
@@ -60,7 +60,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeTask>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveTasks item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeTask>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveTasks item)
         => (await item.Tasks()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeTask>>();
 
     /// <summary>
@@ -69,7 +69,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="item"></param>
     /// <param name="max">Maximum number of entries.</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterLog>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveLog item, int? max = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterLog>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveLog item, int? max = null)
         => (await item.Log(max)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterLog>>();
 
     /// <summary>
@@ -77,7 +77,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterStatus>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveStatus item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterStatus>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveStatus item)
         => (await item.GetStatus()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterStatus>>();
 
     /// <summary>
@@ -85,7 +85,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterBackup>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveBackup item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterBackup>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveBackup item)
         => (await item.Index()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterBackup>>();
 
     /// <summary>
@@ -93,7 +93,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterReplication>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveReplication item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterReplication>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveReplication item)
         => (await item.Index()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterReplication>>();
 
     /// <summary>
@@ -103,7 +103,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="type">
     ///   Enum: vm,storage,node,sdn</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterResource>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveResources item, string type = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterResource>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveResources item, string type = null)
         => (await item.Resources(type)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterResource>>();
 
     /// <summary>
@@ -111,7 +111,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterConfigNode>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveConfig.PveNodes item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterConfigNode>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveConfig.PveNodes item)
         => (await item.Nodes()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterConfigNode>>();
 
     /// <summary>
@@ -119,7 +119,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterHaStatusCurrent>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveHa.PveStatus.PveCurrent item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterHaStatusCurrent>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveHa.PveStatus.PveCurrent item)
         => (await item.Status()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterHaStatusCurrent>>();
 
     /// <summary>
@@ -127,7 +127,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterHaGroup>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveHa.PveGroups item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterHaGroup>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveHa.PveGroups item)
         => (await item.Index()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterHaGroup>>();
 
     /// <summary>
@@ -137,7 +137,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="type">Only list resources of specific type
     ///   Enum: ct,vm</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterHaResource>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveHa.PveResources item, string type = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterHaResource>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveHa.PveResources item, string type = null)
         => (await item.Index(type)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterHaResource>>();
 
     /// <summary>
@@ -145,7 +145,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallAlias>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveFirewall.PveAliases item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallAlias>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveFirewall.PveAliases item)
         => (await item.GetAliases()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallAlias>>();
 
     /// <summary>
@@ -153,7 +153,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallIpSet>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveFirewall.PveIpset item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallIpSet>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveFirewall.PveIpset item)
         => (await item.IpsetIndex()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallIpSet>>();
 
     /// <summary>
@@ -161,7 +161,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRule>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveFirewall.PveRules item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRule>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveFirewall.PveRules item)
         => (await item.GetRules()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRule>>();
 
     /// <summary>
@@ -169,7 +169,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallIpSetContent>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveFirewall.PveIpset.PveNameItem item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallIpSetContent>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveFirewall.PveIpset.PveNameItem item)
         => (await item.GetIpset()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallIpSetContent>>();
 
     /// <summary>
@@ -179,7 +179,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="type">Only list references of specified type.
     ///   Enum: alias,ipset</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRef>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveFirewall.PveRefs item, string type = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRef>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveFirewall.PveRefs item, string type = null)
         => (await item.Refs(type)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRef>>();
 
     /// <summary>
@@ -187,7 +187,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterFirewallGroup>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveFirewall.PveGroups item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterFirewallGroup>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveFirewall.PveGroups item)
         => (await item.ListSecurityGroups()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterFirewallGroup>>();
 
     /// <summary>
@@ -195,23 +195,26 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRule>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveFirewall.PveGroups.PveGroupItem item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRule>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveFirewall.PveGroups.PveGroupItem item)
         => (await item.GetRules()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRule>>();
 
     /// <summary>
-    /// Pool index.
+    /// List pools or get pool configuration.
     /// </summary>
     /// <param name="item"></param>
+    /// <param name="poolid"></param>
+    /// <param name="type">
+    ///   Enum: qemu,lxc,storage</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Pool.PoolItem>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PvePools item)
-        => (await item.Index()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Pool.PoolItem>>();
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Pool.PoolItem>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PvePools item, string poolid = null, string type = null)
+        => (await item.Index(poolid, type)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Pool.PoolItem>>();
 
     /// <summary>
     /// Cluster node index.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeItem>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeItem>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes item)
         => (await item.Index()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeItem>>();
 
     /// <summary>
@@ -220,7 +223,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="item"></param>
     /// <param name="guest">Only list replication jobs for this guest.</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeReplication>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveReplication item, int? guest = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeReplication>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveReplication item, int? guest = null)
         => (await item.Status(guest)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeReplication>>();
 
     /// <summary>
@@ -232,7 +235,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="type">Only list specific types of disks.
     ///   Enum: unused,journal_disks</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeDiskList>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveDisks.PveList item, bool? include_partitions = null, bool? skipsmart = null, string type = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeDiskList>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveDisks.PveList item, bool? include_partitions = null, bool? skipsmart = null, string type = null)
         => (await item.List(include_partitions, skipsmart, type)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeDiskList>>();
 
     /// <summary>
@@ -240,7 +243,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeDiskZfs>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveDisks.PveZfs item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeDiskZfs>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveDisks.PveZfs item)
         => (await item.Index()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeDiskZfs>>();
 
     /// <summary>
@@ -250,7 +253,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="pci_class_blacklist">A list of blacklisted PCI classes, which will not be returned. Following are filtered by default: Memory Controller (05), Bridge (06) and Processor (0b).</param>
     /// <param name="verbose">If disabled, does only print the PCI IDs. Otherwise, additional information like vendor and device will be returned.</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeHardwarePci>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveHardware.PvePci item, string pci_class_blacklist = null, bool? verbose = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeHardwarePci>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveHardware.PvePci item, string pci_class_blacklist = null, bool? verbose = null)
         => (await item.Pciscan(pci_class_blacklist, verbose)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeHardwarePci>>();
 
     /// <summary>
@@ -258,7 +261,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeHardwareUsb>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveHardware.PveUsb item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeHardwareUsb>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveHardware.PveUsb item)
         => (await item.Usbscan()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeHardwareUsb>>();
 
     /// <summary>
@@ -268,7 +271,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="type">Only list specific interface types.
     ///   Enum: bridge,bond,eth,alias,vlan,OVSBridge,OVSBond,OVSPort,OVSIntPort,any_bridge,any_local_bridge</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeNetwork>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveNetwork item, string type = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeNetwork>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveNetwork item, string type = null)
         => (await item.Index(type)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeNetwork>>();
 
     /// <summary>
@@ -276,7 +279,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeAptVersion>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveApt.PveVersions item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeAptVersion>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveApt.PveVersions item)
         => (await item.Versions()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeAptVersion>>();
 
     /// <summary>
@@ -284,7 +287,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeAptUpdate>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveApt.PveUpdate item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeAptUpdate>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveApt.PveUpdate item)
         => (await item.ListUpdates()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeAptUpdate>>();
 
     /// <summary>
@@ -292,7 +295,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeNetstat>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveNetstat item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeNetstat>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveNetstat item)
         => (await item.Netstat()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeNetstat>>();
 
     /// <summary>
@@ -300,7 +303,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeService>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveServices item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeService>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveServices item)
         => (await item.Index()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeService>>();
 
     /// <summary>
@@ -319,7 +322,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="userfilter">Only list tasks from this user.</param>
     /// <param name="vmid">Only list tasks for this VM.</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeTask>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveTasks item, bool? errors = null, int? limit = null, int? since = null, string source = null, int? start = null, string statusfilter = null, string typefilter = null, int? until = null, string userfilter = null, int? vmid = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeTask>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveTasks item, bool? errors = null, int? limit = null, int? since = null, string source = null, int? start = null, string statusfilter = null, string typefilter = null, int? until = null, string userfilter = null, int? vmid = null)
         => (await item.NodeTasks(errors, limit, since, source, start, statusfilter, typefilter, until, userfilter, vmid)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeTask>>();
 
     /// <summary>
@@ -331,7 +334,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="cf">The RRD consolidation function
     ///   Enum: AVERAGE,MAX</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeRrdData>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveRrddata item, string timeframe, string cf = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeRrdData>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveRrddata item, string timeframe, string cf = null)
         => (await item.Rrddata(timeframe, cf)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeRrdData>>();
 
     /// <summary>
@@ -340,7 +343,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="item"></param>
     /// <param name="full">Determine the full status of active VMs.</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeVmQemu>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu item, bool? full = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeVmQemu>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu item, bool? full = null)
         => (await item.Vmlist(full)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeVmQemu>>();
 
     /// <summary>
@@ -348,7 +351,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeVmLxc>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeVmLxc>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc item)
         => (await item.Vmlist()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeVmLxc>>();
 
     /// <summary>
@@ -361,7 +364,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="storage">Only list status for  specified storage</param>
     /// <param name="target">If target is different to 'node', we only lists shared storages which content is accessible on this 'node' and the specified 'target' node.</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeStorage>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveStorage item, string content = null, bool? enabled = null, bool? format = null, string storage = null, string target = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeStorage>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveStorage item, string content = null, bool? enabled = null, bool? format = null, string storage = null, string target = null)
         => (await item.Index(content, enabled, format, storage, target)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeStorage>>();
 
     /// <summary>
@@ -371,7 +374,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="content">Only list content of this type.</param>
     /// <param name="vmid">Only list images for this VM</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeStorageContent>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveStorage.PveStorageItem.PveContent item, string content = null, int? vmid = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeStorageContent>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveStorage.PveStorageItem.PveContent item, string content = null, int? vmid = null)
         => (await item.Index(content, vmid)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeStorageContent>>();
 
     /// <summary>
@@ -383,7 +386,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="cf">The RRD consolidation function
     ///   Enum: AVERAGE,MAX</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeStorageRrdData>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveStorage.PveStorageItem.PveRrddata item, string timeframe, string cf = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeStorageRrdData>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveStorage.PveStorageItem.PveRrddata item, string timeframe, string cf = null)
         => (await item.Rrddata(timeframe, cf)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeStorageRrdData>>();
 
     /// <summary>
@@ -393,7 +396,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="filepath">base64-path to the directory or file being listed, or "/".</param>
     /// <param name="volume">Backup volume ID or name. Currently only PBS snapshots are supported.</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeBackupFile>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveStorage.PveStorageItem.PveFileRestore.PveList item, string filepath, string volume)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeBackupFile>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveStorage.PveStorageItem.PveFileRestore.PveList item, string filepath, string volume)
         => (await item.List(filepath, volume)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeBackupFile>>();
 
     /// <summary>
@@ -401,7 +404,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeCertificate>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveCertificates.PveInfo item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeCertificate>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveCertificates.PveInfo item)
         => (await item.Info()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeCertificate>>();
 
     /// <summary>
@@ -409,7 +412,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRule>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveFirewall.PveRules item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRule>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveFirewall.PveRules item)
         => (await item.GetRules()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRule>>();
 
     /// <summary>
@@ -417,9 +420,9 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <param name="type">Only list storage of specific type
-    ///   Enum: btrfs,cephfs,cifs,dir,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,pbs,rbd,zfs,zfspool</param>
+    ///   Enum: btrfs,cephfs,cifs,dir,esxi,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,pbs,rbd,zfs,zfspool</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Storage.StorageItem>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveStorage item, string type = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Storage.StorageItem>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveStorage item, string type = null)
         => (await item.Index(type)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Storage.StorageItem>>();
 
     /// <summary>
@@ -431,7 +434,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="cf">The RRD consolidation function
     ///   Enum: AVERAGE,MAX</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmRrdData>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveRrddata item, string timeframe, string cf = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmRrdData>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveRrddata item, string timeframe, string cf = null)
         => (await item.Rrddata(timeframe, cf)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmRrdData>>();
 
     /// <summary>
@@ -439,7 +442,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmSnapshot>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveSnapshot item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmSnapshot>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveSnapshot item)
         => (await item.SnapshotList()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmSnapshot>>();
 
     /// <summary>
@@ -447,7 +450,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRule>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveFirewall.PveRules item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRule>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveFirewall.PveRules item)
         => (await item.GetRules()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRule>>();
 
     /// <summary>
@@ -455,7 +458,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallAlias>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveFirewall.PveAliases item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallAlias>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveFirewall.PveAliases item)
         => (await item.GetAliases()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallAlias>>();
 
     /// <summary>
@@ -463,7 +466,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallIpSet>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveFirewall.PveIpset item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallIpSet>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveFirewall.PveIpset item)
         => (await item.IpsetIndex()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallIpSet>>();
 
     /// <summary>
@@ -471,7 +474,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallIpSetContent>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveFirewall.PveIpset.PveNameItem item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallIpSetContent>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveFirewall.PveIpset.PveNameItem item)
         => (await item.GetIpset()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallIpSetContent>>();
 
     /// <summary>
@@ -481,7 +484,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="type">Only list references of specified type.
     ///   Enum: alias,ipset</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRef>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveFirewall.PveRefs item, string type = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRef>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveFirewall.PveRefs item, string type = null)
         => (await item.Refs(type)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRef>>();
 
     /// <summary>
@@ -489,7 +492,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.KeyValue>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PvePending item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.KeyValue>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PvePending item)
         => (await item.VmPending()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.KeyValue>>();
 
     /// <summary>
@@ -501,7 +504,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="cf">The RRD consolidation function
     ///   Enum: AVERAGE,MAX</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmRrdData>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveRrddata item, string timeframe, string cf = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmRrdData>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveRrddata item, string timeframe, string cf = null)
         => (await item.Rrddata(timeframe, cf)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmRrdData>>();
 
     /// <summary>
@@ -509,7 +512,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmSnapshot>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveSnapshot item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmSnapshot>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveSnapshot item)
         => (await item.List()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmSnapshot>>();
 
     /// <summary>
@@ -517,7 +520,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRule>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveFirewall.PveRules item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRule>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveFirewall.PveRules item)
         => (await item.GetRules()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRule>>();
 
     /// <summary>
@@ -525,7 +528,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallAlias>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveFirewall.PveAliases item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallAlias>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveFirewall.PveAliases item)
         => (await item.GetAliases()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallAlias>>();
 
     /// <summary>
@@ -533,7 +536,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallIpSet>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveFirewall.PveIpset item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallIpSet>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveFirewall.PveIpset item)
         => (await item.IpsetIndex()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallIpSet>>();
 
     /// <summary>
@@ -541,7 +544,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallIpSetContent>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveFirewall.PveIpset.PveNameItem item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallIpSetContent>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveFirewall.PveIpset.PveNameItem item)
         => (await item.GetIpset()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallIpSetContent>>();
 
     /// <summary>
@@ -551,7 +554,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="type">Only list references of specified type.
     ///   Enum: alias,ipset</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRef>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveFirewall.PveRefs item, string type = null)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRef>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveFirewall.PveRefs item, string type = null)
         => (await item.Refs(type)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRef>>();
 
     /// <summary>
@@ -559,7 +562,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.KeyValue>> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PvePending item)
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.KeyValue>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PvePending item)
         => (await item.VmPending()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.KeyValue>>();
 
 
@@ -568,7 +571,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeVersion> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveVersion item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeVersion> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveVersion item)
         => (await item.Version()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeVersion>();
 
     /// <summary>
@@ -576,7 +579,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterOptions> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveOptions item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterOptions> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveOptions item)
         => (await item.GetOptions()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterOptions>();
 
     /// <summary>
@@ -584,7 +587,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterConfigQDevice> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveConfig.PveQdevice item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterConfigQDevice> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveConfig.PveQdevice item)
         => (await item.Status()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterConfigQDevice>();
 
     /// <summary>
@@ -592,7 +595,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterConfigTotem> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveConfig.PveTotem item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterConfigTotem> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveConfig.PveTotem item)
         => (await item.Totem()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterConfigTotem>();
 
     /// <summary>
@@ -601,7 +604,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="item"></param>
     /// <param name="node">The node for which the joinee gets the nodeinfo. </param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterConfigJoin> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveConfig.PveJoin item, string node = null)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterConfigJoin> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveConfig.PveJoin item, string node = null)
         => (await item.JoinInfo(node)).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterConfigJoin>();
 
     /// <summary>
@@ -609,7 +612,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterFirewallOptions> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveFirewall.PveOptions item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterFirewallOptions> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveFirewall.PveOptions item)
         => (await item.GetOptions()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterFirewallOptions>();
 
     /// <summary>
@@ -617,7 +620,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeDns> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveDns item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeDns> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveDns item)
         => (await item.Dns()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeDns>();
 
     /// <summary>
@@ -625,7 +628,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeStatus> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveStatus item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeStatus> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveStatus item)
         => (await item.Status()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeStatus>();
 
     /// <summary>
@@ -633,7 +636,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeVersion> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveVersion item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeVersion> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveVersion item)
         => (await item.Version()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeVersion>();
 
     /// <summary>
@@ -641,7 +644,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeStorage> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveStorage.PveStorageItem.PveStatus item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeStorage> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveStorage.PveStorageItem.PveStatus item)
         => (await item.ReadStatus()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeStorage>();
 
     /// <summary>
@@ -649,7 +652,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeSubscription> GetEx(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveSubscription item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeSubscription> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveSubscription item)
         => (await item.Get()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeSubscription>();
 
     /// <summary>
@@ -659,7 +662,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="disk">Block device name</param>
     /// <param name="healthonly">If true returns only the health status</param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeDiskSmart> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveDisks.PveSmart item, string disk, bool? healthonly = null)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeDiskSmart> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveDisks.PveSmart item, string disk, bool? healthonly = null)
         => (await item.Smart(disk, healthonly)).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeDiskSmart>();
 
     /// <summary>
@@ -667,7 +670,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeDiskZfsDetail> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveDisks.PveZfs.PveNameItem item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeDiskZfsDetail> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveDisks.PveZfs.PveNameItem item)
         => (await item.Detail()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeDiskZfsDetail>();
 
     /// <summary>
@@ -675,17 +678,17 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeFirewallOptions> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveFirewall.PveOptions item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeFirewallOptions> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveFirewall.PveOptions item)
         => (await item.GetOptions()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeFirewallOptions>();
 
     /// <summary>
-    /// Get pool configuration.
+    /// Get pool configuration (deprecated, no support for nested pools, use 'GET /pools/?poolid={poolid}').
     /// </summary>
     /// <param name="item"></param>
     /// <param name="type">
     ///   Enum: qemu,lxc,storage</param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Pool.PoolDetail> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PvePools.PvePoolidItem item, string type = null)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Pool.PoolDetail> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PvePools.PvePoolidItem item, string type = null)
         => (await item.ReadPool(type)).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Pool.PoolDetail>();
 
     /// <summary>
@@ -695,7 +698,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="current">Get current values (instead of pending values).</param>
     /// <param name="snapshot">Fetch config values from given snapshot.</param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmConfigQemu> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveConfig item, bool? current = null, string snapshot = null)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmConfigQemu> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveConfig item, bool? current = null, string snapshot = null)
         => (await item.VmConfig(current, snapshot)).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmConfigQemu>();
 
     /// <summary>
@@ -703,7 +706,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentGetFsInfo> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveAgent.PveGetFsinfo item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentGetFsInfo> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveAgent.PveGetFsinfo item)
         => (await item.GetFsinfo()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentGetFsInfo>();
 
     /// <summary>
@@ -711,7 +714,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentGetHostName> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveAgent.PveGetHostName item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentGetHostName> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveAgent.PveGetHostName item)
         => (await item.GetHostName()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentGetHostName>();
 
     /// <summary>
@@ -719,7 +722,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentNetworkGetInterfaces> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveAgent.PveNetworkGetInterfaces item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentNetworkGetInterfaces> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveAgent.PveNetworkGetInterfaces item)
         => (await item.NetworkGetInterfaces()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentNetworkGetInterfaces>();
 
     /// <summary>
@@ -727,7 +730,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentInfo> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveAgent.PveInfo item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentInfo> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveAgent.PveInfo item)
         => (await item.Info()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentInfo>();
 
     /// <summary>
@@ -735,7 +738,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentOsInfo> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveAgent.PveGetOsinfo item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentOsInfo> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveAgent.PveGetOsinfo item)
         => (await item.GetOsinfo()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentOsInfo>();
 
     /// <summary>
@@ -743,7 +746,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentGetVCpus> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveAgent.PveGetVcpus item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentGetVCpus> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveAgent.PveGetVcpus item)
         => (await item.GetVcpus()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentGetVCpus>();
 
     /// <summary>
@@ -751,7 +754,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentGetTimeZone> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveAgent.PveGetTimezone item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentGetTimeZone> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveAgent.PveGetTimezone item)
         => (await item.GetTimezone()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuAgentGetTimeZone>();
 
     /// <summary>
@@ -759,7 +762,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuStatusCurrent> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveStatus.PveCurrent item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuStatusCurrent> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveStatus.PveCurrent item)
         => (await item.VmStatus()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmQemuStatusCurrent>();
 
     /// <summary>
@@ -767,7 +770,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmFirewallOptions> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveFirewall.PveOptions item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmFirewallOptions> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveFirewall.PveOptions item)
         => (await item.GetOptions()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmFirewallOptions>();
 
     /// <summary>
@@ -777,7 +780,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="current">Get current values (instead of pending values).</param>
     /// <param name="snapshot">Fetch config values from given snapshot.</param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmConfigLxc> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveConfig item, bool? current = null, string snapshot = null)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmConfigLxc> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveConfig item, bool? current = null, string snapshot = null)
         => (await item.VmConfig(current, snapshot)).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmConfigLxc>();
 
     /// <summary>
@@ -785,7 +788,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmLxcStatusCurrent> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveStatus.PveCurrent item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmLxcStatusCurrent> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveStatus.PveCurrent item)
         => (await item.VmStatus()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmLxcStatusCurrent>();
 
     /// <summary>
@@ -793,7 +796,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmFirewallOptions> Get(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveFirewall.PveOptions item)
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmFirewallOptions> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveFirewall.PveOptions item)
         => (await item.GetOptions()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmFirewallOptions>();
 
 

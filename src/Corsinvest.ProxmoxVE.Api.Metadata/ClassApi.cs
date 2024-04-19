@@ -57,8 +57,8 @@ public class ClassApi
     /// <param name="port"></param>
     /// <param name="resource"></param>
     /// <returns></returns>
-    public static async Task<ClassApi> GetFromResource(string host, int port, string resource)
-        => GetFromResource(await GeneratorClassApi.Generate(host, port), resource);
+    public static async Task<ClassApi> GetFromResourceAsync(string host, int port, string resource)
+        => GetFromResource(await GeneratorClassApi.GenerateAsync(host, port), resource);
 
     /// <summary>
     /// Get From Resource

@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using Corsinvest.ProxmoxVE.Api.Shared;
 using Microsoft.Extensions.Logging;
 using System;
 using System.CommandLine;
+using System.CommandLine.Builder;
+using System.CommandLine.Parsing;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -88,25 +89,33 @@ Good job";
     /// <returns></returns>
     public static bool ReadYesNo(string prompt, bool defaultAnswer)
     {
-        string text = defaultAnswer ? "[Y/n]" : "[y/N]";
+        var message = defaultAnswer
+                        ? "[Y/n]"
+                        : "[y/N]";
+
         while (true)
         {
-            Console.Write($"{prompt} {text}");
+            Console.Write($"{prompt} {message}");
             Console.Write(' ');
-            var text2 = Console.ReadLine()?.ToLower()?.Trim();
-            if (string.IsNullOrEmpty(text2)) { break; }
+            var input = Console.ReadLine()?.ToLower()?.Trim();
+            if (string.IsNullOrEmpty(input)) { break; }
 
-            switch (text2)
+            switch (input)
             {
                 case "n":
                 case "no":
                     return false;
+
                 case "y":
                 case "yes":
                     return true;
+
+                default:
+                    Console.WriteLine("Invalid response '" + input + "'. Please answer 'y' or 'n' or CTRL+C to exit.");
+                    break;
             }
-            Console.WriteLine("Invalid response '" + text2 + "'. Please answer 'y' or 'n' or CTRL+C to exit.");
         }
+
         return defaultAnswer;
     }
 
@@ -115,11 +124,9 @@ Good job";
     /// </summary>
     /// <returns></returns>
     public static string GetCurrentVersionApp()
-    {
-        return Assembly.GetEntryAssembly()
-              .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-              .InformationalVersion;
-    }
+        => Assembly.GetEntryAssembly()
+                   .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                   .InformationalVersion;
 
     /// <summary>
     /// Create console application.
@@ -164,29 +171,32 @@ Good job";
     /// </summary>
     /// <param name="rootCommand"></param>
     /// <param name="args"></param>
+    /// <param name="logger"></param>
     /// <returns></returns>
-    public static async Task<int> ExecuteApp(this RootCommand rootCommand, string[] args)
-    {
-        //execute command
-        try
-        {
-            return await rootCommand.InvokeAsync(args);
-        }
-        catch (Exception ex)
-        {
-            if (ex is PveException || ex is PveResultException)
-            {
-                Console.Out.WriteLine(ex.Message);
-            }
-            else
-            {
-                Console.Out.WriteLine("================ EXCEPTION ================ ");
-                Console.Out.WriteLine(ex.GetType().FullName);
-                Console.Out.WriteLine(ex.Message);
-                Console.Out.WriteLine(ex.StackTrace);
-            }
+    public static async Task<int> ExecuteAppAsync(this RootCommand rootCommand, string[] args, ILogger logger)
+        => await new CommandLineBuilder(rootCommand)
+                        .UseDefaults()
+                        .UseExceptionHandler((ex, context) =>
+                        {
+                            var exTmp = ex;
+                            while (exTmp != null)
+                            {
+                                Console.Out.WriteLine("ERROR: " + exTmp.Message);
+                                exTmp = exTmp.InnerException;
+                            }
 
-            return 1;
-        }
-    }
+                            if (rootCommand.DebugIsActive())
+                            {
+                                logger.LogError(ex, ex.Message);
+
+                                Console.Out.WriteLine("================ EXCEPTION ================ ");
+                                Console.Out.WriteLine(ex.GetType().FullName);
+                                Console.Out.WriteLine(ex.Message);
+                                Console.Out.WriteLine(ex.StackTrace);
+                            }
+
+                            context.ExitCode = 1;
+                        })
+                        .Build()
+                        .InvokeAsync(args);
 }

@@ -107,16 +107,16 @@ public class PveClientBase
     /// <param name="realm">You can optionally pass the realm using this parameter.
     /// Normally the realm is simply added to the username &lt;username&gt;@&lt;relam&gt;.</param>
     /// <param name="otp">One-time password for Two-factor authentication.</param>
-    public async Task<bool> Login(string userName, string password, string realm, string otp = null)
+    public async Task<bool> LoginAsync(string userName, string password, string realm, string otp = null)
     {
-        var result = await Create("/access/ticket",
-                                  new Dictionary<string, object>
-                                  {
-                                    {"password", password},
-                                    {"username", userName},
-                                    {"realm", realm},
-                                    {"otp", otp},
-                                  });
+        var result = await CreateAsync("/access/ticket",
+                                       new Dictionary<string, object>
+                                       {
+                                           {"password", password},
+                                           {"username", userName},
+                                           {"realm", realm},
+                                           {"otp", otp},
+                                       });
 
         if (result.IsSuccessStatusCode)
         {
@@ -137,7 +137,7 @@ public class PveClientBase
     /// <param name="userName">User name</param>
     /// <param name="password">The secret password. This can also be a valid ticket.</param>
     /// <param name="opt">One-time password for Two-factor authentication.</param>
-    public async Task<bool> Login(string userName, string password, string opt = null)
+    public async Task<bool> LoginAsync(string userName, string password, string opt = null)
     {
         _logger.LogDebug($"Login: {userName}");
 
@@ -150,7 +150,7 @@ public class PveClientBase
             userName = data[0];
             realm = data[1];
         }
-        return await Login(userName, password, realm, opt);
+        return await LoginAsync(userName, password, realm, opt);
     }
 
     /// <summary>
@@ -159,8 +159,8 @@ public class PveClientBase
     /// <param name="resource">Url request</param>
     /// <param name="parameters">Additional parameters</param>
     /// <returns>Result</returns>
-    public async Task<Result> Get(string resource, IDictionary<string, object> parameters = null)
-        => await ExecuteAction(resource, MethodType.Get, parameters);
+    public async Task<Result> GetAsync(string resource, IDictionary<string, object> parameters = null)
+        => await ExecuteActionAsync(resource, MethodType.Get, parameters);
 
     /// <summary>
     /// Execute Execute method POST
@@ -168,8 +168,8 @@ public class PveClientBase
     /// <param name="resource">Url request</param>
     /// <param name="parameters">Additional parameters</param>
     /// <returns>Result</returns>
-    public async Task<Result> Create(string resource, IDictionary<string, object> parameters = null)
-        => await ExecuteAction(resource, MethodType.Create, parameters);
+    public async Task<Result> CreateAsync(string resource, IDictionary<string, object> parameters = null)
+        => await ExecuteActionAsync(resource, MethodType.Create, parameters);
 
     /// <summary>
     /// Execute Execute method PUT
@@ -177,8 +177,8 @@ public class PveClientBase
     /// <param name="resource">Url request</param>
     /// <param name="parameters">Additional parameters</param>
     /// <returns>Result</returns>
-    public async Task<Result> Set(string resource, IDictionary<string, object> parameters = null)
-        => await ExecuteAction(resource, MethodType.Set, parameters);
+    public async Task<Result> SetAsync(string resource, IDictionary<string, object> parameters = null)
+        => await ExecuteActionAsync(resource, MethodType.Set, parameters);
 
     /// <summary>
     /// Het http client
@@ -218,12 +218,12 @@ public class PveClientBase
     /// <param name="resource">Url request</param>
     /// <param name="parameters">Additional parameters</param>
     /// <returns>Result</returns>
-    public async Task<Result> Delete(string resource, IDictionary<string, object> parameters = null)
-        => await ExecuteAction(resource, MethodType.Delete, parameters);
+    public async Task<Result> DeleteAsync(string resource, IDictionary<string, object> parameters = null)
+        => await ExecuteActionAsync(resource, MethodType.Delete, parameters);
 
-    private async Task<Result> ExecuteAction(string resource,
-                                             MethodType methodType,
-                                             IDictionary<string, object> parameters = null)
+    private async Task<Result> ExecuteActionAsync(string resource,
+                                                  MethodType methodType,
+                                                  IDictionary<string, object> parameters = null)
     {
         using var client = GetHttpClient();
 
@@ -350,9 +350,9 @@ public class PveClientBase
     /// <param name="wait"></param>
     /// <param name="timeout"></param>
     /// <returns></returns>
-    public async Task<bool> WaitForTaskToFinish(Result result, int wait = 500, long timeout = 10000)
+    public async Task<bool> WaitForTaskToFinishAsync(Result result, int wait = 500, long timeout = 10000)
         => !(result != null && !result.ResponseInError && timeout > 0) ||
-                await WaitForTaskToFinish(result.ToData(), wait, timeout);
+                await WaitForTaskToFinishAsync(result.ToData(), wait, timeout);
 
     /// <summary>
     /// Wait for task to finish
@@ -361,7 +361,7 @@ public class PveClientBase
     /// <param name="wait">Millisecond wait next check</param>
     /// <param name="timeout">Millisecond timeout</param>
     /// <return></return>
-    public async Task<bool> WaitForTaskToFinish(string task, int wait = 500, long timeout = 10000)
+    public async Task<bool> WaitForTaskToFinishAsync(string task, int wait = 500, long timeout = 10000)
     {
         var isRunning = true;
         if (wait <= 0) { wait = 500; }
@@ -371,7 +371,7 @@ public class PveClientBase
         while (isRunning && (DateTime.Now - timeStart).Milliseconds < timeout)
         {
             Thread.Sleep(wait);
-            isRunning = await TaskIsRunning(task);
+            isRunning = await TaskIsRunningAsync(task);
         }
 
         //check timeout
@@ -383,22 +383,22 @@ public class PveClientBase
     /// </summary>
     /// <param name="task"></param>
     /// <returns></returns>
-    public async Task<bool> TaskIsRunning(string task)
-        => (await ReadTaskStatus(task)).Response.data.status == "running";
+    public async Task<bool> TaskIsRunningAsync(string task)
+        => (await ReadTaskStatusAsync(task)).Response.data.status == "running";
 
     /// <summary>
     /// Get exists status task.
     /// </summary>
     /// <param name="task"></param>
     /// <returns></returns>
-    public async Task<string> GetExitStatusTask(string task)
-        => (await ReadTaskStatus(task)).Response.data.exitstatus;
+    public async Task<string> GetExitStatusTaskAsync(string task)
+        => (await ReadTaskStatusAsync(task)).Response.data.exitstatus;
 
     /// <summary>
     /// Read task status.
     /// </summary>
     /// <param name="task"></param>
     /// <returns></returns>
-    private async Task<Result> ReadTaskStatus(string task)
-        => await Get($"/nodes/{GetNodeFromTask(task)}/tasks/{task}/status");
+    private async Task<Result> ReadTaskStatusAsync(string task)
+        => await GetAsync($"/nodes/{GetNodeFromTask(task)}/tasks/{task}/status");
 }

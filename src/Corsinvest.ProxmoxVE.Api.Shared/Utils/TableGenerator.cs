@@ -77,7 +77,7 @@ public class TableGenerator
         var cols = columns.ToArray();
 
         var columnLengths = cols.Select((t, index) => rows.Select(r => r.ToArray()[index])
-                                .Union(new[] { cols[index] })
+                                .Union([cols[index]])
                                 .Where(x => x != null)
                                 .Select(x => (x + "").Length).Max())
                                 .ToList();

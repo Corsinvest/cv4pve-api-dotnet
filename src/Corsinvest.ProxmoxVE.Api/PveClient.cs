@@ -188,13 +188,13 @@ public class PveClient : PveClientBase
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("force", force);
                     parameters.Add("keep", keep);
-                    return await _client.Delete($"/cluster/replication/{_id}", parameters);
+                    return await _client.DeleteAsync($"/cluster/replication/{_id}", parameters);
                 }
                 /// <summary>
                 /// Read replication job configuration.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Read() { return await _client.Get($"/cluster/replication/{_id}"); }
+                public async Task<Result> Read() { return await _client.GetAsync($"/cluster/replication/{_id}"); }
                 /// <summary>
                 /// Update replication job configuration.
                 /// </summary>
@@ -219,14 +219,14 @@ public class PveClient : PveClientBase
                     parameters.Add("remove_job", remove_job);
                     parameters.Add("schedule", schedule);
                     parameters.Add("source", source);
-                    return await _client.Set($"/cluster/replication/{_id}", parameters);
+                    return await _client.SetAsync($"/cluster/replication/{_id}", parameters);
                 }
             }
             /// <summary>
             /// List replication jobs.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Index() { return await _client.Get($"/cluster/replication"); }
+            public async Task<Result> Index() { return await _client.GetAsync($"/cluster/replication"); }
             /// <summary>
             /// Create a new replication job
             /// </summary>
@@ -254,7 +254,7 @@ public class PveClient : PveClientBase
                 parameters.Add("remove_job", remove_job);
                 parameters.Add("schedule", schedule);
                 parameters.Add("source", source);
-                return await _client.Create($"/cluster/replication", parameters);
+                return await _client.CreateAsync($"/cluster/replication", parameters);
             }
         }
         /// <summary>
@@ -294,12 +294,12 @@ public class PveClient : PveClientBase
                     /// Remove Metric server.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Delete() { return await _client.Delete($"/cluster/metrics/server/{_id}"); }
+                    public async Task<Result> Delete() { return await _client.DeleteAsync($"/cluster/metrics/server/{_id}"); }
                     /// <summary>
                     /// Read metric server configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Read() { return await _client.Get($"/cluster/metrics/server/{_id}"); }
+                    public async Task<Result> Read() { return await _client.GetAsync($"/cluster/metrics/server/{_id}"); }
                     /// <summary>
                     /// Create a new external metric server config
                     /// </summary>
@@ -340,7 +340,7 @@ public class PveClient : PveClientBase
                         parameters.Add("timeout", timeout);
                         parameters.Add("token", token);
                         parameters.Add("verify-certificate", verify_certificate);
-                        return await _client.Create($"/cluster/metrics/server/{_id}", parameters);
+                        return await _client.CreateAsync($"/cluster/metrics/server/{_id}", parameters);
                     }
                     /// <summary>
                     /// Update metric server configuration.
@@ -383,20 +383,20 @@ public class PveClient : PveClientBase
                         parameters.Add("timeout", timeout);
                         parameters.Add("token", token);
                         parameters.Add("verify-certificate", verify_certificate);
-                        return await _client.Set($"/cluster/metrics/server/{_id}", parameters);
+                        return await _client.SetAsync($"/cluster/metrics/server/{_id}", parameters);
                     }
                 }
                 /// <summary>
                 /// List configured metric servers.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> ServerIndex() { return await _client.Get($"/cluster/metrics/server"); }
+                public async Task<Result> ServerIndex() { return await _client.GetAsync($"/cluster/metrics/server"); }
             }
             /// <summary>
             /// Metrics index.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Index() { return await _client.Get($"/cluster/metrics"); }
+            public async Task<Result> Index() { return await _client.GetAsync($"/cluster/metrics"); }
         }
         /// <summary>
         /// Notifications
@@ -468,12 +468,12 @@ public class PveClient : PveClientBase
                         /// Remove sendmail endpoint
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> DeleteSendmailEndpoint() { return await _client.Delete($"/cluster/notifications/endpoints/sendmail/{_name}"); }
+                        public async Task<Result> DeleteSendmailEndpoint() { return await _client.DeleteAsync($"/cluster/notifications/endpoints/sendmail/{_name}"); }
                         /// <summary>
                         /// Return a specific sendmail endpoint
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> GetSendmailEndpoint() { return await _client.Get($"/cluster/notifications/endpoints/sendmail/{_name}"); }
+                        public async Task<Result> GetSendmailEndpoint() { return await _client.GetAsync($"/cluster/notifications/endpoints/sendmail/{_name}"); }
                         /// <summary>
                         /// Update existing sendmail endpoint
                         /// </summary>
@@ -497,14 +497,14 @@ public class PveClient : PveClientBase
                             parameters.Add("from-address", from_address);
                             parameters.Add("mailto", mailto);
                             parameters.Add("mailto-user", mailto_user);
-                            return await _client.Set($"/cluster/notifications/endpoints/sendmail/{_name}", parameters);
+                            return await _client.SetAsync($"/cluster/notifications/endpoints/sendmail/{_name}", parameters);
                         }
                     }
                     /// <summary>
                     /// Returns a list of all sendmail endpoints
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> GetSendmailEndpoints() { return await _client.Get($"/cluster/notifications/endpoints/sendmail"); }
+                    public async Task<Result> GetSendmailEndpoints() { return await _client.GetAsync($"/cluster/notifications/endpoints/sendmail"); }
                     /// <summary>
                     /// Create a new sendmail endpoint
                     /// </summary>
@@ -526,7 +526,7 @@ public class PveClient : PveClientBase
                         parameters.Add("from-address", from_address);
                         parameters.Add("mailto", mailto);
                         parameters.Add("mailto-user", mailto_user);
-                        return await _client.Create($"/cluster/notifications/endpoints/sendmail", parameters);
+                        return await _client.CreateAsync($"/cluster/notifications/endpoints/sendmail", parameters);
                     }
                 }
                 /// <summary>
@@ -553,12 +553,12 @@ public class PveClient : PveClientBase
                         /// Remove gotify endpoint
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> DeleteGotifyEndpoint() { return await _client.Delete($"/cluster/notifications/endpoints/gotify/{_name}"); }
+                        public async Task<Result> DeleteGotifyEndpoint() { return await _client.DeleteAsync($"/cluster/notifications/endpoints/gotify/{_name}"); }
                         /// <summary>
                         /// Return a specific gotify endpoint
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> GetGotifyEndpoint() { return await _client.Get($"/cluster/notifications/endpoints/gotify/{_name}"); }
+                        public async Task<Result> GetGotifyEndpoint() { return await _client.GetAsync($"/cluster/notifications/endpoints/gotify/{_name}"); }
                         /// <summary>
                         /// Update existing gotify endpoint
                         /// </summary>
@@ -578,14 +578,14 @@ public class PveClient : PveClientBase
                             parameters.Add("disable", disable);
                             parameters.Add("server", server);
                             parameters.Add("token", token);
-                            return await _client.Set($"/cluster/notifications/endpoints/gotify/{_name}", parameters);
+                            return await _client.SetAsync($"/cluster/notifications/endpoints/gotify/{_name}", parameters);
                         }
                     }
                     /// <summary>
                     /// Returns a list of all gotify endpoints
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> GetGotifyEndpoints() { return await _client.Get($"/cluster/notifications/endpoints/gotify"); }
+                    public async Task<Result> GetGotifyEndpoints() { return await _client.GetAsync($"/cluster/notifications/endpoints/gotify"); }
                     /// <summary>
                     /// Create a new gotify endpoint
                     /// </summary>
@@ -603,7 +603,7 @@ public class PveClient : PveClientBase
                         parameters.Add("token", token);
                         parameters.Add("comment", comment);
                         parameters.Add("disable", disable);
-                        return await _client.Create($"/cluster/notifications/endpoints/gotify", parameters);
+                        return await _client.CreateAsync($"/cluster/notifications/endpoints/gotify", parameters);
                     }
                 }
                 /// <summary>
@@ -630,12 +630,12 @@ public class PveClient : PveClientBase
                         /// Remove smtp endpoint
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> DeleteSmtpEndpoint() { return await _client.Delete($"/cluster/notifications/endpoints/smtp/{_name}"); }
+                        public async Task<Result> DeleteSmtpEndpoint() { return await _client.DeleteAsync($"/cluster/notifications/endpoints/smtp/{_name}"); }
                         /// <summary>
                         /// Return a specific smtp endpoint
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> GetSmtpEndpoint() { return await _client.Get($"/cluster/notifications/endpoints/smtp/{_name}"); }
+                        public async Task<Result> GetSmtpEndpoint() { return await _client.GetAsync($"/cluster/notifications/endpoints/smtp/{_name}"); }
                         /// <summary>
                         /// Update existing smtp endpoint
                         /// </summary>
@@ -670,14 +670,14 @@ public class PveClient : PveClientBase
                             parameters.Add("port", port);
                             parameters.Add("server", server);
                             parameters.Add("username", username);
-                            return await _client.Set($"/cluster/notifications/endpoints/smtp/{_name}", parameters);
+                            return await _client.SetAsync($"/cluster/notifications/endpoints/smtp/{_name}", parameters);
                         }
                     }
                     /// <summary>
                     /// Returns a list of all smtp endpoints
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> GetSmtpEndpoints() { return await _client.Get($"/cluster/notifications/endpoints/smtp"); }
+                    public async Task<Result> GetSmtpEndpoints() { return await _client.GetAsync($"/cluster/notifications/endpoints/smtp"); }
                     /// <summary>
                     /// Create a new smtp endpoint
                     /// </summary>
@@ -710,14 +710,14 @@ public class PveClient : PveClientBase
                         parameters.Add("password", password);
                         parameters.Add("port", port);
                         parameters.Add("username", username);
-                        return await _client.Create($"/cluster/notifications/endpoints/smtp", parameters);
+                        return await _client.CreateAsync($"/cluster/notifications/endpoints/smtp", parameters);
                     }
                 }
                 /// <summary>
                 /// Index for all available endpoint types.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> EndpointsIndex() { return await _client.Get($"/cluster/notifications/endpoints"); }
+                public async Task<Result> EndpointsIndex() { return await _client.GetAsync($"/cluster/notifications/endpoints"); }
             }
             /// <summary>
             /// Targets
@@ -756,14 +756,14 @@ public class PveClient : PveClientBase
                         /// Send a test notification to a provided target.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> TestTarget() { return await _client.Create($"/cluster/notifications/targets/{_name}/test"); }
+                        public async Task<Result> TestTarget() { return await _client.CreateAsync($"/cluster/notifications/targets/{_name}/test"); }
                     }
                 }
                 /// <summary>
                 /// Returns a list of all entities that can be used as notification targets.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> GetAllTargets() { return await _client.Get($"/cluster/notifications/targets"); }
+                public async Task<Result> GetAllTargets() { return await _client.GetAsync($"/cluster/notifications/targets"); }
             }
             /// <summary>
             /// Matchers
@@ -789,12 +789,12 @@ public class PveClient : PveClientBase
                     /// Remove matcher
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> DeleteMatcher() { return await _client.Delete($"/cluster/notifications/matchers/{_name}"); }
+                    public async Task<Result> DeleteMatcher() { return await _client.DeleteAsync($"/cluster/notifications/matchers/{_name}"); }
                     /// <summary>
                     /// Return a specific matcher
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> GetMatcher() { return await _client.Get($"/cluster/notifications/matchers/{_name}"); }
+                    public async Task<Result> GetMatcher() { return await _client.GetAsync($"/cluster/notifications/matchers/{_name}"); }
                     /// <summary>
                     /// Update existing matcher
                     /// </summary>
@@ -823,14 +823,14 @@ public class PveClient : PveClientBase
                         parameters.Add("match-severity", match_severity);
                         parameters.Add("mode", mode);
                         parameters.Add("target", target);
-                        return await _client.Set($"/cluster/notifications/matchers/{_name}", parameters);
+                        return await _client.SetAsync($"/cluster/notifications/matchers/{_name}", parameters);
                     }
                 }
                 /// <summary>
                 /// Returns a list of all matchers
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> GetMatchers() { return await _client.Get($"/cluster/notifications/matchers"); }
+                public async Task<Result> GetMatchers() { return await _client.GetAsync($"/cluster/notifications/matchers"); }
                 /// <summary>
                 /// Create a new matcher
                 /// </summary>
@@ -857,14 +857,14 @@ public class PveClient : PveClientBase
                     parameters.Add("match-severity", match_severity);
                     parameters.Add("mode", mode);
                     parameters.Add("target", target);
-                    return await _client.Create($"/cluster/notifications/matchers", parameters);
+                    return await _client.CreateAsync($"/cluster/notifications/matchers", parameters);
                 }
             }
             /// <summary>
             /// Index for notification-related API endpoints.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Index() { return await _client.Get($"/cluster/notifications"); }
+            public async Task<Result> Index() { return await _client.GetAsync($"/cluster/notifications"); }
         }
         /// <summary>
         /// Config
@@ -911,7 +911,7 @@ public class PveClient : PveClientBase
                 /// Return the version of the cluster join API available on this node.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> JoinApiVersion() { return await _client.Get($"/cluster/config/apiversion"); }
+                public async Task<Result> JoinApiVersion() { return await _client.GetAsync($"/cluster/config/apiversion"); }
             }
             /// <summary>
             /// Nodes
@@ -937,7 +937,7 @@ public class PveClient : PveClientBase
                     /// Removes a node from the cluster configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Delnode() { return await _client.Delete($"/cluster/config/nodes/{_node}"); }
+                    public async Task<Result> Delnode() { return await _client.DeleteAsync($"/cluster/config/nodes/{_node}"); }
                     /// <summary>
                     /// Adds a node to the cluster configuration. This call is for internal use.
                     /// </summary>
@@ -957,14 +957,14 @@ public class PveClient : PveClientBase
                         parameters.Add("nodeid", nodeid);
                         parameters.Add("votes", votes);
                         AddIndexedParameter(parameters, "link", linkN);
-                        return await _client.Create($"/cluster/config/nodes/{_node}", parameters);
+                        return await _client.CreateAsync($"/cluster/config/nodes/{_node}", parameters);
                     }
                 }
                 /// <summary>
                 /// Corosync node list.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Nodes() { return await _client.Get($"/cluster/config/nodes"); }
+                public async Task<Result> Nodes() { return await _client.GetAsync($"/cluster/config/nodes"); }
             }
             /// <summary>
             /// Join
@@ -983,7 +983,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("node", node);
-                    return await _client.Get($"/cluster/config/join", parameters);
+                    return await _client.GetAsync($"/cluster/config/join", parameters);
                 }
                 /// <summary>
                 /// Joins this node into an existing cluster. If no links are given, default to IP resolved by node's hostname on single link (fallback fails for clusters with multiple links).
@@ -1006,7 +1006,7 @@ public class PveClient : PveClientBase
                     parameters.Add("nodeid", nodeid);
                     parameters.Add("votes", votes);
                     AddIndexedParameter(parameters, "link", linkN);
-                    return await _client.Create($"/cluster/config/join", parameters);
+                    return await _client.CreateAsync($"/cluster/config/join", parameters);
                 }
             }
             /// <summary>
@@ -1021,7 +1021,7 @@ public class PveClient : PveClientBase
                 /// Get corosync totem protocol settings.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Totem() { return await _client.Get($"/cluster/config/totem"); }
+                public async Task<Result> Totem() { return await _client.GetAsync($"/cluster/config/totem"); }
             }
             /// <summary>
             /// Qdevice
@@ -1035,13 +1035,13 @@ public class PveClient : PveClientBase
                 /// Get QDevice status
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Status() { return await _client.Get($"/cluster/config/qdevice"); }
+                public async Task<Result> Status() { return await _client.GetAsync($"/cluster/config/qdevice"); }
             }
             /// <summary>
             /// Directory index.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Index() { return await _client.Get($"/cluster/config"); }
+            public async Task<Result> Index() { return await _client.GetAsync($"/cluster/config"); }
             /// <summary>
             /// Generate new cluster configuration. If no links given, default to local IP address as link0.
             /// </summary>
@@ -1057,7 +1057,7 @@ public class PveClient : PveClientBase
                 parameters.Add("nodeid", nodeid);
                 parameters.Add("votes", votes);
                 AddIndexedParameter(parameters, "link", linkN);
-                return await _client.Create($"/cluster/config", parameters);
+                return await _client.CreateAsync($"/cluster/config", parameters);
             }
         }
         /// <summary>
@@ -1149,13 +1149,13 @@ public class PveClient : PveClientBase
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("digest", digest);
-                            return await _client.Delete($"/cluster/firewall/groups/{_group}/{_pos}", parameters);
+                            return await _client.DeleteAsync($"/cluster/firewall/groups/{_group}/{_pos}", parameters);
                         }
                         /// <summary>
                         /// Get single rule data.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> GetRule() { return await _client.Get($"/cluster/firewall/groups/{_group}/{_pos}"); }
+                        public async Task<Result> GetRule() { return await _client.GetAsync($"/cluster/firewall/groups/{_group}/{_pos}"); }
                         /// <summary>
                         /// Modify rule data.
                         /// </summary>
@@ -1197,19 +1197,19 @@ public class PveClient : PveClientBase
                             parameters.Add("source", source);
                             parameters.Add("sport", sport);
                             parameters.Add("type", type);
-                            return await _client.Set($"/cluster/firewall/groups/{_group}/{_pos}", parameters);
+                            return await _client.SetAsync($"/cluster/firewall/groups/{_group}/{_pos}", parameters);
                         }
                     }
                     /// <summary>
                     /// Delete security group.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> DeleteSecurityGroup() { return await _client.Delete($"/cluster/firewall/groups/{_group}"); }
+                    public async Task<Result> DeleteSecurityGroup() { return await _client.DeleteAsync($"/cluster/firewall/groups/{_group}"); }
                     /// <summary>
                     /// List rules.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> GetRules() { return await _client.Get($"/cluster/firewall/groups/{_group}"); }
+                    public async Task<Result> GetRules() { return await _client.GetAsync($"/cluster/firewall/groups/{_group}"); }
                     /// <summary>
                     /// Create new rule.
                     /// </summary>
@@ -1249,14 +1249,14 @@ public class PveClient : PveClientBase
                         parameters.Add("proto", proto);
                         parameters.Add("source", source);
                         parameters.Add("sport", sport);
-                        return await _client.Create($"/cluster/firewall/groups/{_group}", parameters);
+                        return await _client.CreateAsync($"/cluster/firewall/groups/{_group}", parameters);
                     }
                 }
                 /// <summary>
                 /// List security groups.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> ListSecurityGroups() { return await _client.Get($"/cluster/firewall/groups"); }
+                public async Task<Result> ListSecurityGroups() { return await _client.GetAsync($"/cluster/firewall/groups"); }
                 /// <summary>
                 /// Create new security group.
                 /// </summary>
@@ -1272,7 +1272,7 @@ public class PveClient : PveClientBase
                     parameters.Add("comment", comment);
                     parameters.Add("digest", digest);
                     parameters.Add("rename", rename);
-                    return await _client.Create($"/cluster/firewall/groups", parameters);
+                    return await _client.CreateAsync($"/cluster/firewall/groups", parameters);
                 }
             }
             /// <summary>
@@ -1304,13 +1304,13 @@ public class PveClient : PveClientBase
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("digest", digest);
-                        return await _client.Delete($"/cluster/firewall/rules/{_pos}", parameters);
+                        return await _client.DeleteAsync($"/cluster/firewall/rules/{_pos}", parameters);
                     }
                     /// <summary>
                     /// Get single rule data.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> GetRule() { return await _client.Get($"/cluster/firewall/rules/{_pos}"); }
+                    public async Task<Result> GetRule() { return await _client.GetAsync($"/cluster/firewall/rules/{_pos}"); }
                     /// <summary>
                     /// Modify rule data.
                     /// </summary>
@@ -1352,14 +1352,14 @@ public class PveClient : PveClientBase
                         parameters.Add("source", source);
                         parameters.Add("sport", sport);
                         parameters.Add("type", type);
-                        return await _client.Set($"/cluster/firewall/rules/{_pos}", parameters);
+                        return await _client.SetAsync($"/cluster/firewall/rules/{_pos}", parameters);
                     }
                 }
                 /// <summary>
                 /// List rules.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> GetRules() { return await _client.Get($"/cluster/firewall/rules"); }
+                public async Task<Result> GetRules() { return await _client.GetAsync($"/cluster/firewall/rules"); }
                 /// <summary>
                 /// Create new rule.
                 /// </summary>
@@ -1399,7 +1399,7 @@ public class PveClient : PveClientBase
                     parameters.Add("proto", proto);
                     parameters.Add("source", source);
                     parameters.Add("sport", sport);
-                    return await _client.Create($"/cluster/firewall/rules", parameters);
+                    return await _client.CreateAsync($"/cluster/firewall/rules", parameters);
                 }
             }
             /// <summary>
@@ -1448,13 +1448,13 @@ public class PveClient : PveClientBase
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("digest", digest);
-                            return await _client.Delete($"/cluster/firewall/ipset/{_name}/{_cidr}", parameters);
+                            return await _client.DeleteAsync($"/cluster/firewall/ipset/{_name}/{_cidr}", parameters);
                         }
                         /// <summary>
                         /// Read IP or Network settings from IPSet.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> ReadIp() { return await _client.Get($"/cluster/firewall/ipset/{_name}/{_cidr}"); }
+                        public async Task<Result> ReadIp() { return await _client.GetAsync($"/cluster/firewall/ipset/{_name}/{_cidr}"); }
                         /// <summary>
                         /// Update IP or Network settings
                         /// </summary>
@@ -1468,7 +1468,7 @@ public class PveClient : PveClientBase
                             parameters.Add("comment", comment);
                             parameters.Add("digest", digest);
                             parameters.Add("nomatch", nomatch);
-                            return await _client.Set($"/cluster/firewall/ipset/{_name}/{_cidr}", parameters);
+                            return await _client.SetAsync($"/cluster/firewall/ipset/{_name}/{_cidr}", parameters);
                         }
                     }
                     /// <summary>
@@ -1480,13 +1480,13 @@ public class PveClient : PveClientBase
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("force", force);
-                        return await _client.Delete($"/cluster/firewall/ipset/{_name}", parameters);
+                        return await _client.DeleteAsync($"/cluster/firewall/ipset/{_name}", parameters);
                     }
                     /// <summary>
                     /// List IPSet content
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> GetIpset() { return await _client.Get($"/cluster/firewall/ipset/{_name}"); }
+                    public async Task<Result> GetIpset() { return await _client.GetAsync($"/cluster/firewall/ipset/{_name}"); }
                     /// <summary>
                     /// Add IP or Network to IPSet.
                     /// </summary>
@@ -1500,14 +1500,14 @@ public class PveClient : PveClientBase
                         parameters.Add("cidr", cidr);
                         parameters.Add("comment", comment);
                         parameters.Add("nomatch", nomatch);
-                        return await _client.Create($"/cluster/firewall/ipset/{_name}", parameters);
+                        return await _client.CreateAsync($"/cluster/firewall/ipset/{_name}", parameters);
                     }
                 }
                 /// <summary>
                 /// List IPSets
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> IpsetIndex() { return await _client.Get($"/cluster/firewall/ipset"); }
+                public async Task<Result> IpsetIndex() { return await _client.GetAsync($"/cluster/firewall/ipset"); }
                 /// <summary>
                 /// Create new IPSet
                 /// </summary>
@@ -1523,7 +1523,7 @@ public class PveClient : PveClientBase
                     parameters.Add("comment", comment);
                     parameters.Add("digest", digest);
                     parameters.Add("rename", rename);
-                    return await _client.Create($"/cluster/firewall/ipset", parameters);
+                    return await _client.CreateAsync($"/cluster/firewall/ipset", parameters);
                 }
             }
             /// <summary>
@@ -1555,13 +1555,13 @@ public class PveClient : PveClientBase
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("digest", digest);
-                        return await _client.Delete($"/cluster/firewall/aliases/{_name}", parameters);
+                        return await _client.DeleteAsync($"/cluster/firewall/aliases/{_name}", parameters);
                     }
                     /// <summary>
                     /// Read alias.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> ReadAlias() { return await _client.Get($"/cluster/firewall/aliases/{_name}"); }
+                    public async Task<Result> ReadAlias() { return await _client.GetAsync($"/cluster/firewall/aliases/{_name}"); }
                     /// <summary>
                     /// Update IP or Network alias.
                     /// </summary>
@@ -1577,14 +1577,14 @@ public class PveClient : PveClientBase
                         parameters.Add("comment", comment);
                         parameters.Add("digest", digest);
                         parameters.Add("rename", rename);
-                        return await _client.Set($"/cluster/firewall/aliases/{_name}", parameters);
+                        return await _client.SetAsync($"/cluster/firewall/aliases/{_name}", parameters);
                     }
                 }
                 /// <summary>
                 /// List aliases
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> GetAliases() { return await _client.Get($"/cluster/firewall/aliases"); }
+                public async Task<Result> GetAliases() { return await _client.GetAsync($"/cluster/firewall/aliases"); }
                 /// <summary>
                 /// Create IP or Network Alias.
                 /// </summary>
@@ -1598,7 +1598,7 @@ public class PveClient : PveClientBase
                     parameters.Add("cidr", cidr);
                     parameters.Add("name", name);
                     parameters.Add("comment", comment);
-                    return await _client.Create($"/cluster/firewall/aliases", parameters);
+                    return await _client.CreateAsync($"/cluster/firewall/aliases", parameters);
                 }
             }
             /// <summary>
@@ -1613,7 +1613,7 @@ public class PveClient : PveClientBase
                 /// Get Firewall options.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> GetOptions() { return await _client.Get($"/cluster/firewall/options"); }
+                public async Task<Result> GetOptions() { return await _client.GetAsync($"/cluster/firewall/options"); }
                 /// <summary>
                 /// Set Firewall options.
                 /// </summary>
@@ -1637,7 +1637,7 @@ public class PveClient : PveClientBase
                     parameters.Add("log_ratelimit", log_ratelimit);
                     parameters.Add("policy_in", policy_in);
                     parameters.Add("policy_out", policy_out);
-                    return await _client.Set($"/cluster/firewall/options", parameters);
+                    return await _client.SetAsync($"/cluster/firewall/options", parameters);
                 }
             }
             /// <summary>
@@ -1652,7 +1652,7 @@ public class PveClient : PveClientBase
                 /// List available macros
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> GetMacros() { return await _client.Get($"/cluster/firewall/macros"); }
+                public async Task<Result> GetMacros() { return await _client.GetAsync($"/cluster/firewall/macros"); }
             }
             /// <summary>
             /// Refs
@@ -1672,14 +1672,14 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("type", type);
-                    return await _client.Get($"/cluster/firewall/refs", parameters);
+                    return await _client.GetAsync($"/cluster/firewall/refs", parameters);
                 }
             }
             /// <summary>
             /// Directory index.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Index() { return await _client.Get($"/cluster/firewall"); }
+            public async Task<Result> Index() { return await _client.GetAsync($"/cluster/firewall"); }
         }
         /// <summary>
         /// Backup
@@ -1718,18 +1718,18 @@ public class PveClient : PveClientBase
                     /// Returns included guests and the backup status of their disks. Optimized to be used in ExtJS tree views.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> GetVolumeBackupIncluded() { return await _client.Get($"/cluster/backup/{_id}/included_volumes"); }
+                    public async Task<Result> GetVolumeBackupIncluded() { return await _client.GetAsync($"/cluster/backup/{_id}/included_volumes"); }
                 }
                 /// <summary>
                 /// Delete vzdump backup job definition.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> DeleteJob() { return await _client.Delete($"/cluster/backup/{_id}"); }
+                public async Task<Result> DeleteJob() { return await _client.DeleteAsync($"/cluster/backup/{_id}"); }
                 /// <summary>
                 /// Read vzdump backup job definition.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> ReadJob() { return await _client.Get($"/cluster/backup/{_id}"); }
+                public async Task<Result> ReadJob() { return await _client.GetAsync($"/cluster/backup/{_id}"); }
                 /// <summary>
                 /// Update vzdump backup job definition.
                 /// </summary>
@@ -1820,14 +1820,14 @@ public class PveClient : PveClientBase
                     parameters.Add("tmpdir", tmpdir);
                     parameters.Add("vmid", vmid);
                     parameters.Add("zstd", zstd);
-                    return await _client.Set($"/cluster/backup/{_id}", parameters);
+                    return await _client.SetAsync($"/cluster/backup/{_id}", parameters);
                 }
             }
             /// <summary>
             /// List vzdump backup schedule.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Index() { return await _client.Get($"/cluster/backup"); }
+            public async Task<Result> Index() { return await _client.GetAsync($"/cluster/backup"); }
             /// <summary>
             /// Create new vzdump backup job.
             /// </summary>
@@ -1918,7 +1918,7 @@ public class PveClient : PveClientBase
                 parameters.Add("tmpdir", tmpdir);
                 parameters.Add("vmid", vmid);
                 parameters.Add("zstd", zstd);
-                return await _client.Create($"/cluster/backup", parameters);
+                return await _client.CreateAsync($"/cluster/backup", parameters);
             }
         }
         /// <summary>
@@ -1946,13 +1946,13 @@ public class PveClient : PveClientBase
                 /// Shows all guests which are not covered by any backup job.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> GetGuestsNotInBackup() { return await _client.Get($"/cluster/backup-info/not-backed-up"); }
+                public async Task<Result> GetGuestsNotInBackup() { return await _client.GetAsync($"/cluster/backup-info/not-backed-up"); }
             }
             /// <summary>
             /// Index for backup info related endpoints
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Index() { return await _client.Get($"/cluster/backup-info"); }
+            public async Task<Result> Index() { return await _client.GetAsync($"/cluster/backup-info"); }
         }
         /// <summary>
         /// Ha
@@ -2024,7 +2024,7 @@ public class PveClient : PveClientBase
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("node", node);
-                            return await _client.Create($"/cluster/ha/resources/{_sid}/migrate", parameters);
+                            return await _client.CreateAsync($"/cluster/ha/resources/{_sid}/migrate", parameters);
                         }
                     }
                     /// <summary>
@@ -2044,19 +2044,19 @@ public class PveClient : PveClientBase
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("node", node);
-                            return await _client.Create($"/cluster/ha/resources/{_sid}/relocate", parameters);
+                            return await _client.CreateAsync($"/cluster/ha/resources/{_sid}/relocate", parameters);
                         }
                     }
                     /// <summary>
                     /// Delete resource configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Delete() { return await _client.Delete($"/cluster/ha/resources/{_sid}"); }
+                    public async Task<Result> Delete() { return await _client.DeleteAsync($"/cluster/ha/resources/{_sid}"); }
                     /// <summary>
                     /// Read resource configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Read() { return await _client.Get($"/cluster/ha/resources/{_sid}"); }
+                    public async Task<Result> Read() { return await _client.GetAsync($"/cluster/ha/resources/{_sid}"); }
                     /// <summary>
                     /// Update resource configuration.
                     /// </summary>
@@ -2079,7 +2079,7 @@ public class PveClient : PveClientBase
                         parameters.Add("max_relocate", max_relocate);
                         parameters.Add("max_restart", max_restart);
                         parameters.Add("state", state);
-                        return await _client.Set($"/cluster/ha/resources/{_sid}", parameters);
+                        return await _client.SetAsync($"/cluster/ha/resources/{_sid}", parameters);
                     }
                 }
                 /// <summary>
@@ -2092,7 +2092,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("type", type);
-                    return await _client.Get($"/cluster/ha/resources", parameters);
+                    return await _client.GetAsync($"/cluster/ha/resources", parameters);
                 }
                 /// <summary>
                 /// Create a new HA resource.
@@ -2117,7 +2117,7 @@ public class PveClient : PveClientBase
                     parameters.Add("max_restart", max_restart);
                     parameters.Add("state", state);
                     parameters.Add("type", type);
-                    return await _client.Create($"/cluster/ha/resources", parameters);
+                    return await _client.CreateAsync($"/cluster/ha/resources", parameters);
                 }
             }
             /// <summary>
@@ -2144,12 +2144,12 @@ public class PveClient : PveClientBase
                     /// Delete ha group configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Delete() { return await _client.Delete($"/cluster/ha/groups/{_group}"); }
+                    public async Task<Result> Delete() { return await _client.DeleteAsync($"/cluster/ha/groups/{_group}"); }
                     /// <summary>
                     /// Read ha group configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Read() { return await _client.Get($"/cluster/ha/groups/{_group}"); }
+                    public async Task<Result> Read() { return await _client.GetAsync($"/cluster/ha/groups/{_group}"); }
                     /// <summary>
                     /// Update ha group configuration.
                     /// </summary>
@@ -2169,14 +2169,14 @@ public class PveClient : PveClientBase
                         parameters.Add("nodes", nodes);
                         parameters.Add("nofailback", nofailback);
                         parameters.Add("restricted", restricted);
-                        return await _client.Set($"/cluster/ha/groups/{_group}", parameters);
+                        return await _client.SetAsync($"/cluster/ha/groups/{_group}", parameters);
                     }
                 }
                 /// <summary>
                 /// Get HA groups.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Index() { return await _client.Get($"/cluster/ha/groups"); }
+                public async Task<Result> Index() { return await _client.GetAsync($"/cluster/ha/groups"); }
                 /// <summary>
                 /// Create a new HA group.
                 /// </summary>
@@ -2197,7 +2197,7 @@ public class PveClient : PveClientBase
                     parameters.Add("nofailback", nofailback);
                     parameters.Add("restricted", restricted);
                     parameters.Add("type", type);
-                    return await _client.Create($"/cluster/ha/groups", parameters);
+                    return await _client.CreateAsync($"/cluster/ha/groups", parameters);
                 }
             }
             /// <summary>
@@ -2230,7 +2230,7 @@ public class PveClient : PveClientBase
                     /// Get HA manger status.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Status() { return await _client.Get($"/cluster/ha/status/current"); }
+                    public async Task<Result> Status() { return await _client.GetAsync($"/cluster/ha/status/current"); }
                 }
                 /// <summary>
                 /// ManagerStatus
@@ -2244,19 +2244,19 @@ public class PveClient : PveClientBase
                     /// Get full HA manger status, including LRM status.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> ManagerStatus() { return await _client.Get($"/cluster/ha/status/manager_status"); }
+                    public async Task<Result> ManagerStatus() { return await _client.GetAsync($"/cluster/ha/status/manager_status"); }
                 }
                 /// <summary>
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Index() { return await _client.Get($"/cluster/ha/status"); }
+                public async Task<Result> Index() { return await _client.GetAsync($"/cluster/ha/status"); }
             }
             /// <summary>
             /// Directory index.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Index() { return await _client.Get($"/cluster/ha"); }
+            public async Task<Result> Index() { return await _client.GetAsync($"/cluster/ha"); }
         }
         /// <summary>
         /// Acme
@@ -2320,12 +2320,12 @@ public class PveClient : PveClientBase
                     /// Delete ACME plugin configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> DeletePlugin() { return await _client.Delete($"/cluster/acme/plugins/{_id}"); }
+                    public async Task<Result> DeletePlugin() { return await _client.DeleteAsync($"/cluster/acme/plugins/{_id}"); }
                     /// <summary>
                     /// Get ACME plugin configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> GetPluginConfig() { return await _client.Get($"/cluster/acme/plugins/{_id}"); }
+                    public async Task<Result> GetPluginConfig() { return await _client.GetAsync($"/cluster/acme/plugins/{_id}"); }
                     /// <summary>
                     /// Update ACME plugin configuration.
                     /// </summary>
@@ -2348,7 +2348,7 @@ public class PveClient : PveClientBase
                         parameters.Add("disable", disable);
                         parameters.Add("nodes", nodes);
                         parameters.Add("validation-delay", validation_delay);
-                        return await _client.Set($"/cluster/acme/plugins/{_id}", parameters);
+                        return await _client.SetAsync($"/cluster/acme/plugins/{_id}", parameters);
                     }
                 }
                 /// <summary>
@@ -2361,7 +2361,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("type", type);
-                    return await _client.Get($"/cluster/acme/plugins", parameters);
+                    return await _client.GetAsync($"/cluster/acme/plugins", parameters);
                 }
                 /// <summary>
                 /// Add ACME plugin configuration.
@@ -2386,7 +2386,7 @@ public class PveClient : PveClientBase
                     parameters.Add("disable", disable);
                     parameters.Add("nodes", nodes);
                     parameters.Add("validation-delay", validation_delay);
-                    return await _client.Create($"/cluster/acme/plugins", parameters);
+                    return await _client.CreateAsync($"/cluster/acme/plugins", parameters);
                 }
             }
             /// <summary>
@@ -2413,12 +2413,12 @@ public class PveClient : PveClientBase
                     /// Deactivate existing ACME account at CA.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> DeactivateAccount() { return await _client.Delete($"/cluster/acme/account/{_name}"); }
+                    public async Task<Result> DeactivateAccount() { return await _client.DeleteAsync($"/cluster/acme/account/{_name}"); }
                     /// <summary>
                     /// Return existing ACME account information.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> GetAccount() { return await _client.Get($"/cluster/acme/account/{_name}"); }
+                    public async Task<Result> GetAccount() { return await _client.GetAsync($"/cluster/acme/account/{_name}"); }
                     /// <summary>
                     /// Update existing ACME account information with CA. Note: not specifying any new account information triggers a refresh.
                     /// </summary>
@@ -2428,14 +2428,14 @@ public class PveClient : PveClientBase
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("contact", contact);
-                        return await _client.Set($"/cluster/acme/account/{_name}", parameters);
+                        return await _client.SetAsync($"/cluster/acme/account/{_name}", parameters);
                     }
                 }
                 /// <summary>
                 /// ACMEAccount index.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> AccountIndex() { return await _client.Get($"/cluster/acme/account"); }
+                public async Task<Result> AccountIndex() { return await _client.GetAsync($"/cluster/acme/account"); }
                 /// <summary>
                 /// Register a new ACME account with CA.
                 /// </summary>
@@ -2455,7 +2455,7 @@ public class PveClient : PveClientBase
                     parameters.Add("eab-kid", eab_kid);
                     parameters.Add("name", name);
                     parameters.Add("tos_url", tos_url);
-                    return await _client.Create($"/cluster/acme/account", parameters);
+                    return await _client.CreateAsync($"/cluster/acme/account", parameters);
                 }
             }
             /// <summary>
@@ -2475,7 +2475,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("directory", directory);
-                    return await _client.Get($"/cluster/acme/tos", parameters);
+                    return await _client.GetAsync($"/cluster/acme/tos", parameters);
                 }
             }
             /// <summary>
@@ -2495,7 +2495,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("directory", directory);
-                    return await _client.Get($"/cluster/acme/meta", parameters);
+                    return await _client.GetAsync($"/cluster/acme/meta", parameters);
                 }
             }
             /// <summary>
@@ -2510,7 +2510,7 @@ public class PveClient : PveClientBase
                 /// Get named known ACME directory endpoints.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> GetDirectories() { return await _client.Get($"/cluster/acme/directories"); }
+                public async Task<Result> GetDirectories() { return await _client.GetAsync($"/cluster/acme/directories"); }
             }
             /// <summary>
             /// ChallengeSchema
@@ -2524,13 +2524,13 @@ public class PveClient : PveClientBase
                 /// Get schema of ACME challenge types.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Challengeschema() { return await _client.Get($"/cluster/acme/challenge-schema"); }
+                public async Task<Result> Challengeschema() { return await _client.GetAsync($"/cluster/acme/challenge-schema"); }
             }
             /// <summary>
             /// ACMEAccount index.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Index() { return await _client.Get($"/cluster/acme"); }
+            public async Task<Result> Index() { return await _client.GetAsync($"/cluster/acme"); }
         }
         /// <summary>
         /// Ceph
@@ -2573,7 +2573,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("scope", scope);
-                    return await _client.Get($"/cluster/ceph/metadata", parameters);
+                    return await _client.GetAsync($"/cluster/ceph/metadata", parameters);
                 }
             }
             /// <summary>
@@ -2588,7 +2588,7 @@ public class PveClient : PveClientBase
                 /// Get ceph status.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Status() { return await _client.Get($"/cluster/ceph/status"); }
+                public async Task<Result> Status() { return await _client.GetAsync($"/cluster/ceph/status"); }
             }
             /// <summary>
             /// Flags
@@ -2614,7 +2614,7 @@ public class PveClient : PveClientBase
                     /// Get the status of a specific ceph flag.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> GetFlag() { return await _client.Get($"/cluster/ceph/flags/{_flag}"); }
+                    public async Task<Result> GetFlag() { return await _client.GetAsync($"/cluster/ceph/flags/{_flag}"); }
                     /// <summary>
                     /// Set or clear (unset) a specific ceph flag
                     /// </summary>
@@ -2624,14 +2624,14 @@ public class PveClient : PveClientBase
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("value", value);
-                        return await _client.Set($"/cluster/ceph/flags/{_flag}", parameters);
+                        return await _client.SetAsync($"/cluster/ceph/flags/{_flag}", parameters);
                     }
                 }
                 /// <summary>
                 /// get the status of all ceph flags
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> GetAllFlags() { return await _client.Get($"/cluster/ceph/flags"); }
+                public async Task<Result> GetAllFlags() { return await _client.GetAsync($"/cluster/ceph/flags"); }
                 /// <summary>
                 /// Set/Unset multiple ceph flags at once.
                 /// </summary>
@@ -2661,14 +2661,14 @@ public class PveClient : PveClientBase
                     parameters.Add("notieragent", notieragent);
                     parameters.Add("noup", noup);
                     parameters.Add("pause", pause);
-                    return await _client.Set($"/cluster/ceph/flags", parameters);
+                    return await _client.SetAsync($"/cluster/ceph/flags", parameters);
                 }
             }
             /// <summary>
             /// Cluster ceph index.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Cephindex() { return await _client.Get($"/cluster/ceph"); }
+            public async Task<Result> Cephindex() { return await _client.GetAsync($"/cluster/ceph"); }
         }
         /// <summary>
         /// Jobs
@@ -2712,12 +2712,12 @@ public class PveClient : PveClientBase
                     /// Delete realm-sync job definition.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> DeleteJob() { return await _client.Delete($"/cluster/jobs/realm-sync/{_id}"); }
+                    public async Task<Result> DeleteJob() { return await _client.DeleteAsync($"/cluster/jobs/realm-sync/{_id}"); }
                     /// <summary>
                     /// Read realm-sync job definition.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> ReadJob() { return await _client.Get($"/cluster/jobs/realm-sync/{_id}"); }
+                    public async Task<Result> ReadJob() { return await _client.GetAsync($"/cluster/jobs/realm-sync/{_id}"); }
                     /// <summary>
                     /// Create new realm-sync job.
                     /// </summary>
@@ -2740,7 +2740,7 @@ public class PveClient : PveClientBase
                         parameters.Add("realm", realm);
                         parameters.Add("remove-vanished", remove_vanished);
                         parameters.Add("scope", scope);
-                        return await _client.Create($"/cluster/jobs/realm-sync/{_id}", parameters);
+                        return await _client.CreateAsync($"/cluster/jobs/realm-sync/{_id}", parameters);
                     }
                     /// <summary>
                     /// Update realm-sync job definition.
@@ -2764,14 +2764,14 @@ public class PveClient : PveClientBase
                         parameters.Add("enabled", enabled);
                         parameters.Add("remove-vanished", remove_vanished);
                         parameters.Add("scope", scope);
-                        return await _client.Set($"/cluster/jobs/realm-sync/{_id}", parameters);
+                        return await _client.SetAsync($"/cluster/jobs/realm-sync/{_id}", parameters);
                     }
                 }
                 /// <summary>
                 /// List configured realm-sync-jobs.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> SyncjobIndex() { return await _client.Get($"/cluster/jobs/realm-sync"); }
+                public async Task<Result> SyncjobIndex() { return await _client.GetAsync($"/cluster/jobs/realm-sync"); }
             }
             /// <summary>
             /// ScheduleAnalyze
@@ -2794,14 +2794,14 @@ public class PveClient : PveClientBase
                     parameters.Add("schedule", schedule);
                     parameters.Add("iterations", iterations);
                     parameters.Add("starttime", starttime);
-                    return await _client.Get($"/cluster/jobs/schedule-analyze", parameters);
+                    return await _client.GetAsync($"/cluster/jobs/schedule-analyze", parameters);
                 }
             }
             /// <summary>
             /// Index for jobs related endpoints.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Index() { return await _client.Get($"/cluster/jobs"); }
+            public async Task<Result> Index() { return await _client.GetAsync($"/cluster/jobs"); }
         }
         /// <summary>
         /// Mapping
@@ -2845,12 +2845,12 @@ public class PveClient : PveClientBase
                     /// Remove Hardware Mapping.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Delete() { return await _client.Delete($"/cluster/mapping/pci/{_id}"); }
+                    public async Task<Result> Delete() { return await _client.DeleteAsync($"/cluster/mapping/pci/{_id}"); }
                     /// <summary>
                     /// Get PCI Mapping.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Get() { return await _client.Get($"/cluster/mapping/pci/{_id}"); }
+                    public async Task<Result> Get() { return await _client.GetAsync($"/cluster/mapping/pci/{_id}"); }
                     /// <summary>
                     /// Update a hardware mapping.
                     /// </summary>
@@ -2868,7 +2868,7 @@ public class PveClient : PveClientBase
                         parameters.Add("digest", digest);
                         parameters.Add("map", map);
                         parameters.Add("mdev", mdev);
-                        return await _client.Set($"/cluster/mapping/pci/{_id}", parameters);
+                        return await _client.SetAsync($"/cluster/mapping/pci/{_id}", parameters);
                     }
                 }
                 /// <summary>
@@ -2880,7 +2880,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("check-node", check_node);
-                    return await _client.Get($"/cluster/mapping/pci", parameters);
+                    return await _client.GetAsync($"/cluster/mapping/pci", parameters);
                 }
                 /// <summary>
                 /// Create a new hardware mapping.
@@ -2897,7 +2897,7 @@ public class PveClient : PveClientBase
                     parameters.Add("map", map);
                     parameters.Add("description", description);
                     parameters.Add("mdev", mdev);
-                    return await _client.Create($"/cluster/mapping/pci", parameters);
+                    return await _client.CreateAsync($"/cluster/mapping/pci", parameters);
                 }
             }
             /// <summary>
@@ -2924,12 +2924,12 @@ public class PveClient : PveClientBase
                     /// Remove Hardware Mapping.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Delete() { return await _client.Delete($"/cluster/mapping/usb/{_id}"); }
+                    public async Task<Result> Delete() { return await _client.DeleteAsync($"/cluster/mapping/usb/{_id}"); }
                     /// <summary>
                     /// Get USB Mapping.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Get() { return await _client.Get($"/cluster/mapping/usb/{_id}"); }
+                    public async Task<Result> Get() { return await _client.GetAsync($"/cluster/mapping/usb/{_id}"); }
                     /// <summary>
                     /// Update a hardware mapping.
                     /// </summary>
@@ -2945,7 +2945,7 @@ public class PveClient : PveClientBase
                         parameters.Add("delete", delete);
                         parameters.Add("description", description);
                         parameters.Add("digest", digest);
-                        return await _client.Set($"/cluster/mapping/usb/{_id}", parameters);
+                        return await _client.SetAsync($"/cluster/mapping/usb/{_id}", parameters);
                     }
                 }
                 /// <summary>
@@ -2957,7 +2957,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("check-node", check_node);
-                    return await _client.Get($"/cluster/mapping/usb", parameters);
+                    return await _client.GetAsync($"/cluster/mapping/usb", parameters);
                 }
                 /// <summary>
                 /// Create a new hardware mapping.
@@ -2972,14 +2972,14 @@ public class PveClient : PveClientBase
                     parameters.Add("id", id);
                     parameters.Add("map", map);
                     parameters.Add("description", description);
-                    return await _client.Create($"/cluster/mapping/usb", parameters);
+                    return await _client.CreateAsync($"/cluster/mapping/usb", parameters);
                 }
             }
             /// <summary>
             /// List resource types.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Index() { return await _client.Get($"/cluster/mapping"); }
+            public async Task<Result> Index() { return await _client.GetAsync($"/cluster/mapping"); }
         }
         /// <summary>
         /// Sdn
@@ -3073,7 +3073,7 @@ public class PveClient : PveClientBase
                             /// Delete sdn subnet object configuration.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> Delete() { return await _client.Delete($"/cluster/sdn/vnets/{_vnet}/subnets/{_subnet}"); }
+                            public async Task<Result> Delete() { return await _client.DeleteAsync($"/cluster/sdn/vnets/{_vnet}/subnets/{_subnet}"); }
                             /// <summary>
                             /// Read sdn subnet configuration.
                             /// </summary>
@@ -3085,7 +3085,7 @@ public class PveClient : PveClientBase
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("pending", pending);
                                 parameters.Add("running", running);
-                                return await _client.Get($"/cluster/sdn/vnets/{_vnet}/subnets/{_subnet}", parameters);
+                                return await _client.GetAsync($"/cluster/sdn/vnets/{_vnet}/subnets/{_subnet}", parameters);
                             }
                             /// <summary>
                             /// Update sdn subnet object configuration.
@@ -3108,7 +3108,7 @@ public class PveClient : PveClientBase
                                 parameters.Add("dnszoneprefix", dnszoneprefix);
                                 parameters.Add("gateway", gateway);
                                 parameters.Add("snat", snat);
-                                return await _client.Set($"/cluster/sdn/vnets/{_vnet}/subnets/{_subnet}", parameters);
+                                return await _client.SetAsync($"/cluster/sdn/vnets/{_vnet}/subnets/{_subnet}", parameters);
                             }
                         }
                         /// <summary>
@@ -3122,7 +3122,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("pending", pending);
                             parameters.Add("running", running);
-                            return await _client.Get($"/cluster/sdn/vnets/{_vnet}/subnets", parameters);
+                            return await _client.GetAsync($"/cluster/sdn/vnets/{_vnet}/subnets", parameters);
                         }
                         /// <summary>
                         /// Create a new sdn subnet object.
@@ -3146,7 +3146,7 @@ public class PveClient : PveClientBase
                             parameters.Add("dnszoneprefix", dnszoneprefix);
                             parameters.Add("gateway", gateway);
                             parameters.Add("snat", snat);
-                            return await _client.Create($"/cluster/sdn/vnets/{_vnet}/subnets", parameters);
+                            return await _client.CreateAsync($"/cluster/sdn/vnets/{_vnet}/subnets", parameters);
                         }
                     }
                     /// <summary>
@@ -3170,7 +3170,7 @@ public class PveClient : PveClientBase
                             parameters.Add("ip", ip);
                             parameters.Add("zone", zone);
                             parameters.Add("mac", mac);
-                            return await _client.Delete($"/cluster/sdn/vnets/{_vnet}/ips", parameters);
+                            return await _client.DeleteAsync($"/cluster/sdn/vnets/{_vnet}/ips", parameters);
                         }
                         /// <summary>
                         /// Create IP Mapping in a VNet
@@ -3185,7 +3185,7 @@ public class PveClient : PveClientBase
                             parameters.Add("ip", ip);
                             parameters.Add("zone", zone);
                             parameters.Add("mac", mac);
-                            return await _client.Create($"/cluster/sdn/vnets/{_vnet}/ips", parameters);
+                            return await _client.CreateAsync($"/cluster/sdn/vnets/{_vnet}/ips", parameters);
                         }
                         /// <summary>
                         /// Update IP Mapping in a VNet
@@ -3202,14 +3202,14 @@ public class PveClient : PveClientBase
                             parameters.Add("zone", zone);
                             parameters.Add("mac", mac);
                             parameters.Add("vmid", vmid);
-                            return await _client.Set($"/cluster/sdn/vnets/{_vnet}/ips", parameters);
+                            return await _client.SetAsync($"/cluster/sdn/vnets/{_vnet}/ips", parameters);
                         }
                     }
                     /// <summary>
                     /// Delete sdn vnet object configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Delete() { return await _client.Delete($"/cluster/sdn/vnets/{_vnet}"); }
+                    public async Task<Result> Delete() { return await _client.DeleteAsync($"/cluster/sdn/vnets/{_vnet}"); }
                     /// <summary>
                     /// Read sdn vnet configuration.
                     /// </summary>
@@ -3221,7 +3221,7 @@ public class PveClient : PveClientBase
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("pending", pending);
                         parameters.Add("running", running);
-                        return await _client.Get($"/cluster/sdn/vnets/{_vnet}", parameters);
+                        return await _client.GetAsync($"/cluster/sdn/vnets/{_vnet}", parameters);
                     }
                     /// <summary>
                     /// Update sdn vnet object configuration.
@@ -3242,7 +3242,7 @@ public class PveClient : PveClientBase
                         parameters.Add("tag", tag);
                         parameters.Add("vlanaware", vlanaware);
                         parameters.Add("zone", zone);
-                        return await _client.Set($"/cluster/sdn/vnets/{_vnet}", parameters);
+                        return await _client.SetAsync($"/cluster/sdn/vnets/{_vnet}", parameters);
                     }
                 }
                 /// <summary>
@@ -3256,7 +3256,7 @@ public class PveClient : PveClientBase
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("pending", pending);
                     parameters.Add("running", running);
-                    return await _client.Get($"/cluster/sdn/vnets", parameters);
+                    return await _client.GetAsync($"/cluster/sdn/vnets", parameters);
                 }
                 /// <summary>
                 /// Create a new sdn vnet object.
@@ -3278,7 +3278,7 @@ public class PveClient : PveClientBase
                     parameters.Add("tag", tag);
                     parameters.Add("type", type);
                     parameters.Add("vlanaware", vlanaware);
-                    return await _client.Create($"/cluster/sdn/vnets", parameters);
+                    return await _client.CreateAsync($"/cluster/sdn/vnets", parameters);
                 }
             }
             /// <summary>
@@ -3305,7 +3305,7 @@ public class PveClient : PveClientBase
                     /// Delete sdn zone object configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Delete() { return await _client.Delete($"/cluster/sdn/zones/{_zone}"); }
+                    public async Task<Result> Delete() { return await _client.DeleteAsync($"/cluster/sdn/zones/{_zone}"); }
                     /// <summary>
                     /// Read sdn zone configuration.
                     /// </summary>
@@ -3317,7 +3317,7 @@ public class PveClient : PveClientBase
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("pending", pending);
                         parameters.Add("running", running);
-                        return await _client.Get($"/cluster/sdn/zones/{_zone}", parameters);
+                        return await _client.GetAsync($"/cluster/sdn/zones/{_zone}", parameters);
                     }
                     /// <summary>
                     /// Update sdn zone object configuration.
@@ -3378,7 +3378,7 @@ public class PveClient : PveClientBase
                         parameters.Add("vlan-protocol", vlan_protocol);
                         parameters.Add("vrf-vxlan", vrf_vxlan);
                         parameters.Add("vxlan-port", vxlan_port);
-                        return await _client.Set($"/cluster/sdn/zones/{_zone}", parameters);
+                        return await _client.SetAsync($"/cluster/sdn/zones/{_zone}", parameters);
                     }
                 }
                 /// <summary>
@@ -3395,7 +3395,7 @@ public class PveClient : PveClientBase
                     parameters.Add("pending", pending);
                     parameters.Add("running", running);
                     parameters.Add("type", type);
-                    return await _client.Get($"/cluster/sdn/zones", parameters);
+                    return await _client.GetAsync($"/cluster/sdn/zones", parameters);
                 }
                 /// <summary>
                 /// Create a new sdn zone object.
@@ -3457,7 +3457,7 @@ public class PveClient : PveClientBase
                     parameters.Add("vlan-protocol", vlan_protocol);
                     parameters.Add("vrf-vxlan", vrf_vxlan);
                     parameters.Add("vxlan-port", vxlan_port);
-                    return await _client.Create($"/cluster/sdn/zones", parameters);
+                    return await _client.CreateAsync($"/cluster/sdn/zones", parameters);
                 }
             }
             /// <summary>
@@ -3484,7 +3484,7 @@ public class PveClient : PveClientBase
                     /// Delete sdn controller object configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Delete() { return await _client.Delete($"/cluster/sdn/controllers/{_controller}"); }
+                    public async Task<Result> Delete() { return await _client.DeleteAsync($"/cluster/sdn/controllers/{_controller}"); }
                     /// <summary>
                     /// Read sdn controller configuration.
                     /// </summary>
@@ -3496,7 +3496,7 @@ public class PveClient : PveClientBase
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("pending", pending);
                         parameters.Add("running", running);
-                        return await _client.Get($"/cluster/sdn/controllers/{_controller}", parameters);
+                        return await _client.GetAsync($"/cluster/sdn/controllers/{_controller}", parameters);
                     }
                     /// <summary>
                     /// Update sdn controller object configuration.
@@ -3529,7 +3529,7 @@ public class PveClient : PveClientBase
                         parameters.Add("loopback", loopback);
                         parameters.Add("node", node);
                         parameters.Add("peers", peers);
-                        return await _client.Set($"/cluster/sdn/controllers/{_controller}", parameters);
+                        return await _client.SetAsync($"/cluster/sdn/controllers/{_controller}", parameters);
                     }
                 }
                 /// <summary>
@@ -3546,7 +3546,7 @@ public class PveClient : PveClientBase
                     parameters.Add("pending", pending);
                     parameters.Add("running", running);
                     parameters.Add("type", type);
-                    return await _client.Get($"/cluster/sdn/controllers", parameters);
+                    return await _client.GetAsync($"/cluster/sdn/controllers", parameters);
                 }
                 /// <summary>
                 /// Create a new sdn controller object.
@@ -3580,7 +3580,7 @@ public class PveClient : PveClientBase
                     parameters.Add("loopback", loopback);
                     parameters.Add("node", node);
                     parameters.Add("peers", peers);
-                    return await _client.Create($"/cluster/sdn/controllers", parameters);
+                    return await _client.CreateAsync($"/cluster/sdn/controllers", parameters);
                 }
             }
             /// <summary>
@@ -3620,18 +3620,18 @@ public class PveClient : PveClientBase
                         /// List PVE IPAM Entries
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Ipamindex() { return await _client.Get($"/cluster/sdn/ipams/{_ipam}/status"); }
+                        public async Task<Result> Ipamindex() { return await _client.GetAsync($"/cluster/sdn/ipams/{_ipam}/status"); }
                     }
                     /// <summary>
                     /// Delete sdn ipam object configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Delete() { return await _client.Delete($"/cluster/sdn/ipams/{_ipam}"); }
+                    public async Task<Result> Delete() { return await _client.DeleteAsync($"/cluster/sdn/ipams/{_ipam}"); }
                     /// <summary>
                     /// Read sdn ipam configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Read() { return await _client.Get($"/cluster/sdn/ipams/{_ipam}"); }
+                    public async Task<Result> Read() { return await _client.GetAsync($"/cluster/sdn/ipams/{_ipam}"); }
                     /// <summary>
                     /// Update sdn ipam object configuration.
                     /// </summary>
@@ -3649,7 +3649,7 @@ public class PveClient : PveClientBase
                         parameters.Add("section", section);
                         parameters.Add("token", token);
                         parameters.Add("url", url);
-                        return await _client.Set($"/cluster/sdn/ipams/{_ipam}", parameters);
+                        return await _client.SetAsync($"/cluster/sdn/ipams/{_ipam}", parameters);
                     }
                 }
                 /// <summary>
@@ -3662,7 +3662,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("type", type);
-                    return await _client.Get($"/cluster/sdn/ipams", parameters);
+                    return await _client.GetAsync($"/cluster/sdn/ipams", parameters);
                 }
                 /// <summary>
                 /// Create a new sdn ipam object.
@@ -3682,7 +3682,7 @@ public class PveClient : PveClientBase
                     parameters.Add("section", section);
                     parameters.Add("token", token);
                     parameters.Add("url", url);
-                    return await _client.Create($"/cluster/sdn/ipams", parameters);
+                    return await _client.CreateAsync($"/cluster/sdn/ipams", parameters);
                 }
             }
             /// <summary>
@@ -3709,12 +3709,12 @@ public class PveClient : PveClientBase
                     /// Delete sdn dns object configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Delete() { return await _client.Delete($"/cluster/sdn/dns/{_dns}"); }
+                    public async Task<Result> Delete() { return await _client.DeleteAsync($"/cluster/sdn/dns/{_dns}"); }
                     /// <summary>
                     /// Read sdn dns configuration.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Read() { return await _client.Get($"/cluster/sdn/dns/{_dns}"); }
+                    public async Task<Result> Read() { return await _client.GetAsync($"/cluster/sdn/dns/{_dns}"); }
                     /// <summary>
                     /// Update sdn dns object configuration.
                     /// </summary>
@@ -3734,7 +3734,7 @@ public class PveClient : PveClientBase
                         parameters.Add("reversemaskv6", reversemaskv6);
                         parameters.Add("ttl", ttl);
                         parameters.Add("url", url);
-                        return await _client.Set($"/cluster/sdn/dns/{_dns}", parameters);
+                        return await _client.SetAsync($"/cluster/sdn/dns/{_dns}", parameters);
                     }
                 }
                 /// <summary>
@@ -3747,7 +3747,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("type", type);
-                    return await _client.Get($"/cluster/sdn/dns", parameters);
+                    return await _client.GetAsync($"/cluster/sdn/dns", parameters);
                 }
                 /// <summary>
                 /// Create a new sdn dns object.
@@ -3771,19 +3771,19 @@ public class PveClient : PveClientBase
                     parameters.Add("reversemaskv6", reversemaskv6);
                     parameters.Add("reversev6mask", reversev6mask);
                     parameters.Add("ttl", ttl);
-                    return await _client.Create($"/cluster/sdn/dns", parameters);
+                    return await _client.CreateAsync($"/cluster/sdn/dns", parameters);
                 }
             }
             /// <summary>
             /// Directory index.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Index() { return await _client.Get($"/cluster/sdn"); }
+            public async Task<Result> Index() { return await _client.GetAsync($"/cluster/sdn"); }
             /// <summary>
             /// Apply sdn controller changes &amp;&amp; reload.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Reload() { return await _client.Set($"/cluster/sdn"); }
+            public async Task<Result> Reload() { return await _client.SetAsync($"/cluster/sdn"); }
         }
         /// <summary>
         /// Log
@@ -3802,7 +3802,7 @@ public class PveClient : PveClientBase
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("max", max);
-                return await _client.Get($"/cluster/log", parameters);
+                return await _client.GetAsync($"/cluster/log", parameters);
             }
         }
         /// <summary>
@@ -3823,7 +3823,7 @@ public class PveClient : PveClientBase
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("type", type);
-                return await _client.Get($"/cluster/resources", parameters);
+                return await _client.GetAsync($"/cluster/resources", parameters);
             }
         }
         /// <summary>
@@ -3838,7 +3838,7 @@ public class PveClient : PveClientBase
             /// List recent tasks (cluster wide).
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Tasks() { return await _client.Get($"/cluster/tasks"); }
+            public async Task<Result> Tasks() { return await _client.GetAsync($"/cluster/tasks"); }
         }
         /// <summary>
         /// Options
@@ -3852,7 +3852,7 @@ public class PveClient : PveClientBase
             /// Get datacenter options. Without 'Sys.Audit' on '/' not all options are returned.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> GetOptions() { return await _client.Get($"/cluster/options"); }
+            public async Task<Result> GetOptions() { return await _client.GetAsync($"/cluster/options"); }
             /// <summary>
             /// Set datacenter options.
             /// </summary>
@@ -3908,7 +3908,7 @@ public class PveClient : PveClientBase
                 parameters.Add("u2f", u2f);
                 parameters.Add("user-tag-access", user_tag_access);
                 parameters.Add("webauthn", webauthn);
-                return await _client.Set($"/cluster/options", parameters);
+                return await _client.SetAsync($"/cluster/options", parameters);
             }
         }
         /// <summary>
@@ -3923,7 +3923,7 @@ public class PveClient : PveClientBase
             /// Get cluster status information.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> GetStatus() { return await _client.Get($"/cluster/status"); }
+            public async Task<Result> GetStatus() { return await _client.GetAsync($"/cluster/status"); }
         }
         /// <summary>
         /// Nextid
@@ -3942,14 +3942,14 @@ public class PveClient : PveClientBase
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("vmid", vmid);
-                return await _client.Get($"/cluster/nextid", parameters);
+                return await _client.GetAsync($"/cluster/nextid", parameters);
             }
         }
         /// <summary>
         /// Cluster index.
         /// </summary>
         /// <returns></returns>
-        public async Task<Result> Index() { return await _client.Get($"/cluster"); }
+        public async Task<Result> Index() { return await _client.GetAsync($"/cluster"); }
     }
     /// <summary>
     /// Nodes
@@ -4415,13 +4415,13 @@ public class PveClient : PveClientBase
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("digest", digest);
-                                    return await _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", parameters);
+                                    return await _client.DeleteAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", parameters);
                                 }
                                 /// <summary>
                                 /// Get single rule data.
                                 /// </summary>
                                 /// <returns></returns>
-                                public async Task<Result> GetRule() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}"); }
+                                public async Task<Result> GetRule() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}"); }
                                 /// <summary>
                                 /// Modify rule data.
                                 /// </summary>
@@ -4463,14 +4463,14 @@ public class PveClient : PveClientBase
                                     parameters.Add("source", source);
                                     parameters.Add("sport", sport);
                                     parameters.Add("type", type);
-                                    return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", parameters);
+                                    return await _client.SetAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/rules/{_pos}", parameters);
                                 }
                             }
                             /// <summary>
                             /// List rules.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> GetRules() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/rules"); }
+                            public async Task<Result> GetRules() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/rules"); }
                             /// <summary>
                             /// Create new rule.
                             /// </summary>
@@ -4510,7 +4510,7 @@ public class PveClient : PveClientBase
                                 parameters.Add("proto", proto);
                                 parameters.Add("source", source);
                                 parameters.Add("sport", sport);
-                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/firewall/rules", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/rules", parameters);
                             }
                         }
                         /// <summary>
@@ -4554,13 +4554,13 @@ public class PveClient : PveClientBase
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("digest", digest);
-                                    return await _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", parameters);
+                                    return await _client.DeleteAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", parameters);
                                 }
                                 /// <summary>
                                 /// Read alias.
                                 /// </summary>
                                 /// <returns></returns>
-                                public async Task<Result> ReadAlias() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}"); }
+                                public async Task<Result> ReadAlias() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}"); }
                                 /// <summary>
                                 /// Update IP or Network alias.
                                 /// </summary>
@@ -4576,14 +4576,14 @@ public class PveClient : PveClientBase
                                     parameters.Add("comment", comment);
                                     parameters.Add("digest", digest);
                                     parameters.Add("rename", rename);
-                                    return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", parameters);
+                                    return await _client.SetAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases/{_name}", parameters);
                                 }
                             }
                             /// <summary>
                             /// List aliases
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> GetAliases() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases"); }
+                            public async Task<Result> GetAliases() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases"); }
                             /// <summary>
                             /// Create IP or Network Alias.
                             /// </summary>
@@ -4597,7 +4597,7 @@ public class PveClient : PveClientBase
                                 parameters.Add("cidr", cidr);
                                 parameters.Add("name", name);
                                 parameters.Add("comment", comment);
-                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/aliases", parameters);
                             }
                         }
                         /// <summary>
@@ -4662,13 +4662,13 @@ public class PveClient : PveClientBase
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("digest", digest);
-                                        return await _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
+                                        return await _client.DeleteAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
                                     }
                                     /// <summary>
                                     /// Read IP or Network settings from IPSet.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public async Task<Result> ReadIp() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}"); }
+                                    public async Task<Result> ReadIp() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}"); }
                                     /// <summary>
                                     /// Update IP or Network settings
                                     /// </summary>
@@ -4682,7 +4682,7 @@ public class PveClient : PveClientBase
                                         parameters.Add("comment", comment);
                                         parameters.Add("digest", digest);
                                         parameters.Add("nomatch", nomatch);
-                                        return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
+                                        return await _client.SetAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
                                     }
                                 }
                                 /// <summary>
@@ -4694,13 +4694,13 @@ public class PveClient : PveClientBase
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("force", force);
-                                    return await _client.Delete($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}", parameters);
+                                    return await _client.DeleteAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}", parameters);
                                 }
                                 /// <summary>
                                 /// List IPSet content
                                 /// </summary>
                                 /// <returns></returns>
-                                public async Task<Result> GetIpset() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}"); }
+                                public async Task<Result> GetIpset() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}"); }
                                 /// <summary>
                                 /// Add IP or Network to IPSet.
                                 /// </summary>
@@ -4714,14 +4714,14 @@ public class PveClient : PveClientBase
                                     parameters.Add("cidr", cidr);
                                     parameters.Add("comment", comment);
                                     parameters.Add("nomatch", nomatch);
-                                    return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}", parameters);
+                                    return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset/{_name}", parameters);
                                 }
                             }
                             /// <summary>
                             /// List IPSets
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> IpsetIndex() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset"); }
+                            public async Task<Result> IpsetIndex() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset"); }
                             /// <summary>
                             /// Create new IPSet
                             /// </summary>
@@ -4737,7 +4737,7 @@ public class PveClient : PveClientBase
                                 parameters.Add("comment", comment);
                                 parameters.Add("digest", digest);
                                 parameters.Add("rename", rename);
-                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/ipset", parameters);
                             }
                         }
                         /// <summary>
@@ -4757,7 +4757,7 @@ public class PveClient : PveClientBase
                             /// Get VM firewall options.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> GetOptions() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/options"); }
+                            public async Task<Result> GetOptions() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/options"); }
                             /// <summary>
                             /// Set Firewall options.
                             /// </summary>
@@ -4793,7 +4793,7 @@ public class PveClient : PveClientBase
                                 parameters.Add("policy_in", policy_in);
                                 parameters.Add("policy_out", policy_out);
                                 parameters.Add("radv", radv);
-                                return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/firewall/options", parameters);
+                                return await _client.SetAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/options", parameters);
                             }
                         }
                         /// <summary>
@@ -4824,7 +4824,7 @@ public class PveClient : PveClientBase
                                 parameters.Add("since", since);
                                 parameters.Add("start", start);
                                 parameters.Add("until", until);
-                                return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/log", parameters);
+                                return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/log", parameters);
                             }
                         }
                         /// <summary>
@@ -4850,14 +4850,14 @@ public class PveClient : PveClientBase
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("type", type);
-                                return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall/refs", parameters);
+                                return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/firewall/refs", parameters);
                             }
                         }
                         /// <summary>
                         /// Directory index.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/firewall"); }
+                        public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/firewall"); }
                     }
                     /// <summary>
                     /// Agent
@@ -5014,7 +5014,7 @@ public class PveClient : PveClientBase
                             /// Execute fsfreeze-freeze.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> FsfreezeFreeze() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-freeze"); }
+                            public async Task<Result> FsfreezeFreeze() { return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-freeze"); }
                         }
                         /// <summary>
                         /// FsfreezeStatus
@@ -5033,7 +5033,7 @@ public class PveClient : PveClientBase
                             /// Execute fsfreeze-status.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> FsfreezeStatus() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-status"); }
+                            public async Task<Result> FsfreezeStatus() { return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-status"); }
                         }
                         /// <summary>
                         /// FsfreezeThaw
@@ -5052,7 +5052,7 @@ public class PveClient : PveClientBase
                             /// Execute fsfreeze-thaw.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> FsfreezeThaw() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-thaw"); }
+                            public async Task<Result> FsfreezeThaw() { return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/agent/fsfreeze-thaw"); }
                         }
                         /// <summary>
                         /// Fstrim
@@ -5071,7 +5071,7 @@ public class PveClient : PveClientBase
                             /// Execute fstrim.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> Fstrim() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/fstrim"); }
+                            public async Task<Result> Fstrim() { return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/agent/fstrim"); }
                         }
                         /// <summary>
                         /// GetFsinfo
@@ -5090,7 +5090,7 @@ public class PveClient : PveClientBase
                             /// Execute get-fsinfo.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> GetFsinfo() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-fsinfo"); }
+                            public async Task<Result> GetFsinfo() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/agent/get-fsinfo"); }
                         }
                         /// <summary>
                         /// GetHostName
@@ -5109,7 +5109,7 @@ public class PveClient : PveClientBase
                             /// Execute get-host-name.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> GetHostName() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-host-name"); }
+                            public async Task<Result> GetHostName() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/agent/get-host-name"); }
                         }
                         /// <summary>
                         /// GetMemoryBlockInfo
@@ -5128,7 +5128,7 @@ public class PveClient : PveClientBase
                             /// Execute get-memory-block-info.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> GetMemoryBlockInfo() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-memory-block-info"); }
+                            public async Task<Result> GetMemoryBlockInfo() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/agent/get-memory-block-info"); }
                         }
                         /// <summary>
                         /// GetMemoryBlocks
@@ -5147,7 +5147,7 @@ public class PveClient : PveClientBase
                             /// Execute get-memory-blocks.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> GetMemoryBlocks() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-memory-blocks"); }
+                            public async Task<Result> GetMemoryBlocks() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/agent/get-memory-blocks"); }
                         }
                         /// <summary>
                         /// GetOsinfo
@@ -5166,7 +5166,7 @@ public class PveClient : PveClientBase
                             /// Execute get-osinfo.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> GetOsinfo() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-osinfo"); }
+                            public async Task<Result> GetOsinfo() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/agent/get-osinfo"); }
                         }
                         /// <summary>
                         /// GetTime
@@ -5185,7 +5185,7 @@ public class PveClient : PveClientBase
                             /// Execute get-time.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> GetTime() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-time"); }
+                            public async Task<Result> GetTime() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/agent/get-time"); }
                         }
                         /// <summary>
                         /// GetTimezone
@@ -5204,7 +5204,7 @@ public class PveClient : PveClientBase
                             /// Execute get-timezone.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> GetTimezone() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-timezone"); }
+                            public async Task<Result> GetTimezone() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/agent/get-timezone"); }
                         }
                         /// <summary>
                         /// GetUsers
@@ -5223,7 +5223,7 @@ public class PveClient : PveClientBase
                             /// Execute get-users.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> GetUsers() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-users"); }
+                            public async Task<Result> GetUsers() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/agent/get-users"); }
                         }
                         /// <summary>
                         /// GetVcpus
@@ -5242,7 +5242,7 @@ public class PveClient : PveClientBase
                             /// Execute get-vcpus.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> GetVcpus() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/get-vcpus"); }
+                            public async Task<Result> GetVcpus() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/agent/get-vcpus"); }
                         }
                         /// <summary>
                         /// Info
@@ -5261,7 +5261,7 @@ public class PveClient : PveClientBase
                             /// Execute info.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> Info() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/info"); }
+                            public async Task<Result> Info() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/agent/info"); }
                         }
                         /// <summary>
                         /// NetworkGetInterfaces
@@ -5280,7 +5280,7 @@ public class PveClient : PveClientBase
                             /// Execute network-get-interfaces.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> NetworkGetInterfaces() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/network-get-interfaces"); }
+                            public async Task<Result> NetworkGetInterfaces() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/agent/network-get-interfaces"); }
                         }
                         /// <summary>
                         /// Ping
@@ -5299,7 +5299,7 @@ public class PveClient : PveClientBase
                             /// Execute ping.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> Ping() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/ping"); }
+                            public async Task<Result> Ping() { return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/agent/ping"); }
                         }
                         /// <summary>
                         /// Shutdown
@@ -5318,7 +5318,7 @@ public class PveClient : PveClientBase
                             /// Execute shutdown.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> Shutdown() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/shutdown"); }
+                            public async Task<Result> Shutdown() { return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/agent/shutdown"); }
                         }
                         /// <summary>
                         /// SuspendDisk
@@ -5337,7 +5337,7 @@ public class PveClient : PveClientBase
                             /// Execute suspend-disk.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> SuspendDisk() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-disk"); }
+                            public async Task<Result> SuspendDisk() { return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-disk"); }
                         }
                         /// <summary>
                         /// SuspendHybrid
@@ -5356,7 +5356,7 @@ public class PveClient : PveClientBase
                             /// Execute suspend-hybrid.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> SuspendHybrid() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-hybrid"); }
+                            public async Task<Result> SuspendHybrid() { return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-hybrid"); }
                         }
                         /// <summary>
                         /// SuspendRam
@@ -5375,7 +5375,7 @@ public class PveClient : PveClientBase
                             /// Execute suspend-ram.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> SuspendRam() { return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-ram"); }
+                            public async Task<Result> SuspendRam() { return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/agent/suspend-ram"); }
                         }
                         /// <summary>
                         /// SetUserPassword
@@ -5403,7 +5403,7 @@ public class PveClient : PveClientBase
                                 parameters.Add("password", password);
                                 parameters.Add("username", username);
                                 parameters.Add("crypted", crypted);
-                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/set-user-password", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/agent/set-user-password", parameters);
                             }
                         }
                         /// <summary>
@@ -5430,7 +5430,7 @@ public class PveClient : PveClientBase
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("command", command);
                                 parameters.Add("input-data", input_data);
-                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/exec", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/agent/exec", parameters);
                             }
                         }
                         /// <summary>
@@ -5455,7 +5455,7 @@ public class PveClient : PveClientBase
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("pid", pid);
-                                return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/exec-status", parameters);
+                                return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/agent/exec-status", parameters);
                             }
                         }
                         /// <summary>
@@ -5480,7 +5480,7 @@ public class PveClient : PveClientBase
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("file", file);
-                                return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent/file-read", parameters);
+                                return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/agent/file-read", parameters);
                             }
                         }
                         /// <summary>
@@ -5509,14 +5509,14 @@ public class PveClient : PveClientBase
                                 parameters.Add("content", content);
                                 parameters.Add("file", file);
                                 parameters.Add("encode", encode);
-                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent/file-write", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/agent/file-write", parameters);
                             }
                         }
                         /// <summary>
                         /// QEMU Guest Agent command index.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/agent"); }
+                        public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/agent"); }
                         /// <summary>
                         /// Execute QEMU Guest Agent commands.
                         /// </summary>
@@ -5527,7 +5527,7 @@ public class PveClient : PveClientBase
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("command", command);
-                            return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/agent", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/agent", parameters);
                         }
                     }
                     /// <summary>
@@ -5558,7 +5558,7 @@ public class PveClient : PveClientBase
                             parameters.Add("ds", ds);
                             parameters.Add("timeframe", timeframe);
                             parameters.Add("cf", cf);
-                            return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/rrd", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/rrd", parameters);
                         }
                     }
                     /// <summary>
@@ -5587,7 +5587,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("timeframe", timeframe);
                             parameters.Add("cf", cf);
-                            return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/rrddata", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/rrddata", parameters);
                         }
                     }
                     /// <summary>
@@ -5614,7 +5614,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("current", current);
                             parameters.Add("snapshot", snapshot);
-                            return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
                         }
                         /// <summary>
                         /// Set virtual machine options (asynchrounous API).
@@ -5797,7 +5797,7 @@ public class PveClient : PveClientBase
                             AddIndexedParameter(parameters, "unused", unusedN);
                             AddIndexedParameter(parameters, "usb", usbN);
                             AddIndexedParameter(parameters, "virtio", virtioN);
-                            return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
                         }
                         /// <summary>
                         /// Set virtual machine options (synchrounous API) - You should consider using the POST method instead for any actions involving hotplug or storage allocation.
@@ -5978,7 +5978,7 @@ public class PveClient : PveClientBase
                             AddIndexedParameter(parameters, "unused", unusedN);
                             AddIndexedParameter(parameters, "usb", usbN);
                             AddIndexedParameter(parameters, "virtio", virtioN);
-                            return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
+                            return await _client.SetAsync($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
                         }
                     }
                     /// <summary>
@@ -5998,7 +5998,7 @@ public class PveClient : PveClientBase
                         /// Get the virtual machine configuration with both current and pending values.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> VmPending() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/pending"); }
+                        public async Task<Result> VmPending() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/pending"); }
                     }
                     /// <summary>
                     /// Cloudinit
@@ -6041,19 +6041,19 @@ public class PveClient : PveClientBase
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("type", type);
-                                return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/cloudinit/dump", parameters);
+                                return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/cloudinit/dump", parameters);
                             }
                         }
                         /// <summary>
                         /// Get the cloudinit configuration with both current and pending values.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> CloudinitPending() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/cloudinit"); }
+                        public async Task<Result> CloudinitPending() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/cloudinit"); }
                         /// <summary>
                         /// Regenerate and change cloudinit config drive.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> CloudinitUpdate() { return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/cloudinit"); }
+                        public async Task<Result> CloudinitUpdate() { return await _client.SetAsync($"/nodes/{_node}/qemu/{_vmid}/cloudinit"); }
                     }
                     /// <summary>
                     /// Unlink
@@ -6079,7 +6079,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("idlist", idlist);
                             parameters.Add("force", force);
-                            return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/unlink", parameters);
+                            return await _client.SetAsync($"/nodes/{_node}/qemu/{_vmid}/unlink", parameters);
                         }
                     }
                     /// <summary>
@@ -6106,7 +6106,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("generate-password", generate_password);
                             parameters.Add("websocket", websocket);
-                            return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/vncproxy", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/vncproxy", parameters);
                         }
                     }
                     /// <summary>
@@ -6132,7 +6132,7 @@ public class PveClient : PveClientBase
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("serial", serial);
-                            return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/termproxy", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/termproxy", parameters);
                         }
                     }
                     /// <summary>
@@ -6159,7 +6159,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("port", port);
                             parameters.Add("vncticket", vncticket);
-                            return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/vncwebsocket", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/vncwebsocket", parameters);
                         }
                     }
                     /// <summary>
@@ -6184,7 +6184,7 @@ public class PveClient : PveClientBase
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("proxy", proxy);
-                            return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/spiceproxy", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/spiceproxy", parameters);
                         }
                     }
                     /// <summary>
@@ -6257,7 +6257,7 @@ public class PveClient : PveClientBase
                             /// Get virtual machine status.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> VmStatus() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/status/current"); }
+                            public async Task<Result> VmStatus() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/status/current"); }
                         }
                         /// <summary>
                         /// Start
@@ -6298,7 +6298,7 @@ public class PveClient : PveClientBase
                                 parameters.Add("stateuri", stateuri);
                                 parameters.Add("targetstorage", targetstorage);
                                 parameters.Add("timeout", timeout);
-                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/start", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/status/start", parameters);
                             }
                         }
                         /// <summary>
@@ -6329,7 +6329,7 @@ public class PveClient : PveClientBase
                                 parameters.Add("migratedfrom", migratedfrom);
                                 parameters.Add("skiplock", skiplock);
                                 parameters.Add("timeout", timeout);
-                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/stop", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/status/stop", parameters);
                             }
                         }
                         /// <summary>
@@ -6354,7 +6354,7 @@ public class PveClient : PveClientBase
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("skiplock", skiplock);
-                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/reset", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/status/reset", parameters);
                             }
                         }
                         /// <summary>
@@ -6385,7 +6385,7 @@ public class PveClient : PveClientBase
                                 parameters.Add("keepActive", keepActive);
                                 parameters.Add("skiplock", skiplock);
                                 parameters.Add("timeout", timeout);
-                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/shutdown", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/status/shutdown", parameters);
                             }
                         }
                         /// <summary>
@@ -6410,7 +6410,7 @@ public class PveClient : PveClientBase
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("timeout", timeout);
-                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/reboot", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/status/reboot", parameters);
                             }
                         }
                         /// <summary>
@@ -6439,7 +6439,7 @@ public class PveClient : PveClientBase
                                 parameters.Add("skiplock", skiplock);
                                 parameters.Add("statestorage", statestorage);
                                 parameters.Add("todisk", todisk);
-                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/suspend", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/status/suspend", parameters);
                             }
                         }
                         /// <summary>
@@ -6466,14 +6466,14 @@ public class PveClient : PveClientBase
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("nocheck", nocheck);
                                 parameters.Add("skiplock", skiplock);
-                                return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/status/resume", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/status/resume", parameters);
                             }
                         }
                         /// <summary>
                         /// Directory index
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Vmcmdidx() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/status"); }
+                        public async Task<Result> Vmcmdidx() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/status"); }
                     }
                     /// <summary>
                     /// Sendkey
@@ -6499,7 +6499,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("key", key);
                             parameters.Add("skiplock", skiplock);
-                            return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/sendkey", parameters);
+                            return await _client.SetAsync($"/nodes/{_node}/qemu/{_vmid}/sendkey", parameters);
                         }
                     }
                     /// <summary>
@@ -6527,7 +6527,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("feature", feature);
                             parameters.Add("snapname", snapname);
-                            return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/feature", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/feature", parameters);
                         }
                     }
                     /// <summary>
@@ -6571,7 +6571,7 @@ public class PveClient : PveClientBase
                             parameters.Add("snapname", snapname);
                             parameters.Add("storage", storage);
                             parameters.Add("target", target);
-                            return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/clone", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/clone", parameters);
                         }
                     }
                     /// <summary>
@@ -6615,7 +6615,7 @@ public class PveClient : PveClientBase
                             parameters.Add("target-digest", target_digest);
                             parameters.Add("target-disk", target_disk);
                             parameters.Add("target-vmid", target_vmid);
-                            return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/move_disk", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/move_disk", parameters);
                         }
                     }
                     /// <summary>
@@ -6640,7 +6640,7 @@ public class PveClient : PveClientBase
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("target", target);
-                            return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/migrate", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/migrate", parameters);
                         }
                         /// <summary>
                         /// Migrate virtual machine. Creates a new migration task.
@@ -6666,7 +6666,7 @@ public class PveClient : PveClientBase
                             parameters.Add("online", online);
                             parameters.Add("targetstorage", targetstorage);
                             parameters.Add("with-local-disks", with_local_disks);
-                            return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/migrate", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/migrate", parameters);
                         }
                     }
                     /// <summary>
@@ -6703,7 +6703,7 @@ public class PveClient : PveClientBase
                             parameters.Add("delete", delete);
                             parameters.Add("online", online);
                             parameters.Add("target-vmid", target_vmid);
-                            return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/remote_migrate", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/remote_migrate", parameters);
                         }
                     }
                     /// <summary>
@@ -6728,7 +6728,7 @@ public class PveClient : PveClientBase
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("command", command);
-                            return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/monitor", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/monitor", parameters);
                         }
                     }
                     /// <summary>
@@ -6760,7 +6760,7 @@ public class PveClient : PveClientBase
                             parameters.Add("size", size);
                             parameters.Add("digest", digest);
                             parameters.Add("skiplock", skiplock);
-                            return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/resize", parameters);
+                            return await _client.SetAsync($"/nodes/{_node}/qemu/{_vmid}/resize", parameters);
                         }
                     }
                     /// <summary>
@@ -6824,7 +6824,7 @@ public class PveClient : PveClientBase
                                 /// Get snapshot configuration
                                 /// </summary>
                                 /// <returns></returns>
-                                public async Task<Result> GetSnapshotConfig() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config"); }
+                                public async Task<Result> GetSnapshotConfig() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config"); }
                                 /// <summary>
                                 /// Update snapshot metadata.
                                 /// </summary>
@@ -6834,7 +6834,7 @@ public class PveClient : PveClientBase
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("description", description);
-                                    return await _client.Set($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config", parameters);
+                                    return await _client.SetAsync($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/config", parameters);
                                 }
                             }
                             /// <summary>
@@ -6861,7 +6861,7 @@ public class PveClient : PveClientBase
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("start", start);
-                                    return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/rollback", parameters);
+                                    return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}/rollback", parameters);
                                 }
                             }
                             /// <summary>
@@ -6873,19 +6873,19 @@ public class PveClient : PveClientBase
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("force", force);
-                                return await _client.Delete($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}", parameters);
+                                return await _client.DeleteAsync($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}", parameters);
                             }
                             /// <summary>
                             ///
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> SnapshotCmdIdx() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}"); }
+                            public async Task<Result> SnapshotCmdIdx() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}"); }
                         }
                         /// <summary>
                         /// List all snapshots.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> SnapshotList() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/snapshot"); }
+                        public async Task<Result> SnapshotList() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/snapshot"); }
                         /// <summary>
                         /// Snapshot a VM.
                         /// </summary>
@@ -6899,7 +6899,7 @@ public class PveClient : PveClientBase
                             parameters.Add("snapname", snapname);
                             parameters.Add("description", description);
                             parameters.Add("vmstate", vmstate);
-                            return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/snapshot", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/snapshot", parameters);
                         }
                     }
                     /// <summary>
@@ -6925,7 +6925,7 @@ public class PveClient : PveClientBase
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("disk", disk);
-                            return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/template", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/template", parameters);
                         }
                     }
                     /// <summary>
@@ -6952,7 +6952,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("bridges", bridges);
                             parameters.Add("storages", storages);
-                            return await _client.Create($"/nodes/{_node}/qemu/{_vmid}/mtunnel", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/mtunnel", parameters);
                         }
                     }
                     /// <summary>
@@ -6979,7 +6979,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("socket", socket);
                             parameters.Add("ticket", ticket);
-                            return await _client.Get($"/nodes/{_node}/qemu/{_vmid}/mtunnelwebsocket", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/mtunnelwebsocket", parameters);
                         }
                     }
                     /// <summary>
@@ -6995,13 +6995,13 @@ public class PveClient : PveClientBase
                         parameters.Add("destroy-unreferenced-disks", destroy_unreferenced_disks);
                         parameters.Add("purge", purge);
                         parameters.Add("skiplock", skiplock);
-                        return await _client.Delete($"/nodes/{_node}/qemu/{_vmid}", parameters);
+                        return await _client.DeleteAsync($"/nodes/{_node}/qemu/{_vmid}", parameters);
                     }
                     /// <summary>
                     /// Directory index
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Vmdiridx() { return await _client.Get($"/nodes/{_node}/qemu/{_vmid}"); }
+                    public async Task<Result> Vmdiridx() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}"); }
                 }
                 /// <summary>
                 /// Virtual machine index (per node).
@@ -7012,7 +7012,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("full", full);
-                    return await _client.Get($"/nodes/{_node}/qemu", parameters);
+                    return await _client.GetAsync($"/nodes/{_node}/qemu", parameters);
                 }
                 /// <summary>
                 /// Create or restore a virtual machine.
@@ -7201,7 +7201,7 @@ public class PveClient : PveClientBase
                     AddIndexedParameter(parameters, "unused", unusedN);
                     AddIndexedParameter(parameters, "usb", usbN);
                     AddIndexedParameter(parameters, "virtio", virtioN);
-                    return await _client.Create($"/nodes/{_node}/qemu", parameters);
+                    return await _client.CreateAsync($"/nodes/{_node}/qemu", parameters);
                 }
             }
             /// <summary>
@@ -7358,7 +7358,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("current", current);
                             parameters.Add("snapshot", snapshot);
-                            return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/config", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/config", parameters);
                         }
                         /// <summary>
                         /// Set container options.
@@ -7437,7 +7437,7 @@ public class PveClient : PveClientBase
                             AddIndexedParameter(parameters, "mp", mpN);
                             AddIndexedParameter(parameters, "net", netN);
                             AddIndexedParameter(parameters, "unused", unusedN);
-                            return await _client.Set($"/nodes/{_node}/lxc/{_vmid}/config", parameters);
+                            return await _client.SetAsync($"/nodes/{_node}/lxc/{_vmid}/config", parameters);
                         }
                     }
                     /// <summary>
@@ -7505,7 +7505,7 @@ public class PveClient : PveClientBase
                             /// Get virtual machine status.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> VmStatus() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/status/current"); }
+                            public async Task<Result> VmStatus() { return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/status/current"); }
                         }
                         /// <summary>
                         /// Start
@@ -7531,7 +7531,7 @@ public class PveClient : PveClientBase
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("debug", debug);
                                 parameters.Add("skiplock", skiplock);
-                                return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/start", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/status/start", parameters);
                             }
                         }
                         /// <summary>
@@ -7556,7 +7556,7 @@ public class PveClient : PveClientBase
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("skiplock", skiplock);
-                                return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/stop", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/status/stop", parameters);
                             }
                         }
                         /// <summary>
@@ -7583,7 +7583,7 @@ public class PveClient : PveClientBase
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("forceStop", forceStop);
                                 parameters.Add("timeout", timeout);
-                                return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/shutdown", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/status/shutdown", parameters);
                             }
                         }
                         /// <summary>
@@ -7603,7 +7603,7 @@ public class PveClient : PveClientBase
                             /// Suspend the container. This is experimental.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> VmSuspend() { return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/suspend"); }
+                            public async Task<Result> VmSuspend() { return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/status/suspend"); }
                         }
                         /// <summary>
                         /// Resume
@@ -7622,7 +7622,7 @@ public class PveClient : PveClientBase
                             /// Resume the container.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> VmResume() { return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/resume"); }
+                            public async Task<Result> VmResume() { return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/status/resume"); }
                         }
                         /// <summary>
                         /// Reboot
@@ -7646,14 +7646,14 @@ public class PveClient : PveClientBase
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("timeout", timeout);
-                                return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/status/reboot", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/status/reboot", parameters);
                             }
                         }
                         /// <summary>
                         /// Directory index
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Vmcmdidx() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/status"); }
+                        public async Task<Result> Vmcmdidx() { return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/status"); }
                     }
                     /// <summary>
                     /// Snapshot
@@ -7721,7 +7721,7 @@ public class PveClient : PveClientBase
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("start", start);
-                                    return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/rollback", parameters);
+                                    return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/rollback", parameters);
                                 }
                             }
                             /// <summary>
@@ -7743,7 +7743,7 @@ public class PveClient : PveClientBase
                                 /// Get snapshot configuration
                                 /// </summary>
                                 /// <returns></returns>
-                                public async Task<Result> GetSnapshotConfig() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config"); }
+                                public async Task<Result> GetSnapshotConfig() { return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config"); }
                                 /// <summary>
                                 /// Update snapshot metadata.
                                 /// </summary>
@@ -7753,7 +7753,7 @@ public class PveClient : PveClientBase
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("description", description);
-                                    return await _client.Set($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config", parameters);
+                                    return await _client.SetAsync($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}/config", parameters);
                                 }
                             }
                             /// <summary>
@@ -7765,19 +7765,19 @@ public class PveClient : PveClientBase
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("force", force);
-                                return await _client.Delete($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}", parameters);
+                                return await _client.DeleteAsync($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}", parameters);
                             }
                             /// <summary>
                             ///
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> SnapshotCmdIdx() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}"); }
+                            public async Task<Result> SnapshotCmdIdx() { return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}"); }
                         }
                         /// <summary>
                         /// List all snapshots.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> List() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/snapshot"); }
+                        public async Task<Result> List() { return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/snapshot"); }
                         /// <summary>
                         /// Snapshot a container.
                         /// </summary>
@@ -7789,7 +7789,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("snapname", snapname);
                             parameters.Add("description", description);
-                            return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/snapshot", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/snapshot", parameters);
                         }
                     }
                     /// <summary>
@@ -7876,13 +7876,13 @@ public class PveClient : PveClientBase
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("digest", digest);
-                                    return await _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", parameters);
+                                    return await _client.DeleteAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", parameters);
                                 }
                                 /// <summary>
                                 /// Get single rule data.
                                 /// </summary>
                                 /// <returns></returns>
-                                public async Task<Result> GetRule() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}"); }
+                                public async Task<Result> GetRule() { return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}"); }
                                 /// <summary>
                                 /// Modify rule data.
                                 /// </summary>
@@ -7924,14 +7924,14 @@ public class PveClient : PveClientBase
                                     parameters.Add("source", source);
                                     parameters.Add("sport", sport);
                                     parameters.Add("type", type);
-                                    return await _client.Set($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", parameters);
+                                    return await _client.SetAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/rules/{_pos}", parameters);
                                 }
                             }
                             /// <summary>
                             /// List rules.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> GetRules() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/rules"); }
+                            public async Task<Result> GetRules() { return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/rules"); }
                             /// <summary>
                             /// Create new rule.
                             /// </summary>
@@ -7971,7 +7971,7 @@ public class PveClient : PveClientBase
                                 parameters.Add("proto", proto);
                                 parameters.Add("source", source);
                                 parameters.Add("sport", sport);
-                                return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/firewall/rules", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/rules", parameters);
                             }
                         }
                         /// <summary>
@@ -8015,13 +8015,13 @@ public class PveClient : PveClientBase
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("digest", digest);
-                                    return await _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", parameters);
+                                    return await _client.DeleteAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", parameters);
                                 }
                                 /// <summary>
                                 /// Read alias.
                                 /// </summary>
                                 /// <returns></returns>
-                                public async Task<Result> ReadAlias() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}"); }
+                                public async Task<Result> ReadAlias() { return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}"); }
                                 /// <summary>
                                 /// Update IP or Network alias.
                                 /// </summary>
@@ -8037,14 +8037,14 @@ public class PveClient : PveClientBase
                                     parameters.Add("comment", comment);
                                     parameters.Add("digest", digest);
                                     parameters.Add("rename", rename);
-                                    return await _client.Set($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", parameters);
+                                    return await _client.SetAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases/{_name}", parameters);
                                 }
                             }
                             /// <summary>
                             /// List aliases
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> GetAliases() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases"); }
+                            public async Task<Result> GetAliases() { return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases"); }
                             /// <summary>
                             /// Create IP or Network Alias.
                             /// </summary>
@@ -8058,7 +8058,7 @@ public class PveClient : PveClientBase
                                 parameters.Add("cidr", cidr);
                                 parameters.Add("name", name);
                                 parameters.Add("comment", comment);
-                                return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/aliases", parameters);
                             }
                         }
                         /// <summary>
@@ -8123,13 +8123,13 @@ public class PveClient : PveClientBase
                                     {
                                         var parameters = new Dictionary<string, object>();
                                         parameters.Add("digest", digest);
-                                        return await _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
+                                        return await _client.DeleteAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
                                     }
                                     /// <summary>
                                     /// Read IP or Network settings from IPSet.
                                     /// </summary>
                                     /// <returns></returns>
-                                    public async Task<Result> ReadIp() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}"); }
+                                    public async Task<Result> ReadIp() { return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}"); }
                                     /// <summary>
                                     /// Update IP or Network settings
                                     /// </summary>
@@ -8143,7 +8143,7 @@ public class PveClient : PveClientBase
                                         parameters.Add("comment", comment);
                                         parameters.Add("digest", digest);
                                         parameters.Add("nomatch", nomatch);
-                                        return await _client.Set($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
+                                        return await _client.SetAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}/{_cidr}", parameters);
                                     }
                                 }
                                 /// <summary>
@@ -8155,13 +8155,13 @@ public class PveClient : PveClientBase
                                 {
                                     var parameters = new Dictionary<string, object>();
                                     parameters.Add("force", force);
-                                    return await _client.Delete($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}", parameters);
+                                    return await _client.DeleteAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}", parameters);
                                 }
                                 /// <summary>
                                 /// List IPSet content
                                 /// </summary>
                                 /// <returns></returns>
-                                public async Task<Result> GetIpset() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}"); }
+                                public async Task<Result> GetIpset() { return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}"); }
                                 /// <summary>
                                 /// Add IP or Network to IPSet.
                                 /// </summary>
@@ -8175,14 +8175,14 @@ public class PveClient : PveClientBase
                                     parameters.Add("cidr", cidr);
                                     parameters.Add("comment", comment);
                                     parameters.Add("nomatch", nomatch);
-                                    return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}", parameters);
+                                    return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset/{_name}", parameters);
                                 }
                             }
                             /// <summary>
                             /// List IPSets
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> IpsetIndex() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset"); }
+                            public async Task<Result> IpsetIndex() { return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset"); }
                             /// <summary>
                             /// Create new IPSet
                             /// </summary>
@@ -8198,7 +8198,7 @@ public class PveClient : PveClientBase
                                 parameters.Add("comment", comment);
                                 parameters.Add("digest", digest);
                                 parameters.Add("rename", rename);
-                                return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/ipset", parameters);
                             }
                         }
                         /// <summary>
@@ -8218,7 +8218,7 @@ public class PveClient : PveClientBase
                             /// Get VM firewall options.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> GetOptions() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/options"); }
+                            public async Task<Result> GetOptions() { return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/options"); }
                             /// <summary>
                             /// Set Firewall options.
                             /// </summary>
@@ -8254,7 +8254,7 @@ public class PveClient : PveClientBase
                                 parameters.Add("policy_in", policy_in);
                                 parameters.Add("policy_out", policy_out);
                                 parameters.Add("radv", radv);
-                                return await _client.Set($"/nodes/{_node}/lxc/{_vmid}/firewall/options", parameters);
+                                return await _client.SetAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/options", parameters);
                             }
                         }
                         /// <summary>
@@ -8285,7 +8285,7 @@ public class PveClient : PveClientBase
                                 parameters.Add("since", since);
                                 parameters.Add("start", start);
                                 parameters.Add("until", until);
-                                return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/log", parameters);
+                                return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/log", parameters);
                             }
                         }
                         /// <summary>
@@ -8311,14 +8311,14 @@ public class PveClient : PveClientBase
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("type", type);
-                                return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall/refs", parameters);
+                                return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/firewall/refs", parameters);
                             }
                         }
                         /// <summary>
                         /// Directory index.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/firewall"); }
+                        public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/firewall"); }
                     }
                     /// <summary>
                     /// Rrd
@@ -8348,7 +8348,7 @@ public class PveClient : PveClientBase
                             parameters.Add("ds", ds);
                             parameters.Add("timeframe", timeframe);
                             parameters.Add("cf", cf);
-                            return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/rrd", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/rrd", parameters);
                         }
                     }
                     /// <summary>
@@ -8377,7 +8377,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("timeframe", timeframe);
                             parameters.Add("cf", cf);
-                            return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/rrddata", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/rrddata", parameters);
                         }
                     }
                     /// <summary>
@@ -8406,7 +8406,7 @@ public class PveClient : PveClientBase
                             parameters.Add("height", height);
                             parameters.Add("websocket", websocket);
                             parameters.Add("width", width);
-                            return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/vncproxy", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/vncproxy", parameters);
                         }
                     }
                     /// <summary>
@@ -8426,7 +8426,7 @@ public class PveClient : PveClientBase
                         /// Creates a TCP proxy connection.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Termproxy() { return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/termproxy"); }
+                        public async Task<Result> Termproxy() { return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/termproxy"); }
                     }
                     /// <summary>
                     /// Vncwebsocket
@@ -8452,7 +8452,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("port", port);
                             parameters.Add("vncticket", vncticket);
-                            return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/vncwebsocket", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/vncwebsocket", parameters);
                         }
                     }
                     /// <summary>
@@ -8477,7 +8477,7 @@ public class PveClient : PveClientBase
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("proxy", proxy);
-                            return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/spiceproxy", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/spiceproxy", parameters);
                         }
                     }
                     /// <summary>
@@ -8518,7 +8518,7 @@ public class PveClient : PveClientBase
                             parameters.Add("restart", restart);
                             parameters.Add("target-vmid", target_vmid);
                             parameters.Add("timeout", timeout);
-                            return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/remote_migrate", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/remote_migrate", parameters);
                         }
                     }
                     /// <summary>
@@ -8553,7 +8553,7 @@ public class PveClient : PveClientBase
                             parameters.Add("restart", restart);
                             parameters.Add("target-storage", target_storage);
                             parameters.Add("timeout", timeout);
-                            return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/migrate", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/migrate", parameters);
                         }
                     }
                     /// <summary>
@@ -8581,7 +8581,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("feature", feature);
                             parameters.Add("snapname", snapname);
-                            return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/feature", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/feature", parameters);
                         }
                     }
                     /// <summary>
@@ -8601,7 +8601,7 @@ public class PveClient : PveClientBase
                         /// Create a Template.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Template() { return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/template"); }
+                        public async Task<Result> Template() { return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/template"); }
                     }
                     /// <summary>
                     /// Clone
@@ -8641,7 +8641,7 @@ public class PveClient : PveClientBase
                             parameters.Add("snapname", snapname);
                             parameters.Add("storage", storage);
                             parameters.Add("target", target);
-                            return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/clone", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/clone", parameters);
                         }
                     }
                     /// <summary>
@@ -8671,7 +8671,7 @@ public class PveClient : PveClientBase
                             parameters.Add("disk", disk);
                             parameters.Add("size", size);
                             parameters.Add("digest", digest);
-                            return await _client.Set($"/nodes/{_node}/lxc/{_vmid}/resize", parameters);
+                            return await _client.SetAsync($"/nodes/{_node}/lxc/{_vmid}/resize", parameters);
                         }
                     }
                     /// <summary>
@@ -8712,7 +8712,7 @@ public class PveClient : PveClientBase
                             parameters.Add("target-digest", target_digest);
                             parameters.Add("target-vmid", target_vmid);
                             parameters.Add("target-volume", target_volume);
-                            return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/move_volume", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/move_volume", parameters);
                         }
                     }
                     /// <summary>
@@ -8732,7 +8732,7 @@ public class PveClient : PveClientBase
                         /// Get container configuration, including pending changes.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> VmPending() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/pending"); }
+                        public async Task<Result> VmPending() { return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/pending"); }
                     }
                     /// <summary>
                     /// Interfaces
@@ -8751,7 +8751,7 @@ public class PveClient : PveClientBase
                         /// Get IP addresses of the specified container interface.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Ip() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/interfaces"); }
+                        public async Task<Result> Ip() { return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/interfaces"); }
                     }
                     /// <summary>
                     /// Mtunnel
@@ -8777,7 +8777,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("bridges", bridges);
                             parameters.Add("storages", storages);
-                            return await _client.Create($"/nodes/{_node}/lxc/{_vmid}/mtunnel", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/lxc/{_vmid}/mtunnel", parameters);
                         }
                     }
                     /// <summary>
@@ -8804,7 +8804,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("socket", socket);
                             parameters.Add("ticket", ticket);
-                            return await _client.Get($"/nodes/{_node}/lxc/{_vmid}/mtunnelwebsocket", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/mtunnelwebsocket", parameters);
                         }
                     }
                     /// <summary>
@@ -8820,19 +8820,19 @@ public class PveClient : PveClientBase
                         parameters.Add("destroy-unreferenced-disks", destroy_unreferenced_disks);
                         parameters.Add("force", force);
                         parameters.Add("purge", purge);
-                        return await _client.Delete($"/nodes/{_node}/lxc/{_vmid}", parameters);
+                        return await _client.DeleteAsync($"/nodes/{_node}/lxc/{_vmid}", parameters);
                     }
                     /// <summary>
                     /// Directory index
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Vmdiridx() { return await _client.Get($"/nodes/{_node}/lxc/{_vmid}"); }
+                    public async Task<Result> Vmdiridx() { return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}"); }
                 }
                 /// <summary>
                 /// LXC container index (per node).
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Vmlist() { return await _client.Get($"/nodes/{_node}/lxc"); }
+                public async Task<Result> Vmlist() { return await _client.GetAsync($"/nodes/{_node}/lxc"); }
                 /// <summary>
                 /// Create or restore a container.
                 /// </summary>
@@ -8928,7 +8928,7 @@ public class PveClient : PveClientBase
                     AddIndexedParameter(parameters, "mp", mpN);
                     AddIndexedParameter(parameters, "net", netN);
                     AddIndexedParameter(parameters, "unused", unusedN);
-                    return await _client.Create($"/nodes/{_node}/lxc", parameters);
+                    return await _client.CreateAsync($"/nodes/{_node}/lxc", parameters);
                 }
             }
             /// <summary>
@@ -9054,7 +9054,7 @@ public class PveClient : PveClientBase
                         /// Get the Ceph configuration file.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Raw() { return await _client.Get($"/nodes/{_node}/ceph/cfg/raw"); }
+                        public async Task<Result> Raw() { return await _client.GetAsync($"/nodes/{_node}/ceph/cfg/raw"); }
                     }
                     /// <summary>
                     /// Db
@@ -9068,7 +9068,7 @@ public class PveClient : PveClientBase
                         /// Get the Ceph configuration database.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Db() { return await _client.Get($"/nodes/{_node}/ceph/cfg/db"); }
+                        public async Task<Result> Db() { return await _client.GetAsync($"/nodes/{_node}/ceph/cfg/db"); }
                     }
                     /// <summary>
                     /// Value
@@ -9087,14 +9087,14 @@ public class PveClient : PveClientBase
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("config-keys", config_keys);
-                            return await _client.Get($"/nodes/{_node}/ceph/cfg/value", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/ceph/cfg/value", parameters);
                         }
                     }
                     /// <summary>
                     /// Directory index.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/ceph/cfg"); }
+                    public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/ceph/cfg"); }
                 }
                 /// <summary>
                 /// Osd
@@ -9163,7 +9163,7 @@ public class PveClient : PveClientBase
                             /// Get OSD details
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> Osddetails() { return await _client.Get($"/nodes/{_node}/ceph/osd/{_osdid}/metadata"); }
+                            public async Task<Result> Osddetails() { return await _client.GetAsync($"/nodes/{_node}/ceph/osd/{_osdid}/metadata"); }
                         }
                         /// <summary>
                         /// LvInfo
@@ -9188,7 +9188,7 @@ public class PveClient : PveClientBase
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("type", type);
-                                return await _client.Get($"/nodes/{_node}/ceph/osd/{_osdid}/lv-info", parameters);
+                                return await _client.GetAsync($"/nodes/{_node}/ceph/osd/{_osdid}/lv-info", parameters);
                             }
                         }
                         /// <summary>
@@ -9208,7 +9208,7 @@ public class PveClient : PveClientBase
                             /// ceph osd in
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> In() { return await _client.Create($"/nodes/{_node}/ceph/osd/{_osdid}/in"); }
+                            public async Task<Result> In() { return await _client.CreateAsync($"/nodes/{_node}/ceph/osd/{_osdid}/in"); }
                         }
                         /// <summary>
                         /// Out
@@ -9227,7 +9227,7 @@ public class PveClient : PveClientBase
                             /// ceph osd out
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> Out() { return await _client.Create($"/nodes/{_node}/ceph/osd/{_osdid}/out"); }
+                            public async Task<Result> Out() { return await _client.CreateAsync($"/nodes/{_node}/ceph/osd/{_osdid}/out"); }
                         }
                         /// <summary>
                         /// Scrub
@@ -9251,7 +9251,7 @@ public class PveClient : PveClientBase
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("deep", deep);
-                                return await _client.Create($"/nodes/{_node}/ceph/osd/{_osdid}/scrub", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/ceph/osd/{_osdid}/scrub", parameters);
                             }
                         }
                         /// <summary>
@@ -9263,19 +9263,19 @@ public class PveClient : PveClientBase
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("cleanup", cleanup);
-                            return await _client.Delete($"/nodes/{_node}/ceph/osd/{_osdid}", parameters);
+                            return await _client.DeleteAsync($"/nodes/{_node}/ceph/osd/{_osdid}", parameters);
                         }
                         /// <summary>
                         /// OSD index.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Osdindex() { return await _client.Get($"/nodes/{_node}/ceph/osd/{_osdid}"); }
+                        public async Task<Result> Osdindex() { return await _client.GetAsync($"/nodes/{_node}/ceph/osd/{_osdid}"); }
                     }
                     /// <summary>
                     /// Get Ceph osd list/tree.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/ceph/osd"); }
+                    public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/ceph/osd"); }
                     /// <summary>
                     /// Create OSD
                     /// </summary>
@@ -9299,7 +9299,7 @@ public class PveClient : PveClientBase
                         parameters.Add("osds-per-device", osds_per_device);
                         parameters.Add("wal_dev", wal_dev);
                         parameters.Add("wal_dev_size", wal_dev_size);
-                        return await _client.Create($"/nodes/{_node}/ceph/osd", parameters);
+                        return await _client.CreateAsync($"/nodes/{_node}/ceph/osd", parameters);
                     }
                 }
                 /// <summary>
@@ -9331,7 +9331,7 @@ public class PveClient : PveClientBase
                         /// Destroy Ceph Metadata Server
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Destroymds() { return await _client.Delete($"/nodes/{_node}/ceph/mds/{_name}"); }
+                        public async Task<Result> Destroymds() { return await _client.DeleteAsync($"/nodes/{_node}/ceph/mds/{_name}"); }
                         /// <summary>
                         /// Create Ceph Metadata Server (MDS)
                         /// </summary>
@@ -9341,14 +9341,14 @@ public class PveClient : PveClientBase
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("hotstandby", hotstandby);
-                            return await _client.Create($"/nodes/{_node}/ceph/mds/{_name}", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/ceph/mds/{_name}", parameters);
                         }
                     }
                     /// <summary>
                     /// MDS directory index.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/ceph/mds"); }
+                    public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/ceph/mds"); }
                 }
                 /// <summary>
                 /// Mgr
@@ -9379,18 +9379,18 @@ public class PveClient : PveClientBase
                         /// Destroy Ceph Manager.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Destroymgr() { return await _client.Delete($"/nodes/{_node}/ceph/mgr/{_id}"); }
+                        public async Task<Result> Destroymgr() { return await _client.DeleteAsync($"/nodes/{_node}/ceph/mgr/{_id}"); }
                         /// <summary>
                         /// Create Ceph Manager
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Createmgr() { return await _client.Create($"/nodes/{_node}/ceph/mgr/{_id}"); }
+                        public async Task<Result> Createmgr() { return await _client.CreateAsync($"/nodes/{_node}/ceph/mgr/{_id}"); }
                     }
                     /// <summary>
                     /// MGR directory index.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/ceph/mgr"); }
+                    public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/ceph/mgr"); }
                 }
                 /// <summary>
                 /// Mon
@@ -9421,7 +9421,7 @@ public class PveClient : PveClientBase
                         /// Destroy Ceph Monitor and Manager.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Destroymon() { return await _client.Delete($"/nodes/{_node}/ceph/mon/{_monid}"); }
+                        public async Task<Result> Destroymon() { return await _client.DeleteAsync($"/nodes/{_node}/ceph/mon/{_monid}"); }
                         /// <summary>
                         /// Create Ceph Monitor and Manager
                         /// </summary>
@@ -9431,14 +9431,14 @@ public class PveClient : PveClientBase
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("mon-address", mon_address);
-                            return await _client.Create($"/nodes/{_node}/ceph/mon/{_monid}", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/ceph/mon/{_monid}", parameters);
                         }
                     }
                     /// <summary>
                     /// Get Ceph monitor list.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Listmon() { return await _client.Get($"/nodes/{_node}/ceph/mon"); }
+                    public async Task<Result> Listmon() { return await _client.GetAsync($"/nodes/{_node}/ceph/mon"); }
                 }
                 /// <summary>
                 /// Fs
@@ -9476,14 +9476,14 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("add-storage", add_storage);
                             parameters.Add("pg_num", pg_num);
-                            return await _client.Create($"/nodes/{_node}/ceph/fs/{_name}", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/ceph/fs/{_name}", parameters);
                         }
                     }
                     /// <summary>
                     /// Directory index.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/ceph/fs"); }
+                    public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/ceph/fs"); }
                 }
                 /// <summary>
                 /// Pool
@@ -9537,7 +9537,7 @@ public class PveClient : PveClientBase
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("verbose", verbose);
-                                return await _client.Get($"/nodes/{_node}/ceph/pool/{_name}/status", parameters);
+                                return await _client.GetAsync($"/nodes/{_node}/ceph/pool/{_name}/status", parameters);
                             }
                         }
                         /// <summary>
@@ -9553,13 +9553,13 @@ public class PveClient : PveClientBase
                             parameters.Add("force", force);
                             parameters.Add("remove_ecprofile", remove_ecprofile);
                             parameters.Add("remove_storages", remove_storages);
-                            return await _client.Delete($"/nodes/{_node}/ceph/pool/{_name}", parameters);
+                            return await _client.DeleteAsync($"/nodes/{_node}/ceph/pool/{_name}", parameters);
                         }
                         /// <summary>
                         /// Pool index.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Poolindex() { return await _client.Get($"/nodes/{_node}/ceph/pool/{_name}"); }
+                        public async Task<Result> Poolindex() { return await _client.GetAsync($"/nodes/{_node}/ceph/pool/{_name}"); }
                         /// <summary>
                         /// Change POOL settings
                         /// </summary>
@@ -9587,14 +9587,14 @@ public class PveClient : PveClientBase
                             parameters.Add("size", size);
                             parameters.Add("target_size", target_size);
                             parameters.Add("target_size_ratio", target_size_ratio);
-                            return await _client.Set($"/nodes/{_node}/ceph/pool/{_name}", parameters);
+                            return await _client.SetAsync($"/nodes/{_node}/ceph/pool/{_name}", parameters);
                         }
                     }
                     /// <summary>
                     /// List all pools and their settings (which are settable by the POST/PUT endpoints).
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Lspools() { return await _client.Get($"/nodes/{_node}/ceph/pool"); }
+                    public async Task<Result> Lspools() { return await _client.GetAsync($"/nodes/{_node}/ceph/pool"); }
                     /// <summary>
                     /// Create Ceph pool
                     /// </summary>
@@ -9628,7 +9628,7 @@ public class PveClient : PveClientBase
                         parameters.Add("size", size);
                         parameters.Add("target_size", target_size);
                         parameters.Add("target_size_ratio", target_size_ratio);
-                        return await _client.Create($"/nodes/{_node}/ceph/pool", parameters);
+                        return await _client.CreateAsync($"/nodes/{_node}/ceph/pool", parameters);
                     }
                 }
                 /// <summary>
@@ -9658,7 +9658,7 @@ public class PveClient : PveClientBase
                         parameters.Add("network", network);
                         parameters.Add("pg_bits", pg_bits);
                         parameters.Add("size", size);
-                        return await _client.Create($"/nodes/{_node}/ceph/init", parameters);
+                        return await _client.CreateAsync($"/nodes/{_node}/ceph/init", parameters);
                     }
                 }
                 /// <summary>
@@ -9678,7 +9678,7 @@ public class PveClient : PveClientBase
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("service", service);
-                        return await _client.Create($"/nodes/{_node}/ceph/stop", parameters);
+                        return await _client.CreateAsync($"/nodes/{_node}/ceph/stop", parameters);
                     }
                 }
                 /// <summary>
@@ -9698,7 +9698,7 @@ public class PveClient : PveClientBase
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("service", service);
-                        return await _client.Create($"/nodes/{_node}/ceph/start", parameters);
+                        return await _client.CreateAsync($"/nodes/{_node}/ceph/start", parameters);
                     }
                 }
                 /// <summary>
@@ -9718,7 +9718,7 @@ public class PveClient : PveClientBase
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("service", service);
-                        return await _client.Create($"/nodes/{_node}/ceph/restart", parameters);
+                        return await _client.CreateAsync($"/nodes/{_node}/ceph/restart", parameters);
                     }
                 }
                 /// <summary>
@@ -9733,7 +9733,7 @@ public class PveClient : PveClientBase
                     /// Get ceph status.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Status() { return await _client.Get($"/nodes/{_node}/ceph/status"); }
+                    public async Task<Result> Status() { return await _client.GetAsync($"/nodes/{_node}/ceph/status"); }
                 }
                 /// <summary>
                 /// Crush
@@ -9747,7 +9747,7 @@ public class PveClient : PveClientBase
                     /// Get OSD crush map
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Crush() { return await _client.Get($"/nodes/{_node}/ceph/crush"); }
+                    public async Task<Result> Crush() { return await _client.GetAsync($"/nodes/{_node}/ceph/crush"); }
                 }
                 /// <summary>
                 /// Log
@@ -9768,7 +9768,7 @@ public class PveClient : PveClientBase
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("limit", limit);
                         parameters.Add("start", start);
-                        return await _client.Get($"/nodes/{_node}/ceph/log", parameters);
+                        return await _client.GetAsync($"/nodes/{_node}/ceph/log", parameters);
                     }
                 }
                 /// <summary>
@@ -9783,7 +9783,7 @@ public class PveClient : PveClientBase
                     /// List ceph rules.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Rules() { return await _client.Get($"/nodes/{_node}/ceph/rules"); }
+                    public async Task<Result> Rules() { return await _client.GetAsync($"/nodes/{_node}/ceph/rules"); }
                 }
                 /// <summary>
                 /// CmdSafety
@@ -9808,14 +9808,14 @@ public class PveClient : PveClientBase
                         parameters.Add("action", action);
                         parameters.Add("id", id);
                         parameters.Add("service", service);
-                        return await _client.Get($"/nodes/{_node}/ceph/cmd-safety", parameters);
+                        return await _client.GetAsync($"/nodes/{_node}/ceph/cmd-safety", parameters);
                     }
                 }
                 /// <summary>
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/ceph"); }
+                public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/ceph"); }
             }
             /// <summary>
             /// Vzdump
@@ -9852,7 +9852,7 @@ public class PveClient : PveClientBase
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("storage", storage);
-                        return await _client.Get($"/nodes/{_node}/vzdump/defaults", parameters);
+                        return await _client.GetAsync($"/nodes/{_node}/vzdump/defaults", parameters);
                     }
                 }
                 /// <summary>
@@ -9872,7 +9872,7 @@ public class PveClient : PveClientBase
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("volume", volume);
-                        return await _client.Get($"/nodes/{_node}/vzdump/extractconfig", parameters);
+                        return await _client.GetAsync($"/nodes/{_node}/vzdump/extractconfig", parameters);
                     }
                 }
                 /// <summary>
@@ -9951,7 +9951,7 @@ public class PveClient : PveClientBase
                     parameters.Add("tmpdir", tmpdir);
                     parameters.Add("vmid", vmid);
                     parameters.Add("zstd", zstd);
-                    return await _client.Create($"/nodes/{_node}/vzdump", parameters);
+                    return await _client.CreateAsync($"/nodes/{_node}/vzdump", parameters);
                 }
             }
             /// <summary>
@@ -10021,7 +10021,7 @@ public class PveClient : PveClientBase
                         /// Read service properties
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> ServiceState() { return await _client.Get($"/nodes/{_node}/services/{_service}/state"); }
+                        public async Task<Result> ServiceState() { return await _client.GetAsync($"/nodes/{_node}/services/{_service}/state"); }
                     }
                     /// <summary>
                     /// Start
@@ -10040,7 +10040,7 @@ public class PveClient : PveClientBase
                         /// Start service.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> ServiceStart() { return await _client.Create($"/nodes/{_node}/services/{_service}/start"); }
+                        public async Task<Result> ServiceStart() { return await _client.CreateAsync($"/nodes/{_node}/services/{_service}/start"); }
                     }
                     /// <summary>
                     /// Stop
@@ -10059,7 +10059,7 @@ public class PveClient : PveClientBase
                         /// Stop service.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> ServiceStop() { return await _client.Create($"/nodes/{_node}/services/{_service}/stop"); }
+                        public async Task<Result> ServiceStop() { return await _client.CreateAsync($"/nodes/{_node}/services/{_service}/stop"); }
                     }
                     /// <summary>
                     /// Restart
@@ -10078,7 +10078,7 @@ public class PveClient : PveClientBase
                         /// Hard restart service. Use reload if you want to reduce interruptions.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> ServiceRestart() { return await _client.Create($"/nodes/{_node}/services/{_service}/restart"); }
+                        public async Task<Result> ServiceRestart() { return await _client.CreateAsync($"/nodes/{_node}/services/{_service}/restart"); }
                     }
                     /// <summary>
                     /// Reload
@@ -10097,19 +10097,19 @@ public class PveClient : PveClientBase
                         /// Reload service. Falls back to restart if service cannot be reloaded.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> ServiceReload() { return await _client.Create($"/nodes/{_node}/services/{_service}/reload"); }
+                        public async Task<Result> ServiceReload() { return await _client.CreateAsync($"/nodes/{_node}/services/{_service}/reload"); }
                     }
                     /// <summary>
                     /// Directory index
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Srvcmdidx() { return await _client.Get($"/nodes/{_node}/services/{_service}"); }
+                    public async Task<Result> Srvcmdidx() { return await _client.GetAsync($"/nodes/{_node}/services/{_service}"); }
                 }
                 /// <summary>
                 /// Service list.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/services"); }
+                public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/services"); }
             }
             /// <summary>
             /// Subscription
@@ -10123,12 +10123,12 @@ public class PveClient : PveClientBase
                 /// Delete subscription key of this node.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Delete() { return await _client.Delete($"/nodes/{_node}/subscription"); }
+                public async Task<Result> Delete() { return await _client.DeleteAsync($"/nodes/{_node}/subscription"); }
                 /// <summary>
                 /// Read subscription info.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Get() { return await _client.Get($"/nodes/{_node}/subscription"); }
+                public async Task<Result> Get() { return await _client.GetAsync($"/nodes/{_node}/subscription"); }
                 /// <summary>
                 /// Update subscription info.
                 /// </summary>
@@ -10138,7 +10138,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("force", force);
-                    return await _client.Create($"/nodes/{_node}/subscription", parameters);
+                    return await _client.CreateAsync($"/nodes/{_node}/subscription", parameters);
                 }
                 /// <summary>
                 /// Set subscription key.
@@ -10149,7 +10149,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("key", key);
-                    return await _client.Set($"/nodes/{_node}/subscription", parameters);
+                    return await _client.SetAsync($"/nodes/{_node}/subscription", parameters);
                 }
             }
             /// <summary>
@@ -10181,12 +10181,12 @@ public class PveClient : PveClientBase
                     /// Delete network device configuration
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> DeleteNetwork() { return await _client.Delete($"/nodes/{_node}/network/{_iface}"); }
+                    public async Task<Result> DeleteNetwork() { return await _client.DeleteAsync($"/nodes/{_node}/network/{_iface}"); }
                     /// <summary>
                     /// Read network device configuration
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> NetworkConfig() { return await _client.Get($"/nodes/{_node}/network/{_iface}"); }
+                    public async Task<Result> NetworkConfig() { return await _client.GetAsync($"/nodes/{_node}/network/{_iface}"); }
                     /// <summary>
                     /// Update network device configuration
                     /// </summary>
@@ -10251,14 +10251,14 @@ public class PveClient : PveClientBase
                         parameters.Add("slaves", slaves);
                         parameters.Add("vlan-id", vlan_id);
                         parameters.Add("vlan-raw-device", vlan_raw_device);
-                        return await _client.Set($"/nodes/{_node}/network/{_iface}", parameters);
+                        return await _client.SetAsync($"/nodes/{_node}/network/{_iface}", parameters);
                     }
                 }
                 /// <summary>
                 /// Revert network configuration changes.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> RevertNetworkChanges() { return await _client.Delete($"/nodes/{_node}/network"); }
+                public async Task<Result> RevertNetworkChanges() { return await _client.DeleteAsync($"/nodes/{_node}/network"); }
                 /// <summary>
                 /// List available networks
                 /// </summary>
@@ -10269,7 +10269,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("type", type);
-                    return await _client.Get($"/nodes/{_node}/network", parameters);
+                    return await _client.GetAsync($"/nodes/{_node}/network", parameters);
                 }
                 /// <summary>
                 /// Create network device configuration
@@ -10335,13 +10335,13 @@ public class PveClient : PveClientBase
                     parameters.Add("slaves", slaves);
                     parameters.Add("vlan-id", vlan_id);
                     parameters.Add("vlan-raw-device", vlan_raw_device);
-                    return await _client.Create($"/nodes/{_node}/network", parameters);
+                    return await _client.CreateAsync($"/nodes/{_node}/network", parameters);
                 }
                 /// <summary>
                 /// Reload network configuration
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> ReloadNetworkConfig() { return await _client.Set($"/nodes/{_node}/network"); }
+                public async Task<Result> ReloadNetworkConfig() { return await _client.SetAsync($"/nodes/{_node}/network"); }
             }
             /// <summary>
             /// Tasks
@@ -10404,7 +10404,7 @@ public class PveClient : PveClientBase
                             parameters.Add("download", download);
                             parameters.Add("limit", limit);
                             parameters.Add("start", start);
-                            return await _client.Get($"/nodes/{_node}/tasks/{_upid}/log", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/tasks/{_upid}/log", parameters);
                         }
                     }
                     /// <summary>
@@ -10424,18 +10424,18 @@ public class PveClient : PveClientBase
                         /// Read task status.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> ReadTaskStatus() { return await _client.Get($"/nodes/{_node}/tasks/{_upid}/status"); }
+                        public async Task<Result> ReadTaskStatus() { return await _client.GetAsync($"/nodes/{_node}/tasks/{_upid}/status"); }
                     }
                     /// <summary>
                     /// Stop a task.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> StopTask() { return await _client.Delete($"/nodes/{_node}/tasks/{_upid}"); }
+                    public async Task<Result> StopTask() { return await _client.DeleteAsync($"/nodes/{_node}/tasks/{_upid}"); }
                     /// <summary>
                     ///
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> UpidIndex() { return await _client.Get($"/nodes/{_node}/tasks/{_upid}"); }
+                    public async Task<Result> UpidIndex() { return await _client.GetAsync($"/nodes/{_node}/tasks/{_upid}"); }
                 }
                 /// <summary>
                 /// Read task list for one node (finished tasks).
@@ -10465,7 +10465,7 @@ public class PveClient : PveClientBase
                     parameters.Add("until", until);
                     parameters.Add("userfilter", userfilter);
                     parameters.Add("vmid", vmid);
-                    return await _client.Get($"/nodes/{_node}/tasks", parameters);
+                    return await _client.GetAsync($"/nodes/{_node}/tasks", parameters);
                 }
             }
             /// <summary>
@@ -10533,7 +10533,7 @@ public class PveClient : PveClientBase
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("server", server);
-                        return await _client.Get($"/nodes/{_node}/scan/nfs", parameters);
+                        return await _client.GetAsync($"/nodes/{_node}/scan/nfs", parameters);
                     }
                 }
                 /// <summary>
@@ -10559,7 +10559,7 @@ public class PveClient : PveClientBase
                         parameters.Add("domain", domain);
                         parameters.Add("password", password);
                         parameters.Add("username", username);
-                        return await _client.Get($"/nodes/{_node}/scan/cifs", parameters);
+                        return await _client.GetAsync($"/nodes/{_node}/scan/cifs", parameters);
                     }
                 }
                 /// <summary>
@@ -10587,7 +10587,7 @@ public class PveClient : PveClientBase
                         parameters.Add("username", username);
                         parameters.Add("fingerprint", fingerprint);
                         parameters.Add("port", port);
-                        return await _client.Get($"/nodes/{_node}/scan/pbs", parameters);
+                        return await _client.GetAsync($"/nodes/{_node}/scan/pbs", parameters);
                     }
                 }
                 /// <summary>
@@ -10607,7 +10607,7 @@ public class PveClient : PveClientBase
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("server", server);
-                        return await _client.Get($"/nodes/{_node}/scan/glusterfs", parameters);
+                        return await _client.GetAsync($"/nodes/{_node}/scan/glusterfs", parameters);
                     }
                 }
                 /// <summary>
@@ -10627,7 +10627,7 @@ public class PveClient : PveClientBase
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("portal", portal);
-                        return await _client.Get($"/nodes/{_node}/scan/iscsi", parameters);
+                        return await _client.GetAsync($"/nodes/{_node}/scan/iscsi", parameters);
                     }
                 }
                 /// <summary>
@@ -10642,7 +10642,7 @@ public class PveClient : PveClientBase
                     /// List local LVM volume groups.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Lvmscan() { return await _client.Get($"/nodes/{_node}/scan/lvm"); }
+                    public async Task<Result> Lvmscan() { return await _client.GetAsync($"/nodes/{_node}/scan/lvm"); }
                 }
                 /// <summary>
                 /// Lvmthin
@@ -10661,7 +10661,7 @@ public class PveClient : PveClientBase
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("vg", vg);
-                        return await _client.Get($"/nodes/{_node}/scan/lvmthin", parameters);
+                        return await _client.GetAsync($"/nodes/{_node}/scan/lvmthin", parameters);
                     }
                 }
                 /// <summary>
@@ -10676,13 +10676,13 @@ public class PveClient : PveClientBase
                     /// Scan zfs pool list on local node.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Zfsscan() { return await _client.Get($"/nodes/{_node}/scan/zfs"); }
+                    public async Task<Result> Zfsscan() { return await _client.GetAsync($"/nodes/{_node}/scan/zfs"); }
                 }
                 /// <summary>
                 /// Index of available scan methods
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/scan"); }
+                public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/scan"); }
             }
             /// <summary>
             /// Hardware
@@ -10749,13 +10749,13 @@ public class PveClient : PveClientBase
                             /// List mediated device types for given PCI device.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> Mdevscan() { return await _client.Get($"/nodes/{_node}/hardware/pci/{_pciid}/mdev"); }
+                            public async Task<Result> Mdevscan() { return await _client.GetAsync($"/nodes/{_node}/hardware/pci/{_pciid}/mdev"); }
                         }
                         /// <summary>
                         /// Index of available pci methods
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Pciindex() { return await _client.Get($"/nodes/{_node}/hardware/pci/{_pciid}"); }
+                        public async Task<Result> Pciindex() { return await _client.GetAsync($"/nodes/{_node}/hardware/pci/{_pciid}"); }
                     }
                     /// <summary>
                     /// List local PCI devices.
@@ -10768,7 +10768,7 @@ public class PveClient : PveClientBase
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("pci-class-blacklist", pci_class_blacklist);
                         parameters.Add("verbose", verbose);
-                        return await _client.Get($"/nodes/{_node}/hardware/pci", parameters);
+                        return await _client.GetAsync($"/nodes/{_node}/hardware/pci", parameters);
                     }
                 }
                 /// <summary>
@@ -10783,13 +10783,13 @@ public class PveClient : PveClientBase
                     /// List local USB devices.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Usbscan() { return await _client.Get($"/nodes/{_node}/hardware/usb"); }
+                    public async Task<Result> Usbscan() { return await _client.GetAsync($"/nodes/{_node}/hardware/usb"); }
                 }
                 /// <summary>
                 /// Index of hardware types
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/hardware"); }
+                public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/hardware"); }
             }
             /// <summary>
             /// Capabilities
@@ -10834,7 +10834,7 @@ public class PveClient : PveClientBase
                         /// List all custom and default CPU models.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/capabilities/qemu/cpu"); }
+                        public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/capabilities/qemu/cpu"); }
                     }
                     /// <summary>
                     /// Machines
@@ -10848,19 +10848,19 @@ public class PveClient : PveClientBase
                         /// Get available QEMU/KVM machine types.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Types() { return await _client.Get($"/nodes/{_node}/capabilities/qemu/machines"); }
+                        public async Task<Result> Types() { return await _client.GetAsync($"/nodes/{_node}/capabilities/qemu/machines"); }
                     }
                     /// <summary>
                     /// QEMU capabilities index.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> QemuCapsIndex() { return await _client.Get($"/nodes/{_node}/capabilities/qemu"); }
+                    public async Task<Result> QemuCapsIndex() { return await _client.GetAsync($"/nodes/{_node}/capabilities/qemu"); }
                 }
                 /// <summary>
                 /// Node capabilities index.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/capabilities"); }
+                public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/capabilities"); }
             }
             /// <summary>
             /// Storage
@@ -10959,7 +10959,7 @@ public class PveClient : PveClientBase
                             parameters.Add("prune-backups", prune_backups);
                             parameters.Add("type", type);
                             parameters.Add("vmid", vmid);
-                            return await _client.Delete($"/nodes/{_node}/storage/{_storage}/prunebackups", parameters);
+                            return await _client.DeleteAsync($"/nodes/{_node}/storage/{_storage}/prunebackups", parameters);
                         }
                         /// <summary>
                         /// Get prune information for backups. NOTE: this is only a preview and might not be what a subsequent prune call does if backups are removed/added in the meantime.
@@ -10975,7 +10975,7 @@ public class PveClient : PveClientBase
                             parameters.Add("prune-backups", prune_backups);
                             parameters.Add("type", type);
                             parameters.Add("vmid", vmid);
-                            return await _client.Get($"/nodes/{_node}/storage/{_storage}/prunebackups", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/storage/{_storage}/prunebackups", parameters);
                         }
                     }
                     /// <summary>
@@ -11019,13 +11019,13 @@ public class PveClient : PveClientBase
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("delay", delay);
-                                return await _client.Delete($"/nodes/{_node}/storage/{_storage}/content/{_volume}", parameters);
+                                return await _client.DeleteAsync($"/nodes/{_node}/storage/{_storage}/content/{_volume}", parameters);
                             }
                             /// <summary>
                             /// Get volume attributes
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> Info() { return await _client.Get($"/nodes/{_node}/storage/{_storage}/content/{_volume}"); }
+                            public async Task<Result> Info() { return await _client.GetAsync($"/nodes/{_node}/storage/{_storage}/content/{_volume}"); }
                             /// <summary>
                             /// Copy a volume. This is experimental code - do not use.
                             /// </summary>
@@ -11037,7 +11037,7 @@ public class PveClient : PveClientBase
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("target", target);
                                 parameters.Add("target_node", target_node);
-                                return await _client.Create($"/nodes/{_node}/storage/{_storage}/content/{_volume}", parameters);
+                                return await _client.CreateAsync($"/nodes/{_node}/storage/{_storage}/content/{_volume}", parameters);
                             }
                             /// <summary>
                             /// Update volume attributes
@@ -11050,7 +11050,7 @@ public class PveClient : PveClientBase
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("notes", notes);
                                 parameters.Add("protected", protected_);
-                                return await _client.Set($"/nodes/{_node}/storage/{_storage}/content/{_volume}", parameters);
+                                return await _client.SetAsync($"/nodes/{_node}/storage/{_storage}/content/{_volume}", parameters);
                             }
                         }
                         /// <summary>
@@ -11064,7 +11064,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("content", content);
                             parameters.Add("vmid", vmid);
-                            return await _client.Get($"/nodes/{_node}/storage/{_storage}/content", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/storage/{_storage}/content", parameters);
                         }
                         /// <summary>
                         /// Allocate disk images.
@@ -11082,7 +11082,7 @@ public class PveClient : PveClientBase
                             parameters.Add("size", size);
                             parameters.Add("vmid", vmid);
                             parameters.Add("format", format);
-                            return await _client.Create($"/nodes/{_node}/storage/{_storage}/content", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/storage/{_storage}/content", parameters);
                         }
                     }
                     /// <summary>
@@ -11132,7 +11132,7 @@ public class PveClient : PveClientBase
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("filepath", filepath);
                                 parameters.Add("volume", volume);
-                                return await _client.Get($"/nodes/{_node}/storage/{_storage}/file-restore/list", parameters);
+                                return await _client.GetAsync($"/nodes/{_node}/storage/{_storage}/file-restore/list", parameters);
                             }
                         }
                         /// <summary>
@@ -11161,7 +11161,7 @@ public class PveClient : PveClientBase
                                 parameters.Add("filepath", filepath);
                                 parameters.Add("volume", volume);
                                 parameters.Add("tar", tar);
-                                return await _client.Get($"/nodes/{_node}/storage/{_storage}/file-restore/download", parameters);
+                                return await _client.GetAsync($"/nodes/{_node}/storage/{_storage}/file-restore/download", parameters);
                             }
                         }
                     }
@@ -11182,7 +11182,7 @@ public class PveClient : PveClientBase
                         /// Read storage status.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> ReadStatus() { return await _client.Get($"/nodes/{_node}/storage/{_storage}/status"); }
+                        public async Task<Result> ReadStatus() { return await _client.GetAsync($"/nodes/{_node}/storage/{_storage}/status"); }
                     }
                     /// <summary>
                     /// Rrd
@@ -11212,7 +11212,7 @@ public class PveClient : PveClientBase
                             parameters.Add("ds", ds);
                             parameters.Add("timeframe", timeframe);
                             parameters.Add("cf", cf);
-                            return await _client.Get($"/nodes/{_node}/storage/{_storage}/rrd", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/storage/{_storage}/rrd", parameters);
                         }
                     }
                     /// <summary>
@@ -11241,7 +11241,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("timeframe", timeframe);
                             parameters.Add("cf", cf);
-                            return await _client.Get($"/nodes/{_node}/storage/{_storage}/rrddata", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/storage/{_storage}/rrddata", parameters);
                         }
                     }
                     /// <summary>
@@ -11276,7 +11276,7 @@ public class PveClient : PveClientBase
                             parameters.Add("checksum", checksum);
                             parameters.Add("checksum-algorithm", checksum_algorithm);
                             parameters.Add("tmpfilename", tmpfilename);
-                            return await _client.Create($"/nodes/{_node}/storage/{_storage}/upload", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/storage/{_storage}/upload", parameters);
                         }
                     }
                     /// <summary>
@@ -11315,7 +11315,7 @@ public class PveClient : PveClientBase
                             parameters.Add("checksum-algorithm", checksum_algorithm);
                             parameters.Add("compression", compression);
                             parameters.Add("verify-certificates", verify_certificates);
-                            return await _client.Create($"/nodes/{_node}/storage/{_storage}/download-url", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/storage/{_storage}/download-url", parameters);
                         }
                     }
                     /// <summary>
@@ -11340,14 +11340,14 @@ public class PveClient : PveClientBase
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("volume", volume);
-                            return await _client.Get($"/nodes/{_node}/storage/{_storage}/import-metadata", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/storage/{_storage}/import-metadata", parameters);
                         }
                     }
                     /// <summary>
                     ///
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Diridx() { return await _client.Get($"/nodes/{_node}/storage/{_storage}"); }
+                    public async Task<Result> Diridx() { return await _client.GetAsync($"/nodes/{_node}/storage/{_storage}"); }
                 }
                 /// <summary>
                 /// Get status for all datastores.
@@ -11366,7 +11366,7 @@ public class PveClient : PveClientBase
                     parameters.Add("format", format);
                     parameters.Add("storage", storage);
                     parameters.Add("target", target);
-                    return await _client.Get($"/nodes/{_node}/storage", parameters);
+                    return await _client.GetAsync($"/nodes/{_node}/storage", parameters);
                 }
             }
             /// <summary>
@@ -11453,14 +11453,14 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("cleanup-config", cleanup_config);
                             parameters.Add("cleanup-disks", cleanup_disks);
-                            return await _client.Delete($"/nodes/{_node}/disks/lvm/{_name}", parameters);
+                            return await _client.DeleteAsync($"/nodes/{_node}/disks/lvm/{_name}", parameters);
                         }
                     }
                     /// <summary>
                     /// List LVM Volume Groups
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/disks/lvm"); }
+                    public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/disks/lvm"); }
                     /// <summary>
                     /// Create an LVM Volume Group
                     /// </summary>
@@ -11474,7 +11474,7 @@ public class PveClient : PveClientBase
                         parameters.Add("device", device);
                         parameters.Add("name", name);
                         parameters.Add("add_storage", add_storage);
-                        return await _client.Create($"/nodes/{_node}/disks/lvm", parameters);
+                        return await _client.CreateAsync($"/nodes/{_node}/disks/lvm", parameters);
                     }
                 }
                 /// <summary>
@@ -11515,14 +11515,14 @@ public class PveClient : PveClientBase
                             parameters.Add("volume-group", volume_group);
                             parameters.Add("cleanup-config", cleanup_config);
                             parameters.Add("cleanup-disks", cleanup_disks);
-                            return await _client.Delete($"/nodes/{_node}/disks/lvmthin/{_name}", parameters);
+                            return await _client.DeleteAsync($"/nodes/{_node}/disks/lvmthin/{_name}", parameters);
                         }
                     }
                     /// <summary>
                     /// List LVM thinpools
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/disks/lvmthin"); }
+                    public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/disks/lvmthin"); }
                     /// <summary>
                     /// Create an LVM thinpool
                     /// </summary>
@@ -11536,7 +11536,7 @@ public class PveClient : PveClientBase
                         parameters.Add("device", device);
                         parameters.Add("name", name);
                         parameters.Add("add_storage", add_storage);
-                        return await _client.Create($"/nodes/{_node}/disks/lvmthin", parameters);
+                        return await _client.CreateAsync($"/nodes/{_node}/disks/lvmthin", parameters);
                     }
                 }
                 /// <summary>
@@ -11575,14 +11575,14 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("cleanup-config", cleanup_config);
                             parameters.Add("cleanup-disks", cleanup_disks);
-                            return await _client.Delete($"/nodes/{_node}/disks/directory/{_name}", parameters);
+                            return await _client.DeleteAsync($"/nodes/{_node}/disks/directory/{_name}", parameters);
                         }
                     }
                     /// <summary>
                     /// PVE Managed Directory storages.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/disks/directory"); }
+                    public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/disks/directory"); }
                     /// <summary>
                     /// Create a Filesystem on an unused disk. Will be mounted under '/mnt/pve/NAME'.
                     /// </summary>
@@ -11599,7 +11599,7 @@ public class PveClient : PveClientBase
                         parameters.Add("name", name);
                         parameters.Add("add_storage", add_storage);
                         parameters.Add("filesystem", filesystem);
-                        return await _client.Create($"/nodes/{_node}/disks/directory", parameters);
+                        return await _client.CreateAsync($"/nodes/{_node}/disks/directory", parameters);
                     }
                 }
                 /// <summary>
@@ -11638,19 +11638,19 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("cleanup-config", cleanup_config);
                             parameters.Add("cleanup-disks", cleanup_disks);
-                            return await _client.Delete($"/nodes/{_node}/disks/zfs/{_name}", parameters);
+                            return await _client.DeleteAsync($"/nodes/{_node}/disks/zfs/{_name}", parameters);
                         }
                         /// <summary>
                         /// Get details about a zpool.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Detail() { return await _client.Get($"/nodes/{_node}/disks/zfs/{_name}"); }
+                        public async Task<Result> Detail() { return await _client.GetAsync($"/nodes/{_node}/disks/zfs/{_name}"); }
                     }
                     /// <summary>
                     /// List Zpools.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/disks/zfs"); }
+                    public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/disks/zfs"); }
                     /// <summary>
                     /// Create a ZFS pool.
                     /// </summary>
@@ -11674,7 +11674,7 @@ public class PveClient : PveClientBase
                         parameters.Add("ashift", ashift);
                         parameters.Add("compression", compression);
                         parameters.Add("draid-config", draid_config);
-                        return await _client.Create($"/nodes/{_node}/disks/zfs", parameters);
+                        return await _client.CreateAsync($"/nodes/{_node}/disks/zfs", parameters);
                     }
                 }
                 /// <summary>
@@ -11699,7 +11699,7 @@ public class PveClient : PveClientBase
                         parameters.Add("include-partitions", include_partitions);
                         parameters.Add("skipsmart", skipsmart);
                         parameters.Add("type", type);
-                        return await _client.Get($"/nodes/{_node}/disks/list", parameters);
+                        return await _client.GetAsync($"/nodes/{_node}/disks/list", parameters);
                     }
                 }
                 /// <summary>
@@ -11721,7 +11721,7 @@ public class PveClient : PveClientBase
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("disk", disk);
                         parameters.Add("healthonly", healthonly);
-                        return await _client.Get($"/nodes/{_node}/disks/smart", parameters);
+                        return await _client.GetAsync($"/nodes/{_node}/disks/smart", parameters);
                     }
                 }
                 /// <summary>
@@ -11743,7 +11743,7 @@ public class PveClient : PveClientBase
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("disk", disk);
                         parameters.Add("uuid", uuid);
-                        return await _client.Create($"/nodes/{_node}/disks/initgpt", parameters);
+                        return await _client.CreateAsync($"/nodes/{_node}/disks/initgpt", parameters);
                     }
                 }
                 /// <summary>
@@ -11763,14 +11763,14 @@ public class PveClient : PveClientBase
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("disk", disk);
-                        return await _client.Set($"/nodes/{_node}/disks/wipedisk", parameters);
+                        return await _client.SetAsync($"/nodes/{_node}/disks/wipedisk", parameters);
                     }
                 }
                 /// <summary>
                 /// Node index.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/disks"); }
+                public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/disks"); }
             }
             /// <summary>
             /// Apt
@@ -11812,7 +11812,7 @@ public class PveClient : PveClientBase
                     /// List available updates.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> ListUpdates() { return await _client.Get($"/nodes/{_node}/apt/update"); }
+                    public async Task<Result> ListUpdates() { return await _client.GetAsync($"/nodes/{_node}/apt/update"); }
                     /// <summary>
                     /// This is used to resynchronize the package index files from their sources (apt-get update).
                     /// </summary>
@@ -11824,7 +11824,7 @@ public class PveClient : PveClientBase
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("notify", notify);
                         parameters.Add("quiet", quiet);
-                        return await _client.Create($"/nodes/{_node}/apt/update", parameters);
+                        return await _client.CreateAsync($"/nodes/{_node}/apt/update", parameters);
                     }
                 }
                 /// <summary>
@@ -11846,7 +11846,7 @@ public class PveClient : PveClientBase
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("name", name);
                         parameters.Add("version", version);
-                        return await _client.Get($"/nodes/{_node}/apt/changelog", parameters);
+                        return await _client.GetAsync($"/nodes/{_node}/apt/changelog", parameters);
                     }
                 }
                 /// <summary>
@@ -11861,7 +11861,7 @@ public class PveClient : PveClientBase
                     /// Get APT repository information.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Repositories() { return await _client.Get($"/nodes/{_node}/apt/repositories"); }
+                    public async Task<Result> Repositories() { return await _client.GetAsync($"/nodes/{_node}/apt/repositories"); }
                     /// <summary>
                     /// Change the properties of a repository. Currently only allows enabling/disabling.
                     /// </summary>
@@ -11877,7 +11877,7 @@ public class PveClient : PveClientBase
                         parameters.Add("path", path);
                         parameters.Add("digest", digest);
                         parameters.Add("enabled", enabled);
-                        return await _client.Create($"/nodes/{_node}/apt/repositories", parameters);
+                        return await _client.CreateAsync($"/nodes/{_node}/apt/repositories", parameters);
                     }
                     /// <summary>
                     /// Add a standard repository to the configuration
@@ -11890,7 +11890,7 @@ public class PveClient : PveClientBase
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("handle", handle);
                         parameters.Add("digest", digest);
-                        return await _client.Set($"/nodes/{_node}/apt/repositories", parameters);
+                        return await _client.SetAsync($"/nodes/{_node}/apt/repositories", parameters);
                     }
                 }
                 /// <summary>
@@ -11905,13 +11905,13 @@ public class PveClient : PveClientBase
                     /// Get package information for important Proxmox packages.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Versions() { return await _client.Get($"/nodes/{_node}/apt/versions"); }
+                    public async Task<Result> Versions() { return await _client.GetAsync($"/nodes/{_node}/apt/versions"); }
                 }
                 /// <summary>
                 /// Directory index for apt (Advanced Package Tool).
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/apt"); }
+                public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/apt"); }
             }
             /// <summary>
             /// Firewall
@@ -11970,13 +11970,13 @@ public class PveClient : PveClientBase
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("digest", digest);
-                            return await _client.Delete($"/nodes/{_node}/firewall/rules/{_pos}", parameters);
+                            return await _client.DeleteAsync($"/nodes/{_node}/firewall/rules/{_pos}", parameters);
                         }
                         /// <summary>
                         /// Get single rule data.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> GetRule() { return await _client.Get($"/nodes/{_node}/firewall/rules/{_pos}"); }
+                        public async Task<Result> GetRule() { return await _client.GetAsync($"/nodes/{_node}/firewall/rules/{_pos}"); }
                         /// <summary>
                         /// Modify rule data.
                         /// </summary>
@@ -12018,14 +12018,14 @@ public class PveClient : PveClientBase
                             parameters.Add("source", source);
                             parameters.Add("sport", sport);
                             parameters.Add("type", type);
-                            return await _client.Set($"/nodes/{_node}/firewall/rules/{_pos}", parameters);
+                            return await _client.SetAsync($"/nodes/{_node}/firewall/rules/{_pos}", parameters);
                         }
                     }
                     /// <summary>
                     /// List rules.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> GetRules() { return await _client.Get($"/nodes/{_node}/firewall/rules"); }
+                    public async Task<Result> GetRules() { return await _client.GetAsync($"/nodes/{_node}/firewall/rules"); }
                     /// <summary>
                     /// Create new rule.
                     /// </summary>
@@ -12065,7 +12065,7 @@ public class PveClient : PveClientBase
                         parameters.Add("proto", proto);
                         parameters.Add("source", source);
                         parameters.Add("sport", sport);
-                        return await _client.Create($"/nodes/{_node}/firewall/rules", parameters);
+                        return await _client.CreateAsync($"/nodes/{_node}/firewall/rules", parameters);
                     }
                 }
                 /// <summary>
@@ -12080,7 +12080,7 @@ public class PveClient : PveClientBase
                     /// Get host firewall options.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> GetOptions() { return await _client.Get($"/nodes/{_node}/firewall/options"); }
+                    public async Task<Result> GetOptions() { return await _client.GetAsync($"/nodes/{_node}/firewall/options"); }
                     /// <summary>
                     /// Set Firewall options.
                     /// </summary>
@@ -12130,7 +12130,7 @@ public class PveClient : PveClientBase
                         parameters.Add("smurf_log_level", smurf_log_level);
                         parameters.Add("tcp_flags_log_level", tcp_flags_log_level);
                         parameters.Add("tcpflags", tcpflags);
-                        return await _client.Set($"/nodes/{_node}/firewall/options", parameters);
+                        return await _client.SetAsync($"/nodes/{_node}/firewall/options", parameters);
                     }
                 }
                 /// <summary>
@@ -12156,14 +12156,14 @@ public class PveClient : PveClientBase
                         parameters.Add("since", since);
                         parameters.Add("start", start);
                         parameters.Add("until", until);
-                        return await _client.Get($"/nodes/{_node}/firewall/log", parameters);
+                        return await _client.GetAsync($"/nodes/{_node}/firewall/log", parameters);
                     }
                 }
                 /// <summary>
                 /// Directory index.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/firewall"); }
+                public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/firewall"); }
             }
             /// <summary>
             /// Replication
@@ -12222,7 +12222,7 @@ public class PveClient : PveClientBase
                         /// Get replication job status.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> JobStatus() { return await _client.Get($"/nodes/{_node}/replication/{_id}/status"); }
+                        public async Task<Result> JobStatus() { return await _client.GetAsync($"/nodes/{_node}/replication/{_id}/status"); }
                     }
                     /// <summary>
                     /// Log
@@ -12248,7 +12248,7 @@ public class PveClient : PveClientBase
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("limit", limit);
                             parameters.Add("start", start);
-                            return await _client.Get($"/nodes/{_node}/replication/{_id}/log", parameters);
+                            return await _client.GetAsync($"/nodes/{_node}/replication/{_id}/log", parameters);
                         }
                     }
                     /// <summary>
@@ -12268,13 +12268,13 @@ public class PveClient : PveClientBase
                         /// Schedule replication job to start as soon as possible.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> ScheduleNow() { return await _client.Create($"/nodes/{_node}/replication/{_id}/schedule_now"); }
+                        public async Task<Result> ScheduleNow() { return await _client.CreateAsync($"/nodes/{_node}/replication/{_id}/schedule_now"); }
                     }
                     /// <summary>
                     /// Directory index.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/replication/{_id}"); }
+                    public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/replication/{_id}"); }
                 }
                 /// <summary>
                 /// List status of all replication jobs on this node.
@@ -12285,7 +12285,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("guest", guest);
-                    return await _client.Get($"/nodes/{_node}/replication", parameters);
+                    return await _client.GetAsync($"/nodes/{_node}/replication", parameters);
                 }
             }
             /// <summary>
@@ -12336,7 +12336,7 @@ public class PveClient : PveClientBase
                         /// Revoke existing certificate from CA.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> RevokeCertificate() { return await _client.Delete($"/nodes/{_node}/certificates/acme/certificate"); }
+                        public async Task<Result> RevokeCertificate() { return await _client.DeleteAsync($"/nodes/{_node}/certificates/acme/certificate"); }
                         /// <summary>
                         /// Order a new certificate from ACME-compatible CA.
                         /// </summary>
@@ -12346,7 +12346,7 @@ public class PveClient : PveClientBase
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("force", force);
-                            return await _client.Create($"/nodes/{_node}/certificates/acme/certificate", parameters);
+                            return await _client.CreateAsync($"/nodes/{_node}/certificates/acme/certificate", parameters);
                         }
                         /// <summary>
                         /// Renew existing certificate from CA.
@@ -12357,14 +12357,14 @@ public class PveClient : PveClientBase
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("force", force);
-                            return await _client.Set($"/nodes/{_node}/certificates/acme/certificate", parameters);
+                            return await _client.SetAsync($"/nodes/{_node}/certificates/acme/certificate", parameters);
                         }
                     }
                     /// <summary>
                     /// ACME index.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/certificates/acme"); }
+                    public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/certificates/acme"); }
                 }
                 /// <summary>
                 /// Info
@@ -12378,7 +12378,7 @@ public class PveClient : PveClientBase
                     /// Get information about node's certificates.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Info() { return await _client.Get($"/nodes/{_node}/certificates/info"); }
+                    public async Task<Result> Info() { return await _client.GetAsync($"/nodes/{_node}/certificates/info"); }
                 }
                 /// <summary>
                 /// Custom
@@ -12397,7 +12397,7 @@ public class PveClient : PveClientBase
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("restart", restart);
-                        return await _client.Delete($"/nodes/{_node}/certificates/custom", parameters);
+                        return await _client.DeleteAsync($"/nodes/{_node}/certificates/custom", parameters);
                     }
                     /// <summary>
                     /// Upload or update custom certificate chain and key.
@@ -12414,14 +12414,14 @@ public class PveClient : PveClientBase
                         parameters.Add("force", force);
                         parameters.Add("key", key);
                         parameters.Add("restart", restart);
-                        return await _client.Create($"/nodes/{_node}/certificates/custom", parameters);
+                        return await _client.CreateAsync($"/nodes/{_node}/certificates/custom", parameters);
                     }
                 }
                 /// <summary>
                 /// Node index.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/certificates"); }
+                public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/certificates"); }
             }
             /// <summary>
             /// Config
@@ -12441,7 +12441,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("property", property);
-                    return await _client.Get($"/nodes/{_node}/config", parameters);
+                    return await _client.GetAsync($"/nodes/{_node}/config", parameters);
                 }
                 /// <summary>
                 /// Set node configuration options.
@@ -12464,7 +12464,7 @@ public class PveClient : PveClientBase
                     parameters.Add("startall-onboot-delay", startall_onboot_delay);
                     parameters.Add("wakeonlan", wakeonlan);
                     AddIndexedParameter(parameters, "acmedomain", acmedomainN);
-                    return await _client.Set($"/nodes/{_node}/config", parameters);
+                    return await _client.SetAsync($"/nodes/{_node}/config", parameters);
                 }
             }
             /// <summary>
@@ -12527,25 +12527,25 @@ public class PveClient : PveClientBase
                             /// List zone content.
                             /// </summary>
                             /// <returns></returns>
-                            public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/sdn/zones/{_zone}/content"); }
+                            public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/sdn/zones/{_zone}/content"); }
                         }
                         /// <summary>
                         ///
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> Diridx() { return await _client.Get($"/nodes/{_node}/sdn/zones/{_zone}"); }
+                        public async Task<Result> Diridx() { return await _client.GetAsync($"/nodes/{_node}/sdn/zones/{_zone}"); }
                     }
                     /// <summary>
                     /// Get status for all zones.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}/sdn/zones"); }
+                    public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/sdn/zones"); }
                 }
                 /// <summary>
                 /// SDN index.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Sdnindex() { return await _client.Get($"/nodes/{_node}/sdn"); }
+                public async Task<Result> Sdnindex() { return await _client.GetAsync($"/nodes/{_node}/sdn"); }
             }
             /// <summary>
             /// Version
@@ -12559,7 +12559,7 @@ public class PveClient : PveClientBase
                 /// API version details
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Version() { return await _client.Get($"/nodes/{_node}/version"); }
+                public async Task<Result> Version() { return await _client.GetAsync($"/nodes/{_node}/version"); }
             }
             /// <summary>
             /// Status
@@ -12573,7 +12573,7 @@ public class PveClient : PveClientBase
                 /// Read node status
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Status() { return await _client.Get($"/nodes/{_node}/status"); }
+                public async Task<Result> Status() { return await _client.GetAsync($"/nodes/{_node}/status"); }
                 /// <summary>
                 /// Reboot or shutdown a node.
                 /// </summary>
@@ -12584,7 +12584,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("command", command);
-                    return await _client.Create($"/nodes/{_node}/status", parameters);
+                    return await _client.CreateAsync($"/nodes/{_node}/status", parameters);
                 }
             }
             /// <summary>
@@ -12599,7 +12599,7 @@ public class PveClient : PveClientBase
                 /// Read tap/vm network device interface counters
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Netstat() { return await _client.Get($"/nodes/{_node}/netstat"); }
+                public async Task<Result> Netstat() { return await _client.GetAsync($"/nodes/{_node}/netstat"); }
             }
             /// <summary>
             /// Execute
@@ -12618,7 +12618,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("commands", commands);
-                    return await _client.Create($"/nodes/{_node}/execute", parameters);
+                    return await _client.CreateAsync($"/nodes/{_node}/execute", parameters);
                 }
             }
             /// <summary>
@@ -12633,7 +12633,7 @@ public class PveClient : PveClientBase
                 /// Try to wake a node via 'wake on LAN' network packet.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Wakeonlan() { return await _client.Create($"/nodes/{_node}/wakeonlan"); }
+                public async Task<Result> Wakeonlan() { return await _client.CreateAsync($"/nodes/{_node}/wakeonlan"); }
             }
             /// <summary>
             /// Rrd
@@ -12658,7 +12658,7 @@ public class PveClient : PveClientBase
                     parameters.Add("ds", ds);
                     parameters.Add("timeframe", timeframe);
                     parameters.Add("cf", cf);
-                    return await _client.Get($"/nodes/{_node}/rrd", parameters);
+                    return await _client.GetAsync($"/nodes/{_node}/rrd", parameters);
                 }
             }
             /// <summary>
@@ -12682,7 +12682,7 @@ public class PveClient : PveClientBase
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("timeframe", timeframe);
                     parameters.Add("cf", cf);
-                    return await _client.Get($"/nodes/{_node}/rrddata", parameters);
+                    return await _client.GetAsync($"/nodes/{_node}/rrddata", parameters);
                 }
             }
             /// <summary>
@@ -12710,7 +12710,7 @@ public class PveClient : PveClientBase
                     parameters.Add("since", since);
                     parameters.Add("start", start);
                     parameters.Add("until", until);
-                    return await _client.Get($"/nodes/{_node}/syslog", parameters);
+                    return await _client.GetAsync($"/nodes/{_node}/syslog", parameters);
                 }
             }
             /// <summary>
@@ -12738,7 +12738,7 @@ public class PveClient : PveClientBase
                     parameters.Add("since", since);
                     parameters.Add("startcursor", startcursor);
                     parameters.Add("until", until);
-                    return await _client.Get($"/nodes/{_node}/journal", parameters);
+                    return await _client.GetAsync($"/nodes/{_node}/journal", parameters);
                 }
             }
             /// <summary>
@@ -12767,7 +12767,7 @@ public class PveClient : PveClientBase
                     parameters.Add("height", height);
                     parameters.Add("websocket", websocket);
                     parameters.Add("width", width);
-                    return await _client.Create($"/nodes/{_node}/vncshell", parameters);
+                    return await _client.CreateAsync($"/nodes/{_node}/vncshell", parameters);
                 }
             }
             /// <summary>
@@ -12790,7 +12790,7 @@ public class PveClient : PveClientBase
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("cmd", cmd);
                     parameters.Add("cmd-opts", cmd_opts);
-                    return await _client.Create($"/nodes/{_node}/termproxy", parameters);
+                    return await _client.CreateAsync($"/nodes/{_node}/termproxy", parameters);
                 }
             }
             /// <summary>
@@ -12812,7 +12812,7 @@ public class PveClient : PveClientBase
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("port", port);
                     parameters.Add("vncticket", vncticket);
-                    return await _client.Get($"/nodes/{_node}/vncwebsocket", parameters);
+                    return await _client.GetAsync($"/nodes/{_node}/vncwebsocket", parameters);
                 }
             }
             /// <summary>
@@ -12837,7 +12837,7 @@ public class PveClient : PveClientBase
                     parameters.Add("cmd", cmd);
                     parameters.Add("cmd-opts", cmd_opts);
                     parameters.Add("proxy", proxy);
-                    return await _client.Create($"/nodes/{_node}/spiceshell", parameters);
+                    return await _client.CreateAsync($"/nodes/{_node}/spiceshell", parameters);
                 }
             }
             /// <summary>
@@ -12852,7 +12852,7 @@ public class PveClient : PveClientBase
                 /// Read DNS settings.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Dns() { return await _client.Get($"/nodes/{_node}/dns"); }
+                public async Task<Result> Dns() { return await _client.GetAsync($"/nodes/{_node}/dns"); }
                 /// <summary>
                 /// Write DNS settings.
                 /// </summary>
@@ -12868,7 +12868,7 @@ public class PveClient : PveClientBase
                     parameters.Add("dns1", dns1);
                     parameters.Add("dns2", dns2);
                     parameters.Add("dns3", dns3);
-                    return await _client.Set($"/nodes/{_node}/dns", parameters);
+                    return await _client.SetAsync($"/nodes/{_node}/dns", parameters);
                 }
             }
             /// <summary>
@@ -12883,7 +12883,7 @@ public class PveClient : PveClientBase
                 /// Read server time and time zone settings.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Time() { return await _client.Get($"/nodes/{_node}/time"); }
+                public async Task<Result> Time() { return await _client.GetAsync($"/nodes/{_node}/time"); }
                 /// <summary>
                 /// Set time zone.
                 /// </summary>
@@ -12893,7 +12893,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("timezone", timezone);
-                    return await _client.Set($"/nodes/{_node}/time", parameters);
+                    return await _client.SetAsync($"/nodes/{_node}/time", parameters);
                 }
             }
             /// <summary>
@@ -12908,7 +12908,7 @@ public class PveClient : PveClientBase
                 /// Get list of appliances.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Aplinfo() { return await _client.Get($"/nodes/{_node}/aplinfo"); }
+                public async Task<Result> Aplinfo() { return await _client.GetAsync($"/nodes/{_node}/aplinfo"); }
                 /// <summary>
                 /// Download appliance templates.
                 /// </summary>
@@ -12920,7 +12920,7 @@ public class PveClient : PveClientBase
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("storage", storage);
                     parameters.Add("template", template);
-                    return await _client.Create($"/nodes/{_node}/aplinfo", parameters);
+                    return await _client.CreateAsync($"/nodes/{_node}/aplinfo", parameters);
                 }
             }
             /// <summary>
@@ -12942,7 +12942,7 @@ public class PveClient : PveClientBase
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("url", url);
                     parameters.Add("verify-certificates", verify_certificates);
-                    return await _client.Get($"/nodes/{_node}/query-url-metadata", parameters);
+                    return await _client.GetAsync($"/nodes/{_node}/query-url-metadata", parameters);
                 }
             }
             /// <summary>
@@ -12957,7 +12957,7 @@ public class PveClient : PveClientBase
                 /// Gather various systems information about a node
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Report() { return await _client.Get($"/nodes/{_node}/report"); }
+                public async Task<Result> Report() { return await _client.GetAsync($"/nodes/{_node}/report"); }
             }
             /// <summary>
             /// Startall
@@ -12978,7 +12978,7 @@ public class PveClient : PveClientBase
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("force", force);
                     parameters.Add("vms", vms);
-                    return await _client.Create($"/nodes/{_node}/startall", parameters);
+                    return await _client.CreateAsync($"/nodes/{_node}/startall", parameters);
                 }
             }
             /// <summary>
@@ -13002,7 +13002,7 @@ public class PveClient : PveClientBase
                     parameters.Add("force-stop", force_stop);
                     parameters.Add("timeout", timeout);
                     parameters.Add("vms", vms);
-                    return await _client.Create($"/nodes/{_node}/stopall", parameters);
+                    return await _client.CreateAsync($"/nodes/{_node}/stopall", parameters);
                 }
             }
             /// <summary>
@@ -13022,7 +13022,7 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("vms", vms);
-                    return await _client.Create($"/nodes/{_node}/suspendall", parameters);
+                    return await _client.CreateAsync($"/nodes/{_node}/suspendall", parameters);
                 }
             }
             /// <summary>
@@ -13048,7 +13048,7 @@ public class PveClient : PveClientBase
                     parameters.Add("maxworkers", maxworkers);
                     parameters.Add("vms", vms);
                     parameters.Add("with-local-disks", with_local_disks);
-                    return await _client.Create($"/nodes/{_node}/migrateall", parameters);
+                    return await _client.CreateAsync($"/nodes/{_node}/migrateall", parameters);
                 }
             }
             /// <summary>
@@ -13063,7 +13063,7 @@ public class PveClient : PveClientBase
                 /// Get the content of /etc/hosts.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> GetEtcHosts() { return await _client.Get($"/nodes/{_node}/hosts"); }
+                public async Task<Result> GetEtcHosts() { return await _client.GetAsync($"/nodes/{_node}/hosts"); }
                 /// <summary>
                 /// Write /etc/hosts.
                 /// </summary>
@@ -13075,20 +13075,20 @@ public class PveClient : PveClientBase
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("data", data);
                     parameters.Add("digest", digest);
-                    return await _client.Create($"/nodes/{_node}/hosts", parameters);
+                    return await _client.CreateAsync($"/nodes/{_node}/hosts", parameters);
                 }
             }
             /// <summary>
             /// Node index.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Index() { return await _client.Get($"/nodes/{_node}"); }
+            public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}"); }
         }
         /// <summary>
         /// Cluster node index.
         /// </summary>
         /// <returns></returns>
-        public async Task<Result> Index() { return await _client.Get($"/nodes"); }
+        public async Task<Result> Index() { return await _client.GetAsync($"/nodes"); }
     }
     /// <summary>
     /// Storage
@@ -13114,12 +13114,12 @@ public class PveClient : PveClientBase
             /// Delete storage configuration.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Delete() { return await _client.Delete($"/storage/{_storage}"); }
+            public async Task<Result> Delete() { return await _client.DeleteAsync($"/storage/{_storage}"); }
             /// <summary>
             /// Read storage configuration.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Read() { return await _client.Get($"/storage/{_storage}"); }
+            public async Task<Result> Read() { return await _client.GetAsync($"/storage/{_storage}"); }
             /// <summary>
             /// Update storage configuration.
             /// </summary>
@@ -13230,7 +13230,7 @@ public class PveClient : PveClientBase
                 parameters.Add("tagged_only", tagged_only);
                 parameters.Add("transport", transport);
                 parameters.Add("username", username);
-                return await _client.Set($"/storage/{_storage}", parameters);
+                return await _client.SetAsync($"/storage/{_storage}", parameters);
             }
         }
         /// <summary>
@@ -13243,7 +13243,7 @@ public class PveClient : PveClientBase
         {
             var parameters = new Dictionary<string, object>();
             parameters.Add("type", type);
-            return await _client.Get($"/storage", parameters);
+            return await _client.GetAsync($"/storage", parameters);
         }
         /// <summary>
         /// Create a new storage.
@@ -13380,7 +13380,7 @@ public class PveClient : PveClientBase
             parameters.Add("username", username);
             parameters.Add("vgname", vgname);
             parameters.Add("volume", volume);
-            return await _client.Create($"/storage", parameters);
+            return await _client.CreateAsync($"/storage", parameters);
         }
     }
     /// <summary>
@@ -13493,7 +13493,7 @@ public class PveClient : PveClientBase
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("multiple", multiple);
-                        return await _client.Get($"/access/users/{_userid}/tfa", parameters);
+                        return await _client.GetAsync($"/access/users/{_userid}/tfa", parameters);
                     }
                 }
                 /// <summary>
@@ -13508,7 +13508,7 @@ public class PveClient : PveClientBase
                     /// Unlock a user's TFA authentication.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> UnlockTfa() { return await _client.Set($"/access/users/{_userid}/unlock-tfa"); }
+                    public async Task<Result> UnlockTfa() { return await _client.SetAsync($"/access/users/{_userid}/unlock-tfa"); }
                 }
                 /// <summary>
                 /// Token
@@ -13539,12 +13539,12 @@ public class PveClient : PveClientBase
                         /// Remove API token for a specific user.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> RemoveToken() { return await _client.Delete($"/access/users/{_userid}/token/{_tokenid}"); }
+                        public async Task<Result> RemoveToken() { return await _client.DeleteAsync($"/access/users/{_userid}/token/{_tokenid}"); }
                         /// <summary>
                         /// Get specific API token information.
                         /// </summary>
                         /// <returns></returns>
-                        public async Task<Result> ReadToken() { return await _client.Get($"/access/users/{_userid}/token/{_tokenid}"); }
+                        public async Task<Result> ReadToken() { return await _client.GetAsync($"/access/users/{_userid}/token/{_tokenid}"); }
                         /// <summary>
                         /// Generate a new API token for a specific user. NOTE: returns API token value, which needs to be stored as it cannot be retrieved afterwards!
                         /// </summary>
@@ -13558,7 +13558,7 @@ public class PveClient : PveClientBase
                             parameters.Add("comment", comment);
                             parameters.Add("expire", expire);
                             parameters.Add("privsep", privsep);
-                            return await _client.Create($"/access/users/{_userid}/token/{_tokenid}", parameters);
+                            return await _client.CreateAsync($"/access/users/{_userid}/token/{_tokenid}", parameters);
                         }
                         /// <summary>
                         /// Update API token for a specific user.
@@ -13573,25 +13573,25 @@ public class PveClient : PveClientBase
                             parameters.Add("comment", comment);
                             parameters.Add("expire", expire);
                             parameters.Add("privsep", privsep);
-                            return await _client.Set($"/access/users/{_userid}/token/{_tokenid}", parameters);
+                            return await _client.SetAsync($"/access/users/{_userid}/token/{_tokenid}", parameters);
                         }
                     }
                     /// <summary>
                     /// Get user API tokens.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> TokenIndex() { return await _client.Get($"/access/users/{_userid}/token"); }
+                    public async Task<Result> TokenIndex() { return await _client.GetAsync($"/access/users/{_userid}/token"); }
                 }
                 /// <summary>
                 /// Delete user.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> DeleteUser() { return await _client.Delete($"/access/users/{_userid}"); }
+                public async Task<Result> DeleteUser() { return await _client.DeleteAsync($"/access/users/{_userid}"); }
                 /// <summary>
                 /// Get user configuration.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> ReadUser() { return await _client.Get($"/access/users/{_userid}"); }
+                public async Task<Result> ReadUser() { return await _client.GetAsync($"/access/users/{_userid}"); }
                 /// <summary>
                 /// Update user configuration.
                 /// </summary>
@@ -13617,7 +13617,7 @@ public class PveClient : PveClientBase
                     parameters.Add("groups", groups);
                     parameters.Add("keys", keys);
                     parameters.Add("lastname", lastname);
-                    return await _client.Set($"/access/users/{_userid}", parameters);
+                    return await _client.SetAsync($"/access/users/{_userid}", parameters);
                 }
             }
             /// <summary>
@@ -13631,7 +13631,7 @@ public class PveClient : PveClientBase
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("enabled", enabled);
                 parameters.Add("full", full);
-                return await _client.Get($"/access/users", parameters);
+                return await _client.GetAsync($"/access/users", parameters);
             }
             /// <summary>
             /// Create new user.
@@ -13660,7 +13660,7 @@ public class PveClient : PveClientBase
                 parameters.Add("keys", keys);
                 parameters.Add("lastname", lastname);
                 parameters.Add("password", password);
-                return await _client.Create($"/access/users", parameters);
+                return await _client.CreateAsync($"/access/users", parameters);
             }
         }
         /// <summary>
@@ -13687,12 +13687,12 @@ public class PveClient : PveClientBase
                 /// Delete group.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> DeleteGroup() { return await _client.Delete($"/access/groups/{_groupid}"); }
+                public async Task<Result> DeleteGroup() { return await _client.DeleteAsync($"/access/groups/{_groupid}"); }
                 /// <summary>
                 /// Get group configuration.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> ReadGroup() { return await _client.Get($"/access/groups/{_groupid}"); }
+                public async Task<Result> ReadGroup() { return await _client.GetAsync($"/access/groups/{_groupid}"); }
                 /// <summary>
                 /// Update group data.
                 /// </summary>
@@ -13702,14 +13702,14 @@ public class PveClient : PveClientBase
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("comment", comment);
-                    return await _client.Set($"/access/groups/{_groupid}", parameters);
+                    return await _client.SetAsync($"/access/groups/{_groupid}", parameters);
                 }
             }
             /// <summary>
             /// Group index.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Index() { return await _client.Get($"/access/groups"); }
+            public async Task<Result> Index() { return await _client.GetAsync($"/access/groups"); }
             /// <summary>
             /// Create new group.
             /// </summary>
@@ -13721,7 +13721,7 @@ public class PveClient : PveClientBase
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("groupid", groupid);
                 parameters.Add("comment", comment);
-                return await _client.Create($"/access/groups", parameters);
+                return await _client.CreateAsync($"/access/groups", parameters);
             }
         }
         /// <summary>
@@ -13748,12 +13748,12 @@ public class PveClient : PveClientBase
                 /// Delete role.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> DeleteRole() { return await _client.Delete($"/access/roles/{_roleid}"); }
+                public async Task<Result> DeleteRole() { return await _client.DeleteAsync($"/access/roles/{_roleid}"); }
                 /// <summary>
                 /// Get role configuration.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> ReadRole() { return await _client.Get($"/access/roles/{_roleid}"); }
+                public async Task<Result> ReadRole() { return await _client.GetAsync($"/access/roles/{_roleid}"); }
                 /// <summary>
                 /// Update an existing role.
                 /// </summary>
@@ -13765,14 +13765,14 @@ public class PveClient : PveClientBase
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("append", append);
                     parameters.Add("privs", privs);
-                    return await _client.Set($"/access/roles/{_roleid}", parameters);
+                    return await _client.SetAsync($"/access/roles/{_roleid}", parameters);
                 }
             }
             /// <summary>
             /// Role index.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Index() { return await _client.Get($"/access/roles"); }
+            public async Task<Result> Index() { return await _client.GetAsync($"/access/roles"); }
             /// <summary>
             /// Create new role.
             /// </summary>
@@ -13784,7 +13784,7 @@ public class PveClient : PveClientBase
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("roleid", roleid);
                 parameters.Add("privs", privs);
-                return await _client.Create($"/access/roles", parameters);
+                return await _client.CreateAsync($"/access/roles", parameters);
             }
         }
         /// <summary>
@@ -13799,7 +13799,7 @@ public class PveClient : PveClientBase
             /// Get Access Control List (ACLs).
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> ReadAcl() { return await _client.Get($"/access/acl"); }
+            public async Task<Result> ReadAcl() { return await _client.GetAsync($"/access/acl"); }
             /// <summary>
             /// Update Access Control List (add or remove permissions).
             /// </summary>
@@ -13821,7 +13821,7 @@ public class PveClient : PveClientBase
                 parameters.Add("propagate", propagate);
                 parameters.Add("tokens", tokens);
                 parameters.Add("users", users);
-                return await _client.Set($"/access/acl", parameters);
+                return await _client.SetAsync($"/access/acl", parameters);
             }
         }
         /// <summary>
@@ -13877,19 +13877,19 @@ public class PveClient : PveClientBase
                         parameters.Add("purge", purge);
                         parameters.Add("remove-vanished", remove_vanished);
                         parameters.Add("scope", scope);
-                        return await _client.Create($"/access/domains/{_realm}/sync", parameters);
+                        return await _client.CreateAsync($"/access/domains/{_realm}/sync", parameters);
                     }
                 }
                 /// <summary>
                 /// Delete an authentication server.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Delete() { return await _client.Delete($"/access/domains/{_realm}"); }
+                public async Task<Result> Delete() { return await _client.DeleteAsync($"/access/domains/{_realm}"); }
                 /// <summary>
                 /// Get auth server configuration.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> Read() { return await _client.Get($"/access/domains/{_realm}"); }
+                public async Task<Result> Read() { return await _client.GetAsync($"/access/domains/{_realm}"); }
                 /// <summary>
                 /// Update authentication server settings.
                 /// </summary>
@@ -13973,14 +13973,14 @@ public class PveClient : PveClientBase
                     parameters.Add("user_attr", user_attr);
                     parameters.Add("user_classes", user_classes);
                     parameters.Add("verify", verify);
-                    return await _client.Set($"/access/domains/{_realm}", parameters);
+                    return await _client.SetAsync($"/access/domains/{_realm}", parameters);
                 }
             }
             /// <summary>
             /// Authentication domain index.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Index() { return await _client.Get($"/access/domains"); }
+            public async Task<Result> Index() { return await _client.GetAsync($"/access/domains"); }
             /// <summary>
             /// Add an authentication server.
             /// </summary>
@@ -14067,7 +14067,7 @@ public class PveClient : PveClientBase
                 parameters.Add("user_classes", user_classes);
                 parameters.Add("username-claim", username_claim);
                 parameters.Add("verify", verify);
-                return await _client.Create($"/access/domains", parameters);
+                return await _client.CreateAsync($"/access/domains", parameters);
             }
         }
         /// <summary>
@@ -14107,7 +14107,7 @@ public class PveClient : PveClientBase
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("realm", realm);
                     parameters.Add("redirect-url", redirect_url);
-                    return await _client.Create($"/access/openid/auth-url", parameters);
+                    return await _client.CreateAsync($"/access/openid/auth-url", parameters);
                 }
             }
             /// <summary>
@@ -14131,14 +14131,14 @@ public class PveClient : PveClientBase
                     parameters.Add("code", code);
                     parameters.Add("redirect-url", redirect_url);
                     parameters.Add("state", state);
-                    return await _client.Create($"/access/openid/login", parameters);
+                    return await _client.CreateAsync($"/access/openid/login", parameters);
                 }
             }
             /// <summary>
             /// Directory index.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> Index() { return await _client.Get($"/access/openid"); }
+            public async Task<Result> Index() { return await _client.GetAsync($"/access/openid"); }
         }
         /// <summary>
         /// Tfa
@@ -14186,13 +14186,13 @@ public class PveClient : PveClientBase
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("password", password);
-                        return await _client.Delete($"/access/tfa/{_userid}/{_id}", parameters);
+                        return await _client.DeleteAsync($"/access/tfa/{_userid}/{_id}", parameters);
                     }
                     /// <summary>
                     /// Fetch a requested TFA entry if present.
                     /// </summary>
                     /// <returns></returns>
-                    public async Task<Result> GetTfaEntry() { return await _client.Get($"/access/tfa/{_userid}/{_id}"); }
+                    public async Task<Result> GetTfaEntry() { return await _client.GetAsync($"/access/tfa/{_userid}/{_id}"); }
                     /// <summary>
                     /// Add a TFA entry for a user.
                     /// </summary>
@@ -14206,14 +14206,14 @@ public class PveClient : PveClientBase
                         parameters.Add("description", description);
                         parameters.Add("enable", enable);
                         parameters.Add("password", password);
-                        return await _client.Set($"/access/tfa/{_userid}/{_id}", parameters);
+                        return await _client.SetAsync($"/access/tfa/{_userid}/{_id}", parameters);
                     }
                 }
                 /// <summary>
                 /// List TFA configurations of users.
                 /// </summary>
                 /// <returns></returns>
-                public async Task<Result> ListUserTfa() { return await _client.Get($"/access/tfa/{_userid}"); }
+                public async Task<Result> ListUserTfa() { return await _client.GetAsync($"/access/tfa/{_userid}"); }
                 /// <summary>
                 /// Add a TFA entry for a user.
                 /// </summary>
@@ -14234,14 +14234,14 @@ public class PveClient : PveClientBase
                     parameters.Add("password", password);
                     parameters.Add("totp", totp);
                     parameters.Add("value", value);
-                    return await _client.Create($"/access/tfa/{_userid}", parameters);
+                    return await _client.CreateAsync($"/access/tfa/{_userid}", parameters);
                 }
             }
             /// <summary>
             /// List TFA configurations of users.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> ListTfa() { return await _client.Get($"/access/tfa"); }
+            public async Task<Result> ListTfa() { return await _client.GetAsync($"/access/tfa"); }
         }
         /// <summary>
         /// Ticket
@@ -14255,7 +14255,7 @@ public class PveClient : PveClientBase
             /// Dummy. Useful for formatters which want to provide a login page.
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> GetTicket() { return await _client.Get($"/access/ticket"); }
+            public async Task<Result> GetTicket() { return await _client.GetAsync($"/access/ticket"); }
             /// <summary>
             /// Create or verify authentication ticket.
             /// </summary>
@@ -14279,7 +14279,7 @@ public class PveClient : PveClientBase
                 parameters.Add("privs", privs);
                 parameters.Add("realm", realm);
                 parameters.Add("tfa-challenge", tfa_challenge);
-                return await _client.Create($"/access/ticket", parameters);
+                return await _client.CreateAsync($"/access/ticket", parameters);
             }
         }
         /// <summary>
@@ -14303,7 +14303,7 @@ public class PveClient : PveClientBase
                 parameters.Add("password", password);
                 parameters.Add("userid", userid);
                 parameters.Add("confirmation-password", confirmation_password);
-                return await _client.Set($"/access/password", parameters);
+                return await _client.SetAsync($"/access/password", parameters);
             }
         }
         /// <summary>
@@ -14325,14 +14325,14 @@ public class PveClient : PveClientBase
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("path", path);
                 parameters.Add("userid", userid);
-                return await _client.Get($"/access/permissions", parameters);
+                return await _client.GetAsync($"/access/permissions", parameters);
             }
         }
         /// <summary>
         /// Directory index.
         /// </summary>
         /// <returns></returns>
-        public async Task<Result> Index() { return await _client.Get($"/access"); }
+        public async Task<Result> Index() { return await _client.GetAsync($"/access"); }
     }
     /// <summary>
     /// Pools
@@ -14358,7 +14358,7 @@ public class PveClient : PveClientBase
             /// Delete pool (deprecated, no support for nested pools, use 'DELETE /pools/?poolid={poolid}').
             /// </summary>
             /// <returns></returns>
-            public async Task<Result> DeletePoolDeprecated() { return await _client.Delete($"/pools/{_poolid}"); }
+            public async Task<Result> DeletePoolDeprecated() { return await _client.DeleteAsync($"/pools/{_poolid}"); }
             /// <summary>
             /// Get pool configuration (deprecated, no support for nested pools, use 'GET /pools/?poolid={poolid}').
             /// </summary>
@@ -14369,7 +14369,7 @@ public class PveClient : PveClientBase
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("type", type);
-                return await _client.Get($"/pools/{_poolid}", parameters);
+                return await _client.GetAsync($"/pools/{_poolid}", parameters);
             }
             /// <summary>
             /// Update pool data (deprecated, no support for nested pools - use 'PUT /pools/?poolid={poolid}' instead).
@@ -14388,7 +14388,7 @@ public class PveClient : PveClientBase
                 parameters.Add("delete", delete);
                 parameters.Add("storage", storage);
                 parameters.Add("vms", vms);
-                return await _client.Set($"/pools/{_poolid}", parameters);
+                return await _client.SetAsync($"/pools/{_poolid}", parameters);
             }
         }
         /// <summary>
@@ -14400,7 +14400,7 @@ public class PveClient : PveClientBase
         {
             var parameters = new Dictionary<string, object>();
             parameters.Add("poolid", poolid);
-            return await _client.Delete($"/pools", parameters);
+            return await _client.DeleteAsync($"/pools", parameters);
         }
         /// <summary>
         /// List pools or get pool configuration.
@@ -14414,7 +14414,7 @@ public class PveClient : PveClientBase
             var parameters = new Dictionary<string, object>();
             parameters.Add("poolid", poolid);
             parameters.Add("type", type);
-            return await _client.Get($"/pools", parameters);
+            return await _client.GetAsync($"/pools", parameters);
         }
         /// <summary>
         /// Create new pool.
@@ -14427,7 +14427,7 @@ public class PveClient : PveClientBase
             var parameters = new Dictionary<string, object>();
             parameters.Add("poolid", poolid);
             parameters.Add("comment", comment);
-            return await _client.Create($"/pools", parameters);
+            return await _client.CreateAsync($"/pools", parameters);
         }
         /// <summary>
         /// Update pool.
@@ -14448,7 +14448,7 @@ public class PveClient : PveClientBase
             parameters.Add("delete", delete);
             parameters.Add("storage", storage);
             parameters.Add("vms", vms);
-            return await _client.Set($"/pools", parameters);
+            return await _client.SetAsync($"/pools", parameters);
         }
     }
     /// <summary>
@@ -14463,7 +14463,7 @@ public class PveClient : PveClientBase
         /// API version details, including some parts of the global datacenter config.
         /// </summary>
         /// <returns></returns>
-        public async Task<Result> Version() { return await _client.Get($"/version"); }
+        public async Task<Result> Version() { return await _client.GetAsync($"/version"); }
     }
 
 }

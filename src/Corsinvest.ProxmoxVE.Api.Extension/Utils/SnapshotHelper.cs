@@ -25,11 +25,11 @@ public static class SnapshotHelper
     /// <param name="vmId"></param>
     /// <returns></returns>
     /// <exception cref="InvalidEnumArgumentException"></exception>
-    public static async Task<IEnumerable<VmSnapshot>> GetSnapshots(PveClient client, string node, VmType vmType, long vmId)
+    public static async Task<IEnumerable<VmSnapshot>> GetSnapshotsAsync(PveClient client, string node, VmType vmType, long vmId)
         => (vmType switch
         {
-            VmType.Qemu => await client.Nodes[node].Qemu[vmId].Snapshot.Get(),
-            VmType.Lxc => await client.Nodes[node].Lxc[vmId].Snapshot.Get(),
+            VmType.Qemu => await client.Nodes[node].Qemu[vmId].Snapshot.GetAsync(),
+            VmType.Lxc => await client.Nodes[node].Lxc[vmId].Snapshot.GetAsync(),
             _ => throw new InvalidEnumArgumentException(),
         }).OrderBy(a => a.Date);
 
@@ -46,14 +46,14 @@ public static class SnapshotHelper
     /// <param name="timeout"></param>
     /// <returns></returns>
     /// <exception cref="InvalidEnumArgumentException"></exception>
-    public static async Task<Result> CreateSnapshot(PveClient client,
-                                                    string node,
-                                                    VmType vmType,
-                                                    long vmId,
-                                                    string name,
-                                                    string description,
-                                                    bool state,
-                                                    long timeout)
+    public static async Task<Result> CreateSnapshotAsync(PveClient client,
+                                                         string node,
+                                                         VmType vmType,
+                                                         long vmId,
+                                                         string name,
+                                                         string description,
+                                                         bool state,
+                                                         long timeout)
     {
         var result = vmType switch
         {
@@ -61,7 +61,7 @@ public static class SnapshotHelper
             VmType.Lxc => await client.Nodes[node].Lxc[vmId].Snapshot.Snapshot(name, description),
             _ => throw new InvalidEnumArgumentException(),
         };
-        await client.WaitForTaskToFinish(result, timeout: timeout);
+        await client.WaitForTaskToFinishAsync(result, timeout: timeout);
 
         return result;
     }
@@ -78,13 +78,13 @@ public static class SnapshotHelper
     /// <param name="force"></param>
     /// <returns></returns>
     /// <exception cref="InvalidEnumArgumentException"></exception>
-    public static async Task<Result> RemoveSnapshot(PveClient client,
-                                                    string node,
-                                                    VmType vmType,
-                                                    long vmId,
-                                                    string name,
-                                                    long timeout,
-                                                    bool? force = null)
+    public static async Task<Result> RemoveSnapshotAsync(PveClient client,
+                                                         string node,
+                                                         VmType vmType,
+                                                         long vmId,
+                                                         string name,
+                                                         long timeout,
+                                                         bool? force = null)
     {
         var result = vmType switch
         {
@@ -92,7 +92,7 @@ public static class SnapshotHelper
             VmType.Lxc => await client.Nodes[node].Lxc[vmId].Snapshot[name].Delsnapshot(force),
             _ => throw new InvalidEnumArgumentException(),
         };
-        await client.WaitForTaskToFinish(result, timeout: timeout);
+        await client.WaitForTaskToFinishAsync(result, timeout: timeout);
 
         return result;
     }
@@ -107,11 +107,11 @@ public static class SnapshotHelper
     /// <param name="name"></param>
     /// <returns></returns>
     /// <exception cref="InvalidEnumArgumentException"></exception>
-    public static async Task<Result> GetConfigSnapshot(PveClient client,
-                                                       string node,
-                                                       VmType vmType,
-                                                       long vmId,
-                                                       string name)
+    public static async Task<Result> GetConfigSnapshotAsync(PveClient client,
+                                                            string node,
+                                                            VmType vmType,
+                                                            long vmId,
+                                                            string name)
         => vmType switch
         {
             VmType.Qemu => await client.Nodes[node].Qemu[vmId].Snapshot[name].Config.GetSnapshotConfig(),
@@ -130,12 +130,12 @@ public static class SnapshotHelper
     /// <param name="description"></param>
     /// <returns></returns>
     /// <exception cref="InvalidEnumArgumentException"></exception>
-    public static async Task<Result> UpdateSnapshot(PveClient client,
-                                                    string node,
-                                                    VmType vmType,
-                                                    long vmId,
-                                                    string name,
-                                                    string description)
+    public static async Task<Result> UpdateSnapshotAsync(PveClient client,
+                                                         string node,
+                                                         VmType vmType,
+                                                         long vmId,
+                                                         string name,
+                                                         string description)
         => vmType switch
         {
             VmType.Qemu => await client.Nodes[node].Qemu[vmId].Snapshot[name].Config.UpdateSnapshotConfig(description),
@@ -154,12 +154,12 @@ public static class SnapshotHelper
     /// <param name="timeout"></param>
     /// <returns></returns>
     /// <exception cref="InvalidEnumArgumentException"></exception>
-    public static async Task<Result> RollbackSnapshot(PveClient client,
-                                                      string node,
-                                                      VmType vmType,
-                                                      long vmId,
-                                                      string name,
-                                                      long timeout)
+    public static async Task<Result> RollbackSnapshotAsync(PveClient client,
+                                                           string node,
+                                                           VmType vmType,
+                                                           long vmId,
+                                                           string name,
+                                                           long timeout)
     {
         var result = vmType switch
         {
@@ -168,7 +168,7 @@ public static class SnapshotHelper
             _ => throw new InvalidEnumArgumentException(),
         };
 
-        await client.WaitForTaskToFinish(result, timeout: timeout);
+        await client.WaitForTaskToFinishAsync(result, timeout: timeout);
         return result;
     }
 }

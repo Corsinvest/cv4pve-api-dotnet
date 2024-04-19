@@ -21,14 +21,14 @@ public static class GeneratorClassApi
     /// <param name="host"></param>
     /// <param name="port"></param>
     /// <returns></returns>
-    public static async Task<ClassApi> Generate(string host = "pve.proxmox.com", int port = 443)
+    public static async Task<ClassApi> GenerateAsync(string host = "pve.proxmox.com", int port = 443)
     {
         var classApi = new ClassApi();
-        foreach (var token in JArray.Parse(await GetJsonSchemaFromApiDoc(host, port))) { _ = new ClassApi(token, classApi); }
+        foreach (var token in JArray.Parse(await GetJsonSchemaFromApiDocAsync(host, port))) { _ = new ClassApi(token, classApi); }
         return classApi;
     }
 
-    private static async Task<string> GetJsonSchemaFromApiDoc(string host, int port)
+    private static async Task<string> GetJsonSchemaFromApiDocAsync(string host, int port)
     {
         var url = $"https://{host}:{port}/pve-docs/api-viewer/apidoc.js";
         var json = new StringBuilder();

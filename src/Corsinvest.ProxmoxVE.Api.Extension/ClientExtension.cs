@@ -28,8 +28,8 @@ public static class ClientExtension
     /// <param name="client"></param>
     /// <param name="resourceType"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<ClusterResource>> GetResources(this PveClient client, ClusterResourceType resourceType)
-        => await client.Cluster.Resources.Get(resourceType);
+    public static async Task<IEnumerable<ClusterResource>> GetResourcesAsync(this PveClient client, ClusterResourceType resourceType)
+        => await client.Cluster.Resources.GetAsync(resourceType);
 
     /// <summary>
     /// Get resource type
@@ -38,16 +38,16 @@ public static class ClientExtension
     /// <param name="type">
     ///   Enum: vm,storage,node,sdn</param>
     /// <returns></returns>
-    public static async Task<IEnumerable<ClusterResource>> GetResources(this PveClient client, string type)
-        => await client.Cluster.Resources.Get(type);
+    public static async Task<IEnumerable<ClusterResource>> GetResourcesAsync(this PveClient client, string type)
+        => await client.Cluster.Resources.GetAsync(type);
 
     /// <summary>
     /// Get host and ip
     /// </summary>
     /// <param name="client"></param>
     /// <returns>Dictionary host, ip</returns>
-    public static async Task<IReadOnlyDictionary<string, string>> GetHostAndIp(this PveClient client)
-        => (await client.Cluster.Status.Get())
+    public static async Task<IReadOnlyDictionary<string, string>> GetHostAndIpAsync(this PveClient client)
+        => (await client.Cluster.Status.GetAsync())
                 .Where(a => a.Type == PveConstants.KeyApiNode)
                 .ToDictionary(a => a.Name, a => a.IpAddress);
     #endregion
@@ -58,8 +58,8 @@ public static class ClientExtension
     /// </summary>
     /// <param name="client"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<IClusterResourceNode>> GetNodes(this PveClient client)
-        => await client.GetResources(ClusterResourceType.Node);
+    public static async Task<IEnumerable<IClusterResourceNode>> GetNodesAsync(this PveClient client)
+        => await client.GetResourcesAsync(ClusterResourceType.Node);
 
 
     /// <summary>
@@ -69,8 +69,8 @@ public static class ClientExtension
     /// <param name="node"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public static async Task<IClusterResourceNode> GetNode(this PveClient client, string node)
-        => (await GetNodes(client)).FirstOrDefault(a => a.Node == node) ??
+    public static async Task<IClusterResourceNode> GetNodeAsync(this PveClient client, string node)
+        => (await GetNodesAsync(client)).FirstOrDefault(a => a.Node == node) ??
                     throw new ArgumentException($"Node '{node}' not found!");
     #endregion
 
@@ -80,8 +80,8 @@ public static class ClientExtension
     /// </summary>
     /// <param name="client"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<IClusterResourceStorage>> GetStorages(this PveClient client)
-        => await client.GetResources(ClusterResourceType.Storage);
+    public static async Task<IEnumerable<IClusterResourceStorage>> GetStoragesAsync(this PveClient client)
+        => await client.GetResourcesAsync(ClusterResourceType.Storage);
 
     /// <summary>
     /// Get storage info from id.
@@ -90,8 +90,8 @@ public static class ClientExtension
     /// <param name="storage"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public static async Task<IClusterResourceStorage> GetStorage(this PveClient client, string storage)
-        => (await GetStorages(client)).FirstOrDefault(a => a.Storage == storage) ??
+    public static async Task<IClusterResourceStorage> GetStorageAsync(this PveClient client, string storage)
+        => (await GetStoragesAsync(client)).FirstOrDefault(a => a.Storage == storage) ??
                     throw new ArgumentException($"Storage '{storage}' not found!");
     #endregion
 
@@ -101,8 +101,8 @@ public static class ClientExtension
     /// </summary>
     /// <param name="client"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<IClusterResourceVm>> GetVms(this PveClient client)
-        => (await client.GetResources(ClusterResourceType.Vm))
+    public static async Task<IEnumerable<IClusterResourceVm>> GetVmsAsync(this PveClient client)
+        => (await client.GetResourcesAsync(ClusterResourceType.Vm))
                         .OrderBy(a => a.Node)
                         .ThenBy(a => a.VmId);
 
@@ -112,8 +112,8 @@ public static class ClientExtension
     /// <param name="client"></param>
     /// <param name="vmId"></param>
     /// <returns></returns>
-    public static async Task<IClusterResourceVm> GetVm(this PveClient client, long vmId)
-        => await client.GetVm(vmId + "");
+    public static async Task<IClusterResourceVm> GetVmAsync(this PveClient client, long vmId)
+        => await client.GetVmAsync(vmId + "");
 
     /// <summary>
     /// Get VM/CT from id or name.
@@ -122,8 +122,8 @@ public static class ClientExtension
     /// <param name="vmIdOrName"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public static async Task<IClusterResourceVm> GetVm(this PveClient client, string vmIdOrName)
-        => (await GetVms(client)).FirstOrDefault(a => VmHelper.CheckIdOrName(a, vmIdOrName)) ??
+    public static async Task<IClusterResourceVm> GetVmAsync(this PveClient client, string vmIdOrName)
+        => (await GetVmsAsync(client)).FirstOrDefault(a => VmHelper.CheckIdOrName(a, vmIdOrName)) ??
                 throw new ArgumentException($"VM/CT '{vmIdOrName}' not found!");
 
     /// <summary>
@@ -141,11 +141,11 @@ public static class ClientExtension
     /// <para>comma separated</para>
     /// </param>
     /// <returns></returns>
-    public static async Task<IEnumerable<IClusterResourceVm>> GetVms(this PveClient client, string jolly)
+    public static async Task<IEnumerable<IClusterResourceVm>> GetVmsAsync(this PveClient client, string jolly)
     {
-        var allVms = await GetVms(client);
+        var allVms = await GetVmsAsync(client);
 
-        async Task<IEnumerable<IClusterResourceVm>> GetVmsFromId(string id)
+        async Task<IEnumerable<IClusterResourceVm>> GetVmsFromIdAsync(string id)
         {
             var data = Enumerable.Empty<IClusterResourceVm>();
 
@@ -171,9 +171,9 @@ public static class ClientExtension
                 //all in specific pool
                 var poolName = id.ToLower().Substring(6);
 
-                if ((await client.Pools.Get()).Any(a => a.Id == poolName))
+                if ((await client.Pools.GetAsync()).Any(a => a.Id == poolName))
                 {
-                    data = (await client.Pools[poolName].Get()).Members.Where(a => allVms.Any(b => b.Id == a.Id));
+                    data = (await client.Pools[poolName].GetAsync()).Members.Where(a => allVms.Any(b => b.Id == a.Id));
                 }
             }
             else if (id.StartsWith("@tag-"))
@@ -193,14 +193,14 @@ public static class ClientExtension
         var ret = new List<IClusterResourceVm>();
 
         //add
-        foreach (var id in jolly.Split(',')) { ret.AddRange(await GetVmsFromId(id)); }
+        foreach (var id in jolly.Split(',')) { ret.AddRange(await GetVmsFromIdAsync(id)); }
 
         ret = ret.Distinct().ToList();
 
         //exclude data
         foreach (var id in jolly.Split(',').Where(a => a.StartsWith("-")).Select(a => a.Substring(1)))
         {
-            foreach (var item in await GetVmsFromId(id))
+            foreach (var item in await GetVmsFromIdAsync(id))
             {
                 ret.Remove(item);
             }
@@ -216,8 +216,8 @@ public static class ClientExtension
     /// <param name="vmId"></param>
     /// <param name="status"></param>
     /// <returns></returns>
-    public static async Task<Result> ChangeStatusVm(this PveClient client, long vmId, string status)
-        => await client.ChangeStatusVm(vmId, (VmStatus)Enum.Parse(typeof(VmStatus), status, true));
+    public static async Task<Result> ChangeStatusVmAsync(this PveClient client, long vmId, string status)
+        => await client.ChangeStatusVmAsync(vmId, (VmStatus)Enum.Parse(typeof(VmStatus), status, true));
 
     /// <summary>
     /// Change status VM/CT
@@ -227,10 +227,10 @@ public static class ClientExtension
     /// <param name="status"></param>
     /// <returns></returns>
     /// <exception cref="InvalidEnumArgumentException"></exception>
-    public static async Task<Result> ChangeStatusVm(this PveClient client, long vmId, VmStatus status)
+    public static async Task<Result> ChangeStatusVmAsync(this PveClient client, long vmId, VmStatus status)
     {
-        var vm = await client.GetVm(vmId);
-        return await VmHelper.ChangeStatusVm(client, vm.Node, vm.VmType, vm.VmId, status);
+        var vm = await client.GetVmAsync(vmId);
+        return await VmHelper.ChangeStatusVmAsync(client, vm.Node, vm.VmType, vm.VmId, status);
     }
 
     /// <summary>
@@ -240,11 +240,11 @@ public static class ClientExtension
     /// <param name="vm"></param>
     /// <returns></returns>
     /// <exception cref="InvalidEnumArgumentException"></exception>
-    public static async Task<VmBaseStatusCurrent> GetVmStatus(this PveClient client, IClusterResourceVm vm)
+    public static async Task<VmBaseStatusCurrent> GetVmStatusAsync(this PveClient client, IClusterResourceVm vm)
         => vm.VmType switch
         {
-            VmType.Qemu => await client.Nodes[vm.Node].Qemu[vm.VmId].Status.Current.Get(),
-            VmType.Lxc => await client.Nodes[vm.Node].Lxc[vm.VmId].Status.Current.Get(),
+            VmType.Qemu => await client.Nodes[vm.Node].Qemu[vm.VmId].Status.Current.GetAsync(),
+            VmType.Lxc => await client.Nodes[vm.Node].Lxc[vm.VmId].Status.Current.GetAsync(),
             _ => throw new InvalidEnumArgumentException(),
         };
 
@@ -257,14 +257,14 @@ public static class ClientExtension
     /// <param name="rrdDataConsolidation"></param>
     /// <returns></returns>
     /// <exception cref="InvalidEnumArgumentException"></exception>
-    public static async Task<IEnumerable<VmRrdData>> GetVmRrdData(this PveClient client,
-                                                                  IClusterResourceVm vm,
-                                                                  RrdDataTimeFrame rrdDataTimeFrame,
-                                                                  RrdDataConsolidation rrdDataConsolidation)
+    public static async Task<IEnumerable<VmRrdData>> GetVmRrdDataAsync(this PveClient client,
+                                                                       IClusterResourceVm vm,
+                                                                       RrdDataTimeFrame rrdDataTimeFrame,
+                                                                       RrdDataConsolidation rrdDataConsolidation)
         => vm.VmType switch
         {
-            VmType.Qemu => await client.Nodes[vm.Node].Qemu[vm.VmId].Rrddata.Get(rrdDataTimeFrame, rrdDataConsolidation),
-            VmType.Lxc => await client.Nodes[vm.Node].Lxc[vm.VmId].Rrddata.Get(rrdDataTimeFrame, rrdDataConsolidation),
+            VmType.Qemu => await client.Nodes[vm.Node].Qemu[vm.VmId].Rrddata.GetAsync(rrdDataTimeFrame, rrdDataConsolidation),
+            VmType.Lxc => await client.Nodes[vm.Node].Lxc[vm.VmId].Rrddata.GetAsync(rrdDataTimeFrame, rrdDataConsolidation),
             _ => throw new InvalidEnumArgumentException(),
         };
     #endregion
@@ -280,16 +280,16 @@ public static class ClientExtension
     /// <param name="addVmId"></param>
     /// <param name="addVmName"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<string>> GetVmIds(this PveClient client,
-                                                           bool addAll,
-                                                           bool addNodes,
-                                                           bool addPools,
-                                                           bool addTags,
-                                                           bool addVmId,
-                                                           bool addVmName)
+    public static async Task<IEnumerable<string>> GetVmIdsAsync(this PveClient client,
+                                                                bool addAll,
+                                                                bool addNodes,
+                                                                bool addPools,
+                                                                bool addTags,
+                                                                bool addVmId,
+                                                                bool addVmName)
     {
         var vmIds = new List<string>();
-        var resources = await client.GetResources(ClusterResourceType.All);
+        var resources = await client.GetResourcesAsync(ClusterResourceType.All);
 
         if (addAll) { vmIds.Add("@all"); }
 
@@ -314,7 +314,7 @@ public static class ClientExtension
 
         if (addTags)
         {
-            var tags = (await client.Cluster.Options.Get()).AllowedTags ?? new List<string>();
+            var tags = (await client.Cluster.Options.GetAsync()).AllowedTags ?? new List<string>();
             vmIds.AddRange(tags.Select(a => $"@tag-{a}"));
         }
 
@@ -342,15 +342,15 @@ public static class ClientExtension
 // /// <param name="tmpFileName">The source file name. This parameter is usually set by the REST handler.
 // /// You can only overwrite it when connecting to the trusted port on localhost.</param>
 // /// <returns></returns>
-// public static async Task<Result> UploadFileToStorage(this PveClient client,
-//                                                      string node,
-//                                                      string storage,
-//                                                      string content,
-//                                                      string fileName,
-//                                                      string fileNameToUpload,
-//                                                      string checksum = null,
-//                                                      string checksumAlgorithm = null,
-//                                                      string tmpFileName = null)
+// public static async Task<Result> UploadFileToStorageAsync(this PveClient client,
+//                                                           string node,
+//                                                           string storage,
+//                                                           string content,
+//                                                           string fileName,
+//                                                           string fileNameToUpload,
+//                                                           string checksum = null,
+//                                                           string checksumAlgorithm = null,
+//                                                           string tmpFileName = null)
 // {
 
 //     //        iso: ".img, .iso",

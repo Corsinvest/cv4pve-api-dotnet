@@ -314,22 +314,22 @@ public static class ApiExplorerHelper
     /// <param name="verbose"></param>
     /// <returns></returns>
     /// <exception cref="InvalidEnumArgumentException"></exception>
-    public static async Task<(int ResultCode, string ResultText)> Execute(PveClient client,
-                                                                          ClassApi classApiRoot,
-                                                                          string resource,
-                                                                          MethodType methodType,
-                                                                          IDictionary<string, object> parameters,
-                                                                          bool wait = false,
-                                                                          TableGenerator.Output output = TableGenerator.Output.Text,
-                                                                          bool verbose = false)
+    public static async Task<(int ResultCode, string ResultText)> ExecuteAsync(PveClient client,
+                                                                               ClassApi classApiRoot,
+                                                                               string resource,
+                                                                               MethodType methodType,
+                                                                               IDictionary<string, object> parameters,
+                                                                               bool wait = false,
+                                                                               TableGenerator.Output output = TableGenerator.Output.Text,
+                                                                               bool verbose = false)
     {
         //create result
         var result = methodType switch
         {
-            MethodType.Get => await client.Get(resource, parameters),
-            MethodType.Set => await client.Set(resource, parameters),
-            MethodType.Create => await client.Create(resource, parameters),
-            MethodType.Delete => await client.Delete(resource, parameters),
+            MethodType.Get => await client.GetAsync(resource, parameters),
+            MethodType.Set => await client.SetAsync(resource, parameters),
+            MethodType.Create => await client.CreateAsync(resource, parameters),
+            MethodType.Delete => await client.DeleteAsync(resource, parameters),
             _ => throw new InvalidEnumArgumentException(),
         };
 
@@ -382,7 +382,7 @@ public static class ApiExplorerHelper
 
             if (wait)
             {
-                await client.WaitForTaskToFinish(result, 1000, 30000);
+                await client.WaitForTaskToFinishAsync(result, 1000, 30000);
             }
         }
 
@@ -507,9 +507,9 @@ public static class ApiExplorerHelper
 
                 for (var i = 0; i < Math.Max(partsType.Length, partsComment.Length); i++)
                 {
-                    values.Add(new[] { i == 0 ? param.Name : "",
-                                       i < partsType.Length ? partsType[i] : "",
-                                       i < partsComment.Length ? partsComment[i] : "" });
+                    values.Add([ i == 0  ? param.Name : "",
+                                 i < partsType.Length ? partsType[i] : "",
+                                 i < partsComment.Length ? partsComment[i] : "" ]);
                 }
             }
 
@@ -610,9 +610,9 @@ public static class ApiExplorerHelper
     /// <param name="classApiRoot"></param>
     /// <param name="resource"></param>
     /// <returns></returns>
-    public static async Task<(IEnumerable<(string Attribute, string Value)> Values, string Error)> ListValues(PveClient client,
-                                                                                                              ClassApi classApiRoot,
-                                                                                                              string resource)
+    public static async Task<(IEnumerable<(string Attribute, string Value)> Values, string Error)> ListValuesAsync(PveClient client,
+                                                                                                                   ClassApi classApiRoot,
+                                                                                                                   string resource)
     {
         var values = new List<(string Attribute, string Value)>();
         var error = "";
@@ -640,7 +640,7 @@ public static class ApiExplorerHelper
 
                     if (subClass.IsIndexed)
                     {
-                        var result = await client.Get(resource);
+                        var result = await client.GetAsync(resource);
                         if (result.InError())
                         {
                             error = result.GetError();
@@ -682,11 +682,11 @@ public static class ApiExplorerHelper
     /// <param name="classApiRoot"></param>
     /// <param name="resource"></param>
     /// <returns></returns>
-    public static async Task<string> List(PveClient client, ClassApi classApiRoot, string resource)
+    public static async Task<string> ListAsync(PveClient client, ClassApi classApiRoot, string resource)
     {
-        var (Values, Error) = await ListValues(client, classApiRoot, resource);
-        return string.Join(Environment.NewLine, Values.Select(a => $"{a.Attribute}        {a.Value}")) +
-               (string.IsNullOrWhiteSpace(Error) ? "" : Environment.NewLine + Error) +
+        var (values, error) = await ListValuesAsync(client, classApiRoot, resource);
+        return string.Join(Environment.NewLine, values.Select(a => $"{a.Attribute}        {a.Value}")) +
+               (string.IsNullOrWhiteSpace(error) ? "" : Environment.NewLine + error) +
                Environment.NewLine;
     }
 }

@@ -98,12 +98,6 @@ public class ClusterBackup : IStorageItem
     public string Type { get; set; }
 
     /// <summary>
-    /// VmId
-    /// </summary>
-    [JsonProperty("vmid")]
-    public string Vmid { get; set; }
-
-    /// <summary>
     /// Schedule
     /// </summary>
     [JsonProperty("schedule")]

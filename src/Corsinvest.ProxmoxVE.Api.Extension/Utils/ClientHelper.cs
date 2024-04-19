@@ -6,6 +6,7 @@
 using Corsinvest.ProxmoxVE.Api.Shared;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
@@ -23,43 +24,39 @@ public static class ClientHelper
     /// <param name="username"></param>
     /// <param name="password"></param>
     /// <param name="apiToken"></param>
+    /// <param name="validateCertificate"></param>
     /// <param name="loggerFactory"></param>
     /// <param name="timeout"></param>
     /// <returns></returns>
     /// <exception cref="PveException"></exception>
-    public static async Task<PveClient> GetClientAndTryLogin(string hostsAndPortHA,
-                                                             string username,
-                                                             string password,
-                                                             string apiToken,
-                                                             ILoggerFactory loggerFactory,
-                                                             int timeout = 4000)
+    public static async Task<PveClient> GetClientAndTryLoginAsync(string hostsAndPortHA,
+                                                                  string username,
+                                                                  string password,
+                                                                  string apiToken,
+                                                                  bool validateCertificate,
+                                                                  ILoggerFactory loggerFactory,
+                                                                  int timeout = 4000)
     {
-        try
+        var client = GetClientFromHA(hostsAndPortHA, timeout);
+        if (client != null)
         {
-            var client = GetClientFromHA(hostsAndPortHA, timeout);
-            if (client != null)
+            client.ValidateCertificate = validateCertificate;
+            client.LoggerFactory = loggerFactory;
+
+            bool login;
+            if (!string.IsNullOrEmpty(apiToken))
             {
-                client.LoggerFactory = loggerFactory;
-
-                bool login;
-                if (!string.IsNullOrEmpty(apiToken))
-                {
-                    client.ApiToken = apiToken;
-                    login = (await client.Version.Version()).IsSuccessStatusCode;
-                }
-                else
-                {
-                    login = await client.Login(username, password);
-                }
-
-                return login
-                        ? client
-                        : throw new PveException("ClientHelper.GetClient error! " + client.LastResult.ReasonPhrase);
+                client.ApiToken = apiToken;
+                login = (await client.Version.Version()).IsSuccessStatusCode;
             }
-        }
-        catch (Exception ex)
-        {
-            throw new PveException(ex.Message, ex);
+            else
+            {
+                login = await client.LoginAsync(username, password);
+            }
+
+            return login
+                    ? client
+                    : throw new PveException(client.LastResult.ReasonPhrase);
         }
 
         throw new PveException("ClientHelper.GetClient error!");
@@ -94,6 +91,8 @@ public static class ClientHelper
                                       out string host,
                                       out int port)
     {
+        var errors = new List<string>();
+
         var found = true;
         string hostTest = "";
         int portTest = defaultPort;
@@ -104,41 +103,34 @@ public static class ClientHelper
             portTest = defaultPort;
             if (data.Length == 2) { int.TryParse(data[1], out portTest); }
 
-            if (checkPort)
+            if (!checkPort) { break; }
+
+            found = false;
+            //open connection tcp ip to test port exists
+            using var tcpClient = new TcpClient();
+            var task = tcpClient.ConnectAsync(hostTest, portTest);
+            if (task.Wait(timeout))
             {
-                found = false;
-                try
+                //if fails within timeout, task.Wait still returns true.
+                if (tcpClient.Connected)
                 {
-                    //open connection tcp ip to test port exists
-                    using var tcpClient = new TcpClient();
-                    var task = tcpClient.ConnectAsync(hostTest, portTest);
-                    if (task.Wait(timeout))
-                    {
-                        //if fails within timeout, task.Wait still returns true.
-                        if (tcpClient.Connected)
-                        {
-                            found = true;
-                            break;
-                        }
-                        else
-                        {
-                            // connection refused probably
-                            throw new PveException($"Error: problem connection host {hostTest} with port {portTest}");
-                        }
-                    }
-                    else
-                    {
-                        // timed out
-                        throw new PveException($"Error: timeout problem connection host {hostTest} with port {portTest}");
-                    }
+                    found = true;
+                    break;
                 }
-                catch (Exception ex) { throw new PveException($"Error: host {hostTest}", ex); }
+                else
+                {
+                    // connection refused probably
+                    errors.Add($"Problem connection host {hostTest} with port {portTest}");
+                }
             }
             else
             {
-                break;
+                // timed out
+                errors.Add($"Timeout connection host {hostTest} with port {portTest}");
             }
         }
+
+        if (!found && errors.Count != 0) { throw new PveException(string.Join(Environment.NewLine, errors)); }
 
         host = hostTest;
         port = portTest;
