@@ -307,7 +307,7 @@ range 100:107,-105,200:204
         var inApiToken = command.GetApiTokenOption().HasValue();
         return await ClientHelper.GetClientAndTryLoginAsync(command.GetHostOption().GetValue(),
                                                             inApiToken ? string.Empty : command.GetUsernameOption().GetValue(),
-                                                            inApiToken ? string.Empty : command.GetPasswordOption().GetValue(),
+                                                            inApiToken ? string.Empty : GetPasswordFromOption(command),
                                                             inApiToken ? command.GetApiTokenOption().GetValue() : string.Empty,
                                                             command.GetValidateCertificateOption().GetValue(),
                                                             loggerFactory);
