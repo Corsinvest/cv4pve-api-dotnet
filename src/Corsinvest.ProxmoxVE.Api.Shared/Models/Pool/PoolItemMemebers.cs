@@ -12,7 +12,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Pool;
 /// <summary>
 /// Pool detail
 /// </summary>
-public class PoolDetail
+public class PoolDetail : ModelBase
 {
     /// <summary>
     /// Comment

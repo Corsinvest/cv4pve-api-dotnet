@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
 /// <summary>
 /// Firewall Refs
 /// </summary>
-public class FirewallRef
+public class FirewallRef : ModelBase
 {
     /// <summary>
     /// Comment

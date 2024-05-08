@@ -15,7 +15,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Rrd Data Node
 /// </summary>
-public class NodeRrdData : ICpu, INetIO, IMemory
+public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
 {
     /// <summary>
     /// Net in

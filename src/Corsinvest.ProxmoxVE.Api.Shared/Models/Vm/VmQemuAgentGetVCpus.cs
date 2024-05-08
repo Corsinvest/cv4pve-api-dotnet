@@ -11,7 +11,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 /// <summary>
 /// Vm Qemu Agent GetVCpus
 /// </summary>
-public class VmQemuAgentGetVCpus
+public class VmQemuAgentGetVCpus : ModelBase
 {
     /// <summary>
     /// Data

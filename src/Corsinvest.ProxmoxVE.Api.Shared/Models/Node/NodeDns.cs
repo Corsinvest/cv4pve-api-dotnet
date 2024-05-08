@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Node dns
 /// </summary>
-public class NodeDns
+public class NodeDns : ModelBase
 {
     /// <summary>
     /// Search

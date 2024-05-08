@@ -6,7 +6,6 @@
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
@@ -14,7 +13,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Backup data
 /// </summary>
-public class NodeStorageContent
+public class NodeStorageContent : ModelBase
 {
     /// <summary>
     /// Content
@@ -110,11 +109,7 @@ public class NodeStorageContent
     /// </summary>
     [JsonIgnore]
     public bool Verified
-        => AllData != null && AllData.TryGetValue("verification", out dynamic verification) && verification.state == "ok";
-
-    /// <summary>
-    /// All Data
-    /// </summary>
-    [JsonExtensionData]
-    private IDictionary<string, object> AllData { get; set; }
+        => ExtensionData != null
+            && ExtensionData.TryGetValue("verification", out dynamic verification)
+            && verification.state == "ok";
 }

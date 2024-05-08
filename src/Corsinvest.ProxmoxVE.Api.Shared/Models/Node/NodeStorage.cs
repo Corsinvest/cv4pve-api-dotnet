@@ -13,7 +13,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Node storage
 /// </summary>
-public class NodeStorage : IStorageItem
+public class NodeStorage : ModelBase, IStorageItem
 {
     /// <summary>
     /// Type

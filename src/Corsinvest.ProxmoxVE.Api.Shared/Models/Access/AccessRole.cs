@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Access;
 /// <summary>
 /// Role
 /// </summary>
-public class AccessRole
+public class AccessRole : ModelBase
 {
     /// <summary>
     /// Privileges

@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Node Apt Update
 /// </summary>
-public class NodeAptUpdate
+public class NodeAptUpdate : ModelBase
 {
     /// <summary>
     /// Package

@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 /// <summary>
 /// Cluster Ha group
 /// </summary>
-public class ClusterHaGroup
+public class ClusterHaGroup : ModelBase
 {
     /// <summary>
     /// Digest

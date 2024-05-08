@@ -14,7 +14,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// vm base
 /// </summary>
-public abstract class NodeVmBase : IVmBase, ICpu, INetIO, IMemory, IDiskIO, IDisk, IStatusItem, IUptimeItem
+public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, IDiskIO, IDisk, IStatusItem, IUptimeItem
 {
     /// <summary>
     /// Uptime

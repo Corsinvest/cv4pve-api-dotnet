@@ -10,10 +10,10 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 /// <summary>
 /// Vm firewall options
 /// </summary>
-public class VmFirewallOptions
+public class VmFirewallOptions : ModelBase
 {
     /// <summary>
-    /// Enable 
+    /// Enable
     /// </summary>
     [JsonProperty("enable")]
     public bool Enable { get; set; }
@@ -37,25 +37,25 @@ public class VmFirewallOptions
     public bool RouterAdvertisement { get; set; }
 
     /// <summary>
-    /// Log Level Out 
+    /// Log Level Out
     /// </summary>
     [JsonProperty("log_level_out")]
     public string LogLevelOut { get; set; }
 
     /// <summary>
-    /// Log Level In 
+    /// Log Level In
     /// </summary>
     [JsonProperty("log_level_in")]
     public string LogLevelIn { get; set; }
 
     /// <summary>
-    /// Mac filter 
+    /// Mac filter
     /// </summary>
     [JsonProperty("macfilter")]
     public bool MacFilter { get; set; }
 
     /// <summary>
-    /// Policy In 
+    /// Policy In
     /// </summary>
     [JsonProperty("policy_in")]
     public string PolicyIn { get; set; }
@@ -67,7 +67,7 @@ public class VmFirewallOptions
     public string Digest { get; set; }
 
     /// <summary>
-    /// Dhcp 
+    /// Dhcp
     /// </summary>
     [JsonProperty("dhcp")]
     public bool Dhcp { get; set; }

@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 /// <summary>
 /// Cluster Firewall Options
 /// </summary>
-public class ClusterFirewallOptions
+public class ClusterFirewallOptions : ModelBase
 {
     /// <summary>
     /// Digest

@@ -11,7 +11,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 /// <summary>
 /// Cluster options
 /// </summary>
-public class ClusterOptions
+public class ClusterOptions : ModelBase
 {
     /// <summary>
     /// Keyboard

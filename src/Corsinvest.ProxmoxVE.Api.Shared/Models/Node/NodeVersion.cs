@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Node version
 /// </summary>
-public class NodeVersion
+public class NodeVersion : ModelBase
 {
     /// <summary>
     /// Repository id

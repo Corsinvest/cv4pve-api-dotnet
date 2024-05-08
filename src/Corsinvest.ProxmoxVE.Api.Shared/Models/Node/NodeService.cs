@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Node service
 /// </summary>
-public class NodeService
+public class NodeService : ModelBase
 {
     /// <summary>
     /// Name

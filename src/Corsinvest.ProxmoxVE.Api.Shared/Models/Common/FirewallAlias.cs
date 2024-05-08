@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
 /// <summary>
 /// Firewall Alias
 /// </summary>
-public class FirewallAlias
+public class FirewallAlias : ModelBase
 {
     /// <summary>
     /// IP/Cidr

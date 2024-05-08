@@ -11,7 +11,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Node network
 /// </summary>
-public class NodeNetwork
+public class NodeNetwork : ModelBase
 {
     /// <summary>
     /// Method6

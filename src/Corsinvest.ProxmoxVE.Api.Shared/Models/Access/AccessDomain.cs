@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Access;
 /// <summary>
 /// Domain
 /// </summary>
-public class AccessDomain
+public class AccessDomain : ModelBase
 {
     /// <summary>
     /// Realm

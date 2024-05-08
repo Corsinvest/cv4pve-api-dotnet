@@ -11,7 +11,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 /// <summary>
 /// Vm Qemu Agent NetworkGetInterfaces
 /// </summary>
-public class VmQemuAgentNetworkGetInterfaces
+public class VmQemuAgentNetworkGetInterfaces : ModelBase
 {
     /// <summary>
     /// Result

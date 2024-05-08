@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
 /// <summary>
 /// Firewall rules
 /// </summary>
-public class FirewallRule
+public class FirewallRule : ModelBase
 {
     /// <summary>
     /// Protocol

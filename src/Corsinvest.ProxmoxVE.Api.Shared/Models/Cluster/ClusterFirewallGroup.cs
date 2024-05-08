@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 /// <summary>
 /// Cluster Firewall Group
 /// </summary>
-public class ClusterFirewallGroup
+public class ClusterFirewallGroup : ModelBase
 {
     /// <summary>
     /// Comment

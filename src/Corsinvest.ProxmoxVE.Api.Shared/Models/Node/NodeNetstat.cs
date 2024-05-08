@@ -12,7 +12,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Node Netstat
 /// </summary>
-public class NodeNetstat
+public class NodeNetstat : ModelBase
 {
     /// <summary>
     /// Device

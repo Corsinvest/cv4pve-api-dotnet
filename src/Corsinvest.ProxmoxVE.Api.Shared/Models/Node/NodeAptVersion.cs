@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Node apt version
 /// </summary>
-public class NodeAptVersion
+public class NodeAptVersion : ModelBase
 {
     /// <summary>
     /// Arch

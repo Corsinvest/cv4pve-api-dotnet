@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Node Apt Update
 /// </summary>
-public class NodeFirewallOptions
+public class NodeFirewallOptions : ModelBase
 {
     /// <summary>
     /// Smurf Log Level
@@ -43,7 +43,7 @@ public class NodeFirewallOptions
     public bool Nosmurfs { get; set; }
 
     /// <summary>
-    /// Log Level Out 
+    /// Log Level Out
     /// </summary>
     [JsonProperty("log_level_out")]
     public string LogLevelOut { get; set; }

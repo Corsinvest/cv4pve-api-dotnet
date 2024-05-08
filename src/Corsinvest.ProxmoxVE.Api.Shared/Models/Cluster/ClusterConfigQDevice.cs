@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 /// <summary>
 /// Cluster config Qdevice
 /// </summary>
-public class ClusterConfigQDevice
+public class ClusterConfigQDevice : ModelBase
 {
     /// <summary>
     /// Algorithm

@@ -4,14 +4,13 @@
  */
 
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 
 /// <summary>
 /// Node replication
 /// </summary>
-public class NodeReplication
+public class NodeReplication : ModelBase
 {
     /// <summary>
     /// Comment
@@ -108,10 +107,4 @@ public class NodeReplication
     /// </summary>
     [JsonProperty("error")]
     public string Error { get; set; }
-
-    /// <summary>
-    /// Extension Data
-    /// </summary>
-    [JsonExtensionData]
-    public IDictionary<string, object> ExtensionData { get; set; }
 }

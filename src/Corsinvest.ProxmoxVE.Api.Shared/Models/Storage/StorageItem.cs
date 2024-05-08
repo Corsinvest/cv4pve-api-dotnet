@@ -11,7 +11,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Storage;
 /// <summary>
 /// Storage
 /// </summary>
-public class StorageItem : IPoolItem
+public class StorageItem : ModelBase, IPoolItem
 {
     /// <summary>
     /// PruneBackups

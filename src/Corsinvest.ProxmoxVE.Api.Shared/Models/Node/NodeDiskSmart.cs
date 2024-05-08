@@ -11,7 +11,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Node Disk Smart
 /// </summary>
-public class NodeDiskSmart
+public class NodeDiskSmart : ModelBase
 {
     /// <summary>
     /// Type
@@ -24,6 +24,12 @@ public class NodeDiskSmart
     /// </summary>
     [JsonProperty("health")]
     public string Health { get; set; }
+
+    /// <summary>
+    /// Text
+    /// </summary>
+    [JsonProperty("text")]
+    public string Text { get; set; }
 
     /// <summary>
     /// Attributes

@@ -12,7 +12,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Node disk list
 /// </summary>
-public class NodeDiskList
+public class NodeDiskList : ModelBase
 {
     /// <summary>
     /// Device path

@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Node subscription
 /// </summary>
-public class NodeSubscription
+public class NodeSubscription : ModelBase
 {
     /// <summary>
     /// Status

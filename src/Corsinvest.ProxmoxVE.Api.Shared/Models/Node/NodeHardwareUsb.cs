@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Node hardware usb
 /// </summary>
-public class NodeHardwareUsb
+public class NodeHardwareUsb : ModelBase
 {
     /// <summary>
     /// Dev Num

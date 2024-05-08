@@ -13,7 +13,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 /// <summary>
 /// Cluster log
 /// </summary>
-public class ClusterLog
+public class ClusterLog : ModelBase
 {
     /// <summary>
     /// Message

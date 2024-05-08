@@ -13,7 +13,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 /// <summary>
 /// Snapshot data
 /// </summary>
-public class VmSnapshot
+public class VmSnapshot : ModelBase
 {
     private long _time;
     private string _parent;

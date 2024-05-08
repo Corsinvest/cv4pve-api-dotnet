@@ -13,7 +13,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Node status
 /// </summary>
-public class NodeStatus
+public class NodeStatus : ModelBase
 {
     /// <summary>
     /// Proxmox VE Version

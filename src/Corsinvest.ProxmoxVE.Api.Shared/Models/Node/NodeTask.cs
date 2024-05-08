@@ -14,7 +14,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Task data
 /// </summary>
-public class NodeTask : IStatusItem, INodeItem
+public class NodeTask : ModelBase, IStatusItem, INodeItem
 {
     /// <summary>
     /// Node

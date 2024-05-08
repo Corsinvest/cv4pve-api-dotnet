@@ -11,7 +11,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 /// <summary>
 /// Cluster Config Totem
 /// </summary>
-public class ClusterConfigTotem
+public class ClusterConfigTotem : ModelBase
 {
     /// <summary>
     /// Cluster name

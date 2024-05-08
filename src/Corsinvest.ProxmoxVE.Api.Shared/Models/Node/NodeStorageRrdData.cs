@@ -12,7 +12,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Storage RrdData
 /// </summary>
-public class NodeStorageRrdData
+public class NodeStorageRrdData : ModelBase
 {
     /// <summary>
     /// Used

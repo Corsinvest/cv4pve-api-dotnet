@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 
-public class ClusterCephStatus
+public class ClusterCephStatus : ModelBase
 {
     [JsonProperty("fsmap")]
     public FsmapInt Fsmap { get; set; }

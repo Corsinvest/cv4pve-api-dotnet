@@ -13,7 +13,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 /// <summary>
 /// Vm Qemu Status Current
 /// </summary>
-public class VmBaseStatusCurrent : IVmBase, INetIO, IDisk, IMemory, ICpu, IDiskIO
+public class VmBaseStatusCurrent : ModelBase, IVmBase, INetIO, IDisk, IMemory, ICpu, IDiskIO
 {
     /// <summary>
     /// Net in

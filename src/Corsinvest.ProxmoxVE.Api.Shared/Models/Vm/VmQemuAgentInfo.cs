@@ -11,7 +11,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 /// <summary>
 /// Vm Qemu Agent Info
 /// </summary>
-public class VmQemuAgentInfo
+public class VmQemuAgentInfo : ModelBase
 {
     /// <summary>
     /// Result

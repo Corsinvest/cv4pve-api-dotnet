@@ -14,7 +14,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 /// <summary>
 /// Vm Config
 /// </summary>
-public class VmConfig
+public class VmConfig : ModelBase
 {
     /// <summary>
     /// Architecture type.
@@ -102,12 +102,6 @@ public class VmConfig
     /// /// Disks
     /// </summary>
     public IEnumerable<VmDisk> Disks { get; private set; }
-
-    /// <summary>
-    /// Extension Data
-    /// </summary>
-    [JsonExtensionData]
-    public IDictionary<string, object> ExtensionData { get; set; }
 
     [OnDeserialized]
     internal void OnSerializedMethod(StreamingContext context)

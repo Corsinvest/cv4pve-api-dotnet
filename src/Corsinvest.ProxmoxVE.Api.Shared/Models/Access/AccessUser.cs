@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Access;
 /// <summary>
 /// User
 /// </summary>
-public class AccessUser
+public class AccessUser : ModelBase
 {
     /// <summary>
     /// Enabled

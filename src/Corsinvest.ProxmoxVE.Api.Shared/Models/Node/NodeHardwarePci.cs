@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Node Hardware Pci
 /// </summary>
-public class NodeHardwarePci
+public class NodeHardwarePci : ModelBase
 {
     /// <summary>
     /// Subsystem Device

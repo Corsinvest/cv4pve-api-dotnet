@@ -11,7 +11,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 /// <summary>
 /// Cluster backup
 /// </summary>
-public class ClusterBackup : IStorageItem
+public class ClusterBackup : ModelBase, IStorageItem
 {
     /// <summary>
     /// All

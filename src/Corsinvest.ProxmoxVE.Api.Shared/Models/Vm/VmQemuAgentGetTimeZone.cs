@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 /// <summary>
 /// Vm Qemu Agent Get TimeZone
 /// </summary>
-public class VmQemuAgentGetTimeZone
+public class VmQemuAgentGetTimeZone : ModelBase
 {
     /// <summary>
     /// Result

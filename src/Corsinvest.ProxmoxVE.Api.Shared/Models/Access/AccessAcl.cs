@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Access;
 /// <summary>
 /// Acl
 /// </summary>
-public class AccessAcl
+public class AccessAcl: ModelBase
 {
     /// <summary>
     /// Path

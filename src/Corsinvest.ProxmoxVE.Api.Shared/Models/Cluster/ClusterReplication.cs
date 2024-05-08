@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 /// <summary>
 /// Cluster replication
 /// </summary>
-public class ClusterReplication
+public class ClusterReplication : ModelBase
 {
     /// <summary>
     /// Schedule

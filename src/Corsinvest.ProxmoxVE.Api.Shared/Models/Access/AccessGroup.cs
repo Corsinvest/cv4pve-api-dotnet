@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Access;
 /// <summary>
 /// Group
 /// </summary>
-public class AccessGroup
+public class AccessGroup : ModelBase
 {
     /// <summary>
     /// Group Id

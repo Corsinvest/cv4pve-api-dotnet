@@ -15,7 +15,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Node
 /// </summary>
-public class NodeItem : IClusterResourceNode
+public class NodeItem : ModelBase, IClusterResourceNode
 {
     /// <summary>
     /// Node Level

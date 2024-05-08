@@ -11,7 +11,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Node certificate
 /// </summary>
-public class NodeCertificate
+public class NodeCertificate : ModelBase
 {
     /// <summary>
     /// Fingerprint

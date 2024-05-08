@@ -15,7 +15,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 /// <summary>
 /// rrd data structure
 /// </summary>
-public class VmRrdData : IDisk, INetIO, IDiskIO, ICpu, IMemory
+public class VmRrdData : ModelBase, IDisk, INetIO, IDiskIO, ICpu, IMemory
 {
     /// <summary>
     /// Time unix time

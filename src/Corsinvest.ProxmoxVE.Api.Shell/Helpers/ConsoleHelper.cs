@@ -46,11 +46,13 @@ Good job";
     /// <returns></returns>
     public static string MakeLogoAndTitle(string title)
     {
-        title += new string(' ', 47 - title.Length);
+        var space = new string(' ', title.Length < 47
+                                    ? 47 - title.Length
+                                    : 1);
 
         return $@"{Logo}
 
-{title}(Made in Italy)";
+{title}{space}(Made in Italy)";
     }
 
     /// <summary>

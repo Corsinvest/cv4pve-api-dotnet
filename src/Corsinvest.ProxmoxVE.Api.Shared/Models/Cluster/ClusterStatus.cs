@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 /// <summary>
 /// Status
 /// </summary>
-public class ClusterStatus
+public class ClusterStatus : ModelBase
 {
     /// <summary>
     /// Name

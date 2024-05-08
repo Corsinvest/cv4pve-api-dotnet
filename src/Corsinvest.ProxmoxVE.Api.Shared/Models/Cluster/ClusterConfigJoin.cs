@@ -11,7 +11,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 /// <summary>
 /// Cluster Config Join
 /// </summary>
-public class ClusterConfigJoin
+public class ClusterConfigJoin : ModelBase
 {
     /// <summary>
     /// ConfigDigest

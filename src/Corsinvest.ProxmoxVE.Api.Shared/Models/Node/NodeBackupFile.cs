@@ -13,7 +13,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Backup file
 /// </summary>
-public class NodeBackupFile
+public class NodeBackupFile : ModelBase
 {
     /// <summary>
     /// Leaft

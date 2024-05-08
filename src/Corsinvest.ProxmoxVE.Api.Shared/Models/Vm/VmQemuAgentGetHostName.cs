@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 /// <summary>
 /// Vm Qemu Agent GetHostName
 /// </summary>
-public class VmQemuAgentGetHostName
+public class VmQemuAgentGetHostName : ModelBase
 {
     /// <summary>
     /// Result

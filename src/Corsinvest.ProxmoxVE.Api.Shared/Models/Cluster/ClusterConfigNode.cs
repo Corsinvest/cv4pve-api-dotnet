@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 /// <summary>
 /// Cluster config node
 /// </summary>
-public class ClusterConfigNode
+public class ClusterConfigNode : ModelBase
 {
     /// <summary>
     /// Quorum Votes

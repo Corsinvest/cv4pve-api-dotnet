@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
 /// <summary>
 /// Firewall IpSet content
 /// </summary>
-public class FirewallIpSetContent
+public class FirewallIpSetContent : ModelBase
 {
     /// <summary>
     /// Digest
