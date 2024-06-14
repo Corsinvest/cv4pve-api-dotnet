@@ -975,8 +975,12 @@ public static class InfoHelper
 
             if (storage.Detail.Enabled)
             {
-                storage.RrdData.Day = await storageNode.Rrddata.GetAsync(RrdDataTimeFrame.Day, RrdDataConsolidation.Average);
-                storage.RrdData.Week = await storageNode.Rrddata.GetAsync(RrdDataTimeFrame.Week, RrdDataConsolidation.Average);
+                storage.RrdData.Day = item.Active
+                                        ? await storageNode.Rrddata.GetAsync(RrdDataTimeFrame.Day, RrdDataConsolidation.Average)
+                                        : [];
+                storage.RrdData.Week = item.Active
+                                        ? await storageNode.Rrddata.GetAsync(RrdDataTimeFrame.Week, RrdDataConsolidation.Average)
+                                        : [];
             }
 
             storages.Add(storage);
