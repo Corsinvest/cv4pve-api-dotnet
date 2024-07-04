@@ -3,8 +3,13 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
+using System;
 using System.Collections.Generic;
+using System.Dynamic;
+using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Corsinvest.ProxmoxVE.Api;
 
@@ -6105,12 +6110,14 @@ public class PveClient : PveClientBase
                         /// <param name="generate_password">Generates a random password to be used as ticket instead of the API ticket.</param>
                         /// <param name="websocket">Prepare for websocket upgrade (only required when using serial terminal, otherwise upgrade is always possible).</param>
                         /// <returns></returns>
-                        public async Task<Result> Vncproxy(bool? generate_password = null, bool? websocket = null)
+                        public async Task<Result> Vncproxy(string CSRFPreventionToken, bool? generate_password = null, bool? websocket = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("generate-password", generate_password);
                             parameters.Add("websocket", websocket);
-                            return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/vncproxy", parameters);
+                            var headers = new Dictionary<string, object> { { "CSRFPreventionToken", CSRFPreventionToken } };
+
+                            return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/vncproxy", parameters, headers);
                         }
                     }
                     /// <summary>
@@ -11270,6 +11277,7 @@ public class PveClient : PveClientBase
                         /// <summary>
                         /// Upload templates and ISO images.
                         /// </summary>
+                        /// <param name="fileStream">file stream</param>
                         /// <param name="content">Content type.
                         ///   Enum: iso,vztmpl</param>
                         /// <param name="filename">The name of the file to create. Caution: This will be normalized!</param>
@@ -11278,15 +11286,37 @@ public class PveClient : PveClientBase
                         ///   Enum: md5,sha1,sha224,sha256,sha384,sha512</param>
                         /// <param name="tmpfilename">The source file name. This parameter is usually set by the REST handler. You can only overwrite it when connecting to the trusted port on localhost.</param>
                         /// <returns></returns>
-                        public async Task<Result> Upload(string content, string filename, string checksum = null, string checksum_algorithm = null, string tmpfilename = null)
+                        public async Task<Result> Upload(Stream fileStream,string filename, string content="iso",  string checksum = null, string checksum_algorithm = null, string tmpfilename = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("content", content);
                             parameters.Add("filename", filename);
-                            parameters.Add("checksum", checksum);
-                            parameters.Add("checksum-algorithm", checksum_algorithm);
-                            parameters.Add("tmpfilename", tmpfilename);
-                            return await _client.CreateAsync($"/nodes/{_node}/storage/{_storage}/upload", parameters);
+                            //parameters.Add("checksum", checksum);
+                            //parameters.Add("checksum-algorithm", checksum_algorithm);
+                            //parameters.Add("tmpfilename", tmpfilename);
+
+                            string resource = $"/nodes/{_node}/storage/{_storage}/upload";
+                            string uriString = _client.GetApiUrl() + resource;
+                            string boundary = Guid.NewGuid().ToString();
+                            string contentType = $"multipart/form-data; boundary={boundary}";
+                            //form-data
+                            var mpfdContent = new MultipartFormDataContent(boundary);
+                            mpfdContent.Add(new StringContent(content), "\"content\"");//必须带""
+                            mpfdContent.Add(new StreamContent(fileStream), "\"filename\"", $"\"{filename}\"");
+                            //httpclient原生的boundary拼接有""，不能正常识别,所以要自己拼接
+                            mpfdContent.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse(contentType);
+
+                            var response =await _client.GetHttpClient().PostAsync(uriString, mpfdContent);
+                            Result lastResult = new Result(JsonConvert.DeserializeObject<ExpandoObject>(await response.Content.ReadAsStringAsync()),
+                                response.StatusCode,
+                                response.ReasonPhrase,
+                                response.IsSuccessStatusCode,
+                                resource,
+                                parameters,
+                                MethodType.Create,
+                                ResponseType.Json);
+                            return lastResult;
+
                         }
                     }
                     /// <summary>

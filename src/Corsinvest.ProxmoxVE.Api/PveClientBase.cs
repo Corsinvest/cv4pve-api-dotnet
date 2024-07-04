@@ -14,6 +14,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +29,7 @@ public class PveClientBase
 {
     private ILogger<PveClientBase> _logger;
 
+    private HttpClient _client;
     /// <summary>
     /// Constructor
     /// </summary>
@@ -80,7 +82,8 @@ public class PveClientBase
     public ResponseType ResponseType { get; set; } = ResponseType.Json;
 
     /// <summary>
-    /// Returns the base URL used to interact with the Proxmox VE API.
+    /// Returns the base URL used to interact with the Proxmox VE API. 
+    /// https://192.168.100.245:8006/api2/json  后面没/
     /// </summary>
     public string GetApiUrl() => $"https://{Host}:{Port}/api2/{Enum.GetName(typeof(ResponseType), ResponseType).ToLower()}";
 
@@ -127,6 +130,13 @@ public class PveClientBase
 
             CSRFPreventionToken = result.Response.data.CSRFPreventionToken;
             PVEAuthCookie = result.Response.data.ticket;
+
+            
+
+            _client.DefaultRequestHeaders.Remove("Cookie");
+            _client.DefaultRequestHeaders.Add("Cookie", $"PVEAuthCookie={PVEAuthCookie}");
+
+
         }
         return result.IsSuccessStatusCode;
     }
@@ -168,8 +178,8 @@ public class PveClientBase
     /// <param name="resource">Url request</param>
     /// <param name="parameters">Additional parameters</param>
     /// <returns>Result</returns>
-    public async Task<Result> CreateAsync(string resource, IDictionary<string, object> parameters = null)
-        => await ExecuteActionAsync(resource, MethodType.Create, parameters);
+    public async Task<Result> CreateAsync(string resource, IDictionary<string, object> parameters = null, IDictionary<string, object> headers = null)
+        => await ExecuteActionAsync(resource, MethodType.Create, parameters,headers);
 
     /// <summary>
     /// Execute Execute method PUT
@@ -181,10 +191,48 @@ public class PveClientBase
         => await ExecuteActionAsync(resource, MethodType.Set, parameters);
 
     /// <summary>
-    /// Het http client
+    /// Het http client,外部不能using
     /// </summary>
     /// <returns></returns>
     public virtual HttpClient GetHttpClient()
+    {
+        if (_client != null && _client.DefaultRequestHeaders.TryGetValues("Cookie",out _))
+            return _client;
+
+        var handler = new HttpClientHandler()
+        {
+            CookieContainer = new CookieContainer(),
+            //fiddler 代理，部署iis后捕获流量
+            //Proxy = new WebProxy(new Uri("http://127.0.0.1:8888"))
+        };
+#pragma warning disable S4830 // Server certificates should be verified during SSL/TLS connections
+        if (!ValidateCertificate) handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+#pragma warning restore S4830 // Server certificates should be verified during SSL/TLS connections
+
+        _client = new HttpClient(handler); 
+        if (Timeout.HasValue) { _client.Timeout = Timeout.Value; }
+
+        //ticket login
+        if (PVEAuthCookie != null)
+        {
+            handler.CookieContainer.Add(new Cookie("PVEAuthCookie", PVEAuthCookie, "/", Host));
+            //不是所有请求都需要加 CSRFPreventionToken，而且改为加载 HttpRequestMessage
+            //_client.DefaultRequestHeaders.Add("CSRFPreventionToken", CSRFPreventionToken);
+        }
+
+        if (!string.IsNullOrWhiteSpace(ApiToken))
+        {
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("PVEAPIToken", ApiToken);
+        }
+
+        return _client;
+    }
+
+    /// <summary>
+    /// 获取一个独立的HttpClient 来修改请求头 CSRFPreventionToken ，避免并发影响，要用using
+    /// </summary>
+    /// <returns></returns>
+    public virtual HttpClient CloneHttpClient()
     {
         var handler = new HttpClientHandler()
         {
@@ -193,15 +241,13 @@ public class PveClientBase
 #pragma warning disable S4830 // Server certificates should be verified during SSL/TLS connections
         if (!ValidateCertificate) handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
 #pragma warning restore S4830 // Server certificates should be verified during SSL/TLS connections
-
         var client = new HttpClient(handler);
         if (Timeout.HasValue) { client.Timeout = Timeout.Value; }
 
         //ticket login
-        if (CSRFPreventionToken != null)
+        if (PVEAuthCookie != null)
         {
             handler.CookieContainer.Add(new Cookie("PVEAuthCookie", PVEAuthCookie, "/", Host));
-            client.DefaultRequestHeaders.Add("CSRFPreventionToken", CSRFPreventionToken);
         }
 
         if (!string.IsNullOrWhiteSpace(ApiToken))
@@ -223,9 +269,11 @@ public class PveClientBase
 
     private async Task<Result> ExecuteActionAsync(string resource,
                                                   MethodType methodType,
-                                                  IDictionary<string, object> parameters = null)
+                                                  IDictionary<string, object> parameters = null,
+                                                  IDictionary<string, object> headers = null)
     {
-        using var client = GetHttpClient();
+        //using
+        var client = GetHttpClient();
 
         var httpMethod = methodType switch
         {
@@ -264,11 +312,26 @@ public class PveClientBase
                                  string.Join(Environment.NewLine, @params.Select(a => $"{a.Key} : {a.Value}")));
             }
         }
-
+        //每次请求都不一样，不会影响全局
         var request = new HttpRequestMessage(httpMethod, new Uri(uriString));
+        if (headers != null)
+        {
+            foreach (var header in headers)
+            {
+                if (header.Value != null) request.Headers.TryAddWithoutValidation(header.Key, header.Value.ToString());
+            }
+        }
+        else {
+            //any write request (POST, PUT, DELETE) must include the CSRFPreventionToken header:
+            //有些get也要,如果没传就用全局的
+            //if(httpMethod ==   HttpMethod.Delete || httpMethod == HttpMethod.Post || httpMethod == HttpMethod.Put)
+                request.Headers.TryAddWithoutValidation("CSRFPreventionToken", CSRFPreventionToken);
+        }
+
         if (httpMethod != HttpMethod.Get && httpMethod != HttpMethod.Delete)
         {
             request.Content = new StringContent(JsonConvert.SerializeObject(@params), Encoding.UTF8, "application/json");
+         
         }
 
         var response = await client.SendAsync(request);
@@ -297,7 +360,8 @@ public class PveClientBase
                 if (_logger.IsEnabled(LogLevel.Trace)) { _logger.LogTrace(result as string); }
                 break;
 
-            case ResponseType.Response: result = response; break;
+            case ResponseType.Response: result = response; 
+                break;
 
             default: throw new InvalidEnumArgumentException();
         }
