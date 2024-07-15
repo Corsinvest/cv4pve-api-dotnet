@@ -15,14 +15,25 @@ namespace Corsinvest.ProxmoxVE.Api;
 /// </summary>
 public class Result
 {
-    internal Result(dynamic response,
-                    HttpStatusCode statusCode,
-                    string reasonPhrase,
-                    bool isSuccessStatusCode,
-                    string requestResource,
-                    IDictionary<string, object> requestParameters,
-                    MethodType methodType,
-                    ResponseType responseType)
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="response"></param>
+    /// <param name="statusCode"></param>
+    /// <param name="reasonPhrase"></param>
+    /// <param name="isSuccessStatusCode"></param>
+    /// <param name="requestResource"></param>
+    /// <param name="requestParameters"></param>
+    /// <param name="methodType"></param>
+    /// <param name="responseType"></param>
+    public Result(dynamic response,
+                  HttpStatusCode statusCode,
+                  string reasonPhrase,
+                  bool isSuccessStatusCode,
+                  string requestResource,
+                  IDictionary<string, object> requestParameters,
+                  MethodType methodType,
+                  ResponseType responseType)
     {
         Response = response;
         StatusCode = statusCode;

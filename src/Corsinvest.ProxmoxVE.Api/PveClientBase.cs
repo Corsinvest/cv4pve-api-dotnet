@@ -198,11 +198,8 @@ public class PveClientBase
         if (Timeout.HasValue) { client.Timeout = Timeout.Value; }
 
         //ticket login
-        if (CSRFPreventionToken != null)
-        {
-            handler.CookieContainer.Add(new Cookie("PVEAuthCookie", PVEAuthCookie, "/", Host));
-            client.DefaultRequestHeaders.Add("CSRFPreventionToken", CSRFPreventionToken);
-        }
+        if (CSRFPreventionToken != null) { client.DefaultRequestHeaders.Add("CSRFPreventionToken", CSRFPreventionToken); }
+        if (PVEAuthCookie != null) { handler.CookieContainer.Add(new Cookie("PVEAuthCookie", PVEAuthCookie, "/", Host)); }
 
         if (!string.IsNullOrWhiteSpace(ApiToken))
         {

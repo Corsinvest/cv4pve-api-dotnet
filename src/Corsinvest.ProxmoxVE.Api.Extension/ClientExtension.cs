@@ -4,14 +4,21 @@
  */
 
 using Corsinvest.ProxmoxVE.Api.Extension.Utils;
+using Corsinvest.ProxmoxVE.Api.Shared;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Dynamic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension;
@@ -324,65 +331,75 @@ public static class ClientExtension
 
         return vmIds.Distinct();
     }
+
+    /// <summary>
+    /// Upload templates and ISO images.
+    /// </summary>
+    /// <param name="client"></param>
+    /// <param name="node">Node.</param>
+    /// <param name="storage">Node.</param>
+    /// <param name="content">Content type.
+    ///   Enum: iso,vztmpl</param>
+    /// <param name="fileStream">Stream of file</param>
+    /// <param name="fileName">The name of the file to create. Caution: This will be normalized!</param>
+    /// <param name="cancellationToken"></param>
+    /// <param name="secondsTimeout">Timeout in secods</param>
+    /// <param name="checksum">The expected checksum of the file.</param>
+    /// <param name="checksumAlgorithm">The algorithm to calculate the checksum of the file.
+    ///   Enum: md5,sha1,sha224,sha256,sha384,sha512</param>
+    /// <param name="tmpFileName">The source file name. This parameter is usually set by the REST handler.
+    /// You can only overwrite it when connecting to the trusted port on localhost.</param>
+    /// <returns>Result</returns>
+    public static async Task<Result> UploadFileToStorageAsync(this PveClient client,
+                                                              string node,
+                                                              string storage,
+                                                              string content,
+                                                              Stream fileStream,
+                                                              string fileName,
+                                                              CancellationToken cancellationToken,
+                                                              int secondsTimeout = 600,
+                                                              string checksum = null,
+                                                              string checksumAlgorithm = null,
+                                                              string tmpFileName = null)
+    {
+        if (!new[] { "iso", "vztmpl" }.Contains(content)) { throw new PveException("Content type non valid! 'iso' or 'vztmpl'"); }
+
+        var boundary = Guid.NewGuid().ToString();
+        var mpfdContent = new MultipartFormDataContent(boundary)
+        {
+            { new StringContent(content), "\"content\"" },
+            { new StreamContent(fileStream), "\"filename\"", $"\"{fileName}\"" }
+        };
+
+        var parameters = new Dictionary<string, object>
+        {
+             { "content", content },
+             { "checksum", checksum },
+             { "checksum-algorithm", checksumAlgorithm },
+             { "tmpfilename", tmpFileName }
+        };
+
+        // foreach (var item in parameters.Where(a => a.Value != null))
+        // {
+        //     mpfdContent.Add(new StringContent(item.Value.ToString()), $"\"{item.Key}\"");
+        // }
+
+        mpfdContent.Headers.ContentType = MediaTypeHeaderValue.Parse($"multipart/form-data; boundary={boundary}");
+
+        var httpClient = client.GetHttpClient();
+        httpClient.Timeout = TimeSpan.FromSeconds(secondsTimeout);
+
+        var resource = $"/nodes/{node}/storage/{storage}/upload";
+        var response = await httpClient.PostAsync(client.GetApiUrl() + resource, mpfdContent, cancellationToken);
+        var result = new Result(JsonConvert.DeserializeObject<ExpandoObject>(await response.Content.ReadAsStringAsync()),
+                                 response.StatusCode,
+                                 response.ReasonPhrase,
+                                 response.IsSuccessStatusCode,
+                                 resource,
+                                 parameters,
+                                 MethodType.Create,
+                                 ResponseType.Json);
+
+        return result;
+    }
 }
-
-// /// <summary>
-// /// Upload templates and ISO images to storage.
-// /// </summary>
-// /// <param name="client"></param>
-// /// <param name="node">Node.</param>
-// /// <param name="storage">Node.</param>
-// /// <param name="content">Content type.
-// ///   Enum: iso,vztmpl</param>
-// /// <param name="fileName">The name of the file to create. Caution: This will be normalized!</param>
-// /// <param name="fileNameToUpload"></param>
-// /// <param name="checksum">The expected checksum of the file.</param>
-// /// <param name="checksumAlgorithm">The algorithm to calculate the checksum of the file.
-// ///   Enum: md5,sha1,sha224,sha256,sha384,sha512</param>
-// /// <param name="tmpFileName">The source file name. This parameter is usually set by the REST handler.
-// /// You can only overwrite it when connecting to the trusted port on localhost.</param>
-// /// <returns></returns>
-// public static async Task<Result> UploadFileToStorageAsync(this PveClient client,
-//                                                           string node,
-//                                                           string storage,
-//                                                           string content,
-//                                                           string fileName,
-//                                                           string fileNameToUpload,
-//                                                           string checksum = null,
-//                                                           string checksumAlgorithm = null,
-//                                                           string tmpFileName = null)
-// {
-
-//     //        iso: ".img, .iso",
-//     //  	    vztmpl: ".tar.gz, .tar.xz",
-
-//     if (!new[] { "iso", "vztmpl" }.Contains(content)) { throw new PveException("Content type non valid! 'iso' or 'vztmpl'"); }
-
-//     // using var stream = File.OpenRead(fileNameToUpload);
-//     // using var streamContent = new StreamContent(stream);
-//     // //    streamContent.Headers.ContentType = new MediaTypeHeaderValue("multipart/form-data");
-
-//     // using var multipartFormContent = new MultipartFormDataContent
-//     // {
-//     //     { streamContent, "filename"}, //fileName
-//     //     { new StringContent(content), "content" },
-//     // };
-
-//     // if (!string.IsNullOrEmpty(checksum)) { multipartFormContent.Add(new StringContent(checksum), "checksum"); }
-//     // if (!string.IsNullOrEmpty(checksumAlgorithm)) { multipartFormContent.Add(new StringContent(checksumAlgorithm), "checksum_algorithm"); }
-//     // if (!string.IsNullOrEmpty(tmpFileName)) { multipartFormContent.Add(new StringContent(tmpFileName), "tmpfilename"); }
-
-//     // var parameters = new Dictionary<string, object>
-//     //  {
-//     //      { "content", content },
-//     //      { "filename", stream },
-//     //      { "checksum", checksum },
-//     //      { "checksum-algorithm", checksum_algorithm },
-//     //      { "tmpfilename", tmpFileName }
-//     //  };
-
-
-//     //      var aa = await httpClient.PostAsync(new Uri($"{client.GetApiUrl()}/nodes/{node}/storage/{storage}/upload"), multipartFormContent);
-//     //    return await client.Create($"/nodes/{node}/storage/{storage}/upload", null, multipartFormContent);
-//     return null;
-// }
