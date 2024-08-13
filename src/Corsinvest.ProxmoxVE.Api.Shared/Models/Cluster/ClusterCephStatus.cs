@@ -9,6 +9,7 @@ using System.Collections.Generic;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 
+#pragma warning disable CS1591
 public class ClusterCephStatus : ModelBase
 {
     [JsonProperty("fsmap")]
@@ -4655,3 +4656,4 @@ public class ClusterCephStatus : ModelBase
         public int Flags { get; set; }
     }
 }
+#pragma warning restore CS1591
