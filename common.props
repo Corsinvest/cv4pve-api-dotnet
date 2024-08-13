@@ -12,6 +12,7 @@
 		<PackageTags>ProxmoxVE;Api,Client;Rest;Corsinvest;</PackageTags>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageOutputPath>..\..\..\.nupkgs\</PackageOutputPath>
 		<RepositoryType>Github</RepositoryType>
 		<RepositoryUrl>https://github.com/Corsinvest/cv4pve-api-dotnet</RepositoryUrl>
