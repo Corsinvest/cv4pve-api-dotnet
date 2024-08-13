@@ -165,20 +165,24 @@ public static class ClientExtension
             {
                 //all in specific node
                 var idx = id.StartsWith("all-") ? 4 : 5;
-                data = allVms.Where(a => a.Node.ToLower() == id.ToLower().Substring(idx));
+                var nodeName = id.Substring(idx);
+                data = allVms.Where(a => a.Node == nodeName || a.Node.ToLower() == nodeName.ToLower());
             }
             else if (id.StartsWith("@node-"))
             {
                 //all in specific node
-                var nodeName = id.ToLower().Substring(6);
-                data = allVms.Where(a => a.Node.ToLower() == nodeName.ToLower());
+                var nodeName = id.Substring(6);
+                data = allVms.Where(a => a.Node == nodeName || a.Node.ToLower() == nodeName.ToLower());
             }
             else if (id.StartsWith("@pool-"))
             {
                 //all in specific pool
-                var poolName = id.ToLower().Substring(6);
+                var name = id.Substring(6);
+                var poolName = (await client.Pools.GetAsync())
+                                    .Select(a => a.Id)
+                                    .FirstOrDefault(a => a == name || a.ToLower() == name.ToLower());
 
-                if ((await client.Pools.GetAsync()).Any(a => a.Id == poolName))
+                if (!string.IsNullOrEmpty(poolName))
                 {
                     data = (await client.Pools[poolName].GetAsync()).Members.Where(a => allVms.Any(b => b.Id == a.Id));
                 }
@@ -186,8 +190,9 @@ public static class ClientExtension
             else if (id.StartsWith("@tag-"))
             {
                 //all in specific tag
-                var tagName = id.ToLower().Substring(5);
-                data = allVms.Where(a => (a.Tags + "").ToLower().Split(';').Contains(tagName));
+                var tagName = id.Substring(5);
+                data = allVms.Where(a => (a.Tags + "").ToLower().Split(';').Contains(tagName.ToLower())
+                                        || (a.Tags + "").Split(';').Contains(tagName));
             }
             else
             {
