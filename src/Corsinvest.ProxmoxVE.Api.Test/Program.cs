@@ -6,7 +6,7 @@
 using Corsinvest.ProxmoxVE.Api;
 
 var client = new PveClient("192.168.0.2");
-if (await client.LoginAsync("root", Environment.GetEnvironmentVariable("pve_password")))
+if (await client.LoginAsync("root", Environment.GetEnvironmentVariable("PvePassword")))
 {
     Console.WriteLine("pippo");
 

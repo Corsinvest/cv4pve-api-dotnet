@@ -115,14 +115,42 @@ public class VmConfig : ModelBase
                 || (Regex.IsMatch(key, @"(efidisk|tpmstate|virtio|ide|scsi|sata|mp)\d+") && !Regex.IsMatch(def, "media=cdrom")))
             {
                 var infos = def.Split(',');
-                var storages = infos[0].Split(':');
+                var storage = string.Empty;
+                var fileName = string.Empty;
+                var passthrough = false;
+                var device = string.Empty;
+                var mountSourcePath = string.Empty;
+
+                if (infos[0].Contains(":"))
+                {
+                    var data = infos[0].Split(':');
+                    storage = data[0];
+                    fileName = data[1];
+                }
+                else if (infos[0].StartsWith("/dev"))
+                {
+                    passthrough = true;
+                    device = infos[0];
+                }
+                else if (key.StartsWith("mp"))
+                {
+                    mountSourcePath = infos[0];
+                }
+                else
+                {
+                    storage = infos[0];
+                }
 
                 disks.Add(new VmDisk
                 {
                     Id = key,
-                    Storage = storages[0],
-                    FileName = storages[1],
+                    Storage = storage,
+                    FileName = fileName,
+                    Device = device,
+                    Passthrough = passthrough,
                     Size = infos.Where(a => a.StartsWith("size=")).Select(a => a.Substring(5)).FirstOrDefault(),
+                    MountPoint = infos.Where(a => a.StartsWith("mp=")).Select(a => a.Substring(3)).FirstOrDefault(),
+                    MountSourcePath = mountSourcePath,
                     Backup = !infos.Contains("backup=0")
                 });
             }

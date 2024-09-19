@@ -18,14 +18,32 @@ public class VmDisk
     /// <summary>
     /// Storage
     /// </summary>
-    /// <value></value>
     public string Storage { get; set; }
 
     /// <summary>
     /// Name
     /// </summary>
-    /// <value></value>
     public string FileName { get; set; }
+
+    /// <summary>
+    /// Device
+    /// </summary>
+    public string Device { get; set; }
+
+    /// <summary>
+    /// Passthrough
+    /// </summary>
+    public bool Passthrough { get; set; }
+
+    /// <summary>
+    /// Mount Point
+    /// </summary>
+    public string MountPoint { get; set; }
+
+    /// <summary>
+    /// Mount Source Path
+    /// </summary>
+    public string MountSourcePath { get; set; }
 
     /// <summary>
     /// Size
