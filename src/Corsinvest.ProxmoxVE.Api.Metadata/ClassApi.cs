@@ -27,10 +27,10 @@ public class ClassApi
     /// <param name="parent"></param>
     public ClassApi(JToken token, ClassApi parent)
     {
-        Name = token["text"].ToString();
+        Name = token["text"].ToString().Replace("-", "_");
         IndexName = Name.Replace("{", "").Replace("}", "");
         Parent = parent;
-        Resource = token["path"].ToString();
+        Resource = token["path"].ToString().Replace("-", "_");
 
         Keys.AddRange(parent.Keys);
         parent.SubClasses.Add(this);
