@@ -43,7 +43,7 @@ public class NodeTask : ModelBase, IStatusItem, INodeItem
     /// StartTime unix time
     /// </summary>
     [JsonProperty("starttime")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime )]
     public long StartTime { get; set; }
 
     /// <summary>
@@ -87,7 +87,7 @@ public class NodeTask : ModelBase, IStatusItem, INodeItem
     /// EndTime unix time
     /// </summary>
     [JsonProperty("endtime")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime )]
     public long EndTime { get; set; }
 
     /// <summary>

@@ -28,7 +28,7 @@ public static class ClusterExtension
         foreach (var item in items.Where(a => a.ResourceType == ClusterResourceType.Vm))
         {
             var node = items.FirstOrDefault(a => a.ResourceType == ClusterResourceType.Node && a.Node == item.Node);
-            if (node != null) { item.CalculateHostUsage(node.MemorySize, node.CpuSize); }
+            if (node != null) { item.CalculateHostUsage(node.MemorySize, (ulong)node.CpuSize); }
         }
 
         return items;
@@ -40,7 +40,7 @@ public static class ClusterExtension
     /// <param name="data"></param>
     /// <param name="hostMemorySize"></param>
     /// <param name="hostCpuSize"></param>
-    public static void CalculateHostUsage(this ClusterResource data, long hostMemorySize, long hostCpuSize)
+    public static void CalculateHostUsage(this ClusterResource data, ulong hostMemorySize, ulong hostCpuSize)
     {
         //calculate host usage
         if (data.ResourceType == ClusterResourceType.Vm && data.Uptime > 0 && hostCpuSize > 0 && hostMemorySize > 0)

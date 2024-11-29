@@ -25,15 +25,15 @@ public class VmLxcStatusCurrent : VmBaseStatusCurrent
     /// Swap
     /// </summary>
     [JsonProperty("swap")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-    public long SwapUsage { get; set; }
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    public ulong SwapUsage { get; set; }
 
     /// <summary>
     /// Swap
     /// </summary>
     [JsonProperty("maxswap")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-    public long SwapSize { get; set; }
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    public ulong SwapSize { get; set; }
 
     /// <summary>
     /// Swap usage percentage

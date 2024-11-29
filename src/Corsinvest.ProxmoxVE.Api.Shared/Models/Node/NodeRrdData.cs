@@ -22,7 +22,7 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// </summary>
     /// <value></value>
     [JsonProperty("netin")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long NetIn { get; set; }
 
     /// <summary>
@@ -30,7 +30,7 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// </summary>
     /// <value></value>
     [JsonProperty("netout")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long NetOut { get; set; }
 
     /// <summary>
@@ -61,7 +61,7 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// </summary>
     /// <value></value>
     [JsonProperty("time")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime )]
     long Time { get; set; }
 
     /// <summary>
@@ -89,8 +89,8 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// <value></value>
     [JsonProperty("memtotal")]
     [Display(Name = "Max Memory")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-    public long MemorySize { get; set; }
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    public ulong MemorySize { get; set; }
 
     /// <summary>
     /// Memory Used
@@ -98,8 +98,8 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// <value></value>
     [JsonProperty("memused")]
     [Display(Name = "Memory")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-    public long MemoryUsage { get; set; }
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    public ulong MemoryUsage { get; set; }
 
     /// <summary>
     /// Memory info
@@ -121,15 +121,15 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// </summary>
     /// <value></value>
     [JsonProperty("swaptotal")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-    public long SwapSize { get; set; }
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    public ulong SwapSize { get; set; }
 
     /// <summary>
     /// Swap used
     /// </summary>
     /// <value></value>
     [JsonProperty("swapused")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public double SwapUsage { get; set; }
 
     /// <summary>
@@ -137,7 +137,7 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// </summary>
     /// <value></value>
     [JsonProperty("roottotal")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public double RootSize { get; set; }
 
     /// <summary>
@@ -145,7 +145,7 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// </summary>
     /// <value></value>
     [JsonProperty("rootused")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public double RootUsage { get; set; }
 
     [OnDeserialized]

@@ -100,7 +100,7 @@ public static class ModelsExtensionsAutoGen
     /// Resources index (cluster wide).
     /// </summary>
     /// <param name="item"></param>
-    /// <param name="type">
+    /// <param name="type">Resource type.
     ///   Enum: vm,storage,node,sdn</param>
     /// <returns></returns>
     public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterResource>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveResources item, string type = null)
@@ -254,7 +254,7 @@ public static class ModelsExtensionsAutoGen
     /// <param name="verbose">If disabled, does only print the PCI IDs. Otherwise, additional information like vendor and device will be returned.</param>
     /// <returns></returns>
     public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeHardwarePci>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveHardware.PvePci item, string pci_class_blacklist = null, bool? verbose = null)
-        => (await item.Pciscan(pci_class_blacklist, verbose)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeHardwarePci>>();
+        => (await item.PciScan(pci_class_blacklist, verbose)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeHardwarePci>>();
 
     /// <summary>
     /// List local USB devices.

@@ -31,7 +31,7 @@ public class NodeStorageContent : ModelBase
     /// Creation unix
     /// </summary>
     [JsonProperty("ctime")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime )]
     public long Creation { get; set; }
 
     /// <summary>
@@ -60,7 +60,7 @@ public class NodeStorageContent : ModelBase
     /// File size
     /// </summary>
     [JsonProperty("size")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long Size { get; set; }
 
     /// <summary>

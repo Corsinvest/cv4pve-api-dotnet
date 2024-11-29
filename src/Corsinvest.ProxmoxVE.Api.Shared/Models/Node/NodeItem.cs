@@ -66,8 +66,8 @@ public class NodeItem : ModelBase, IClusterResourceNode
     /// <value></value>
     [JsonProperty("disk")]
     [Display(Name = "Disk usage")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-    public long DiskUsage { get; set; }
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    public ulong DiskUsage { get; set; }
 
     /// <summary>
     /// Disk size
@@ -75,8 +75,8 @@ public class NodeItem : ModelBase, IClusterResourceNode
     /// <value></value>
     [JsonProperty("maxdisk")]
     [Display(Name = "Disk size")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-    public long DiskSize { get; set; }
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    public ulong DiskSize { get; set; }
 
     /// <summary>
     /// Disk usage percentage
@@ -98,8 +98,8 @@ public class NodeItem : ModelBase, IClusterResourceNode
     /// <value></value>
     [JsonProperty("mem")]
     [Display(Name = "Memory")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-    public long MemoryUsage { get; set; }
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    public ulong MemoryUsage { get; set; }
 
     /// <summary>
     ///Memory size
@@ -107,8 +107,8 @@ public class NodeItem : ModelBase, IClusterResourceNode
     /// <value></value>
     [JsonProperty("maxmem")]
     [Display(Name = "Max Memory")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-    public long MemorySize { get; set; }
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    public ulong MemorySize { get; set; }
 
     /// <summary>
     /// Memory info

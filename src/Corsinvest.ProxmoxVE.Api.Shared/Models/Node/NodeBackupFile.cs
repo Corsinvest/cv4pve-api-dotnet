@@ -48,7 +48,7 @@ public class NodeBackupFile : ModelBase
     /// Modified Time Unix
     /// </summary>
     [JsonProperty("mtime")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime )]
     public long ModifiedTime { get; set; }
 
     /// <summary>
@@ -60,6 +60,6 @@ public class NodeBackupFile : ModelBase
     /// Size
     /// </summary>
     [JsonProperty("size")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long Size { get; set; }
 }

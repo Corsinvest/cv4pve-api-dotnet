@@ -36,8 +36,8 @@ public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, ID
     /// <value></value>
     [JsonProperty("disk")]
     [Display(Name = "Disk usage")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-    public long DiskUsage { get; set; }
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    public ulong DiskUsage { get; set; }
 
     /// <summary>
     /// Disk size
@@ -45,8 +45,8 @@ public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, ID
     /// <value></value>
     [JsonProperty("maxdisk")]
     [Display(Name = "Disk size")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-    public long DiskSize { get; set; }
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    public ulong DiskSize { get; set; }
 
     /// <summary>
     /// Disk usage percentage
@@ -61,7 +61,7 @@ public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, ID
     /// </summary>
     /// <value></value>
     [JsonProperty("diskread")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long DiskRead { get; set; }
 
     /// <summary>
@@ -69,7 +69,7 @@ public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, ID
     /// </summary>
     /// <value></value>
     [JsonProperty("diskwrite")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long DiskWrite { get; set; }
 
     /// <summary>
@@ -78,8 +78,8 @@ public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, ID
     /// <value></value>
     [JsonProperty("mem")]
     [Display(Name = "Memory")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-    public long MemoryUsage { get; set; }
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    public ulong MemoryUsage { get; set; }
 
     /// <summary>
     ///Memory size
@@ -87,8 +87,8 @@ public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, ID
     /// <value></value>
     [JsonProperty("maxmem")]
     [Display(Name = "Max Memory")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-    public long MemorySize { get; set; }
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    public ulong MemorySize { get; set; }
 
     /// <summary>
     /// Memory info
@@ -110,7 +110,7 @@ public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, ID
     /// </summary>
     /// <value></value>
     [JsonProperty("netin")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long NetIn { get; set; }
 
     /// <summary>
@@ -118,7 +118,7 @@ public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, ID
     /// </summary>
     /// <value></value>
     [JsonProperty("netout")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long NetOut { get; set; }
 
     /// <summary>
