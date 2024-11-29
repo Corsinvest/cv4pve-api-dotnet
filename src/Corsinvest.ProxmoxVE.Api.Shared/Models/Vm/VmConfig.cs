@@ -141,6 +141,22 @@ public class VmConfig : ModelBase
                     storage = infos[0];
                 }
 
+                var backup = false;
+                if (this is VmConfigQemu)
+                {
+                    backup = !infos.Contains("backup=0");
+                }
+                else if (this is VmConfigLxc)
+                {
+                    backup = infos.Contains("backup=1");
+                }
+                //var backup = this. VmType switch
+                //{
+                //VmType.Qemu => await client.Nodes[item.Node].Qemu[item.VmId].Config.GetAsync(),
+                //VmType.Lxc => await client.Nodes[item.Node].Lxc[item.VmId].Config.GetAsync(),
+                //_ => throw new InvalidEnumArgumentException(),
+                //};
+
                 disks.Add(new VmDisk
                 {
                     Id = key,
@@ -151,7 +167,7 @@ public class VmConfig : ModelBase
                     Size = infos.Where(a => a.StartsWith("size=")).Select(a => a.Substring(5)).FirstOrDefault(),
                     MountPoint = infos.Where(a => a.StartsWith("mp=")).Select(a => a.Substring(3)).FirstOrDefault(),
                     MountSourcePath = mountSourcePath,
-                    Backup = !infos.Contains("backup=0")
+                    Backup = backup
                 });
             }
         }
