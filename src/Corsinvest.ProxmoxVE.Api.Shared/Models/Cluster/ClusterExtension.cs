@@ -45,7 +45,7 @@ public static class ClusterExtension
         //calculate host usage
         if (data.ResourceType == ClusterResourceType.Vm && data.Uptime > 0 && hostCpuSize > 0 && hostMemorySize > 0)
         {
-            var per = Math.Round(data.CpuUsagePercentage / hostCpuSize * data.CpuSize, 1);
+            var per = Math.Round(data.CpuUsagePercentage / hostCpuSize * data.CpuSize * 100.0, 1);
             data.HostCpuUsage = $"{per} % of {hostCpuSize} {(hostCpuSize > 1 ? "CPUs" : "CPU")}";
 
             data.HostMemoryUsage = (double)data.MemoryUsage / hostMemorySize;
