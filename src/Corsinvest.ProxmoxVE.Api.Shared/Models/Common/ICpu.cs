@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
+using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
@@ -18,7 +19,7 @@ public interface ICpu
     /// </summary>
     /// <value></value>
     [Display(Name = "CPU Usage %")]
-    [DisplayFormat(DataFormatString = "{0:P1}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     [JsonProperty("cpu")]
     double CpuUsagePercentage { get; set; }
 

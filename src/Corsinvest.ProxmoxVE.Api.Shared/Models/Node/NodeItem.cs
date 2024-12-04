@@ -83,7 +83,7 @@ public class NodeItem : ModelBase, IClusterResourceNode
     /// </summary>
     /// <value></value>
     [Display(Name = "Disk usage %")]
-    [DisplayFormat(DataFormatString = "{0:P1}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     public double DiskUsagePercentage { get; set; }
 
     /// <summary>
@@ -122,7 +122,7 @@ public class NodeItem : ModelBase, IClusterResourceNode
     /// </summary>
     /// <value></value>
     [Display(Name = "Memory Usage %")]
-    [DisplayFormat(DataFormatString = "{0:P1}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     public double MemoryUsagePercentage { get; set; }
 
     /// <summary>
@@ -130,7 +130,7 @@ public class NodeItem : ModelBase, IClusterResourceNode
     /// </summary>
     /// <value></value>
     [Display(Name = "CPU Usage %")]
-    [DisplayFormat(DataFormatString = "{0:P1}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     [JsonProperty("cpu")]
     public double CpuUsagePercentage { get; set; }
 
@@ -153,7 +153,7 @@ public class NodeItem : ModelBase, IClusterResourceNode
     /// </summary>
     /// <value></value>
     [JsonProperty("uptime")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUptimeUnixTime + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUptimeUnixTime)]
     public long Uptime { get; set; }
 
     /// <summary>

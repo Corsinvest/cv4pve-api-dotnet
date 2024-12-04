@@ -40,7 +40,7 @@ public class VmLxcStatusCurrent : VmBaseStatusCurrent
     /// </summary>
     /// <value></value>
     [Display(Name = "Disk usage %")]
-    [DisplayFormat(DataFormatString = "{0:P1}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     public double SwapUsagePercentage => FormatHelper.CalculatePercentage(SwapUsage, SwapSize);
 
     [OnDeserialized]

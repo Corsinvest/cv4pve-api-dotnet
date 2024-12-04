@@ -39,9 +39,19 @@ public static class FormatHelper
     public const string DataFormatUnixTime = "{0:" + FormatUnixTime + "}";
 
     /// <summary>
+    /// Dataformat uptime unix time
+    /// </summary>
+    public const string DataFormatUptimeUnixTime = "{0:" + FormatUptimeUnixTime + "}";
+
+    /// <summary>
     /// Dataformat bytes
     /// </summary>
     public const string DataFormatBytes = "{0:" + FormatBytes + "}";
+
+    /// <summary>
+    /// Dataformat percentage
+    /// </summary>
+    public const string DataFormatPercentage = "{0:P1}";
 
     /// <summary>
     /// From bytes
@@ -61,7 +71,7 @@ public static class FormatHelper
     /// Memory info
     /// </summary>
     public static string UsageInfo(ulong usage, ulong size)
-        => $"{Math.Round(CalculatePercentage(usage, size) * 100, 1)}% ({FromBytes(usage)} of {FromBytes(size)})";
+        => $"{Math.Round(CalculatePercentage(usage, size) * 100.0, 1)}% ({FromBytes(usage)} of {FromBytes(size)})";
 
     /// <summary>
     /// Calculate percentage

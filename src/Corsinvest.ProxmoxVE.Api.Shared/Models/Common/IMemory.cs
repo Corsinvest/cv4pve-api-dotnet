@@ -44,6 +44,6 @@ public interface IMemory
     /// </summary>
     /// <value></value>
     [Display(Name = "Memory Usage %")]
-    [DisplayFormat(DataFormatString = "{0:P1}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     double MemoryUsagePercentage { get; set; }
 }

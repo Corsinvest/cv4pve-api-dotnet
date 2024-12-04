@@ -37,6 +37,6 @@ public interface IDisk
     /// </summary>
     /// <value></value>
     [Display(Name = "Disk usage %")]
-    [DisplayFormat(DataFormatString = "{0:P1}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     double DiskUsagePercentage { get; set; }
 }

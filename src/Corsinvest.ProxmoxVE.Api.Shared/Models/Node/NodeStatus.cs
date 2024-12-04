@@ -61,7 +61,7 @@ public class NodeStatus : ModelBase
     /// Uptime
     /// </summary>
     [JsonProperty("uptime")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUptimeUnixTime + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUptimeUnixTime)]
     public int Uptime { get; set; }
 
     /// <summary>

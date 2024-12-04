@@ -52,7 +52,7 @@ public class NodeStorage : ModelBase, IStorageItem
     /// </summary>
     [JsonProperty("used_fraction")]
     [Display(Name = "Usage %")]
-    [DisplayFormat(DataFormatString = "{0:P1}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     public double UsagePercentage { get; set; }
 
     /// <summary>
