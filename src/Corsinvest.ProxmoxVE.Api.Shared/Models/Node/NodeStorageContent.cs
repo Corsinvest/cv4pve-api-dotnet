@@ -38,7 +38,7 @@ public class NodeStorageContent : ModelBase
     /// Creation date
     /// </summary>
     /// <returns></returns>
-    public DateTime CreationDate => DateTimeOffset.FromUnixTimeSeconds(Creation).Date;
+    public DateTime CreationDate => DateTimeOffset.FromUnixTimeSeconds(Creation).DateTime;
 
     /// <summary>
     /// Storage
