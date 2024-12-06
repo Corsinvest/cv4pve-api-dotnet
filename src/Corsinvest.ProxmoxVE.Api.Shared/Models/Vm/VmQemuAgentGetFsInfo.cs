@@ -49,7 +49,7 @@ public class VmQemuAgentGetFsInfo : ModelBase
         /// </summary>
         [JsonProperty("total-bytes")]
         [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
-        public long TotalBytes { get; set; }
+        public ulong TotalBytes { get; set; }
 
         /// <summary>
         /// Mount point
@@ -61,7 +61,7 @@ public class VmQemuAgentGetFsInfo : ModelBase
         /// Used Bytes
         /// </summary>
         [JsonProperty("used-bytes")]
-        public long UsedBytes { get; set; }
+        public ulong UsedBytes { get; set; }
 
         /// <summary>
         /// Disks
