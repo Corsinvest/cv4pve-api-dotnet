@@ -6,7 +6,6 @@
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -131,21 +130,6 @@ public static class VmHelper
                 _ => throw new InvalidEnumArgumentException(),
             },
             _ => throw new InvalidEnumArgumentException(),
-        };
-
-    /// <summary>
-    /// Get vm status
-    /// </summary>
-    /// <param name="client"></param>
-    /// <param name="vm"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static async Task<VmBaseStatusCurrent> GetVmStatusAsync(PveClient client, IClusterResourceVm vm)
-        => vm.VmType switch
-        {
-            VmType.Qemu => await client.Nodes[vm.Node].Qemu[vm.VmId].Status.Current.GetAsync(),
-            VmType.Lxc => await client.Nodes[vm.Node].Lxc[vm.VmId].Status.Current.GetAsync(),
-            _ => throw new ArgumentOutOfRangeException("vm.VmType"),
         };
 
     /// <summary>
