@@ -81,7 +81,7 @@ public class NodeStorageContent : ModelBase
     public string Volume { get; set; }
 
     /// <summary>
-    /// Volume Id
+    /// Name
     /// </summary>
     [JsonProperty("name")]
     public string Name { get; set; }
@@ -93,21 +93,28 @@ public class NodeStorageContent : ModelBase
     public string Parent { get; set; }
 
     /// <summary>
-    /// Parent
+    /// notes
     /// </summary>
     [JsonProperty("notes")]
     public string Notes { get; set; }
 
     /// <summary>
-    /// Parent
+    /// excripted
     /// </summary>
     [JsonProperty("excripted")]
     public bool Encrypted { get; set; }
 
     /// <summary>
+    /// Protected
+    /// </summary>
+    [JsonProperty("protected")]
+    public bool Protected { get; set; }
+
+
+    /// <summary>
     /// Verified
     /// </summary>
-    [JsonIgnore]
+        [JsonIgnore]
     public bool Verified
         => ExtensionData != null
             && ExtensionData.TryGetValue("verification", out dynamic verification)
