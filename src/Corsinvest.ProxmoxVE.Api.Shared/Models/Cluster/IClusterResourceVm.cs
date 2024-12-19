@@ -5,6 +5,7 @@
 
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
+using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
@@ -45,7 +46,7 @@ public interface IClusterResourceVm : IVmBase, IClusterResourceHost, IDiskIO, IN
     /// </summary>
     /// <value></value>
     [Display(Name = "Host Memory Usage %")]
-    [DisplayFormat(DataFormatString = "{0:P1}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     double HostMemoryUsage { get; set; }
 
     /// <summary>

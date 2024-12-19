@@ -25,14 +25,14 @@ public class NodeStorage : ModelBase, IStorageItem
     /// Used
     /// </summary>
     [JsonProperty("used")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long Used { get; set; }
 
     /// <summary>
     /// Available
     /// </summary>
     [JsonProperty("avail")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long Available { get; set; }
 
     /// <summary>
@@ -52,7 +52,7 @@ public class NodeStorage : ModelBase, IStorageItem
     /// </summary>
     [JsonProperty("used_fraction")]
     [Display(Name = "Usage %")]
-    [DisplayFormat(DataFormatString = "{0:P1}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     public double UsagePercentage { get; set; }
 
     /// <summary>
@@ -65,7 +65,7 @@ public class NodeStorage : ModelBase, IStorageItem
     /// Size
     /// </summary>
     [JsonProperty("total")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long Size { get; set; }
 
     /// <summary>

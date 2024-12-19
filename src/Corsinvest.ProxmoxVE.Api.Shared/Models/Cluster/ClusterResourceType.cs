@@ -11,37 +11,37 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 public enum ClusterResourceType
 {
     /// <summary>
-    /// All
+    /// Sdn
     /// </summary>
-    All,
+    Unknown = 0,
 
     /// <summary>
     /// Node
     /// </summary>
-    Node,
+    Node = 1,
 
     /// <summary>
     /// Vm
     /// </summary>
-    Vm,
+    Vm = 2,
 
     /// <summary>
     /// Storage
     /// </summary>
-    Storage,
+    Storage = 4,
 
     /// <summary>
     /// Pool
     /// </summary>
-    Pool,
+    Pool = 8,
 
     /// <summary>
     /// Sdn
     /// </summary>
-    Sdn,
+    Sdn = 16,
 
     /// <summary>
-    /// Sdn
+    /// All
     /// </summary>
-    Unknown,
+    All = Node | Vm | Storage | Pool | Sdn,
 }

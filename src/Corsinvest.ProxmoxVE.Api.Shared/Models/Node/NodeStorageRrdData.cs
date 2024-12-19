@@ -18,20 +18,20 @@ public class NodeStorageRrdData : ModelBase
     /// Used
     /// </summary>
     [JsonProperty("used")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long Used { get; set; }
 
     /// <summary>
     /// Time
     /// </summary>
     [JsonProperty("time")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime )]
     public int Time { get; set; }
 
     /// <summary>
     /// Size
     /// </summary>
     [JsonProperty("total")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long Size { get; set; }
 }

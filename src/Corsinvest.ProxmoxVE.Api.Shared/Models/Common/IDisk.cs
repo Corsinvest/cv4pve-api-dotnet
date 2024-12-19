@@ -20,8 +20,8 @@ public interface IDisk
     /// <value></value>
     [JsonProperty("disk")]
     [Display(Name = "Disk usage")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-    long DiskUsage { get; set; }
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    ulong DiskUsage { get; set; }
 
     /// <summary>
     /// Disk size
@@ -29,14 +29,14 @@ public interface IDisk
     /// <value></value>
     [JsonProperty("maxdisk")]
     [Display(Name = "Disk size")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-    long DiskSize { get; set; }
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    ulong DiskSize { get; set; }
 
     /// <summary>
     /// Disk usage percentage
     /// </summary>
     /// <value></value>
     [Display(Name = "Disk usage %")]
-    [DisplayFormat(DataFormatString = "{0:P1}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     double DiskUsagePercentage { get; set; }
 }

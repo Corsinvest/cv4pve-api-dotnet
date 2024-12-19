@@ -790,7 +790,7 @@ public static class InfoHelper
     private static async Task ReadClusterAsync(Info info, PveClient client)
     {
         info.Cluster.Status = await client.Cluster.Status.GetAsync();
-        info.IsCluster = !string.IsNullOrEmpty(info.Cluster.Status.FirstOrDefault(a => a.Type == Corsinvest.ProxmoxVE.Api.Shared.Utils.PveConstants.KeyApiCluster)?.Name);
+        info.IsCluster = !string.IsNullOrEmpty(info.Cluster.Status.FirstOrDefault(a => a.Type == Shared.Utils.PveConstants.KeyApiCluster)?.Name);
 
         info.Cluster.Config.Nodes = await client.Cluster.Config.Nodes.GetAsync();
         info.Cluster.Config.Qdevice = await client.Cluster.Config.Qdevice.GetAsync();

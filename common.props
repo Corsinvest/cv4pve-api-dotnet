@@ -1,7 +1,7 @@
 <Project>
 	<PropertyGroup>
 		<LangVersion>latest</LangVersion>
-		<Version>8.2.5</Version>
+		<Version>8.3.0</Version>
 		<!--<NoWarn>$(NoWarn);CS1591;CS0436</NoWarn>-->
 
 		<Company>Corsinvest Srl</Company>
@@ -19,6 +19,7 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<OutputType>Library</OutputType>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<!-- Include symbol files (*.pdb) in the built .nupkg -->
 		<AllowedOutputExtensionsInPackageBuildOutputFolder>
 			$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>

@@ -99,12 +99,136 @@ public class VmConfig : ModelBase
     public string Lock { get; set; }
 
     /// <summary>
-    /// /// Disks
+    /// Disks
     /// </summary>
     public IEnumerable<VmDisk> Disks { get; private set; }
 
+    /// <summary>
+    /// Networks
+    /// </summary>
+    public IEnumerable<VmNetwork> Networks { get; private set; }
+
     [OnDeserialized]
     internal void OnSerializedMethod(StreamingContext context)
+    {
+        ReadDisks();
+        ReadNetworks();
+    }
+
+    private void ReadNetworks()
+    {
+        var networks = new List<VmNetwork>();
+
+        foreach (var key in ExtensionData.Keys)
+        {
+            if (key.StartsWith("net"))
+            {
+                var network = new VmNetwork();
+
+                foreach (var item in (ExtensionData[key] + "").Split(','))
+                {
+                    Match match;
+                    if (this is VmConfigQemu)
+                    {
+                        if ((match = Regex.Match(item, @"^(ne2k_pci|e1000e?|e1000-82540em|e1000-82544gc|e1000-82545em|vmxnet3|rtl8139|pcnet|virtio|ne2k_isa|i82551|i82557b|i82559er)(=([0-9a-f]{2}(:[0-9a-f]{2}){5}))?$", RegexOptions.IgnoreCase)).Success)
+                        {
+                            network.Model = match.Groups[1].Value.ToLower();
+                            if (match.Groups[3].Success) { network.MacAddress = match.Groups[3].Value; }
+                        }
+                        else if ((match = Regex.Match(item, @"^bridge=(\S+)$")).Success)
+                        {
+                            network.Bridge = match.Groups[1].Value;
+                        }
+                        else if ((match = Regex.Match(item, @"^rate=(\d+(\.\d+)?|\.\d+)$")).Success)
+                        {
+                            network.Rate = int.Parse(match.Groups[1].Value);
+                        }
+                        else if ((match = Regex.Match(item, @"^tag=(\d+(\.\d+)?)$")).Success)
+                        {
+                            network.Tag = int.Parse(match.Groups[1].Value);
+                        }
+                        else if ((match = Regex.Match(item, @"^firewall=(\d+)$")).Success)
+                        {
+                            network.Firewall = match.Groups[1].Value == "1";
+                        }
+                        else if ((match = Regex.Match(item, @"^link_down=(\d+)$")).Success)
+                        {
+                            network.Disconnect = match.Groups[1].Value == "1";
+                        }
+                        else if ((match = Regex.Match(item, @"^queues=(\d+)$")).Success)
+                        {
+                            network.Queues = int.Parse(match.Groups[1].Value);
+                        }
+                        else if ((match = Regex.Match(item, @"^trunks=(\d+(?:-\d+)?(?:;\d+(?:-\d+)?)*)$")).Success)
+                        {
+                            network.Trunks = match.Groups[1].Value;
+                        }
+                        else if ((match = Regex.Match(item, @"^mtu=(\d+)$")).Success)
+                        {
+                            network.Mtu = int.Parse(match.Groups[1].Value);
+                        }
+                    }
+                    else if (this is VmConfigLxc)
+                    {
+                        if ((match = Regex.Match(item, @"^(bridge)=(\S+)$")).Success)
+                        {
+                            network.Bridge = match.Groups[2].Value;
+                        }
+                        else if ((match = Regex.Match(item, @"^(gw)=(\S+)$")).Success)
+                        {
+                            network.Gateway = match.Groups[2].Value;
+                        }
+                        else if ((match = Regex.Match(item, @"^(gw6)=(\S+)$")).Success)
+                        {
+                            network.Gateway6 = match.Groups[2].Value;
+                        }
+                        else if ((match = Regex.Match(item, @"^(hwaddr)=(\S+)$")).Success)
+                        {
+                            network.MacAddress = match.Groups[2].Value;
+                        }
+                        else if ((match = Regex.Match(item, @"^(rate)=(\S+)$")).Success)
+                        {
+                            network.Rate = int.Parse(match.Groups[2].Value);
+                        }
+                        else if ((match = Regex.Match(item, @"^(tag)=(\S+)$")).Success)
+                        {
+                            network.Tag = int.Parse(match.Groups[2].Value);
+                        }
+                        else if ((match = Regex.Match(item, @"^(mtu)=(\S+)$")).Success)
+                        {
+                            network.Mtu = int.Parse(match.Groups[2].Value);
+                        }
+                        else if ((match = Regex.Match(item, @"^(name)=(\S+)$")).Success)
+                        {
+                            network.Name = match.Groups[2].Value;
+                        }
+                        else if ((match = Regex.Match(item, @"^(ip)=(\S+)$")).Success)
+                        {
+                            network.IpAddress = match.Groups[2].Value;
+                        }
+                        else if ((match = Regex.Match(item, @"^(ip6)=(\S+)$")).Success)
+                        {
+                            network.IpAddress6 = match.Groups[2].Value;
+                        }
+                        else if ((match = Regex.Match(item, @"^firewall=(\d+)$")).Success)
+                        {
+                            network.Firewall = match.Groups[1].Value == "1";
+                        }
+                        else if ((match = Regex.Match(item, @"^link_down=(\d+)$")).Success)
+                        {
+                            network.LinkDown = match.Groups[1].Value == "1";
+                        }
+                    }
+                }
+
+                networks.Add(network);
+            }
+        }
+
+        Networks = networks;
+    }
+
+    private void ReadDisks()
     {
         var disks = new List<VmDisk>();
         foreach (var key in ExtensionData.Keys)
@@ -141,6 +265,16 @@ public class VmConfig : ModelBase
                     storage = infos[0];
                 }
 
+                var backup = false;
+                if (this is VmConfigQemu)
+                {
+                    backup = !infos.Contains("backup=0");
+                }
+                else if (this is VmConfigLxc)
+                {
+                    backup = infos.Contains("backup=1");
+                }
+
                 disks.Add(new VmDisk
                 {
                     Id = key,
@@ -151,7 +285,7 @@ public class VmConfig : ModelBase
                     Size = infos.Where(a => a.StartsWith("size=")).Select(a => a.Substring(5)).FirstOrDefault(),
                     MountPoint = infos.Where(a => a.StartsWith("mp=")).Select(a => a.Substring(3)).FirstOrDefault(),
                     MountSourcePath = mountSourcePath,
-                    Backup = !infos.Contains("backup=0")
+                    Backup = backup
                 });
             }
         }

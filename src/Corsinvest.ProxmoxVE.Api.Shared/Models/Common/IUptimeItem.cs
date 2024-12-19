@@ -19,6 +19,6 @@ public interface IUptimeItem
     /// </summary>
     /// <value></value>
     [JsonProperty("uptime")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUptimeUnixTime + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUptimeUnixTime)]
     long Uptime { get; set; }
 }

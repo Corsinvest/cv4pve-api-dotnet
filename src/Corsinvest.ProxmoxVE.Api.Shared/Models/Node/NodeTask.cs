@@ -43,7 +43,7 @@ public class NodeTask : ModelBase, IStatusItem, INodeItem
     /// StartTime unix time
     /// </summary>
     [JsonProperty("starttime")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime )]
     public long StartTime { get; set; }
 
     /// <summary>
@@ -87,7 +87,7 @@ public class NodeTask : ModelBase, IStatusItem, INodeItem
     /// EndTime unix time
     /// </summary>
     [JsonProperty("endtime")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime )]
     public long EndTime { get; set; }
 
     /// <summary>
@@ -99,8 +99,8 @@ public class NodeTask : ModelBase, IStatusItem, INodeItem
     /// <summary>
     /// Description
     /// </summary>
-    public string Description
-        => Type switch
+    public string Description =>
+        Type switch
         {
             "acmedeactivate" => "ACME Account Deactivate",
             "acmenewcert" => "SRV Order Certificate",
@@ -121,60 +121,15 @@ public class NodeTask : ModelBase, IStatusItem, INodeItem
             "cephdestroymon" => "Ceph Monitor Destroy",
             "cephdestroyosd" => "Ceph OSD Destroy",
             "cephdestroypool" => "Ceph Pool Destroy",
+            "cephdestroyfs" => "CephFS Destroy",
             "cephfscreate" => "CephFS Create",
             "cephsetpool" => "Ceph Pool Edit",
             "cephsetflags" => "Change global Ceph flags",
             "clustercreate" => "Create Cluster",
             "clusterjoin" => "Join Cluster",
-            "qmclone" => "Clone",
-            "qmconfig" => "Configure",
-            "qmcreate" => "Create",
-            "qmdelsnapshot" => "Delete Snapshot",
-            "qmdestroy" => "Destroy",
-            "qmigrate" => "Migrate",
-            "qmmove" => "Move disk",
-            "qmpause" => "Pause",
-            "qmreboot" => "Reboot",
-            "qmreset" => "Reset",
-            "qmrestore" => "Restore",
-            "qmresume" => "Resume",
-            "qmrollback" => "Rollback",
-            "qmshutdown" => "Shutdown",
-            "qmsnapshot" => "Snapshot",
-            "qmstart" => "Start",
-            "qmstop" => "Stop",
-            "qmsuspend" => "Hibernate",
-            "move_volume" => "Move Volume",
-            "vzmigrate" => "Migrate",
-            "vzmount" => "Mount",
-            "vzreboot" => "Reboot",
-            "vzrestore" => "Restore",
-            "vzresume" => "Resume",
-            "vzrollback" => "Rollback",
-            "vzshutdown" => "Shutdown",
-            "vzsnapshot" => "Snapshot",
-            "vzstart" => "Start",
-            "vzstop" => "Stop",
-            "vzsuspend" => "Suspend",
-            "vztemplate" => "Convert to template",
-            "vzumount" => "Unmount",
-            "pull_file" => "Pull file",
-            "push_file" => "Push file",
-            "qmtemplate" => "Convert to template",
-            "spiceproxy" => "Console (Spice)",
-            "spiceshell" => "Shell (Spice)",
-            "startall" => "Start all VMs and Containers",
-            "stopall" => "Stop all VMs and Containers",
-            "unknownimgdel" => "Destroy image from unknown guest",
-            "vncproxy" => "Console",
-            "vncshell" => "Shell",
-            "vzclone" => "Clone",
-            "vzcreate" => "Create",
-            "vzdelsnapshot" => "Delete Snapshot",
-            "vzdestroy" => "Destroy",
             "dircreate" => "Directory Storage Create",
             "dirremove" => "Directory Remove",
-            "download" => "Download",
+            "download" => "File Download",
             "hamigrate" => "HA Migrate",
             "hashutdown" => "HA Shutdown",
             "hastart" => "HA Start",
@@ -182,18 +137,65 @@ public class NodeTask : ModelBase, IStatusItem, INodeItem
             "imgcopy" => "Copy data",
             "imgdel" => "Erase data",
             "lvmcreate" => "LVM Storage Create",
+            "lvmremove" => "Volume Group Remove",
             "lvmthincreate" => "LVM-Thin Storage Create",
-            "migrateall" => "Migrate all VMs and Containers",
-            "pbs-download" => "VM/CT File Restore Download",
+            "lvmthinremove" => "Thinpool Remove",
+            "migrateall" => "Bulk migrate VMs and Containers",
+            "move_volume" => $"CT {VmId} Move Volume",
+            "pbs-download" => $"VM/CT {VmId} File Restore Download",
+            "pull_file" => $"CT {VmId} Pull file",
+            "push_file" => $"CT {VmId} Push file",
+            "qmclone" => $"VM {VmId} Clone",
+            "qmconfig" => $"VM {VmId} Configure",
+            "qmcreate" => $"VM {VmId} Create",
+            "qmdelsnapshot" => $"VM {VmId} Delete Snapshot",
+            "qmdestroy" => $"VM {VmId} Destroy",
+            "qmigrate" => $"VM {VmId} Migrate",
+            "qmmove" => $"VM {VmId} Move disk",
+            "qmpause" => $"VM {VmId} Pause",
+            "qmreboot" => $"VM {VmId} Reboot",
+            "qmreset" => $"VM {VmId} Reset",
+            "qmrestore" => $"VM {VmId} Restore",
+            "qmresume" => $"VM {VmId} Resume",
+            "qmrollback" => $"VM {VmId} Rollback",
+            "qmshutdown" => $"VM {VmId} Shutdown",
+            "qmsnapshot" => $"VM {VmId} Snapshot",
+            "qmstart" => $"VM {VmId} Start",
+            "qmstop" => $"VM {VmId} Stop",
+            "qmsuspend" => $"VM {VmId} Hibernate",
+            "qmtemplate" => $"VM {VmId} Convert to template",
+            "resize" => $"VM/CT {VmId} Resize",
+            "spiceproxy" => $"VM/CT {VmId} Console (Spice)",
+            "spiceshell" => "Shell (Spice)",
+            "startall" => "Bulk start VMs and Containers",
+            "stopall" => "Bulk shutdown VMs and Containers",
+            "suspendall" => "Suspend all VMs",
+            "unknownimgdel" => "Destroy image from unknown guest",
+            "wipedisk" => "Device Wipe Disk",
+            "vncproxy" => $"VM/CT {VmId} Console",
+            "vncshell" => "Shell",
+            "vzclone" => $"CT {VmId} Clone",
+            "vzcreate" => $"CT {VmId} Create",
+            "vzdelsnapshot" => $"CT {VmId} Delete Snapshot",
+            "vzdestroy" => $"CT {VmId} Destroy",
+            "vzdump" => !string.IsNullOrEmpty(VmId) ? $"VM/CT {VmId} - Backup" : "Backup Job",
+            "vzmigrate" => $"CT {VmId} Migrate",
+            "vzmount" => $"CT {VmId} Mount",
+            "vzreboot" => $"CT {VmId} Reboot",
+            "vzrestore" => $"CT {VmId} Restore",
+            "vzresume" => $"CT {VmId} Resume",
+            "vzrollback" => $"CT {VmId} Rollback",
+            "vzshutdown" => $"CT {VmId} Shutdown",
+            "vzsnapshot" => $"CT {VmId} Snapshot",
+            "vzstart" => $"CT {VmId} Start",
+            "vzstop" => $"CT {VmId} Stop",
+            "vzsuspend" => $"CT {VmId} Suspend",
+            "vztemplate" => $"CT {VmId} Convert to template",
+            "vzumount" => $"CT {VmId} Unmount",
             "zfscreate" => "ZFS Storage Create",
-            "vzdump" => "Backup",
+            "zfsremove" => "ZFS Pool Remove",
             _ => Type
         };
-
-    /// <summary>
-    /// Type decode
-    /// </summary>
-    public string DescriptionFull => (string.IsNullOrWhiteSpace(VmId) ? "" : $"VM/CT {VmId} - ") + Description;
 
     /// <summary>
     /// Upid

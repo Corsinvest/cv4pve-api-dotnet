@@ -31,14 +31,14 @@ public class NodeStorageContent : ModelBase
     /// Creation unix
     /// </summary>
     [JsonProperty("ctime")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime )]
     public long Creation { get; set; }
 
     /// <summary>
     /// Creation date
     /// </summary>
     /// <returns></returns>
-    public DateTime CreationDate => DateTimeOffset.FromUnixTimeSeconds(Creation).Date;
+    public DateTime CreationDate => DateTimeOffset.FromUnixTimeSeconds(Creation).DateTime;
 
     /// <summary>
     /// Storage
@@ -60,7 +60,7 @@ public class NodeStorageContent : ModelBase
     /// File size
     /// </summary>
     [JsonProperty("size")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long Size { get; set; }
 
     /// <summary>
@@ -81,7 +81,7 @@ public class NodeStorageContent : ModelBase
     public string Volume { get; set; }
 
     /// <summary>
-    /// Volume Id
+    /// Name
     /// </summary>
     [JsonProperty("name")]
     public string Name { get; set; }
@@ -93,21 +93,28 @@ public class NodeStorageContent : ModelBase
     public string Parent { get; set; }
 
     /// <summary>
-    /// Parent
+    /// notes
     /// </summary>
     [JsonProperty("notes")]
     public string Notes { get; set; }
 
     /// <summary>
-    /// Parent
+    /// excripted
     /// </summary>
     [JsonProperty("excripted")]
     public bool Encrypted { get; set; }
 
     /// <summary>
+    /// Protected
+    /// </summary>
+    [JsonProperty("protected")]
+    public bool Protected { get; set; }
+
+
+    /// <summary>
     /// Verified
     /// </summary>
-    [JsonIgnore]
+        [JsonIgnore]
     public bool Verified
         => ExtensionData != null
             && ExtensionData.TryGetValue("verification", out dynamic verification)

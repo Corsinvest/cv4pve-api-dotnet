@@ -18,15 +18,15 @@ public class NodeVmLxc : NodeVmBase
     /// Swap size
     /// </summary>
     [JsonProperty("maxswap")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-    public long SwapSize { get; set; }
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    public ulong SwapSize { get; set; }
 
     /// <summary>
     /// Swap
     /// </summary>
     [JsonProperty("swap")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
-    public long Swap { get; set; }
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    public ulong Swap { get; set; }
 
     /// <summary>
     /// Type

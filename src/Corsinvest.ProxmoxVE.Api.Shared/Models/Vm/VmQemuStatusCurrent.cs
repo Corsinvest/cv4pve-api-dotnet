@@ -90,7 +90,7 @@ public class VmQemuStatusCurrent : VmBaseStatusCurrent
         /// </summary>
         /// <value></value>
         [JsonProperty("netin")]
-        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
         public long NetIn { get; set; }
 
         /// <summary>
@@ -98,7 +98,7 @@ public class VmQemuStatusCurrent : VmBaseStatusCurrent
         /// </summary>
         /// <value></value>
         [JsonProperty("netout")]
-        [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+        [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
         public long NetOut { get; set; }
     }
 

@@ -82,7 +82,7 @@ public class ClusterLog : ModelBase
     /// </summary>
     /// <value></value>
     [JsonProperty("time")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatUnixTime + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime)]
     public int Time { get; set; }
 
     /// <summary>

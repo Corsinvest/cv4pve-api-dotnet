@@ -261,6 +261,21 @@ public static class ClientExtension
         };
 
     /// <summary>
+    /// Get Vm Config
+    /// </summary>
+    /// <param name="client"></param>
+    /// <param name="vm"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidEnumArgumentException"></exception>
+    public static async Task<VmConfig> GetVmConfigAsync(this PveClient client, IClusterResourceVm vm)
+        => vm.VmType switch
+        {
+            VmType.Qemu => await client.Nodes[vm.Node].Qemu[vm.VmId].Config.GetAsync(),
+            VmType.Lxc => await client.Nodes[vm.Node].Lxc[vm.VmId].Config.GetAsync(),
+            _ => throw new InvalidEnumArgumentException(),
+        };
+
+    /// <summary>
     /// Get Vm RrdData
     /// </summary>
     /// <param name="client"></param>

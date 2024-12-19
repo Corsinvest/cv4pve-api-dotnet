@@ -6,7 +6,6 @@
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -29,9 +28,26 @@ public static class VmHelper
     /// <param name="vmId"></param>
     /// <param name="vmName"></param>
     /// <param name="vmType"></param>
+    /// <param name="noVnc"></param>
+    /// <param name="xtermJs"></param>
+    /// <param name="parameters"></param>
     /// <returns></returns>
-    public static async Task<HttpResponseMessage> GetConsoleNoVncAsync(PveClient client, string node, long vmId, string vmName, VmType vmType)
-        => await GetConsoleNoVncAsync(client, node, vmId, vmName, NoVncHelper.GetConsoleType(vmType));
+    public static async Task<HttpResponseMessage> GetConsoleNoVncAsync(PveClient client,
+                                                                    string node,
+                                                                    long vmId,
+                                                                    string vmName,
+                                                                    VmType vmType,
+                                                                    bool noVnc,
+                                                                    bool xtermJs,
+                                                                    string parameters = null)
+        => await GetConsoleNoVncAsync(client,
+                                      node,
+                                      vmId,
+                                      vmName,
+                                      NoVncHelper.GetConsoleType(vmType),
+                                      noVnc,
+                                      xtermJs,
+                                      parameters);
 
     /// <summary>
     /// Get console NoVnc
@@ -41,16 +57,29 @@ public static class VmHelper
     /// <param name="vmId"></param>
     /// <param name="vmName"></param>
     /// <param name="console"></param>
+    /// <param name="noVnc"></param>
+    /// <param name="xtermJs"></param>
+    /// <param name="parameters"></param>
     /// <returns></returns>
-    public static async Task<HttpResponseMessage> GetConsoleNoVncAsync(PveClient client, string node, long vmId, string vmName, string console)
+    public static async Task<HttpResponseMessage> GetConsoleNoVncAsync(PveClient client,
+                                                                       string node,
+                                                                       long vmId,
+                                                                       string vmName,
+                                                                       string console,
+                                                                       bool noVnc,
+                                                                       bool xtermJs,
+                                                                       string parameters = null)
     {
         using var httpClient = client.GetHttpClient();
         return await httpClient.GetAsync(NoVncHelper.GetConsoleUrl(client.Host,
-                                                                      client.Port,
-                                                                      console,
-                                                                      node,
-                                                                      vmId,
-                                                                      vmName));
+                                                                   client.Port,
+                                                                   console,
+                                                                   node,
+                                                                   vmId,
+                                                                   vmName,
+                                                                   noVnc,
+                                                                   xtermJs,
+                                                                   parameters));
     }
     #endregion
 
@@ -131,21 +160,6 @@ public static class VmHelper
                 _ => throw new InvalidEnumArgumentException(),
             },
             _ => throw new InvalidEnumArgumentException(),
-        };
-
-    /// <summary>
-    /// Get vm status
-    /// </summary>
-    /// <param name="client"></param>
-    /// <param name="vm"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static async Task<VmBaseStatusCurrent> GetVmStatusAsync(PveClient client, IClusterResourceVm vm)
-        => vm.VmType switch
-        {
-            VmType.Qemu => await client.Nodes[vm.Node].Qemu[vm.VmId].Status.Current.GetAsync(),
-            VmType.Lxc => await client.Nodes[vm.Node].Lxc[vm.VmId].Status.Current.GetAsync(),
-            _ => throw new ArgumentOutOfRangeException("vm.VmType"),
         };
 
     /// <summary>

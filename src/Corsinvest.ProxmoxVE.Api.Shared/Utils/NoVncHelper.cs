@@ -36,9 +36,26 @@ public static class NoVncHelper
     /// <param name="node"></param>
     /// <param name="vmId"></param>
     /// <param name="vmName"></param>
+    /// <param name="noVnc"></param>
+    /// <param name="xtermJs"></param>
+    /// <param name="parameters"></param>
     /// <returns></returns>
-    public static string GetConsoleUrl(string host, int port, string console, string node, long vmId, string vmName)
-        => $"https://{host}:{port}/?console={console}&vmid={vmId}&vmname={vmName}&node={node}&resize=scale&novnc=1";
+    public static string GetConsoleUrl(string host,
+                                       int port,
+                                       string console,
+                                       string node,
+                                       long vmId,
+                                       string vmName,
+                                       bool noVnc,
+                                       bool xtermJs,
+                                       string parameters = null)
+    {
+        var url = $"https://{host}:{port}/?console={console}&vmid={vmId}&vmname={vmName}&node={node}";
+        if (noVnc) { url += "&novnc=1"; }
+        if (xtermJs) { url += "&xtermjs=1"; }
+        if (!string.IsNullOrEmpty(parameters)) { url += parameters; }
+        return url;
+    }
 
     /// <summary>
     /// Get Vnc Websocket Url VM/CT

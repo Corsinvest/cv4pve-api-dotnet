@@ -19,7 +19,7 @@ public interface INetIO
     /// </summary>
     /// <value></value>
     [JsonProperty("netin")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     long NetIn { get; set; }
 
     /// <summary>
@@ -27,6 +27,6 @@ public interface INetIO
     /// </summary>
     /// <value></value>
     [JsonProperty("netout")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     long NetOut { get; set; }
 }

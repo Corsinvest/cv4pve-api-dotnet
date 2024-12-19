@@ -107,6 +107,6 @@ public class NodeDiskList : ModelBase
     /// Size
     /// </summary>
     [JsonProperty("size")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long Size { get; set; }
 }

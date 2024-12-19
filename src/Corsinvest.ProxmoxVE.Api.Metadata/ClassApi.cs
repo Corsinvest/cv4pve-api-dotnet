@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace Corsinvest.ProxmoxVE.Api.Metadata;
 
@@ -27,10 +28,15 @@ public class ClassApi
     /// <param name="parent"></param>
     public ClassApi(JToken token, ClassApi parent)
     {
-        Name = token["text"].ToString();
+        Name = token["text"].ToString().Replace("-", "_");
         IndexName = Name.Replace("{", "").Replace("}", "");
         Parent = parent;
         Resource = token["path"].ToString();
+
+        Resource = Regex.Replace(Resource, @"\{([^}]*)\}", match =>
+        {
+            return "{" + match.Groups[1].Value.Replace('-', '_') + "}";
+        });
 
         Keys.AddRange(parent.Keys);
         parent.SubClasses.Add(this);

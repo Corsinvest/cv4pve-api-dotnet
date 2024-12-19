@@ -24,14 +24,14 @@ public class NodeNetstat : ModelBase
     /// In
     /// </summary>
     [JsonProperty("in")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long In { get; set; }
 
     /// <summary>
     /// Out
     /// </summary>
     [JsonProperty("out")]
-    [DisplayFormat(DataFormatString = "{0:" + FormatHelper.FormatBytes + "}")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long Out { get; set; }
 
     /// <summary>
