@@ -34,6 +34,13 @@ public class VmConfigQemu : VmConfig
     public string Keyboard { get; set; }
 
     /// <summary>
+    /// Vga.
+    /// </summary>
+    /// <value></value>
+    [JsonProperty("vga")]
+    public string Vga { get; set; }
+
+    /// <summary>
     /// Arbitrary arguments passed to kvm.
     /// </summary>
     [JsonProperty("args")]
