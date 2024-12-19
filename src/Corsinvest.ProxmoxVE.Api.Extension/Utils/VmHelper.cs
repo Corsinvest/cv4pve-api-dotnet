@@ -28,9 +28,26 @@ public static class VmHelper
     /// <param name="vmId"></param>
     /// <param name="vmName"></param>
     /// <param name="vmType"></param>
+    /// <param name="noVnc"></param>
+    /// <param name="xtermJs"></param>
+    /// <param name="parameters"></param>
     /// <returns></returns>
-    public static async Task<HttpResponseMessage> GetConsoleNoVncAsync(PveClient client, string node, long vmId, string vmName, VmType vmType)
-        => await GetConsoleNoVncAsync(client, node, vmId, vmName, NoVncHelper.GetConsoleType(vmType));
+    public static async Task<HttpResponseMessage> GetConsoleNoVncAsync(PveClient client,
+                                                                    string node,
+                                                                    long vmId,
+                                                                    string vmName,
+                                                                    VmType vmType,
+                                                                    bool noVnc,
+                                                                    bool xtermJs,
+                                                                    string parameters = null)
+        => await GetConsoleNoVncAsync(client,
+                                      node,
+                                      vmId,
+                                      vmName,
+                                      NoVncHelper.GetConsoleType(vmType),
+                                      noVnc,
+                                      xtermJs,
+                                      parameters);
 
     /// <summary>
     /// Get console NoVnc
@@ -40,16 +57,29 @@ public static class VmHelper
     /// <param name="vmId"></param>
     /// <param name="vmName"></param>
     /// <param name="console"></param>
+    /// <param name="noVnc"></param>
+    /// <param name="xtermJs"></param>
+    /// <param name="parameters"></param>
     /// <returns></returns>
-    public static async Task<HttpResponseMessage> GetConsoleNoVncAsync(PveClient client, string node, long vmId, string vmName, string console)
+    public static async Task<HttpResponseMessage> GetConsoleNoVncAsync(PveClient client,
+                                                                       string node,
+                                                                       long vmId,
+                                                                       string vmName,
+                                                                       string console,
+                                                                       bool noVnc,
+                                                                       bool xtermJs,
+                                                                       string parameters = null)
     {
         using var httpClient = client.GetHttpClient();
         return await httpClient.GetAsync(NoVncHelper.GetConsoleUrl(client.Host,
-                                                                      client.Port,
-                                                                      console,
-                                                                      node,
-                                                                      vmId,
-                                                                      vmName));
+                                                                   client.Port,
+                                                                   console,
+                                                                   node,
+                                                                   vmId,
+                                                                   vmName,
+                                                                   noVnc,
+                                                                   xtermJs,
+                                                                   parameters));
     }
     #endregion
 
