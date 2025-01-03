@@ -40,7 +40,7 @@ public class NodeReplication : ModelBase
     /// Vm Type
     /// </summary>
     [JsonProperty("vmtype")]
-    public string Vmtype { get; set; }
+    public string VmType { get; set; }
 
     /// <summary>
     /// Fail Count
@@ -107,4 +107,10 @@ public class NodeReplication : ModelBase
     /// </summary>
     [JsonProperty("error")]
     public string Error { get; set; }
+
+     /// <summary>
+    /// Rate
+    /// </summary>
+    [JsonProperty("rate")]
+    public int Rate { get; set; }
 }
