@@ -73,7 +73,7 @@ public class VmNetwork
     /// <summary>
     /// Rate
     /// </summary>
-    public int? Rate { get; set; }
+    public double? Rate { get; set; }
 
     /// <summary>
     /// Disconnect
