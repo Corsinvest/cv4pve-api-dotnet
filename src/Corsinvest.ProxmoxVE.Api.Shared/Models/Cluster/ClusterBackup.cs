@@ -114,4 +114,10 @@ public class ClusterBackup : ModelBase, IStorageItem
     /// </summary>
     [JsonProperty("next-run")]
     public int NextRun { get; set; }
+
+    /// <summary>
+    /// Node
+    /// </summary>
+    [JsonProperty("node")]
+    public string Node { get; set; }
 }
