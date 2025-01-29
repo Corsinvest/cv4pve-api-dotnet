@@ -69,7 +69,19 @@ public static class ModelsExtensions
     public static async Task<IEnumerable<string>> GetAsync(this PveClient.PveNodes.PveNodeItem.PveTasks.PveUpidItem.PveLog item,
                                                            int? limit = null,
                                                            int? start = null)
-        => (await item.ReadTaskLog(null, limit, start)).ToEnumerable().OrderBy(a => a.n).Select(a => a.t as string);
+        => (await item.ReadTaskLog(null, limit, start)).ToLogs();
+
+    /// <summary>
+    /// Read replication job log.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="limit">The maximum amount of lines that should be printed.</param>
+    /// <param name="start">The line number to start printing at.</param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<string>> GetAsync(this PveClient.PveNodes.PveNodeItem.PveReplication.PveIdItem.PveLog item,
+                                                           int? limit = null,
+                                                           int? start = null)
+        => (await item.ReadJobLog(limit, start)).ToLogs();
 
     /// <summary>
     /// Get backups in all storages
