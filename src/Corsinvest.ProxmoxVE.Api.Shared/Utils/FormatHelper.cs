@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using Humanizer.Bytes;
 using System;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Utils;
@@ -58,14 +57,14 @@ public static class FormatHelper
     /// </summary>
     /// <param name="bytes"></param>
     /// <returns></returns>
-    public static string FromBytes(double bytes) => ByteSize.FromBytes(bytes).ToString();
+    public static string FromBytes(double bytes) => ByteHelper.ToSizeString(bytes, false);
 
     /// <summary>
     /// From bit
     /// </summary>
     /// <param name="bits"></param>
     /// <returns></returns>
-    public static string FromBits(long bits) => ByteSize.FromBits(bits).ToString();
+    public static string FromBits(long bits) => ByteHelper.ToSizeString(bits, false);
 
     /// <summary>
     /// Memory info
