@@ -6,6 +6,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 
 namespace Corsinvest.ProxmoxVE.Api;
@@ -37,6 +38,18 @@ public static class ResultExtension
     public static T ToData<T>(this Result result) => (T)Convert.ChangeType(result.ToData(), typeof(T));
 
     /// <summary>
+    /// Convert result (t and n) to logs
+    /// </summary>
+    /// <param name="result"></param>
+    /// <returns></returns>
+    public static IEnumerable<string> ToLogs(this Result result)
+        => result.ToData() is ExpandoObject
+                ? new[] { (result.ToData().t as string) }
+                : result.ToEnumerable()
+                        .OrderBy(a => a.n)
+                        .Select(a => a.t as string);
+
+    /// <summary>
     /// Check result in error.
     /// </summary>
     /// <param name="result"></param>
@@ -55,7 +68,7 @@ public static class ResultExtension
             : JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(result.ToData()), new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
-                Converters = new JsonConverter[] { new CustomBooleanJsonConverter() }.ToList()
+                Converters = [new CustomBooleanJsonConverter()]
             });
 
     class CustomBooleanJsonConverter : JsonConverter
