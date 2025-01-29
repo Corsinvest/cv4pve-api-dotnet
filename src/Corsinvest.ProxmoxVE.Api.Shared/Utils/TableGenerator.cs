@@ -129,7 +129,7 @@ public class TableGenerator
 
         ret.AppendLine(columnHeaders);
         ret.AppendLine(Regex.Replace(columnHeaders, @"[^|]", "-"));
-        rows.Select(row => string.Format(format, row.ToArray())).ToList().ForEach(row => ret.AppendLine(row));
+        rows.Select(row => string.Format(format, [.. row])).ToList().ForEach(row => ret.AppendLine(row));
         return ret.ToString();
     }
 
@@ -151,7 +151,7 @@ public class TableGenerator
         ret.AppendLine(dividerPlus);
         ret.AppendLine(columnHeaders);
         ret.AppendLine(dividerPlus);
-        rows.Select(a => string.Format(format, a.ToArray())).ToList().ForEach(a => ret.AppendLine(a));
+        rows.Select(a => string.Format(format, [.. a])).ToList().ForEach(a => ret.AppendLine(a));
         ret.AppendLine(dividerPlus);
 
         return ret.ToString();

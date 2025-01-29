@@ -923,7 +923,7 @@ public static class InfoHelper
                 disks.Add(new()
                 {
                     Disk = item,
-                    Partitions = disksAll.Where(a => a.Type == "partition" && a.Parent == item.DevPath).ToList(),
+                    Partitions = [.. disksAll.Where(a => a.Type == "partition" && a.Parent == item.DevPath)],
                     Smart = smart
                 });
             }
