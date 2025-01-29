@@ -5,6 +5,7 @@
 
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
@@ -141,7 +142,7 @@ public class VmConfig : ModelBase
                         }
                         else if ((match = Regex.Match(item, @"^rate=(\d+(\.\d+)?|\.\d+)$")).Success)
                         {
-                            network.Rate = double.Parse(match.Groups[1].Value);
+                            network.Rate = double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
                         }
                         else if ((match = Regex.Match(item, @"^tag=(\d+(\.\d+)?)$")).Success)
                         {
@@ -188,7 +189,7 @@ public class VmConfig : ModelBase
                         }
                         else if ((match = Regex.Match(item, @"^(rate)=(\S+)$")).Success)
                         {
-                            network.Rate = double.Parse(match.Groups[2].Value);
+                            network.Rate = double.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture);
                         }
                         else if ((match = Regex.Match(item, @"^(tag)=(\S+)$")).Success)
                         {
