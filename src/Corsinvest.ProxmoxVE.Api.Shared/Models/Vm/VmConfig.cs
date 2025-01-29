@@ -141,7 +141,7 @@ public class VmConfig : ModelBase
                         }
                         else if ((match = Regex.Match(item, @"^rate=(\d+(\.\d+)?|\.\d+)$")).Success)
                         {
-                            network.Rate = int.Parse(match.Groups[1].Value);
+                            network.Rate = double.Parse(match.Groups[1].Value);
                         }
                         else if ((match = Regex.Match(item, @"^tag=(\d+(\.\d+)?)$")).Success)
                         {
@@ -188,7 +188,7 @@ public class VmConfig : ModelBase
                         }
                         else if ((match = Regex.Match(item, @"^(rate)=(\S+)$")).Success)
                         {
-                            network.Rate = int.Parse(match.Groups[2].Value);
+                            network.Rate = double.Parse(match.Groups[2].Value);
                         }
                         else if ((match = Regex.Match(item, @"^(tag)=(\S+)$")).Success)
                         {
