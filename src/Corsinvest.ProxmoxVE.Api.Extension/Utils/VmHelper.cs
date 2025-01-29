@@ -208,55 +208,52 @@ public static class VmHelper
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="client"></param>
-    /// <param name="vms"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
     /// <exception cref="InvalidEnumArgumentException"></exception>
-    public static async Task PopulateVmOsInfoAsync<T>(PveClient client, IEnumerable<T> vms)
+    public static async Task PopulateVmOsInfoAsync<T>(PveClient client, T item)
          where T : IClusterResourceVm, IClusterResourceVmOsInfo
     {
-        foreach (var vm in vms)
+        //set info Vm
+        switch (item.VmType)
         {
-            //set info Vm
-            switch (vm.VmType)
-            {
-                case VmType.Qemu:
-                    var qemuApi = client.Nodes[vm.Node].Qemu[vm.VmId];
-                    var qemuConfig = await qemuApi.Config.GetAsync();
-                    vm.OsType = qemuConfig.VmOsType;
-                    vm.OsVersion = qemuConfig.OsTypeDecode;
+            case VmType.Qemu:
+                var qemuApi = client.Nodes[item.Node].Qemu[item.VmId];
+                var qemuConfig = await qemuApi.Config.GetAsync();
+                item.OsType = qemuConfig.VmOsType;
+                item.OsVersion = qemuConfig.OsTypeDecode;
 
-                    if (vm.IsRunning)
+                if (item.IsRunning)
+                {
+                    if (qemuConfig.AgentEnabled)
                     {
-                        if (qemuConfig.AgentEnabled)
+                        try
                         {
-                            try
-                            {
-                                vm.VmQemuAgentOsInfo = await qemuApi.Agent.GetOsinfo.GetAsync();
-                                vm.OsVersion = vm.VmQemuAgentOsInfo?.Result?.OsVersion;
-                                vm.HostName = (await qemuApi.Agent.GetHostName.GetAsync())?.Result?.HostName ?? "Error Agent data!";
-                            }
-                            catch
-                            {
-                                vm.HostName = "Error Agent data!";
-                            }
+                            item.VmQemuAgentOsInfo = await qemuApi.Agent.GetOsinfo.GetAsync();
+                            item.OsVersion = item.VmQemuAgentOsInfo?.Result?.OsVersion;
+                            item.HostName = (await qemuApi.Agent.GetHostName.GetAsync())?.Result?.HostName ?? "Error Agent data!";
                         }
-                        else
+                        catch
                         {
-                            vm.HostName = "Agent not enabled!";
+                            item.HostName = "Error Agent data!";
                         }
                     }
-                    break;
+                    else
+                    {
+                        item.HostName = "Agent not enabled!";
+                    }
+                }
+                break;
 
-                case VmType.Lxc:
-                    var lxcApi = client.Nodes[vm.Node].Lxc[vm.VmId];
-                    var lxcConfig = await lxcApi.Config.GetAsync(true);
-                    vm.HostName = lxcConfig.Hostname;
-                    vm.OsVersion = lxcConfig.OsTypeDecode;
-                    vm.OsType = lxcConfig.VmOsType;
-                    break;
+            case VmType.Lxc:
+                var lxcApi = client.Nodes[item.Node].Lxc[item.VmId];
+                var lxcConfig = await lxcApi.Config.GetAsync(true);
+                item.HostName = lxcConfig.Hostname;
+                item.OsVersion = lxcConfig.OsTypeDecode;
+                item.OsType = lxcConfig.VmOsType;
+                break;
 
-                default: throw new InvalidEnumArgumentException();
-            }
+            default: throw new InvalidEnumArgumentException();
         }
     }
 }

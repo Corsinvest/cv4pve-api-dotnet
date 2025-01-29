@@ -207,7 +207,7 @@ public static class ClientExtension
         //add
         foreach (var id in jolly.Split(',')) { ret.AddRange(await GetVmsFromIdAsync(id)); }
 
-        ret = ret.Distinct().ToList();
+        ret = [.. ret.Distinct()];
 
         //exclude data
         foreach (var id in jolly.Split(',').Where(a => a.StartsWith("-")).Select(a => a.Substring(1)))
@@ -249,14 +249,19 @@ public static class ClientExtension
     /// Get Vm Status
     /// </summary>
     /// <param name="client"></param>
-    /// <param name="vm"></param>
+    /// <param name="node"></param>
+    /// <param name="vmType"></param>
+    /// <param name="vmId"></param>
     /// <returns></returns>
     /// <exception cref="InvalidEnumArgumentException"></exception>
-    public static async Task<VmBaseStatusCurrent> GetVmStatusAsync(this PveClient client, IClusterResourceVm vm)
-        => vm.VmType switch
+    public static async Task<VmBaseStatusCurrent> GetVmStatusAsync(this PveClient client,
+                                                                   string node,
+                                                                   VmType vmType,
+                                                                   long vmId)
+        => vmType switch
         {
-            VmType.Qemu => await client.Nodes[vm.Node].Qemu[vm.VmId].Status.Current.GetAsync(),
-            VmType.Lxc => await client.Nodes[vm.Node].Lxc[vm.VmId].Status.Current.GetAsync(),
+            VmType.Qemu => await client.Nodes[node].Qemu[vmId].Status.Current.GetAsync(),
+            VmType.Lxc => await client.Nodes[node].Lxc[vmId].Status.Current.GetAsync(),
             _ => throw new InvalidEnumArgumentException(),
         };
 
@@ -264,14 +269,19 @@ public static class ClientExtension
     /// Get Vm Config
     /// </summary>
     /// <param name="client"></param>
-    /// <param name="vm"></param>
+    /// <param name="node"></param>
+    /// <param name="vmType"></param>
+    /// <param name="vmId"></param>
     /// <returns></returns>
     /// <exception cref="InvalidEnumArgumentException"></exception>
-    public static async Task<VmConfig> GetVmConfigAsync(this PveClient client, IClusterResourceVm vm)
-        => vm.VmType switch
+    public static async Task<VmConfig> GetVmConfigAsync(this PveClient client,
+                                                        string node,
+                                                        VmType vmType,
+                                                        long vmId)
+        => vmType switch
         {
-            VmType.Qemu => await client.Nodes[vm.Node].Qemu[vm.VmId].Config.GetAsync(),
-            VmType.Lxc => await client.Nodes[vm.Node].Lxc[vm.VmId].Config.GetAsync(),
+            VmType.Qemu => await client.Nodes[node].Qemu[vmId].Config.GetAsync(),
+            VmType.Lxc => await client.Nodes[node].Lxc[vmId].Config.GetAsync(),
             _ => throw new InvalidEnumArgumentException(),
         };
 
@@ -279,19 +289,23 @@ public static class ClientExtension
     /// Get Vm RrdData
     /// </summary>
     /// <param name="client"></param>
-    /// <param name="vm"></param>
+    /// <param name="node"></param>
+    /// <param name="vmType"></param>
+    /// <param name="vmId"></param>
     /// <param name="rrdDataTimeFrame"></param>
     /// <param name="rrdDataConsolidation"></param>
     /// <returns></returns>
     /// <exception cref="InvalidEnumArgumentException"></exception>
     public static async Task<IEnumerable<VmRrdData>> GetVmRrdDataAsync(this PveClient client,
-                                                                       IClusterResourceVm vm,
+                                                                       string node,
+                                                                       VmType vmType,
+                                                                       long vmId,
                                                                        RrdDataTimeFrame rrdDataTimeFrame,
                                                                        RrdDataConsolidation rrdDataConsolidation)
-        => vm.VmType switch
+        => vmType switch
         {
-            VmType.Qemu => await client.Nodes[vm.Node].Qemu[vm.VmId].Rrddata.GetAsync(rrdDataTimeFrame, rrdDataConsolidation),
-            VmType.Lxc => await client.Nodes[vm.Node].Lxc[vm.VmId].Rrddata.GetAsync(rrdDataTimeFrame, rrdDataConsolidation),
+            VmType.Qemu => await client.Nodes[node].Qemu[vmId].Rrddata.GetAsync(rrdDataTimeFrame, rrdDataConsolidation),
+            VmType.Lxc => await client.Nodes[node].Lxc[vmId].Rrddata.GetAsync(rrdDataTimeFrame, rrdDataConsolidation),
             _ => throw new InvalidEnumArgumentException(),
         };
     #endregion
