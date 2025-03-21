@@ -2,15 +2,8 @@
 	<Import Project="..\..\common.props" />
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
 		<Product>Corsinvest for Proxmox VE Api Client Shared</Product>
 		<AssemblyTitle>Corsinvest for Proxmox VE Api Client Shared</AssemblyTitle>
 		<Description>Corsinvest for Proxmox VE Api Client Shared</Description>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-	</ItemGroup>
 </Project>

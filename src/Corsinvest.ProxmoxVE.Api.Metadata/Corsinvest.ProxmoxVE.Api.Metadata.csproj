@@ -2,13 +2,8 @@
 	<Import Project="..\..\common.props" />
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
 		<Product>Corsinvest for Proxmox VE Metadati Api</Product>
 		<AssemblyTitle>Corsinvest for Proxmox VE Metadati Api</AssemblyTitle>
 		<Description>Corsinvest for Proxmox VE Metadati Api</Description>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-	</ItemGroup>
 </Project>
