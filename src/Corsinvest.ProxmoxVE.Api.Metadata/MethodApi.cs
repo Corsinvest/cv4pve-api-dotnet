@@ -4,8 +4,6 @@
  */
 
 using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Corsinvest.ProxmoxVE.Api.Metadata;
 
@@ -33,15 +31,11 @@ public class MethodApi
 
             if (returns["properties"] != null)
             {
-                ReturnParameters.AddRange(returns["properties"]
-                                .Select(a => new ParameterApi(a.Parent[((JProperty)a).Name]))
-                                .ToArray());
+                ReturnParameters.AddRange([.. returns["properties"].Select(a => new ParameterApi(a.Parent[((JProperty)a).Name]))]);
             }
             else if (returns["items"] != null && returns["items"]["properties"] != null)
             {
-                ReturnParameters.AddRange(returns["items"]["properties"]
-                                .Select(a => new ParameterApi(a.Parent[((JProperty)a).Name]))
-                                .ToArray());
+                ReturnParameters.AddRange([.. returns["items"]["properties"].Select(a => new ParameterApi(a.Parent[((JProperty)a).Name]))]);
             }
 
             if (returns["links"] != null)
@@ -53,9 +47,7 @@ public class MethodApi
 
         if (token["parameters"] != null && token["parameters"]["properties"] != null)
         {
-            Parameters.AddRange(token["parameters"]["properties"]
-                      .Select(a => new ParameterApi(a.Parent[((JProperty)a).Name]))
-                      .ToArray());
+            Parameters.AddRange([.. token["parameters"]["properties"].Select(a => new ParameterApi(a.Parent[((JProperty)a).Name]))]);
         }
 
         ReturnIsArray = ReturnType == "array";

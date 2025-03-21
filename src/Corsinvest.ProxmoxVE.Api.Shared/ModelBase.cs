@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared;

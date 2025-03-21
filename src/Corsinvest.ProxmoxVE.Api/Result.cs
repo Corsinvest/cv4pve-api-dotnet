@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using System.Collections.Generic;
 using System.Dynamic;
 using System.Net;
 using System.Text;

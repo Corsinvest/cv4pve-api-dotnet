@@ -5,11 +5,8 @@
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Dynamic;
-using System.Linq;
 
 namespace Corsinvest.ProxmoxVE.Api.Metadata;
 
@@ -39,15 +36,11 @@ public class ParameterApi
 
         if (token["properties"] != null)
         {
-            Items.AddRange(token["properties"]
-                            .Select(a => new ParameterApi(a.Parent[((JProperty)a).Name]))
-                            .ToArray());
+            Items.AddRange([.. token["properties"].Select(a => new ParameterApi(a.Parent[((JProperty)a).Name]))]);
         }
         else if (token["items"] != null && token["items"]["properties"] != null)
         {
-            Items.AddRange(token["items"]["properties"]
-                            .Select(a => new ParameterApi(a.Parent[((JProperty)a).Name]))
-                            .ToArray());
+            Items.AddRange([.. token["items"]["properties"].Select(a => new ParameterApi(a.Parent[((JProperty)a).Name]))]);
         }
 
         #region create enum values
@@ -56,15 +49,13 @@ public class ParameterApi
         {
             foreach (var item in token["enum"]) { enumValues.Add(item.ToString()); }
         }
-        EnumValues = enumValues.ToArray();
+        EnumValues = [.. enumValues];
         #endregion
 
         #region formats
         if (token["format"] != null)
         {
-            Formats.AddRange(token["format"]
-                      .Select(a => new ParameterFormatApi(a.Parent[((JProperty)a).Name]))
-                      .ToArray());
+            Formats.AddRange([.. token["format"].Select(a => new ParameterFormatApi(a.Parent[((JProperty)a).Name]))]);
         }
         #endregion
     }

@@ -4,9 +4,6 @@
  */
 
 using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 
 namespace Corsinvest.ProxmoxVE.Api.Metadata;
@@ -46,7 +43,7 @@ public class ClassApi
 
         if (token["info"] != null)
         {
-            Methods.AddRange(token["info"].Select(a => new MethodApi(a.Parent[((JProperty)a).Name], this)).ToArray());
+            Methods.AddRange([.. token["info"].Select(a => new MethodApi(a.Parent[((JProperty)a).Name], this))]);
         }
 
         //tree children

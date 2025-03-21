@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using System;
-using System.IO;
-
 namespace Corsinvest.ProxmoxVE.Api.Shared.Utils;
 
 /// <summary>

@@ -4,10 +4,7 @@
  */
 
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -125,7 +122,7 @@ public class TableGenerator
 
         var ret = new StringBuilder();
         var format = CreateStringFormat(columns, rows);
-        var columnHeaders = string.Format(format, columns.ToArray());
+        var columnHeaders = string.Format(format, [.. columns]);
 
         ret.AppendLine(columnHeaders);
         ret.AppendLine(Regex.Replace(columnHeaders, @"[^|]", "-"));
@@ -145,7 +142,7 @@ public class TableGenerator
 
         var ret = new StringBuilder();
         var format = CreateStringFormat(columns, rows);
-        var columnHeaders = string.Format(format, columns.ToArray());
+        var columnHeaders = string.Format(format, [.. columns]);
         var dividerPlus = Regex.Replace(columnHeaders, @"[^|]", "-").Replace("|", "+");
 
         ret.AppendLine(dividerPlus);
@@ -173,7 +170,7 @@ public class TableGenerator
                 "</tr>";
 
         return "<table style='width: 100%;border-collapse: collapse;border: 1px solid black;'>" +
-                $"<thead>{CreateRow("th", columns.ToArray())}</thead>" +
+                $"<thead>{CreateRow("th", [.. columns])}</thead>" +
                 $"<tbody>{string.Join("", rows.Select(a => CreateRow("td", a)))}</tbody>" +
                 "</table>";
     }

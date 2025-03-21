@@ -5,7 +5,6 @@
 
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Pool;
 

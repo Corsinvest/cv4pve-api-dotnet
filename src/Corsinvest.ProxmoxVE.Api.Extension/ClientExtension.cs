@@ -10,16 +10,9 @@ using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Dynamic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension;
 
@@ -165,19 +158,19 @@ public static class ClientExtension
             {
                 //all in specific node
                 var idx = id.StartsWith("all-") ? 4 : 5;
-                var nodeName = id.Substring(idx);
+                var nodeName = id[idx..];
                 data = allVms.Where(a => a.Node == nodeName || a.Node.ToLower() == nodeName.ToLower());
             }
             else if (id.StartsWith("@node-"))
             {
                 //all in specific node
-                var nodeName = id.Substring(6);
+                var nodeName = id[6..];
                 data = allVms.Where(a => a.Node == nodeName || a.Node.ToLower() == nodeName.ToLower());
             }
             else if (id.StartsWith("@pool-"))
             {
                 //all in specific pool
-                var name = id.Substring(6);
+                var name = id[6..];
                 var poolName = (await client.Pools.GetAsync())
                                     .Select(a => a.Id)
                                     .FirstOrDefault(a => a == name || a.ToLower() == name.ToLower());
@@ -190,7 +183,7 @@ public static class ClientExtension
             else if (id.StartsWith("@tag-"))
             {
                 //all in specific tag
-                var tagName = id.Substring(5);
+                var tagName = id[5..];
                 data = allVms.Where(a => (a.Tags + "").ToLower().Split(';').Contains(tagName.ToLower())
                                         || (a.Tags + "").Split(';').Contains(tagName));
             }
@@ -210,7 +203,7 @@ public static class ClientExtension
         ret = [.. ret.Distinct()];
 
         //exclude data
-        foreach (var id in jolly.Split(',').Where(a => a.StartsWith("-")).Select(a => a.Substring(1)))
+        foreach (var id in jolly.Split(',').Where(a => a.StartsWith("-")).Select(a => a[1..]))
         {
             foreach (var item in await GetVmsFromIdAsync(id))
             {
@@ -218,7 +211,7 @@ public static class ClientExtension
             }
         }
 
-        return ret.ToArray();
+        return [.. ret];
     }
 
     /// <summary>

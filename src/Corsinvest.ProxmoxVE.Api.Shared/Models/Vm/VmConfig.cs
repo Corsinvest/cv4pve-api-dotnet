@@ -4,9 +4,7 @@
  */
 
 using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 
@@ -283,8 +281,8 @@ public class VmConfig : ModelBase
                     FileName = fileName,
                     Device = device,
                     Passthrough = passthrough,
-                    Size = infos.Where(a => a.StartsWith("size=")).Select(a => a.Substring(5)).FirstOrDefault(),
-                    MountPoint = infos.Where(a => a.StartsWith("mp=")).Select(a => a.Substring(3)).FirstOrDefault(),
+                    Size = infos.Where(a => a.StartsWith("size=")).Select(a => a[5..]).FirstOrDefault(),
+                    MountPoint = infos.Where(a => a.StartsWith("mp=")).Select(a => a[3..]).FirstOrDefault(),
                     MountSourcePath = mountSourcePath,
                     Backup = backup
                 });
