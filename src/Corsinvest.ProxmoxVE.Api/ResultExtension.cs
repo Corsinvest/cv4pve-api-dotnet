@@ -4,10 +4,7 @@
  */
 
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Dynamic;
-using System.Linq;
 
 namespace Corsinvest.ProxmoxVE.Api;
 
@@ -44,7 +41,7 @@ public static class ResultExtension
     /// <returns></returns>
     public static IEnumerable<string> ToLogs(this Result result)
         => result.ToData() is ExpandoObject
-                ? new[] { (result.ToData().t as string) }
+                ? [(result.ToData().t as string)]
                 : result.ToEnumerable()
                         .OrderBy(a => a.n)
                         .Select(a => a.t as string);

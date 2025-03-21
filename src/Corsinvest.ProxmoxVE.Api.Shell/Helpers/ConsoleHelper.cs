@@ -4,12 +4,10 @@
  */
 
 using Microsoft.Extensions.Logging;
-using System;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers;
 

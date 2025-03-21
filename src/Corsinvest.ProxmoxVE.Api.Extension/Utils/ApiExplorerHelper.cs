@@ -6,17 +6,12 @@
 using Corsinvest.ProxmoxVE.Api.Metadata;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using Newtonsoft.Json;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Dynamic;
-using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Utils;
 
@@ -279,11 +274,10 @@ public static class ApiExplorerHelper
     /// <param name="command"></param>
     /// <returns></returns>
     public static string[] GetArgumentTags(string command)
-        => new Regex(@"{\s*(.+?)\s*}").Matches(command)
+        => [.. new Regex(@"{\s*(.+?)\s*}").Matches(command)
                                       .OfType<Match>()
                                       .Where(a => a.Success)
-                                      .Select(a => a.Groups[1].Value)
-                                      .ToArray();
+                                      .Select(a => a.Groups[1].Value)];
 
     /// <summary>
     /// Create parameter resource split ':'
@@ -296,7 +290,7 @@ public static class ApiExplorerHelper
         foreach (var item in items)
         {
             var pos = item.IndexOf(":");
-            if (pos >= 0) { parameters.Add(item.Substring(0, pos), item.Substring(pos + 1)); }
+            if (pos >= 0) { parameters.Add(item[..pos], item[(pos + 1)..]); }
         }
         return parameters;
     }
@@ -410,7 +404,7 @@ public static class ApiExplorerHelper
             columns.Add("key");
             columns.Add("value");
 
-            keys ??= dic.Select(a => a.Key).ToArray();
+            keys ??= [.. dic.Select(a => a.Key)];
 
             foreach (var key in keys.OrderBy(a => a))
             {
@@ -425,8 +419,8 @@ public static class ApiExplorerHelper
             if (keys == null)
             {
                 var keysTmp = new List<string>();
-                foreach (IDictionary<string, object> item in data) { keysTmp.AddRange(item.Keys.ToArray()); }
-                keys = keysTmp.Distinct().OrderBy(a => a).ToArray();
+                foreach (IDictionary<string, object> item in data) { keysTmp.AddRange([.. item.Keys]); }
+                keys = [.. keysTmp.Distinct().OrderBy(a => a)];
             }
 
             columns.AddRange(keys);
@@ -448,11 +442,11 @@ public static class ApiExplorerHelper
                     row.Add(value);
                 }
 
-                rowsTmp.Add(new KeyValuePair<object, object[]>(row[0] + "", row.ToArray()));
+                rowsTmp.Add(new KeyValuePair<object, object[]>(row[0] + "", [.. row]));
             }
 
             //order row by first column
-            rows.AddRange(rowsTmp.OrderBy(a => a.Key).Select(a => a.Value).ToArray());
+            rows.AddRange([.. rowsTmp.OrderBy(a => a.Key).Select(a => a.Value)]);
             if (rows.Count == 0) { data = ""; }
         }
 
@@ -490,7 +484,7 @@ public static class ApiExplorerHelper
                 var partsComment = JoinWord(param.Description
                                                  .Replace("\n", " ")
                                                  .Trim()
-                                                 .Split(new[] { " " }, StringSplitOptions.None), 45, " ");
+                                                 .Split([" "], StringSplitOptions.None), 45, " ");
 
                 //type
                 var partsType = new[] { param.Type };
@@ -600,7 +594,7 @@ public static class ApiExplorerHelper
         }
 
         if (!string.IsNullOrWhiteSpace(line.ToString())) { ret.Add(line.ToString().Trim()); }
-        return ret.ToArray();
+        return [.. ret];
     }
 
     /// <summary>

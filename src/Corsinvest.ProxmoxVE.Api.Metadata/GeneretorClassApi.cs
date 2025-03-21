@@ -4,9 +4,7 @@
  */
 
 using Newtonsoft.Json.Linq;
-using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Corsinvest.ProxmoxVE.Api.Metadata;
 
@@ -44,13 +42,13 @@ public static class GeneratorClassApi
         {
             var data = await response.Content.ReadAsStringAsync();
             //start Json API
-            data = data.Substring(data.IndexOf("["));
+            data = data[data.IndexOf("[")..];
 
             foreach (var line in data.Split('\n'))
             {
                 json.Append(line);
                 //end Json API
-                if (line.Substring(0, 1) == "]") { break; }
+                if (line[..1] == "]") { break; }
             }
         }
 

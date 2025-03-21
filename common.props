@@ -2,6 +2,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>net7.0;net8.0;net9.0</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<Version>8.3.3</Version>
 		<!--<NoWarn>$(NoWarn);CS1591;CS0436</NoWarn>-->
 

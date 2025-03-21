@@ -4,7 +4,6 @@
  */
 
 using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
 
 namespace Corsinvest.ProxmoxVE.Api.Metadata;
 
@@ -37,7 +36,7 @@ public class ParameterFormatApi
         {
             foreach (var item in token["enum"]) { enumValues.Add(item.ToString()); }
         }
-        EnumValues = enumValues.ToArray();
+        EnumValues = [.. enumValues];
         #endregion
     }
 

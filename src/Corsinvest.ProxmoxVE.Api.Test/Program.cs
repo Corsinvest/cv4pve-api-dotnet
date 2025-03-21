@@ -10,7 +10,7 @@ if (await client.LoginAsync("root", Environment.GetEnvironmentVariable("PvePassw
 {
     Console.WriteLine("pippo");
 
-    var aa  = await client.Nodes["cc01"].Qemu[1006].Agent.Exec.Exec(new string[]{"powershell", "-command", "echo", "test"});
+    var aa  = await client.Nodes["cc01"].Qemu[1006].Agent.Exec.Exec(["powershell", "-command", "echo", "test"]);
 
     Console.WriteLine(aa.ReasonPhrase);
 
