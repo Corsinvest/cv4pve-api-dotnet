@@ -2,7 +2,6 @@
 	<Import Project="..\..\common.props" />
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
 		<Product>Corsinvest for Proxmox VE Api Client Extension</Product>
 		<AssemblyTitle>Corsinvest for Proxmox VE Api Client Extension</AssemblyTitle>
 		<Description>Corsinvest for Proxmox VE Api Client Extension</Description>

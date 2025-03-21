@@ -6,15 +6,8 @@ SPDX-License-Identifier: GPL-3.0-only
 	<Import Project="..\..\common.props" />
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
 		<Product>Corsinvest for Proxmox VE Api Client</Product>
 		<AssemblyTitle>Corsinvest for Proxmox VE Api Client</AssemblyTitle>
 		<Description>Corsinvest for Proxmox VE Api Client</Description>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.3" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-	</ItemGroup>
 </Project>
