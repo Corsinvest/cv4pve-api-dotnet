@@ -59,4 +59,10 @@ public class ClusterReplication : ModelBase
     /// </summary>
     [JsonProperty("disable")]
     public bool Disable { get; set; }
+
+    /// <summary>
+    /// Rate
+    /// </summary>
+    [JsonProperty("rate")]
+    public int Rate { get; set; }
 }
