@@ -108,7 +108,7 @@ public class NodeReplication : ModelBase
     [JsonProperty("error")]
     public string Error { get; set; }
 
-     /// <summary>
+    /// <summary>
     /// Rate
     /// </summary>
     [JsonProperty("rate")]
