@@ -14,7 +14,7 @@
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageOutputPath>..\.nupkgs\</PackageOutputPath>
+		<PackageOutputPath>..\..\..\.nupkgs\</PackageOutputPath>
 		<RepositoryType>Github</RepositoryType>
 		<RepositoryUrl>https://github.com/Corsinvest/cv4pve-api-dotnet</RepositoryUrl>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -34,10 +34,4 @@
 		<None Include="..\..\icon.png" Pack="true" PackagePath="" />
 		<none Include="..\..\README.md" Pack="true" PackagePath="" />
 	</ItemGroup>
-
-	<Target Name="SpicNSpan" AfterTargets="Clean">
-		<RemoveDir Directories="$(TargetDir)" />
-		<RemoveDir Directories="$(ProjectDir)$(BaseIntermediateOutputPath)" />
-		<RemoveDir Directories="$(ProjectDir)$(BaseOutputPath)" />
-	</Target>
 </Project>
