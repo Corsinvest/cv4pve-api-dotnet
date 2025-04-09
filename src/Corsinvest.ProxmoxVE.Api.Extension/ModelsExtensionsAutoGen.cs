@@ -269,7 +269,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <param name="type">Only list specific interface types.
-    ///   Enum: bridge,bond,eth,alias,vlan,OVSBridge,OVSBond,OVSPort,OVSIntPort,any_bridge,any_local_bridge</param>
+    ///   Enum: bridge,bond,eth,alias,vlan,OVSBridge,OVSBond,OVSPort,OVSIntPort,vnet,any_bridge,any_local_bridge</param>
     /// <returns></returns>
     public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeNetwork>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveNetwork item, string type = null)
         => (await item.Index(type)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeNetwork>>();

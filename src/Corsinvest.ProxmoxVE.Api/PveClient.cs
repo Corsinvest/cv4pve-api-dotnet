@@ -2506,7 +2506,7 @@ public class PveClient : PveClientBase
                     /// Update ACME plugin configuration.
                     /// </summary>
                     /// <param name="api">API plugin name
-                    ///   Enum: 1984hosting,acmedns,acmeproxy,active24,ad,ali,anx,artfiles,arvan,aurora,autodns,aws,azion,azure,bookmyname,bunny,cf,clouddns,cloudns,cn,conoha,constellix,cpanel,curanet,cyon,da,ddnss,desec,df,dgon,dnsexit,dnshome,dnsimple,dnsservices,do,doapi,domeneshop,dp,dpi,dreamhost,duckdns,durabledns,dyn,dynu,dynv6,easydns,edgedns,euserv,exoscale,fornex,freedns,gandi_livedns,gcloud,gcore,gd,geoscaling,googledomains,he,hetzner,hexonet,hostingde,huaweicloud,infoblox,infomaniak,internetbs,inwx,ionos,ipv64,ispconfig,jd,joker,kappernet,kas,kinghost,knot,la,leaseweb,lexicon,linode,linode_v4,loopia,lua,maradns,me,miab,misaka,myapi,mydevil,mydnsjp,mythic_beasts,namecheap,namecom,namesilo,nanelo,nederhost,neodigit,netcup,netlify,nic,njalla,nm,nsd,nsone,nsupdate,nw,oci,one,online,openprovider,openstack,opnsense,ovh,pdns,pleskxml,pointhq,porkbun,rackcorp,rackspace,rage4,rcode0,regru,scaleway,schlundtech,selectel,selfhost,servercow,simply,tele3,tencent,transip,udr,ultra,unoeuro,variomedia,veesp,vercel,vscale,vultr,websupport,world4you,yandex,yc,zilore,zone,zonomi</param>
+                    ///   Enum: 1984hosting,acmedns,acmeproxy,active24,ad,ali,alviy,anx,artfiles,arvan,aurora,autodns,aws,azion,azure,bookmyname,bunny,cf,clouddns,cloudns,cn,conoha,constellix,cpanel,curanet,cyon,da,ddnss,desec,df,dgon,dnsexit,dnshome,dnsimple,dnsservices,doapi,domeneshop,dp,dpi,dreamhost,duckdns,durabledns,dyn,dynu,dynv6,easydns,edgedns,euserv,exoscale,fornex,freedns,gandi_livedns,gcloud,gcore,gd,geoscaling,googledomains,he,hetzner,hexonet,hostingde,huaweicloud,infoblox,infomaniak,internetbs,inwx,ionos,ionos_cloud,ipv64,ispconfig,jd,joker,kappernet,kas,kinghost,knot,la,leaseweb,lexicon,limacity,linode,linode_v4,loopia,lua,maradns,me,miab,misaka,myapi,mydevil,mydnsjp,mythic_beasts,namecheap,namecom,namesilo,nanelo,nederhost,neodigit,netcup,netlify,nic,njalla,nm,nsd,nsone,nsupdate,nw,oci,omglol,one,online,openprovider,openstack,opnsense,ovh,pdns,pleskxml,pointhq,porkbun,rackcorp,rackspace,rage4,rcode0,regru,scaleway,schlundtech,selectel,selfhost,servercow,simply,technitium,tele3,tencent,timeweb,transip,udr,ultra,unoeuro,variomedia,veesp,vercel,vscale,vultr,websupport,west_cn,world4you,yandex360,yc,zilore,zone,zoneedit,zonomi</param>
                     /// <param name="data">DNS plugin data. (base64 encoded)</param>
                     /// <param name="delete">A list of settings you want to delete.</param>
                     /// <param name="digest">Prevent changes if current configuration file has a different digest. This can be used to prevent concurrent modifications.</param>
@@ -2546,7 +2546,7 @@ public class PveClient : PveClientBase
                 /// <param name="type">ACME challenge type.
                 ///   Enum: dns,standalone</param>
                 /// <param name="api">API plugin name
-                ///   Enum: 1984hosting,acmedns,acmeproxy,active24,ad,ali,anx,artfiles,arvan,aurora,autodns,aws,azion,azure,bookmyname,bunny,cf,clouddns,cloudns,cn,conoha,constellix,cpanel,curanet,cyon,da,ddnss,desec,df,dgon,dnsexit,dnshome,dnsimple,dnsservices,do,doapi,domeneshop,dp,dpi,dreamhost,duckdns,durabledns,dyn,dynu,dynv6,easydns,edgedns,euserv,exoscale,fornex,freedns,gandi_livedns,gcloud,gcore,gd,geoscaling,googledomains,he,hetzner,hexonet,hostingde,huaweicloud,infoblox,infomaniak,internetbs,inwx,ionos,ipv64,ispconfig,jd,joker,kappernet,kas,kinghost,knot,la,leaseweb,lexicon,linode,linode_v4,loopia,lua,maradns,me,miab,misaka,myapi,mydevil,mydnsjp,mythic_beasts,namecheap,namecom,namesilo,nanelo,nederhost,neodigit,netcup,netlify,nic,njalla,nm,nsd,nsone,nsupdate,nw,oci,one,online,openprovider,openstack,opnsense,ovh,pdns,pleskxml,pointhq,porkbun,rackcorp,rackspace,rage4,rcode0,regru,scaleway,schlundtech,selectel,selfhost,servercow,simply,tele3,tencent,transip,udr,ultra,unoeuro,variomedia,veesp,vercel,vscale,vultr,websupport,world4you,yandex,yc,zilore,zone,zonomi</param>
+                ///   Enum: 1984hosting,acmedns,acmeproxy,active24,ad,ali,alviy,anx,artfiles,arvan,aurora,autodns,aws,azion,azure,bookmyname,bunny,cf,clouddns,cloudns,cn,conoha,constellix,cpanel,curanet,cyon,da,ddnss,desec,df,dgon,dnsexit,dnshome,dnsimple,dnsservices,doapi,domeneshop,dp,dpi,dreamhost,duckdns,durabledns,dyn,dynu,dynv6,easydns,edgedns,euserv,exoscale,fornex,freedns,gandi_livedns,gcloud,gcore,gd,geoscaling,googledomains,he,hetzner,hexonet,hostingde,huaweicloud,infoblox,infomaniak,internetbs,inwx,ionos,ionos_cloud,ipv64,ispconfig,jd,joker,kappernet,kas,kinghost,knot,la,leaseweb,lexicon,limacity,linode,linode_v4,loopia,lua,maradns,me,miab,misaka,myapi,mydevil,mydnsjp,mythic_beasts,namecheap,namecom,namesilo,nanelo,nederhost,neodigit,netcup,netlify,nic,njalla,nm,nsd,nsone,nsupdate,nw,oci,omglol,one,online,openprovider,openstack,opnsense,ovh,pdns,pleskxml,pointhq,porkbun,rackcorp,rackspace,rage4,rcode0,regru,scaleway,schlundtech,selectel,selfhost,servercow,simply,technitium,tele3,tencent,timeweb,transip,udr,ultra,unoeuro,variomedia,veesp,vercel,vscale,vultr,websupport,west_cn,world4you,yandex360,yc,zilore,zone,zoneedit,zonomi</param>
                 /// <param name="data">DNS plugin data. (base64 encoded)</param>
                 /// <param name="disable">Flag to disable the config.</param>
                 /// <param name="nodes">List of cluster node names.</param>
@@ -2902,7 +2902,7 @@ public class PveClient : PveClientBase
                     /// <param name="enable_new">Enable newly synced users immediately.</param>
                     /// <param name="enabled">Determines if the job is enabled.</param>
                     /// <param name="realm">Authentication domain ID</param>
-                    /// <param name="remove_vanished">A semicolon-seperated list of things to remove when they or the user vanishes during a sync. The following values are possible: 'entry' removes the user/group when not returned from the sync. 'properties' removes the set properties on existing user/group that do not appear in the source (even custom ones). 'acl' removes acls when the user/group is not returned from the sync. Instead of a list it also can be 'none' (the default).</param>
+                    /// <param name="remove_vanished">A semicolon-separated list of things to remove when they or the user vanishes during a sync. The following values are possible: 'entry' removes the user/group when not returned from the sync. 'properties' removes the set properties on existing user/group that do not appear in the source (even custom ones). 'acl' removes acls when the user/group is not returned from the sync. Instead of a list it also can be 'none' (the default).</param>
                     /// <param name="scope">Select what to sync.
                     ///   Enum: users,groups,both</param>
                     /// <returns></returns>
@@ -2926,7 +2926,7 @@ public class PveClient : PveClientBase
                     /// <param name="delete">A list of settings you want to delete.</param>
                     /// <param name="enable_new">Enable newly synced users immediately.</param>
                     /// <param name="enabled">Determines if the job is enabled.</param>
-                    /// <param name="remove_vanished">A semicolon-seperated list of things to remove when they or the user vanishes during a sync. The following values are possible: 'entry' removes the user/group when not returned from the sync. 'properties' removes the set properties on existing user/group that do not appear in the source (even custom ones). 'acl' removes acls when the user/group is not returned from the sync. Instead of a list it also can be 'none' (the default).</param>
+                    /// <param name="remove_vanished">A semicolon-separated list of things to remove when they or the user vanishes during a sync. The following values are possible: 'entry' removes the user/group when not returned from the sync. 'properties' removes the set properties on existing user/group that do not appear in the source (even custom ones). 'acl' removes acls when the user/group is not returned from the sync. Instead of a list it also can be 'none' (the default).</param>
                     /// <param name="scope">Select what to sync.
                     ///   Enum: users,groups,both</param>
                     /// <returns></returns>
@@ -2987,6 +2987,11 @@ public class PveClient : PveClientBase
             private readonly PveClient _client;
 
             internal PveMapping(PveClient client) { _client = client; }
+            private PveDir _dir;
+            /// <summary>
+            /// Dir
+            /// </summary>
+            public PveDir Dir => _dir ??= new(_client);
             private PvePci _pci;
             /// <summary>
             /// Pci
@@ -2997,6 +3002,81 @@ public class PveClient : PveClientBase
             /// Usb
             /// </summary>
             public PveUsb Usb => _usb ??= new(_client);
+            /// <summary>
+            /// Dir
+            /// </summary>
+            public class PveDir
+            {
+                private readonly PveClient _client;
+
+                internal PveDir(PveClient client) { _client = client; }
+                /// <summary>
+                /// IdItem
+                /// </summary>
+                public PveIdItem this[object id] => new(_client, id);
+                /// <summary>
+                /// IdItem
+                /// </summary>
+                public class PveIdItem
+                {
+                    private readonly PveClient _client;
+                    private readonly object _id;
+                    internal PveIdItem(PveClient client, object id) { _client = client; _id = id; }
+                    /// <summary>
+                    /// Remove directory mapping.
+                    /// </summary>
+                    /// <returns></returns>
+                    public async Task<Result> Delete() { return await _client.DeleteAsync($"/cluster/mapping/dir/{_id}"); }
+                    /// <summary>
+                    /// Get directory mapping.
+                    /// </summary>
+                    /// <returns></returns>
+                    public async Task<Result> Get() { return await _client.GetAsync($"/cluster/mapping/dir/{_id}"); }
+                    /// <summary>
+                    /// Update a directory mapping.
+                    /// </summary>
+                    /// <param name="delete">A list of settings you want to delete.</param>
+                    /// <param name="description">Description of the directory mapping</param>
+                    /// <param name="digest">Prevent changes if current configuration file has a different digest. This can be used to prevent concurrent modifications.</param>
+                    /// <param name="map">A list of maps for the cluster nodes.</param>
+                    /// <returns></returns>
+                    public async Task<Result> Update(string delete = null, string description = null, string digest = null, IEnumerable<object> map = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("delete", delete);
+                        parameters.Add("description", description);
+                        parameters.Add("digest", digest);
+                        parameters.Add("map", map);
+                        return await _client.SetAsync($"/cluster/mapping/dir/{_id}", parameters);
+                    }
+                }
+                /// <summary>
+                /// List directory mapping
+                /// </summary>
+                /// <param name="check_node">If given, checks the configurations on the given node for correctness, and adds relevant diagnostics for the directory to the response.</param>
+                /// <returns></returns>
+                public async Task<Result> Index(string check_node = null)
+                {
+                    var parameters = new Dictionary<string, object>();
+                    parameters.Add("check-node", check_node);
+                    return await _client.GetAsync($"/cluster/mapping/dir", parameters);
+                }
+                /// <summary>
+                /// Create a new directory mapping.
+                /// </summary>
+                /// <param name="id">The ID of the directory mapping</param>
+                /// <param name="map">A list of maps for the cluster nodes.</param>
+                /// <param name="description">Description of the directory mapping</param>
+                /// <returns></returns>
+                public async Task<Result> Create(string id, IEnumerable<object> map, string description = null)
+                {
+                    var parameters = new Dictionary<string, object>();
+                    parameters.Add("id", id);
+                    parameters.Add("map", map);
+                    parameters.Add("description", description);
+                    return await _client.CreateAsync($"/cluster/mapping/dir", parameters);
+                }
+            }
             /// <summary>
             /// Pci
             /// </summary>
@@ -3033,15 +3113,17 @@ public class PveClient : PveClientBase
                     /// <param name="delete">A list of settings you want to delete.</param>
                     /// <param name="description">Description of the logical PCI device.</param>
                     /// <param name="digest">Prevent changes if current configuration file has a different digest. This can be used to prevent concurrent modifications.</param>
+                    /// <param name="live_migration_capable">Marks the device(s) as being able to be live-migrated (Experimental). This needs hardware and driver support to work.</param>
                     /// <param name="map">A list of maps for the cluster nodes.</param>
                     /// <param name="mdev">Marks the device(s) as being capable of providing mediated devices.</param>
                     /// <returns></returns>
-                    public async Task<Result> Update(string delete = null, string description = null, string digest = null, IEnumerable<object> map = null, bool? mdev = null)
+                    public async Task<Result> Update(string delete = null, string description = null, string digest = null, bool? live_migration_capable = null, IEnumerable<object> map = null, bool? mdev = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("delete", delete);
                         parameters.Add("description", description);
                         parameters.Add("digest", digest);
+                        parameters.Add("live-migration-capable", live_migration_capable);
                         parameters.Add("map", map);
                         parameters.Add("mdev", mdev);
                         return await _client.SetAsync($"/cluster/mapping/pci/{_id}", parameters);
@@ -3064,14 +3146,16 @@ public class PveClient : PveClientBase
                 /// <param name="id">The ID of the logical PCI mapping.</param>
                 /// <param name="map">A list of maps for the cluster nodes.</param>
                 /// <param name="description">Description of the logical PCI device.</param>
+                /// <param name="live_migration_capable">Marks the device(s) as being able to be live-migrated (Experimental). This needs hardware and driver support to work.</param>
                 /// <param name="mdev">Marks the device(s) as being capable of providing mediated devices.</param>
                 /// <returns></returns>
-                public async Task<Result> Create(string id, IEnumerable<object> map, string description = null, bool? mdev = null)
+                public async Task<Result> Create(string id, IEnumerable<object> map, string description = null, bool? live_migration_capable = null, bool? mdev = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("id", id);
                     parameters.Add("map", map);
                     parameters.Add("description", description);
+                    parameters.Add("live-migration-capable", live_migration_capable);
                     parameters.Add("mdev", mdev);
                     return await _client.CreateAsync($"/cluster/mapping/pci", parameters);
                 }
@@ -4013,15 +4097,17 @@ public class PveClient : PveClientBase
                     /// </summary>
                     /// <param name="delete">A list of settings you want to delete.</param>
                     /// <param name="digest">Prevent changes if current configuration file has a different digest. This can be used to prevent concurrent modifications.</param>
+                    /// <param name="fingerprint">Certificate SHA 256 fingerprint.</param>
                     /// <param name="section"></param>
                     /// <param name="token"></param>
                     /// <param name="url"></param>
                     /// <returns></returns>
-                    public async Task<Result> Update(string delete = null, string digest = null, int? section = null, string token = null, string url = null)
+                    public async Task<Result> Update(string delete = null, string digest = null, string fingerprint = null, int? section = null, string token = null, string url = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("delete", delete);
                         parameters.Add("digest", digest);
+                        parameters.Add("fingerprint", fingerprint);
                         parameters.Add("section", section);
                         parameters.Add("token", token);
                         parameters.Add("url", url);
@@ -4046,15 +4132,17 @@ public class PveClient : PveClientBase
                 /// <param name="ipam">The SDN ipam object identifier.</param>
                 /// <param name="type">Plugin type.
                 ///   Enum: netbox,phpipam,pve</param>
+                /// <param name="fingerprint">Certificate SHA 256 fingerprint.</param>
                 /// <param name="section"></param>
                 /// <param name="token"></param>
                 /// <param name="url"></param>
                 /// <returns></returns>
-                public async Task<Result> Create(string ipam, string type, int? section = null, string token = null, string url = null)
+                public async Task<Result> Create(string ipam, string type, string fingerprint = null, int? section = null, string token = null, string url = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("ipam", ipam);
                     parameters.Add("type", type);
+                    parameters.Add("fingerprint", fingerprint);
                     parameters.Add("section", section);
                     parameters.Add("token", token);
                     parameters.Add("url", url);
@@ -4096,16 +4184,18 @@ public class PveClient : PveClientBase
                     /// </summary>
                     /// <param name="delete">A list of settings you want to delete.</param>
                     /// <param name="digest">Prevent changes if current configuration file has a different digest. This can be used to prevent concurrent modifications.</param>
+                    /// <param name="fingerprint">Certificate SHA 256 fingerprint.</param>
                     /// <param name="key"></param>
                     /// <param name="reversemaskv6"></param>
                     /// <param name="ttl"></param>
                     /// <param name="url"></param>
                     /// <returns></returns>
-                    public async Task<Result> Update(string delete = null, string digest = null, string key = null, int? reversemaskv6 = null, int? ttl = null, string url = null)
+                    public async Task<Result> Update(string delete = null, string digest = null, string fingerprint = null, string key = null, int? reversemaskv6 = null, int? ttl = null, string url = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("delete", delete);
                         parameters.Add("digest", digest);
+                        parameters.Add("fingerprint", fingerprint);
                         parameters.Add("key", key);
                         parameters.Add("reversemaskv6", reversemaskv6);
                         parameters.Add("ttl", ttl);
@@ -4133,17 +4223,19 @@ public class PveClient : PveClientBase
                 /// <param name="type">Plugin type.
                 ///   Enum: powerdns</param>
                 /// <param name="url"></param>
+                /// <param name="fingerprint">Certificate SHA 256 fingerprint.</param>
                 /// <param name="reversemaskv6"></param>
                 /// <param name="reversev6mask"></param>
                 /// <param name="ttl"></param>
                 /// <returns></returns>
-                public async Task<Result> Create(string dns, string key, string type, string url, int? reversemaskv6 = null, int? reversev6mask = null, int? ttl = null)
+                public async Task<Result> Create(string dns, string key, string type, string url, string fingerprint = null, int? reversemaskv6 = null, int? reversev6mask = null, int? ttl = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("dns", dns);
                     parameters.Add("key", key);
                     parameters.Add("type", type);
                     parameters.Add("url", url);
+                    parameters.Add("fingerprint", fingerprint);
                     parameters.Add("reversemaskv6", reversemaskv6);
                     parameters.Add("reversev6mask", reversev6mask);
                     parameters.Add("ttl", ttl);
@@ -4233,6 +4325,7 @@ public class PveClient : PveClientBase
             /// Set datacenter options.
             /// </summary>
             /// <param name="bwlimit">Set I/O bandwidth limit for various operations (in KiB/s).</param>
+            /// <param name="consent_text">Consent text that is displayed before logging in.</param>
             /// <param name="console">Select the default Console viewer. You can either use the builtin java applet (VNC; deprecated and maps to html5), an external virt-viewer comtatible application (SPICE), an HTML5 based vnc viewer (noVNC), or an HTML5 based console client (xtermjs). If the selected viewer is not available (e.g. SPICE not activated for the VM), the fallback is noVNC.
             ///   Enum: applet,vv,html5,xtermjs</param>
             /// <param name="crs">Cluster resource scheduling settings.</param>
@@ -4259,10 +4352,11 @@ public class PveClient : PveClientBase
             /// <param name="user_tag_access">Privilege options for user-settable tags</param>
             /// <param name="webauthn">webauthn configuration</param>
             /// <returns></returns>
-            public async Task<Result> SetOptions(string bwlimit = null, string console = null, string crs = null, string delete = null, string description = null, string email_from = null, string fencing = null, string ha = null, string http_proxy = null, string keyboard = null, string language = null, string mac_prefix = null, int? max_workers = null, string migration = null, bool? migration_unsecure = null, string next_id = null, string notify = null, string registered_tags = null, string tag_style = null, string u2f = null, string user_tag_access = null, string webauthn = null)
+            public async Task<Result> SetOptions(string bwlimit = null, string consent_text = null, string console = null, string crs = null, string delete = null, string description = null, string email_from = null, string fencing = null, string ha = null, string http_proxy = null, string keyboard = null, string language = null, string mac_prefix = null, int? max_workers = null, string migration = null, bool? migration_unsecure = null, string next_id = null, string notify = null, string registered_tags = null, string tag_style = null, string u2f = null, string user_tag_access = null, string webauthn = null)
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("bwlimit", bwlimit);
+                parameters.Add("consent-text", consent_text);
                 parameters.Add("console", console);
                 parameters.Add("crs", crs);
                 parameters.Add("delete", delete);
@@ -6085,11 +6179,12 @@ public class PveClient : PveClientBase
                         /// <param name="vcpus">Number of hotplugged vcpus.</param>
                         /// <param name="vga">Configure the VGA hardware.</param>
                         /// <param name="virtioN">Use volume as VIRTIO hard disk (n is 0 to 15). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
+                        /// <param name="virtiofsN">Configuration for sharing a directory between host and guest using Virtio-fs.</param>
                         /// <param name="vmgenid">Set VM Generation ID. Use '1' to autogenerate on create or update, pass '0' to disable explicitly.</param>
                         /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                         /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                         /// <returns></returns>
-                        public async Task<Result> UpdateVmAsync(bool? acpi = null, string affinity = null, string agent = null, string amd_sev = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, bool? ciupgrade = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string import_working_storage = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, string memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                        public async Task<Result> UpdateVmAsync(bool? acpi = null, string affinity = null, string agent = null, string amd_sev = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, bool? ciupgrade = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string import_working_storage = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, string memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, IDictionary<int, string> virtiofsN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("acpi", acpi);
@@ -6177,6 +6272,7 @@ public class PveClient : PveClientBase
                             AddIndexedParameter(parameters, "unused", unusedN);
                             AddIndexedParameter(parameters, "usb", usbN);
                             AddIndexedParameter(parameters, "virtio", virtioN);
+                            AddIndexedParameter(parameters, "virtiofs", virtiofsN);
                             return await _client.CreateAsync($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
                         }
                         /// <summary>
@@ -6270,11 +6366,12 @@ public class PveClient : PveClientBase
                         /// <param name="vcpus">Number of hotplugged vcpus.</param>
                         /// <param name="vga">Configure the VGA hardware.</param>
                         /// <param name="virtioN">Use volume as VIRTIO hard disk (n is 0 to 15). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
+                        /// <param name="virtiofsN">Configuration for sharing a directory between host and guest using Virtio-fs.</param>
                         /// <param name="vmgenid">Set VM Generation ID. Use '1' to autogenerate on create or update, pass '0' to disable explicitly.</param>
                         /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                         /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                         /// <returns></returns>
-                        public async Task<Result> UpdateVm(bool? acpi = null, string affinity = null, string agent = null, string amd_sev = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, bool? ciupgrade = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, string memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                        public async Task<Result> UpdateVm(bool? acpi = null, string affinity = null, string agent = null, string amd_sev = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, bool? ciupgrade = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, string memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, IDictionary<int, string> virtiofsN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("acpi", acpi);
@@ -6360,6 +6457,7 @@ public class PveClient : PveClientBase
                             AddIndexedParameter(parameters, "unused", unusedN);
                             AddIndexedParameter(parameters, "usb", usbN);
                             AddIndexedParameter(parameters, "virtio", virtioN);
+                            AddIndexedParameter(parameters, "virtiofs", virtiofsN);
                             return await _client.SetAsync($"/nodes/{_node}/qemu/{_vmid}/config", parameters);
                         }
                     }
@@ -7494,11 +7592,12 @@ public class PveClient : PveClientBase
                 /// <param name="vcpus">Number of hotplugged vcpus.</param>
                 /// <param name="vga">Configure the VGA hardware.</param>
                 /// <param name="virtioN">Use volume as VIRTIO hard disk (n is 0 to 15). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
+                /// <param name="virtiofsN">Configuration for sharing a directory between host and guest using Virtio-fs.</param>
                 /// <param name="vmgenid">Set VM Generation ID. Use '1' to autogenerate on create or update, pass '0' to disable explicitly.</param>
                 /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                 /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                 /// <returns></returns>
-                public async Task<Result> CreateVm(int vmid, bool? acpi = null, string affinity = null, string agent = null, string amd_sev = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, bool? ciupgrade = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string import_working_storage = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? live_restore = null, bool? localtime = null, string lock_ = null, string machine = null, string memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                public async Task<Result> CreateVm(int vmid, bool? acpi = null, string affinity = null, string agent = null, string amd_sev = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, bool? ciupgrade = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string import_working_storage = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? live_restore = null, bool? localtime = null, string lock_ = null, string machine = null, string memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, IDictionary<int, string> virtiofsN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("vmid", vmid);
@@ -7589,6 +7688,7 @@ public class PveClient : PveClientBase
                     AddIndexedParameter(parameters, "unused", unusedN);
                     AddIndexedParameter(parameters, "usb", usbN);
                     AddIndexedParameter(parameters, "virtio", virtioN);
+                    AddIndexedParameter(parameters, "virtiofs", virtiofsN);
                     return await _client.CreateAsync($"/nodes/{_node}/qemu", parameters);
                 }
             }
@@ -10588,7 +10688,7 @@ public class PveClient : PveClientBase
                     /// Update network device configuration
                     /// </summary>
                     /// <param name="type">Network interface type
-                    ///   Enum: bridge,bond,eth,alias,vlan,OVSBridge,OVSBond,OVSPort,OVSIntPort,unknown</param>
+                    ///   Enum: bridge,bond,eth,alias,vlan,OVSBridge,OVSBond,OVSPort,OVSIntPort,vnet,unknown</param>
                     /// <param name="address">IP address.</param>
                     /// <param name="address6">IP address.</param>
                     /// <param name="autostart">Automatically start interface on boot.</param>
@@ -10662,7 +10762,7 @@ public class PveClient : PveClientBase
                 /// List available networks
                 /// </summary>
                 /// <param name="type">Only list specific interface types.
-                ///   Enum: bridge,bond,eth,alias,vlan,OVSBridge,OVSBond,OVSPort,OVSIntPort,any_bridge,any_local_bridge</param>
+                ///   Enum: bridge,bond,eth,alias,vlan,OVSBridge,OVSBond,OVSPort,OVSIntPort,vnet,any_bridge,any_local_bridge</param>
                 /// <returns></returns>
                 public async Task<Result> Index(string type = null)
                 {
@@ -10675,7 +10775,7 @@ public class PveClient : PveClientBase
                 /// </summary>
                 /// <param name="iface">Network interface name.</param>
                 /// <param name="type">Network interface type
-                ///   Enum: bridge,bond,eth,alias,vlan,OVSBridge,OVSBond,OVSPort,OVSIntPort,unknown</param>
+                ///   Enum: bridge,bond,eth,alias,vlan,OVSBridge,OVSBond,OVSPort,OVSIntPort,vnet,unknown</param>
                 /// <param name="address">IP address.</param>
                 /// <param name="address6">IP address.</param>
                 /// <param name="autostart">Automatically start interface on boot.</param>
@@ -11485,8 +11585,8 @@ public class PveClient : PveClientBase
                         /// <param name="filename">The name of the file to create.</param>
                         /// <param name="size">Size in kilobyte (1024 bytes). Optional suffixes 'M' (megabyte, 1024K) and 'G' (gigabyte, 1024M)</param>
                         /// <param name="vmid">Specify owner VM</param>
-                        /// <param name="format">
-                        ///   Enum: raw,qcow2,subvol</param>
+                        /// <param name="format">Format of the image.
+                        ///   Enum: raw,qcow2,subvol,vmdk</param>
                         /// <returns></returns>
                         public async Task<Result> Create(string filename, string size, int vmid, string format = null)
                         {
@@ -11671,7 +11771,7 @@ public class PveClient : PveClientBase
                             _storage = storage;
                         }
                         /// <summary>
-                        /// Upload templates, ISO images and OVAs.
+                        /// Upload templates, ISO images, OVAs and VM images.
                         /// </summary>
                         /// <param name="content">Content type.
                         ///   Enum: iso,vztmpl,import</param>
@@ -11706,7 +11806,7 @@ public class PveClient : PveClientBase
                             _storage = storage;
                         }
                         /// <summary>
-                        /// Download templates, ISO images and OVAs by using an URL.
+                        /// Download templates, ISO images, OVAs and VM images by using an URL.
                         /// </summary>
                         /// <param name="content">Content type.
                         ///   Enum: iso,vztmpl,import</param>
@@ -12853,7 +12953,7 @@ public class PveClient : PveClientBase
                 /// Get node configuration options.
                 /// </summary>
                 /// <param name="property">Return only a specific property from the node configuration.
-                ///   Enum: acme,acmedomain0,acmedomain1,acmedomain2,acmedomain3,acmedomain4,acmedomain5,description,startall-onboot-delay,wakeonlan</param>
+                ///   Enum: acme,acmedomain0,acmedomain1,acmedomain2,acmedomain3,acmedomain4,acmedomain5,ballooning-target,description,startall-onboot-delay,wakeonlan</param>
                 /// <returns></returns>
                 public async Task<Result> GetConfig(string property = null)
                 {
@@ -12866,16 +12966,18 @@ public class PveClient : PveClientBase
                 /// </summary>
                 /// <param name="acme">Node specific ACME settings.</param>
                 /// <param name="acmedomainN">ACME domain and validation plugin</param>
+                /// <param name="ballooning_target">RAM usage target for ballooning (in percent of total memory)</param>
                 /// <param name="delete">A list of settings you want to delete.</param>
                 /// <param name="description">Description for the Node. Shown in the web-interface node notes panel. This is saved as comment inside the configuration file.</param>
                 /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                 /// <param name="startall_onboot_delay">Initial delay in seconds, before starting all the Virtual Guests with on-boot enabled.</param>
                 /// <param name="wakeonlan">Node specific wake on LAN settings.</param>
                 /// <returns></returns>
-                public async Task<Result> SetOptions(string acme = null, IDictionary<int, string> acmedomainN = null, string delete = null, string description = null, string digest = null, int? startall_onboot_delay = null, string wakeonlan = null)
+                public async Task<Result> SetOptions(string acme = null, IDictionary<int, string> acmedomainN = null, int? ballooning_target = null, string delete = null, string description = null, string digest = null, int? startall_onboot_delay = null, string wakeonlan = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("acme", acme);
+                    parameters.Add("ballooning-target", ballooning_target);
                     parameters.Add("delete", delete);
                     parameters.Add("description", description);
                     parameters.Add("digest", digest);
@@ -13171,7 +13273,7 @@ public class PveClient : PveClientBase
                 /// Creates a VNC Shell proxy.
                 /// </summary>
                 /// <param name="cmd">Run specific command or default to login (requires 'root@pam')
-                ///   Enum: upgrade,ceph_install,login</param>
+                ///   Enum: ceph_install,upgrade,login</param>
                 /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                 /// <param name="height">sets the height of the console in pixels.</param>
                 /// <param name="websocket">use websocket instead of standard vnc.</param>
@@ -13200,7 +13302,7 @@ public class PveClient : PveClientBase
                 /// Creates a VNC Shell proxy.
                 /// </summary>
                 /// <param name="cmd">Run specific command or default to login (requires 'root@pam')
-                ///   Enum: upgrade,ceph_install,login</param>
+                ///   Enum: ceph_install,upgrade,login</param>
                 /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                 /// <returns></returns>
                 public async Task<Result> Termproxy(string cmd = null, string cmd_opts = null)
@@ -13245,7 +13347,7 @@ public class PveClient : PveClientBase
                 /// Creates a SPICE shell.
                 /// </summary>
                 /// <param name="cmd">Run specific command or default to login (requires 'root@pam')
-                ///   Enum: upgrade,ceph_install,login</param>
+                ///   Enum: ceph_install,upgrade,login</param>
                 /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                 /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As reasonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                 /// <returns></returns>
@@ -13556,7 +13658,8 @@ public class PveClient : PveClientBase
             /// <param name="domain">CIFS domain.</param>
             /// <param name="encryption_key">Encryption key. Use 'autogen' to generate one automatically without passphrase.</param>
             /// <param name="fingerprint">Certificate SHA 256 fingerprint.</param>
-            /// <param name="format">Default image format.</param>
+            /// <param name="format">Default image format.
+            ///   Enum: raw,qcow2,subvol,vmdk</param>
             /// <param name="fs_name">The Ceph filesystem name.</param>
             /// <param name="fuse">Mount CephFS through FUSE.</param>
             /// <param name="is_mountpoint">Assume the given path is an externally managed mountpoint and consider the storage offline if it is not mounted. Using a boolean (yes/no) value serves as a shortcut to using the target path in this field.</param>
@@ -13686,7 +13789,8 @@ public class PveClient : PveClientBase
         /// <param name="encryption_key">Encryption key. Use 'autogen' to generate one automatically without passphrase.</param>
         /// <param name="export">NFS export path.</param>
         /// <param name="fingerprint">Certificate SHA 256 fingerprint.</param>
-        /// <param name="format">Default image format.</param>
+        /// <param name="format">Default image format.
+        ///   Enum: raw,qcow2,subvol,vmdk</param>
         /// <param name="fs_name">The Ceph filesystem name.</param>
         /// <param name="fuse">Mount CephFS through FUSE.</param>
         /// <param name="is_mountpoint">Assume the given path is an externally managed mountpoint and consider the storage offline if it is not mounted. Using a boolean (yes/no) value serves as a shortcut to using the target path in this field.</param>
@@ -14282,7 +14386,7 @@ public class PveClient : PveClientBase
                     /// <param name="enable_new">Enable newly synced users immediately.</param>
                     /// <param name="full">DEPRECATED: use 'remove-vanished' instead. If set, uses the LDAP Directory as source of truth, deleting users or groups not returned from the sync and removing all locally modified properties of synced users. If not set, only syncs information which is present in the synced data, and does not delete or modify anything else.</param>
                     /// <param name="purge">DEPRECATED: use 'remove-vanished' instead. Remove ACLs for users or groups which were removed from the config during a sync.</param>
-                    /// <param name="remove_vanished">A semicolon-seperated list of things to remove when they or the user vanishes during a sync. The following values are possible: 'entry' removes the user/group when not returned from the sync. 'properties' removes the set properties on existing user/group that do not appear in the source (even custom ones). 'acl' removes acls when the user/group is not returned from the sync. Instead of a list it also can be 'none' (the default).</param>
+                    /// <param name="remove_vanished">A semicolon-separated list of things to remove when they or the user vanishes during a sync. The following values are possible: 'entry' removes the user/group when not returned from the sync. 'properties' removes the set properties on existing user/group that do not appear in the source (even custom ones). 'acl' removes acls when the user/group is not returned from the sync. Instead of a list it also can be 'none' (the default).</param>
                     /// <param name="scope">Select what to sync.
                     ///   Enum: users,groups,both</param>
                     /// <returns></returns>
@@ -14332,12 +14436,16 @@ public class PveClient : PveClientBase
                 /// <param name="group_dn">LDAP base domain name for group sync. If not set, the base_dn will be used.</param>
                 /// <param name="group_filter">LDAP filter for group sync.</param>
                 /// <param name="group_name_attr">LDAP attribute representing a groups name. If not set or found, the first value of the DN will be used as name.</param>
+                /// <param name="groups_autocreate">Automatically create groups if they do not exist.</param>
+                /// <param name="groups_claim">OpenID claim used to retrieve groups with.</param>
+                /// <param name="groups_overwrite">All groups will be overwritten for the user on login.</param>
                 /// <param name="issuer_url">OpenID Issuer Url</param>
                 /// <param name="mode">LDAP protocol mode.
                 ///   Enum: ldap,ldaps,ldap+starttls</param>
                 /// <param name="password">LDAP bind password. Will be stored in '/etc/pve/priv/realm/&amp;lt;REALM&amp;gt;.pw'.</param>
                 /// <param name="port">Server port.</param>
                 /// <param name="prompt">Specifies whether the Authorization Server prompts the End-User for reauthentication and consent.</param>
+                /// <param name="query_userinfo">Enables querying the userinfo endpoint for claims values.</param>
                 /// <param name="scopes">Specifies the scopes (user details) that should be authorized and returned, for example 'email' or 'profile'.</param>
                 /// <param name="secure">Use secure LDAPS protocol. DEPRECATED: use 'mode' instead.</param>
                 /// <param name="server1">Server IP address (or DNS name)</param>
@@ -14351,7 +14459,7 @@ public class PveClient : PveClientBase
                 /// <param name="user_classes">The objectclasses for users.</param>
                 /// <param name="verify">Verify the server's SSL certificate</param>
                 /// <returns></returns>
-                public async Task<Result> Update(string acr_values = null, bool? autocreate = null, string base_dn = null, string bind_dn = null, string capath = null, bool? case_sensitive = null, string cert = null, string certkey = null, bool? check_connection = null, string client_id = null, string client_key = null, string comment = null, bool? default_ = null, string delete = null, string digest = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, string issuer_url = null, string mode = null, string password = null, int? port = null, string prompt = null, string scopes = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, bool? verify = null)
+                public async Task<Result> Update(string acr_values = null, bool? autocreate = null, string base_dn = null, string bind_dn = null, string capath = null, bool? case_sensitive = null, string cert = null, string certkey = null, bool? check_connection = null, string client_id = null, string client_key = null, string comment = null, bool? default_ = null, string delete = null, string digest = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, bool? groups_autocreate = null, string groups_claim = null, bool? groups_overwrite = null, string issuer_url = null, string mode = null, string password = null, int? port = null, string prompt = null, bool? query_userinfo = null, string scopes = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, bool? verify = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("acr-values", acr_values);
@@ -14375,11 +14483,15 @@ public class PveClient : PveClientBase
                     parameters.Add("group_dn", group_dn);
                     parameters.Add("group_filter", group_filter);
                     parameters.Add("group_name_attr", group_name_attr);
+                    parameters.Add("groups-autocreate", groups_autocreate);
+                    parameters.Add("groups-claim", groups_claim);
+                    parameters.Add("groups-overwrite", groups_overwrite);
                     parameters.Add("issuer-url", issuer_url);
                     parameters.Add("mode", mode);
                     parameters.Add("password", password);
                     parameters.Add("port", port);
                     parameters.Add("prompt", prompt);
+                    parameters.Add("query-userinfo", query_userinfo);
                     parameters.Add("scopes", scopes);
                     parameters.Add("secure", secure);
                     parameters.Add("server1", server1);
@@ -14424,12 +14536,16 @@ public class PveClient : PveClientBase
             /// <param name="group_dn">LDAP base domain name for group sync. If not set, the base_dn will be used.</param>
             /// <param name="group_filter">LDAP filter for group sync.</param>
             /// <param name="group_name_attr">LDAP attribute representing a groups name. If not set or found, the first value of the DN will be used as name.</param>
+            /// <param name="groups_autocreate">Automatically create groups if they do not exist.</param>
+            /// <param name="groups_claim">OpenID claim used to retrieve groups with.</param>
+            /// <param name="groups_overwrite">All groups will be overwritten for the user on login.</param>
             /// <param name="issuer_url">OpenID Issuer Url</param>
             /// <param name="mode">LDAP protocol mode.
             ///   Enum: ldap,ldaps,ldap+starttls</param>
             /// <param name="password">LDAP bind password. Will be stored in '/etc/pve/priv/realm/&amp;lt;REALM&amp;gt;.pw'.</param>
             /// <param name="port">Server port.</param>
             /// <param name="prompt">Specifies whether the Authorization Server prompts the End-User for reauthentication and consent.</param>
+            /// <param name="query_userinfo">Enables querying the userinfo endpoint for claims values.</param>
             /// <param name="scopes">Specifies the scopes (user details) that should be authorized and returned, for example 'email' or 'profile'.</param>
             /// <param name="secure">Use secure LDAPS protocol. DEPRECATED: use 'mode' instead.</param>
             /// <param name="server1">Server IP address (or DNS name)</param>
@@ -14444,7 +14560,7 @@ public class PveClient : PveClientBase
             /// <param name="username_claim">OpenID claim used to generate the unique username.</param>
             /// <param name="verify">Verify the server's SSL certificate</param>
             /// <returns></returns>
-            public async Task<Result> Create(string realm, string type, string acr_values = null, bool? autocreate = null, string base_dn = null, string bind_dn = null, string capath = null, bool? case_sensitive = null, string cert = null, string certkey = null, bool? check_connection = null, string client_id = null, string client_key = null, string comment = null, bool? default_ = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, string issuer_url = null, string mode = null, string password = null, int? port = null, string prompt = null, string scopes = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, string username_claim = null, bool? verify = null)
+            public async Task<Result> Create(string realm, string type, string acr_values = null, bool? autocreate = null, string base_dn = null, string bind_dn = null, string capath = null, bool? case_sensitive = null, string cert = null, string certkey = null, bool? check_connection = null, string client_id = null, string client_key = null, string comment = null, bool? default_ = null, string domain = null, string filter = null, string group_classes = null, string group_dn = null, string group_filter = null, string group_name_attr = null, bool? groups_autocreate = null, string groups_claim = null, bool? groups_overwrite = null, string issuer_url = null, string mode = null, string password = null, int? port = null, string prompt = null, bool? query_userinfo = null, string scopes = null, bool? secure = null, string server1 = null, string server2 = null, string sslversion = null, string sync_defaults_options = null, string sync_attributes = null, string tfa = null, string user_attr = null, string user_classes = null, string username_claim = null, bool? verify = null)
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("realm", realm);
@@ -14468,11 +14584,15 @@ public class PveClient : PveClientBase
                 parameters.Add("group_dn", group_dn);
                 parameters.Add("group_filter", group_filter);
                 parameters.Add("group_name_attr", group_name_attr);
+                parameters.Add("groups-autocreate", groups_autocreate);
+                parameters.Add("groups-claim", groups_claim);
+                parameters.Add("groups-overwrite", groups_overwrite);
                 parameters.Add("issuer-url", issuer_url);
                 parameters.Add("mode", mode);
                 parameters.Add("password", password);
                 parameters.Add("port", port);
                 parameters.Add("prompt", prompt);
+                parameters.Add("query-userinfo", query_userinfo);
                 parameters.Add("scopes", scopes);
                 parameters.Add("secure", secure);
                 parameters.Add("server1", server1);
@@ -14683,7 +14803,7 @@ public class PveClient : PveClientBase
             /// <param name="otp">One-time password for Two-factor authentication.</param>
             /// <param name="path">Verify ticket, and check if user have access 'privs' on 'path'</param>
             /// <param name="privs">Verify ticket, and check if user have access 'privs' on 'path'</param>
-            /// <param name="realm">You can optionally pass the realm using this parameter. Normally the realm is simply added to the username &amp;lt;username&amp;gt;@&amp;lt;relam&amp;gt;.</param>
+            /// <param name="realm">You can optionally pass the realm using this parameter. Normally the realm is simply added to the username &amp;lt;username&amp;gt;@&amp;lt;realm&amp;gt;.</param>
             /// <param name="tfa_challenge">The signed TFA challenge string the user wants to respond to.</param>
             /// <returns></returns>
             public async Task<Result> CreateTicket(string password, string username, bool? new_format = null, string otp = null, string path = null, string privs = null, string realm = null, string tfa_challenge = null)
