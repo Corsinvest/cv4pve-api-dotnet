@@ -392,7 +392,7 @@ range 100:107,-105,200:204
 
     private static T CreateObject<T>(string name, string description) where T : IdentifierSymbol
     {
-        var names = name.Split("|");
+        var names = name.Split('|');
         var obj = (T)Activator.CreateInstance(typeof(T), [names[0], description]);
         for (int i = 1; i < names.Length; i++) { obj.AddAlias(names[i]); }
         return obj;
@@ -413,6 +413,7 @@ range 100:107,-105,200:204
         return option;
     }
 
+#if !NETSTANDARD
     /// <summary>
     /// Add validator range
     /// </summary>
@@ -433,12 +434,94 @@ range 100:107,-105,200:204
 
         return option;
     }
-
+#else
     /// <summary>
-    /// Add validator exist file
+    /// Add validator range
     /// </summary>
     /// <param name="option"></param>
-    public static Option<string> AddValidatorExistFile(this Option<string> option)
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <returns></returns>
+    public static Option<int> AddValidatorRange(this Option<int> option, int min, int max)
+    {
+        option.AddValidator(e =>
+        {
+            var range = e.GetValueOrDefault<int>();
+            if (range < min || range > max)
+            {
+                e.ErrorMessage = $"Option {e.Token.Value} whit value '{range}' is not in range!";
+            }
+        });
+
+        return option;
+    }
+	/// <summary>
+	/// Add validator range
+	/// </summary>
+	/// <param name="option"></param>
+	/// <param name="min"></param>
+	/// <param name="max"></param>
+	/// <returns></returns>
+	public static Option<long> AddValidatorRange(this Option<long> option, long min, long max)
+	{
+		option.AddValidator(e =>
+		{
+			var range = e.GetValueOrDefault<int>();
+			if (range < min || range > max)
+			{
+				e.ErrorMessage = $"Option {e.Token.Value} whit value '{range}' is not in range!";
+			}
+		});
+
+		return option;
+	}
+	/// <summary>
+	/// Add validator range
+	/// </summary>
+	/// <param name="option"></param>
+	/// <param name="min"></param>
+	/// <param name="max"></param>
+	/// <returns></returns>
+	public static Option<short> AddValidatorRange(this Option<short> option, short min, short max)
+	{
+		option.AddValidator(e =>
+		{
+			var range = e.GetValueOrDefault<int>();
+			if (range < min || range > max)
+			{
+				e.ErrorMessage = $"Option {e.Token.Value} whit value '{range}' is not in range!";
+			}
+		});
+
+		return option;
+	}
+	/// <summary>
+	/// Add validator range
+	/// </summary>
+	/// <param name="option"></param>
+	/// <param name="min"></param>
+	/// <param name="max"></param>
+	/// <returns></returns>
+	public static Option<byte> AddValidatorRange(this Option<byte> option, byte min, byte max)
+	{
+		option.AddValidator(e =>
+		{
+			var range = e.GetValueOrDefault<int>();
+			if (range < min || range > max)
+			{
+				e.ErrorMessage = $"Option {e.Token.Value} whit value '{range}' is not in range!";
+			}
+		});
+
+		return option;
+	}
+
+#endif
+	/// <summary>
+	/// Add validator exist file
+	/// </summary>
+	/// <param name="option"></param>
+	public static Option<string> AddValidatorExistFile(this Option<string> option)
     {
         option.AddValidator(e =>
         {
