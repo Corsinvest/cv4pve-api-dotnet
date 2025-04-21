@@ -515,7 +515,46 @@ range 100:107,-105,200:204
 
 		return option;
 	}
+	/// <summary>
+	/// Add validator range
+	/// </summary>
+	/// <param name="option"></param>
+	/// <param name="min"></param>
+	/// <param name="max"></param>
+	/// <returns></returns>
+	public static Option<float> AddValidatorRange(this Option<float> option, float min, float max)
+	{
+		option.AddValidator(e =>
+		{
+			var range = e.GetValueOrDefault<int>();
+			if (range < min || range > max)
+			{
+				e.ErrorMessage = $"Option {e.Token.Value} whit value '{range}' is not in range!";
+			}
+		});
 
+		return option;
+	}
+	/// <summary>
+	/// Add validator range
+	/// </summary>
+	/// <param name="option"></param>
+	/// <param name="min"></param>
+	/// <param name="max"></param>
+	/// <returns></returns>
+	public static Option<double> AddValidatorRange(this Option<double> option, double min, double max)
+	{
+		option.AddValidator(e =>
+		{
+			var range = e.GetValueOrDefault<int>();
+			if (range < min || range > max)
+			{
+				e.ErrorMessage = $"Option {e.Token.Value} whit value '{range}' is not in range!";
+			}
+		});
+
+		return option;
+	}
 #endif
 	/// <summary>
 	/// Add validator exist file
