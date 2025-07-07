@@ -16,7 +16,7 @@ public class VmQemuAgentNetworkGetInterfaces : ModelBase
     /// Result
     /// </summary>
     [JsonProperty("result")]
-    public IEnumerable<ResultInt> Result { get; set; }
+    public IEnumerable<ResultInt> Result { get; set; } = [];
 
     /// <summary>
     /// IpAddress
@@ -113,7 +113,7 @@ public class VmQemuAgentNetworkGetInterfaces : ModelBase
         /// IpAddresses
         /// </summary>
         [JsonProperty("ip-addresses")]
-        public IEnumerable<Ip> IpAddresses { get; set; }
+        public IEnumerable<Ip> IpAddresses { get; set; } = [];
 
         /// <summary>
         /// Statistics

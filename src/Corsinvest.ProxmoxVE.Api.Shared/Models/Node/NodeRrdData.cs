@@ -19,7 +19,6 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// <summary>
     /// Net in
     /// </summary>
-    /// <value></value>
     [JsonProperty("netin")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long NetIn { get; set; }
@@ -27,7 +26,6 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// <summary>
     /// Net out
     /// </summary>
-    /// <value></value>
     [JsonProperty("netout")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long NetOut { get; set; }
@@ -35,7 +33,6 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// <summary>
     /// Cpu usage
     /// </summary>
-    /// <value></value>
     [Display(Name = "CPU Usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     [JsonProperty("cpu")]
@@ -44,21 +41,18 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// <summary>
     /// Cpu size
     /// </summary>
-    /// <value></value>
     [JsonProperty("maxcpu")]
     public long CpuSize { get; set; }
 
     /// <summary>
     /// Cpu info
     /// </summary>
-    /// <value></value>
     [Display(Name = "Cpu")]
     public string CpuInfo { get; set; }
 
     /// <summary>
     /// Time unix time
     /// </summary>
-    /// <value></value>
     [JsonProperty("time")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime )]
     long Time { get; set; }
@@ -71,21 +65,18 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// <summary>
     /// Load average
     /// </summary>
-    /// <value></value>
     [JsonProperty("loadavg")]
     public double Loadavg { get; set; }
 
     /// <summary>
     /// Io wait
     /// </summary>
-    /// <value></value>
     [JsonProperty("iowait")]
     public double IoWait { get; set; }
 
     /// <summary>
-    ///
+    /// Memory Size
     /// </summary>
-    /// <value></value>
     [JsonProperty("memtotal")]
     [Display(Name = "Max Memory")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
@@ -94,7 +85,6 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// <summary>
     /// Memory Used
     /// </summary>
-    /// <value></value>
     [JsonProperty("memused")]
     [Display(Name = "Memory")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
@@ -103,14 +93,12 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// <summary>
     /// Memory info
     /// </summary>
-    /// <value></value>
     [Display(Name = "Memory")]
     public string MemoryInfo { get; set; }
 
     /// <summary>
     /// Memory usage percentage
     /// </summary>
-    /// <value></value>
     [Display(Name = "Memory Usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     public double MemoryUsagePercentage { get; set; }
@@ -118,7 +106,6 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// <summary>
     /// Swap size
     /// </summary>
-    /// <value></value>
     [JsonProperty("swaptotal")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public ulong SwapSize { get; set; }
@@ -126,7 +113,6 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// <summary>
     /// Swap used
     /// </summary>
-    /// <value></value>
     [JsonProperty("swapused")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public double SwapUsage { get; set; }
@@ -134,7 +120,6 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// <summary>
     /// Root size
     /// </summary>
-    /// <value></value>
     [JsonProperty("roottotal")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public double RootSize { get; set; }
@@ -142,7 +127,6 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// <summary>
     /// Root used
     /// </summary>
-    /// <value></value>
     [JsonProperty("rootused")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public double RootUsage { get; set; }

@@ -282,7 +282,7 @@ range 100:107,-105,200:204
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public static Option<bool> VerboseOption(this Command command) => command.AddOption<bool>($"--verbose|-v", "Verbose.");
+    public static Option<bool> VerboseOption(this Command command) => command.AddOption<bool>("--verbose|-v", "Verbose.");
 
     /// <summary>
     /// Validate Certificate

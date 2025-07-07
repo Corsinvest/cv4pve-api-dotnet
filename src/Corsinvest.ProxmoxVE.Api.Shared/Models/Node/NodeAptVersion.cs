@@ -13,82 +13,74 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 public class NodeAptVersion : ModelBase
 {
     /// <summary>
-    /// Arch
-    /// </summary>
-    [JsonProperty("Arch")]
-    public string Arch { get; set; }
-
-    /// <summary>
-    /// Running kernel
-    /// </summary>
-    [JsonProperty("RunningKernel")]
-    public string RunningKernel { get; set; }
-
-    /// <summary>
-    /// Old version
-    /// </summary>
-    [JsonProperty("OldVersion")]
-    public string OldVersion { get; set; }
-
-    /// <summary>
-    /// Version
+    /// Package version
     /// </summary>
     [JsonProperty("Version")]
     public string Version { get; set; }
 
     /// <summary>
-    /// Change Log Url
+    /// Current package state
     /// </summary>
-    /// <value></value>
-    [JsonProperty("ChangeLogUrl")]
-    public string ChangeLogUrl { get; set; }
-
-    /// <summary>
-    /// Current State
-    /// </summary>
-    /// <value></value>
     [JsonProperty("CurrentState")]
     public string CurrentState { get; set; }
 
     /// <summary>
-    /// Priority
+    /// Package description
     /// </summary>
-    /// <value></value>
-    [JsonProperty("Priority")]
-    public string Priority { get; set; }
-
-    /// <summary>
-    /// Description
-    /// </summary>
-    /// <value></value>
     [JsonProperty("Description")]
     public string Description { get; set; }
 
     /// <summary>
-    /// Origin
+    /// Package priority
     /// </summary>
-    /// <value></value>
-    [JsonProperty("Origin")]
-    public string Origin { get; set; }
+    [JsonProperty("Priority")]
+    public string Priority { get; set; }
 
     /// <summary>
-    /// Package
+    /// Package name
     /// </summary>
-    /// <value></value>
     [JsonProperty("Package")]
     public string Package { get; set; }
 
     /// <summary>
-    /// Title
+    /// Package title
     /// </summary>
-    /// <value></value>
     [JsonProperty("Title")]
     public string Title { get; set; }
 
     /// <summary>
-    /// Section
+    /// Package section
     /// </summary>
-    /// <value></value>
     [JsonProperty("Section")]
     public string Section { get; set; }
+
+    /// <summary>
+    /// Package origin
+    /// </summary>
+    [JsonProperty("Origin")]
+    public string Origin { get; set; }
+
+    /// <summary>
+    /// Package architecture
+    /// </summary>
+    [JsonProperty("Arch")]
+    public string Arch { get; set; }
+
+    /// <summary>
+    /// Currently running kernel
+    /// </summary>
+    [JsonProperty("RunningKernel")]
+    public string RunningKernel { get; set; }
+
+    /// <summary>
+    /// Old package version
+    /// </summary>
+    [JsonProperty("OldVersion")]
+    public string OldVersion { get; set; }
+
+    /// <summary>
+    /// Manager version
+    /// </summary>
+    [JsonProperty("ManagerVersion")]
+    public string ManagerVersion { get; set; }
 }

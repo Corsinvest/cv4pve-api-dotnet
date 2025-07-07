@@ -109,7 +109,6 @@ public class NodeStorageContent : ModelBase
     [JsonProperty("protected")]
     public bool Protected { get; set; }
 
-
     /// <summary>
     /// Verified
     /// </summary>

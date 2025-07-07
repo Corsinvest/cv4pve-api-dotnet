@@ -29,7 +29,7 @@ public class VmQemuAgentInfo : ModelBase
         /// </summary>
         /// <value></value>
         [JsonProperty("supported_commands")]
-        public IEnumerable<SupportedCommand> SupportedCommands { get; set; }
+        public IEnumerable<SupportedCommand> SupportedCommands { get; set; } = [];
 
         /// <summary>
         /// Version

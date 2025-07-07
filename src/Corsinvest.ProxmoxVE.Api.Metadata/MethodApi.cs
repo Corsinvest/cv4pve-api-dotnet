@@ -33,7 +33,7 @@ public class MethodApi
             {
                 ReturnParameters.AddRange([.. returns["properties"].Select(a => new ParameterApi(a.Parent[((JProperty)a).Name]))]);
             }
-            else if (returns["items"] != null && returns["items"]["properties"] != null)
+            else if (returns["items"]?["properties"] != null)
             {
                 ReturnParameters.AddRange([.. returns["items"]["properties"].Select(a => new ParameterApi(a.Parent[((JProperty)a).Name]))]);
             }
@@ -45,7 +45,7 @@ public class MethodApi
             }
         }
 
-        if (token["parameters"] != null && token["parameters"]["properties"] != null)
+        if (token["parameters"]?["properties"] != null)
         {
             Parameters.AddRange([.. token["parameters"]["properties"].Select(a => new ParameterApi(a.Parent[((JProperty)a).Name]))]);
         }
@@ -88,23 +88,22 @@ public class MethodApi
     /// Is Get
     /// </summary>
     /// <returns></returns>
-    public bool IsGet => MethodType.ToLower() == "get";
+    public bool IsGet => string.Equals(MethodType, "get", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Is Post
     /// </summary>
     /// <returns></returns>
-    public bool IsPost => MethodType.ToLower() == "post";
+    public bool IsPost => string.Equals(MethodType, "post", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Is Post
     /// </summary>
     /// <returns></returns>
-    public bool IsPut => MethodType.ToLower() == "put";
-
+    public bool IsPut => string.Equals(MethodType, "put", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
-    ///
+    /// Get Method Type Humanized
     /// </summary>
     /// <returns></returns>
     public string GetMethodTypeHumanized()
@@ -121,29 +120,26 @@ public class MethodApi
     /// <summary>
     /// Return type
     /// </summary>
-    /// <value></value>
     public string ReturnType { get; }
 
     /// <summary>
-    ///
+    /// Return Is Array
     /// </summary>
     public bool ReturnIsArray { get; }
 
     /// <summary>
-    ///
+    /// Return Is Null
     /// </summary>
     public bool ReturnIsNull { get; }
 
     /// <summary>
     /// Method name
     /// </summary>
-    /// <value></value>
     public string MethodName { get; }
 
     /// <summary>
     /// Comment
     /// </summary>
-    /// <value></value>
     public string Comment { get; }
 
     /// <summary>

@@ -22,7 +22,7 @@ public class ClusterConfigJoin : ModelBase
     /// Nodes
     /// </summary>
     [JsonProperty("nodelist")]
-    public IEnumerable<Node> Nodes { get; set; }
+    public IEnumerable<Node> Nodes { get; set; } = [];
 
     /// <summary>
     /// Preferred Node

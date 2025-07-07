@@ -65,10 +65,8 @@ if (await client.LoginAsync("root", Environment.GetEnvironmentVariable("PvePassw
 //     //httpClient.DefaultRequestHeaders.ExpectContinue = true;
 //     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("multipart/form-data"));
 
-
 //     var message = await httpClient.PostAsync($"{client.GetApiUrl()}/nodes/cv-pve01/storage/local/upload", mpfdContent);
 //     message.EnsureSuccessStatusCode();
-
 
 //     var result = await client.UploadFileToStorage("cv-pve01",
 //                                                     "local",

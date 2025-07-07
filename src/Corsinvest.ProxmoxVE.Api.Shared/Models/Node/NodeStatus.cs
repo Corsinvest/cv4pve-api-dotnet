@@ -67,7 +67,7 @@ public class NodeStatus : ModelBase
     /// Load average
     /// </summary>
     [JsonProperty("loadavg")]
-    public IEnumerable<string> LoadAvg { get; set; }
+    public IEnumerable<string> LoadAvg { get; set; } = [];
 
     /// <summary>
     /// Root fs

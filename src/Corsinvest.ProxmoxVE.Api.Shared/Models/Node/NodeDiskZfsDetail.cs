@@ -38,7 +38,7 @@ public class NodeDiskZfsDetail
     /// </summary>
     /// <value></value>
     [JsonProperty("children")]
-    public IEnumerable<Child> Children { get; set; }
+    public IEnumerable<Child> Children { get; set; } = [];
 
     /// <summary>
     /// Action
@@ -127,6 +127,6 @@ public class NodeDiskZfsDetail
         /// Children
         /// </summary>
         [JsonProperty("children")]
-        public IEnumerable<Child> Children { get; set; }
+        public IEnumerable<Child> Children { get; set; } = [];
     }
 }

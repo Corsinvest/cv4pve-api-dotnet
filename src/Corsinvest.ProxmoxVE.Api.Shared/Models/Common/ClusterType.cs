@@ -1,20 +1,22 @@
-﻿/*
+/*
  * SPDX-FileCopyrightText: Copyright Corsinvest Srl
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using Newtonsoft.Json;
-
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
 
 /// <summary>
-/// Interface status
+/// Cluster type
 /// </summary>
-public interface IStatusItem
+public enum ClusterType
 {
     /// <summary>
-    /// Status
+    /// Single node cluster
     /// </summary>
-    [JsonProperty("status")]
-    string Status { get; set; }
+    SingleNode = 0,
+
+    /// <summary>
+    /// Cluster
+    /// </summary>
+    Cluster = 1,
 }

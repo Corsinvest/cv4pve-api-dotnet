@@ -3,16 +3,17 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
+using System.ComponentModel;
+using System.Dynamic;
+using System.Net.Http.Headers;
 using Corsinvest.ProxmoxVE.Api.Extension.Utils;
 using Corsinvest.ProxmoxVE.Api.Shared;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using Newtonsoft.Json;
-using System.ComponentModel;
-using System.Dynamic;
-using System.Net.Http.Headers;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension;
 
@@ -159,13 +160,13 @@ public static class ClientExtension
                 //all in specific node
                 var idx = id.StartsWith("all-") ? 4 : 5;
                 var nodeName = id[idx..];
-                data = allVms.Where(a => a.Node == nodeName || a.Node.ToLower() == nodeName.ToLower());
+                data = allVms.Where(a => a.Node == nodeName || string.Equals(a.Node, nodeName, StringComparison.OrdinalIgnoreCase));
             }
             else if (id.StartsWith("@node-"))
             {
                 //all in specific node
                 var nodeName = id[6..];
-                data = allVms.Where(a => a.Node == nodeName || a.Node.ToLower() == nodeName.ToLower());
+                data = allVms.Where(a => a.Node == nodeName || string.Equals(a.Node, nodeName, StringComparison.OrdinalIgnoreCase));
             }
             else if (id.StartsWith("@pool-"))
             {
@@ -173,7 +174,7 @@ public static class ClientExtension
                 var name = id[6..];
                 var poolName = (await client.Pools.GetAsync())
                                     .Select(a => a.Id)
-                                    .FirstOrDefault(a => a == name || a.ToLower() == name.ToLower());
+                                    .FirstOrDefault(a => a == name || string.Equals(a, name, StringComparison.OrdinalIgnoreCase));
 
                 if (!string.IsNullOrEmpty(poolName))
                 {
@@ -279,6 +280,24 @@ public static class ClientExtension
         };
 
     /// <summary>
+    /// Unlock vm
+    /// </summary>
+    /// <param name="client"></param>
+    /// <param name="node"></param>
+    /// <param name="vmId"></param>
+    /// <param name="vmType"></param>
+    /// <returns></returns>
+    public static async Task VmUnlockAsync(this PveClient client, string node, VmType vmType, long vmId)
+    {
+        switch (vmType)
+        {
+            case VmType.Qemu: await client.Nodes[node].Qemu[vmId].Config.UpdateVm(delete: "lock", skiplock: true); break;
+            case VmType.Lxc: await client.Nodes[node].Lxc[vmId].Config.UpdateVm(delete: "lock"); break;
+            default: throw new InvalidEnumArgumentException();
+        }
+    }
+
+    /// <summary>
     /// Get Vm RrdData
     /// </summary>
     /// <param name="client"></param>
@@ -304,7 +323,7 @@ public static class ClientExtension
     #endregion
 
     /// <summary>
-    ///
+    /// Get Vm Ids
     /// </summary>
     /// <param name="client"></param>
     /// <param name="addAll"></param>
@@ -348,7 +367,7 @@ public static class ClientExtension
 
         if (addTags)
         {
-            var tags = (await client.Cluster.Options.GetAsync()).AllowedTags ?? new List<string>();
+            var tags = (await client.Cluster.Options.GetAsync()).AllowedTags ?? [];
             vmIds.AddRange(tags.Select(a => $"@tag-{a}"));
         }
 
@@ -417,16 +436,74 @@ public static class ClientExtension
         httpClient.Timeout = TimeSpan.FromSeconds(secondsTimeout);
 
         var resource = $"/nodes/{node}/storage/{storage}/upload";
-        var response = await httpClient.PostAsync(client.GetApiUrl() + resource, mpfdContent, cancellationToken);
+        var request = client.CreateHttpRequestMessage(HttpMethod.Post, client.GetApiUrl() + resource);
+        request.Content = mpfdContent;
+
+        var response = await httpClient.SendAsync(request, cancellationToken);
         var result = new Result(JsonConvert.DeserializeObject<ExpandoObject>(await response.Content.ReadAsStringAsync()),
-                                 response.StatusCode,
-                                 response.ReasonPhrase,
-                                 response.IsSuccessStatusCode,
-                                 resource,
-                                 parameters,
-                                 MethodType.Create,
-                                 ResponseType.Json);
+                                response.StatusCode,
+                                response.ReasonPhrase,
+                                response.IsSuccessStatusCode,
+                                resource,
+                                parameters,
+                                MethodType.Create,
+                                ResponseType.Json);
 
         return result;
+    }
+
+    /// <summary>
+    /// Get default web console type
+    /// </summary>
+    /// <param name="client"></param>
+    /// <returns></returns>
+    public static async Task<WebConsoleType> GetDefaultWebConsoleAsync(this PveClient client)
+        => (await client.Cluster.Options.GetAsync()).Console switch
+        {
+            "vv" => WebConsoleType.Spice,
+            "html5" => WebConsoleType.NoVnc,
+            "xtermjs" => WebConsoleType.XtermJs,
+            _ => WebConsoleType.XtermJs
+        };
+
+    /// <summary>
+    /// Get disk smart info
+    /// </summary>
+    /// <param name="client"></param>
+    /// <param name="node"></param>
+    /// <param name="devPath"></param>
+    /// <returns></returns>
+    public static async Task<NodeDiskSmart> GetDiskSmart(this PveClient client, string node, string devPath)
+    {
+        try
+        {
+            return await client.Nodes[node].Disks.Smart.GetAsync(devPath);
+        }
+        catch (Exception ex)
+        {
+            return new()
+            {
+                Attributes = [new() { Id = "0", Name = "Error", Raw = ex.Message, Value = -1 }]
+            };
+        }
+    }
+
+    /// <summary>
+    /// Get cluster info
+    /// </summary>
+    /// <param name="client"></param>
+    /// <returns></returns>
+    public static async Task<(ClusterType Type, string Name)> GetClusterInfoAsync(this PveClient client)
+    {
+        var status = await client.Cluster.Status.GetAsync();
+        var clusterName = status.FirstOrDefault(a => a.Type == PveConstants.KeyApiCluster)?.Name;
+        var type = string.IsNullOrEmpty(clusterName)
+                        ? ClusterType.SingleNode
+                        : ClusterType.Cluster;
+
+        var name = string.IsNullOrEmpty(clusterName)
+                        ? status.FirstOrDefault()!.Name
+                        : clusterName;
+        return (type, name);
     }
 }

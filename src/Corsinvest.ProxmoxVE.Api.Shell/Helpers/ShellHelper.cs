@@ -13,7 +13,6 @@ namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers;
 /// </summary>
 public static class ShellHelper
 {
-
     /// <summary>
     /// Execute shell command
     /// </summary>

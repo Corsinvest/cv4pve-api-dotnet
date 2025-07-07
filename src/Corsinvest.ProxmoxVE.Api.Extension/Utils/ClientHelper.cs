@@ -3,135 +3,313 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
+using System.Net.Sockets;
 using Corsinvest.ProxmoxVE.Api.Shared;
 using Microsoft.Extensions.Logging;
-using System.Net.Sockets;
 
-namespace Corsinvest.ProxmoxVE.Api.Extension.Utils;
-
-/// <summary>
-/// Client helper
-/// </summary>
-public static class ClientHelper
+namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
 {
     /// <summary>
-    /// Get Client and try login
+    /// Client helper with improved error handling and async operations
     /// </summary>
-    /// <param name="hostsAndPortHA"></param>
-    /// <param name="username"></param>
-    /// <param name="password"></param>
-    /// <param name="apiToken"></param>
-    /// <param name="validateCertificate"></param>
-    /// <param name="loggerFactory"></param>
-    /// <param name="timeout"></param>
-    /// <returns></returns>
-    /// <exception cref="PveException"></exception>
-    public static async Task<PveClient> GetClientAndTryLoginAsync(string hostsAndPortHA,
-                                                                  string username,
-                                                                  string password,
-                                                                  string apiToken,
-                                                                  bool validateCertificate,
-                                                                  ILoggerFactory loggerFactory,
-                                                                  int timeout = 4000)
+    public static class ClientHelper
     {
-        var client = GetClientFromHA(hostsAndPortHA, timeout);
-        if (client != null)
+        private const int DEFAULT_PORT = 8006;
+        private const int DEFAULT_TIMEOUT = 4000;
+
+        /// <summary>
+        /// Represents a host and port combination
+        /// </summary>
+        public class HostEndpoint(string host, int port)
         {
-            client.ValidateCertificate = validateCertificate;
-            client.LoggerFactory = loggerFactory;
+            /// <summary>
+            /// Host
+            /// </summary>
+            public string Host { get; } = host;
 
-            bool login;
-            if (!string.IsNullOrEmpty(apiToken))
-            {
-                client.ApiToken = apiToken;
-                login = (await client.Version.Version()).IsSuccessStatusCode;
-            }
-            else
-            {
-                login = await client.LoginAsync(username, password);
-            }
-
-            return login
-                    ? client
-                    : throw new PveException(client.LastResult.ReasonPhrase);
+            /// <summary>
+            /// Port
+            /// </summary>
+            public int Port { get; } = port;
         }
 
-        throw new PveException("ClientHelper.GetClient error!");
-    }
 
-    /// <summary>
-    /// Host and port for HA
-    /// Format 10.1.1.90:8006,10.1.1.91:8006,10.1.1.92:8006
-    /// </summary>
-    /// <param name="hostsAndPortHA"></param>
-    /// <param name="timeout"></param>
-    public static PveClient GetClientFromHA(string hostsAndPortHA, int timeout = 4000)
-        => TryHostAndPort(hostsAndPortHA, 8006, true, timeout, out var host, out var port)
-                ? new PveClient(host, port)
-                : null;
-
-    /// <summary>
-    /// Try host and port. Format 10.1.1.90:8006,10.1.1.91:8006,10.1.1.92:8006
-    /// </summary>
-    /// <param name="hostsAndPorts"></param>
-    /// <param name="defaultPort"></param>
-    /// <param name="checkPort"></param>
-    /// <param name="timeout"></param>
-    /// <param name="host"></param>
-    /// <param name="port"></param>
-    /// <returns></returns>
-    /// <exception cref="PveException"></exception>
-    public static bool TryHostAndPort(string hostsAndPorts,
-                                      int defaultPort,
-                                      bool checkPort,
-                                      int timeout,
-                                      out string host,
-                                      out int port)
-    {
-        var errors = new List<string>();
-
-        var found = true;
-        string hostTest = "";
-        int portTest = defaultPort;
-        foreach (var hostAndPort in hostsAndPorts.Split(','))
+        /// <summary>
+        /// Get Client and try login with improved error handling (simplified version without factory)
+        /// </summary>
+        /// <param name="hostsAndPortHA">Comma-separated list of hosts (e.g., "10.1.1.90:8006,10.1.1.91:8006")</param>
+        /// <param name="username">Username for authentication</param>
+        /// <param name="password">Password for authentication</param>
+        /// <param name="apiToken">API token for authentication (alternative to username/password)</param>
+        /// <param name="validateCertificate">Whether to validate SSL certificates</param>
+        /// <param name="loggerFactory">Logger factory for logging</param>
+        /// <param name="timeout">Connection timeout in milliseconds</param>
+        /// <param name="httpClient">Optional HTTP client</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Authenticated PveClient</returns>
+        /// <exception cref="PveException">Thrown when no hosts are reachable or authentication fails</exception>
+        public static async Task<PveClient> GetClientAndTryLoginAsync(string hostsAndPortHA,
+                                                                      string username = null,
+                                                                      string password = null,
+                                                                      string apiToken = null,
+                                                                      bool validateCertificate = true,
+                                                                      ILoggerFactory loggerFactory = null,
+                                                                      int timeout = DEFAULT_TIMEOUT,
+                                                                      HttpClient httpClient = null,
+                                                                      CancellationToken cancellationToken = default(CancellationToken))
         {
-            var data = hostAndPort.Split(':');
-            hostTest = data[0];
-            portTest = defaultPort;
-            if (data.Length == 2) { int.TryParse(data[1], out portTest); }
+            if (string.IsNullOrWhiteSpace(hostsAndPortHA)) { throw new ArgumentException("Hosts and ports cannot be null or empty", nameof(hostsAndPortHA)); }
 
-            if (!checkPort) { break; }
+            var (client, endpoint) = await GetClientFromHAAsync(hostsAndPortHA, timeout, httpClient, cancellationToken);
 
-            found = false;
-            //open connection tcp ip to test port exists
-            using var tcpClient = new TcpClient();
-            var task = tcpClient.ConnectAsync(hostTest, portTest);
-            if (task.Wait(timeout))
+            if (client == null) { throw new PveException("No reachable hosts found in the provided list"); }
+
+            try
             {
-                //if fails within timeout, task.Wait still returns true.
-                if (tcpClient.Connected)
+                client.ValidateCertificate = validateCertificate;
+                client.LoggerFactory = loggerFactory;
+
+                if (!await AuthenticateAsync(client, username, password, apiToken))
                 {
-                    found = true;
-                    break;
+                    var errorMessage = client.LastResult?.ReasonPhrase ?? "Authentication failed";
+                    throw new PveException($"Authentication failed for host {endpoint}: {errorMessage}");
+                }
+
+                loggerFactory?.CreateLogger<PveClient>()?.LogInformation("Successfully connected to Proxmox VE at {0}", endpoint);
+                return client;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Get Client and try login with factory for advanced scenarios
+        /// </summary>
+        /// <typeparam name="T">Type derived from PveClient</typeparam>
+        /// <param name="hostsAndPortHA">Comma-separated list of hosts</param>
+        /// <param name="clientFactory">Factory function to create client instance</param>
+        /// <param name="username">Username for authentication</param>
+        /// <param name="password">Password for authentication</param>
+        /// <param name="apiToken">API token for authentication</param>
+        /// <param name="validateCertificate">Whether to validate SSL certificates</param>
+        /// <param name="loggerFactory">Logger factory for logging</param>
+        /// <param name="timeout">Connection timeout in milliseconds</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Authenticated client of type T</returns>
+        public static async Task<T> GetClientAndTryLoginAsync<T>(string hostsAndPortHA,
+                                                                 Func<string, int, T> clientFactory,
+                                                                 string username = null,
+                                                                 string password = null,
+                                                                 string apiToken = null,
+                                                                 bool validateCertificate = true,
+                                                                 ILoggerFactory loggerFactory = null,
+                                                                 int timeout = DEFAULT_TIMEOUT,
+                                                                 CancellationToken cancellationToken = default(CancellationToken))
+            where T : PveClient
+        {
+            if (string.IsNullOrWhiteSpace(hostsAndPortHA)) { throw new ArgumentException("Hosts and ports cannot be null or empty", nameof(hostsAndPortHA)); }
+
+            var (client, endpoint) = await GetClientFromHAAsync(hostsAndPortHA, clientFactory, timeout, cancellationToken);
+
+            if (client == null) { throw new PveException("No reachable hosts found in the provided list"); }
+
+            try
+            {
+                client.ValidateCertificate = validateCertificate;
+                client.LoggerFactory = loggerFactory;
+
+                if (!await AuthenticateAsync(client, username, password, apiToken))
+                {
+                    var errorMessage = client.LastResult?.ReasonPhrase ?? "Authentication failed";
+                    throw new PveException($"Authentication failed for host {endpoint}: {errorMessage}");
+                }
+
+                loggerFactory?.CreateLogger<T>()?.LogInformation("Successfully connected to Proxmox VE at {0}", endpoint);
+                return client;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Get client from HA list with async connectivity check (generic version)
+        /// </summary>
+        /// <typeparam name="T">Type derived from PveClient</typeparam>
+        /// <param name="hostsAndPortHA">Comma-separated list of hosts</param>
+        /// <param name="clientFactory">Factory function to create client instance</param>
+        /// <param name="timeout">Connection timeout in milliseconds</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Named tuple of client and endpoint, or (null, null) if no hosts are reachable</returns>
+        public static async Task<(T client, HostEndpoint endpoint)> GetClientFromHAAsync<T>(string hostsAndPortHA,
+                                                                                            Func<string, int, T> clientFactory,
+                                                                                            int timeout = DEFAULT_TIMEOUT,
+                                                                                            CancellationToken cancellationToken = default(CancellationToken))
+            where T : PveClient
+        {
+            var endpoints = ParseHostEndpoints(hostsAndPortHA);
+            var reachableEndpoint = await FindFirstReachableHostAsync(endpoints, timeout, cancellationToken);
+
+            return reachableEndpoint != null
+                ? (clientFactory(reachableEndpoint.Host, reachableEndpoint.Port), reachableEndpoint)
+                : (null, null);
+        }
+
+        /// <summary>
+        /// Get client from HA list with async connectivity check (non-generic overload for backward compatibility)
+        /// </summary>
+        /// <param name="hostsAndPortHA">Comma-separated list of hosts</param>
+        /// <param name="timeout">Connection timeout in milliseconds</param>
+        /// <param name="httpClient">Optional HTTP client</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Named tuple of client and endpoint, or (null, null) if no hosts are reachable</returns>
+        public static async Task<(PveClient client, HostEndpoint endpoint)> GetClientFromHAAsync(string hostsAndPortHA,
+                                                                                                 int timeout = DEFAULT_TIMEOUT,
+                                                                                                 HttpClient httpClient = null,
+                                                                                                 CancellationToken cancellationToken = default(CancellationToken))
+            => await GetClientFromHAAsync(hostsAndPortHA,
+                                          (host, port) => new PveClient(host, port, httpClient),
+                                          timeout,
+                                          cancellationToken);
+
+        /// <summary>
+        /// Parse host endpoints from string
+        /// </summary>
+        /// <param name="hostsAndPorts">Comma-separated host:port pairs</param>
+        /// <returns>List of parsed endpoints</returns>
+        public static List<HostEndpoint> ParseHostEndpoints(string hostsAndPorts)
+        {
+            if (string.IsNullOrWhiteSpace(hostsAndPorts)) { return []; }
+
+            var endpoints = new List<HostEndpoint>();
+
+            foreach (var hostAndPort in hostsAndPorts.Split(','))
+            {
+                var trimmed = hostAndPort.Trim();
+                if (string.IsNullOrEmpty(trimmed)) { continue; }
+
+                var parts = trimmed.Split(':');
+                var host = parts[0].Trim();
+
+                if (string.IsNullOrEmpty(host)) { continue; }
+
+                var port = DEFAULT_PORT;
+                if (parts.Length > 1 && int.TryParse(parts[1].Trim(), out int parsedPort))
+                {
+                    port = parsedPort;
+                }
+
+                endpoints.Add(new HostEndpoint(host, port));
+            }
+
+            return endpoints;
+        }
+
+        /// <summary>
+        /// Find first reachable host from the list
+        /// </summary>
+        /// <param name="endpoints">List of endpoints to test</param>
+        /// <param name="timeout">Connection timeout in milliseconds</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>First reachable endpoint or null</returns>
+        public static async Task<HostEndpoint> FindFirstReachableHostAsync(IEnumerable<HostEndpoint> endpoints,
+                                                                           int timeout = DEFAULT_TIMEOUT,
+                                                                           CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var errors = new List<string>();
+
+            foreach (var endpoint in endpoints)
+            {
+                try
+                {
+                    if (await IsHostReachableAsync(endpoint, timeout, cancellationToken)) { return endpoint; }
+                    errors.Add($"Host {endpoint} is not reachable");
+                }
+                catch (Exception ex)
+                {
+                    errors.Add($"Error testing host {endpoint}: {ex.Message}");
+                }
+            }
+
+            if (errors.Any())
+            {
+                throw new PveException($"No reachable hosts found. Errors: {string.Join("; ", errors)}");
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Test if a host is reachable
+        /// </summary>
+        /// <param name="endpoint">Endpoint to test</param>
+        /// <param name="timeout">Connection timeout in milliseconds</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>True if host is reachable</returns>
+        public static async Task<bool> IsHostReachableAsync(HostEndpoint endpoint,
+                                                            int timeout = DEFAULT_TIMEOUT,
+                                                            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                using var tcpClient = new TcpClient();
+#if NET7_0_OR_GREATER
+                // .NET 7+ supports CancellationToken in ConnectAsync
+                using (var timeoutCts = new CancellationTokenSource(timeout))
+                using (var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token))
+                {
+                    await tcpClient.ConnectAsync(endpoint.Host, endpoint.Port).ConfigureAwait(false);
+                    return tcpClient.Connected;
+                }
+#else
+                // .NET Standard 2.0 and older versions don't support CancellationToken in ConnectAsync
+                var connectTask = tcpClient.ConnectAsync(endpoint.Host, endpoint.Port);
+                var completedTask = await Task.WhenAny(connectTask, Task.Delay(timeout, cancellationToken));
+
+                if (completedTask == connectTask)
+                {
+                    await connectTask; // Await to get any exceptions
+                    return tcpClient.Connected;
                 }
                 else
                 {
-                    // connection refused probably
-                    errors.Add($"Problem connection host {hostTest} with port {portTest}");
+                    return false; // Timeout
                 }
+#endif
             }
-            else
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
-                // timed out
-                errors.Add($"Timeout connection host {hostTest} with port {portTest}");
+                throw; // Rethrow if it's the user's cancellation token
+            }
+            catch
+            {
+                return false; // Timeout or connection refused
             }
         }
 
-        if (!found && errors.Count != 0) { throw new PveException(string.Join(Environment.NewLine, errors)); }
+        /// <summary>
+        /// Authenticate with the Proxmox VE API
+        /// </summary>
+        /// <param name="client">PVE client</param>
+        /// <param name="username">Username</param>
+        /// <param name="password">Password</param>
+        /// <param name="apiToken">API token</param>
+        /// <returns>True if authentication successful</returns>
+        private static async Task<bool> AuthenticateAsync(PveClient client, string username, string password, string apiToken)
+        {
+            if (!string.IsNullOrEmpty(apiToken))
+            {
+                client.ApiToken = apiToken;
+                var versionResult = await client.Version.Version();
+                return versionResult.IsSuccessStatusCode;
+            }
 
-        host = hostTest;
-        port = portTest;
+            if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password)) { return await client.LoginAsync(username, password); }
 
-        return found;
+            throw new ArgumentException("Either API token or username/password must be provided");
+        }
     }
 }

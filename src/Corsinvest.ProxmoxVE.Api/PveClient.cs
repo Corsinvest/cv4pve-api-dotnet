@@ -21,8 +21,10 @@ public class PveClient : PveClientBase
     /// </summary>
     /// <param name="host"></param>
     /// <param name="port"></param>
+    /// <param name="httpClient"></param>
     /// <returns></returns>
-    public PveClient(string host, int port = 8006) : base(host, port) => _client = this;
+    public PveClient(string host, int port = 8006, HttpClient? httpClient = null) : base(host, port, httpClient)
+        => _client = this;
 
     private PveCluster _cluster;
     /// <summary>

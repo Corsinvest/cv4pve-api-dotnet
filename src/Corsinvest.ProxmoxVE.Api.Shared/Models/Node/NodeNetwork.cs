@@ -73,7 +73,7 @@ public class NodeNetwork : ModelBase
     /// </summary>
     /// <value></value>
     [JsonProperty("families")]
-    public IEnumerable<string> Families { get; set; }
+    public IEnumerable<string> Families { get; set; } = [];
 
     /// <summary>
     /// Interface

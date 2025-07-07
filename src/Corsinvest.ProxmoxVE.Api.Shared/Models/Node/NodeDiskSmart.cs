@@ -34,7 +34,7 @@ public class NodeDiskSmart : ModelBase
     /// Attributes
     /// </summary>
     [JsonProperty("attributes")]
-    public IEnumerable<NodeDiskSmartAttribute> Attributes { get; set; }
+    public IEnumerable<NodeDiskSmartAttribute> Attributes { get; set; } = [];
 
     /// <summary>
     /// Node disk smart attributes

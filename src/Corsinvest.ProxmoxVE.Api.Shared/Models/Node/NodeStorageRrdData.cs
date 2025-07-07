@@ -34,4 +34,9 @@ public class NodeStorageRrdData : ModelBase
     [JsonProperty("total")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long Size { get; set; }
+
+    /// <summary>
+    /// Time
+    /// </summary>
+    public DateTime TimeDate => DateTimeOffset.FromUnixTimeSeconds(Time).DateTime;
 }

@@ -38,7 +38,7 @@ public class ParameterApi
         {
             Items.AddRange([.. token["properties"].Select(a => new ParameterApi(a.Parent[((JProperty)a).Name]))]);
         }
-        else if (token["items"] != null && token["items"]["properties"] != null)
+        else if (token["items"]?["properties"] != null)
         {
             Items.AddRange([.. token["items"]["properties"].Select(a => new ParameterApi(a.Parent[((JProperty)a).Name]))]);
         }

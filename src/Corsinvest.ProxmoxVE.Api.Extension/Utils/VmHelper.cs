@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
+using System.ComponentModel;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
-using System.ComponentModel;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Utils;
 
@@ -29,13 +29,13 @@ public static class VmHelper
     /// <param name="parameters"></param>
     /// <returns></returns>
     public static async Task<HttpResponseMessage> GetConsoleNoVncAsync(PveClient client,
-                                                                    string node,
-                                                                    long vmId,
-                                                                    string vmName,
-                                                                    VmType vmType,
-                                                                    bool noVnc,
-                                                                    bool xtermJs,
-                                                                    string parameters = null)
+                                                                       string node,
+                                                                       long vmId,
+                                                                       string vmName,
+                                                                       VmType vmType,
+                                                                       bool noVnc,
+                                                                       bool xtermJs,
+                                                                       string parameters = null)
         => await GetConsoleNoVncAsync(client,
                                       node,
                                       vmId,
@@ -66,16 +66,19 @@ public static class VmHelper
                                                                        bool xtermJs,
                                                                        string parameters = null)
     {
-        using var httpClient = client.GetHttpClient();
-        return await httpClient.GetAsync(NoVncHelper.GetConsoleUrl(client.Host,
-                                                                   client.Port,
-                                                                   console,
-                                                                   node,
-                                                                   vmId,
-                                                                   vmName,
-                                                                   noVnc,
-                                                                   xtermJs,
-                                                                   parameters));
+        var url = NoVncHelper.GetConsoleUrl(client.Host,
+                                            client.Port,
+                                            console,
+                                            node,
+                                            vmId,
+                                            vmName,
+                                            noVnc,
+                                            xtermJs,
+                                            parameters);
+
+        var httpClient = client.GetHttpClient();
+        var request = client.CreateHttpRequestMessage(HttpMethod.Get, url);
+        return await httpClient.SendAsync(request);
     }
     #endregion
 
@@ -106,7 +109,7 @@ public static class VmHelper
             //string check name
             var name = data.Name.ToLower();
             var vmIdOrNameLower = vmIdOrName.Replace("%", "").ToLower();
-            if (vmIdOrName.Contains("%"))
+            if (vmIdOrName.Contains('%'))
             {
                 if (vmIdOrName.StartsWith("%") && vmIdOrName.EndsWith("%")) { return name.Contains(vmIdOrNameLower); }
                 else if (vmIdOrName.StartsWith("%")) { return name.StartsWith(vmIdOrNameLower); }

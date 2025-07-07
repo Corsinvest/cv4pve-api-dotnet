@@ -194,7 +194,7 @@ public class VmQemuStatusCurrent : VmBaseStatusCurrent
         /// Timed Stats
         /// </summary>
         [JsonProperty("timed_stats")]
-        public IEnumerable<object> TimedStats { get; set; }
+        public IEnumerable<object> TimedStats { get; set; } = [];
 
         /// <summary>
         /// Invalid Flush Operations
@@ -328,5 +328,4 @@ public class VmQemuStatusCurrent : VmBaseStatusCurrent
         [JsonProperty("pbs-library-version")]
         public string PbsLibraryVersion { get; set; }
     }
-
 }

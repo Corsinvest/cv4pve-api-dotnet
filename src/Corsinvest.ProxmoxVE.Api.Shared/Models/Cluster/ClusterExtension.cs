@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
+using System.ComponentModel;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
-using System.ComponentModel;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 
@@ -22,31 +22,21 @@ public static class ClusterExtension
     public static IEnumerable<TResource> CalculateHostUsage<TResource>(this IEnumerable<TResource> items)
         where TResource : ClusterResource
     {
-        foreach (var item in items.Where(a => a.ResourceType == ClusterResourceType.Vm))
+        foreach (var node in items.Where(a => a.ResourceType == ClusterResourceType.Node && a.IsOnline))
         {
-            var node = items.FirstOrDefault(a => a.ResourceType == ClusterResourceType.Node && a.Node == item.Node);
-            if (node != null) { item.CalculateHostUsage(node.MemorySize, (ulong)node.CpuSize); }
+            var vms = items.Where(a => a.ResourceType == ClusterResourceType.Vm && a.Node == node.Node && a.Uptime > 0);
+            foreach (var item in vms)
+            {
+                var percentage = Math.Round(item.CpuUsagePercentage / node.CpuSize * item.CpuSize * 100.0, 1);
+                item.HostCpuUsage = $"{percentage} % of {node.CpuSize} {(node.CpuSize > 1 ? "CPUs" : "CPU")}";
+                item.HostMemoryUsage = (double)item.MemoryUsage / node.MemorySize;
+            }
+
+            node.NodeCpuAssigned = vms.Sum(a=> a.CpuSize);
+            node.NodeMemoryAssigned = vms.Sum(a => a.MemorySize);
         }
 
         return items;
-    }
-
-    /// <summary>
-    /// Calculate Host Usage
-    /// </summary>
-    /// <param name="data"></param>
-    /// <param name="hostMemorySize"></param>
-    /// <param name="hostCpuSize"></param>
-    public static void CalculateHostUsage(this ClusterResource data, ulong hostMemorySize, ulong hostCpuSize)
-    {
-        //calculate host usage
-        if (data.ResourceType == ClusterResourceType.Vm && data.Uptime > 0 && hostCpuSize > 0 && hostMemorySize > 0)
-        {
-            var per = Math.Round(data.CpuUsagePercentage / hostCpuSize * data.CpuSize * 100.0, 1);
-            data.HostCpuUsage = $"{per} % of {hostCpuSize} {(hostCpuSize > 1 ? "CPUs" : "CPU")}";
-
-            data.HostMemoryUsage = (double)data.MemoryUsage / hostMemorySize;
-        }
     }
 
     /// <summary>

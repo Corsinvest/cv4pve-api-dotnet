@@ -19,11 +19,17 @@ public class ClusterOptions : ModelBase
     public string Keyboard { get; set; }
 
     /// <summary>
+    /// Console
+    /// </summary>
+    [JsonProperty("console")]
+    public string Console { get; set; }
+
+    /// <summary>
     /// Allowed Tags
     /// </summary>
     /// <value></value>
     [JsonProperty("allowed-tags")]
-    public List<string> AllowedTags { get; set; }
+    public IEnumerable<string> AllowedTags { get; set; } = [];
 
     /// <summary>
     /// Migration

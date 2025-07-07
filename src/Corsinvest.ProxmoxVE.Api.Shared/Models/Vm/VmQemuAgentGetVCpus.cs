@@ -17,7 +17,7 @@ public class VmQemuAgentGetVCpus : ModelBase
     /// </summary>
     /// <value></value>
     [JsonProperty("result")]
-    public IEnumerable<ResultInt> Result { get; set; }
+    public IEnumerable<ResultInt> Result { get; set; } = [];
 
     /// <summary>
     /// Result

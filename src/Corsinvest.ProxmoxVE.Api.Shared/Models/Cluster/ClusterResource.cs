@@ -134,11 +134,21 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     public double HostMemoryUsage { get; set; }
 
     /// <summary>
+    /// Node Cpu Assigned
+    /// </summary>
+    public long NodeCpuAssigned { get; set; }
+
+    /// <summary>
+    /// Node Memory Assigned
+    /// </summary>
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    public ulong NodeMemoryAssigned { get; set; }
+
+    /// <summary>
     /// Storage
     /// </summary>
     [JsonProperty("storage")]
     public string Storage { get; set; }
-
 
     /// <summary>
     /// Shared storage

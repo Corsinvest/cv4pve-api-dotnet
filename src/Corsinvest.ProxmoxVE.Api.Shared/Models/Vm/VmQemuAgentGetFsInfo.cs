@@ -18,7 +18,7 @@ public class VmQemuAgentGetFsInfo : ModelBase
     /// Result
     /// </summary>
     [JsonProperty("result")]
-    public IEnumerable<ResultInt> Result { get; set; }
+    public IEnumerable<ResultInt> Result { get; set; } = [];
 
     /// <summary>
     /// Result
@@ -66,7 +66,7 @@ public class VmQemuAgentGetFsInfo : ModelBase
         /// Disks
         /// </summary>
         [JsonProperty("disk")]
-        public IEnumerable<Disk> Disks { get; set; }
+        public IEnumerable<Disk> Disks { get; set; } = [];
     }
 
     /// <summary>

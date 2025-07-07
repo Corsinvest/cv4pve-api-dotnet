@@ -3,38 +3,31 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Newtonsoft.Json;
 using System.ComponentModel;
 using System.Dynamic;
-using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Web;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Newtonsoft.Json;
 
 namespace Corsinvest.ProxmoxVE.Api;
 
 /// <summary>
 /// Proxmox VE Client Base
 /// </summary>
-public class PveClientBase
+/// <param name="host"></param>
+/// <param name="port"></param>
+/// <param name="httpClient"></param>
+public class PveClientBase(string host, int port = 8006, HttpClient? httpClient = null)
 {
-    private ILogger<PveClientBase> _logger;
-
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="host"></param>
-    /// <param name="port"></param>
-    public PveClientBase(string host, int port = 8006)
-    {
-        Host = host;
-        Port = port;
-        _logger = NullLoggerFactory.Instance.CreateLogger<PveClientBase>();
-    }
-
+    private ILogger<PveClientBase> _logger = NullLoggerFactory.Instance.CreateLogger<PveClientBase>();
     private ILoggerFactory _loggerFactory;
+
+    private HttpClient _httpClient;
+    private readonly HttpClient? _externalHttpClient = httpClient;
+
     /// <summary>
     /// Logger Factory
     /// </summary>
@@ -49,79 +42,78 @@ public class PveClientBase
     }
 
     /// <summary>
-    /// Host
+    /// Host address of the Proxmox server.
     /// </summary>
-    public string Host { get; }
+    public string Host { get; } = host;
 
     /// <summary>
-    /// Port
+    /// Port number of the Proxmox API.
     /// </summary>
-    public int Port { get; }
+    public int Port { get; } = port;
 
     /// <summary>
-    /// Timeout
+    /// Optional timeout for HTTP requests.
     /// </summary>
-    public TimeSpan? Timeout { get; set; } = null;
+    public TimeSpan? Timeout { get; set; }
 
     /// <summary>
-    /// If set to true verifies the certificate of the Proxmox API server.
+    /// If true, validates the certificate of the Proxmox API server.
     /// </summary>
     public bool ValidateCertificate { get; set; } = false;
 
     /// <summary>
-    /// Get/Set the response type that is going to be returned when doing requests (json, png).
+    /// Response type (Json, Png or Raw).
     /// </summary>
     public ResponseType ResponseType { get; set; } = ResponseType.Json;
 
     /// <summary>
-    /// Returns the base URL used to interact with the Proxmox VE API.
+    /// Gets the base URL for the Proxmox API.
     /// </summary>
-    public string GetApiUrl() => $"https://{Host}:{Port}/api2/{Enum.GetName(typeof(ResponseType), ResponseType).ToLower()}";
+    public string GetApiUrl() => $"{BaseAddress}/api2/{Enum.GetName(typeof(ResponseType), ResponseType)?.ToLower()}";
 
     /// <summary>
-    /// Api Token format USER@REALM!TOKENID=UUID
+    /// BaseAddress
+    /// </summary>
+    public string BaseAddress => $"https://{Host}:{Port}";
+
+    /// <summary>
+    /// API Token format: USER@REALM!TOKENID=UUID
     /// </summary>
     public string ApiToken { get; set; }
 
     /// <summary>
-    /// Ticket CSRFPreventionToken
+    /// CSRF prevention token received after login.
     /// </summary>
     public string CSRFPreventionToken { get; private set; }
 
     /// <summary>
-    /// Ticket PVEAuthCookie
+    /// Authentication cookie received after login.
     /// </summary>
     public string PVEAuthCookie { get; private set; }
 
     /// <summary>
-    /// Creation ticket from login.
+    /// Logs in to the Proxmox API using username and password.
     /// </summary>
-    /// <param name="userName">User name</param>
-    /// <param name="password">The secret password. This can also be a valid ticket.</param>
-    /// <param name="realm">You can optionally pass the realm using this parameter.
-    /// Normally the realm is simply added to the username &lt;username&gt;@&lt;relam&gt;.</param>
-    /// <param name="otp">One-time password for Two-factor authentication.</param>
     public async Task<bool> LoginAsync(string userName, string password, string realm, string otp = null)
     {
-        var result = await CreateAsync("/access/ticket",
-                                       new Dictionary<string, object>
-                                       {
-                                           {"password", password},
-                                           {"username", userName},
-                                           {"realm", realm},
-                                           {"otp", otp},
-                                       });
+        var result = await CreateAsync("/access/ticket", new Dictionary<string, object>
+        {
+            {"password", password},
+            {"username", userName},
+            {"realm", realm},
+            {"otp", otp},
+        });
 
         if (result.IsSuccessStatusCode)
         {
-            if (((IDictionary<string, object>)result.Response.data).ContainsKey("NeedTFA"))
-            {
-                throw new PveAuthenticationException(result, "Couldn't authenticate user: missing Two Factor Authentication (TFA)");
-            }
+            var data = (IDictionary<string, object>)result.Response.data;
+            if (data.ContainsKey("NeedTFA"))
+                throw new PveAuthenticationException(result, "Missing Two Factor Authentication (TFA)");
 
             CSRFPreventionToken = result.Response.data.CSRFPreventionToken;
             PVEAuthCookie = result.Response.data.ticket;
         }
+
         return result.IsSuccessStatusCode;
     }
 
@@ -133,7 +125,7 @@ public class PveClientBase
     /// <param name="opt">One-time password for Two-factor authentication.</param>
     public async Task<bool> LoginAsync(string userName, string password, string opt = null)
     {
-        _logger.LogDebug($"Login: {userName}");
+        _logger.LogDebug("Login: {userName}", userName);
 
         var realm = "pam";
 
@@ -148,76 +140,84 @@ public class PveClientBase
     }
 
     /// <summary>
-    /// Execute Execute method GET
+    /// Execute method GET
     /// </summary>
     /// <param name="resource">Url request</param>
     /// <param name="parameters">Additional parameters</param>
     /// <returns>Result</returns>
     public async Task<Result> GetAsync(string resource, IDictionary<string, object> parameters = null)
-        => await ExecuteActionAsync(resource, MethodType.Get, parameters);
+        => await ExecuteRequestAsync(resource, MethodType.Get, parameters);
 
     /// <summary>
-    /// Execute Execute method POST
+    /// Execute method POST
     /// </summary>
     /// <param name="resource">Url request</param>
     /// <param name="parameters">Additional parameters</param>
     /// <returns>Result</returns>
     public async Task<Result> CreateAsync(string resource, IDictionary<string, object> parameters = null)
-        => await ExecuteActionAsync(resource, MethodType.Create, parameters);
+        => await ExecuteRequestAsync(resource, MethodType.Create, parameters);
 
     /// <summary>
-    /// Execute Execute method PUT
+    /// Execute method PUT
     /// </summary>
     /// <param name="resource">Url request</param>
     /// <param name="parameters">Additional parameters</param>
     /// <returns>Result</returns>
     public async Task<Result> SetAsync(string resource, IDictionary<string, object> parameters = null)
-        => await ExecuteActionAsync(resource, MethodType.Set, parameters);
+        => await ExecuteRequestAsync(resource, MethodType.Set, parameters);
 
     /// <summary>
-    /// Het http client
-    /// </summary>
-    /// <returns></returns>
-    public virtual HttpClient GetHttpClient()
-    {
-        var handler = new HttpClientHandler()
-        {
-            CookieContainer = new CookieContainer()
-        };
-#pragma warning disable S4830 // Server certificates should be verified during SSL/TLS connections
-        if (!ValidateCertificate) handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
-#pragma warning restore S4830 // Server certificates should be verified during SSL/TLS connections
-
-        var client = new HttpClient(handler);
-        if (Timeout.HasValue) { client.Timeout = Timeout.Value; }
-
-        //ticket login
-        if (CSRFPreventionToken != null) { client.DefaultRequestHeaders.Add("CSRFPreventionToken", CSRFPreventionToken); }
-        if (PVEAuthCookie != null) { handler.CookieContainer.Add(new Cookie("PVEAuthCookie", PVEAuthCookie, "/", Host)); }
-
-        if (!string.IsNullOrWhiteSpace(ApiToken))
-        {
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("PVEAPIToken", ApiToken);
-        }
-
-        return client;
-    }
-
-    /// <summary>
-    /// Execute Execute method DELETE
+    /// Execute method DELETE
     /// </summary>
     /// <param name="resource">Url request</param>
     /// <param name="parameters">Additional parameters</param>
     /// <returns>Result</returns>
     public async Task<Result> DeleteAsync(string resource, IDictionary<string, object> parameters = null)
-        => await ExecuteActionAsync(resource, MethodType.Delete, parameters);
+        => await ExecuteRequestAsync(resource, MethodType.Delete, parameters);
 
-    private async Task<Result> ExecuteActionAsync(string resource,
-                                                  MethodType methodType,
-                                                  IDictionary<string, object> parameters = null)
+    /// <summary>
+    /// Get http client
+    /// </summary>
+    /// <returns></returns>
+    public virtual HttpClient GetHttpClient()
     {
-        using var client = GetHttpClient();
+        if (_externalHttpClient != null) return _externalHttpClient;
 
+        _httpClient ??= new HttpClient(new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = !ValidateCertificate
+                                                            ? (message, cert, chain, errors) => true
+                                                            : null
+        });
+
+        return _httpClient;
+    }
+
+    /// <summary>
+    /// Creates an HttpRequestMessage with appropriate headers.
+    /// </summary>
+    public HttpRequestMessage CreateHttpRequestMessage(HttpMethod method, string url)
+    {
+        var request = new HttpRequestMessage(method, url);
+        if (!string.IsNullOrWhiteSpace(ApiToken)) { request.Headers.Authorization = new AuthenticationHeaderValue("PVEAPIToken", ApiToken); }
+        if (!string.IsNullOrWhiteSpace(CSRFPreventionToken)) { request.Headers.Add("CSRFPreventionToken", CSRFPreventionToken); }
+        if (!string.IsNullOrWhiteSpace(PVEAuthCookie)) { request.Headers.Add("Cookie", $"PVEAuthCookie={PVEAuthCookie}"); }
+        return request;
+    }
+
+    /// <summary>
+    /// Execute Request.
+    /// </summary>
+    /// <param name="resource"></param>
+    /// <param name="methodType"></param>
+    /// <param name="parameters"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    /// <exception cref="InvalidEnumArgumentException"></exception>
+    protected virtual async Task<Result> ExecuteRequestAsync(string resource,
+                                                             MethodType methodType,
+                                                             IDictionary<string, object> parameters = null)
+    {
         var httpMethod = methodType switch
         {
             MethodType.Get => HttpMethod.Get,
@@ -247,50 +247,62 @@ public class PveClientBase
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug($"Method: {httpMethod}, Url: {uriString}");
+            _logger.LogDebug("Method: {httpMethod}, Url: {uriString}", httpMethod, uriString);
             if (httpMethod != HttpMethod.Get)
             {
-                _logger.LogDebug("Parameters:" +
-                                 Environment.NewLine +
-                                 string.Join(Environment.NewLine, @params.Select(a => $"{a.Key} : {a.Value}")));
+                _logger.LogDebug("Parameters: {parameters}", string.Join(Environment.NewLine, @params.Select(a => $"{a.Key} : {a.Value}")));
             }
         }
 
-        var request = new HttpRequestMessage(httpMethod, new Uri(uriString));
+        var request = CreateHttpRequestMessage(httpMethod, uriString);
+
         if (httpMethod != HttpMethod.Get && httpMethod != HttpMethod.Delete)
         {
             request.Content = new StringContent(JsonConvert.SerializeObject(@params), Encoding.UTF8, "application/json");
         }
 
-        var response = await client.SendAsync(request);
-        if (_logger.IsEnabled(LogLevel.Debug))
+        using var cts = Timeout.HasValue
+                ? new CancellationTokenSource(Timeout.Value)
+                : new CancellationTokenSource();
+
+        HttpResponseMessage response = null!;
+        dynamic result = null;
+
+        try
         {
-            _logger.LogDebug($"StatusCode:          {response.StatusCode}" +
-                             Environment.NewLine +
-                             $"ReasonPhrase:        {response.ReasonPhrase}" +
-                             Environment.NewLine +
-                             $"IsSuccessStatusCode: {response.IsSuccessStatusCode}");
+            response = await GetHttpClient().SendAsync(request, cts.Token);
+
+            switch (ResponseType)
+            {
+                case ResponseType.Json:
+                    result = JsonConvert.DeserializeObject<ExpandoObject>(await response.Content.ReadAsStringAsync());
+                    if (_logger.IsEnabled(LogLevel.Trace))
+                    {
+                        _logger.LogTrace(JsonConvert.SerializeObject(result, Formatting.Indented) as string);
+                    }
+                    break;
+
+                case ResponseType.Png:
+                    result = "data:image/png;base64," + Convert.ToBase64String(await response.Content.ReadAsByteArrayAsync());
+                    if (_logger.IsEnabled(LogLevel.Trace)) { _logger.LogTrace(result as string); }
+                    break;
+
+                case ResponseType.Response: result = response; break;
+
+                default: throw new InvalidEnumArgumentException();
+            }
+        }
+        catch (TaskCanceledException ex) when (!cts.Token.IsCancellationRequested)
+        {
+            _logger.LogError(ex, ex.Message);
         }
 
-        dynamic result = null;
-        switch (ResponseType)
+        if (_logger.IsEnabled(LogLevel.Debug))
         {
-            case ResponseType.Json:
-                result = JsonConvert.DeserializeObject<ExpandoObject>(await response.Content.ReadAsStringAsync());
-                if (_logger.IsEnabled(LogLevel.Trace))
-                {
-                    _logger.LogTrace(JsonConvert.SerializeObject(result, Formatting.Indented) as string);
-                }
-                break;
-
-            case ResponseType.Png:
-                result = "data:image/png;base64," + Convert.ToBase64String(await response.Content.ReadAsByteArrayAsync());
-                if (_logger.IsEnabled(LogLevel.Trace)) { _logger.LogTrace(result as string); }
-                break;
-
-            case ResponseType.Response: result = response; break;
-
-            default: throw new InvalidEnumArgumentException();
+            _logger.LogDebug("StatusCode: {StatusCode} ReasonPhrase: {ReasonPhrase} IsSuccessStatusCode: {IsSuccessStatusCode}",
+                             response.StatusCode,
+                             response.ReasonPhrase,
+                             response.IsSuccessStatusCode);
         }
 
         result ??= new ExpandoObject();
@@ -314,7 +326,7 @@ public class PveClientBase
     public Result LastResult { get; private set; }
 
     /// <summary>
-    /// Add indexed parameter to parameters.
+    /// Adds indexed parameters to a dictionary.
     /// </summary>
     /// <param name="parameters"></param>
     /// <param name="name"></param>
@@ -328,14 +340,14 @@ public class PveClientBase
     }
 
     /// <summary>
-    /// Get node from task
+    /// Extracts the node name from a task identifier.
     /// </summary>
     /// <param name="task"></param>
     /// <returns></returns>
     public static string GetNodeFromTask(string task) => task.Split(':')[1];
 
     /// <summary>
-    /// Wait for task to finish
+    /// Waits for a background task to finish.
     /// </summary>
     /// <param name="result"></param>
     /// <param name="wait"></param>
@@ -346,7 +358,7 @@ public class PveClientBase
                 await WaitForTaskToFinishAsync(result.ToData(), wait, timeout);
 
     /// <summary>
-    /// Wait for task to finish
+    /// Waits for a background task to finish by its ID.
     /// </summary>
     /// <param name="task">Task identifier</param>
     /// <param name="wait">Millisecond wait next check</param>
@@ -370,7 +382,7 @@ public class PveClientBase
     }
 
     /// <summary>
-    /// Get exists status task.
+    /// Checks whether a task is still running.
     /// </summary>
     /// <param name="task"></param>
     /// <returns></returns>
@@ -378,7 +390,7 @@ public class PveClientBase
         => (await ReadTaskStatusAsync(task)).Response.data.status == "running";
 
     /// <summary>
-    /// Get exists status task.
+    /// Gets the exit status of a task.
     /// </summary>
     /// <param name="task"></param>
     /// <returns></returns>
@@ -386,7 +398,7 @@ public class PveClientBase
         => (await ReadTaskStatusAsync(task)).Response.data.exitstatus;
 
     /// <summary>
-    /// Read task status.
+    /// Reads the current status of a task.
     /// </summary>
     /// <param name="task"></param>
     /// <returns></returns>

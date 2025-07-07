@@ -13,79 +13,62 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 public class NodeAptUpdate : ModelBase
 {
     /// <summary>
-    /// Package
+    /// Package name
     /// </summary>
-    /// <value></value>
     [JsonProperty("Package")]
     public string Package { get; set; }
 
     /// <summary>
-    ///
+    /// Update notification status
     /// </summary>
-    /// <value></value>
-    [JsonProperty("Section")]
-    public string Section { get; set; }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <value></value>
-    [JsonProperty("Arch")]
-    public string Arch { get; set; }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <value></value>
-    [JsonProperty("Priority")]
-    public string Priority { get; set; }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <value></value>
-    [JsonProperty("OldVersion")]
-    public string OldVersion { get; set; }
-
-    /// <summary>
-    /// Version
-    /// </summary>
-    /// <value></value>
-    [JsonProperty("Version")]
-    public string Version { get; set; }
-
-    /// <summary>
-    /// Notify Status
-    /// </summary>
-    /// <value></value>
     [JsonProperty("NotifyStatus")]
     public string NotifyStatus { get; set; }
 
     /// <summary>
-    /// Change Log Url
+    /// Package architecture
     /// </summary>
-    /// <value></value>
-    [JsonProperty("ChangeLogUrl")]
-    public string ChangeLogUrl { get; set; }
+    [JsonProperty("Arch")]
+    public string Arch { get; set; }
 
     /// <summary>
-    /// Origin
+    /// Package version
     /// </summary>
-    /// <value></value>
+    [JsonProperty("Version")]
+    public string Version { get; set; }
+
+    /// <summary>
+    /// Package origin
+    /// </summary>
     [JsonProperty("Origin")]
     public string Origin { get; set; }
 
     /// <summary>
-    /// Description
+    /// Package priority
     /// </summary>
-    /// <value></value>
+    [JsonProperty("Priority")]
+    public string Priority { get; set; }
+
+    /// <summary>
+    /// Package description
+    /// </summary>
     [JsonProperty("Description")]
     public string Description { get; set; }
 
     /// <summary>
-    /// Title
+    /// Package title
     /// </summary>
-    /// <value></value>
     [JsonProperty("Title")]
     public string Title { get; set; }
+
+    /// <summary>
+    /// Old package version
+    /// </summary>
+    [JsonProperty("OldVersion")]
+    public string OldVersion { get; set; }
+
+    /// <summary>
+    /// Package section
+    /// </summary>
+    [JsonProperty("Section")]
+    public string Section { get; set; }
 }

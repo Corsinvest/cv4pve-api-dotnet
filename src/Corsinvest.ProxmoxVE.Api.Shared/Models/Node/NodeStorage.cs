@@ -48,7 +48,7 @@ public class NodeStorage : ModelBase, IStorageItem
     public bool Active { get; set; }
 
     /// <summary>
-    ///
+    /// Usage Percentage
     /// </summary>
     [JsonProperty("used_fraction")]
     [Display(Name = "Usage %")]

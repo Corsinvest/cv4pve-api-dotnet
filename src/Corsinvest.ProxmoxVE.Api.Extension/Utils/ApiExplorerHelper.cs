@@ -540,7 +540,7 @@ public static class ApiExplorerHelper
             {
                 //exclude other command
                 if (!string.IsNullOrWhiteSpace(command)
-                    && method.GetMethodTypeHumanized().ToLower() != command.ToLower())
+                    && !string.Equals(method.GetMethodTypeHumanized(), command, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
@@ -627,10 +627,9 @@ public static class ApiExplorerHelper
                 string key = null;
                 foreach (var subClass in classApi.SubClasses.OrderBy(a => a.Name))
                 {
-                    var attribute = string.Join("",
-                                                [ subClass.SubClasses.Count > 0 ? "D" : "-",
-                                                  "r--",
-                                                  subClass.Methods.Any(a => a.IsPost)? "c" : "-"]);
+                    var attribute = string.Concat([ subClass.SubClasses.Count > 0 ? "D" : "-",
+                                                    "r--",
+                                                     subClass.Methods.Any(a => a.IsPost) ? "c" : "-"]);
 
                     if (subClass.IsIndexed)
                     {

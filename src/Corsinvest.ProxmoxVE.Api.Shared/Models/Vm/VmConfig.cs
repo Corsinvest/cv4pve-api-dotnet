@@ -100,12 +100,12 @@ public class VmConfig : ModelBase
     /// <summary>
     /// Disks
     /// </summary>
-    public IEnumerable<VmDisk> Disks { get; private set; }
+    public IEnumerable<VmDisk> Disks { get; private set; } = [];
 
     /// <summary>
     /// Networks
     /// </summary>
-    public IEnumerable<VmNetwork> Networks { get; private set; }
+    public IEnumerable<VmNetwork> Networks { get; private set; } = [];
 
     [OnDeserialized]
     internal void OnSerializedMethod(StreamingContext context)
@@ -129,7 +129,7 @@ public class VmConfig : ModelBase
                     Match match;
                     if (this is VmConfigQemu)
                     {
-                        if ((match = Regex.Match(item, @"^(ne2k_pci|e1000e?|e1000-82540em|e1000-82544gc|e1000-82545em|vmxnet3|rtl8139|pcnet|virtio|ne2k_isa|i82551|i82557b|i82559er)(=([0-9a-f]{2}(:[0-9a-f]{2}){5}))?$", RegexOptions.IgnoreCase)).Success)
+                        if ((match = Regex.Match(item, "^(ne2k_pci|e1000e?|e1000-82540em|e1000-82544gc|e1000-82545em|vmxnet3|rtl8139|pcnet|virtio|ne2k_isa|i82551|i82557b|i82559er)(=([0-9a-f]{2}(:[0-9a-f]{2}){5}))?$", RegexOptions.IgnoreCase)).Success)
                         {
                             network.Model = match.Groups[1].Value.ToLower();
                             if (match.Groups[3].Success) { network.MacAddress = match.Groups[3].Value; }

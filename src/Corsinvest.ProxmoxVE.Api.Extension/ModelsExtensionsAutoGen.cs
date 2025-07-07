@@ -3,9 +3,6 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace Corsinvest.ProxmoxVE.Api.Extension;
 
 /// <summary>
@@ -289,6 +286,14 @@ public static class ModelsExtensionsAutoGen
     /// <returns></returns>
     public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeAptUpdate>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveApt.PveUpdate item)
         => (await item.ListUpdates()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeAptUpdate>>();
+
+    /// <summary>
+    /// Get APT repository information.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeAptRepositories>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveApt.PveRepositories item)
+        => (await item.Repositories()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeAptRepositories>>();
 
     /// <summary>
     /// Read tap/vm network device interface counters
@@ -798,7 +803,4 @@ public static class ModelsExtensionsAutoGen
     /// <returns></returns>
     public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmFirewallOptions> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveFirewall.PveOptions item)
         => (await item.GetOptions()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmFirewallOptions>();
-
-
-
 }

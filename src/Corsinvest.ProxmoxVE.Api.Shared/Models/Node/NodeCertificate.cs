@@ -64,7 +64,7 @@ public class NodeCertificate : ModelBase
     /// San
     /// </summary>
     [JsonProperty("san")]
-    public IEnumerable<string> San { get; set; }
+    public IEnumerable<string> San { get; set; } = [];
 
     /// <summary>
     /// Notbefore

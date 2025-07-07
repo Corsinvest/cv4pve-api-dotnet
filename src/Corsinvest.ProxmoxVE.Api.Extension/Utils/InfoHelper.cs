@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
+using System.Diagnostics;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Access;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
@@ -10,7 +11,6 @@ using Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Pool;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Storage;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
-using System.Diagnostics;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Utils;
 
@@ -64,19 +64,19 @@ public static class InfoHelper
         /// Pools
         /// </summary>
         /// <value></value>
-        public IEnumerable<PoolInfo> Pools { get; set; }
+        public IEnumerable<PoolInfo> Pools { get; set; } = [];
 
         /// <summary>
         /// Storage
         /// </summary>
         /// <value></value>
-        public IEnumerable<StorageItem> Storages { get; set; }
+        public IEnumerable<StorageItem> Storages { get; set; } = [];
 
         /// <summary>
         /// Nodes
         /// </summary>
         /// <value></value>
-        public IEnumerable<NodeInfo> Nodes { get; set; }
+        public IEnumerable<NodeInfo> Nodes { get; set; } = [];
 
         /// <summary>
         /// Pool
@@ -114,22 +114,22 @@ public static class InfoHelper
             /// <summary>
             /// Aliases
             /// </summary>
-            public IEnumerable<FirewallAlias> Aliases { get; set; }
+            public IEnumerable<FirewallAlias> Aliases { get; set; } = [];
 
             /// <summary>
             /// IpSet
             /// </summary>
-            public IEnumerable<FirewallIpsetInfo> IpSets { get; set; }
+            public IEnumerable<FirewallIpsetInfo> IpSets { get; set; } = [];
 
             /// <summary>
             /// Refs
             /// </summary>
-            public IEnumerable<FirewallRef> Refs { get; set; }
+            public IEnumerable<FirewallRef> Refs { get; set; } = [];
 
             /// <summary>
             /// Rules
             /// </summary>
-            public IEnumerable<FirewallRule> Rules { get; set; }
+            public IEnumerable<FirewallRule> Rules { get; set; } = [];
 
             /// <summary>
             /// Firewall Ipset Info
@@ -144,7 +144,7 @@ public static class InfoHelper
                 /// <summary>
                 /// Contents
                 /// </summary>
-                public IEnumerable<FirewallIpSetContent> Contents { get; set; }
+                public IEnumerable<FirewallIpSetContent> Contents { get; set; } = [];
             }
         }
 
@@ -157,31 +157,31 @@ public static class InfoHelper
             /// Users
             /// </summary>
             /// <value></value>
-            public IEnumerable<AccessUser> Users { get; set; }
+            public IEnumerable<AccessUser> Users { get; set; } = [];
 
             /// <summary>
             /// Groups
             /// </summary>
             /// <value></value>
-            public IEnumerable<AccessGroup> Groups { get; set; }
+            public IEnumerable<AccessGroup> Groups { get; set; } = [];
 
             /// <summary>
             /// Roles
             /// </summary>
             /// <value></value>
-            public IEnumerable<AccessRole> Roles { get; set; }
+            public IEnumerable<AccessRole> Roles { get; set; } = [];
 
             /// <summary>
             /// Acl
             /// </summary>
             /// <value></value>
-            public IEnumerable<AccessAcl> Acl { get; set; }
+            public IEnumerable<AccessAcl> Acl { get; set; } = [];
 
             /// <summary>
             /// Domains
             /// </summary>
             /// <value></value>
-            public IEnumerable<AccessDomain> Domains { get; set; }
+            public IEnumerable<AccessDomain> Domains { get; set; } = [];
         }
 
         /// <summary>
@@ -193,25 +193,25 @@ public static class InfoHelper
             /// Resources
             /// </summary>
             /// <value></value>
-            public IEnumerable<ClusterResource> Resources { get; set; }
+            public IEnumerable<ClusterResource> Resources { get; set; } = [];
 
             /// <summary>
             /// Status
             /// </summary>
             /// <value></value>
-            public IEnumerable<ClusterStatus> Status { get; set; }
+            public IEnumerable<ClusterStatus> Status { get; set; } = [];
 
             /// <summary>
             /// Replication
             /// </summary>
             /// <value></value>
-            public IEnumerable<ClusterReplication> Replication { get; set; }
+            public IEnumerable<ClusterReplication> Replication { get; set; } = [];
 
             /// <summary>
             /// Backups
             /// </summary>
             /// <value></value>
-            public IEnumerable<ClusterBackup> Backups { get; set; }
+            public IEnumerable<ClusterBackup> Backups { get; set; } = [];
 
             /// <summary>
             /// Config
@@ -246,7 +246,7 @@ public static class InfoHelper
                 /// <summary>
                 /// Groups
                 /// </summary>
-                public IEnumerable<GroupInfo> Groups { get; set; }
+                public IEnumerable<GroupInfo> Groups { get; set; } = [];
 
                 /// <summary>
                 /// Group
@@ -261,7 +261,7 @@ public static class InfoHelper
                     /// <summary>
                     /// Rules
                     /// </summary>
-                    public IEnumerable<FirewallRule> Rules { get; set; }
+                    public IEnumerable<FirewallRule> Rules { get; set; } = [];
                 }
             }
 
@@ -278,12 +278,12 @@ public static class InfoHelper
                 /// <summary>
                 /// Groups
                 /// </summary>
-                public IEnumerable<ClusterHaGroup> Groups { get; set; }
+                public IEnumerable<ClusterHaGroup> Groups { get; set; } = [];
 
                 /// <summary>
                 /// Resources
                 /// </summary>
-                public IEnumerable<ClusterHaResource> Resources { get; internal set; }
+                public IEnumerable<ClusterHaResource> Resources { get; internal set; } = [];
 
                 /// <summary>
                 /// Status
@@ -293,7 +293,7 @@ public static class InfoHelper
                     /// <summary>
                     /// Current
                     /// </summary>
-                    public IEnumerable<ClusterHaStatusCurrent> Current { get; internal set; }
+                    public IEnumerable<ClusterHaStatusCurrent> Current { get; internal set; } = [];
                 }
             }
 
@@ -305,7 +305,7 @@ public static class InfoHelper
                 /// <summary>
                 /// Config nodes
                 /// </summary>
-                public IEnumerable<ClusterConfigNode> Nodes { get; set; }
+                public IEnumerable<ClusterConfigNode> Nodes { get; set; } = [];
 
                 /// <summary>
                 /// Config Qdevice
@@ -361,25 +361,25 @@ public static class InfoHelper
             /// Hosts
             /// </summary>
             /// <value></value>
-            public IEnumerable<string> Hosts { get; set; }
+            public IEnumerable<string> Hosts { get; set; } = [];
 
             /// <summary>
             /// Netstat
             /// </summary>
             /// <value></value>
-            public IEnumerable<NodeNetstat> Netstat { get; set; }
+            public IEnumerable<NodeNetstat> Netstat { get; set; } = [];
 
             /// <summary>
             /// Network
             /// </summary>
             /// <value></value>
-            public IEnumerable<NodeNetwork> Network { get; set; }
+            public IEnumerable<NodeNetwork> Network { get; set; } = [];
 
             /// <summary>
             /// Services
             /// </summary>
             /// <value></value>
-            public IEnumerable<NodeService> Services { get; set; }
+            public IEnumerable<NodeService> Services { get; set; } = [];
 
             /// <summary>
             /// Subscription
@@ -397,13 +397,13 @@ public static class InfoHelper
             /// Tasks
             /// </summary>
             /// <value></value>
-            public IEnumerable<NodeTask> Tasks { get; set; }
+            public IEnumerable<NodeTask> Tasks { get; set; } = [];
 
             /// <summary>
             /// Report
             /// </summary>
             /// <value></value>
-            public IEnumerable<string> Report { get; set; }
+            public IEnumerable<string> Report { get; set; } = [];
 
             /// <summary>
             /// Apt
@@ -425,7 +425,7 @@ public static class InfoHelper
             /// Replication
             /// </summary>
             /// <value></value>
-            public IEnumerable<NodeReplication> Replication { get; set; }
+            public IEnumerable<NodeReplication> Replication { get; set; } = [];
 
             /// <summary>
             /// Hardware
@@ -437,23 +437,23 @@ public static class InfoHelper
             /// Qemu
             /// </summary>
             /// <value></value>
-            public IEnumerable<QemuInfo> Qemu { get; set; }
+            public IEnumerable<QemuInfo> Qemu { get; set; } = [];
 
             /// <summary>
             /// Qemu
             /// </summary>
             /// <value></value>
-            public IEnumerable<LxcInfo> Lxc { get; set; }
+            public IEnumerable<LxcInfo> Lxc { get; set; } = [];
 
             /// <summary>
             /// Storages
             /// </summary>
-            public IEnumerable<StorageInfo> Storages { get; set; }
+            public IEnumerable<StorageInfo> Storages { get; set; } = [];
 
             /// <summary>
             /// Certificates
             /// </summary>
-            public IEnumerable<NodeCertificate> Certificates { get; set; }
+            public IEnumerable<NodeCertificate> Certificates { get; set; } = [];
 
             /// <summary>
             /// Firewall
@@ -468,7 +468,7 @@ public static class InfoHelper
                 /// <summary>
                 /// Rules
                 /// </summary>
-                public IEnumerable<FirewallRule> Rules { get; set; }
+                public IEnumerable<FirewallRule> Rules { get; set; } = [];
 
                 /// <summary>
                 /// Options
@@ -485,13 +485,13 @@ public static class InfoHelper
                 /// Package Versions
                 /// </summary>
                 /// <value></value>
-                public IEnumerable<NodeAptVersion> Version { get; set; }
+                public IEnumerable<NodeAptVersion> Version { get; set; } = [];
 
                 /// <summary>
                 /// Apt Update
                 /// </summary>
                 /// <value></value>
-                public IEnumerable<NodeAptUpdate> Update { get; set; }
+                public IEnumerable<NodeAptUpdate> Update { get; set; } = [];
             }
 
             /// <summary>
@@ -508,7 +508,7 @@ public static class InfoHelper
                 /// Content
                 /// </summary>
                 /// <value></value>
-                public IEnumerable<NodeStorageContent> Content { get; set; }
+                public IEnumerable<NodeStorageContent> Content { get; set; } = [];
 
                 /// <summary>
                 /// Status
@@ -531,13 +531,13 @@ public static class InfoHelper
                 /// Pci
                 /// </summary>
                 /// <value></value>
-                public IEnumerable<NodeHardwarePci> Pci { get; set; }
+                public IEnumerable<NodeHardwarePci> Pci { get; set; } = [];
 
                 /// <summary>
                 /// Pci
                 /// </summary>
                 /// <value></value>
-                public IEnumerable<NodeHardwareUsb> Usb { get; set; }
+                public IEnumerable<NodeHardwareUsb> Usb { get; set; } = [];
             }
 
             /// <summary>
@@ -549,13 +549,13 @@ public static class InfoHelper
                 /// Disks
                 /// </summary>
                 /// <value></value>
-                public IEnumerable<DiskInfo> List { get; set; }
+                public IEnumerable<DiskInfo> List { get; set; } = [];
 
                 /// <summary>
                 /// Zfs
                 /// </summary>
                 /// <value></value>
-                public IEnumerable<ZfsInfo> Zfs { get; set; }
+                public IEnumerable<ZfsInfo> Zfs { get; set; } = [];
 
                 /// <summary>
                 /// Node disk
@@ -577,7 +577,7 @@ public static class InfoHelper
                     /// <summary>
                     /// Partitions
                     /// </summary>
-                    public IEnumerable<NodeDiskList> Partitions { get; set; }
+                    public IEnumerable<NodeDiskList> Partitions { get; set; } = [];
                 }
 
                 /// <summary>
@@ -621,7 +621,7 @@ public static class InfoHelper
                 /// Snapshots
                 /// </summary>
                 /// <value></value>
-                public IEnumerable<VmSnapshot> Snapshots { get; set; }
+                public IEnumerable<VmSnapshot> Snapshots { get; set; } = [];
 
                 /// <summary>
                 /// Detail
@@ -636,7 +636,7 @@ public static class InfoHelper
                 /// <summary>
                 /// Pending
                 /// </summary>
-                public IEnumerable<KeyValue> Pending { get; set; }
+                public IEnumerable<KeyValue> Pending { get; set; } = [];
 
                 /// <summary>
                 /// Firewall vm
@@ -893,34 +893,11 @@ public static class InfoHelper
             var disksAll = await nodeApi.Disks.List.GetAsync(include_partitions: true);
             foreach (var item in disksAll.Where(a => string.IsNullOrWhiteSpace(a.Parent)))
             {
-                NodeDiskSmart smart = null;
-
-                try
-                {
-                    smart = await nodeApi.Disks.Smart.GetAsync(item.DevPath);
-                }
-                catch (Exception exSmart)
-                {
-                    smart = new()
-                    {
-                        Attributes =
-                        [
-                            new()
-                            {
-                                Id = "0",
-                                Name = "Error",
-                                Raw = exSmart.Message,
-                                Value = -1
-                            }
-                        ]
-                    };
-                }
-
                 disks.Add(new()
                 {
                     Disk = item,
                     Partitions = [.. disksAll.Where(a => a.Type == "partition" && a.Parent == item.DevPath)],
-                    Smart = smart
+                    Smart = await client.GetDiskSmart(nodeItem.Node, item.DevPath)
                 });
             }
 

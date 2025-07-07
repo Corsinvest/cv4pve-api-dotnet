@@ -30,10 +30,7 @@ public class ClassApi
         Parent = parent;
         Resource = token["path"].ToString();
 
-        Resource = Regex.Replace(Resource, @"\{([^}]*)\}", match =>
-        {
-            return "{" + match.Groups[1].Value.Replace('-', '_') + "}";
-        });
+        Resource = Regex.Replace(Resource, @"\{([^}]*)\}", match => "{" + match.Groups[1].Value.Replace('-', '_') + "}");
 
         Keys.AddRange(parent.Keys);
         parent.SubClasses.Add(this);

@@ -8,4 +8,4 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Qemu data
 /// </summary>
-public class NodeVmQemu : NodeVmBase { }
+public class NodeVmQemu : NodeVmBase;

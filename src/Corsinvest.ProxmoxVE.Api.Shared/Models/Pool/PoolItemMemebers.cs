@@ -25,5 +25,5 @@ public class PoolDetail : ModelBase
     /// </summary>
     /// <value></value>
     [JsonProperty("members")]
-    public IEnumerable<ClusterResource> Members { get; set; }
+    public IEnumerable<ClusterResource> Members { get; set; } = [];
 }

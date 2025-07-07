@@ -20,7 +20,7 @@ public class ClusterCephStatus : ModelBase
     public ProgressEventsInt ProgressEvents { get; set; }
 
     [JsonProperty("quorum")]
-    public List<int> Quorum { get; set; }
+    public IEnumerable<int> Quorum { get; set; } = [];
 
     [JsonProperty("osdmap")]
     public OsdmapInt Osdmap { get; set; }
@@ -41,7 +41,7 @@ public class ClusterCephStatus : ModelBase
     public int ElectionEpoch { get; set; }
 
     [JsonProperty("quorum_names")]
-    public List<string> QuorumNames { get; set; }
+    public IEnumerable<string> QuorumNames { get; set; } = [];
 
     [JsonProperty("mgrmap")]
     public MgrmapInt Mgrmap { get; set; }
@@ -52,10 +52,10 @@ public class ClusterCephStatus : ModelBase
     public class Active
     {
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -76,7 +76,7 @@ public class ClusterCephStatus : ModelBase
         public string Min { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -91,22 +91,22 @@ public class ClusterCephStatus : ModelBase
     public class ActiveAddrs
     {
         [JsonProperty("addrvec")]
-        public List<Addrvec> Addrvec { get; set; }
+        public IEnumerable<Addrvec> Addrvec { get; set; } = [];
     }
 
     public class ActiveClient
     {
         [JsonProperty("addrvec")]
-        public List<Addrvec> Addrvec { get; set; }
+        public IEnumerable<Addrvec> Addrvec { get; set; } = [];
     }
 
     public class Address
     {
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("default_value")]
         public string DefaultValue { get; set; }
@@ -127,7 +127,7 @@ public class ClusterCephStatus : ModelBase
         public string Type { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -169,7 +169,7 @@ public class ClusterCephStatus : ModelBase
         public string Type { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -178,10 +178,10 @@ public class ClusterCephStatus : ModelBase
         public int Flags { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("default_value")]
         public string DefaultValue { get; set; }
@@ -193,19 +193,19 @@ public class ClusterCephStatus : ModelBase
     public class AlwaysOnModules
     {
         [JsonProperty("nautilus")]
-        public List<string> Nautilus { get; set; }
+        public IEnumerable<string> Nautilus { get; set; } = [];
 
         [JsonProperty("last_failure_osd_epoch")]
         public int LastFailureOsdEpoch { get; set; }
 
         [JsonProperty("active_clients")]
-        public List<ActiveClient> ActiveClients { get; set; }
+        public IEnumerable<ActiveClient> ActiveClients { get; set; } = [];
 
         [JsonProperty("pacific")]
-        public List<string> Pacific { get; set; }
+        public IEnumerable<string> Pacific { get; set; } = [];
 
         [JsonProperty("octopus")]
-        public List<string> Octopus { get; set; }
+        public IEnumerable<string> Octopus { get; set; } = [];
     }
 
     public class AvailableModule
@@ -235,10 +235,10 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -250,7 +250,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("max")]
         public string Max { get; set; }
@@ -274,10 +274,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -289,7 +289,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("type")]
         public string Type { get; set; }
@@ -307,10 +307,10 @@ public class ClusterCephStatus : ModelBase
         public int Flags { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("default_value")]
         public string DefaultValue { get; set; }
@@ -337,13 +337,13 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
     }
 
     public class Cache
     {
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -370,10 +370,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
@@ -394,7 +394,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("long_desc")]
         public string LongDesc { get; set; }
@@ -403,10 +403,10 @@ public class ClusterCephStatus : ModelBase
         public string Name { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -421,7 +421,7 @@ public class ClusterCephStatus : ModelBase
     public class ChannelCrash
     {
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -448,10 +448,10 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
@@ -460,10 +460,10 @@ public class ClusterCephStatus : ModelBase
     public class ChannelDevice
     {
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -487,7 +487,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("long_desc")]
         public string LongDesc { get; set; }
@@ -505,16 +505,16 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -535,17 +535,15 @@ public class ClusterCephStatus : ModelBase
         public string LongDesc { get; set; }
     }
 
-    public class Checks
-    {
-    }
+    public class Checks;
 
     public class Contact
     {
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("default_value")]
         public string DefaultValue { get; set; }
@@ -566,7 +564,7 @@ public class ClusterCephStatus : ModelBase
         public string Min { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -590,7 +588,7 @@ public class ClusterCephStatus : ModelBase
         public string Type { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -602,10 +600,10 @@ public class ClusterCephStatus : ModelBase
         public string Name { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -629,10 +627,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -644,7 +642,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("max")]
         public string Max { get; set; }
@@ -665,7 +663,7 @@ public class ClusterCephStatus : ModelBase
         public string LongDesc { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -689,10 +687,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
     }
 
     public class Database
@@ -701,7 +699,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("type")]
         public string Type { get; set; }
@@ -725,10 +723,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
@@ -746,7 +744,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("max")]
         public string Max { get; set; }
@@ -767,16 +765,16 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
     }
 
     public class DeviceUrl
     {
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -803,10 +801,10 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
@@ -818,10 +816,10 @@ public class ClusterCephStatus : ModelBase
         public int Flags { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -848,7 +846,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
     }
 
     public class DumpOnUpdate
@@ -863,10 +861,10 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -878,7 +876,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("min")]
         public string Min { get; set; }
@@ -896,10 +894,10 @@ public class ClusterCephStatus : ModelBase
         public int Flags { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("default_value")]
         public string DefaultValue { get; set; }
@@ -923,7 +921,7 @@ public class ClusterCephStatus : ModelBase
         public string Type { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -941,10 +939,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -956,7 +954,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("min")]
         public string Min { get; set; }
@@ -980,7 +978,7 @@ public class ClusterCephStatus : ModelBase
         public string Type { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -992,10 +990,10 @@ public class ClusterCephStatus : ModelBase
         public string Name { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -1013,7 +1011,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("max")]
         public string Max { get; set; }
@@ -1037,10 +1035,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
@@ -1058,7 +1056,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("max")]
         public string Max { get; set; }
@@ -1079,10 +1077,10 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
     }
 
     public class FailureDomain
@@ -1106,16 +1104,16 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -1127,10 +1125,10 @@ public class ClusterCephStatus : ModelBase
     public class Features
     {
         [JsonProperty("optional")]
-        public List<object> Optional { get; set; }
+        public IEnumerable<object> Optional { get; set; } = [];
 
         [JsonProperty("persistent")]
-        public List<string> Persistent { get; set; }
+        public IEnumerable<string> Persistent { get; set; } = [];
     }
 
     public class FsmapInt
@@ -1139,7 +1137,7 @@ public class ClusterCephStatus : ModelBase
         public int Epoch { get; set; }
 
         [JsonProperty("by_rank")]
-        public List<object> ByRank { get; set; }
+        public IEnumerable<object> ByRank { get; set; } = [];
 
         [JsonProperty("up:standby")]
         public int UpStandby { get; set; }
@@ -1148,7 +1146,7 @@ public class ClusterCephStatus : ModelBase
     public class HealthInt
     {
         [JsonProperty("mutes")]
-        public List<object> Mutes { get; set; }
+        public IEnumerable<object> Mutes { get; set; } = [];
 
         [JsonProperty("status")]
         public string Status { get; set; }
@@ -1166,16 +1164,16 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -1202,7 +1200,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("max")]
         public string Max { get; set; }
@@ -1226,10 +1224,10 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
@@ -1238,10 +1236,10 @@ public class ClusterCephStatus : ModelBase
     public class Interval
     {
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -1265,7 +1263,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("long_desc")]
         public string LongDesc { get; set; }
@@ -1283,10 +1281,10 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
@@ -1295,7 +1293,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("max")]
         public string Max { get; set; }
@@ -1322,8 +1320,7 @@ public class ClusterCephStatus : ModelBase
         public string LongDesc { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
-
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
         [JsonProperty("level")]
         public string Level { get; set; }
 
@@ -1346,10 +1343,10 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
     }
 
     public class Leaderboard
@@ -1358,10 +1355,10 @@ public class ClusterCephStatus : ModelBase
         public int Flags { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -1385,7 +1382,7 @@ public class ClusterCephStatus : ModelBase
         public string Type { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -1403,10 +1400,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -1415,7 +1412,7 @@ public class ClusterCephStatus : ModelBase
         public string LongDesc { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<string> EnumAllowed { get; set; }
+        public IEnumerable<string> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -1433,10 +1430,10 @@ public class ClusterCephStatus : ModelBase
     public class LogToCluster
     {
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("default_value")]
         public string DefaultValue { get; set; }
@@ -1460,7 +1457,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("long_desc")]
         public string LongDesc { get; set; }
@@ -1472,10 +1469,10 @@ public class ClusterCephStatus : ModelBase
     public class LogToClusterLevel
     {
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -1499,7 +1496,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<string> EnumAllowed { get; set; }
+        public IEnumerable<string> EnumAllowed { get; set; } = [];
 
         [JsonProperty("long_desc")]
         public string LongDesc { get; set; }
@@ -1520,7 +1517,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("min")]
         public string Min { get; set; }
@@ -1541,10 +1538,10 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
     }
 
     public class MarkOutThreshold
@@ -1565,7 +1562,7 @@ public class ClusterCephStatus : ModelBase
         public string Min { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -1574,10 +1571,10 @@ public class ClusterCephStatus : ModelBase
         public int Flags { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("default_value")]
         public string DefaultValue { get; set; }
@@ -1595,7 +1592,7 @@ public class ClusterCephStatus : ModelBase
         public string LongDesc { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -1619,10 +1616,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
     }
 
     public class MaxConcurrentClones
@@ -1634,16 +1631,16 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -1676,7 +1673,7 @@ public class ClusterCephStatus : ModelBase
         public string Min { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -1688,10 +1685,10 @@ public class ClusterCephStatus : ModelBase
         public string Name { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -1712,10 +1709,10 @@ public class ClusterCephStatus : ModelBase
         public string ActiveName { get; set; }
 
         [JsonProperty("available_modules")]
-        public List<AvailableModule> AvailableModules { get; set; }
+        public IEnumerable<AvailableModule> AvailableModules { get; set; } = [];
 
         [JsonProperty("modules")]
-        public List<string> Modules { get; set; }
+        public IEnumerable<string> Modules { get; set; } = [];
 
         [JsonProperty("always_on_modules")]
         public AlwaysOnModules AlwaysOnModules { get; set; }
@@ -1727,7 +1724,7 @@ public class ClusterCephStatus : ModelBase
         public bool Available { get; set; }
 
         [JsonProperty("standbys")]
-        public List<Standby> Standbys { get; set; }
+        public IEnumerable<Standby> Standbys { get; set; } = [];
 
         [JsonProperty("active_addrs")]
         public ActiveAddrs ActiveAddrs { get; set; }
@@ -1754,16 +1751,16 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -1793,10 +1790,10 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
@@ -1805,7 +1802,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("min")]
         public string Min { get; set; }
@@ -1832,16 +1829,16 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -1874,7 +1871,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<string> EnumAllowed { get; set; }
+        public IEnumerable<string> EnumAllowed { get; set; } = [];
 
         [JsonProperty("min")]
         public string Min { get; set; }
@@ -1895,10 +1892,10 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
     }
 
     public class ModuleOptions
@@ -2240,7 +2237,7 @@ public class ClusterCephStatus : ModelBase
     public class MonmapInt
     {
         [JsonProperty("quorum")]
-        public List<int> Quorum { get; set; }
+        public IEnumerable<int> Quorum { get; set; } = [];
 
         [JsonProperty("fsid")]
         public string Fsid { get; set; }
@@ -2264,7 +2261,7 @@ public class ClusterCephStatus : ModelBase
         public string TiebreakerMon { get; set; }
 
         [JsonProperty("mons")]
-        public List<Mon> Mons { get; set; }
+        public IEnumerable<Mon> Mons { get; set; } = [];
 
         [JsonProperty("min_mon_release_name")]
         public string MinMonReleaseName { get; set; }
@@ -2291,7 +2288,7 @@ public class ClusterCephStatus : ModelBase
         public string Type { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -2303,10 +2300,10 @@ public class ClusterCephStatus : ModelBase
         public string Name { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("default_value")]
         public string DefaultValue { get; set; }
@@ -2336,7 +2333,7 @@ public class ClusterCephStatus : ModelBase
         public string Min { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -2345,10 +2342,10 @@ public class ClusterCephStatus : ModelBase
         public int Flags { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("default_value")]
         public string DefaultValue { get; set; }
@@ -2360,7 +2357,7 @@ public class ClusterCephStatus : ModelBase
     public class Orchestrator
     {
         [JsonProperty("enum_allowed")]
-        public List<string> EnumAllowed { get; set; }
+        public IEnumerable<string> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -2387,10 +2384,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
@@ -2417,16 +2414,16 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -2477,7 +2474,7 @@ public class ClusterCephStatus : ModelBase
         public string Type { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -2486,10 +2483,10 @@ public class ClusterCephStatus : ModelBase
         public int Flags { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("default_value")]
         public string DefaultValue { get; set; }
@@ -2504,7 +2501,7 @@ public class ClusterCephStatus : ModelBase
         public int NumPools { get; set; }
 
         [JsonProperty("pgs_by_state")]
-        public List<PgsByState> PgsByState { get; set; }
+        public IEnumerable<PgsByState> PgsByState { get; set; } = [];
 
         [JsonProperty("bytes_used")]
         public long BytesUsed { get; set; }
@@ -2543,10 +2540,10 @@ public class ClusterCephStatus : ModelBase
         public int Flags { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("default_value")]
         public string DefaultValue { get; set; }
@@ -2570,7 +2567,7 @@ public class ClusterCephStatus : ModelBase
         public string Min { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -2597,10 +2594,10 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -2609,7 +2606,7 @@ public class ClusterCephStatus : ModelBase
         public string LongDesc { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -2636,10 +2633,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -2651,7 +2648,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("max")]
         public string Max { get; set; }
@@ -2672,16 +2669,16 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -2714,7 +2711,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("min")]
         public string Min { get; set; }
@@ -2735,15 +2732,13 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
     }
 
-    public class ProgressEventsInt
-    {
-    }
+    public class ProgressEventsInt;
 
     public class Proxy
     {
@@ -2754,7 +2749,7 @@ public class ClusterCephStatus : ModelBase
         public string LongDesc { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -2778,16 +2773,16 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
     }
 
     public class PublicAddrs
     {
         [JsonProperty("addrvec")]
-        public List<Addrvec> Addrvec { get; set; }
+        public IEnumerable<Addrvec> Addrvec { get; set; } = [];
     }
 
     public class RbdStatsPools
@@ -2796,7 +2791,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("min")]
         public string Min { get; set; }
@@ -2820,10 +2815,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
@@ -2850,16 +2845,16 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("default_value")]
         public string DefaultValue { get; set; }
@@ -2883,7 +2878,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("long_desc")]
         public string LongDesc { get; set; }
@@ -2892,10 +2887,10 @@ public class ClusterCephStatus : ModelBase
         public string Name { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -2928,16 +2923,16 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -2964,7 +2959,7 @@ public class ClusterCephStatus : ModelBase
         public string Type { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -2973,10 +2968,10 @@ public class ClusterCephStatus : ModelBase
         public int Flags { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -2988,10 +2983,10 @@ public class ClusterCephStatus : ModelBase
     public class Roption2
     {
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -3015,7 +3010,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("long_desc")]
         public string LongDesc { get; set; }
@@ -3036,10 +3031,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -3051,7 +3046,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("min")]
         public string Min { get; set; }
@@ -3072,10 +3067,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
@@ -3084,7 +3079,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("max")]
         public string Max { get; set; }
@@ -3114,7 +3109,7 @@ public class ClusterCephStatus : ModelBase
         public string Min { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -3126,10 +3121,10 @@ public class ClusterCephStatus : ModelBase
         public string Name { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -3150,16 +3145,16 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -3201,16 +3196,16 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("default_value")]
         public string DefaultValue { get; set; }
@@ -3222,10 +3217,10 @@ public class ClusterCephStatus : ModelBase
     public class Rwoption6
     {
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -3246,7 +3241,7 @@ public class ClusterCephStatus : ModelBase
         public string Min { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -3261,7 +3256,7 @@ public class ClusterCephStatus : ModelBase
     public class ScrapeFrequency
     {
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -3288,10 +3283,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
@@ -3306,10 +3301,10 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
@@ -3318,7 +3313,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("max")]
         public string Max { get; set; }
@@ -3342,7 +3337,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("max")]
         public string Max { get; set; }
@@ -3366,10 +3361,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
@@ -3387,10 +3382,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -3402,7 +3397,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("max")]
         public string Max { get; set; }
@@ -3426,7 +3421,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("max")]
         public string Max { get; set; }
@@ -3447,10 +3442,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
     }
 
     public class ServicemapInt
@@ -3465,9 +3460,7 @@ public class ClusterCephStatus : ModelBase
         public DateTime Modified { get; set; }
     }
 
-    public class Services
-    {
-    }
+    public class Services;
 
     public class SleepInterval
     {
@@ -3481,10 +3474,10 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -3496,7 +3489,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("max")]
         public string Max { get; set; }
@@ -3526,7 +3519,7 @@ public class ClusterCephStatus : ModelBase
         public string Type { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -3535,10 +3528,10 @@ public class ClusterCephStatus : ModelBase
         public int Flags { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("default_value")]
         public string DefaultValue { get; set; }
@@ -3559,10 +3552,10 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -3574,7 +3567,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("type")]
         public string Type { get; set; }
@@ -3598,7 +3591,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("type")]
         public string Type { get; set; }
@@ -3619,10 +3612,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
     }
 
     public class SmtpPassword
@@ -3631,7 +3624,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("max")]
         public string Max { get; set; }
@@ -3655,10 +3648,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
@@ -3673,16 +3666,16 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -3706,10 +3699,10 @@ public class ClusterCephStatus : ModelBase
     public class SmtpSender
     {
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -3733,7 +3726,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("long_desc")]
         public string LongDesc { get; set; }
@@ -3757,7 +3750,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("long_desc")]
         public string LongDesc { get; set; }
@@ -3766,10 +3759,10 @@ public class ClusterCephStatus : ModelBase
         public string Name { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -3802,16 +3795,16 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("default_value")]
         public string DefaultValue { get; set; }
@@ -3832,7 +3825,7 @@ public class ClusterCephStatus : ModelBase
         public string Type { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -3844,10 +3837,10 @@ public class ClusterCephStatus : ModelBase
         public string Name { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -3865,10 +3858,10 @@ public class ClusterCephStatus : ModelBase
         public int Flags { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("default_value")]
         public string DefaultValue { get; set; }
@@ -3895,7 +3888,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
     }
 
     public class StaleCacheStrategy
@@ -3907,16 +3900,16 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -3949,7 +3942,7 @@ public class ClusterCephStatus : ModelBase
         public string Name { get; set; }
 
         [JsonProperty("available_modules")]
-        public List<AvailableModule> AvailableModules { get; set; }
+        public IEnumerable<AvailableModule> AvailableModules { get; set; } = [];
     }
 
     public class StandbyBehaviour
@@ -3961,7 +3954,7 @@ public class ClusterCephStatus : ModelBase
         public string LongDesc { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<string> EnumAllowed { get; set; }
+        public IEnumerable<string> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -3985,10 +3978,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
     }
 
     public class StandbyErrorStatusCode
@@ -4006,7 +3999,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("long_desc")]
         public string LongDesc { get; set; }
@@ -4015,10 +4008,10 @@ public class ClusterCephStatus : ModelBase
         public string Name { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -4036,7 +4029,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("type")]
         public string Type { get; set; }
@@ -4060,10 +4053,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
@@ -4078,10 +4071,10 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
@@ -4090,7 +4083,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("max")]
         public string Max { get; set; }
@@ -4117,16 +4110,16 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("flags")]
         public int Flags { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -4159,7 +4152,7 @@ public class ClusterCephStatus : ModelBase
         public string Type { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -4171,10 +4164,10 @@ public class ClusterCephStatus : ModelBase
         public string Name { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -4189,10 +4182,10 @@ public class ClusterCephStatus : ModelBase
     public class Threads
     {
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -4213,7 +4206,7 @@ public class ClusterCephStatus : ModelBase
         public string Type { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -4228,10 +4221,10 @@ public class ClusterCephStatus : ModelBase
     public class TrashPurgeSchedule
     {
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -4255,7 +4248,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("long_desc")]
         public string LongDesc { get; set; }
@@ -4273,7 +4266,7 @@ public class ClusterCephStatus : ModelBase
         public string LongDesc { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -4297,19 +4290,19 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
     }
 
     public class UpmapMaxOptimizations
     {
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -4333,7 +4326,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("long_desc")]
         public string LongDesc { get; set; }
@@ -4348,10 +4341,10 @@ public class ClusterCephStatus : ModelBase
         public int Flags { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -4378,7 +4371,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
     }
 
     public class Username
@@ -4393,10 +4386,10 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -4405,7 +4398,7 @@ public class ClusterCephStatus : ModelBase
         public string LongDesc { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -4429,7 +4422,7 @@ public class ClusterCephStatus : ModelBase
         public string LongDesc { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -4453,10 +4446,10 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
     }
 
     public class WarnRecentInterval
@@ -4465,10 +4458,10 @@ public class ClusterCephStatus : ModelBase
         public int Flags { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("default_value")]
         public string DefaultValue { get; set; }
@@ -4495,7 +4488,7 @@ public class ClusterCephStatus : ModelBase
         public string Level { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
     }
 
     public class WarnThreshold
@@ -4504,10 +4497,10 @@ public class ClusterCephStatus : ModelBase
         public int Flags { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -4531,7 +4524,7 @@ public class ClusterCephStatus : ModelBase
         public string Type { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -4549,7 +4542,7 @@ public class ClusterCephStatus : ModelBase
         public string Min { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -4561,10 +4554,10 @@ public class ClusterCephStatus : ModelBase
         public string Name { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
@@ -4588,7 +4581,7 @@ public class ClusterCephStatus : ModelBase
         public string Type { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -4600,10 +4593,10 @@ public class ClusterCephStatus : ModelBase
         public string Name { get; set; }
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; }
 
         [JsonProperty("default_value")]
         public string DefaultValue { get; set; }
@@ -4627,7 +4620,7 @@ public class ClusterCephStatus : ModelBase
         public string Type { get; set; }
 
         [JsonProperty("enum_allowed")]
-        public List<object> EnumAllowed { get; set; }
+        public IEnumerable<object> EnumAllowed { get; set; } = [];
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -4639,10 +4632,10 @@ public class ClusterCephStatus : ModelBase
         public string Name { get; set; }
 
         [JsonProperty("tags")]
-        public List<object> Tags { get; set; }
+        public IEnumerable<object> Tags { get; set; } =[];
 
         [JsonProperty("see_also")]
-        public List<object> SeeAlso { get; set; }
+        public IEnumerable<object> SeeAlso { get; set; } = [];
 
         [JsonProperty("desc")]
         public string Desc { get; set; }

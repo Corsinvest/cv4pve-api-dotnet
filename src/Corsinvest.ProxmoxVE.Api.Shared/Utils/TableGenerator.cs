@@ -125,7 +125,7 @@ public class TableGenerator
         var columnHeaders = string.Format(format, [.. columns]);
 
         ret.AppendLine(columnHeaders);
-        ret.AppendLine(Regex.Replace(columnHeaders, @"[^|]", "-"));
+        ret.AppendLine(Regex.Replace(columnHeaders, "[^|]", "-"));
         rows.Select(row => string.Format(format, [.. row])).ToList().ForEach(row => ret.AppendLine(row));
         return ret.ToString();
     }
@@ -143,7 +143,7 @@ public class TableGenerator
         var ret = new StringBuilder();
         var format = CreateStringFormat(columns, rows);
         var columnHeaders = string.Format(format, [.. columns]);
-        var dividerPlus = Regex.Replace(columnHeaders, @"[^|]", "-").Replace("|", "+");
+        var dividerPlus = Regex.Replace(columnHeaders, "[^|]", "-").Replace("|", "+");
 
         ret.AppendLine(dividerPlus);
         ret.AppendLine(columnHeaders);
@@ -166,12 +166,12 @@ public class TableGenerator
 
         static string CreateRow(string tag, IEnumerable<object> values)
             => "<tr>" +
-                string.Join("", values.Select(a => $"<{tag} style='border: 1px solid black;'>{(a + "").Trim()}</{tag}>")) +
+                string.Concat(values.Select(a => $"<{tag} style='border: 1px solid black;'>{(a + "").Trim()}</{tag}>")) +
                 "</tr>";
 
         return "<table style='width: 100%;border-collapse: collapse;border: 1px solid black;'>" +
                 $"<thead>{CreateRow("th", [.. columns])}</thead>" +
-                $"<tbody>{string.Join("", rows.Select(a => CreateRow("td", a)))}</tbody>" +
+                $"<tbody>{string.Concat(rows.Select(a => CreateRow("td", a)))}</tbody>" +
                 "</table>";
     }
 
