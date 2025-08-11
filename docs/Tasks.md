@@ -456,8 +456,8 @@ public class TaskStatus
 }
 ```
 
-## 🔗 Related Topics
+---
 
-- **[Result Handling](./Results.md)** - Working with API responses
-- **[Error Handling](./ErrorHandling.md)** - Exception management
-- **[Advanced Usage](./Advanced.md)** - Complex scenarios and patterns
+<div align="center">
+  <sub>Made with ❤️ in Italy 🇮🇹 by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
+</div>
