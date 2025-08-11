@@ -1,16 +1,21 @@
-name: Bug Report
-description: File a bug report
-labels: [needs investigation]
+name: 🐛 Bug Report
+description: Report a bug in cv4pve-api-dotnet
+title: "[BUG] "
+labels: ["bug", "needs investigation"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report. Note that this template is only for bug reports.
+        ## 🐛 Bug Report
+        
+        Thanks for taking the time to fill out this bug report!
+        
+        **Before submitting:** Search existing issues to avoid duplicates.
   - type: textarea
     id: what-happened
     attributes:
       label: What happened?
-      description: Please describe the issue briefly. You can use log, screenshots, gifs or videos to further explain your problem.
+      description: Describe the issue briefly
       placeholder: Describe your issue!
     validations:
       required: true
@@ -18,67 +23,102 @@ body:
     id: expected-behavior
     attributes:
       label: Expected behavior
-      description: Please provide a clear and concise description of what you expected to happen.
+      description: What you expected to happen
       placeholder: Describe the expected behavior!
     validations:
       required: true
   - type: textarea
-    id: logs
+    id: code-sample
     attributes:
-      label: Relevant log output
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
-      render: shell
-
-  - type: input
-    id: net-version
-    attributes:
-      label: Net Version
-      description: Net Version (.NET Framework 4.7,.NET Framework 4.8, NetCore 3.1, .Net 5.0, .Net 6.0)
-      placeholder: 3.X.X
+      label: Code sample
+      description: |
+        Paste your code here. **Remove passwords and API tokens!**
+      placeholder: |
+        var client = new PveClient("pve.local");
+        await client.Login("user@pam", "***");
+        var result = await client.Nodes["pve1"].Qemu[100].Config.VmConfig();
+      render: csharp
     validations:
       required: true
-  
+  - type: textarea
+    id: error-message
+    attributes:
+      label: Error message / Stack trace
+      description: |
+        Paste the complete error message and stack trace here.
+        
+        ⚠️ **ATTENTION: Remove sensitive data (passwords, API keys) before pasting!**
+      placeholder: Paste the error message and stack trace here
+      render: shell
+    validations:
+      required: false
   - type: input
-    id: proxmox-ve-version
+    id: nuget-version
+    attributes:
+      label: NuGet Package Version
+      description: Which version of the NuGet package are you using?
+      placeholder: "e.g., 8.2.0"
+    validations:
+      required: true
+  - type: input
+    id: dotnet-version
+    attributes:
+      label: .NET Version
+      description: Output of "dotnet --version"
+      placeholder: "e.g., 8.0.100"
+    validations:
+      required: true
+  - type: input
+    id: proxmox-version
     attributes:
       label: Proxmox VE Version
-      description: Proxmox VE Version
-      placeholder: 5.X.X
+      description: What version of Proxmox VE are you connecting to?
+      placeholder: "e.g., 8.1.4"
     validations:
       required: true
-
-  - type: input
-    id: bug-version
+  - type: dropdown
+    id: package
     attributes:
-      label: Version (bug)
-      description: With which version are you experiencing the issue?
-      placeholder: 1.X.X
+      label: Affected Package
+      description: Which package is causing the issue?
+      options:
+        - Corsinvest.ProxmoxVE.Api
+        - Corsinvest.ProxmoxVE.Api.Extension
+        - Corsinvest.ProxmoxVE.Api.Shared
+        - Corsinvest.ProxmoxVE.Api.Shell
+        - Corsinvest.ProxmoxVE.Api.Metadata
+        - Not sure / Multiple packages
     validations:
       required: true
-  - type: input
-    id: working-version
-    attributes:
-      label: Version (working)
-      description: Did it work on a previous version? If so, which version?
-      placeholder: 1.X.X
   - type: dropdown
     id: os
     attributes:
-      label: On what operating system are you experiencing the issue?
-      description: You don't have to test it on every os.
-      multiple: true
+      label: Operating System
       options:
         - Windows
-        - Mac OSX
         - Linux
+        - macOS
         - Other
     validations:
       required: true
-
-  - type: checkboxes
-    id: pr
+  - type: dropdown
+    id: authentication
     attributes:
-      label: Pull Request
-      description: Are you interested in implementing a fix via a Pull Request? That would be the fastest way to resolve your issue. We appreciate every contribution!
+      label: Authentication Method
+      description: How are you authenticating with Proxmox VE?
       options:
-        - label: I would like to do a Pull Request
+        - Username/Password
+        - API Token
+        - Username/Password with 2FA
+        - Not applicable
+    validations:
+      required: true
+  - type: checkboxes
+    id: additional-info
+    attributes:
+      label: Additional Information
+      options:
+        - label: I have tested with the latest version available
+        - label: I have searched existing issues and this is not a duplicate
+        - label: I have removed all sensitive information from my report
+        - label: I would like to submit a Pull Request to fix this issue
