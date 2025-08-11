@@ -341,8 +341,6 @@ public static async Task<r> LoggedApiCall<T>(Func<Task<r>> apiCall, string opera
 }
 ```
 
-## 🔗 Related Topics
-
-- **[Result Handling](./Results.md)** - Working with API responses
-- **[Task Management](./Tasks.md)** - Long-running operations
-- **[Basic Examples](./Examples.md)** - Common usage patterns
+<div align="center">
+  <sub>Made with ❤️ in Italy 🇮🇹 by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
+</div>
