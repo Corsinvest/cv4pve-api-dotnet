@@ -84,7 +84,6 @@ await vm.Config.Set(memory: 4096, cores: 2);
 await vm.Snapshot.Snapshot("backup", "Description here");
 ```
 
-## 🔗 Related Topics
-
-- **[Result Handling](./Results.md)** - Working with API responses
-- **[Basic Examples](./Examples.md)** - Common usage patterns
+<div align="center">
+  <sub>Part of the cv4pve-tools suite | Made with ❤️ in Italy 🇮🇹</sub>
+</div>
