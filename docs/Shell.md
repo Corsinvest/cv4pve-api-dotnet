@@ -761,5 +761,5 @@ switch (outputFormat)
 ---
 
 <div align="center">
-  <sub>Part of the cv4pve-tools suite | Made with ❤️ in Italy 🇮🇹</sub>
+  <sub>Made with ❤️ in Italy 🇮🇹 by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
 </div>
