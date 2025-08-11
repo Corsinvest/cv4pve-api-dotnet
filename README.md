@@ -189,10 +189,9 @@ graph TB
 ## 📚 Documentation
 
 ### 🎓 **Getting Started**
-1. **[Installation Guide](./docs/Installation.md)** - Setup and package selection
-2. **[Authentication](./docs/Authentication.md)** - API tokens and security
-3. **[Basic Examples](./docs/Examples.md)** - Common usage patterns
-4. **[Advanced Usage](./docs/Advanced.md)** - Complex scenarios and best practices
+- **[Authentication](./docs/Authentication.md)** - API tokens and security
+- **[Basic Examples](./docs/Examples.md)** - Common usage patterns
+- **[Advanced Usage](./docs/Advanced.md)** - Complex scenarios and best practices
 
 ### 📖 **API Reference**
 - **[API Structure](./docs/ApiStructure.md)** - Understanding the tree structure
@@ -280,3 +279,4 @@ This software is part of the **cv4pve-tools** suite. For licensing details, plea
 <div align="center">
   <sub>Made with ❤️ in Italy 🇮🇹 by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
 </div>
+
