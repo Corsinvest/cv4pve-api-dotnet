@@ -464,9 +464,6 @@ if (vmLocation.HasValue)
 
 ---
 
-## 🔗 Related Topics
-
-- **[Authentication Guide](./Authentication.md)** - Setting up secure connections
-- **[Advanced Usage](./Advanced.md)** - Complex scenarios and patterns
-- **[Result Handling](./Results.md)** - Working with API responses
-- **[Error Handling](./ErrorHandling.md)** - Exception management
+<div align="center">
+  <sub>Made with ❤️ in Italy 🇮🇹 by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
+</div>
