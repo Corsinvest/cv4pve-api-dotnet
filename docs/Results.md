@@ -216,8 +216,8 @@ if (result.IsSuccessStatusCode)
 }
 ```
 
-## 🔗 Related Topics
+---
 
-- **[API Structure](./ApiStructure.md)** - Understanding endpoint hierarchy
-- **[Error Handling](./ErrorHandling.md)** - Exception management
-- **[Basic Examples](./Examples.md)** - Common usage patterns
+<div align="center">
+  <sub>Made with ❤️ in Italy 🇮🇹 by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
+</div>
