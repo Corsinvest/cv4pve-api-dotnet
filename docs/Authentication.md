@@ -340,9 +340,6 @@ if (!await TestAuthentication(client))
 }
 ```
 
----
-
-## 🔗 Related Topics
-
-- **[Basic Examples](./Examples.md)** - Using authenticated clients
-- **[Error Handling](./ErrorHandling.md)** - Handling authentication errors
+<div align="center">
+  <sub>Part of the cv4pve-tools suite | Made with ❤️ in Italy 🇮🇹</sub>
+</div>
