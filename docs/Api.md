@@ -728,5 +728,5 @@ Console.WriteLine(result.Response.data.nonexistent); // May throw
 ---
 
 <div align="center">
-  <sub>Made with ❤️ in Italy 🇮🇹 by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
+  <sub>Part of <a href="https://www.cv4pve-tools.com">cv4pve-tools</a> suite | Made with ❤️ in Italy by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
 </div>
