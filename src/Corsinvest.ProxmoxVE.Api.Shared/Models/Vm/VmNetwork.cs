@@ -11,6 +11,11 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 public class VmNetwork
 {
     /// <summary>
+    /// Id
+    /// </summary>
+    public string Id { get; set; }
+
+    /// <summary>
     /// Name
     /// </summary>
     public string Name { get; set; }
