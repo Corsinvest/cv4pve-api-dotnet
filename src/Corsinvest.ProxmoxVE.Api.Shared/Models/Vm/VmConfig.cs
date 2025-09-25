@@ -123,6 +123,7 @@ public class VmConfig : ModelBase
             if (key.StartsWith("net"))
             {
                 var network = new VmNetwork();
+                network.Id = key;
 
                 foreach (var item in (ExtensionData[key] + "").Split(','))
                 {
