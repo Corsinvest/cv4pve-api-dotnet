@@ -120,7 +120,7 @@ public static class ModelsExtensionsAutoGen
         => (await item.Status()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterHaStatusCurrent>>();
 
     /// <summary>
-    /// Get HA groups.
+    /// Get HA groups. (deprecated in favor of HA rules)
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
@@ -266,7 +266,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <param name="type">Only list specific interface types.
-    ///   Enum: bridge,bond,eth,alias,vlan,OVSBridge,OVSBond,OVSPort,OVSIntPort,vnet,any_bridge,any_local_bridge</param>
+    ///   Enum: bridge,bond,eth,alias,vlan,fabric,OVSBridge,OVSBond,OVSPort,OVSIntPort,vnet,any_bridge,any_local_bridge,include_sdn</param>
     /// <returns></returns>
     public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeNetwork>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveNetwork item, string type = null)
         => (await item.Index(type)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeNetwork>>();
@@ -335,7 +335,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <param name="timeframe">Specify the time frame you are interested in.
-    ///   Enum: hour,day,week,month,year</param>
+    ///   Enum: hour,day,week,month,year,decade</param>
     /// <param name="cf">The RRD consolidation function
     ///   Enum: AVERAGE,MAX</param>
     /// <returns></returns>
@@ -425,7 +425,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <param name="type">Only list storage of specific type
-    ///   Enum: btrfs,cephfs,cifs,dir,esxi,glusterfs,iscsi,iscsidirect,lvm,lvmthin,nfs,pbs,rbd,zfs,zfspool</param>
+    ///   Enum: btrfs,cephfs,cifs,dir,esxi,iscsi,iscsidirect,lvm,lvmthin,nfs,pbs,rbd,zfs,zfspool</param>
     /// <returns></returns>
     public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Storage.StorageItem>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveStorage item, string type = null)
         => (await item.Index(type)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Storage.StorageItem>>();
@@ -803,4 +803,7 @@ public static class ModelsExtensionsAutoGen
     /// <returns></returns>
     public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmFirewallOptions> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveFirewall.PveOptions item)
         => (await item.GetOptions()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmFirewallOptions>();
+
+
+
 }
