@@ -7,7 +7,7 @@
 **🚀 Official .NET Client Library Suite for Proxmox VE API**
 
 [![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg?style=flat-square)](LICENSE)
-[![.NET](https://img.shields.io/badge/.NET-6.0%2B-blue?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
+[![.NET](https://img.shields.io/badge/.NET-7.0%2B-blue?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 [![GitHub Stars](https://img.shields.io/github/stars/Corsinvest/cv4pve-api-dotnet?style=flat-square&logo=github)](https://github.com/Corsinvest/cv4pve-api-dotnet)
 
 ⭐ **We appreciate your star, it helps!** ⭐
