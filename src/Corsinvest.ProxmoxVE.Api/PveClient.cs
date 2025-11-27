@@ -3,10 +3,6 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
-
 namespace Corsinvest.ProxmoxVE.Api;
 
 /// <summary>
@@ -125,6 +121,11 @@ public class PveClient : PveClientBase
         /// Mapping
         /// </summary>
         public PveMapping Mapping => _mapping ??= new(_client);
+        private PveBulkAction _bulkAction;
+        /// <summary>
+        /// BulkAction
+        /// </summary>
+        public PveBulkAction BulkAction => _bulkAction ??= new(_client);
         private PveSdn _sdn;
         /// <summary>
         /// Sdn
@@ -449,13 +450,15 @@ public class PveClient : PveClientBase
                 /// </summary>
                 /// <param name="history">Also return historic values. Returns full available metric history unless `start-time` is also set</param>
                 /// <param name="local_only">Only return metrics for the current node instead of the whole cluster</param>
+                /// <param name="node_list">Only return metrics from nodes passed as comma-separated list</param>
                 /// <param name="start_time">Only include metrics with a timestamp &amp;gt; start-time.</param>
                 /// <returns></returns>
-                public async Task<Result> Export(bool? history = null, bool? local_only = null, int? start_time = null)
+                public async Task<Result> Export(bool? history = null, bool? local_only = null, string node_list = null, int? start_time = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("history", history);
                     parameters.Add("local-only", local_only);
+                    parameters.Add("node-list", node_list);
                     parameters.Add("start-time", start_time);
                     return await _client.GetAsync($"/cluster/metrics/export", parameters);
                 }
@@ -2260,8 +2263,14 @@ public class PveClient : PveClientBase
                     /// <summary>
                     /// Delete resource configuration.
                     /// </summary>
+                    /// <param name="purge">Remove this resource from rules that reference it, deleting the rule if this resource is the only resource in the rule</param>
                     /// <returns></returns>
-                    public async Task<Result> Delete() { return await _client.DeleteAsync($"/cluster/ha/resources/{_sid}"); }
+                    public async Task<Result> Delete(bool? purge = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("purge", purge);
+                        return await _client.DeleteAsync($"/cluster/ha/resources/{_sid}", parameters);
+                    }
                     /// <summary>
                     /// Read resource configuration.
                     /// </summary>
@@ -3382,6 +3391,163 @@ public class PveClient : PveClientBase
             public async Task<Result> Index() { return await _client.GetAsync($"/cluster/mapping"); }
         }
         /// <summary>
+        /// BulkAction
+        /// </summary>
+        public class PveBulkAction
+        {
+            private readonly PveClient _client;
+
+            internal PveBulkAction(PveClient client) { _client = client; }
+            private PveGuest _guest;
+            /// <summary>
+            /// Guest
+            /// </summary>
+            public PveGuest Guest => _guest ??= new(_client);
+            /// <summary>
+            /// Guest
+            /// </summary>
+            public class PveGuest
+            {
+                private readonly PveClient _client;
+
+                internal PveGuest(PveClient client) { _client = client; }
+                private PveStart _start;
+                /// <summary>
+                /// Start
+                /// </summary>
+                public PveStart Start => _start ??= new(_client);
+                private PveShutdown _shutdown;
+                /// <summary>
+                /// Shutdown
+                /// </summary>
+                public PveShutdown Shutdown => _shutdown ??= new(_client);
+                private PveSuspend _suspend;
+                /// <summary>
+                /// Suspend
+                /// </summary>
+                public PveSuspend Suspend => _suspend ??= new(_client);
+                private PveMigrate _migrate;
+                /// <summary>
+                /// Migrate
+                /// </summary>
+                public PveMigrate Migrate => _migrate ??= new(_client);
+                /// <summary>
+                /// Start
+                /// </summary>
+                public class PveStart
+                {
+                    private readonly PveClient _client;
+
+                    internal PveStart(PveClient client) { _client = client; }
+                    /// <summary>
+                    /// Bulk start or resume all guests on the cluster.
+                    /// </summary>
+                    /// <param name="maxworkers">How many parallel tasks at maximum should be started.</param>
+                    /// <param name="timeout">Default start timeout in seconds. Only valid for VMs. (default depends on the guest configuration).</param>
+                    /// <param name="vms">Only consider guests from this list of VMIDs.</param>
+                    /// <returns></returns>
+                    public async Task<Result> Start(int? maxworkers = null, int? timeout = null, IEnumerable<object> vms = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("maxworkers", maxworkers);
+                        parameters.Add("timeout", timeout);
+                        parameters.Add("vms", vms);
+                        return await _client.CreateAsync($"/cluster/bulk-action/guest/start", parameters);
+                    }
+                }
+                /// <summary>
+                /// Shutdown
+                /// </summary>
+                public class PveShutdown
+                {
+                    private readonly PveClient _client;
+
+                    internal PveShutdown(PveClient client) { _client = client; }
+                    /// <summary>
+                    /// Bulk shutdown all guests on the cluster.
+                    /// </summary>
+                    /// <param name="force_stop">Makes sure the Guest stops after the timeout.</param>
+                    /// <param name="maxworkers">How many parallel tasks at maximum should be started.</param>
+                    /// <param name="timeout">Default shutdown timeout in seconds if none is configured for the guest.</param>
+                    /// <param name="vms">Only consider guests from this list of VMIDs.</param>
+                    /// <returns></returns>
+                    public async Task<Result> Shutdown(bool? force_stop = null, int? maxworkers = null, int? timeout = null, IEnumerable<object> vms = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("force-stop", force_stop);
+                        parameters.Add("maxworkers", maxworkers);
+                        parameters.Add("timeout", timeout);
+                        parameters.Add("vms", vms);
+                        return await _client.CreateAsync($"/cluster/bulk-action/guest/shutdown", parameters);
+                    }
+                }
+                /// <summary>
+                /// Suspend
+                /// </summary>
+                public class PveSuspend
+                {
+                    private readonly PveClient _client;
+
+                    internal PveSuspend(PveClient client) { _client = client; }
+                    /// <summary>
+                    /// Bulk suspend all guests on the cluster.
+                    /// </summary>
+                    /// <param name="maxworkers">How many parallel tasks at maximum should be started.</param>
+                    /// <param name="statestorage">The storage for the VM state.</param>
+                    /// <param name="to_disk">If set, suspends the guests to disk. Will be resumed on next start.</param>
+                    /// <param name="vms">Only consider guests from this list of VMIDs.</param>
+                    /// <returns></returns>
+                    public async Task<Result> Suspend(int? maxworkers = null, string statestorage = null, bool? to_disk = null, IEnumerable<object> vms = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("maxworkers", maxworkers);
+                        parameters.Add("statestorage", statestorage);
+                        parameters.Add("to-disk", to_disk);
+                        parameters.Add("vms", vms);
+                        return await _client.CreateAsync($"/cluster/bulk-action/guest/suspend", parameters);
+                    }
+                }
+                /// <summary>
+                /// Migrate
+                /// </summary>
+                public class PveMigrate
+                {
+                    private readonly PveClient _client;
+
+                    internal PveMigrate(PveClient client) { _client = client; }
+                    /// <summary>
+                    /// Bulk migrate all guests on the cluster.
+                    /// </summary>
+                    /// <param name="target">Target node.</param>
+                    /// <param name="maxworkers">How many parallel tasks at maximum should be started.</param>
+                    /// <param name="online">Enable live migration for VMs and restart migration for CTs.</param>
+                    /// <param name="vms">Only consider guests from this list of VMIDs.</param>
+                    /// <param name="with_local_disks">Enable live storage migration for local disk</param>
+                    /// <returns></returns>
+                    public async Task<Result> Migrate(string target, int? maxworkers = null, bool? online = null, IEnumerable<object> vms = null, bool? with_local_disks = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("target", target);
+                        parameters.Add("maxworkers", maxworkers);
+                        parameters.Add("online", online);
+                        parameters.Add("vms", vms);
+                        parameters.Add("with-local-disks", with_local_disks);
+                        return await _client.CreateAsync($"/cluster/bulk-action/guest/migrate", parameters);
+                    }
+                }
+                /// <summary>
+                /// Bulk action index.
+                /// </summary>
+                /// <returns></returns>
+                public async Task<Result> Index() { return await _client.GetAsync($"/cluster/bulk-action/guest"); }
+            }
+            /// <summary>
+            /// List resource types.
+            /// </summary>
+            /// <returns></returns>
+            public async Task<Result> Index() { return await _client.GetAsync($"/cluster/bulk-action"); }
+        }
+        /// <summary>
         /// Sdn
         /// </summary>
         public class PveSdn
@@ -3853,14 +4019,14 @@ public class PveClient : PveClientBase
                     /// <summary>
                     /// Update sdn vnet object configuration.
                     /// </summary>
-                    /// <param name="alias">alias name of the vnet</param>
+                    /// <param name="alias">Alias name of the VNet.</param>
                     /// <param name="delete">A list of settings you want to delete.</param>
                     /// <param name="digest">Prevent changes if current configuration file has a different digest. This can be used to prevent concurrent modifications.</param>
-                    /// <param name="isolate_ports">If true, sets the isolated property for all members of this VNet</param>
+                    /// <param name="isolate_ports">If true, sets the isolated property for all interfaces on the bridge of this VNet.</param>
                     /// <param name="lock_token">the token for unlocking the global SDN configuration</param>
-                    /// <param name="tag">vlan or vxlan id</param>
-                    /// <param name="vlanaware">Allow vm VLANs to pass through this vnet.</param>
-                    /// <param name="zone">zone id</param>
+                    /// <param name="tag">VLAN Tag (for VLAN or QinQ zones) or VXLAN VNI (for VXLAN or EVPN zones).</param>
+                    /// <param name="vlanaware">Allow VLANs to pass through this vnet.</param>
+                    /// <param name="zone">Name of the zone this VNet belongs to.</param>
                     /// <returns></returns>
                     public async Task<Result> Update(string alias = null, string delete = null, string digest = null, bool? isolate_ports = null, string lock_token = null, int? tag = null, bool? vlanaware = null, string zone = null)
                     {
@@ -3893,14 +4059,14 @@ public class PveClient : PveClientBase
                 /// Create a new sdn vnet object.
                 /// </summary>
                 /// <param name="vnet">The SDN vnet object identifier.</param>
-                /// <param name="zone">zone id</param>
-                /// <param name="alias">alias name of the vnet</param>
-                /// <param name="isolate_ports">If true, sets the isolated property for all members of this VNet</param>
+                /// <param name="zone">Name of the zone this VNet belongs to.</param>
+                /// <param name="alias">Alias name of the VNet.</param>
+                /// <param name="isolate_ports">If true, sets the isolated property for all interfaces on the bridge of this VNet.</param>
                 /// <param name="lock_token">the token for unlocking the global SDN configuration</param>
-                /// <param name="tag">vlan or vxlan id</param>
-                /// <param name="type">Type
+                /// <param name="tag">VLAN Tag (for VLAN or QinQ zones) or VXLAN VNI (for VXLAN or EVPN zones).</param>
+                /// <param name="type">Type of the VNet.
                 ///   Enum: vnet</param>
-                /// <param name="vlanaware">Allow vm VLANs to pass through this vnet.</param>
+                /// <param name="vlanaware">Allow VLANs to pass through this vnet.</param>
                 /// <returns></returns>
                 public async Task<Result> Create(string vnet, string zone, string alias = null, bool? isolate_ports = null, string lock_token = null, int? tag = null, string type = null, bool? vlanaware = null)
                 {
@@ -3963,35 +4129,35 @@ public class PveClient : PveClientBase
                     /// <summary>
                     /// Update sdn zone object configuration.
                     /// </summary>
-                    /// <param name="advertise_subnets">Advertise evpn subnets if you have silent hosts</param>
-                    /// <param name="bridge"></param>
+                    /// <param name="advertise_subnets">Advertise IP prefixes (Type-5 routes) instead of MAC/IP pairs (Type-2 routes).</param>
+                    /// <param name="bridge">The bridge for which VLANs should be managed.</param>
                     /// <param name="bridge_disable_mac_learning">Disable auto mac learning.</param>
-                    /// <param name="controller">Frr router name</param>
+                    /// <param name="controller">Controller for this zone.</param>
                     /// <param name="delete">A list of settings you want to delete.</param>
                     /// <param name="dhcp">Type of the DHCP backend for this zone
                     ///   Enum: dnsmasq</param>
                     /// <param name="digest">Prevent changes if current configuration file has a different digest. This can be used to prevent concurrent modifications.</param>
-                    /// <param name="disable_arp_nd_suppression">Disable ipv4 arp &amp;&amp; ipv6 neighbour discovery suppression</param>
+                    /// <param name="disable_arp_nd_suppression">Suppress IPv4 ARP &amp;&amp; IPv6 Neighbour Discovery messages.</param>
                     /// <param name="dns">dns api server</param>
                     /// <param name="dnszone">dns domain zone  ex: mydomain.com</param>
                     /// <param name="dp_id">Faucet dataplane id</param>
                     /// <param name="exitnodes">List of cluster node names.</param>
-                    /// <param name="exitnodes_local_routing">Allow exitnodes to connect to evpn guests</param>
-                    /// <param name="exitnodes_primary">Force traffic to this exitnode first.</param>
+                    /// <param name="exitnodes_local_routing">Allow exitnodes to connect to EVPN guests.</param>
+                    /// <param name="exitnodes_primary">Force traffic through this exitnode first.</param>
                     /// <param name="fabric">SDN fabric to use as underlay for this VXLAN zone.</param>
                     /// <param name="ipam">use a specific ipam</param>
                     /// <param name="lock_token">the token for unlocking the global SDN configuration</param>
-                    /// <param name="mac">Anycast logical router mac address</param>
-                    /// <param name="mtu">MTU</param>
+                    /// <param name="mac">Anycast logical router mac address.</param>
+                    /// <param name="mtu">MTU of the zone, will be used for the created VNet bridges.</param>
                     /// <param name="nodes">List of cluster node names.</param>
-                    /// <param name="peers">peers address list.</param>
+                    /// <param name="peers">Comma-separated list of peers, that are part of the VXLAN zone. Usually the IPs of the nodes.</param>
                     /// <param name="reversedns">reverse dns api server</param>
-                    /// <param name="rt_import">Route-Target import</param>
-                    /// <param name="tag">Service-VLAN Tag</param>
-                    /// <param name="vlan_protocol">
+                    /// <param name="rt_import">List of Route Targets that should be imported into the VRF of the zone.</param>
+                    /// <param name="tag">Service-VLAN Tag (outer VLAN)</param>
+                    /// <param name="vlan_protocol">Which VLAN protocol should be used for the creation of the QinQ zone.
                     ///   Enum: 802.1q,802.1ad</param>
-                    /// <param name="vrf_vxlan">l3vni.</param>
-                    /// <param name="vxlan_port">Vxlan tunnel udp port (default 4789).</param>
+                    /// <param name="vrf_vxlan">VNI for the zone VRF.</param>
+                    /// <param name="vxlan_port">UDP port that should be used for the VXLAN tunnel (default 4789).</param>
                     /// <returns></returns>
                     public async Task<Result> Update(bool? advertise_subnets = null, string bridge = null, bool? bridge_disable_mac_learning = null, string controller = null, string delete = null, string dhcp = null, string digest = null, bool? disable_arp_nd_suppression = null, string dns = null, string dnszone = null, int? dp_id = null, string exitnodes = null, bool? exitnodes_local_routing = null, string exitnodes_primary = null, string fabric = null, string ipam = null, string lock_token = null, string mac = null, int? mtu = null, string nodes = null, string peers = null, string reversedns = null, string rt_import = null, int? tag = null, string vlan_protocol = null, int? vrf_vxlan = null, int? vxlan_port = null)
                     {
@@ -4048,33 +4214,33 @@ public class PveClient : PveClientBase
                 /// <param name="type">Plugin type.
                 ///   Enum: evpn,faucet,qinq,simple,vlan,vxlan</param>
                 /// <param name="zone">The SDN zone object identifier.</param>
-                /// <param name="advertise_subnets">Advertise evpn subnets if you have silent hosts</param>
-                /// <param name="bridge"></param>
+                /// <param name="advertise_subnets">Advertise IP prefixes (Type-5 routes) instead of MAC/IP pairs (Type-2 routes).</param>
+                /// <param name="bridge">The bridge for which VLANs should be managed.</param>
                 /// <param name="bridge_disable_mac_learning">Disable auto mac learning.</param>
-                /// <param name="controller">Frr router name</param>
+                /// <param name="controller">Controller for this zone.</param>
                 /// <param name="dhcp">Type of the DHCP backend for this zone
                 ///   Enum: dnsmasq</param>
-                /// <param name="disable_arp_nd_suppression">Disable ipv4 arp &amp;&amp; ipv6 neighbour discovery suppression</param>
+                /// <param name="disable_arp_nd_suppression">Suppress IPv4 ARP &amp;&amp; IPv6 Neighbour Discovery messages.</param>
                 /// <param name="dns">dns api server</param>
                 /// <param name="dnszone">dns domain zone  ex: mydomain.com</param>
                 /// <param name="dp_id">Faucet dataplane id</param>
                 /// <param name="exitnodes">List of cluster node names.</param>
-                /// <param name="exitnodes_local_routing">Allow exitnodes to connect to evpn guests</param>
-                /// <param name="exitnodes_primary">Force traffic to this exitnode first.</param>
+                /// <param name="exitnodes_local_routing">Allow exitnodes to connect to EVPN guests.</param>
+                /// <param name="exitnodes_primary">Force traffic through this exitnode first.</param>
                 /// <param name="fabric">SDN fabric to use as underlay for this VXLAN zone.</param>
                 /// <param name="ipam">use a specific ipam</param>
                 /// <param name="lock_token">the token for unlocking the global SDN configuration</param>
-                /// <param name="mac">Anycast logical router mac address</param>
-                /// <param name="mtu">MTU</param>
+                /// <param name="mac">Anycast logical router mac address.</param>
+                /// <param name="mtu">MTU of the zone, will be used for the created VNet bridges.</param>
                 /// <param name="nodes">List of cluster node names.</param>
-                /// <param name="peers">peers address list.</param>
+                /// <param name="peers">Comma-separated list of peers, that are part of the VXLAN zone. Usually the IPs of the nodes.</param>
                 /// <param name="reversedns">reverse dns api server</param>
-                /// <param name="rt_import">Route-Target import</param>
-                /// <param name="tag">Service-VLAN Tag</param>
-                /// <param name="vlan_protocol">
+                /// <param name="rt_import">List of Route Targets that should be imported into the VRF of the zone.</param>
+                /// <param name="tag">Service-VLAN Tag (outer VLAN)</param>
+                /// <param name="vlan_protocol">Which VLAN protocol should be used for the creation of the QinQ zone.
                 ///   Enum: 802.1q,802.1ad</param>
-                /// <param name="vrf_vxlan">l3vni.</param>
-                /// <param name="vxlan_port">Vxlan tunnel udp port (default 4789).</param>
+                /// <param name="vrf_vxlan">VNI for the zone VRF.</param>
+                /// <param name="vxlan_port">UDP port that should be used for the VXLAN tunnel (default 4789).</param>
                 /// <returns></returns>
                 public async Task<Result> Create(string type, string zone, bool? advertise_subnets = null, string bridge = null, bool? bridge_disable_mac_learning = null, string controller = null, string dhcp = null, bool? disable_arp_nd_suppression = null, string dns = null, string dnszone = null, int? dp_id = null, string exitnodes = null, bool? exitnodes_local_routing = null, string exitnodes_primary = null, string fabric = null, string ipam = null, string lock_token = null, string mac = null, int? mtu = null, string nodes = null, string peers = null, string reversedns = null, string rt_import = null, int? tag = null, string vlan_protocol = null, int? vrf_vxlan = null, int? vxlan_port = null)
                 {
@@ -4157,17 +4323,17 @@ public class PveClient : PveClientBase
                     /// Update sdn controller object configuration.
                     /// </summary>
                     /// <param name="asn">autonomous system number</param>
-                    /// <param name="bgp_multipath_as_path_relax"></param>
+                    /// <param name="bgp_multipath_as_path_relax">Consider different AS paths of equal length for multipath computation.</param>
                     /// <param name="delete">A list of settings you want to delete.</param>
                     /// <param name="digest">Prevent changes if current configuration file has a different digest. This can be used to prevent concurrent modifications.</param>
-                    /// <param name="ebgp">Enable ebgp. (remote-as external)</param>
-                    /// <param name="ebgp_multihop"></param>
+                    /// <param name="ebgp">Enable eBGP (remote-as external).</param>
+                    /// <param name="ebgp_multihop">Set maximum amount of hops for eBGP peers.</param>
                     /// <param name="fabric">SDN fabric to use as underlay for this EVPN controller.</param>
-                    /// <param name="isis_domain">ISIS domain.</param>
-                    /// <param name="isis_ifaces">ISIS interface.</param>
-                    /// <param name="isis_net">ISIS network entity title.</param>
+                    /// <param name="isis_domain">Name of the IS-IS domain.</param>
+                    /// <param name="isis_ifaces">Comma-separated list of interfaces where IS-IS should be active.</param>
+                    /// <param name="isis_net">Network Entity title for this node in the IS-IS network.</param>
                     /// <param name="lock_token">the token for unlocking the global SDN configuration</param>
-                    /// <param name="loopback">source loopback interface.</param>
+                    /// <param name="loopback">Name of the loopback/dummy interface that provides the Router-IP.</param>
                     /// <param name="node">The cluster node name.</param>
                     /// <param name="peers">peers address list.</param>
                     /// <returns></returns>
@@ -4214,15 +4380,15 @@ public class PveClient : PveClientBase
                 /// <param name="type">Plugin type.
                 ///   Enum: bgp,evpn,faucet,isis</param>
                 /// <param name="asn">autonomous system number</param>
-                /// <param name="bgp_multipath_as_path_relax"></param>
-                /// <param name="ebgp">Enable ebgp. (remote-as external)</param>
-                /// <param name="ebgp_multihop"></param>
+                /// <param name="bgp_multipath_as_path_relax">Consider different AS paths of equal length for multipath computation.</param>
+                /// <param name="ebgp">Enable eBGP (remote-as external).</param>
+                /// <param name="ebgp_multihop">Set maximum amount of hops for eBGP peers.</param>
                 /// <param name="fabric">SDN fabric to use as underlay for this EVPN controller.</param>
-                /// <param name="isis_domain">ISIS domain.</param>
-                /// <param name="isis_ifaces">ISIS interface.</param>
-                /// <param name="isis_net">ISIS network entity title.</param>
+                /// <param name="isis_domain">Name of the IS-IS domain.</param>
+                /// <param name="isis_ifaces">Comma-separated list of interfaces where IS-IS should be active.</param>
+                /// <param name="isis_net">Network Entity title for this node in the IS-IS network.</param>
                 /// <param name="lock_token">the token for unlocking the global SDN configuration</param>
-                /// <param name="loopback">source loopback interface.</param>
+                /// <param name="loopback">Name of the loopback/dummy interface that provides the Router-IP.</param>
                 /// <param name="node">The cluster node name.</param>
                 /// <param name="peers">peers address list.</param>
                 /// <returns></returns>
@@ -5180,6 +5346,11 @@ public class PveClient : PveClientBase
             /// Aplinfo
             /// </summary>
             public PveAplinfo Aplinfo => _aplinfo ??= new(_client, _node);
+            private PveQueryOciRepoTags _queryOciRepoTags;
+            /// <summary>
+            /// QueryOciRepoTags
+            /// </summary>
+            public PveQueryOciRepoTags QueryOciRepoTags => _queryOciRepoTags ??= new(_client, _node);
             private PveQueryUrlMetadata _queryUrlMetadata;
             /// <summary>
             /// QueryUrlMetadata
@@ -6661,6 +6832,7 @@ public class PveClient : PveClientBase
                         /// <param name="acpi">Enable/disable ACPI.</param>
                         /// <param name="affinity">List of host cores used to execute guest processes, for example: 0,5,8-11</param>
                         /// <param name="agent">Enable/disable communication with the QEMU Guest Agent and its properties.</param>
+                        /// <param name="allow_ksm">Allow memory pages of this guest to be merged via KSM (Kernel Samepage Merging).</param>
                         /// <param name="amd_sev">Secure Encrypted Virtualization (SEV) features by AMD CPUs</param>
                         /// <param name="arch">Virtual processor architecture. Defaults to the host.
                         ///   Enum: x86_64,aarch64</param>
@@ -6693,10 +6865,11 @@ public class PveClient : PveClientBase
                         /// <param name="hookscript">Script that will be executed during various steps in the vms lifetime.</param>
                         /// <param name="hostpciN">Map host PCI devices into guest.</param>
                         /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory', 'usb' and 'cloudinit'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`. USB hotplugging is possible for guests with machine version &amp;gt;= 7.1 and ostype l26 or windows &amp;gt; 7.</param>
-                        /// <param name="hugepages">Enable/disable hugepages memory.
+                        /// <param name="hugepages">Enables hugepages memory.  Sets the size of hugepages in MiB. If the value is set to 'any' then 1 GiB hugepages will be used if possible, otherwise the size will fall back to 2 MiB.
                         ///   Enum: any,2,1024</param>
                         /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
                         /// <param name="import_working_storage">A file-based storage with 'images' content-type enabled, which is used as an intermediary extraction storage during import. Defaults to the source storage.</param>
+                        /// <param name="intel_tdx">Trusted Domain Extension (TDX) features by Intel CPUs</param>
                         /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration. This requires cloud-init 19.4 or newer.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
                         /// <param name="ivshmem">Inter-VM shared memory. Useful for direct communication between VMs, or to the host.</param>
                         /// <param name="keephugepages">Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.</param>
@@ -6753,12 +6926,13 @@ public class PveClient : PveClientBase
                         /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                         /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                         /// <returns></returns>
-                        public async Task<Result> UpdateVmAsync(bool? acpi = null, string affinity = null, string agent = null, string amd_sev = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, bool? ciupgrade = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string import_working_storage = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, string memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, IDictionary<int, string> virtiofsN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                        public async Task<Result> UpdateVmAsync(bool? acpi = null, string affinity = null, string agent = null, bool? allow_ksm = null, string amd_sev = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? background_delay = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, bool? ciupgrade = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string import_working_storage = null, string intel_tdx = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, string memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, IDictionary<int, string> virtiofsN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("acpi", acpi);
                             parameters.Add("affinity", affinity);
                             parameters.Add("agent", agent);
+                            parameters.Add("allow-ksm", allow_ksm);
                             parameters.Add("amd-sev", amd_sev);
                             parameters.Add("arch", arch);
                             parameters.Add("args", args);
@@ -6789,6 +6963,7 @@ public class PveClient : PveClientBase
                             parameters.Add("hotplug", hotplug);
                             parameters.Add("hugepages", hugepages);
                             parameters.Add("import-working-storage", import_working_storage);
+                            parameters.Add("intel-tdx", intel_tdx);
                             parameters.Add("ivshmem", ivshmem);
                             parameters.Add("keephugepages", keephugepages);
                             parameters.Add("keyboard", keyboard);
@@ -6850,6 +7025,7 @@ public class PveClient : PveClientBase
                         /// <param name="acpi">Enable/disable ACPI.</param>
                         /// <param name="affinity">List of host cores used to execute guest processes, for example: 0,5,8-11</param>
                         /// <param name="agent">Enable/disable communication with the QEMU Guest Agent and its properties.</param>
+                        /// <param name="allow_ksm">Allow memory pages of this guest to be merged via KSM (Kernel Samepage Merging).</param>
                         /// <param name="amd_sev">Secure Encrypted Virtualization (SEV) features by AMD CPUs</param>
                         /// <param name="arch">Virtual processor architecture. Defaults to the host.
                         ///   Enum: x86_64,aarch64</param>
@@ -6881,9 +7057,10 @@ public class PveClient : PveClientBase
                         /// <param name="hookscript">Script that will be executed during various steps in the vms lifetime.</param>
                         /// <param name="hostpciN">Map host PCI devices into guest.</param>
                         /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory', 'usb' and 'cloudinit'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`. USB hotplugging is possible for guests with machine version &amp;gt;= 7.1 and ostype l26 or windows &amp;gt; 7.</param>
-                        /// <param name="hugepages">Enable/disable hugepages memory.
+                        /// <param name="hugepages">Enables hugepages memory.  Sets the size of hugepages in MiB. If the value is set to 'any' then 1 GiB hugepages will be used if possible, otherwise the size will fall back to 2 MiB.
                         ///   Enum: any,2,1024</param>
                         /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
+                        /// <param name="intel_tdx">Trusted Domain Extension (TDX) features by Intel CPUs</param>
                         /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration. This requires cloud-init 19.4 or newer.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
                         /// <param name="ivshmem">Inter-VM shared memory. Useful for direct communication between VMs, or to the host.</param>
                         /// <param name="keephugepages">Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.</param>
@@ -6940,12 +7117,13 @@ public class PveClient : PveClientBase
                         /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                         /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                         /// <returns></returns>
-                        public async Task<Result> UpdateVm(bool? acpi = null, string affinity = null, string agent = null, string amd_sev = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, bool? ciupgrade = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, string memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, IDictionary<int, string> virtiofsN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                        public async Task<Result> UpdateVm(bool? acpi = null, string affinity = null, string agent = null, bool? allow_ksm = null, string amd_sev = null, string arch = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, bool? ciupgrade = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string delete = null, string description = null, string digest = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string intel_tdx = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? localtime = null, string lock_ = null, string machine = null, string memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, bool? protection = null, bool? reboot = null, string revert = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, bool? skiplock = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, string startdate = null, string startup = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, IDictionary<int, string> virtiofsN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("acpi", acpi);
                             parameters.Add("affinity", affinity);
                             parameters.Add("agent", agent);
+                            parameters.Add("allow-ksm", allow_ksm);
                             parameters.Add("amd-sev", amd_sev);
                             parameters.Add("arch", arch);
                             parameters.Add("args", args);
@@ -6974,6 +7152,7 @@ public class PveClient : PveClientBase
                             parameters.Add("hookscript", hookscript);
                             parameters.Add("hotplug", hotplug);
                             parameters.Add("hugepages", hugepages);
+                            parameters.Add("intel-tdx", intel_tdx);
                             parameters.Add("ivshmem", ivshmem);
                             parameters.Add("keephugepages", keephugepages);
                             parameters.Add("keyboard", keyboard);
@@ -7198,7 +7377,7 @@ public class PveClient : PveClientBase
                             _vmid = vmid;
                         }
                         /// <summary>
-                        /// Opens a weksocket for VNC traffic.
+                        /// Opens a websocket for VNC traffic.
                         /// </summary>
                         /// <param name="port">Port number returned by previous vncproxy call.</param>
                         /// <param name="vncticket">Ticket from previous call to vncproxy.</param>
@@ -7330,13 +7509,14 @@ public class PveClient : PveClientBase
                             /// <param name="migration_network">CIDR of the (sub) network that is used for migration.</param>
                             /// <param name="migration_type">Migration traffic is encrypted using an SSH tunnel by default. On secure, completely private networks this can be disabled to increase performance.
                             ///   Enum: secure,insecure</param>
+                            /// <param name="nets_host_mtu">Used for migration compat. List of VirtIO network devices and their effective host_mtu setting according to the QEMU object model on the source side of the migration. A value of 0 means that the host_mtu parameter is to be avoided for the corresponding device.</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                             /// <param name="stateuri">Some command save/restore state from this location.</param>
                             /// <param name="targetstorage">Mapping from source to target storages. Providing only a single storage ID maps all source storages to that storage. Providing the special value '1' will map each source storage to itself.</param>
                             /// <param name="timeout">Wait maximal timeout seconds.</param>
                             /// <param name="with_conntrack_state">Whether to migrate conntrack entries for running VMs.</param>
                             /// <returns></returns>
-                            public async Task<Result> VmStart(string force_cpu = null, string machine = null, string migratedfrom = null, string migration_network = null, string migration_type = null, bool? skiplock = null, string stateuri = null, string targetstorage = null, int? timeout = null, bool? with_conntrack_state = null)
+                            public async Task<Result> VmStart(string force_cpu = null, string machine = null, string migratedfrom = null, string migration_network = null, string migration_type = null, string nets_host_mtu = null, bool? skiplock = null, string stateuri = null, string targetstorage = null, int? timeout = null, bool? with_conntrack_state = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("force-cpu", force_cpu);
@@ -7344,6 +7524,7 @@ public class PveClient : PveClientBase
                                 parameters.Add("migratedfrom", migratedfrom);
                                 parameters.Add("migration_network", migration_network);
                                 parameters.Add("migration_type", migration_type);
+                                parameters.Add("nets-host-mtu", nets_host_mtu);
                                 parameters.Add("skiplock", skiplock);
                                 parameters.Add("stateuri", stateuri);
                                 parameters.Add("targetstorage", targetstorage);
@@ -7647,11 +7828,11 @@ public class PveClient : PveClientBase
                         ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0,tpmstate0,unused0,unused1,unused2,unused3,unused4,unused5,unused6,unused7,unused8,unused9,unused10,unused11,unused12,unused13,unused14,unused15,unused16,unused17,unused18,unused19,unused20,unused21,unused22,unused23,unused24,unused25,unused26,unused27,unused28,unused29,unused30,unused31,unused32,unused33,unused34,unused35,unused36,unused37,unused38,unused39,unused40,unused41,unused42,unused43,unused44,unused45,unused46,unused47,unused48,unused49,unused50,unused51,unused52,unused53,unused54,unused55,unused56,unused57,unused58,unused59,unused60,unused61,unused62,unused63,unused64,unused65,unused66,unused67,unused68,unused69,unused70,unused71,unused72,unused73,unused74,unused75,unused76,unused77,unused78,unused79,unused80,unused81,unused82,unused83,unused84,unused85,unused86,unused87,unused88,unused89,unused90,unused91,unused92,unused93,unused94,unused95,unused96,unused97,unused98,unused99,unused100,unused101,unused102,unused103,unused104,unused105,unused106,unused107,unused108,unused109,unused110,unused111,unused112,unused113,unused114,unused115,unused116,unused117,unused118,unused119,unused120,unused121,unused122,unused123,unused124,unused125,unused126,unused127,unused128,unused129,unused130,unused131,unused132,unused133,unused134,unused135,unused136,unused137,unused138,unused139,unused140,unused141,unused142,unused143,unused144,unused145,unused146,unused147,unused148,unused149,unused150,unused151,unused152,unused153,unused154,unused155,unused156,unused157,unused158,unused159,unused160,unused161,unused162,unused163,unused164,unused165,unused166,unused167,unused168,unused169,unused170,unused171,unused172,unused173,unused174,unused175,unused176,unused177,unused178,unused179,unused180,unused181,unused182,unused183,unused184,unused185,unused186,unused187,unused188,unused189,unused190,unused191,unused192,unused193,unused194,unused195,unused196,unused197,unused198,unused199,unused200,unused201,unused202,unused203,unused204,unused205,unused206,unused207,unused208,unused209,unused210,unused211,unused212,unused213,unused214,unused215,unused216,unused217,unused218,unused219,unused220,unused221,unused222,unused223,unused224,unused225,unused226,unused227,unused228,unused229,unused230,unused231,unused232,unused233,unused234,unused235,unused236,unused237,unused238,unused239,unused240,unused241,unused242,unused243,unused244,unused245,unused246,unused247,unused248,unused249,unused250,unused251,unused252,unused253,unused254,unused255</param>
                         /// <param name="bwlimit">Override I/O bandwidth limit (in KiB/s).</param>
                         /// <param name="delete">Delete the original disk after successful copy. By default the original disk is kept as unused disk.</param>
-                        /// <param name="digest">Prevent changes if current configuration file has different SHA1" 		    ." digest. This can be used to prevent concurrent modifications.</param>
+                        /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
                         /// <param name="format">Target Format.
                         ///   Enum: raw,qcow2,vmdk</param>
                         /// <param name="storage">Target storage.</param>
-                        /// <param name="target_digest">Prevent changes if the current config file of the target VM has a" 		    ." different SHA1 digest. This can be used to detect concurrent modifications.</param>
+                        /// <param name="target_digest">Prevent changes if the current config file of the target VM has a different SHA1 digest. This can be used to detect concurrent modifications.</param>
                         /// <param name="target_disk">The config key the disk will be moved to on the target VM (for example, ide0 or scsi1). Default is the source disk key.
                         ///   Enum: ide0,ide1,ide2,ide3,scsi0,scsi1,scsi2,scsi3,scsi4,scsi5,scsi6,scsi7,scsi8,scsi9,scsi10,scsi11,scsi12,scsi13,scsi14,scsi15,scsi16,scsi17,scsi18,scsi19,scsi20,scsi21,scsi22,scsi23,scsi24,scsi25,scsi26,scsi27,scsi28,scsi29,scsi30,virtio0,virtio1,virtio2,virtio3,virtio4,virtio5,virtio6,virtio7,virtio8,virtio9,virtio10,virtio11,virtio12,virtio13,virtio14,virtio15,sata0,sata1,sata2,sata3,sata4,sata5,efidisk0,tpmstate0,unused0,unused1,unused2,unused3,unused4,unused5,unused6,unused7,unused8,unused9,unused10,unused11,unused12,unused13,unused14,unused15,unused16,unused17,unused18,unused19,unused20,unused21,unused22,unused23,unused24,unused25,unused26,unused27,unused28,unused29,unused30,unused31,unused32,unused33,unused34,unused35,unused36,unused37,unused38,unused39,unused40,unused41,unused42,unused43,unused44,unused45,unused46,unused47,unused48,unused49,unused50,unused51,unused52,unused53,unused54,unused55,unused56,unused57,unused58,unused59,unused60,unused61,unused62,unused63,unused64,unused65,unused66,unused67,unused68,unused69,unused70,unused71,unused72,unused73,unused74,unused75,unused76,unused77,unused78,unused79,unused80,unused81,unused82,unused83,unused84,unused85,unused86,unused87,unused88,unused89,unused90,unused91,unused92,unused93,unused94,unused95,unused96,unused97,unused98,unused99,unused100,unused101,unused102,unused103,unused104,unused105,unused106,unused107,unused108,unused109,unused110,unused111,unused112,unused113,unused114,unused115,unused116,unused117,unused118,unused119,unused120,unused121,unused122,unused123,unused124,unused125,unused126,unused127,unused128,unused129,unused130,unused131,unused132,unused133,unused134,unused135,unused136,unused137,unused138,unused139,unused140,unused141,unused142,unused143,unused144,unused145,unused146,unused147,unused148,unused149,unused150,unused151,unused152,unused153,unused154,unused155,unused156,unused157,unused158,unused159,unused160,unused161,unused162,unused163,unused164,unused165,unused166,unused167,unused168,unused169,unused170,unused171,unused172,unused173,unused174,unused175,unused176,unused177,unused178,unused179,unused180,unused181,unused182,unused183,unused184,unused185,unused186,unused187,unused188,unused189,unused190,unused191,unused192,unused193,unused194,unused195,unused196,unused197,unused198,unused199,unused200,unused201,unused202,unused203,unused204,unused205,unused206,unused207,unused208,unused209,unused210,unused211,unused212,unused213,unused214,unused215,unused216,unused217,unused218,unused219,unused220,unused221,unused222,unused223,unused224,unused225,unused226,unused227,unused228,unused229,unused230,unused231,unused232,unused233,unused234,unused235,unused236,unused237,unused238,unused239,unused240,unused241,unused242,unused243,unused244,unused245,unused246,unused247,unused248,unused249,unused250,unused251,unused252,unused253,unused254,unused255</param>
                         /// <param name="target_vmid">The (unique) ID of the VM.</param>
@@ -8051,7 +8232,7 @@ public class PveClient : PveClientBase
                             _vmid = vmid;
                         }
                         /// <summary>
-                        /// Stop the dbus-vmstate helper for the given VM if running.
+                        /// Control the dbus-vmstate helper for a given running VM.
                         /// </summary>
                         /// <param name="action">Action to perform on the DBus VMState helper.
                         ///   Enum: start,stop</param>
@@ -8102,6 +8283,7 @@ public class PveClient : PveClientBase
                 /// <param name="acpi">Enable/disable ACPI.</param>
                 /// <param name="affinity">List of host cores used to execute guest processes, for example: 0,5,8-11</param>
                 /// <param name="agent">Enable/disable communication with the QEMU Guest Agent and its properties.</param>
+                /// <param name="allow_ksm">Allow memory pages of this guest to be merged via KSM (Kernel Samepage Merging).</param>
                 /// <param name="amd_sev">Secure Encrypted Virtualization (SEV) features by AMD CPUs</param>
                 /// <param name="arch">Virtual processor architecture. Defaults to the host.
                 ///   Enum: x86_64,aarch64</param>
@@ -8130,13 +8312,15 @@ public class PveClient : PveClientBase
                 /// <param name="efidisk0">Configure a disk for storing EFI vars. Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Note that SIZE_IN_GiB is ignored here and that the default EFI vars are copied to the volume instead. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
                 /// <param name="force">Allow to overwrite existing VM.</param>
                 /// <param name="freeze">Freeze CPU at startup (use 'c' monitor command to start execution).</param>
+                /// <param name="ha_managed">Add the VM as a HA resource after it was created.</param>
                 /// <param name="hookscript">Script that will be executed during various steps in the vms lifetime.</param>
                 /// <param name="hostpciN">Map host PCI devices into guest.</param>
                 /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory', 'usb' and 'cloudinit'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`. USB hotplugging is possible for guests with machine version &amp;gt;= 7.1 and ostype l26 or windows &amp;gt; 7.</param>
-                /// <param name="hugepages">Enable/disable hugepages memory.
+                /// <param name="hugepages">Enables hugepages memory.  Sets the size of hugepages in MiB. If the value is set to 'any' then 1 GiB hugepages will be used if possible, otherwise the size will fall back to 2 MiB.
                 ///   Enum: any,2,1024</param>
                 /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
                 /// <param name="import_working_storage">A file-based storage with 'images' content-type enabled, which is used as an intermediary extraction storage during import. Defaults to the source storage.</param>
+                /// <param name="intel_tdx">Trusted Domain Extension (TDX) features by Intel CPUs</param>
                 /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration. This requires cloud-init 19.4 or newer.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
                 /// <param name="ivshmem">Inter-VM shared memory. Useful for direct communication between VMs, or to the host.</param>
                 /// <param name="keephugepages">Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.</param>
@@ -8196,13 +8380,14 @@ public class PveClient : PveClientBase
                 /// <param name="vmstatestorage">Default storage for VM state volumes/files.</param>
                 /// <param name="watchdog">Create a virtual hardware watchdog device.</param>
                 /// <returns></returns>
-                public async Task<Result> CreateVm(int vmid, bool? acpi = null, string affinity = null, string agent = null, string amd_sev = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, bool? ciupgrade = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string import_working_storage = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? live_restore = null, bool? localtime = null, string lock_ = null, string machine = null, string memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, IDictionary<int, string> virtiofsN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
+                public async Task<Result> CreateVm(int vmid, bool? acpi = null, string affinity = null, string agent = null, bool? allow_ksm = null, string amd_sev = null, string arch = null, string archive = null, string args = null, string audio0 = null, bool? autostart = null, int? balloon = null, string bios = null, string boot = null, string bootdisk = null, int? bwlimit = null, string cdrom = null, string cicustom = null, string cipassword = null, string citype = null, bool? ciupgrade = null, string ciuser = null, int? cores = null, string cpu = null, float? cpulimit = null, int? cpuunits = null, string description = null, string efidisk0 = null, bool? force = null, bool? freeze = null, bool? ha_managed = null, string hookscript = null, IDictionary<int, string> hostpciN = null, string hotplug = null, string hugepages = null, IDictionary<int, string> ideN = null, string import_working_storage = null, string intel_tdx = null, IDictionary<int, string> ipconfigN = null, string ivshmem = null, bool? keephugepages = null, string keyboard = null, bool? kvm = null, bool? live_restore = null, bool? localtime = null, string lock_ = null, string machine = null, string memory = null, float? migrate_downtime = null, int? migrate_speed = null, string name = null, string nameserver = null, IDictionary<int, string> netN = null, bool? numa = null, IDictionary<int, string> numaN = null, bool? onboot = null, string ostype = null, IDictionary<int, string> parallelN = null, string pool = null, bool? protection = null, bool? reboot = null, string rng0 = null, IDictionary<int, string> sataN = null, IDictionary<int, string> scsiN = null, string scsihw = null, string searchdomain = null, IDictionary<int, string> serialN = null, int? shares = null, string smbios1 = null, int? smp = null, int? sockets = null, string spice_enhancements = null, string sshkeys = null, bool? start = null, string startdate = null, string startup = null, string storage = null, bool? tablet = null, string tags = null, bool? tdf = null, bool? template = null, string tpmstate0 = null, bool? unique = null, IDictionary<int, string> unusedN = null, IDictionary<int, string> usbN = null, int? vcpus = null, string vga = null, IDictionary<int, string> virtioN = null, IDictionary<int, string> virtiofsN = null, string vmgenid = null, string vmstatestorage = null, string watchdog = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("vmid", vmid);
                     parameters.Add("acpi", acpi);
                     parameters.Add("affinity", affinity);
                     parameters.Add("agent", agent);
+                    parameters.Add("allow-ksm", allow_ksm);
                     parameters.Add("amd-sev", amd_sev);
                     parameters.Add("arch", arch);
                     parameters.Add("archive", archive);
@@ -8228,10 +8413,12 @@ public class PveClient : PveClientBase
                     parameters.Add("efidisk0", efidisk0);
                     parameters.Add("force", force);
                     parameters.Add("freeze", freeze);
+                    parameters.Add("ha-managed", ha_managed);
                     parameters.Add("hookscript", hookscript);
                     parameters.Add("hotplug", hotplug);
                     parameters.Add("hugepages", hugepages);
                     parameters.Add("import-working-storage", import_working_storage);
+                    parameters.Add("intel-tdx", intel_tdx);
                     parameters.Add("ivshmem", ivshmem);
                     parameters.Add("keephugepages", keephugepages);
                     parameters.Add("keyboard", keyboard);
@@ -8463,6 +8650,8 @@ public class PveClient : PveClientBase
                         /// <param name="description">Description for the Container. Shown in the web-interface CT's summary. This is saved as comment inside the configuration file.</param>
                         /// <param name="devN">Device to pass through to the container</param>
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
+                        /// <param name="entrypoint">Command to run as init, optionally with arguments; may start with an absolute path, relative path, or a binary in $PATH.</param>
+                        /// <param name="env">The container runtime environment as NUL-separated list. Replaces any lxc.environment.runtime entries in the config.</param>
                         /// <param name="features">Allow containers access to advanced features.</param>
                         /// <param name="hookscript">Script that will be executed during various steps in the containers lifetime.</param>
                         /// <param name="hostname">Set a host name for the container.</param>
@@ -8485,10 +8674,10 @@ public class PveClient : PveClientBase
                         /// <param name="template">Enable/disable Template.</param>
                         /// <param name="timezone">Time zone to use in the container. If option isn't set, then nothing will be done. Can be set to 'host' to match the host time zone, or an arbitrary time zone option from /usr/share/zoneinfo/zone.tab</param>
                         /// <param name="tty">Specify the number of tty available to the container</param>
-                        /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
+                        /// <param name="unprivileged">Makes the container run as unprivileged user. For creation, the default is 1. For restore, the default is the value from the backup. (Should not be modified manually.)</param>
                         /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                         /// <returns></returns>
-                        public async Task<Result> UpdateVm(string arch = null, string cmode = null, bool? console = null, int? cores = null, float? cpulimit = null, int? cpuunits = null, bool? debug = null, string delete = null, string description = null, IDictionary<int, string> devN = null, string digest = null, string features = null, string hookscript = null, string hostname = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, bool? protection = null, string revert = null, string rootfs = null, string searchdomain = null, string startup = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
+                        public async Task<Result> UpdateVm(string arch = null, string cmode = null, bool? console = null, int? cores = null, float? cpulimit = null, int? cpuunits = null, bool? debug = null, string delete = null, string description = null, IDictionary<int, string> devN = null, string digest = null, string entrypoint = null, string env = null, string features = null, string hookscript = null, string hostname = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, bool? protection = null, string revert = null, string rootfs = null, string searchdomain = null, string startup = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("arch", arch);
@@ -8501,6 +8690,8 @@ public class PveClient : PveClientBase
                             parameters.Add("delete", delete);
                             parameters.Add("description", description);
                             parameters.Add("digest", digest);
+                            parameters.Add("entrypoint", entrypoint);
+                            parameters.Add("env", env);
                             parameters.Add("features", features);
                             parameters.Add("hookscript", hookscript);
                             parameters.Add("hostname", hostname);
@@ -9531,7 +9722,7 @@ public class PveClient : PveClientBase
                             _vmid = vmid;
                         }
                         /// <summary>
-                        /// Opens a weksocket for VNC traffic.
+                        /// Opens a websocket for VNC traffic.
                         /// </summary>
                         /// <param name="port">Port number returned by previous vncproxy call.</param>
                         /// <param name="vncticket">Ticket from previous call to vncproxy.</param>
@@ -9950,8 +10141,11 @@ public class PveClient : PveClientBase
                 /// <param name="debug">Try to be more verbose. For now this only enables debug log-level on start.</param>
                 /// <param name="description">Description for the Container. Shown in the web-interface CT's summary. This is saved as comment inside the configuration file.</param>
                 /// <param name="devN">Device to pass through to the container</param>
+                /// <param name="entrypoint">Command to run as init, optionally with arguments; may start with an absolute path, relative path, or a binary in $PATH.</param>
+                /// <param name="env">The container runtime environment as NUL-separated list. Replaces any lxc.environment.runtime entries in the config.</param>
                 /// <param name="features">Allow containers access to advanced features.</param>
                 /// <param name="force">Allow to overwrite existing container.</param>
+                /// <param name="ha_managed">Add the CT as a HA resource after it was created.</param>
                 /// <param name="hookscript">Script that will be executed during various steps in the containers lifetime.</param>
                 /// <param name="hostname">Set a host name for the container.</param>
                 /// <param name="ignore_unpack_errors">Ignore errors when extracting the template.</param>
@@ -9980,10 +10174,10 @@ public class PveClient : PveClientBase
                 /// <param name="timezone">Time zone to use in the container. If option isn't set, then nothing will be done. Can be set to 'host' to match the host time zone, or an arbitrary time zone option from /usr/share/zoneinfo/zone.tab</param>
                 /// <param name="tty">Specify the number of tty available to the container</param>
                 /// <param name="unique">Assign a unique random ethernet address.</param>
-                /// <param name="unprivileged">Makes the container run as unprivileged user. (Should not be modified manually.)</param>
+                /// <param name="unprivileged">Makes the container run as unprivileged user. For creation, the default is 1. For restore, the default is the value from the backup. (Should not be modified manually.)</param>
                 /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
                 /// <returns></returns>
-                public async Task<Result> CreateVm(string ostemplate, int vmid, string arch = null, float? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, float? cpulimit = null, int? cpuunits = null, bool? debug = null, string description = null, IDictionary<int, string> devN = null, string features = null, bool? force = null, string hookscript = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, bool? start = null, string startup = null, string storage = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unique = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
+                public async Task<Result> CreateVm(string ostemplate, int vmid, string arch = null, float? bwlimit = null, string cmode = null, bool? console = null, int? cores = null, float? cpulimit = null, int? cpuunits = null, bool? debug = null, string description = null, IDictionary<int, string> devN = null, string entrypoint = null, string env = null, string features = null, bool? force = null, bool? ha_managed = null, string hookscript = null, string hostname = null, bool? ignore_unpack_errors = null, string lock_ = null, int? memory = null, IDictionary<int, string> mpN = null, string nameserver = null, IDictionary<int, string> netN = null, bool? onboot = null, string ostype = null, string password = null, string pool = null, bool? protection = null, bool? restore = null, string rootfs = null, string searchdomain = null, string ssh_public_keys = null, bool? start = null, string startup = null, string storage = null, int? swap = null, string tags = null, bool? template = null, string timezone = null, int? tty = null, bool? unique = null, bool? unprivileged = null, IDictionary<int, string> unusedN = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("ostemplate", ostemplate);
@@ -9997,8 +10191,11 @@ public class PveClient : PveClientBase
                     parameters.Add("cpuunits", cpuunits);
                     parameters.Add("debug", debug);
                     parameters.Add("description", description);
+                    parameters.Add("entrypoint", entrypoint);
+                    parameters.Add("env", env);
                     parameters.Add("features", features);
                     parameters.Add("force", force);
+                    parameters.Add("ha-managed", ha_managed);
                     parameters.Add("hookscript", hookscript);
                     parameters.Add("hostname", hostname);
                     parameters.Add("ignore-unpack-errors", ignore_unpack_errors);
@@ -11507,7 +11704,7 @@ public class PveClient : PveClientBase
                         /// Read task log.
                         /// </summary>
                         /// <param name="download">Whether the tasklog file should be downloaded. This parameter can't be used in conjunction with other parameters</param>
-                        /// <param name="limit">The amount of lines to read from the tasklog.</param>
+                        /// <param name="limit">The number of lines to read from the tasklog.</param>
                         /// <param name="start">Start at this line when reading the tasklog</param>
                         /// <returns></returns>
                         public async Task<Result> ReadTaskLog(bool? download = null, int? limit = null, int? start = null)
@@ -11553,7 +11750,7 @@ public class PveClient : PveClientBase
                 /// Read task list for one node (finished tasks).
                 /// </summary>
                 /// <param name="errors">Only list tasks with a status of ERROR.</param>
-                /// <param name="limit">Only list this amount of tasks.</param>
+                /// <param name="limit">Only list this number of tasks.</param>
                 /// <param name="since">Only list tasks since this UNIX epoch.</param>
                 /// <param name="source">List archived, active or all tasks.
                 ///   Enum: archive,active,all</param>
@@ -11916,6 +12113,11 @@ public class PveClient : PveClientBase
                     /// Cpu
                     /// </summary>
                     public PveCpu Cpu => _cpu ??= new(_client, _node);
+                    private PveCpuFlags _cpuFlags;
+                    /// <summary>
+                    /// CpuFlags
+                    /// </summary>
+                    public PveCpuFlags CpuFlags => _cpuFlags ??= new(_client, _node);
                     private PveMachines _machines;
                     /// <summary>
                     /// Machines
@@ -11939,6 +12141,20 @@ public class PveClient : PveClientBase
                         /// </summary>
                         /// <returns></returns>
                         public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/capabilities/qemu/cpu"); }
+                    }
+                    /// <summary>
+                    /// CpuFlags
+                    /// </summary>
+                    public class PveCpuFlags
+                    {
+                        private readonly PveClient _client;
+                        private readonly object _node;
+                        internal PveCpuFlags(PveClient client, object node) { _client = client; _node = node; }
+                        /// <summary>
+                        /// List of available VM-specific CPU flags.
+                        /// </summary>
+                        /// <returns></returns>
+                        public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/capabilities/qemu/cpu-flags"); }
                     }
                     /// <summary>
                     /// Machines
@@ -12045,6 +12261,11 @@ public class PveClient : PveClientBase
                     /// DownloadUrl
                     /// </summary>
                     public PveDownloadUrl DownloadUrl => _downloadUrl ??= new(_client, _node, _storage);
+                    private PveOciRegistryPull _ociRegistryPull;
+                    /// <summary>
+                    /// OciRegistryPull
+                    /// </summary>
+                    public PveOciRegistryPull OciRegistryPull => _ociRegistryPull ??= new(_client, _node, _storage);
                     private PveImportMetadata _importMetadata;
                     /// <summary>
                     /// ImportMetadata
@@ -12434,6 +12655,33 @@ public class PveClient : PveClientBase
                             parameters.Add("compression", compression);
                             parameters.Add("verify-certificates", verify_certificates);
                             return await _client.CreateAsync($"/nodes/{_node}/storage/{_storage}/download-url", parameters);
+                        }
+                    }
+                    /// <summary>
+                    /// OciRegistryPull
+                    /// </summary>
+                    public class PveOciRegistryPull
+                    {
+                        private readonly PveClient _client;
+                        private readonly object _node;
+                        private readonly object _storage;
+                        internal PveOciRegistryPull(PveClient client, object node, object storage)
+                        {
+                            _client = client; _node = node;
+                            _storage = storage;
+                        }
+                        /// <summary>
+                        /// Pull an OCI image from a registry.
+                        /// </summary>
+                        /// <param name="reference">The reference to the OCI image to download.</param>
+                        /// <param name="filename">Custom destination file name of the OCI image. Caution: This will be normalized!</param>
+                        /// <returns></returns>
+                        public async Task<Result> OciRegistryPull(string reference, string filename = null)
+                        {
+                            var parameters = new Dictionary<string, object>();
+                            parameters.Add("reference", reference);
+                            parameters.Add("filename", filename);
+                            return await _client.CreateAsync($"/nodes/{_node}/storage/{_storage}/oci-registry-pull", parameters);
                         }
                     }
                     /// <summary>
@@ -13600,11 +13848,125 @@ public class PveClient : PveClientBase
                 private readonly PveClient _client;
                 private readonly object _node;
                 internal PveSdn(PveClient client, object node) { _client = client; _node = node; }
+                private PveFabrics _fabrics;
+                /// <summary>
+                /// Fabrics
+                /// </summary>
+                public PveFabrics Fabrics => _fabrics ??= new(_client, _node);
                 private PveZones _zones;
                 /// <summary>
                 /// Zones
                 /// </summary>
                 public PveZones Zones => _zones ??= new(_client, _node);
+                private PveVnets _vnets;
+                /// <summary>
+                /// Vnets
+                /// </summary>
+                public PveVnets Vnets => _vnets ??= new(_client, _node);
+                /// <summary>
+                /// Fabrics
+                /// </summary>
+                public class PveFabrics
+                {
+                    private readonly PveClient _client;
+                    private readonly object _node;
+                    internal PveFabrics(PveClient client, object node) { _client = client; _node = node; }
+                    /// <summary>
+                    /// FabricItem
+                    /// </summary>
+                    public PveFabricItem this[object fabric] => new(_client, _node, fabric);
+                    /// <summary>
+                    /// FabricItem
+                    /// </summary>
+                    public class PveFabricItem
+                    {
+                        private readonly PveClient _client;
+                        private readonly object _node;
+                        private readonly object _fabric;
+                        internal PveFabricItem(PveClient client, object node, object fabric)
+                        {
+                            _client = client; _node = node;
+                            _fabric = fabric;
+                        }
+                        private PveRoutes _routes;
+                        /// <summary>
+                        /// Routes
+                        /// </summary>
+                        public PveRoutes Routes => _routes ??= new(_client, _node, _fabric);
+                        private PveNeighbors _neighbors;
+                        /// <summary>
+                        /// Neighbors
+                        /// </summary>
+                        public PveNeighbors Neighbors => _neighbors ??= new(_client, _node, _fabric);
+                        private PveInterfaces _interfaces;
+                        /// <summary>
+                        /// Interfaces
+                        /// </summary>
+                        public PveInterfaces Interfaces => _interfaces ??= new(_client, _node, _fabric);
+                        /// <summary>
+                        /// Routes
+                        /// </summary>
+                        public class PveRoutes
+                        {
+                            private readonly PveClient _client;
+                            private readonly object _node;
+                            private readonly object _fabric;
+                            internal PveRoutes(PveClient client, object node, object fabric)
+                            {
+                                _client = client; _node = node;
+                                _fabric = fabric;
+                            }
+                            /// <summary>
+                            /// Get all routes for a fabric.
+                            /// </summary>
+                            /// <returns></returns>
+                            public async Task<Result> Routes() { return await _client.GetAsync($"/nodes/{_node}/sdn/fabrics/{_fabric}/routes"); }
+                        }
+                        /// <summary>
+                        /// Neighbors
+                        /// </summary>
+                        public class PveNeighbors
+                        {
+                            private readonly PveClient _client;
+                            private readonly object _node;
+                            private readonly object _fabric;
+                            internal PveNeighbors(PveClient client, object node, object fabric)
+                            {
+                                _client = client; _node = node;
+                                _fabric = fabric;
+                            }
+                            /// <summary>
+                            /// Get all neighbors for a fabric.
+                            /// </summary>
+                            /// <returns></returns>
+                            public async Task<Result> Neighbors() { return await _client.GetAsync($"/nodes/{_node}/sdn/fabrics/{_fabric}/neighbors"); }
+                        }
+                        /// <summary>
+                        /// Interfaces
+                        /// </summary>
+                        public class PveInterfaces
+                        {
+                            private readonly PveClient _client;
+                            private readonly object _node;
+                            private readonly object _fabric;
+                            internal PveInterfaces(PveClient client, object node, object fabric)
+                            {
+                                _client = client; _node = node;
+                                _fabric = fabric;
+                            }
+                            /// <summary>
+                            /// Get all interfaces for a fabric.
+                            /// </summary>
+                            /// <returns></returns>
+                            public async Task<Result> Interfaces() { return await _client.GetAsync($"/nodes/{_node}/sdn/fabrics/{_fabric}/interfaces"); }
+                        }
+                        /// <summary>
+                        /// Directory index for SDN fabric status.
+                        /// </summary>
+                        /// <returns></returns>
+                        public async Task<Result> Diridx() { return await _client.GetAsync($"/nodes/{_node}/sdn/fabrics/{_fabric}"); }
+                    }
+                }
                 /// <summary>
                 /// Zones
                 /// </summary>
@@ -13635,6 +13997,16 @@ public class PveClient : PveClientBase
                         /// Content
                         /// </summary>
                         public PveContent Content => _content ??= new(_client, _node, _zone);
+                        private PveBridges _bridges;
+                        /// <summary>
+                        /// Bridges
+                        /// </summary>
+                        public PveBridges Bridges => _bridges ??= new(_client, _node, _zone);
+                        private PveIpVrf _ipVrf;
+                        /// <summary>
+                        /// IpVrf
+                        /// </summary>
+                        public PveIpVrf IpVrf => _ipVrf ??= new(_client, _node, _zone);
                         /// <summary>
                         /// Content
                         /// </summary>
@@ -13655,7 +14027,45 @@ public class PveClient : PveClientBase
                             public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/sdn/zones/{_zone}/content"); }
                         }
                         /// <summary>
-                        /// 
+                        /// Bridges
+                        /// </summary>
+                        public class PveBridges
+                        {
+                            private readonly PveClient _client;
+                            private readonly object _node;
+                            private readonly object _zone;
+                            internal PveBridges(PveClient client, object node, object zone)
+                            {
+                                _client = client; _node = node;
+                                _zone = zone;
+                            }
+                            /// <summary>
+                            /// Get a list of all bridges (vnets) that are part of a zone, as well as the ports that are members of that bridge.
+                            /// </summary>
+                            /// <returns></returns>
+                            public async Task<Result> Bridges() { return await _client.GetAsync($"/nodes/{_node}/sdn/zones/{_zone}/bridges"); }
+                        }
+                        /// <summary>
+                        /// IpVrf
+                        /// </summary>
+                        public class PveIpVrf
+                        {
+                            private readonly PveClient _client;
+                            private readonly object _node;
+                            private readonly object _zone;
+                            internal PveIpVrf(PveClient client, object node, object zone)
+                            {
+                                _client = client; _node = node;
+                                _zone = zone;
+                            }
+                            /// <summary>
+                            /// Get the IP VRF of an EVPN zone.
+                            /// </summary>
+                            /// <returns></returns>
+                            public async Task<Result> IpVrf() { return await _client.GetAsync($"/nodes/{_node}/sdn/zones/{_zone}/ip-vrf"); }
+                        }
+                        /// <summary>
+                        /// Directory index for SDN zone status.
                         /// </summary>
                         /// <returns></returns>
                         public async Task<Result> Diridx() { return await _client.GetAsync($"/nodes/{_node}/sdn/zones/{_zone}"); }
@@ -13665,6 +14075,62 @@ public class PveClient : PveClientBase
                     /// </summary>
                     /// <returns></returns>
                     public async Task<Result> Index() { return await _client.GetAsync($"/nodes/{_node}/sdn/zones"); }
+                }
+                /// <summary>
+                /// Vnets
+                /// </summary>
+                public class PveVnets
+                {
+                    private readonly PveClient _client;
+                    private readonly object _node;
+                    internal PveVnets(PveClient client, object node) { _client = client; _node = node; }
+                    /// <summary>
+                    /// VnetItem
+                    /// </summary>
+                    public PveVnetItem this[object vnet] => new(_client, _node, vnet);
+                    /// <summary>
+                    /// VnetItem
+                    /// </summary>
+                    public class PveVnetItem
+                    {
+                        private readonly PveClient _client;
+                        private readonly object _node;
+                        private readonly object _vnet;
+                        internal PveVnetItem(PveClient client, object node, object vnet)
+                        {
+                            _client = client; _node = node;
+                            _vnet = vnet;
+                        }
+                        private PveMacVrf _macVrf;
+                        /// <summary>
+                        /// MacVrf
+                        /// </summary>
+                        public PveMacVrf MacVrf => _macVrf ??= new(_client, _node, _vnet);
+                        /// <summary>
+                        /// MacVrf
+                        /// </summary>
+                        public class PveMacVrf
+                        {
+                            private readonly PveClient _client;
+                            private readonly object _node;
+                            private readonly object _vnet;
+                            internal PveMacVrf(PveClient client, object node, object vnet)
+                            {
+                                _client = client; _node = node;
+                                _vnet = vnet;
+                            }
+                            /// <summary>
+                            /// Get the MAC VRF for a VNet in an EVPN zone.
+                            /// </summary>
+                            /// <returns></returns>
+                            public async Task<Result> MacVrf() { return await _client.GetAsync($"/nodes/{_node}/sdn/vnets/{_vnet}/mac-vrf"); }
+                        }
+                        /// <summary>
+                        /// 
+                        /// </summary>
+                        /// <returns></returns>
+                        public async Task<Result> Diridx() { return await _client.GetAsync($"/nodes/{_node}/sdn/vnets/{_vnet}"); }
+                    }
                 }
                 /// <summary>
                 /// SDN index.
@@ -13878,7 +14344,7 @@ public class PveClient : PveClientBase
                 /// Creates a VNC Shell proxy.
                 /// </summary>
                 /// <param name="cmd">Run specific command or default to login (requires 'root@pam')
-                ///   Enum: upgrade,ceph_install,login</param>
+                ///   Enum: ceph_install,login,upgrade</param>
                 /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                 /// <param name="height">sets the height of the console in pixels.</param>
                 /// <param name="websocket">use websocket instead of standard vnc.</param>
@@ -13907,7 +14373,7 @@ public class PveClient : PveClientBase
                 /// Creates a VNC Shell proxy.
                 /// </summary>
                 /// <param name="cmd">Run specific command or default to login (requires 'root@pam')
-                ///   Enum: upgrade,ceph_install,login</param>
+                ///   Enum: ceph_install,login,upgrade</param>
                 /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                 /// <returns></returns>
                 public async Task<Result> Termproxy(string cmd = null, string cmd_opts = null)
@@ -13952,7 +14418,7 @@ public class PveClient : PveClientBase
                 /// Creates a SPICE shell.
                 /// </summary>
                 /// <param name="cmd">Run specific command or default to login (requires 'root@pam')
-                ///   Enum: upgrade,ceph_install,login</param>
+                ///   Enum: ceph_install,login,upgrade</param>
                 /// <param name="cmd_opts">Add parameters to a command. Encoded as null terminated strings.</param>
                 /// <param name="proxy">SPICE proxy server. This can be used by the client to specify the proxy server. All nodes in a cluster runs 'spiceproxy', so it is up to the client to choose one. By default, we return the node where the VM is currently running. As reasonable setting is to use same node you use to connect to the API (This is window.location.hostname for the JS GUI).</param>
                 /// <returns></returns>
@@ -14046,6 +14512,26 @@ public class PveClient : PveClientBase
                     parameters.Add("storage", storage);
                     parameters.Add("template", template);
                     return await _client.CreateAsync($"/nodes/{_node}/aplinfo", parameters);
+                }
+            }
+            /// <summary>
+            /// QueryOciRepoTags
+            /// </summary>
+            public class PveQueryOciRepoTags
+            {
+                private readonly PveClient _client;
+                private readonly object _node;
+                internal PveQueryOciRepoTags(PveClient client, object node) { _client = client; _node = node; }
+                /// <summary>
+                /// List all tags for an OCI repository reference.
+                /// </summary>
+                /// <param name="reference">The reference to the repository to query tags from.</param>
+                /// <returns></returns>
+                public async Task<Result> QueryOciRepoTags(string reference)
+                {
+                    var parameters = new Dictionary<string, object>();
+                    parameters.Add("reference", reference);
+                    return await _client.GetAsync($"/nodes/{_node}/query-oci-repo-tags", parameters);
                 }
             }
             /// <summary>
@@ -14288,6 +14774,8 @@ public class PveClient : PveClientBase
             ///   Enum: off,metadata,falloc,full</param>
             /// <param name="prune_backups">The retention options with shorter intervals are processed first with --keep-last being the very first one. Each option covers a specific period of time. We say that backups within this period are covered by this option. The next option does not take care of already covered backups and only considers older backups.</param>
             /// <param name="saferemove">Zero-out data when removing LVs.</param>
+            /// <param name="saferemove_stepsize">Wipe step size in MiB. It will be capped to the maximum supported by the storage.
+            ///   Enum: 1,2,4,8,16,32</param>
             /// <param name="saferemove_throughput">Wipe throughput (cstream -t parameter value).</param>
             /// <param name="server">Server IP or DNS name.</param>
             /// <param name="shared">Indicate that this is a single storage with the same contents on all nodes (or all listed in the 'nodes' option). It will not make the contents of a local storage automatically accessible to other nodes, it just marks an already shared storage as such!</param>
@@ -14301,7 +14789,7 @@ public class PveClient : PveClientBase
             /// <param name="username">RBD Id.</param>
             /// <param name="zfs_base_path">Base path where to look for the created ZFS block devices. Set automatically during creation if not specified. Usually '/dev/zvol'.</param>
             /// <returns></returns>
-            public async Task<Result> Update(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string content_dirs = null, bool? create_base_path = null, bool? create_subdirs = null, string data_pool = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? max_protected_backups = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? port = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, bool? shared = null, bool? skip_cert_verification = null, string smbversion = null, bool? snapshot_as_volume_chain = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string username = null, string zfs_base_path = null)
+            public async Task<Result> Update(string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string content_dirs = null, bool? create_base_path = null, bool? create_subdirs = null, string data_pool = null, string delete = null, string digest = null, bool? disable = null, string domain = null, string encryption_key = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? max_protected_backups = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string pool = null, int? port = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, int? saferemove_stepsize = null, string saferemove_throughput = null, string server = null, bool? shared = null, bool? skip_cert_verification = null, string smbversion = null, bool? snapshot_as_volume_chain = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string username = null, string zfs_base_path = null)
             {
                 var parameters = new Dictionary<string, object>();
                 parameters.Add("blocksize", blocksize);
@@ -14342,6 +14830,7 @@ public class PveClient : PveClientBase
                 parameters.Add("preallocation", preallocation);
                 parameters.Add("prune-backups", prune_backups);
                 parameters.Add("saferemove", saferemove);
+                parameters.Add("saferemove-stepsize", saferemove_stepsize);
                 parameters.Add("saferemove_throughput", saferemove_throughput);
                 parameters.Add("server", server);
                 parameters.Add("shared", shared);
@@ -14419,6 +14908,8 @@ public class PveClient : PveClientBase
         ///   Enum: off,metadata,falloc,full</param>
         /// <param name="prune_backups">The retention options with shorter intervals are processed first with --keep-last being the very first one. Each option covers a specific period of time. We say that backups within this period are covered by this option. The next option does not take care of already covered backups and only considers older backups.</param>
         /// <param name="saferemove">Zero-out data when removing LVs.</param>
+        /// <param name="saferemove_stepsize">Wipe step size in MiB. It will be capped to the maximum supported by the storage.
+        ///   Enum: 1,2,4,8,16,32</param>
         /// <param name="saferemove_throughput">Wipe throughput (cstream -t parameter value).</param>
         /// <param name="server">Server IP or DNS name.</param>
         /// <param name="share">CIFS share.</param>
@@ -14436,7 +14927,7 @@ public class PveClient : PveClientBase
         /// <param name="vgname">Volume group name.</param>
         /// <param name="zfs_base_path">Base path where to look for the created ZFS block devices. Set automatically during creation if not specified. Usually '/dev/zvol'.</param>
         /// <returns></returns>
-        public async Task<Result> Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string content_dirs = null, bool? create_base_path = null, bool? create_subdirs = null, string data_pool = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? max_protected_backups = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, int? port = null, string portal = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, string saferemove_throughput = null, string server = null, string share = null, bool? shared = null, bool? skip_cert_verification = null, string smbversion = null, bool? snapshot_as_volume_chain = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string username = null, string vgname = null, string zfs_base_path = null)
+        public async Task<Result> Create(string storage, string type, string authsupported = null, string base_ = null, string blocksize = null, string bwlimit = null, string comstar_hg = null, string comstar_tg = null, string content = null, string content_dirs = null, bool? create_base_path = null, bool? create_subdirs = null, string data_pool = null, string datastore = null, bool? disable = null, string domain = null, string encryption_key = null, string export = null, string fingerprint = null, string format = null, string fs_name = null, bool? fuse = null, string is_mountpoint = null, string iscsiprovider = null, string keyring = null, bool? krbd = null, string lio_tpg = null, string master_pubkey = null, int? max_protected_backups = null, bool? mkdir = null, string monhost = null, string mountpoint = null, string namespace_ = null, bool? nocow = null, string nodes = null, bool? nowritecache = null, string options = null, string password = null, string path = null, string pool = null, int? port = null, string portal = null, string preallocation = null, string prune_backups = null, bool? saferemove = null, int? saferemove_stepsize = null, string saferemove_throughput = null, string server = null, string share = null, bool? shared = null, bool? skip_cert_verification = null, string smbversion = null, bool? snapshot_as_volume_chain = null, bool? sparse = null, string subdir = null, bool? tagged_only = null, string target = null, string thinpool = null, string username = null, string vgname = null, string zfs_base_path = null)
         {
             var parameters = new Dictionary<string, object>();
             parameters.Add("storage", storage);
@@ -14484,6 +14975,7 @@ public class PveClient : PveClientBase
             parameters.Add("preallocation", preallocation);
             parameters.Add("prune-backups", prune_backups);
             parameters.Add("saferemove", saferemove);
+            parameters.Add("saferemove-stepsize", saferemove_stepsize);
             parameters.Add("saferemove_throughput", saferemove_throughput);
             parameters.Add("server", server);
             parameters.Add("share", share);
@@ -14550,6 +15042,11 @@ public class PveClient : PveClientBase
         /// Ticket
         /// </summary>
         public PveTicket Ticket => _ticket ??= new(_client);
+        private PveVncticket _vncticket;
+        /// <summary>
+        /// Vncticket
+        /// </summary>
+        public PveVncticket Vncticket => _vncticket ??= new(_client);
         private PvePassword _password;
         /// <summary>
         /// Password
@@ -14683,13 +15180,15 @@ public class PveClient : PveClientBase
                         /// Update API token for a specific user.
                         /// </summary>
                         /// <param name="comment"></param>
+                        /// <param name="delete">A list of settings you want to delete.</param>
                         /// <param name="expire">API token expiration date (seconds since epoch). '0' means no expiration date.</param>
                         /// <param name="privsep">Restrict API token privileges with separate ACLs (default), or give full privileges of corresponding user.</param>
                         /// <returns></returns>
-                        public async Task<Result> UpdateTokenInfo(string comment = null, int? expire = null, bool? privsep = null)
+                        public async Task<Result> UpdateTokenInfo(string comment = null, string delete = null, int? expire = null, bool? privsep = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("comment", comment);
+                            parameters.Add("delete", delete);
                             parameters.Add("expire", expire);
                             parameters.Add("privsep", privsep);
                             return await _client.SetAsync($"/access/users/{_userid}/token/{_tokenid}", parameters);
@@ -15415,6 +15914,32 @@ public class PveClient : PveClientBase
                 parameters.Add("realm", realm);
                 parameters.Add("tfa-challenge", tfa_challenge);
                 return await _client.CreateAsync($"/access/ticket", parameters);
+            }
+        }
+        /// <summary>
+        /// Vncticket
+        /// </summary>
+        public class PveVncticket
+        {
+            private readonly PveClient _client;
+
+            internal PveVncticket(PveClient client) { _client = client; }
+            /// <summary>
+            /// verify VNC authentication ticket.
+            /// </summary>
+            /// <param name="authid">UserId or token</param>
+            /// <param name="path">Verify ticket, and check if user have access 'privs' on 'path'</param>
+            /// <param name="privs">Verify ticket, and check if user have access 'privs' on 'path'</param>
+            /// <param name="vncticket">The VNC ticket.</param>
+            /// <returns></returns>
+            public async Task<Result> VerifyVncTicket(string authid, string path, string privs, string vncticket)
+            {
+                var parameters = new Dictionary<string, object>();
+                parameters.Add("authid", authid);
+                parameters.Add("path", path);
+                parameters.Add("privs", privs);
+                parameters.Add("vncticket", vncticket);
+                return await _client.CreateAsync($"/access/vncticket", parameters);
             }
         }
         /// <summary>
