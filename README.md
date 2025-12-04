@@ -1,20 +1,6 @@
-# Corsinvest.ProxmoxVE.Api
-
-![cv4pve-api-dotnet Banner](https://img.shields.io/badge/Corsinvest-Proxmox%20VE%20API%20.NET-blue?style=for-the-badge&logo=dotnet)
-
-**Official .NET Client Library Suite for Proxmox VE API**
-
-[![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg?style=flat-square)](LICENSE)
-[![.NET](https://img.shields.io/badge/.NET-8.0%2B-blue?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
-[![GitHub Stars](https://img.shields.io/github/stars/Corsinvest/cv4pve-api-dotnet?style=flat-square&logo=github)](https://github.com/Corsinvest/cv4pve-api-dotnet)
-
-⭐ **We appreciate your star, it helps!** ⭐
-
----
-
-## About
-
 <div align="center">
+
+# Corsinvest.ProxmoxVE.Api
 
 ```
    ______                _                      __
@@ -23,12 +9,16 @@
 / /___/ /_/ / /  (__  ) / / / / |/ /  __(__  ) /_
 \____/\____/_/  /____/_/_/ /_/|___/\___/____/\__/
 
-Corsinvest for Proxmox VE Api Client (Made in Italy)
+Proxmox VE API Client for .NET (Made in Italy)
 ```
+
+[![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg?style=flat-square)](LICENSE)
+[![.NET](https://img.shields.io/badge/.NET-8.0%2B-blue?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
+[![GitHub Stars](https://img.shields.io/github/stars/Corsinvest/cv4pve-api-dotnet?style=flat-square&logo=github)](https://github.com/Corsinvest/cv4pve-api-dotnet)
 
 </div>
 
-A comprehensive .NET library suite for interacting with the [Proxmox VE API](https://pve.proxmox.com/pve-docs/api-viewer/). This collection provides everything you need to build powerful applications that manage Proxmox VE infrastructure programmatically.
+---
 
 ## Quick Start
 
@@ -59,9 +49,7 @@ if (await client.Login("root", "your-password"))
 ---
 
 ## Package Suite
-
-<div align="center">
-  
+ 
 | Package | Purpose | Documentation |
 |---------|---------|---------------|
 | **[Corsinvest.ProxmoxVE.Api](./docs/api.md)** | Core API Client | Main library for Proxmox VE API access |
@@ -69,8 +57,6 @@ if (await client.Login("root", "your-password"))
 | **[Corsinvest.ProxmoxVE.Api.Shared](./docs/shared.md)** | Shared Models | Common models and utilities |
 | **[Corsinvest.ProxmoxVE.Api.Console](./docs/console.md)** | Console Tools | Console application utilities |
 | **[Corsinvest.ProxmoxVE.Api.Metadata](./docs/metadata.md)** | API Metadata | API documentation extraction |
-
-</div>
 
 ---
 
@@ -121,55 +107,6 @@ if (await client.Login("root", "your-password"))
 
 ---
 
-## Choose Your Package
-
-### Core API Client
-
-```bash
-dotnet add package Corsinvest.ProxmoxVE.Api
-```
-
-Perfect for basic API operations and building custom solutions.
-**[Read Api Documentation](./docs/api.md)**
-
-### Extended Functionality
-
-```bash
-dotnet add package Corsinvest.ProxmoxVE.Api.Extension
-```
-
-Adds helper methods, VM discovery, and simplified operations.
-**[Read Extension Documentation](./docs/extension.md)**
-
-### Shared Models
-
-```bash
-dotnet add package Corsinvest.ProxmoxVE.Api.Shared
-```
-
-Common models and utilities used across the suite.
-**[Read Shared Documentation](./docs/shared.md)**
-
-### Console Applications
-
-```bash
-dotnet add package Corsinvest.ProxmoxVE.Api.Console
-```
-
-Utilities for building command-line tools.
-**[Read Console Documentation](./docs/console.md)**
-
-### API Metadata
-
-```bash
-dotnet add package Corsinvest.ProxmoxVE.Api.Metadata
-```
-
-Tools for API documentation extraction and analysis.
-**[Read Metadata Documentation](./docs/metadata.md)**
-
----
-
 ## Documentation
 
 ### Getting Started
@@ -177,6 +114,7 @@ Tools for API documentation extraction and analysis.
 - **[Authentication](./docs/authentication.md)** - API tokens and security
 - **[Basic Examples](./docs/examples.md)** - Common usage patterns
 - **[Advanced Usage](./docs/advanced.md)** - Complex scenarios and best practices
+- **[Common Issues](./docs/common-issues.md)** - Configuration patterns and troubleshooting
 
 ### API Reference
 
@@ -184,16 +122,6 @@ Tools for API documentation extraction and analysis.
 - **[Result Handling](./docs/results.md)** - Working with responses
 - **[Error Handling](./docs/errorhandling.md)** - Exception management
 - **[Task Management](./docs/tasks.md)** - Long-running operations
-
-### Package Documentation
-
-Each package has detailed documentation with examples and API reference:
-
-- **[Api Package Documentation](./docs/api.md)**
-- **[Extension Package Documentation](./docs/extension.md)**
-- **[Shared Package Documentation](./docs/shared.md)**
-- **[Console Package Documentation](./docs/console.md)**
-- **[Metadata Package Documentation](./docs/metadata.md)**
 
 ---
 
@@ -243,28 +171,14 @@ var allExceptTest = await client.GetVmsAsync("@all,-@tag-test");
 
 ---
 
-## Community & Support
-
-### Commercial Support
+## Support
 
 Professional support and consulting available through [Corsinvest](https://www.corsinvest.it/cv4pve).
-
-### Community Resources
-
-- **[GitHub Issues](https://github.com/Corsinvest/cv4pve-api-dotnet/issues)** - Bug reports and feature requests
-- **[GitHub Discussions](https://github.com/Corsinvest/cv4pve-api-dotnet/discussions)** - Community Q&A
-- **[NuGet Packages](https://www.nuget.org/profiles/Corsinvest)** - Package downloads and updates
-
----
-
-## License
-
-**Copyright © Corsinvest Srl**
-
-This software is part of the **cv4pve** suite. For licensing details, please visit [LICENSE](LICENSE).
 
 ---
 
 <div align="center">
   <sub>Part of <a href="https://www.corsinvest.it/cv4pve">cv4pve</a> suite | Made with ❤️ in Italy by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
+  <br>
+  <sub>Copyright © Corsinvest Srl</sub>
 </div>
