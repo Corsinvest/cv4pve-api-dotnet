@@ -1,0 +1,87 @@
+name: Publish NuGet Packages
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Validate version consistency
+      run: |
+        # Extract version from Directory.Packages.props
+        PROPS_VERSION=$(grep -oPm1 '<Version>\K[^<]*' Directory.Packages.props)
+        # Remove 'v' prefix from tag and compare
+        TAG_VERSION=${GITHUB_REF#refs/tags/v}
+
+        echo "Props version: $PROPS_VERSION"
+        echo "Tag version: $TAG_VERSION"
+
+        if [ "$PROPS_VERSION" != "$TAG_VERSION" ]; then
+          echo "Error: Version in Directory.Packages.props ($PROPS_VERSION) does not match tag version ($TAG_VERSION)"
+          exit 1
+        fi
+
+    - name: Check if prerelease
+      id: prerelease_check
+      run: |
+        # Check if the tag contains prerelease indicators
+        if [[ "${{ github.ref_name }}" =~ -(alpha|beta|rc|preview|pre|dev|experimental)$ ]]; then
+          echo "IS_PRERELEASE=true" >> $GITHUB_OUTPUT
+        else
+          echo "IS_PRERELEASE=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Pack
+      run: dotnet pack --configuration Release --output ./nupkgs
+
+    - name: Publish to NuGet
+      run: |
+        for file in ./nupkgs/*.nupkg; do
+          if [ -f "$file" ]; then
+            echo "Publishing $file..."
+            dotnet nuget push "$file" --api-key ${{ secrets.NUGET_API_KEY_CV4PVE }} --source https://api.nuget.org/v3/index.json
+          fi
+        done
+      env:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY_CV4PVE }}
+
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: Release ${{ github.ref_name }}
+        generate_release_notes: true
+        draft: false
+        prerelease: ${{ steps.prerelease_check.outputs.IS_PRERELEASE }}
+
+    - name: Upload Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./nupkgs/*
+        asset_name: ${{ github.event.repository.name }}-packages.zip
+        asset_content_type: application/zip
+      continue-on-error: true

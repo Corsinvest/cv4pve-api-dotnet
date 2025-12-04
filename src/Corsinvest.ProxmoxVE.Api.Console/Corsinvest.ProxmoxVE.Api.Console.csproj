@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<Product>Corsinvest for Proxmox VE Api Console</Product>
+		<AssemblyTitle>Corsinvest for Proxmox VE Api Console</AssemblyTitle>
+		<Description>Corsinvest for Proxmox VE Api Console</Description>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference
+			Include="..\Corsinvest.ProxmoxVE.Api.Extension\Corsinvest.ProxmoxVE.Api.Extension.csproj" />
+	</ItemGroup>
+</Project>
