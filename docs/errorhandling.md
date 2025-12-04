@@ -1,10 +1,10 @@
-# Error Handling Guide 🛡️
+# Error Handling Guide
 
 Comprehensive guide to handling errors and exceptions when working with the Proxmox VE API.
 
-## 🎯 Types of Errors
+## Types of Errors
 
-### 🌐 **Network Errors**
+### **Network Errors**
 ```csharp
 try
 {
@@ -23,7 +23,7 @@ catch (TaskCanceledException ex)
 }
 ```
 
-### 🔐 **Authentication Errors**
+### **Authentication Errors**
 ```csharp
 try
 {
@@ -32,16 +32,16 @@ try
     
     if (!success)
     {
-        Console.WriteLine("❌ Authentication failed - check credentials");
+        Console.WriteLine("Authentication failed - check credentials");
     }
 }
 catch (UnauthorizedAccessException ex)
 {
-    Console.WriteLine($"❌ Authentication error: {ex.Message}");
+    Console.WriteLine($"Authentication error: {ex.Message}");
 }
 ```
 
-### 📊 **API Response Errors**
+### **API Response Errors**
 ```csharp
 var result = await client.Nodes["pve1"].Qemu[999].Config.VmConfig();
 
@@ -50,24 +50,24 @@ if (!result.IsSuccessStatusCode)
     switch (result.StatusCode)
     {
         case HttpStatusCode.NotFound:
-            Console.WriteLine("❌ VM not found");
+            Console.WriteLine("VM not found");
             break;
         case HttpStatusCode.Forbidden:
-            Console.WriteLine("❌ Permission denied");
+            Console.WriteLine("Permission denied");
             break;
         case HttpStatusCode.BadRequest:
-            Console.WriteLine($"❌ Bad request: {result.GetError()}");
+            Console.WriteLine($"Bad request: {result.GetError()}");
             break;
         default:
-            Console.WriteLine($"❌ API error: {result.StatusCode} - {result.ReasonPhrase}");
+            Console.WriteLine($"API error: {result.StatusCode} - {result.ReasonPhrase}");
             break;
     }
 }
 ```
 
-## 🔧 Error Handling Patterns
+## Error Handling Patterns
 
-### 📋 **Basic Pattern**
+### **Basic Pattern**
 ```csharp
 public static async Task<bool> SafeVmOperation(PveClient client, string node, int vmId)
 {
@@ -77,24 +77,24 @@ public static async Task<bool> SafeVmOperation(PveClient client, string node, in
         
         if (result.IsSuccessStatusCode)
         {
-            Console.WriteLine($"✅ VM {vmId} started successfully");
+            Console.WriteLine($"VM {vmId} started successfully");
             return true;
         }
         else
         {
-            Console.WriteLine($"❌ Failed to start VM {vmId}: {result.GetError()}");
+            Console.WriteLine($"Failed to start VM {vmId}: {result.GetError()}");
             return false;
         }
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"❌ Exception starting VM {vmId}: {ex.Message}");
+        Console.WriteLine($"Exception starting VM {vmId}: {ex.Message}");
         return false;
     }
 }
 ```
 
-### 🎯 **Centralized Error Handler**
+### **Centralized Error Handler**
 ```csharp
 public static class ErrorHandler
 {
@@ -113,24 +113,24 @@ public static class ErrorHandler
         }
         catch (HttpRequestException ex)
         {
-            Console.WriteLine($"❌ Network error during {operation}: {ex.Message}");
+            Console.WriteLine($"Network error during {operation}: {ex.Message}");
             throw;
         }
         catch (TaskCanceledException ex)
         {
-            Console.WriteLine($"❌ Timeout during {operation}: {ex.Message}");
+            Console.WriteLine($"Timeout during {operation}: {ex.Message}");
             throw;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"❌ Unexpected error during {operation}: {ex.Message}");
+            Console.WriteLine($"Unexpected error during {operation}: {ex.Message}");
             throw;
         }
     }
     
     private static void LogApiError(Result result, string operation)
     {
-        Console.WriteLine($"❌ {operation} failed:");
+        Console.WriteLine($"{operation} failed:");
         Console.WriteLine($"   Status: {result.StatusCode} - {result.ReasonPhrase}");
         
         if (result.ResponseInError)
@@ -147,7 +147,7 @@ var result = await ErrorHandler.SafeApiCall(
 );
 ```
 
-### 🔄 **Retry Logic**
+### **Retry Logic**
 ```csharp
 public static async Task<r> WithRetry<T>(
     Func<Task<r>> operation, 
@@ -168,19 +168,19 @@ public static async Task<r> WithRetry<T>(
             // Don't retry client errors (4xx), only server errors (5xx)
             if ((int)result.StatusCode < 500)
             {
-                Console.WriteLine($"❌ {operationName} failed with client error: {result.StatusCode}");
+                Console.WriteLine($"{operationName} failed with client error: {result.StatusCode}");
                 return result;
             }
             
             if (attempt < maxRetries)
             {
-                Console.WriteLine($"⚠️  {operationName} failed (attempt {attempt}/{maxRetries}), retrying...");
+                Console.WriteLine($"Warning: {operationName} failed (attempt {attempt}/{maxRetries}), retrying...");
                 await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2, attempt))); // Exponential backoff
             }
         }
         catch (Exception ex) when (attempt < maxRetries)
         {
-            Console.WriteLine($"⚠️  {operationName} threw exception (attempt {attempt}/{maxRetries}): {ex.Message}");
+            Console.WriteLine($"Warning: {operationName} threw exception (attempt {attempt}/{maxRetries}): {ex.Message}");
             await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2, attempt)));
         }
     }
@@ -197,15 +197,15 @@ var result = await WithRetry(
 );
 ```
 
-## 🚨 Common Error Scenarios
+## Common Error Scenarios
 
-### 🔐 **Permission Issues**
+### **Permission Issues**
 ```csharp
 public static void HandlePermissionError(Result result)
 {
     if (result.StatusCode == HttpStatusCode.Forbidden)
     {
-        Console.WriteLine("❌ Permission denied. Check:");
+        Console.WriteLine("Permission denied. Check:");
         Console.WriteLine("   - User has required permissions");
         Console.WriteLine("   - API token has correct privileges");
         Console.WriteLine("   - Resource exists and user has access");
@@ -213,7 +213,7 @@ public static void HandlePermissionError(Result result)
 }
 ```
 
-### 🔍 **Resource Not Found**
+### **Resource Not Found**
 ```csharp
 public static async Task<bool> VmExists(PveClient client, string node, int vmId)
 {
@@ -231,12 +231,12 @@ public static async Task<bool> VmExists(PveClient client, string node, int vmId)
 // Usage
 if (!await VmExists(client, "pve1", 100))
 {
-    Console.WriteLine("❌ VM 100 does not exist on node pve1");
+    Console.WriteLine("VM 100 does not exist on node pve1");
     return;
 }
 ```
 
-### ⏱️ **Timeout Handling**
+### **Timeout Handling**
 ```csharp
 var client = new PveClient("pve.local")
 {
@@ -251,20 +251,20 @@ catch (TaskCanceledException ex)
 {
     if (ex.CancellationToken.IsCancellationRequested)
     {
-        Console.WriteLine("❌ Operation was cancelled");
+        Console.WriteLine("Operation was cancelled");
     }
     else
     {
-        Console.WriteLine("❌ Operation timed out - try increasing client timeout");
+        Console.WriteLine("Operation timed out - try increasing client timeout");
     }
 }
 ```
 
-## 🎯 Best Practices
+## Best Practices
 
-### ✅ **Defensive Programming**
+### **Defensive Programming**
 ```csharp
-// ✅ Always validate input
+// Always validate input
 public static async Task<r> GetVmConfig(PveClient client, string node, int vmId)
 {
     if (string.IsNullOrWhiteSpace(node))
@@ -276,7 +276,7 @@ public static async Task<r> GetVmConfig(PveClient client, string node, int vmId)
     return await client.Nodes[node].Qemu[vmId].Config.VmConfig();
 }
 
-// ✅ Check for null responses
+// Check for null responses
 var result = await client.Cluster.Resources.Resources();
 if (result.IsSuccessStatusCode && result.Response?.data != null)
 {
@@ -287,7 +287,7 @@ if (result.IsSuccessStatusCode && result.Response?.data != null)
 }
 ```
 
-### 📊 **Graceful Degradation**
+### **Graceful Degradation**
 ```csharp
 public static async Task<ClusterStatus> GetClusterStatus(PveClient client)
 {
@@ -301,7 +301,7 @@ public static async Task<ClusterStatus> GetClusterStatus(PveClient client)
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"⚠️  Could not get cluster status: {ex.Message}");
+        Console.WriteLine($"Warning: Could not get cluster status: {ex.Message}");
     }
     
     // Return fallback status
@@ -309,11 +309,11 @@ public static async Task<ClusterStatus> GetClusterStatus(PveClient client)
 }
 ```
 
-### 🔍 **Detailed Logging**
+### **Detailed Logging**
 ```csharp
 public static async Task<r> LoggedApiCall<T>(Func<Task<r>> apiCall, string operation)
 {
-    Console.WriteLine($"🔄 Starting: {operation}");
+    Console.WriteLine($"Starting: {operation}");
     var stopwatch = Stopwatch.StartNew();
     
     try
@@ -323,11 +323,11 @@ public static async Task<r> LoggedApiCall<T>(Func<Task<r>> apiCall, string opera
         
         if (result.IsSuccessStatusCode)
         {
-            Console.WriteLine($"✅ {operation} completed in {stopwatch.ElapsedMilliseconds}ms");
+            Console.WriteLine($"{operation} completed in {stopwatch.ElapsedMilliseconds}ms");
         }
         else
         {
-            Console.WriteLine($"❌ {operation} failed after {stopwatch.ElapsedMilliseconds}ms: {result.GetError()}");
+            Console.WriteLine($"{operation} failed after {stopwatch.ElapsedMilliseconds}ms: {result.GetError()}");
         }
         
         return result;
@@ -335,12 +335,8 @@ public static async Task<r> LoggedApiCall<T>(Func<Task<r>> apiCall, string opera
     catch (Exception ex)
     {
         stopwatch.Stop();
-        Console.WriteLine($"❌ {operation} threw exception after {stopwatch.ElapsedMilliseconds}ms: {ex.Message}");
+        Console.WriteLine($"{operation} threw exception after {stopwatch.ElapsedMilliseconds}ms: {ex.Message}");
         throw;
     }
 }
 ```
-
-<div align="center">
-  <sub>Part of <a href="https://www.cv4pve-tools.com">cv4pve-tools</a> suite | Made with ❤️ in Italy by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
-</div>

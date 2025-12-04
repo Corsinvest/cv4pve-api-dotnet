@@ -1,4 +1,4 @@
-# Corsinvest.ProxmoxVE.Api 🔧
+# Corsinvest.ProxmoxVE.Api
 
 <div align="center">
 
@@ -6,7 +6,7 @@
 [![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api)
 [![.NET](https://img.shields.io/badge/.NET-6.0%2B-blue?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 
-**🚀 Core .NET Client for Proxmox VE API**
+**Core .NET Client for Proxmox VE API**
 
 *The foundation package for all Proxmox VE operations in .NET*
 
@@ -14,30 +14,30 @@
 
 ---
 
-## 📖 Overview
+## Overview
 
 The `Corsinvest.ProxmoxVE.Api` package is the core library that provides direct access to the Proxmox VE REST API. It features a 1:1 mapping with the official API structure, making it intuitive for developers familiar with Proxmox VE.
 
-## 🚀 Installation
+## Installation
 
 ```bash
 dotnet add package Corsinvest.ProxmoxVE.Api
 ```
 
-## 🎯 Key Features
+## Key Features
 
-- **🌳 Tree Structure** - Mirrors the Proxmox VE API hierarchy exactly
-- **⚡ Async/Await** - Full asynchronous support throughout
-- **🔧 Auto-Generated** - Generated from official Proxmox VE API documentation
-- **📝 IntelliSense** - Complete code completion and documentation
-- **🔐 Multiple Auth** - Username/password, API tokens, 2FA support
-- **📊 Flexible Results** - Dynamic responses with comprehensive metadata
-- **🌐 HttpClient Injection** - Custom HttpClient support for enterprise scenarios
-- **🛡️ Enterprise Ready** - SSL validation, timeouts, logging integration
+- **Tree Structure** - Mirrors the Proxmox VE API hierarchy exactly
+- **Async/Await** - Full asynchronous support throughout
+- **Auto-Generated** - Generated from official Proxmox VE API documentation
+- **IntelliSense** - Complete code completion and documentation
+- **Multiple Auth** - Username/password, API tokens, 2FA support
+- **Flexible Results** - Dynamic responses with comprehensive metadata
+- **HttpClient Injection** - Custom HttpClient support for enterprise scenarios
+- **Enterprise Ready** - SSL validation, timeouts, logging integration
 
 ---
 
-## 🏗️ API Structure
+## API Structure
 
 The library follows the exact structure of the [Proxmox VE API](https://pve.proxmox.com/pve-docs/api-viewer/):
 
@@ -55,7 +55,7 @@ client.Nodes["pve1"].Lxc[101].Snapshot.Snapshot("snap-name")
 client.Nodes["pve1"].Storage["local"].Status()
 ```
 
-### 🔧 HTTP Method Mapping
+### HTTP Method Mapping
 
 | HTTP Method | C# Method | Purpose | Example |
 |-------------|-----------|---------|---------|
@@ -68,9 +68,9 @@ client.Nodes["pve1"].Storage["local"].Status()
 
 ---
 
-## 🔐 Authentication
+## Authentication
 
-### 🔑 Username/Password Authentication
+### Username/Password Authentication
 
 ```csharp
 using Corsinvest.ProxmoxVE.Api;
@@ -87,7 +87,7 @@ bool success = await client.Login("admin@pve", "password");
 bool success = await client.Login("root", "password", "123456");
 ```
 
-### 🎯 API Token Authentication (Recommended)
+### API Token Authentication (Recommended)
 
 ```csharp
 var client = new PveClient("pve.example.com");
@@ -99,7 +99,7 @@ client.ApiToken = "user@realm!tokenid=uuid";
 var version = await client.Version.Version();
 ```
 
-### ⚙️ Advanced Configuration
+### Advanced Configuration
 
 ```csharp
 // Basic configuration
@@ -147,10 +147,10 @@ var httpClient = new HttpClient(handler)
 var client = new PveClient("pve.example.com", httpClient);
 ```
 
-### 🏢 Enterprise HttpClient Scenarios
+### Enterprise HttpClient Scenarios
 
 <details>
-<summary><strong>🔐 Custom Certificate Validation</strong></summary>
+<summary><strong>Custom Certificate Validation</strong></summary>
 
 ```csharp
 // Custom certificate validation for corporate environments
@@ -176,7 +176,7 @@ var client = new PveClient("pve.company.com", httpClient);
 </details>
 
 <details>
-<summary><strong>🌐 Proxy Configuration</strong></summary>
+<summary><strong>Proxy Configuration</strong></summary>
 
 ```csharp
 // Corporate proxy setup
@@ -199,7 +199,7 @@ var client = new PveClient("pve.company.com", httpClient);
 </details>
 
 <details>
-<summary><strong>📊 Request/Response Logging</strong></summary>
+<summary><strong>Request/Response Logging</strong></summary>
 
 ```csharp
 // Custom logging handler for debugging
@@ -235,7 +235,7 @@ var client = new PveClient("pve.example.com", httpClient);
 </details>
 
 <details>
-<summary><strong>🔄 Retry Policies with Polly</strong></summary>
+<summary><strong>Retry Policies with Polly</strong></summary>
 
 ```csharp
 using Polly;
@@ -259,7 +259,7 @@ var client = new PveClient("pve.example.com", httpClient);
 
 ---
 
-## 📊 Working with Results
+## Working with Results
 
 Every API call returns a `Result` object containing comprehensive response information:
 
@@ -289,7 +289,7 @@ else
 }
 ```
 
-### 📋 Result Properties
+### Result Properties
 
 ```csharp
 public class Result
@@ -311,12 +311,12 @@ public class Result
 
 ---
 
-## 🔧 Basic Examples
+## Basic Examples
 
-### 🖥️ Virtual Machine Management
+### Virtual Machine Management
 
 <details>
-<summary><strong>📊 VM Configuration</strong></summary>
+<summary><strong>VM Configuration</strong></summary>
 
 ```csharp
 using Corsinvest.ProxmoxVE.Api;
@@ -350,14 +350,14 @@ var updateResult = await vm.Config.UpdateVm(
 
 if (updateResult.IsSuccessStatusCode)
 {
-    Console.WriteLine("✅ VM configuration updated!");
+    Console.WriteLine("VM configuration updated!");
 }
 ```
 
 </details>
 
 <details>
-<summary><strong>📸 Snapshot Management</strong></summary>
+<summary><strong>Snapshot Management</strong></summary>
 
 ```csharp
 // Create snapshot
@@ -369,7 +369,7 @@ var snapshot = await client.Nodes["pve1"].Qemu[100]
 
 if (snapshot.IsSuccessStatusCode)
 {
-    Console.WriteLine("✅ Snapshot created successfully!");
+    Console.WriteLine("Snapshot created successfully!");
 }
 
 // List snapshots
@@ -378,7 +378,7 @@ var snapshots = await client.Nodes["pve1"].Qemu[100]
 
 if (snapshots.IsSuccessStatusCode)
 {
-    Console.WriteLine("📸 Available snapshots:");
+    Console.WriteLine("Available snapshots:");
     foreach (var snap in snapshots.Response.data)
     {
         Console.WriteLine($"  - {snap.name}: {snap.description} ({snap.snaptime})");
@@ -391,14 +391,14 @@ var deleteResult = await client.Nodes["pve1"].Qemu[100]
 
 if (deleteResult.IsSuccessStatusCode)
 {
-    Console.WriteLine("🗑️ Snapshot deleted successfully!");
+    Console.WriteLine("Snapshot deleted successfully!");
 }
 ```
 
 </details>
 
 <details>
-<summary><strong>🔄 VM Status Management</strong></summary>
+<summary><strong>VM Status Management</strong></summary>
 
 ```csharp
 var vm = client.Nodes["pve1"].Qemu[100];
@@ -415,7 +415,7 @@ if (status.Response.data.status == "stopped")
     var startResult = await vm.Status.Start.VmStart();
     if (startResult.IsSuccessStatusCode)
     {
-        Console.WriteLine("🚀 VM started successfully!");
+        Console.WriteLine("VM started successfully!");
     }
 }
 
@@ -423,23 +423,23 @@ if (status.Response.data.status == "stopped")
 var stopResult = await vm.Status.Stop.VmStop();
 if (stopResult.IsSuccessStatusCode)
 {
-    Console.WriteLine("⏹️ VM stopped successfully!");
+    Console.WriteLine("VM stopped successfully!");
 }
 
 // Restart VM
 var restartResult = await vm.Status.Reboot.VmReboot();
 if (restartResult.IsSuccessStatusCode)
 {
-    Console.WriteLine("🔄 VM restarted successfully!");
+    Console.WriteLine("VM restarted successfully!");
 }
 ```
 
 </details>
 
-### 📦 Container Management
+### Container Management
 
 <details>
-<summary><strong>🐳 LXC Container Operations</strong></summary>
+<summary><strong>LXC Container Operations</strong></summary>
 
 ```csharp
 // Access LXC container
@@ -463,30 +463,30 @@ Console.WriteLine($"Status: {status.Response.data.status}");
 if (status.Response.data.status == "stopped")
 {
     await container.Status.Start.VmStart();
-    Console.WriteLine("🚀 Container started!");
+    Console.WriteLine("Container started!");
 }
 
 // Create container snapshot
 var snapshot = await container.Snapshot.Snapshot("backup-snapshot");
 if (snapshot.IsSuccessStatusCode)
 {
-    Console.WriteLine("📸 Container snapshot created!");
+    Console.WriteLine("Container snapshot created!");
 }
 ```
 
 </details>
 
-### 🏗️ Cluster Operations
+### Cluster Operations
 
 <details>
-<summary><strong>📊 Cluster Status and Resources</strong></summary>
+<summary><strong>Cluster Status and Resources</strong></summary>
 
 ```csharp
 // Get cluster status
 var clusterStatus = await client.Cluster.Status.Status();
 if (clusterStatus.IsSuccessStatusCode)
 {
-    Console.WriteLine("🏗️ Cluster Status:");
+    Console.WriteLine("Cluster Status:");
     foreach (var item in clusterStatus.Response.data)
     {
         Console.WriteLine($"  {item.type}: {item.name} - {item.status}");
@@ -497,7 +497,7 @@ if (clusterStatus.IsSuccessStatusCode)
 var resources = await client.Cluster.Resources.Resources();
 if (resources.IsSuccessStatusCode)
 {
-    Console.WriteLine("📊 Cluster Resources:");
+    Console.WriteLine("Cluster Resources:");
     foreach (var resource in resources.Response.data)
     {
         if (resource.type == "node")
@@ -515,7 +515,7 @@ if (resources.IsSuccessStatusCode)
 var nodes = await client.Nodes.Index();
 if (nodes.IsSuccessStatusCode)
 {
-    Console.WriteLine("🖥️ Available Nodes:");
+    Console.WriteLine("Available Nodes:");
     foreach (var node in nodes.Response.data)
     {
         Console.WriteLine($"  {node.node}: {node.status} - Uptime: {node.uptime}s");
@@ -525,17 +525,17 @@ if (nodes.IsSuccessStatusCode)
 
 </details>
 
-### 💾 Storage Management
+### Storage Management
 
 <details>
-<summary><strong>🗄️ Storage Operations</strong></summary>
+<summary><strong>Storage Operations</strong></summary>
 
 ```csharp
 // List storage on a node
 var storages = await client.Nodes["pve1"].Storage.Index();
 if (storages.IsSuccessStatusCode)
 {
-    Console.WriteLine("💾 Available Storage:");
+    Console.WriteLine("Available Storage:");
     foreach (var storage in storages.Response.data)
     {
         Console.WriteLine($"  {storage.storage}: {storage.type} - {storage.avail / (1024*1024*1024):F2} GB available");
@@ -558,7 +558,7 @@ if (localStorage.IsSuccessStatusCode)
 var content = await client.Nodes["pve1"].Storage["local"].Content.Index();
 if (content.IsSuccessStatusCode)
 {
-    Console.WriteLine("📁 Storage Content:");
+    Console.WriteLine("Storage Content:");
     foreach (var item in content.Response.data)
     {
         Console.WriteLine($"  {item.volid}: {item.format} - {item.size / (1024*1024):F2} MB");
@@ -570,9 +570,9 @@ if (content.IsSuccessStatusCode)
 
 ---
 
-## 🔧 Advanced Features
+## Advanced Features
 
-### 📈 Response Type Switching
+### Response Type Switching
 
 ```csharp
 // Default JSON responses
@@ -591,7 +591,7 @@ Console.WriteLine($"<img src=\"data:image/png;base64,{imageData}\" />");
 client.ResponseType = "json";
 ```
 
-### ⏳ Task Management
+### Task Management
 
 ```csharp
 // Long-running operations return task IDs
@@ -631,7 +631,7 @@ if (createResult.IsSuccessStatusCode)
 }
 ```
 
-### 🔐 SSL and Security
+### SSL and Security
 
 ```csharp
 var client = new PveClient("pve.example.com")
@@ -652,9 +652,9 @@ var result = await client.Version.Version();
 
 ---
 
-## 🚀 Best Practices
+## Best Practices
 
-### ✅ **Recommended Patterns**
+### Recommended Patterns
 
 ```csharp
 // 1. Always check IsSuccessStatusCode
@@ -693,7 +693,7 @@ using var httpClient = new HttpClient();
 var client = new PveClient("pve.example.com", httpClient);
 ```
 
-### ❌ **Common Pitfalls to Avoid**
+### Common Pitfalls to Avoid
 
 ```csharp
 // Don't ignore error handling
@@ -708,25 +708,3 @@ await client.Login("root", "password123"); // Bad
 Console.WriteLine(result.Response.data.nonexistent); // May throw
 // Better: Check if property exists or use null-conditional operators
 ```
-
----
-
-## 🔗 Related Packages
-
-- **[Corsinvest.ProxmoxVE.Api.Extension](../Extension.md)** - Helper methods and utilities
-- **[Corsinvest.ProxmoxVE.Api.Shared](../Shared.md)** - Common models and types
-- **[Corsinvest.ProxmoxVE.Api.Shell](../Shell.md)** - Console application helpers
-
----
-
-## 📞 Support
-
-- **[GitHub Issues](https://github.com/Corsinvest/cv4pve-api-dotnet/issues)** - Bug reports and questions
-- **[NuGet Package](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api)** - Download and version info
-- **[Commercial Support](https://www.corsinvest.it/cv4pve)** - Professional services
-
----
-
-<div align="center">
-  <sub>Part of <a href="https://www.cv4pve-tools.com">cv4pve-tools</a> suite | Made with ❤️ in Italy by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
-</div>

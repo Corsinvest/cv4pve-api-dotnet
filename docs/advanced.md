@@ -1,10 +1,10 @@
-# Advanced Usage Guide 🚀
+# Advanced Usage Guide
 
 This guide covers complex scenarios, best practices, and advanced patterns for experienced developers.
 
-## 🏢 Enterprise Configuration
+## Enterprise Configuration
 
-### 🔧 **Custom HttpClient Setup**
+### **Custom HttpClient Setup**
 
 ```csharp
 // Corporate environment with proxy and certificate validation
@@ -35,7 +35,7 @@ var client = new PveClient("pve.company.com", httpClient)
 };
 ```
 
-### 🔄 **Resilient Operations**
+### **Resilient Operations**
 
 ```csharp
 // Retry policy with exponential backoff
@@ -69,9 +69,9 @@ var result = await WithRetry(() => client.Nodes["pve1"].Qemu[100].Status.Start.V
 
 ---
 
-## ⏳ Task and Resource Management
+## Task and Resource Management
 
-### 🔄 **Long-Running Operations**
+### **Long-Running Operations**
 
 ```csharp
 // Complete task management with progress
@@ -81,12 +81,12 @@ public static async Task<bool> ExecuteWithProgress(
     string node,
     string description)
 {
-    Console.WriteLine($"🔄 Starting: {description}");
+    Console.WriteLine($"Starting: {description}");
     
     var result = await operation();
     if (!result.IsSuccessStatusCode)
     {
-        Console.WriteLine($"❌ Failed to start {description}: {result.GetError()}");
+        Console.WriteLine($"Failed to start {description}: {result.GetError()}");
         return false;
     }
     
@@ -110,19 +110,19 @@ private static async Task<bool> WaitForTaskCompletion(
         if (status.IsSuccessStatusCode && status.Response.data.status == "stopped")
         {
             var success = status.Response.data.exitstatus == "OK";
-            Console.WriteLine($"{(success ? "✅" : "❌")} {description}: {status.Response.data.exitstatus}");
+            Console.WriteLine($"{description}: {status.Response.data.exitstatus} ({(success ? "Success" : "Failed")})");
             return success;
         }
         
         await Task.Delay(2000);
     }
     
-    Console.WriteLine($"⏰ {description} timed out");
+    Console.WriteLine($"Timeout: {description} timed out");
     return false;
 }
 ```
 
-### 🔄 **Bulk Operations**
+### **Bulk Operations**
 
 ```csharp
 // Perform operations on multiple VMs with concurrency control
@@ -144,7 +144,7 @@ public static async Task<Dictionary<int, bool>> BulkVmOperation(
     {
         if (!vmLocations.TryGetValue(vmId, out string node))
         {
-            Console.WriteLine($"❌ VM {vmId} not found");
+            Console.WriteLine($"VM {vmId} not found");
             results[vmId] = false;
             return;
         }
@@ -155,7 +155,7 @@ public static async Task<Dictionary<int, bool>> BulkVmOperation(
             var result = await operation(client, node, vmId);
             var success = result.IsSuccessStatusCode;
             
-            Console.WriteLine($"{(success ? "✅" : "❌")} VM {vmId} {operationName}: {(success ? "OK" : result.GetError())}");
+            Console.WriteLine($"VM {vmId} {operationName}: {(success ? "Success" : $"Failed - {result.GetError()}")}");
             results[vmId] = success;
         }
         finally
@@ -186,9 +186,9 @@ var snapshotResults = await BulkVmOperation(
 
 ---
 
-## 📊 Monitoring and Health Checks
+## Monitoring and Health Checks
 
-### 🎯 **Cluster Health Assessment**
+### **Cluster Health Assessment**
 
 ```csharp
 public class ClusterHealthMonitor
@@ -271,15 +271,15 @@ Console.WriteLine($"VMs: {health.VirtualMachines.Running}/{health.VirtualMachine
 
 foreach (var alert in alerts.Where(a => a.Severity == AlertSeverity.Critical))
 {
-    Console.WriteLine($"🚨 CRITICAL: {alert.Message}");
+    Console.WriteLine($"CRITICAL: {alert.Message}");
 }
 ```
 
 ---
 
-## 🏗️ Architecture Patterns
+## Architecture Patterns
 
-### 🎯 **Repository Pattern**
+### **Repository Pattern**
 
 ```csharp
 public interface IProxmoxRepository
@@ -353,9 +353,9 @@ public class ProxmoxRepository : IProxmoxRepository
 
 ---
 
-## 🔧 Error Handling and Logging
+## Error Handling and Logging
 
-### 🛡️ **Centralized Error Management**
+### **Centralized Error Management**
 
 ```csharp
 public static class ProxmoxOperations
@@ -375,28 +375,28 @@ public static class ProxmoxOperations
             
             if (result.IsSuccessStatusCode)
             {
-                logger?.LogInformation($"✅ {operationName} completed in {stopwatch.ElapsedMilliseconds}ms");
+                logger?.LogInformation($"{operationName} completed in {stopwatch.ElapsedMilliseconds}ms");
             }
             else
             {
-                logger?.LogWarning($"❌ {operationName} failed: {result.GetError()} (took {stopwatch.ElapsedMilliseconds}ms)");
+                logger?.LogWarning($"{operationName} failed: {result.GetError()} (took {stopwatch.ElapsedMilliseconds}ms)");
             }
             
             return result;
         }
         catch (HttpRequestException ex)
         {
-            logger?.LogError(ex, $"❌ Network error during {operationName}");
+            logger?.LogError(ex, $"Network error during {operationName}");
             throw;
         }
         catch (TaskCanceledException ex)
         {
-            logger?.LogError(ex, $"❌ Timeout during {operationName}");
+            logger?.LogError(ex, $"Timeout during {operationName}");
             throw;
         }
         catch (Exception ex)
         {
-            logger?.LogError(ex, $"❌ Unexpected error during {operationName}");
+            logger?.LogError(ex, $"Unexpected error during {operationName}");
             throw;
         }
     }
@@ -412,34 +412,28 @@ var result = await ProxmoxOperations.SafeExecute(
 
 ---
 
-## 🎯 Best Practices Summary
+## Best Practices Summary
 
-### ✅ **Performance**
+### **Performance**
 - Use HttpClientFactory for connection pooling
 - Implement retry policies for resilience
 - Limit concurrent operations with SemaphoreSlim
 - Cache frequently accessed data
 
-### 🛡️ **Security**
+### **Security**
 - Always use API tokens in production
 - Enable SSL certificate validation
 - Store credentials securely (environment variables, key vault)
 - Implement proper audit logging
 
-### 🏗️ **Architecture**
+### **Architecture**
 - Use repository pattern for testability
 - Implement centralized error handling
 - Use dependency injection for configuration
 - Separate concerns with proper abstractions
 
-### 📊 **Monitoring**
+### **Monitoring**
 - Log all operations with appropriate levels
 - Implement health checks and alerting
 - Monitor task completion and failures
 - Track performance metrics
-
----
-
-<div align="center">
-  <sub>Part of <a href="https://www.cv4pve-tools.com">cv4pve-tools</a> suite | Made with ❤️ in Italy by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
-</div>
