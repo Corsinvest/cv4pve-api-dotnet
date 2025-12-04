@@ -250,7 +250,14 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
             _logger.LogDebug("Method: {httpMethod}, Url: {uriString}", httpMethod, uriString);
             if (httpMethod != HttpMethod.Get)
             {
-                _logger.LogDebug("Parameters: {parameters}", string.Join(Environment.NewLine, @params.Select(a => $"{a.Key} : {a.Value}")));
+                var sensitiveParams = new[] { "password", "token", "ticket", "otp", "apitoken"};
+                _logger.LogDebug("Parameters: {parameters}", string.Join(Environment.NewLine, @params.Select(a =>
+                {
+                    var paramName = a.Key.ToLower();
+                    return sensitiveParams.Any(p => paramName.Contains(p))
+                        ? $"{a.Key} : ****"
+                        : $"{a.Key} : {a.Value}";
+                })));
             }
         }
 
