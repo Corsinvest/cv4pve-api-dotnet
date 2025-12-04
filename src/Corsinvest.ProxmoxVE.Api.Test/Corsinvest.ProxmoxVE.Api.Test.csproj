@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net9.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
@@ -9,6 +8,6 @@
 
   <ItemGroup>
     <ProjectReference
-      Include="..\Corsinvest.ProxmoxVE.Api.Extension\Corsinvest.ProxmoxVE.Api.Extension.csproj" />
+      Include="..\Corsinvest.ProxmoxVE.Api.Console\Corsinvest.ProxmoxVE.Api.Console.csproj" />
   </ItemGroup>
 </Project>
