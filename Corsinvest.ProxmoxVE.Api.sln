@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Corsinvest.ProxmoxVE.Api.Ex
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Corsinvest.ProxmoxVE.Api.Metadata", "src\Corsinvest.ProxmoxVE.Api.Metadata\Corsinvest.ProxmoxVE.Api.Metadata.csproj", "{692CCB0F-FC3F-47A6-858A-D08C9191CB38}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Corsinvest.ProxmoxVE.Api.Shell", "src\Corsinvest.ProxmoxVE.Api.Shell\Corsinvest.ProxmoxVE.Api.Shell.csproj", "{CAFEC2C7-A2F5-4923-B1B7-003633324105}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Corsinvest.ProxmoxVE.Api.Console", "src\Corsinvest.ProxmoxVE.Api.Console\Corsinvest.ProxmoxVE.Api.Console.csproj", "{CAFEC2C7-A2F5-4923-B1B7-003633324105}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Corsinvest.ProxmoxVE.Api.Shared", "src\Corsinvest.ProxmoxVE.Api.Shared\Corsinvest.ProxmoxVE.Api.Shared.csproj", "{3DD1BFAA-31B2-45EA-8C26-9C6BA32AC16D}"
 EndProject
@@ -19,7 +19,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Elementi di soluzione", "El
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		3rd-party-licenses.md = 3rd-party-licenses.md
-		common.props = common.props
 		Corsinvest.ProxmoxVE.Api.sln.licenseheader = Corsinvest.ProxmoxVE.Api.sln.licenseheader
 		Directory.Packages.props = Directory.Packages.props
 		icon.png = icon.png
