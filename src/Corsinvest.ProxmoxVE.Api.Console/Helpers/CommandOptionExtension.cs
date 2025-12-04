@@ -10,10 +10,10 @@ using System.CommandLine;
 using System.Numerics;
 using System.Text;
 
-namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers;
+namespace Corsinvest.ProxmoxVE.Api.Console.Helpers;
 
 /// <summary>
-/// Command option shell extension.
+/// Command option Console extension.
 /// </summary>
 public static class CommandOptionExtension
 {
@@ -44,14 +44,14 @@ For more information visit https://www.corsinvest.it/cv4pve";
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public static bool DryRunIsActive(this Command command) => command.GetOption<bool>(DryRunOptionName).GetValue();
+    public static bool DryRunIsActive(this Command command) => command.GetValue(command.GetOption<bool>($"--{DryRunOptionName}"));
 
     /// <summary>
     /// Debug is active
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public static bool DebugIsActive(this Command command) => command.GetOption<bool>(DebugOptionName).GetValue();
+    public static bool DebugIsActive(this Command command) => command.GetValue(command.GetOption<bool>($"--{DebugOptionName}"));
 
     /// <summary>
     /// Get LogLevel from debug
@@ -68,13 +68,12 @@ For more information visit https://www.corsinvest.it/cv4pve";
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public static Option<bool> DebugOption(this Command command)
+    public static Option<bool> AddDebugOption(this Command command)
     {
-        var opt = new Option<bool>($"--{DebugOptionName}", "Debug application")
-        {
-            IsHidden = true
-        };
-        command.AddGlobalOption(opt);
+        var opt = command.AddOption<bool>($"--{DebugOptionName}", "Debug application");
+        opt.Hidden = true;
+        opt.Recursive = true;
+
         return opt;
     }
 
@@ -83,39 +82,18 @@ For more information visit https://www.corsinvest.it/cv4pve";
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public static Option<bool> DryRunOption(this Command command)
+    public static Option<bool> AddDryRunOption(this Command command)
     {
-        var opt = new Option<bool>($"--{DryRunOptionName}", "Dry run application")
-        {
-            IsHidden = true,
-        };
-        command.AddGlobalOption(opt);
+        var opt = command.AddOption<bool>($"--{DryRunOptionName}", "Dry run application");
+        opt.Hidden = true;
+        opt.Recursive = true;
+
         return opt;
     }
 
-    /// <summary>
-    /// Get Value from option
-    /// </summary>
-    /// <param name="option"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    private static T GetValue<T>(this Option<T> option) => option.Parse(Environment.GetCommandLineArgs()).GetValueForOption(option);
+    private static T GetValue<T>(this Command command, Option<T> option)
+        => command.Parse(Environment.GetCommandLineArgs()).GetValue(option);
 
-    // /// <summary>
-    // /// Get value
-    // /// </summary>
-    // /// <param name="argument"></param>
-    // /// <typeparam name="T"></typeparam>
-    // /// <returns></returns>
-    // public static T GetValue<T>(this Argument<T> argument) => argument.Parse(Environment.GetCommandLineArgs()).GetValueForArgument(argument);
-
-    /// <summary>
-    /// Return if a option has value
-    /// </summary>
-    /// <param name="option"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    public static bool HasValue<T>(this Option<T> option) => option.GetValue() != null;
 
     /// <summary>
     /// Id or name option
@@ -149,35 +127,35 @@ range 100:107,-105,200:204
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public static Option<string> GetApiTokenOption(this Command command) => command.GetOption<string>(ApiTokenOptionName);
+    public static Option<string> GetApiTokenOption(this Command command) => command.GetOption<string>($"--{ApiTokenOptionName}");
 
     /// <summary>
     /// Get Validate Certificate option
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public static Option<bool> GetValidateCertificateOption(this Command command) => command.GetOption<bool>(ValidateCertificateOptionName);
+    public static Option<bool> GetValidateCertificateOption(this Command command) => command.GetOption<bool>($"--{ValidateCertificateOptionName}");
 
     /// <summary>
     /// Get username option
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public static Option<string> GetUsernameOption(this Command command) => command.GetOption<string>(UsernameOptionName);
+    public static Option<string> GetUsernameOption(this Command command) => command.GetOption<string>($"--{UsernameOptionName}");
 
     /// <summary>
     /// Get password option
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public static Option<string> GetPasswordOption(this Command command) => command.GetOption<string>(PasswordOptionName);
+    public static Option<string> GetPasswordOption(this Command command) => command.GetOption<string>($"--{PasswordOptionName}");
 
     /// <summary>
     /// Get host option
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public static Option<string> GetHostOption(this Command command) => command.GetOption<string>(HostOptionName);
+    public static Option<string> GetHostOption(this Command command) => command.GetOption<string>($"--{HostOptionName}");
 
     #region Login option
     /// <summary>
@@ -191,24 +169,26 @@ range 100:107,-105,200:204
         var optPassword = command.AddOption<string>($"--{PasswordOptionName}", "The password. Specify 'file:path_file' to store password in file.");
         command.ValidateCertificateOption();
 
-        var optHost = new Option<string>($"--{HostOptionName}",
-                                         parseArgument: (e) =>
-                                         {
-                                             if (e.FindResultFor(optApiToken) == null && e.FindResultFor(optUsername) == null)
-                                             {
-                                                 e.ErrorMessage = $"Option '--{optUsername.Name}' or '--{optApiToken.Name}' is required!";
-                                             }
-                                             else if (e.FindResultFor(optUsername) != null && e.FindResultFor(optPassword) == null)
-                                             {
-                                                 e.ErrorMessage = $"Option '--{optPassword.Name}' is required!";
-                                             }
-
-                                             return e.Tokens.Single().Value;
-                                         }, description: "The host name host[:port],host1[:port],host2[:port]")
+        var optHost = new Option<string>($"--{HostOptionName}")
         {
-            IsRequired = true
+            Description = "The host name host[:port],host1[:port],host2[:port]",
+            Required = true,
+            CustomParser = (e) =>
+            {
+                if (e.GetValue(optApiToken) == null && e.GetValue(optUsername) == null)
+                {
+                    e.AddError($"Option '{optUsername.Name}' or '{optApiToken.Name}' is required!");
+                }
+                else if (e.GetValue(optUsername) != null && e.GetValue(optPassword) == null)
+                {
+                    e.AddError($"Option '{optPassword.Name}' is required!");
+                }
+
+                return e.Tokens.Single().Value;
+            }
         };
-        command.AddOption(optHost);
+
+        command.Add(optHost);
     }
 
     /// <summary>
@@ -254,7 +234,7 @@ range 100:107,-105,200:204
     public static Option<string> HostOption(this Command command)
     {
         var option = command.AddOption<string>($"--{HostOptionName}", "The host name host[:port],host1[:port],host2[:port]");
-        option.IsRequired = true;
+        option.Required = true;
         return option;
     }
 
@@ -266,7 +246,7 @@ range 100:107,-105,200:204
     public static Option<TableGenerator.Output> TableOutputOption(this Command command)
     {
         var opt = command.AddOption<TableGenerator.Output>("--output|-o", "Type output");
-        opt.SetDefaultValue(TableGenerator.Output.Text);
+        opt.DefaultValueFactory = (_) => TableGenerator.Output.Text;
         return opt;
     }
 
@@ -300,12 +280,13 @@ range 100:107,-105,200:204
     /// <returns></returns>
     public static async Task<PveClient> ClientTryLoginAsync(this Command command, ILoggerFactory loggerFactory)
     {
-        var inApiToken = command.GetApiTokenOption().HasValue();
-        return await ClientHelper.GetClientAndTryLoginAsync(command.GetHostOption().GetValue(),
-                                                            inApiToken ? string.Empty : command.GetUsernameOption().GetValue(),
+        var result = command.Parse(Environment.GetCommandLineArgs());
+        var inApiToken = result.GetValue(command.GetApiTokenOption()) != null;
+        return await ClientHelper.GetClientAndTryLoginAsync(result.GetValue(command.GetHostOption()),
+                                                            inApiToken ? string.Empty : result.GetValue(command.GetUsernameOption()),
                                                             inApiToken ? string.Empty : GetPasswordFromOption(command),
-                                                            inApiToken ? command.GetApiTokenOption().GetValue() : string.Empty,
-                                                            command.GetValidateCertificateOption().GetValue(),
+                                                            inApiToken ? result.GetValue(command.GetApiTokenOption()) : string.Empty,
+                                                            result.GetValue(command.GetValidateCertificateOption()),
                                                             loggerFactory);
     }
 
@@ -318,7 +299,7 @@ range 100:107,-105,200:204
     {
         const string key = "012345678901234567890123";
 
-        var password = command.GetPasswordOption().GetValue();
+        var password = command.GetValue(command.GetPasswordOption());
         if (!string.IsNullOrWhiteSpace(password))
         {
             password = password.Trim();
@@ -333,7 +314,7 @@ range 100:107,-105,200:204
                 }
                 else
                 {
-                    Console.WriteLine("Password:");
+                    System.Console.WriteLine("Password:");
                     password = ConsoleHelper.ReadPassword();
                     File.WriteAllText(fileName, StringHelper.Encrypt(password, key), Encoding.UTF8);
                 }
@@ -371,8 +352,11 @@ range 100:107,-105,200:204
     /// <returns></returns>
     public static Argument<T> AddArgument<T>(this Command command, string name, string description)
     {
-        var argument = new Argument<T>(name, description);
-        command.AddArgument(argument);
+        var argument = new Argument<T>(name)
+        {
+            Description = description
+        };
+        command.Add(argument);
         return argument;
     }
 
@@ -385,17 +369,11 @@ range 100:107,-105,200:204
     /// <returns></returns>
     public static Command AddCommand(this Command command, string name, string description)
     {
-        var cmd = CreateObject<Command>(name, description);
-        command.AddCommand(cmd);
-        return cmd;
-    }
-
-    private static T CreateObject<T>(string name, string description) where T : IdentifierSymbol
-    {
         var names = name.Split('|');
-        var obj = (T)Activator.CreateInstance(typeof(T), [names[0], description]);
-        for (int i = 1; i < names.Length; i++) { obj.AddAlias(names[i]); }
-        return obj;
+        var cmd = new Command(names[0], description);
+        foreach (var item in names.Skip(1)) { cmd.Aliases.Add(item); }
+        command.Add(cmd);
+        return cmd;
     }
 
     /// <summary>
@@ -408,8 +386,13 @@ range 100:107,-105,200:204
     /// <returns></returns>
     public static Option<T> AddOption<T>(this Command command, string name, string description)
     {
-        var option = CreateObject<Option<T>>(name, description);
-        command.AddOption(option);
+        var names = name.Split('|');
+        var option = new Option<T>(names[0], [.. names.Skip(1)])
+        {
+            Description = description
+        };
+
+        command.Add(option);
         return option;
     }
 
@@ -423,12 +406,12 @@ range 100:107,-105,200:204
     /// <returns></returns>
     public static Option<T> AddValidatorRange<T>(this Option<T> option, T min, T max) where T : INumber<T>
     {
-        option.AddValidator(e =>
+        option.Validators.Add(e =>
         {
             var range = e.GetValueOrDefault<T>();
             if (range < min || range > max)
             {
-                e.ErrorMessage = $"Option {e.Token.Value} whit value '{range}' is not in range!";
+                e.AddError($"Option {e.Tokens.Single().Value} whit value '{range}' is not in range!");
             }
         });
 
@@ -444,130 +427,130 @@ range 100:107,-105,200:204
     /// <returns></returns>
     public static Option<int> AddValidatorRange(this Option<int> option, int min, int max)
     {
-        option.AddValidator(e =>
+        option.Validators.Add(e =>
         {
             var range = e.GetValueOrDefault<int>();
             if (range < min || range > max)
             {
-                e.ErrorMessage = $"Option {e.Token.Value} whit value '{range}' is not in range!";
+                e.AddError($"Option {e.Tokens.Single().Value} whit value '{range}' is not in range!");
             }
         });
 
         return option;
     }
-	/// <summary>
-	/// Add validator range
-	/// </summary>
-	/// <param name="option"></param>
-	/// <param name="min"></param>
-	/// <param name="max"></param>
-	/// <returns></returns>
-	public static Option<long> AddValidatorRange(this Option<long> option, long min, long max)
-	{
-		option.AddValidator(e =>
-		{
-			var range = e.GetValueOrDefault<int>();
-			if (range < min || range > max)
-			{
-				e.ErrorMessage = $"Option {e.Token.Value} whit value '{range}' is not in range!";
-			}
-		});
-
-		return option;
-	}
-	/// <summary>
-	/// Add validator range
-	/// </summary>
-	/// <param name="option"></param>
-	/// <param name="min"></param>
-	/// <param name="max"></param>
-	/// <returns></returns>
-	public static Option<short> AddValidatorRange(this Option<short> option, short min, short max)
-	{
-		option.AddValidator(e =>
-		{
-			var range = e.GetValueOrDefault<int>();
-			if (range < min || range > max)
-			{
-				e.ErrorMessage = $"Option {e.Token.Value} whit value '{range}' is not in range!";
-			}
-		});
-
-		return option;
-	}
-	/// <summary>
-	/// Add validator range
-	/// </summary>
-	/// <param name="option"></param>
-	/// <param name="min"></param>
-	/// <param name="max"></param>
-	/// <returns></returns>
-	public static Option<byte> AddValidatorRange(this Option<byte> option, byte min, byte max)
-	{
-		option.AddValidator(e =>
-		{
-			var range = e.GetValueOrDefault<int>();
-			if (range < min || range > max)
-			{
-				e.ErrorMessage = $"Option {e.Token.Value} whit value '{range}' is not in range!";
-			}
-		});
-
-		return option;
-	}
-	/// <summary>
-	/// Add validator range
-	/// </summary>
-	/// <param name="option"></param>
-	/// <param name="min"></param>
-	/// <param name="max"></param>
-	/// <returns></returns>
-	public static Option<float> AddValidatorRange(this Option<float> option, float min, float max)
-	{
-		option.AddValidator(e =>
-		{
-			var range = e.GetValueOrDefault<int>();
-			if (range < min || range > max)
-			{
-				e.ErrorMessage = $"Option {e.Token.Value} whit value '{range}' is not in range!";
-			}
-		});
-
-		return option;
-	}
-	/// <summary>
-	/// Add validator range
-	/// </summary>
-	/// <param name="option"></param>
-	/// <param name="min"></param>
-	/// <param name="max"></param>
-	/// <returns></returns>
-	public static Option<double> AddValidatorRange(this Option<double> option, double min, double max)
-	{
-		option.AddValidator(e =>
-		{
-			var range = e.GetValueOrDefault<int>();
-			if (range < min || range > max)
-			{
-				e.ErrorMessage = $"Option {e.Token.Value} whit value '{range}' is not in range!";
-			}
-		});
-
-		return option;
-	}
-#endif
-	/// <summary>
-	/// Add validator exist file
-	/// </summary>
-	/// <param name="option"></param>
-	public static Option<string> AddValidatorExistFile(this Option<string> option)
+    /// <summary>
+    /// Add validator range
+    /// </summary>
+    /// <param name="option"></param>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <returns></returns>
+    public static Option<long> AddValidatorRange(this Option<long> option, long min, long max)
     {
-        option.AddValidator(e =>
+        option.Validators.Add(e =>
+        {
+            var range = e.GetValueOrDefault<int>();
+            if (range < min || range > max)
+            {
+                e.AddError($"Option {e.Tokens.Single().Value} whit value '{range}' is not in range!");
+            }
+        });
+
+        return option;
+    }
+    /// <summary>
+    /// Add validator range
+    /// </summary>
+    /// <param name="option"></param>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <returns></returns>
+    public static Option<short> AddValidatorRange(this Option<short> option, short min, short max)
+    {
+        option.Validators.Add(e =>
+        {
+            var range = e.GetValueOrDefault<int>();
+            if (range < min || range > max)
+            {
+                e.AddError($"Option {e.Tokens.Single().Value} whit value '{range}' is not in range!");
+            }
+        });
+
+        return option;
+    }
+    /// <summary>
+    /// Add validator range
+    /// </summary>
+    /// <param name="option"></param>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <returns></returns>
+    public static Option<byte> AddValidatorRange(this Option<byte> option, byte min, byte max)
+    {
+        option.Validators.Add(e =>
+        {
+            var range = e.GetValueOrDefault<int>();
+            if (range < min || range > max)
+            {
+                e.AddError($"Option {e.Tokens.Single().Value} whit value '{range}' is not in range!");
+            }
+        });
+
+        return option;
+    }
+    /// <summary>
+    /// Add validator range
+    /// </summary>
+    /// <param name="option"></param>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <returns></returns>
+    public static Option<float> AddValidatorRange(this Option<float> option, float min, float max)
+    {
+        option.Validators.Add(e =>
+        {
+            var range = e.GetValueOrDefault<int>();
+            if (range < min || range > max)
+            {
+                e.AddError($"Option {e.Tokens.Single().Value} whit value '{range}' is not in range!");
+            }
+        });
+
+        return option;
+    }
+    /// <summary>
+    /// Add validator range
+    /// </summary>
+    /// <param name="option"></param>
+    /// <param name="min"></param>
+    /// <param name="max"></param>
+    /// <returns></returns>
+    public static Option<double> AddValidatorRange(this Option<double> option, double min, double max)
+    {
+        option.Validators.Add(e =>
+        {
+            var range = e.GetValueOrDefault<int>();
+            if (range < min || range > max)
+            {
+                e.AddError($"Option {e.Tokens.Single().Value} whit value '{range}' is not in range!");
+            }
+        });
+
+        return option;
+    }
+#endif
+    /// <summary>
+    /// Add validator exist file
+    /// </summary>
+    /// <param name="option"></param>
+    public static Option<string> AddValidatorExistFile(this Option<string> option)
+    {
+        option.Validators.Add(e =>
         {
             var fileName = e.GetValueOrDefault<string>();
             if (!File.Exists(fileName))
             {
-                e.ErrorMessage = $"Option {e.Token.Value} whit value '{fileName}' is not a valid file!";
+                e.AddError($"Option {e.Tokens.Single().Value} whit value '{fileName}' is not a valid file!");
             }
         });
 
@@ -580,12 +563,12 @@ range 100:107,-105,200:204
     /// <param name="option"></param>
     public static Option<string> AddValidatorExistDirectory(this Option<string> option)
     {
-        option.AddValidator(e =>
+        option.Validators.Add(e =>
         {
             var directoryName = e.GetValueOrDefault<string>();
             if (!Directory.Exists(directoryName))
             {
-                e.ErrorMessage = $"Option {e.Token.Value} whit value '{directoryName}' is not a valid file!";
+                e.AddError($"Option {e.Tokens.Single().Value} whit value '{directoryName}' is not a valid file!");
             }
         });
 

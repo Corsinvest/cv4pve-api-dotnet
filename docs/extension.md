@@ -1,4 +1,4 @@
-# Corsinvest.ProxmoxVE.Api.Extension 🚀
+# Corsinvest.ProxmoxVE.Api.Extension
 
 <div align="center">
 
@@ -6,7 +6,7 @@
 [![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Extension.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Extension)
 [![.NET](https://img.shields.io/badge/.NET-6.0%2B-blue?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 
-**🛠️ Extension Methods for Proxmox VE API**
+**Extension Methods for Proxmox VE API**
 
 *Helper methods and utilities to simplify Proxmox VE operations*
 
@@ -14,11 +14,11 @@
 
 ---
 
-## 📖 Overview
+## Overview
 
 The `Corsinvest.ProxmoxVE.Api.Extension` package provides extension methods and utilities that add functionality on top of the core Proxmox VE API. It simplifies common operations and provides strongly-typed access to API responses.
 
-## 🚀 Installation
+## Installation
 
 ```bash
 dotnet add package Corsinvest.ProxmoxVE.Api.Extension
@@ -26,17 +26,17 @@ dotnet add package Corsinvest.ProxmoxVE.Api.Extension
 
 > **Note:** This package automatically includes `Corsinvest.ProxmoxVE.Api` as a dependency.
 
-## 🎯 Key Features
+## Key Features
 
-- **🔍 ApiExplorer** - Explore and discover API endpoints
-- **📊 Strongly-Typed Results** - Extension method **Get()** to decode JSON from Result
-- **🔍 VM/CT Discovery** - Retrieve VM/CT data from name or ID  
-- **📸 Simplified Management** - Simplified VM/CT and snapshot operations
-- **🏷️ Resource Operations** - Enhanced cluster resource management
+- **ApiExplorer** - Explore and discover API endpoints
+- **Strongly-Typed Results** - Extension method **Get()** to decode JSON from Result
+- **VM/CT Discovery** - Retrieve VM/CT data from name or ID  
+- **Simplified Management** - Simplified VM/CT and snapshot operations
+- **Resource Operations** - Enhanced cluster resource management
 
 ---
 
-## 📊 Extension Method Get()
+## Extension Method Get()
 
 The main extension method `Get()` converts dynamic API responses to strongly-typed objects:
 
@@ -73,7 +73,7 @@ foreach (var vm in vms.Where(r => r.Type == "qemu"))
 
 ---
 
-## 🔍 VM/CT Discovery
+## VM/CT Discovery
 
 The extension provides methods to retrieve VM/CT data from name or ID, as mentioned in the README:
 
@@ -88,9 +88,9 @@ The extension provides methods to retrieve VM/CT data from name or ID, as mentio
 
 ---
 
-## 🛠️ Simplified VM/CT Management
+## Simplified VM/CT Management
 
-### 📸 Enhanced Snapshot Operations
+### Enhanced Snapshot Operations
 
 ```csharp
 // Get VM snapshots with strongly-typed results
@@ -106,18 +106,18 @@ foreach (var snapshot in snapshots)
 var result = await client.Nodes["pve1"].Qemu[100].Snapshot.Snapshot("backup-2024");
 if (result.IsSuccessStatusCode)
 {
-    Console.WriteLine("✅ Snapshot created successfully");
+    Console.WriteLine("Snapshot created successfully");
 }
 
 // Delete snapshot
 var deleteResult = await client.Nodes["pve1"].Qemu[100].Snapshot["backup-2024"].Delsnapshot();
 if (deleteResult.IsSuccessStatusCode)
 {
-    Console.WriteLine("🗑️ Snapshot deleted successfully");
+    Console.WriteLine("Snapshot deleted successfully");
 }
 ```
 
-### 🖥️ VM Configuration and Status
+###  VM Configuration and Status
 
 ```csharp
 // Get VM configuration with typed results
@@ -133,7 +133,7 @@ Console.WriteLine($"CPU Usage: {vmStatus.Cpu:P2}");
 Console.WriteLine($"Memory Usage: {vmStatus.Mem / vmStatus.MaxMem:P2}");
 ```
 
-### 📦 Container Operations
+### Container Operations
 
 ```csharp
 // Get container configuration
@@ -149,7 +149,7 @@ Console.WriteLine($"Uptime: {ctStatus.Uptime} seconds");
 
 ---
 
-## 🏗️ Cluster Resource Management
+## Cluster Resource Management
 
 ```csharp
 // Get all cluster resources with filtering
@@ -186,7 +186,7 @@ foreach (var storage in storages)
 
 ---
 
-## 🔍 ApiExplorer
+## ApiExplorer
 
 Discover available API endpoints and their structure:
 
@@ -203,19 +203,19 @@ var vm = client.Nodes["pve1"].Qemu[100];
 
 ---
 
-## 🎯 Best Practices
+## Best Practices
 
-### ✅ **Using Extension Methods**
+### **Using Extension Methods**
 
 ```csharp
-// ✅ Use Get() extension method for strongly-typed results
+// Use Get() extension method for strongly-typed results
 var nodes = await client.Nodes.Get();
 foreach (var node in nodes)
 {
     Console.WriteLine($"Node: {node.Node}");
 }
 
-// ❌ Instead of working with dynamic objects
+// Instead of working with dynamic objects
 var result = await client.Nodes.Index();
 if (result.IsSuccessStatusCode)
 {
@@ -226,13 +226,13 @@ if (result.IsSuccessStatusCode)
 }
 ```
 
-### 🔍 **VM/CT Discovery Pattern**
+### **VM/CT Discovery Pattern**
 
 ```csharp
-// ✅ Use extension methods for VM/CT discovery
+// Use extension methods for VM/CT discovery
 // (Exact implementation depends on the extension library)
 
-// ✅ Combine with LINQ for powerful filtering of strongly-typed results
+// Combine with LINQ for powerful filtering of strongly-typed results
 var runningVms = (await client.Cluster.Resources.Get())
     .Where(r => r.Type == "qemu" && r.Status == "running")
     .ToList();
@@ -240,7 +240,7 @@ var runningVms = (await client.Cluster.Resources.Get())
 
 ---
 
-## 📚 Model Types
+## Model Types
 
 The extension library provides strongly-typed models for common Proxmox VE objects:
 
@@ -255,7 +255,7 @@ The extension library provides strongly-typed models for common Proxmox VE objec
 
 ---
 
-## 🔗 Integration with Core API
+## Integration with Core API
 
 The Extension package works seamlessly with the core API:
 
@@ -277,31 +277,8 @@ foreach (var vm in vms.Where(v => v.Type == "qemu"))
         var startResult = await vmInstance.Status.Start.VmStart();
         if (startResult.IsSuccessStatusCode)
         {
-            Console.WriteLine($"✅ Started VM {vm.Name}");
+            Console.WriteLine($"Started VM {vm.Name}");
         }
     }
 }
 ```
-
----
-
-## 🔗 Related Packages
-
-- **[Corsinvest.ProxmoxVE.Api](../Api.md)** - Core API client
-- **[Corsinvest.ProxmoxVE.Api.Shared](../Shared.md)** - Common models and types  
-- **[Corsinvest.ProxmoxVE.Api.Shell](../Shell.md)** - Console application helpers
-- **[Corsinvest.ProxmoxVE.Api.Metadata](../Metadata.md)** - API metadata extraction
-
----
-
-## 📞 Support
-
-- **[GitHub Issues](https://github.com/Corsinvest/cv4pve-api-dotnet/issues)** - Bug reports and questions
-- **[NuGet Package](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Extension)** - Download and version info
-- **[Commercial Support](https://www.corsinvest.it/cv4pve)** - Professional services
-
----
-
-<div align="center">
-  <sub>Part of <a href="https://www.cv4pve-tools.com">cv4pve-tools</a> suite | Made with ❤️ in Italy by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
-</div>

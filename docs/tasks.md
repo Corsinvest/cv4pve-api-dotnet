@@ -1,8 +1,8 @@
-# Task Management Guide ⏳
+# Task Management Guide
 
 Understanding and managing long-running operations in Proxmox VE.
 
-## 🎯 Understanding Tasks
+## Understanding Tasks
 
 Many Proxmox VE operations are asynchronous and return a task ID instead of immediate results:
 
@@ -16,9 +16,9 @@ if (result.IsSuccessStatusCode)
 }
 ```
 
-## 📊 Task Status
+## Task Status
 
-### 🔍 **Checking Task Status**
+### **Checking Task Status**
 ```csharp
 public static async Task<TaskStatus> GetTaskStatus(PveClient client, string node, string taskId)
 {
@@ -42,7 +42,7 @@ public static async Task<TaskStatus> GetTaskStatus(PveClient client, string node
 }
 ```
 
-### ⏱️ **Waiting for Completion**
+### **Waiting for Completion**
 ```csharp
 public static async Task<bool> WaitForTaskCompletion(
     PveClient client, 
@@ -92,9 +92,9 @@ public static async Task<bool> WaitForTaskCompletion(
 }
 ```
 
-## 🔄 Common Task Operations
+## Common Task Operations
 
-### 📸 **VM Clone with Progress**
+### **VM Clone with Progress**
 ```csharp
 public static async Task<bool> CloneVmWithProgress(
     PveClient client, 
@@ -103,7 +103,7 @@ public static async Task<bool> CloneVmWithProgress(
     int targetVmId, 
     string newName)
 {
-    Console.WriteLine($"🔄 Cloning VM {sourceVmId} to {targetVmId}...");
+    Console.WriteLine($"Cloning VM {sourceVmId} to {targetVmId}...");
     
     // Start clone operation
     var cloneResult = await client.Nodes[node].Qemu[sourceVmId].Clone.CloneVm(
@@ -113,14 +113,14 @@ public static async Task<bool> CloneVmWithProgress(
     
     if (!cloneResult.IsSuccessStatusCode)
     {
-        Console.WriteLine($"❌ Failed to start clone: {cloneResult.GetError()}");
+        Console.WriteLine($"Failed to start clone: {cloneResult.GetError()}");
         return false;
     }
     
     var taskId = cloneResult.Response.data;
     
     // Wait for completion with progress reporting
-    var progress = new Progress<string>(status => Console.WriteLine($"📊 {status}"));
+    var progress = new Progress<string>(status => Console.WriteLine($"Status: {status}"));
     
     try
     {
@@ -128,24 +128,24 @@ public static async Task<bool> CloneVmWithProgress(
         
         if (success)
         {
-            Console.WriteLine($"✅ VM cloned successfully: {sourceVmId} → {targetVmId}");
+            Console.WriteLine($"VM cloned successfully: {sourceVmId} → {targetVmId}");
         }
         else
         {
-            Console.WriteLine($"❌ VM clone failed");
+            Console.WriteLine($"VM clone failed");
         }
         
         return success;
     }
     catch (TimeoutException)
     {
-        Console.WriteLine($"⏰ Clone operation timed out");
+        Console.WriteLine($"Timeout: Clone operation timed out");
         return false;
     }
 }
 ```
 
-### 📦 **Container Creation**
+### **Container Creation**
 ```csharp
 public static async Task<bool> CreateContainer(
     PveClient client, 
@@ -165,20 +165,20 @@ public static async Task<bool> CreateContainer(
     
     if (!createResult.IsSuccessStatusCode)
     {
-        Console.WriteLine($"❌ Failed to create container: {createResult.GetError()}");
+        Console.WriteLine($"Failed to create container: {createResult.GetError()}");
         return false;
     }
     
     var taskId = createResult.Response.data;
-    Console.WriteLine($"📦 Creating container {vmId} (Task: {taskId})");
+    Console.WriteLine($"Creating container {vmId} (Task: {taskId})");
     
     return await WaitForTaskCompletion(client, node, taskId, TimeSpan.FromMinutes(10));
 }
 ```
 
-## 📊 Monitoring Multiple Tasks
+## Monitoring Multiple Tasks
 
-### 🔄 **Parallel Task Monitoring**
+### **Parallel Task Monitoring**
 ```csharp
 public static async Task<Dictionary<string, bool>> MonitorMultipleTasks(
     PveClient client, 
@@ -187,7 +187,7 @@ public static async Task<Dictionary<string, bool>> MonitorMultipleTasks(
     var results = new Dictionary<string, bool>();
     var activeTasks = new Dictionary<string, string>(tasks);
     
-    Console.WriteLine($"📊 Monitoring {activeTasks.Count} tasks...");
+    Console.WriteLine($"Monitoring {activeTasks.Count} tasks...");
     
     while (activeTasks.Any())
     {
@@ -206,12 +206,12 @@ public static async Task<Dictionary<string, bool>> MonitorMultipleTasks(
                     results[taskId] = success;
                     completedTasks.Add(taskId);
                     
-                    Console.WriteLine($"{(success ? "✅" : "❌")} Task {taskId}: {statusResult.Response.data.exitstatus}");
+                    Console.WriteLine($"Task {taskId}: {statusResult.Response.data.exitstatus} ({(success ? "Success" : "Failed")})");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error checking task {taskId}: {ex.Message}");
+                Console.WriteLine($"Error checking task {taskId}: {ex.Message}");
                 results[taskId] = false;
                 completedTasks.Add(taskId);
             }
@@ -233,7 +233,7 @@ public static async Task<Dictionary<string, bool>> MonitorMultipleTasks(
 }
 ```
 
-### 📈 **Task Progress Display**
+### **Task Progress Display**
 ```csharp
 public static async Task DisplayTaskProgress(PveClient client, string node, string taskId)
 {
@@ -275,9 +275,9 @@ public static async Task DisplayTaskProgress(PveClient client, string node, stri
 }
 ```
 
-## 🛠️ Task Utilities
+## Task Utilities
 
-### 📋 **Task History**
+### **Task History**
 ```csharp
 public static async Task<List<TaskInfo>> GetRecentTasks(PveClient client, string node, int limit = 10)
 {
@@ -309,7 +309,7 @@ public static async Task<List<TaskInfo>> GetRecentTasks(PveClient client, string
 }
 ```
 
-### 🗑️ **Task Cleanup**
+### **Task Cleanup**
 ```csharp
 public static async Task<bool> StopTask(PveClient client, string node, string taskId)
 {
@@ -317,22 +317,22 @@ public static async Task<bool> StopTask(PveClient client, string node, string ta
     
     if (result.IsSuccessStatusCode)
     {
-        Console.WriteLine($"🛑 Task {taskId} stopped");
+        Console.WriteLine($"Task {taskId} stopped");
         return true;
     }
     else
     {
-        Console.WriteLine($"❌ Failed to stop task {taskId}: {result.GetError()}");
+        Console.WriteLine($"Failed to stop task {taskId}: {result.GetError()}");
         return false;
     }
 }
 ```
 
-## 🎯 Best Practices
+## Best Practices
 
-### ✅ **Timeout Management**
+### **Timeout Management**
 ```csharp
-// ✅ Set appropriate timeouts for different operations
+// Set appropriate timeouts for different operations
 var timeouts = new Dictionary<string, TimeSpan>
 {
     ["clone"] = TimeSpan.FromHours(2),
@@ -346,7 +346,7 @@ var timeout = timeouts.GetValueOrDefault(operationType, TimeSpan.FromMinutes(30)
 await WaitForTaskCompletion(client, node, taskId, timeout);
 ```
 
-### 📊 **Error Recovery**
+### **Error Recovery**
 ```csharp
 public static async Task<bool> RobustTaskWait(PveClient client, string node, string taskId)
 {
@@ -360,7 +360,7 @@ public static async Task<bool> RobustTaskWait(PveClient client, string node, str
         }
         catch (HttpRequestException ex) when (attempt < maxRetries)
         {
-            Console.WriteLine($"⚠️  Network error checking task (attempt {attempt}): {ex.Message}");
+            Console.WriteLine($"Warning: Network error checking task (attempt {attempt}): {ex.Message}");
             await Task.Delay(TimeSpan.FromSeconds(5));
         }
     }
@@ -370,7 +370,7 @@ public static async Task<bool> RobustTaskWait(PveClient client, string node, str
 }
 ```
 
-### 🔄 **Batch Operations with Tasks**
+### **Batch Operations with Tasks**
 ```csharp
 public static async Task<Dictionary<int, bool>> BulkVmClone(
     PveClient client, 
@@ -392,17 +392,17 @@ public static async Task<Dictionary<int, bool>> BulkVmClone(
             {
                 var taskId = cloneResult.Response.data;
                 tasks[taskId] = targetVmId;
-                Console.WriteLine($"🔄 Started clone to VM {targetVmId} (Task: {taskId})");
+                Console.WriteLine($"Started clone to VM {targetVmId} (Task: {taskId})");
             }
             else
             {
-                Console.WriteLine($"❌ Failed to start clone to VM {targetVmId}: {cloneResult.GetError()}");
+                Console.WriteLine($"Failed to start clone to VM {targetVmId}: {cloneResult.GetError()}");
                 results[targetVmId] = false;
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"❌ Exception starting clone to VM {targetVmId}: {ex.Message}");
+            Console.WriteLine($"Exception starting clone to VM {targetVmId}: {ex.Message}");
             results[targetVmId] = false;
         }
     }
@@ -426,7 +426,7 @@ public static async Task<Dictionary<int, bool>> BulkVmClone(
 }
 ```
 
-## 📚 Task Information Models
+## Task Information Models
 
 ```csharp
 public class TaskInfo
@@ -455,9 +455,3 @@ public class TaskStatus
     public string Log { get; set; }
 }
 ```
-
----
-
-<div align="center">
-  <sub>Part of <a href="https://www.cv4pve-tools.com">cv4pve-tools</a> suite | Made with ❤️ in Italy by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
-</div>

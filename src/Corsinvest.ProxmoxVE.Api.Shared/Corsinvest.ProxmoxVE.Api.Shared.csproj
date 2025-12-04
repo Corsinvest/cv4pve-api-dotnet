@@ -1,6 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<Import Project="..\..\common.props" />
-
 	<PropertyGroup>
 		<Product>Corsinvest for Proxmox VE Api Client Shared</Product>
 		<AssemblyTitle>Corsinvest for Proxmox VE Api Client Shared</AssemblyTitle>

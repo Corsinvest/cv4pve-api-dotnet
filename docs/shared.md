@@ -1,4 +1,4 @@
-# Corsinvest.ProxmoxVE.Api.Shared 📚
+# Corsinvest.ProxmoxVE.Api.Shared
 
 <div align="center">
 
@@ -6,7 +6,7 @@
 [![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Shared.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shared)
 [![.NET](https://img.shields.io/badge/.NET-6.0%2B-blue?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 
-**📦 Shared Models and Utilities for Proxmox VE**
+**Shared Models and Utilities for Proxmox VE**
 
 *Common models, types, and utilities used across Proxmox VE API packages*
 
@@ -14,11 +14,11 @@
 
 ---
 
-## 📖 Overview
+## Overview
 
 The `Corsinvest.ProxmoxVE.Api.Shared` package contains model definitions for JSON conversion and utility classes that are shared across the Proxmox VE API ecosystem. It provides strongly-typed representations of Proxmox VE objects and common utilities.
 
-## 🚀 Installation
+## Installation
 
 ```bash
 dotnet add package Corsinvest.ProxmoxVE.Api.Shared
@@ -26,19 +26,19 @@ dotnet add package Corsinvest.ProxmoxVE.Api.Shared
 
 > **Note:** This package is typically included as a dependency by other Corsinvest.ProxmoxVE packages.
 
-## 🎯 Key Features
+## Key Features
 
-- **📋 Data Models** - Strongly-typed models for Proxmox VE objects
-- **🔄 JSON Conversion** - Models optimized for JSON serialization/deserialization
-- **🛠️ Utility Classes** - Common utilities and helper methods
-- **🏷️ Type Definitions** - Enums and constants for Proxmox VE values
-- **🔗 Shared Interfaces** - Common interfaces used across packages
+- **Data Models** - Strongly-typed models for Proxmox VE objects
+- **JSON Conversion** - Models optimized for JSON serialization/deserialization
+- **Utility Classes** - Common utilities and helper methods
+- **Type Definitions** - Enums and constants for Proxmox VE values
+- **Shared Interfaces** - Common interfaces used across packages
 
 ---
 
-## 📋 Common Models
+## Common Models
 
-### 🖥️ Virtual Machine Models
+### Virtual Machine Models
 
 ```csharp
 using Corsinvest.ProxmoxVE.Api.Shared.Models;
@@ -73,7 +73,7 @@ public class VmStatus
 }
 ```
 
-### 📦 Container Models
+### Container Models
 
 ```csharp
 // Container Configuration model
@@ -103,7 +103,7 @@ public class ContainerStatus
 }
 ```
 
-### 🏗️ Cluster Models
+### Cluster Models
 
 ```csharp
 // Cluster Status model
@@ -135,7 +135,7 @@ public class ClusterResource
 }
 ```
 
-### 🖥️ Node Models
+### Node Models
 
 ```csharp
 // Node Information model
@@ -154,7 +154,7 @@ public class NodeInfo
 }
 ```
 
-### 📸 Snapshot Models
+### Snapshot Models
 
 ```csharp
 // Snapshot Information model
@@ -172,9 +172,9 @@ public class SnapshotInfo
 
 ---
 
-## 🏷️ Enums and Constants
+## Enums and Constants
 
-### 📊 Resource Types
+### Resource Types
 
 ```csharp
 // Cluster resource types
@@ -205,7 +205,7 @@ public enum NodeStatus
 }
 ```
 
-### ⚙️ Configuration Constants
+### Configuration Constants
 
 ```csharp
 // Common Proxmox VE constants
@@ -214,7 +214,7 @@ public static class PveConstants
     public const string DefaultRealm = "pam";
     public const int DefaultPort = 8006;
     public const string ApiPath = "/api2/json";
-    
+
     // Resource type strings
     public const string ResourceTypeNode = "node";
     public const string ResourceTypeQemu = "qemu";
@@ -225,9 +225,9 @@ public static class PveConstants
 
 ---
 
-## 🛠️ Utility Classes
+## Utility Classes
 
-### 🔄 JSON Converters
+### JSON Converters
 
 ```csharp
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
@@ -244,7 +244,7 @@ public class BooleanConverter : JsonConverter<bool>
 }
 ```
 
-### 📐 Extension Methods
+### Extension Methods
 
 ```csharp
 // Extension methods for common operations
@@ -255,7 +255,7 @@ public static class Extensions
     {
         return DateTimeOffset.FromUnixTimeSeconds(unixTime).DateTime;
     }
-    
+
     // Format bytes to human-readable string
     public static string ToHumanReadableSize(this long bytes)
     {
@@ -269,7 +269,7 @@ public static class Extensions
         }
         return $"{len:0.##} {sizes[order]}";
     }
-    
+
     // Calculate percentage
     public static double ToPercentage(this long used, long total)
     {
@@ -280,9 +280,9 @@ public static class Extensions
 
 ---
 
-## 🔧 Usage Examples
+## Usage Examples
 
-### 📋 Working with Models
+### Working with Models
 
 ```csharp
 using Corsinvest.ProxmoxVE.Api.Shared.Models;
@@ -309,7 +309,7 @@ string json = JsonConvert.SerializeObject(newConfig, Formatting.Indented);
 Console.WriteLine(json);
 ```
 
-### 🏷️ Using Enums
+### Using Enums
 
 ```csharp
 using Corsinvest.ProxmoxVE.Api.Shared;
@@ -327,7 +327,7 @@ if (vmStatus.Status == VmStatus.Running.ToString().ToLower())
 }
 ```
 
-### 🛠️ Using Utilities
+### Using Utilities
 
 ```csharp
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
@@ -350,9 +350,9 @@ Console.WriteLine($"Memory usage: {percentage:F1}%"); // "50.0%"
 
 ---
 
-## 🎯 Integration with Other Packages
+## Integration with Other Packages
 
-### 🔗 With Core API
+### With Core API
 
 ```csharp
 using Corsinvest.ProxmoxVE.Api;
@@ -369,12 +369,12 @@ if (result.IsSuccessStatusCode)
     // Convert to strongly-typed model
     var vmConfig = JsonConvert.DeserializeObject<VmConfig>(
         JsonConvert.SerializeObject(result.Response.data));
-    
+
     Console.WriteLine($"VM: {vmConfig.Name} - Memory: {vmConfig.Memory} MB");
 }
 ```
 
-### 🔗 With Extension Package
+### With Extension Package
 
 ```csharp
 using Corsinvest.ProxmoxVE.Api.Extension;
@@ -393,19 +393,19 @@ foreach (var node in nodes)
 
 ---
 
-## 🎯 Best Practices
+## Best Practices
 
-### ✅ **Model Usage**
+### **Model Usage**
 
 ```csharp
-// ✅ Use strongly-typed models for better code reliability
+// Use strongly-typed models for better code reliability
 var vmConfig = JsonConvert.DeserializeObject<VmConfig>(jsonData);
 if (vmConfig.Memory < 1024)
 {
     Console.WriteLine("Low memory configuration");
 }
 
-// ❌ Instead of working with dynamic objects
+// Instead of working with dynamic objects
 dynamic config = JsonConvert.DeserializeObject(jsonData);
 if (config.memory < 1024) // No compile-time checking
 {
@@ -413,39 +413,16 @@ if (config.memory < 1024) // No compile-time checking
 }
 ```
 
-### 🛠️ **Utility Methods**
+### **Utility Methods**
 
 ```csharp
-// ✅ Use utility extension methods for common formatting
+// Use utility extension methods for common formatting
 Console.WriteLine($"Disk usage: {diskUsed.ToHumanReadableSize()} / {diskTotal.ToHumanReadableSize()}");
 Console.WriteLine($"Memory: {memUsed.ToPercentage(memTotal):F1}%");
 
-// ✅ Use constants instead of magic strings
+// Use constants instead of magic strings
 if (resource.Type == PveConstants.ResourceTypeQemu)
 {
     // Handle VM
 }
 ```
-
----
-
-## 🔗 Related Packages
-
-- **[Corsinvest.ProxmoxVE.Api](../Api.md)** - Core API client
-- **[Corsinvest.ProxmoxVE.Api.Extension](../Extension.md)** - Extension methods and utilities
-- **[Corsinvest.ProxmoxVE.Api.Shell](../Shell.md)** - Console application helpers
-- **[Corsinvest.ProxmoxVE.Api.Metadata](../Metadata.md)** - API metadata extraction
-
----
-
-## 📞 Support
-
-- **[GitHub Issues](https://github.com/Corsinvest/cv4pve-api-dotnet/issues)** - Bug reports and questions
-- **[NuGet Package](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shared)** - Download and version info
-- **[Commercial Support](https://www.corsinvest.it/cv4pve)** - Professional services
-
----
-
-<div align="center">
-  <sub>Part of <a href="https://www.cv4pve-tools.com">cv4pve-tools</a> suite | Made with ❤️ in Italy by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
-</div>

@@ -5,14 +5,12 @@
 
 using Microsoft.Extensions.Logging;
 using System.CommandLine;
-using System.CommandLine.Builder;
-using System.CommandLine.Parsing;
 using System.Reflection;
 
-namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers;
+namespace Corsinvest.ProxmoxVE.Api.Console.Helpers;
 
 /// <summary>
-/// Shell Helper
+/// Console Helper
 /// </summary>
 public static class ConsoleHelper
 {
@@ -63,17 +61,17 @@ Good job";
         ConsoleKey key;
         do
         {
-            var keyInfo = Console.ReadKey(intercept: true);
+            var keyInfo = System.Console.ReadKey(intercept: true);
             key = keyInfo.Key;
 
             if (key == ConsoleKey.Backspace && pass.Length > 0)
             {
-                Console.Write("\b \b");
+                System.Console.Write("\b \b");
                 pass = pass[0..^1];
             }
             else if (!char.IsControl(keyInfo.KeyChar))
             {
-                Console.Write("*");
+                System.Console.Write("*");
                 pass += keyInfo.KeyChar;
             }
         } while (key != ConsoleKey.Enter);
@@ -95,9 +93,9 @@ Good job";
 
         while (true)
         {
-            Console.Write($"{prompt} {message}");
-            Console.Write(' ');
-            var input = Console.ReadLine()?.ToLower()?.Trim();
+            System.Console.Write($"{prompt} {message}");
+            System.Console.Write(' ');
+            var input = System.Console.ReadLine()?.ToLower()?.Trim();
             if (string.IsNullOrEmpty(input)) { break; }
 
             switch (input)
@@ -111,7 +109,7 @@ Good job";
                     return true;
 
                 default:
-                    Console.WriteLine("Invalid response '" + input + "'. Please answer 'y' or 'n' or CTRL+C to exit.");
+                    System.Console.WriteLine("Invalid response '" + input + "'. Please answer 'y' or 'n' or CTRL+C to exit.");
                     break;
             }
         }
@@ -136,15 +134,10 @@ Good job";
     /// <returns></returns>
     public static RootCommand CreateApp(string name, string description)
     {
-        var rc = new RootCommand
-        {
-            Name = name,
-            Description = description,
-        };
-
+        var rc = new RootCommand(description);
         rc.AddFullNameLogo();
-        rc.DebugOption();
-        rc.DryRunOption();
+        rc.AddDebugOption();
+        rc.AddDryRunOption();
         rc.AddLoginOptions();
 
         return rc;
@@ -174,29 +167,32 @@ Good job";
     /// <param name="logger"></param>
     /// <returns></returns>
     public static async Task<int> ExecuteAppAsync(this RootCommand rootCommand, string[] args, ILogger logger)
-        => await new CommandLineBuilder(rootCommand)
-                        .UseDefaults()
-                        .UseExceptionHandler((ex, context) =>
-                        {
-                            var exTmp = ex;
-                            while (exTmp != null)
-                            {
-                                Console.Out.WriteLine("ERROR: " + exTmp.Message);
-                                exTmp = exTmp.InnerException;
-                            }
+    {
+        var resultCode = 0;
 
-                            if (rootCommand.DebugIsActive())
-                            {
-                                logger.LogError(ex, ex.Message);
+        try
+        {
+            resultCode = await rootCommand.Parse(args).InvokeAsync(new()
+            {
+                EnableDefaultExceptionHandler = false
+            });
+        }
+        catch (Exception ex)
+        {
+            System.Console.Out.WriteLine("ERROR: " + ex.Message);
 
-                                Console.Out.WriteLine("================ EXCEPTION ================ ");
-                                Console.Out.WriteLine(ex.GetType().FullName);
-                                Console.Out.WriteLine(ex.Message);
-                                Console.Out.WriteLine(ex.StackTrace);
-                            }
+            if (rootCommand.DebugIsActive())
+            {
+                logger.LogError(ex, ex.Message);
 
-                            context.ExitCode = 1;
-                        })
-                        .Build()
-                        .InvokeAsync(args);
+                System.Console.Out.WriteLine("================ EXCEPTION ================ ");
+                System.Console.Out.WriteLine(ex.GetType().FullName);
+                System.Console.Out.WriteLine(ex.Message);
+                System.Console.Out.WriteLine(ex.StackTrace);
+            }
+
+            resultCode = 1;
+        }
+        return resultCode;
+    }
 }

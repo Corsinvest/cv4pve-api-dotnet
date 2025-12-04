@@ -1,12 +1,12 @@
-# Corsinvest.ProxmoxVE.Api.Shell 🖥️
+# Corsinvest.ProxmoxVE.Api.Console
 
 <div align="center">
 
-[![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Shell.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shell)
-[![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Shell.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shell)
+[![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Console.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Console)
+[![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Console.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Console)
 [![.NET](https://img.shields.io/badge/.NET-6.0%2B-blue?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 
-**🛠️ Console Application Utilities for Proxmox VE**
+**Console Application Utilities for Proxmox VE**
 
 *Helpers and utilities for building console applications with Proxmox VE API*
 
@@ -14,36 +14,36 @@
 
 ---
 
-## 📖 Overview
+## Overview
 
-The `Corsinvest.ProxmoxVE.Api.Shell` package provides utilities specifically designed for console applications that interact with Proxmox VE. It includes command-line helpers, formatting utilities, and common patterns used in CLI tools.
+The `Corsinvest.ProxmoxVE.Api.Console` package provides utilities specifically designed for console applications that interact with Proxmox VE. It includes command-line helpers, formatting utilities, and common patterns used in CLI tools.
 
-## 🚀 Installation
+## Installation
 
 ```bash
-dotnet add package Corsinvest.ProxmoxVE.Api.Shell
+dotnet add package Corsinvest.ProxmoxVE.Api.Console
 ```
 
 > **Note:** This package includes dependencies on the core API and shared packages.
 
-## 🎯 Key Features
+## Key Features
 
-- **⚙️ Command-Line Helpers** - Utilities for console application development
-- **📊 Output Formatting** - Table and data formatting for console output
-- **🔧 Configuration Management** - Helper methods for application configuration
-- **📝 Logging Integration** - Console logging and output utilities
-- **🛡️ Error Handling** - Standardized error handling for CLI applications
-- **🔐 Authentication Helpers** - Common authentication patterns for console apps
+- **Command-Line Helpers** - Utilities for console application development
+- **Output Formatting** - Table and data formatting for console output
+- **Configuration Management** - Helper methods for application configuration
+- **Logging Integration** - Console logging and output utilities
+- **Error Handling** - Standardized error handling for CLI applications
+- **Authentication Helpers** - Common authentication patterns for console apps
 
 ---
 
-## ⚙️ Command-Line Application Helpers
+## Command-Line Application Helpers
 
-### 🚀 Basic Console Application Setup
+### Basic Console Application Setup
 
 ```csharp
 using Corsinvest.ProxmoxVE.Api;
-using Corsinvest.ProxmoxVE.Api.Shell;
+using Corsinvest.ProxmoxVE.Api.Console;
 
 class Program
 {
@@ -106,10 +106,10 @@ class Program
 }
 ```
 
-### 🔐 Authentication Patterns
+### Authentication Patterns
 
 ```csharp
-using Corsinvest.ProxmoxVE.Api.Shell;
+using Corsinvest.ProxmoxVE.Api.Console;
 
 // Helper method for common authentication scenarios
 public static async Task<PveClient> CreateAuthenticatedClient(ConsoleHelper app)
@@ -163,12 +163,12 @@ public static async Task<PveClient> CreateAuthenticatedClient(ConsoleHelper app)
 
 ---
 
-## 📊 Output Formatting
+## Output Formatting
 
-### 📋 Table Display
+### Table Display
 
 ```csharp
-using Corsinvest.ProxmoxVE.Api.Shell;
+using Corsinvest.ProxmoxVE.Api.Console;
 
 // Display data in table format
 public static void DisplayVmList(IEnumerable<VmInfo> vms, ConsoleHelper app)
@@ -216,7 +216,7 @@ public static void DisplaySnapshots(IEnumerable<SnapshotInfo> snapshots, Console
 }
 ```
 
-### 📝 Formatted Output
+### Formatted Output
 
 ```csharp
 // Different output formats based on user preference
@@ -255,12 +255,12 @@ public static async Task<T> WithProgress<T>(Func<Task<T>> operation, string mess
 
 ---
 
-## 🔧 Configuration Management
+## Configuration Management
 
-### ⚙️ Configuration File Support
+### Configuration File Support
 
 ```csharp
-using Corsinvest.ProxmoxVE.Api.Shell;
+using Corsinvest.ProxmoxVE.Api.Console;
 
 // Load configuration from file
 public class AppConfig
@@ -298,7 +298,7 @@ public static void ApplyConfiguration(AppConfig config, ConsoleHelper app)
 }
 ```
 
-### 📄 Parameter Files
+### Parameter Files
 
 ```csharp
 // Support for parameter files (e.g., @params.txt)
@@ -329,12 +329,12 @@ public static string[] ProcessParameterFiles(string[] args)
 
 ---
 
-## 📝 Logging and Output
+## Logging and Output
 
-### 🎨 Colored Console Output
+### Colored Console Output
 
 ```csharp
-using Corsinvest.ProxmoxVE.Api.Shell;
+using Corsinvest.ProxmoxVE.Api.Console;
 
 // Different output levels with colors
 app.WriteInfo("Processing VMs...");           // Blue text
@@ -352,7 +352,7 @@ app.WriteVerbose("Checking VM configuration...");
 app.WriteColor("Custom message", ConsoleColor.Magenta);
 ```
 
-### 📊 Progress Reporting
+### Progress Reporting
 
 ```csharp
 // Progress bar for long operations
@@ -397,12 +397,12 @@ public static async Task<T> WithSpinner<T>(Func<Task<T>> operation, string messa
 
 ---
 
-## 🛡️ Error Handling
+## Error Handling
 
-### ⚠️ Standardized Error Handling
+### Standardized Error Handling
 
 ```csharp
-using Corsinvest.ProxmoxVE.Api.Shell;
+using Corsinvest.ProxmoxVE.Api.Console;
 
 // Comprehensive error handling wrapper
 public static async Task<int> SafeExecute(Func<Task> operation, ConsoleHelper app)
@@ -469,9 +469,9 @@ public static async Task<T> WithRetry<T>(Func<Task<T>> operation, int maxRetries
 
 ---
 
-## 🔧 Common CLI Patterns
+## Common CLI Patterns
 
-### 📋 VM/CT Selection
+### VM/CT Selection
 
 ```csharp
 // Helper for VM/CT selection by various criteria
@@ -513,7 +513,7 @@ public static async Task<IEnumerable<VmInfo>> SelectVms(PveClient client, Consol
 }
 ```
 
-### 🔄 Batch Operations
+### Batch Operations
 
 ```csharp
 // Pattern for batch operations with confirmation
@@ -560,18 +560,18 @@ public static async Task<bool> ExecuteBatchOperation(
             
             if (await operation(vm))
             {
-                app.WriteSuccess($"✅ {operationName} completed for {vm.Name}");
+                app.WriteSuccess($"{operationName} completed for {vm.Name}");
                 success++;
             }
             else
             {
-                app.WriteError($"❌ {operationName} failed for {vm.Name}");
+                app.WriteError($"{operationName} failed for {vm.Name}");
                 failed++;
             }
         }
         catch (Exception ex)
         {
-            app.WriteError($"❌ {operationName} failed for {vm.Name}: {ex.Message}");
+            app.WriteError($"{operationName} failed for {vm.Name}: {ex.Message}");
             failed++;
         }
     }
@@ -584,13 +584,13 @@ public static async Task<bool> ExecuteBatchOperation(
 
 ---
 
-## 📚 Real-World Examples
+## Real-World Examples
 
-### 🔧 Complete CLI Tool Example
+### Complete CLI Tool Example
 
 ```csharp
 using Corsinvest.ProxmoxVE.Api;
-using Corsinvest.ProxmoxVE.Api.Shell;
+using Corsinvest.ProxmoxVE.Api.Console;
 using Corsinvest.ProxmoxVE.Api.Extension;
 
 class VmManagerTool
@@ -685,28 +685,28 @@ class VmManagerTool
 
 ---
 
-## 🎯 Best Practices
+## Best Practices
 
-### ✅ **Command-Line Design**
+### **Command-Line Design**
 
 ```csharp
-// ✅ Use consistent option naming
+// Use consistent option naming
 app.AddOption("--host", "Proxmox VE host");           // Good
 app.AddOption("--dry-run", "Simulate operation");     // Good
 
-// ✅ Provide sensible defaults
+// Provide sensible defaults
 app.AddOption("--timeout", "Timeout in seconds", defaultValue: 100);
 app.AddOption("--output", "Output format", defaultValue: "table");
 
-// ✅ Use validation for critical options
+// Use validation for critical options
 app.AddOption("--action", "Action to perform", required: true,
     allowedValues: new[] { "start", "stop", "restart" });
 ```
 
-### 🔧 **Error Handling**
+### **Error Handling**
 
 ```csharp
-// ✅ Provide helpful error messages
+// Provide helpful error messages
 try
 {
     await client.Login(username, password);
@@ -718,14 +718,14 @@ catch (Exception ex)
     return 1;
 }
 
-// ✅ Use appropriate exit codes
+// Use appropriate exit codes
 return success ? 0 : 1; // Standard success/failure codes
 ```
 
-### 📊 **Output Formatting**
+### **Output Formatting**
 
 ```csharp
-// ✅ Support multiple output formats
+// Support multiple output formats
 var outputFormat = app.GetValue("output") ?? "table";
 switch (outputFormat)
 {
@@ -740,26 +740,3 @@ switch (outputFormat)
         break;
 }
 ```
-
----
-
-## 🔗 Related Packages
-
-- **[Corsinvest.ProxmoxVE.Api](../Api.md)** - Core API client
-- **[Corsinvest.ProxmoxVE.Api.Extension](../Extension.md)** - Extension methods and utilities  
-- **[Corsinvest.ProxmoxVE.Api.Shared](../Shared.md)** - Common models and types
-- **[Corsinvest.ProxmoxVE.Api.Metadata](../Metadata.md)** - API metadata extraction
-
----
-
-## 📞 Support
-
-- **[GitHub Issues](https://github.com/Corsinvest/cv4pve-api-dotnet/issues)** - Bug reports and questions
-- **[NuGet Package](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shell)** - Download and version info
-- **[Commercial Support](https://www.corsinvest.it/cv4pve)** - Professional services
-
----
-
-<div align="center">
-  <sub>Part of <a href="https://www.cv4pve-tools.com">cv4pve-tools</a> suite | Made with ❤️ in Italy by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
-</div>

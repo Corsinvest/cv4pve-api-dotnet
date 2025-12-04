@@ -6,7 +6,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Corsinvest.ProxmoxVE.Api.Shell.Helpers;
+namespace Corsinvest.ProxmoxVE.Api.Console.Helpers;
 
 /// <summary>
 /// String helper

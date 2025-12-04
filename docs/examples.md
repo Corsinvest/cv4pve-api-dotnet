@@ -1,10 +1,10 @@
-# Basic Examples 📚
+# Basic Examples
 
 This guide provides common usage patterns and practical examples for getting started with the Proxmox VE API.
 
-## 🚀 Getting Started
+## Getting Started
 
-### 🔌 **Basic Connection**
+### **Basic Connection**
 
 ```csharp
 using Corsinvest.ProxmoxVE.Api;
@@ -22,7 +22,7 @@ if (version.IsSuccessStatusCode)
 }
 ```
 
-### 🏗️ **Client Setup with Error Handling**
+### **Client Setup with Error Handling**
 
 ```csharp
 public static async Task<PveClient> CreateClient()
@@ -61,9 +61,9 @@ public static async Task<PveClient> CreateClient()
 
 ---
 
-## 🖥️ Virtual Machine Operations
+## Virtual Machine Operations
 
-### 📋 **List Virtual Machines**
+### **List Virtual Machines**
 
 ```csharp
 // Get all VMs in cluster
@@ -89,7 +89,7 @@ foreach (var vm in vms)
 }
 ```
 
-### ⚙️ **Get VM Configuration**
+### **Get VM Configuration**
 
 ```csharp
 // Get VM configuration
@@ -108,7 +108,7 @@ var config = await client.Nodes["pve1"].Qemu[100].Config.Get();
 Console.WriteLine($"VM: {config.Name} - {config.Memory} MB RAM, {config.Cores} cores");
 ```
 
-### 🔄 **VM Power Management**
+### **VM Power Management**
 
 ```csharp
 var vm = client.Nodes["pve1"].Qemu[100];
@@ -117,21 +117,21 @@ var vm = client.Nodes["pve1"].Qemu[100];
 var startResult = await vm.Status.Start.VmStart();
 if (startResult.IsSuccessStatusCode)
 {
-    Console.WriteLine("✅ VM started successfully");
+    Console.WriteLine("VM started successfully");
 }
 
 // Stop VM
 var stopResult = await vm.Status.Stop.VmStop();
 if (stopResult.IsSuccessStatusCode)
 {
-    Console.WriteLine("⏹️ VM stopped successfully");
+    Console.WriteLine("VM stopped successfully");
 }
 
 // Restart VM
 var rebootResult = await vm.Status.Reboot.VmReboot();
 if (rebootResult.IsSuccessStatusCode)
 {
-    Console.WriteLine("🔄 VM restarted successfully");
+    Console.WriteLine("VM restarted successfully");
 }
 
 // Get current status
@@ -144,7 +144,7 @@ if (status.IsSuccessStatusCode)
 }
 ```
 
-### 📸 **Snapshot Management**
+### **Snapshot Management**
 
 ```csharp
 var vm = client.Nodes["pve1"].Qemu[100];
@@ -153,7 +153,7 @@ var vm = client.Nodes["pve1"].Qemu[100];
 var snapshotResult = await vm.Snapshot.Snapshot("backup-2024", "Pre-update backup");
 if (snapshotResult.IsSuccessStatusCode)
 {
-    Console.WriteLine("📸 Snapshot created successfully");
+    Console.WriteLine("Snapshot created successfully");
 }
 
 // List snapshots
@@ -171,22 +171,22 @@ if (snapshots.IsSuccessStatusCode)
 var restoreResult = await vm.Snapshot["backup-2024"].Rollback.RollbackVm();
 if (restoreResult.IsSuccessStatusCode)
 {
-    Console.WriteLine("🔄 Snapshot restored successfully");
+    Console.WriteLine("Snapshot restored successfully");
 }
 
 // Delete snapshot
 var deleteResult = await vm.Snapshot["backup-2024"].Delsnapshot();
 if (deleteResult.IsSuccessStatusCode)
 {
-    Console.WriteLine("🗑️ Snapshot deleted successfully");
+    Console.WriteLine("Snapshot deleted successfully");
 }
 ```
 
 ---
 
-## 📦 Container Operations
+## Container Operations
 
-### 🐳 **List Containers**
+### **List Containers**
 
 ```csharp
 // Get all containers
@@ -199,7 +199,7 @@ foreach (var container in containers)
 }
 ```
 
-### ⚙️ **Container Management**
+### **Container Management**
 
 ```csharp
 var container = client.Nodes["pve1"].Lxc[101];
@@ -218,7 +218,7 @@ if (config.IsSuccessStatusCode)
 var startResult = await container.Status.Start.VmStart();
 if (startResult.IsSuccessStatusCode)
 {
-    Console.WriteLine("🚀 Container started");
+    Console.WriteLine("Container started");
 }
 
 // Get container status
@@ -232,9 +232,9 @@ if (status.IsSuccessStatusCode)
 
 ---
 
-## 🏗️ Cluster Operations
+## Cluster Operations
 
-### 📊 **Cluster Status**
+### **Cluster Status**
 
 ```csharp
 // Get cluster status
@@ -256,7 +256,7 @@ foreach (var item in status)
 }
 ```
 
-### 🖥️ **Node Information**
+### **Node Information**
 
 ```csharp
 // Get all nodes
@@ -281,7 +281,7 @@ foreach (var node in nodeList)
 }
 ```
 
-### 💾 **Storage Information**
+### **Storage Information**
 
 ```csharp
 // Get storage for a specific node
@@ -301,9 +301,9 @@ if (storages.IsSuccessStatusCode)
 
 ---
 
-## 🔧 Common Patterns
+## Common Patterns
 
-### 📊 **Resource Monitoring**
+### **Resource Monitoring**
 
 ```csharp
 public static async Task MonitorResources(PveClient client)
@@ -324,7 +324,7 @@ public static async Task MonitorResources(PveClient client)
         Console.WriteLine($"Nodes: {nodes.Count()}");
         foreach (var node in nodes)
         {
-            Console.WriteLine($"  📊 {node.Node}: CPU {node.Cpu:P1}, Memory {node.Mem.ToPercentage(node.MaxMem):F1}%");
+            Console.WriteLine($"  {node.Node}: CPU {node.Cpu:P1}, Memory {node.Mem.ToPercentage(node.MaxMem):F1}%");
         }
         
         Console.WriteLine($"\nVMs: {vms.Count()} ({vms.Count(v => v.Status == "running")} running)");
@@ -335,7 +335,7 @@ public static async Task MonitorResources(PveClient client)
 }
 ```
 
-### 🔄 **Batch Operations**
+### **Batch Operations**
 
 ```csharp
 public static async Task BatchVmOperation(PveClient client, int[] vmIds, string operation)
@@ -369,12 +369,12 @@ public static async Task BatchVmOperation(PveClient client, int[] vmIds, string 
     for (int i = 0; i < vmIds.Length; i++)
     {
         var success = results[i].IsSuccessStatusCode;
-        Console.WriteLine($"VM {vmIds[i]} {operation}: {(success ? "✅" : "❌")}");
+        Console.WriteLine($"VM {vmIds[i]} {operation}: {(success ? "Success" : "Failed")}");
     }
 }
 ```
 
-### 📈 **Performance Monitoring**
+### **Performance Monitoring**
 
 ```csharp
 public static async Task GetVmPerformance(PveClient client, string node, int vmId)
@@ -402,9 +402,9 @@ public static async Task GetVmPerformance(PveClient client, string node, int vmI
 
 ---
 
-## 🎯 Best Practices
+## Best Practices
 
-### ✅ **Error Handling**
+### **Error Handling**
 
 ```csharp
 public static async Task<bool> SafeVmOperation(PveClient client, string node, int vmId, string operation)
@@ -422,24 +422,24 @@ public static async Task<bool> SafeVmOperation(PveClient client, string node, in
         
         if (result.IsSuccessStatusCode)
         {
-            Console.WriteLine($"✅ VM {vmId} {operation} successful");
+            Console.WriteLine($"VM {vmId} {operation} successful");
             return true;
         }
         else
         {
-            Console.WriteLine($"❌ VM {vmId} {operation} failed: {result.GetError()}");
+            Console.WriteLine($"VM {vmId} {operation} failed: {result.GetError()}");
             return false;
         }
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"❌ Exception during {operation} on VM {vmId}: {ex.Message}");
+        Console.WriteLine($"Exception during {operation} on VM {vmId}: {ex.Message}");
         return false;
     }
 }
 ```
 
-### 📊 **Resource Discovery**
+### **Resource Discovery**
 
 ```csharp
 public static async Task<(string node, int vmId)?> FindVm(PveClient client, string vmName)
@@ -461,9 +461,3 @@ if (vmLocation.HasValue)
     // ... work with VM
 }
 ```
-
----
-
-<div align="center">
-  <sub>Part of <a href="https://www.cv4pve-tools.com">cv4pve-tools</a> suite | Made with ❤️ in Italy by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
-</div>

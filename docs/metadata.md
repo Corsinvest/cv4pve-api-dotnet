@@ -1,4 +1,4 @@
-# Corsinvest.ProxmoxVE.Api.Metadata 📊
+# Corsinvest.ProxmoxVE.Api.Metadata
 
 <div align="center">
 
@@ -6,7 +6,7 @@
 [![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Metadata.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Metadata)
 [![.NET](https://img.shields.io/badge/.NET-6.0%2B-blue?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 
-**🔍 Proxmox VE API Documentation Reader**
+**Proxmox VE API Documentation Reader**
 
 *Extract structure and metadata from Proxmox VE API documentation*
 
@@ -14,11 +14,11 @@
 
 ---
 
-## 📖 Overview
+## Overview
 
 The `Corsinvest.ProxmoxVE.Api.Metadata` package reads the official Proxmox VE API documentation and extracts structural information. This package is primarily used for code generation and API exploration.
 
-## 🚀 Installation
+## Installation
 
 ```bash
 dotnet add package Corsinvest.ProxmoxVE.Api.Metadata
@@ -26,20 +26,20 @@ dotnet add package Corsinvest.ProxmoxVE.Api.Metadata
 
 > **Note:** This package is primarily used by developers working with API generation tools and advanced API exploration.
 
-## 🎯 Key Features
+## Key Features
 
-- **📋 API Documentation Parsing** - Read and parse Proxmox VE API documentation
-- **🏗️ Structure Extraction** - Extract API endpoint structure and hierarchy  
-- **📊 Parameter Analysis** - Analyze method parameters and their types
-- **🔍 Endpoint Discovery** - Discover all available API endpoints
-- **📝 Documentation Extraction** - Extract method descriptions and parameter docs
-- **🔧 Code Generation Support** - Provide metadata for code generation tools
+- **API Documentation Parsing** - Read and parse Proxmox VE API documentation
+- **Structure Extraction** - Extract API endpoint structure and hierarchy  
+- **Parameter Analysis** - Analyze method parameters and their types
+- **Endpoint Discovery** - Discover all available API endpoints
+- **Documentation Extraction** - Extract method descriptions and parameter docs
+- **Code Generation Support** - Provide metadata for code generation tools
 
 ---
 
-## 🔧 Basic Usage
+## Basic Usage
 
-### 📊 Reading API Documentation
+### Reading API Documentation
 
 ```csharp
 using Corsinvest.ProxmoxVE.Api.Metadata;
@@ -55,7 +55,7 @@ var apiDoc = await metadataReader.LoadDocumentationAsync();
 Console.WriteLine($"Found {apiDoc.Endpoints.Count} API endpoints");
 ```
 
-### 🔍 Exploring API Structure
+### Exploring API Structure
 
 ```csharp
 // Get API structure
@@ -73,7 +73,7 @@ foreach (var path in structure.RootPaths)
 }
 ```
 
-### 📋 Discovering Endpoints
+### Discovering Endpoints
 
 ```csharp
 // Get all endpoints
@@ -89,9 +89,9 @@ Console.WriteLine($"Node endpoints: {nodeEndpoints.Count()}");
 
 ---
 
-## 📊 Metadata Models
+## Metadata Models
 
-### 🔧 API Endpoint
+### API Endpoint
 
 ```csharp
 public class ApiEndpoint
@@ -104,7 +104,7 @@ public class ApiEndpoint
 }
 ```
 
-### 📝 API Parameter
+### API Parameter
 
 ```csharp
 public class ApiParameter
@@ -117,7 +117,7 @@ public class ApiParameter
 }
 ```
 
-### 🏗️ API Structure
+### API Structure
 
 ```csharp
 public class ApiStructure
@@ -131,9 +131,9 @@ public class ApiStructure
 
 ---
 
-## 🎯 Use Cases
+## Use Cases
 
-### 🔧 Code Generation
+### Code Generation
 
 The metadata package is used to generate the main API client code:
 
@@ -142,7 +142,7 @@ The metadata package is used to generate the main API client code:
 - Create the hierarchical API structure (client.Nodes["pve1"].Qemu[100]...)
 - Generate documentation and IntelliSense comments
 
-### 📝 Documentation Generation
+### Documentation Generation
 
 Generate comprehensive API documentation:
 
@@ -151,7 +151,7 @@ Generate comprehensive API documentation:
 - Build interactive API explorers
 - Create code examples for each endpoint
 
-### 🔍 API Exploration
+### API Exploration
 
 Discover and explore available API functionality:
 
@@ -162,9 +162,9 @@ Discover and explore available API functionality:
 
 ---
 
-## 🛠️ Integration
+## Integration
 
-### 🔗 With Core API
+### With Core API
 
 The metadata package helps understand what's available in the core API:
 
@@ -182,7 +182,7 @@ foreach (var endpoint in vmEndpoints)
 }
 ```
 
-### 🏗️ For Development Tools
+### For Development Tools
 
 The package provides foundation for development tools:
 
@@ -193,16 +193,16 @@ The package provides foundation for development tools:
 
 ---
 
-## 🎯 Best Practices
+## Best Practices
 
-### ✅ **Using for Discovery**
+### **Using for Discovery**
 
 ```csharp
-// ✅ Use metadata to understand API capabilities
+// Use metadata to understand API capabilities
 var endpoints = await metadataReader.GetEndpointsAsync();
 var snapshotOps = endpoints.Where(e => e.Path.Contains("snapshot"));
 
-// ✅ Check parameter requirements before API calls
+// Check parameter requirements before API calls
 foreach (var endpoint in snapshotOps)
 {
     var requiredParams = endpoint.Parameters.Where(p => p.Required);
@@ -210,35 +210,12 @@ foreach (var endpoint in snapshotOps)
 }
 ```
 
-### 🔧 **For Code Generation**
+### **For Code Generation**
 
 ```csharp
-// ✅ Use structured data for generating typed interfaces
+// Use structured data for generating typed interfaces
 var structure = await metadataReader.GetApiStructureAsync();
 
 // Generate method signatures based on actual API structure
 // Example: Generate client.Nodes[node].Qemu[vmid].Config.Get()
 ```
-
----
-
-## 🔗 Related Packages
-
-- **[Corsinvest.ProxmoxVE.Api](../Api.md)** - Core API client (generated using this metadata)
-- **[Corsinvest.ProxmoxVE.Api.Extension](../Extension.md)** - Extension methods and utilities
-- **[Corsinvest.ProxmoxVE.Api.Shared](../Shared.md)** - Common models and types
-- **[Corsinvest.ProxmoxVE.Api.Shell](../Shell.md)** - Console application helpers
-
----
-
-## 📞 Support
-
-- **[GitHub Issues](https://github.com/Corsinvest/cv4pve-api-dotnet/issues)** - Bug reports and questions
-- **[NuGet Package](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Metadata)** - Download and version info
-- **[Commercial Support](https://www.corsinvest.it/cv4pve)** - Professional services
-
----
-
-<div align="center">
-  <sub>Part of <a href="https://www.cv4pve-tools.com">cv4pve-tools</a> suite | Made with ❤️ in Italy by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
-</div>

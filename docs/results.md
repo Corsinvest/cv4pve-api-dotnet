@@ -1,8 +1,8 @@
-# Result Handling Guide 📊
+# Result Handling Guide
 
 Understanding how to work with API responses and the Result class.
 
-## 📋 Result Class
+## Result Class
 
 Every API call returns a `Result` object:
 
@@ -11,12 +11,12 @@ public class Result
 {
     // Response data from Proxmox VE (dynamic ExpandoObject)
     public dynamic Response { get; set; }
-    
+
     // HTTP response information
     public HttpStatusCode StatusCode { get; set; }
     public string ReasonPhrase { get; set; }
     public bool IsSuccessStatusCode { get; set; }
-    
+
     // Utility properties and methods
     public bool ResponseInError { get; }
     public IDictionary<string, object> ResponseToDictionary();
@@ -24,7 +24,7 @@ public class Result
 }
 ```
 
-## ✅ Checking Success
+## Checking Success
 
 ```csharp
 var result = await client.Nodes["pve1"].Qemu[100].Config.VmConfig();
@@ -42,9 +42,9 @@ else
 }
 ```
 
-## 📊 Accessing Response Data
+## Accessing Response Data
 
-### 🎯 **Dynamic Access**
+### **Dynamic Access**
 ```csharp
 var result = await vm.Config.VmConfig();
 if (result.IsSuccessStatusCode)
@@ -56,7 +56,7 @@ if (result.IsSuccessStatusCode)
 }
 ```
 
-### 📋 **Dictionary Access**
+### **Dictionary Access**
 ```csharp
 var result = await vm.Config.VmConfig();
 if (result.IsSuccessStatusCode)
@@ -69,7 +69,7 @@ if (result.IsSuccessStatusCode)
 }
 ```
 
-### 🔧 **Extension Methods**
+### **Extension Methods**
 ```csharp
 using Corsinvest.ProxmoxVE.Api.Extension;
 
@@ -78,9 +78,9 @@ var vmConfig = await client.Nodes["pve1"].Qemu[100].Config.Get();
 Console.WriteLine($"VM: {vmConfig.Name} - {vmConfig.Memory} MB");
 ```
 
-## ⚠️ Error Handling
+## Error Handling
 
-### 📋 **Basic Error Checking**
+### **Basic Error Checking**
 ```csharp
 var result = await vm.Status.Start.VmStart();
 
@@ -91,7 +91,7 @@ if (!result.IsSuccessStatusCode)
 }
 ```
 
-### 🎯 **Detailed Error Information**
+### **Detailed Error Information**
 ```csharp
 var result = await vm.Config.Set(memory: 999999); // Invalid value
 
@@ -104,7 +104,7 @@ if (result.ResponseInError)
 if (!result.IsSuccessStatusCode)
 {
     Console.WriteLine($"HTTP Error: {result.StatusCode}");
-    
+
     // Check specific status codes
     switch (result.StatusCode)
     {
@@ -121,9 +121,9 @@ if (!result.IsSuccessStatusCode)
 }
 ```
 
-## 📊 Working with Different Response Types
+## Working with Different Response Types
 
-### 📋 **List Responses**
+### **List Responses**
 ```csharp
 var result = await client.Cluster.Resources.Resources();
 if (result.IsSuccessStatusCode)
@@ -142,7 +142,7 @@ foreach (var resource in resources.Where(r => r.Type == "qemu"))
 }
 ```
 
-### 📝 **Task Responses**
+### **Task Responses**
 ```csharp
 // Operations that return task IDs
 var result = await vm.Snapshot.Snapshot("backup-snapshot");
@@ -150,12 +150,12 @@ if (result.IsSuccessStatusCode)
 {
     var taskId = result.Response.data;
     Console.WriteLine($"Task started: {taskId}");
-    
+
     // Monitor task progress...
 }
 ```
 
-### 🖼️ **Image Responses**
+### **Image Responses**
 ```csharp
 // Change response type for charts
 client.ResponseType = "png";
@@ -171,11 +171,11 @@ if (chartResult.IsSuccessStatusCode)
 client.ResponseType = "json";
 ```
 
-## 🎯 Best Practices
+## Best Practices
 
-### ✅ **Always Check Success**
+### **Always Check Success**
 ```csharp
-// ✅ Good practice
+// Good practice
 var result = await vm.Status.Start.VmStart();
 if (result.IsSuccessStatusCode)
 {
@@ -186,38 +186,32 @@ else
     Console.WriteLine($"Failed to start VM: {result.GetError()}");
 }
 
-// ❌ Don't ignore errors
+// Don't ignore errors
 await vm.Status.Start.VmStart(); // Missing error handling
 ```
 
-### 📊 **Use Extension Methods for Type Safety**
+### **Use Extension Methods for Type Safety**
 ```csharp
-// ✅ Strongly-typed with IntelliSense
+// Strongly-typed with IntelliSense
 var vmConfig = await client.Nodes["pve1"].Qemu[100].Config.Get();
 Console.WriteLine($"Memory: {vmConfig.Memory} MB");
 
-// ❌ Dynamic - prone to runtime errors
+// Dynamic - prone to runtime errors
 var result = await client.Nodes["pve1"].Qemu[100].Config.VmConfig();
 Console.WriteLine($"Memory: {result.Response.data.memory}"); // No compile-time checking
 ```
 
-### 🔧 **Handle Null Values**
+### **Handle Null Values**
 ```csharp
 var result = await vm.Config.VmConfig();
 if (result.IsSuccessStatusCode)
 {
     var data = result.Response.data;
-    
-    // ✅ Safe access
+
+    // Safe access
     var vmName = data.name ?? "Unnamed VM";
     var description = data.description ?? "No description";
-    
+
     Console.WriteLine($"VM: {vmName} - {description}");
 }
 ```
-
----
-
-<div align="center">
-  <sub>Part of <a href="https://www.cv4pve-tools.com">cv4pve-tools</a> suite | Made with ❤️ in Italy by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
-</div>

@@ -1,10 +1,10 @@
-# Authentication Guide 🔐
+# Authentication Guide
 
 This guide covers all authentication methods available for connecting to Proxmox VE.
 
-## 🎯 Authentication Methods
+## Authentication Methods
 
-### 🔑 **API Token (Recommended)**
+### **API Token (Recommended)**
 
 API tokens are the most secure method for automation and applications.
 
@@ -22,7 +22,7 @@ var version = await client.Version.Version();
 
 **Example:** `automation@pve!api-token=12345678-1234-1234-1234-123456789abc`
 
-### 👤 **Username/Password**
+### **Username/Password**
 
 Traditional authentication with username and password.
 
@@ -39,7 +39,7 @@ bool success = await client.Login("admin@pve", "password");
 bool success = await client.Login("user@pam", "password");
 ```
 
-### 🔒 **Two-Factor Authentication (2FA)**
+### **Two-Factor Authentication (2FA)**
 
 For accounts with Two-Factor Authentication enabled.
 
@@ -54,21 +54,21 @@ bool success = await client.Login("admin@pve", "password", "123456");
 
 ---
 
-## 🏗️ Creating API Tokens
+## Creating API Tokens
 
-### 📋 **Via Proxmox VE Web Interface**
+### **Via Proxmox VE Web Interface**
 
 1. **Login** to Proxmox VE web interface
-2. **Navigate** to Datacenter → Permissions → API Tokens
+2. **Navigate** to Datacenter Permissions API Tokens
 3. **Click** "Add" button
 4. **Configure** token:
    - **User:** Select user (e.g., `root@pam`)
    - **Token ID:** Choose name (e.g., `api-automation`)
-   - **Privilege Separation:** ❌ Uncheck for full user permissions
+   - **Privilege Separation:** Uncheck for full user permissions
    - **Comment:** Optional description
 5. **Click** "Add" and **copy the token** (you won't see it again!)
 
-### 🔧 **Via Command Line**
+### **Via Command Line**
 
 ```bash
 # Create API token
@@ -81,7 +81,7 @@ pveum user token list root@pam
 pveum user token remove root@pam api-automation
 ```
 
-### ⚡ **Example Token Creation**
+### **Example Token Creation**
 
 ```bash
 # Create token for automation user
@@ -94,46 +94,46 @@ pveum aclmod / -user automation@pve -role Administrator
 
 ---
 
-## 🛡️ Security Best Practices
+## Security Best Practices
 
-### ✅ **DO's**
+### **DO's**
 
 ```csharp
-// ✅ Use API tokens for automation
+// Use API tokens for automation
 client.ApiToken = Environment.GetEnvironmentVariable("PROXMOX_API_TOKEN");
 
-// ✅ Store credentials securely
+// Store credentials securely
 var username = Environment.GetEnvironmentVariable("PROXMOX_USER");
 var password = Environment.GetEnvironmentVariable("PROXMOX_PASS");
 
-// ✅ Enable SSL validation in production
+// Enable SSL validation in production
 var client = new PveClient("pve.company.com")
 {
     ValidateCertificate = true
 };
 
-// ✅ Use specific user accounts (not root)
+// Use specific user accounts (not root)
 await client.Login("automation@pve", password);
 ```
 
-### ❌ **DON'Ts**
+### **DON'Ts**
 
 ```csharp
-// ❌ Don't hardcode credentials
+// Don't hardcode credentials
 await client.Login("root", "password123"); // Bad!
 
-// ❌ Don't disable SSL validation in production
+// Don't disable SSL validation in production
 client.ValidateCertificate = false; // Only for development!
 
-// ❌ Don't use overly permissive tokens
+// Don't use overly permissive tokens
 // Create tokens with minimal required permissions
 ```
 
 ---
 
-## 🔧 Permission Management
+## Permission Management
 
-### 👥 **Creating Dedicated Users**
+### **Creating Dedicated Users**
 
 ```bash
 # Create user for API access
@@ -146,7 +146,7 @@ pveum role add ApiUser -privs "VM.Audit,VM.Config.Disk,VM.Config.Memory,VM.Power
 pveum aclmod / -user api-user@pve -role ApiUser
 ```
 
-### 🎯 **Common Permission Sets**
+### **Common Permission Sets**
 
 ```bash
 # Read-only access
@@ -161,9 +161,9 @@ pveum aclmod / -user user@pve -role Administrator
 
 ---
 
-## 🌍 Environment Configuration
+## Environment Configuration
 
-### 📄 **Environment Variables**
+### **Environment Variables**
 
 ```bash
 # Set environment variables
@@ -175,7 +175,7 @@ export PROXMOX_USER="admin@pve"
 export PROXMOX_PASS="secure-password"
 ```
 
-### 🔧 **Application Configuration**
+### **Application Configuration**
 
 ```csharp
 using Microsoft.Extensions.Configuration;
@@ -203,7 +203,7 @@ else
 }
 ```
 
-### 📋 **Configuration File Example**
+### **Configuration File Example**
 
 ```json
 {
@@ -218,9 +218,9 @@ else
 
 ---
 
-## 🔍 Troubleshooting Authentication
+## Troubleshooting Authentication
 
-### ❌ **Common Issues**
+### **Common Issues**
 
 #### **"Authentication Failed"**
 ```csharp
@@ -230,12 +230,12 @@ try
     bool success = await client.Login("user@pam", "password");
     if (!success)
     {
-        Console.WriteLine("❌ Invalid credentials");
+        Console.WriteLine("Invalid credentials");
     }
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"❌ Login error: {ex.Message}");
+    Console.WriteLine($"Login error: {ex.Message}");
 }
 ```
 
@@ -255,7 +255,7 @@ client.ApiToken = "user@realm!tokenid=uuid"; // Correct format
 // Token format: USER@REALM!TOKENID=SECRET
 ```
 
-### ✅ **Testing Authentication**
+### **Testing Authentication**
 
 ```csharp
 public static async Task<bool> TestAuthentication(PveClient client)
@@ -265,19 +265,19 @@ public static async Task<bool> TestAuthentication(PveClient client)
         var version = await client.Version.Version();
         if (version.IsSuccessStatusCode)
         {
-            Console.WriteLine("✅ Authentication successful");
+            Console.WriteLine("Authentication successful");
             Console.WriteLine($"Connected to Proxmox VE {version.Response.data.version}");
             return true;
         }
         else
         {
-            Console.WriteLine($"❌ Authentication failed: {version.ReasonPhrase}");
+            Console.WriteLine($"Authentication failed: {version.ReasonPhrase}");
             return false;
         }
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"❌ Connection error: {ex.Message}");
+        Console.WriteLine($"Connection error: {ex.Message}");
         return false;
     }
 }
@@ -285,9 +285,9 @@ public static async Task<bool> TestAuthentication(PveClient client)
 
 ---
 
-## 🎯 Authentication Examples
+## Authentication Examples
 
-### 🏢 **Enterprise Setup**
+### **Enterprise Setup**
 
 ```csharp
 // Corporate environment with proxy and custom certificates
@@ -308,7 +308,7 @@ var client = new PveClient("pve.company.com", httpClient)
 client.ApiToken = Environment.GetEnvironmentVariable("PROXMOX_API_TOKEN");
 ```
 
-### 🏠 **Home Lab Setup**
+### **Home Lab Setup**
 
 ```csharp
 // Simple home lab setup
@@ -321,7 +321,7 @@ var client = new PveClient("192.168.1.100")
 await client.Login("root@pam", Environment.GetEnvironmentVariable("PVE_PASSWORD"));
 ```
 
-### ☁️ **Cloud/Automation Setup**
+### **Cloud/Automation Setup**
 
 ```csharp
 // Automated deployment script
@@ -339,7 +339,3 @@ if (!await TestAuthentication(client))
     Environment.Exit(1);
 }
 ```
-
-<div align="center">
-  <sub>Part of <a href="https://www.cv4pve-tools.com">cv4pve-tools</a> suite | Made with ❤️ in Italy by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
-</div>
