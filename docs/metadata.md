@@ -4,7 +4,6 @@
 
 [![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Metadata.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Metadata)
 [![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Metadata.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Metadata)
-[![.NET](https://img.shields.io/badge/.NET-6.0%2B-blue?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 
 **Proxmox VE API Documentation Reader**
 
