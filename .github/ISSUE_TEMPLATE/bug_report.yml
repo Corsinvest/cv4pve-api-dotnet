@@ -49,7 +49,7 @@ body:
         
         ⚠️ **ATTENTION: Remove sensitive data (passwords, API keys) before pasting!**
       placeholder: Paste the error message and stack trace here
-      render: shell
+      render: Console
     validations:
       required: false
   - type: input
@@ -85,7 +85,7 @@ body:
         - Corsinvest.ProxmoxVE.Api
         - Corsinvest.ProxmoxVE.Api.Extension
         - Corsinvest.ProxmoxVE.Api.Shared
-        - Corsinvest.ProxmoxVE.Api.Shell
+        - Corsinvest.ProxmoxVE.Api.Console
         - Corsinvest.ProxmoxVE.Api.Metadata
         - Not sure / Multiple packages
     validations:
