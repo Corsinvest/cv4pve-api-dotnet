@@ -1,29 +1,8 @@
 # Corsinvest.ProxmoxVE.Api.Metadata
 
-<div align="center">
-
-[![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Metadata.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Metadata)
-[![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Metadata.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Metadata)
-
-**Proxmox VE API Documentation Reader**
-
-*Extract structure and metadata from Proxmox VE API documentation*
-
-</div>
-
----
-
-## Overview
-
-The `Corsinvest.ProxmoxVE.Api.Metadata` package reads the official Proxmox VE API documentation and extracts structural information. This package is primarily used for code generation and API exploration.
-
-## Installation
-
 ```bash
 dotnet add package Corsinvest.ProxmoxVE.Api.Metadata
 ```
-
-> **Note:** This package is primarily used by developers working with API generation tools and advanced API exploration.
 
 ## Key Features
 

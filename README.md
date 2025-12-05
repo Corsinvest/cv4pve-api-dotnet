@@ -49,25 +49,47 @@ if (await client.Login("root", "your-password"))
 ---
 
 ## Package Suite
- 
-| Package | Purpose | Documentation |
-|---------|---------|---------------|
-| **[Corsinvest.ProxmoxVE.Api](./docs/api.md)** | Core API Client | Main library for Proxmox VE API access |
-| **[Corsinvest.ProxmoxVE.Api.Extension](./docs/extension.md)** | Extended Features | Helper methods and utilities |
-| **[Corsinvest.ProxmoxVE.Api.Shared](./docs/shared.md)** | Shared Models | Common models and utilities |
-| **[Corsinvest.ProxmoxVE.Api.Console](./docs/console.md)** | Console Tools | Console application utilities |
-| **[Corsinvest.ProxmoxVE.Api.Metadata](./docs/metadata.md)** | API Metadata | API documentation extraction |
+
+### [Corsinvest.ProxmoxVE.Api](./docs/api.md)
+
+[![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api)
+[![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api)
+
+Core .NET client library for Proxmox VE API. Foundation package with complete API coverage.
+
+### [Corsinvest.ProxmoxVE.Api.Extension](./docs/extension.md)
+
+[![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Extension.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Extension)
+[![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Extension.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Extension)
+
+Extension methods and helper utilities for common operations and task management.
+
+### [Corsinvest.ProxmoxVE.Api.Shared](./docs/shared.md)
+
+[![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Shared.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shared)
+[![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Shared.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shared)
+
+Shared models, utilities, and common types used across the package suite.
+
+### [Corsinvest.ProxmoxVE.Api.Console](./docs/console.md)
+
+[![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Console.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Console)
+[![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Console.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Console)
+
+Console application helpers for building CLI tools with Proxmox VE.
+
+### [Corsinvest.ProxmoxVE.Api.Metadata](./docs/metadata.md)
+
+[![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Metadata.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Metadata)
+[![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Metadata.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Metadata)
+
+API metadata extraction and documentation generation tools.
 
 ---
 
 ## Key Features
 
-<table>
-<tr>
-<td width="50%">
-
 ### Developer Experience
-
 - **Async/Await** throughout the library
 - **Strongly typed** models and responses
 - **IntelliSense** support in all IDEs
@@ -75,18 +97,13 @@ if (await client.Login("root", "your-password"))
 - **Tree structure** matching Proxmox VE API
 
 ### Core Functionality
-
 - **Full API coverage** for Proxmox VE
 - **VM/CT management** (create, configure, snapshot)
 - **Cluster operations** (status, resources, HA)
 - **Storage management** (local, shared, backup)
 - **Network configuration** (bridges, VLANs, SDN)
 
-</td>
-<td width="50%">
-
 ### Enterprise Ready
-
 - **API token** authentication (Proxmox VE 6.2+)
 - **Two-factor** authentication support
 - **SSL certificate** validation
@@ -94,16 +111,11 @@ if (await client.Login("root", "your-password"))
 - **Microsoft.Extensions.Logging** integration
 
 ### Advanced Features
-
 - **Extension methods** for common operations
 - **Task management** utilities
 - **Bulk operations** with pattern matching
 - **Response type** switching (JSON, PNG)
 - **Console application** helpers
-
-</td>
-</tr>
-</table>
 
 ---
 
