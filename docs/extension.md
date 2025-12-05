@@ -1,29 +1,8 @@
 # Corsinvest.ProxmoxVE.Api.Extension
 
-<div align="center">
-
-[![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Extension.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Extension)
-[![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Extension.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Extension)
-
-**Extension Methods for Proxmox VE API**
-
-*Helper methods and utilities to simplify Proxmox VE operations*
-
-</div>
-
----
-
-## Overview
-
-The `Corsinvest.ProxmoxVE.Api.Extension` package provides extension methods and utilities that add functionality on top of the core Proxmox VE API. It simplifies common operations and provides strongly-typed access to API responses.
-
-## Installation
-
 ```bash
 dotnet add package Corsinvest.ProxmoxVE.Api.Extension
 ```
-
-> **Note:** This package automatically includes `Corsinvest.ProxmoxVE.Api` as a dependency.
 
 ## Key Features
 

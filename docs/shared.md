@@ -1,29 +1,8 @@
 # Corsinvest.ProxmoxVE.Api.Shared
 
-<div align="center">
-
-[![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Shared.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shared)
-[![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Shared.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shared)
-
-**Shared Models and Utilities for Proxmox VE**
-
-*Common models, types, and utilities used across Proxmox VE API packages*
-
-</div>
-
----
-
-## Overview
-
-The `Corsinvest.ProxmoxVE.Api.Shared` package contains model definitions for JSON conversion and utility classes that are shared across the Proxmox VE API ecosystem. It provides strongly-typed representations of Proxmox VE objects and common utilities.
-
-## Installation
-
 ```bash
 dotnet add package Corsinvest.ProxmoxVE.Api.Shared
 ```
-
-> **Note:** This package is typically included as a dependency by other Corsinvest.ProxmoxVE packages.
 
 ## Key Features
 

@@ -1,29 +1,8 @@
 # Corsinvest.ProxmoxVE.Api.Console
 
-<div align="center">
-
-[![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Console.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Console)
-[![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Console.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Console)
-
-**Console Application Utilities for Proxmox VE**
-
-*Helpers and utilities for building console applications with Proxmox VE API*
-
-</div>
-
----
-
-## Overview
-
-The `Corsinvest.ProxmoxVE.Api.Console` package provides utilities specifically designed for console applications that interact with Proxmox VE. It includes command-line helpers, formatting utilities, and common patterns used in CLI tools.
-
-## Installation
-
 ```bash
 dotnet add package Corsinvest.ProxmoxVE.Api.Console
 ```
-
-> **Note:** This package includes dependencies on the core API and shared packages.
 
 ## Key Features
 

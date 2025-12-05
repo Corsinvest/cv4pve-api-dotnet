@@ -1,24 +1,5 @@
 # Corsinvest.ProxmoxVE.Api
 
-<div align="center">
-
-[![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api)
-[![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api)
-
-**Core .NET Client for Proxmox VE API**
-
-*The foundation package for all Proxmox VE operations in .NET*
-
-</div>
-
----
-
-## Overview
-
-The `Corsinvest.ProxmoxVE.Api` package is the core library that provides direct access to the Proxmox VE REST API. It features a 1:1 mapping with the official API structure, making it intuitive for developers familiar with Proxmox VE.
-
-## Installation
-
 ```bash
 dotnet add package Corsinvest.ProxmoxVE.Api
 ```
