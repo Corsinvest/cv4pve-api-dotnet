@@ -246,24 +246,21 @@ Every API call returns a `Result` object containing comprehensive response infor
 ```csharp
 var result = await client.Nodes["pve1"].Qemu[100].Config.VmConfig();
 
-// Check success
-if (result.IsSuccessStatusCode)
+// Access response data (dynamic object)
+Console.WriteLine($"VM Name: {result.Response.data.name}");
+Console.WriteLine($"Memory: {result.Response.data.memory}");
+Console.WriteLine($"Cores: {result.Response.data.cores}");
+
+// Convert to dictionary for easier access
+var dict = result.ResponseToDictionary();
+foreach (var item in dict)
 {
-    // Access response data (dynamic object)
-    Console.WriteLine($"VM Name: {result.Response.data.name}");
-    Console.WriteLine($"Memory: {result.Response.data.memory}");
-    Console.WriteLine($"Cores: {result.Response.data.cores}");
-    
-    // Convert to dictionary for easier access
-    var dict = result.ResponseToDictionary();
-    foreach (var item in dict)
-    {
-        Console.WriteLine($"{item.Key}: {item.Value}");
-    }
+    Console.WriteLine($"{item.Key}: {item.Value}");
 }
-else
+
+// Check success if needed
+if (!result.IsSuccessStatusCode)
 {
-    // Handle errors
     Console.WriteLine($"Error: {result.GetError()}");
     Console.WriteLine($"Status: {result.StatusCode} - {result.ReasonPhrase}");
 }
@@ -307,31 +304,24 @@ await client.Login("admin@pve", "password");
 // Get VM configuration
 var vm = client.Nodes["pve1"].Qemu[100];
 var config = await vm.Config.VmConfig();
-
-if (config.IsSuccessStatusCode)
-{
-    var vmData = config.Response.data;
-    Console.WriteLine($"VM Name: {vmData.name}");
-    Console.WriteLine($"Memory: {vmData.memory} MB");
-    Console.WriteLine($"CPUs: {vmData.cores}");
-    Console.WriteLine($"OS Type: {vmData.ostype}");
-}
+var vmData = config.Response.data;
+Console.WriteLine($"VM Name: {vmData.name}");
+Console.WriteLine($"Memory: {vmData.memory} MB");
+Console.WriteLine($"CPUs: {vmData.cores}");
+Console.WriteLine($"OS Type: {vmData.ostype}");
 
 // Update VM configuration
-var updateResult = await vm.Config.Set(
+await vm.Config.Set(
     memory: 8192,  // 8GB RAM
     cores: 4       // 4 CPU cores
 );
 // OR using specific method
-var updateResult = await vm.Config.UpdateVm(
+await vm.Config.UpdateVm(
     memory: 8192,
     cores: 4
 );
 
-if (updateResult.IsSuccessStatusCode)
-{
-    Console.WriteLine("VM configuration updated!");
-}
+Console.WriteLine("VM configuration updated!");
 ```
 
 </details>
@@ -341,38 +331,29 @@ if (updateResult.IsSuccessStatusCode)
 
 ```csharp
 // Create snapshot
-var snapshot = await client.Nodes["pve1"].Qemu[100]
+await client.Nodes["pve1"].Qemu[100]
     .Snapshot.Create("backup-before-update", description: "Pre-update backup");
 // OR using specific method
-var snapshot = await client.Nodes["pve1"].Qemu[100]
+await client.Nodes["pve1"].Qemu[100]
     .Snapshot.Snapshot("backup-before-update", "Pre-update backup");
 
-if (snapshot.IsSuccessStatusCode)
-{
-    Console.WriteLine("Snapshot created successfully!");
-}
+Console.WriteLine("Snapshot created successfully!");
 
 // List snapshots
 var snapshots = await client.Nodes["pve1"].Qemu[100]
     .Snapshot.SnapshotList();
 
-if (snapshots.IsSuccessStatusCode)
+Console.WriteLine("Available snapshots:");
+foreach (var snap in snapshots.Response.data)
 {
-    Console.WriteLine("Available snapshots:");
-    foreach (var snap in snapshots.Response.data)
-    {
-        Console.WriteLine($"  - {snap.name}: {snap.description} ({snap.snaptime})");
-    }
+    Console.WriteLine($"  - {snap.name}: {snap.description} ({snap.snaptime})");
 }
 
 // Delete snapshot
-var deleteResult = await client.Nodes["pve1"].Qemu[100]
+await client.Nodes["pve1"].Qemu[100]
     .Snapshot["backup-before-update"].Delsnapshot();
 
-if (deleteResult.IsSuccessStatusCode)
-{
-    Console.WriteLine("Snapshot deleted successfully!");
-}
+Console.WriteLine("Snapshot deleted successfully!");
 ```
 
 </details>
@@ -392,26 +373,17 @@ Console.WriteLine($"Memory usage: {status.Response.data.mem / status.Response.da
 // Start VM
 if (status.Response.data.status == "stopped")
 {
-    var startResult = await vm.Status.Start.VmStart();
-    if (startResult.IsSuccessStatusCode)
-    {
-        Console.WriteLine("VM started successfully!");
-    }
+    await vm.Status.Start.VmStart();
+    Console.WriteLine("VM started successfully!");
 }
 
 // Stop VM
-var stopResult = await vm.Status.Stop.VmStop();
-if (stopResult.IsSuccessStatusCode)
-{
-    Console.WriteLine("VM stopped successfully!");
-}
+await vm.Status.Stop.VmStop();
+Console.WriteLine("VM stopped successfully!");
 
 // Restart VM
-var restartResult = await vm.Status.Reboot.VmReboot();
-if (restartResult.IsSuccessStatusCode)
-{
-    Console.WriteLine("VM restarted successfully!");
-}
+await vm.Status.Reboot.VmReboot();
+Console.WriteLine("VM restarted successfully!");
 ```
 
 </details>
@@ -427,13 +399,10 @@ var container = client.Nodes["pve1"].Lxc[101];
 
 // Get container configuration
 var config = await container.Config.VmConfig();
-if (config.IsSuccessStatusCode)
-{
-    var ctData = config.Response.data;
-    Console.WriteLine($"Container: {ctData.hostname}");
-    Console.WriteLine($"OS Template: {ctData.ostemplate}");
-    Console.WriteLine($"Memory: {ctData.memory} MB");
-}
+var ctData = config.Response.data;
+Console.WriteLine($"Container: {ctData.hostname}");
+Console.WriteLine($"OS Template: {ctData.ostemplate}");
+Console.WriteLine($"Memory: {ctData.memory} MB");
 
 // Container status operations
 var status = await container.Status.Current.VmStatus();
@@ -447,11 +416,8 @@ if (status.Response.data.status == "stopped")
 }
 
 // Create container snapshot
-var snapshot = await container.Snapshot.Snapshot("backup-snapshot");
-if (snapshot.IsSuccessStatusCode)
-{
-    Console.WriteLine("Container snapshot created!");
-}
+await container.Snapshot.Snapshot("backup-snapshot");
+Console.WriteLine("Container snapshot created!");
 ```
 
 </details>
@@ -464,42 +430,33 @@ if (snapshot.IsSuccessStatusCode)
 ```csharp
 // Get cluster status
 var clusterStatus = await client.Cluster.Status.Status();
-if (clusterStatus.IsSuccessStatusCode)
+Console.WriteLine("Cluster Status:");
+foreach (var item in clusterStatus.Response.data)
 {
-    Console.WriteLine("Cluster Status:");
-    foreach (var item in clusterStatus.Response.data)
-    {
-        Console.WriteLine($"  {item.type}: {item.name} - {item.status}");
-    }
+    Console.WriteLine($"  {item.type}: {item.name} - {item.status}");
 }
 
 // Get cluster resources
 var resources = await client.Cluster.Resources.Resources();
-if (resources.IsSuccessStatusCode)
+Console.WriteLine("Cluster Resources:");
+foreach (var resource in resources.Response.data)
 {
-    Console.WriteLine("Cluster Resources:");
-    foreach (var resource in resources.Response.data)
+    if (resource.type == "node")
     {
-        if (resource.type == "node")
-        {
-            Console.WriteLine($"  Node: {resource.node} - CPU: {resource.cpu:P2}, Memory: {resource.mem / resource.maxmem:P2}");
-        }
-        else if (resource.type == "qemu")
-        {
-            Console.WriteLine($"  VM: {resource.vmid} ({resource.name}) on {resource.node} - {resource.status}");
-        }
+        Console.WriteLine($"  Node: {resource.node} - CPU: {resource.cpu:P2}, Memory: {resource.mem / resource.maxmem:P2}");
+    }
+    else if (resource.type == "qemu")
+    {
+        Console.WriteLine($"  VM: {resource.vmid} ({resource.name}) on {resource.node} - {resource.status}");
     }
 }
 
 // Get node information
 var nodes = await client.Nodes.Index();
-if (nodes.IsSuccessStatusCode)
+Console.WriteLine("Available Nodes:");
+foreach (var node in nodes.Response.data)
 {
-    Console.WriteLine("Available Nodes:");
-    foreach (var node in nodes.Response.data)
-    {
-        Console.WriteLine($"  {node.node}: {node.status} - Uptime: {node.uptime}s");
-    }
+    Console.WriteLine($"  {node.node}: {node.status} - Uptime: {node.uptime}s");
 }
 ```
 
@@ -513,36 +470,27 @@ if (nodes.IsSuccessStatusCode)
 ```csharp
 // List storage on a node
 var storages = await client.Nodes["pve1"].Storage.Index();
-if (storages.IsSuccessStatusCode)
+Console.WriteLine("Available Storage:");
+foreach (var storage in storages.Response.data)
 {
-    Console.WriteLine("Available Storage:");
-    foreach (var storage in storages.Response.data)
-    {
-        Console.WriteLine($"  {storage.storage}: {storage.type} - {storage.avail / (1024*1024*1024):F2} GB available");
-    }
+    Console.WriteLine($"  {storage.storage}: {storage.type} - {storage.avail / (1024*1024*1024):F2} GB available");
 }
 
 // Get specific storage details
 var localStorage = await client.Nodes["pve1"].Storage["local"].Status();
-if (localStorage.IsSuccessStatusCode)
-{
-    var storageData = localStorage.Response.data;
-    Console.WriteLine($"Storage: {storageData.storage}");
-    Console.WriteLine($"Type: {storageData.type}");
-    Console.WriteLine($"Total: {storageData.total / (1024*1024*1024):F2} GB");
-    Console.WriteLine($"Used: {storageData.used / (1024*1024*1024):F2} GB");
-    Console.WriteLine($"Available: {storageData.avail / (1024*1024*1024):F2} GB");
-}
+var storageData = localStorage.Response.data;
+Console.WriteLine($"Storage: {storageData.storage}");
+Console.WriteLine($"Type: {storageData.type}");
+Console.WriteLine($"Total: {storageData.total / (1024*1024*1024):F2} GB");
+Console.WriteLine($"Used: {storageData.used / (1024*1024*1024):F2} GB");
+Console.WriteLine($"Available: {storageData.avail / (1024*1024*1024):F2} GB");
 
 // List storage content
 var content = await client.Nodes["pve1"].Storage["local"].Content.Index();
-if (content.IsSuccessStatusCode)
+Console.WriteLine("Storage Content:");
+foreach (var item in content.Response.data)
 {
-    Console.WriteLine("Storage Content:");
-    foreach (var item in content.Response.data)
-    {
-        Console.WriteLine($"  {item.volid}: {item.format} - {item.size / (1024*1024):F2} MB");
-    }
+    Console.WriteLine($"  {item.volid}: {item.format} - {item.size / (1024*1024):F2} MB");
 }
 ```
 
@@ -581,32 +529,25 @@ var createResult = await client.Nodes["pve1"].Qemu.CreateVm(
     memory: 2048
 );
 
-if (createResult.IsSuccessStatusCode)
+var taskId = createResult.Response.data;
+Console.WriteLine($"Task started: {taskId}");
+
+// Monitor task progress
+while (true)
 {
-    var taskId = createResult.Response.data;
-    Console.WriteLine($"Task started: {taskId}");
-    
-    // Monitor task progress
-    while (true)
+    var taskStatus = await client.Nodes["pve1"].Tasks[taskId].Status.ReadTaskStatus();
+    var status = taskStatus.Response.data.status;
+
+    if (status == "stopped")
     {
-        var taskStatus = await client.Nodes["pve1"].Tasks[taskId].Status.ReadTaskStatus();
-        
-        if (taskStatus.IsSuccessStatusCode)
-        {
-            var status = taskStatus.Response.data.status;
-            
-            if (status == "stopped")
-            {
-                var exitStatus = taskStatus.Response.data.exitstatus;
-                Console.WriteLine($"Task completed with status: {exitStatus}");
-                break;
-            }
-            else if (status == "running")
-            {
-                Console.WriteLine("Task still running...");
-                await Task.Delay(2000);
-            }
-        }
+        var exitStatus = taskStatus.Response.data.exitstatus;
+        Console.WriteLine($"Task completed with status: {exitStatus}");
+        break;
+    }
+    else if (status == "running")
+    {
+        Console.WriteLine("Task still running...");
+        await Task.Delay(2000);
     }
 }
 ```

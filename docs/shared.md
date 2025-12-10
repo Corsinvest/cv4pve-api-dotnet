@@ -342,14 +342,11 @@ await client.Login("admin@pve", "password");
 // Get raw response
 var result = await client.Nodes["pve1"].Qemu[100].Config.VmConfig();
 
-if (result.IsSuccessStatusCode)
-{
-    // Convert to strongly-typed model
-    var vmConfig = JsonConvert.DeserializeObject<VmConfig>(
-        JsonConvert.SerializeObject(result.Response.data));
+// Convert to strongly-typed model
+var vmConfig = JsonConvert.DeserializeObject<VmConfig>(
+    JsonConvert.SerializeObject(result.Response.data));
 
-    Console.WriteLine($"VM: {vmConfig.Name} - Memory: {vmConfig.Memory} MB");
-}
+Console.WriteLine($"VM: {vmConfig.Name} - Memory: {vmConfig.Memory} MB");
 ```
 
 ### With Extension Package

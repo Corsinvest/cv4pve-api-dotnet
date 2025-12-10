@@ -299,10 +299,7 @@ var result = await client.Nodes[node].Qemu.CreateVm(
     searchdomain: searchdomain
 );
 
-if (result.IsSuccessStatusCode)
-{
-    Console.WriteLine($"VM {vmid} created successfully with cloud-init!");
-}
+Console.WriteLine($"VM {vmid} created successfully with cloud-init!");
 ```
 
 ---
@@ -314,11 +311,8 @@ if (result.IsSuccessStatusCode)
 **Check configuration:**
 ```csharp
 var result = await client.Nodes["pve1"].Qemu[100].Config.VmConfig();
-if (result.IsSuccessStatusCode)
-{
-    // Verify configuration is valid
-    Console.WriteLine(result.Response.data);
-}
+// Verify configuration is valid
+Console.WriteLine(result.Response.data);
 ```
 
 **Common issues:**

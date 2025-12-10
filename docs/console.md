@@ -652,8 +652,8 @@ class VmManagerTool
     {
         await ExecuteBatchOperation(vms, "start", async vm =>
         {
-            var result = await client.Nodes[vm.Node].Qemu[vm.VmId].Status.Start.VmStart();
-            return result.IsSuccessStatusCode;
+            await client.Nodes[vm.Node].Qemu[vm.VmId].Status.Start.VmStart();
+            return true;
         }, app);
     }
     

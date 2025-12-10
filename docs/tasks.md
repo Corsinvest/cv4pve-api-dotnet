@@ -9,11 +9,8 @@ Many Proxmox VE operations are asynchronous and return a task ID instead of imme
 ```csharp
 // Operations that return task IDs
 var result = await client.Nodes["pve1"].Qemu[100].Clone.CloneVm(newid: 101);
-if (result.IsSuccessStatusCode)
-{
-    var taskId = result.Response.data; // Returns: "UPID:pve1:..."
-    Console.WriteLine($"Task started: {taskId}");
-}
+var taskId = result.Response.data; // Returns: "UPID:pve1:..."
+Console.WriteLine($"Task started: {taskId}");
 ```
 
 ## Task Status
@@ -23,22 +20,17 @@ if (result.IsSuccessStatusCode)
 public static async Task<TaskStatus> GetTaskStatus(PveClient client, string node, string taskId)
 {
     var result = await client.Nodes[node].Tasks[taskId].Status.ReadTaskStatus();
-    
-    if (result.IsSuccessStatusCode)
+    var data = result.Response.data;
+
+    return new TaskStatus
     {
-        var data = result.Response.data;
-        return new TaskStatus
-        {
-            Status = data.status,        // "running", "stopped"
-            ExitStatus = data.exitstatus, // "OK" if successful
-            StartTime = data.starttime,
-            EndTime = data.endtime,
-            Progress = data.progress,     // For operations with progress
-            Log = data.log               // Task log entries
-        };
-    }
-    
-    throw new Exception($"Failed to get task status: {result.GetError()}");
+        Status = data.status,        // "running", "stopped"
+        ExitStatus = data.exitstatus, // "OK" if successful
+        StartTime = data.starttime,
+        EndTime = data.endtime,
+        Progress = data.progress,     // For operations with progress
+        Log = data.log               // Task log entries
+    };
 }
 ```
 
@@ -59,12 +51,6 @@ public static async Task<bool> WaitForTaskCompletion(
     while (DateTime.Now - startTime < timeout)
     {
         var statusResult = await client.Nodes[node].Tasks[taskId].Status.ReadTaskStatus();
-        
-        if (!statusResult.IsSuccessStatusCode)
-        {
-            throw new Exception($"Failed to check task status: {statusResult.GetError()}");
-        }
-        
         var data = statusResult.Response.data;
         var currentStatus = data.status;
         
@@ -200,7 +186,7 @@ public static async Task<Dictionary<string, bool>> MonitorMultipleTasks(
             {
                 var statusResult = await client.Nodes[node].Tasks[taskId].Status.ReadTaskStatus();
                 
-                if (statusResult.IsSuccessStatusCode && statusResult.Response.data.status == "stopped")
+                if (statusResult.Response.data.status == "stopped")
                 {
                     var success = statusResult.Response.data.exitstatus == "OK";
                     results[taskId] = success;
@@ -242,34 +228,30 @@ public static async Task DisplayTaskProgress(PveClient client, string node, stri
     while (true)
     {
         var statusResult = await client.Nodes[node].Tasks[taskId].Status.ReadTaskStatus();
-        
-        if (statusResult.IsSuccessStatusCode)
+        var data = statusResult.Response.data;
+        var elapsed = DateTime.Now - startTime;
+
+        Console.Clear();
+        Console.WriteLine($"Task Progress: {taskId}");
+        Console.WriteLine($"Status: {data.status}");
+        Console.WriteLine($"Elapsed: {elapsed:hh\\:mm\\:ss}");
+
+        if (data.progress != null)
         {
-            var data = statusResult.Response.data;
-            var elapsed = DateTime.Now - startTime;
-            
-            Console.Clear();
-            Console.WriteLine($"Task Progress: {taskId}");
-            Console.WriteLine($"Status: {data.status}");
-            Console.WriteLine($"Elapsed: {elapsed:hh\\:mm\\:ss}");
-            
-            if (data.progress != null)
-            {
-                Console.WriteLine($"Progress: {data.progress}%");
-                
-                // Draw progress bar
-                var progressBar = new string('█', (int)(data.progress / 5));
-                var remaining = new string('░', 20 - progressBar.Length);
-                Console.WriteLine($"[{progressBar}{remaining}] {data.progress}%");
-            }
-            
-            if (data.status == "stopped")
-            {
-                Console.WriteLine($"Final Status: {data.exitstatus}");
-                break;
-            }
+            Console.WriteLine($"Progress: {data.progress}%");
+
+            // Draw progress bar
+            var progressBar = new string('█', (int)(data.progress / 5));
+            var remaining = new string('░', 20 - progressBar.Length);
+            Console.WriteLine($"[{progressBar}{remaining}] {data.progress}%");
         }
-        
+
+        if (data.status == "stopped")
+        {
+            Console.WriteLine($"Final Status: {data.exitstatus}");
+            break;
+        }
+
         await Task.Delay(1000);
     }
 }
@@ -282,30 +264,24 @@ public static async Task DisplayTaskProgress(PveClient client, string node, stri
 public static async Task<List<TaskInfo>> GetRecentTasks(PveClient client, string node, int limit = 10)
 {
     var result = await client.Nodes[node].Tasks.NodeTasks(limit: limit);
-    
-    if (result.IsSuccessStatusCode)
+    var tasks = new List<TaskInfo>();
+
+    foreach (var task in result.Response.data)
     {
-        var tasks = new List<TaskInfo>();
-        
-        foreach (var task in result.Response.data)
+        tasks.Add(new TaskInfo
         {
-            tasks.Add(new TaskInfo
-            {
-                Id = task.upid,
-                Type = task.type,
-                Status = task.status,
-                ExitStatus = task.exitstatus,
-                StartTime = DateTimeOffset.FromUnixTimeSeconds((long)task.starttime).DateTime,
-                EndTime = task.endtime != null ? DateTimeOffset.FromUnixTimeSeconds((long)task.endtime).DateTime : null,
-                User = task.user,
-                Node = task.node
-            });
-        }
-        
-        return tasks.OrderByDescending(t => t.StartTime).ToList();
+            Id = task.upid,
+            Type = task.type,
+            Status = task.status,
+            ExitStatus = task.exitstatus,
+            StartTime = DateTimeOffset.FromUnixTimeSeconds((long)task.starttime).DateTime,
+            EndTime = task.endtime != null ? DateTimeOffset.FromUnixTimeSeconds((long)task.endtime).DateTime : null,
+            User = task.user,
+            Node = task.node
+        });
     }
-    
-    return new List<TaskInfo>();
+
+    return tasks.OrderByDescending(t => t.StartTime).ToList();
 }
 ```
 

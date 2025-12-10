@@ -81,18 +81,12 @@ foreach (var snapshot in snapshots)
 }
 
 // Create snapshot (using core API)
-var result = await client.Nodes["pve1"].Qemu[100].Snapshot.Snapshot("backup-2024");
-if (result.IsSuccessStatusCode)
-{
-    Console.WriteLine("Snapshot created successfully");
-}
+await client.Nodes["pve1"].Qemu[100].Snapshot.Snapshot("backup-2024");
+Console.WriteLine("Snapshot created successfully");
 
 // Delete snapshot
-var deleteResult = await client.Nodes["pve1"].Qemu[100].Snapshot["backup-2024"].Delsnapshot();
-if (deleteResult.IsSuccessStatusCode)
-{
-    Console.WriteLine("Snapshot deleted successfully");
-}
+await client.Nodes["pve1"].Qemu[100].Snapshot["backup-2024"].Delsnapshot();
+Console.WriteLine("Snapshot deleted successfully");
 ```
 
 ###  VM Configuration and Status
@@ -195,12 +189,9 @@ foreach (var node in nodes)
 
 // Instead of working with dynamic objects
 var result = await client.Nodes.Index();
-if (result.IsSuccessStatusCode)
+foreach (var node in result.Response.data)
 {
-    foreach (var node in result.Response.data)
-    {
-        Console.WriteLine($"Node: {node.node}"); // No IntelliSense, prone to errors
-    }
+    Console.WriteLine($"Node: {node.node}"); // No IntelliSense, prone to errors
 }
 ```
 
@@ -252,11 +243,8 @@ foreach (var vm in vms.Where(v => v.Type == "qemu"))
     if (status.Status == "stopped")
     {
         // Use core API for actions
-        var startResult = await vmInstance.Status.Start.VmStart();
-        if (startResult.IsSuccessStatusCode)
-        {
-            Console.WriteLine($"Started VM {vm.Name}");
-        }
+        await vmInstance.Status.Start.VmStart();
+        Console.WriteLine($"Started VM {vm.Name}");
     }
 }
 ```
