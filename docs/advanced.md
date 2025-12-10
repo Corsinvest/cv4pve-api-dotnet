@@ -82,14 +82,8 @@ public static async Task<bool> ExecuteWithProgress(
     string description)
 {
     Console.WriteLine($"Starting: {description}");
-    
+
     var result = await operation();
-    if (!result.IsSuccessStatusCode)
-    {
-        Console.WriteLine($"Failed to start {description}: {result.GetError()}");
-        return false;
-    }
-    
     var taskId = result.Response.data.ToString();
     return await WaitForTaskCompletion(client, node, taskId, description);
 }
@@ -106,14 +100,14 @@ private static async Task<bool> WaitForTaskCompletion(
     while (DateTime.Now - start < timeout)
     {
         var status = await client.Nodes[node].Tasks[taskId].Status.ReadTaskStatus();
-        
-        if (status.IsSuccessStatusCode && status.Response.data.status == "stopped")
+
+        if (status.Response.data.status == "stopped")
         {
             var success = status.Response.data.exitstatus == "OK";
             Console.WriteLine($"{description}: {status.Response.data.exitstatus} ({(success ? "Success" : "Failed")})");
             return success;
         }
-        
+
         await Task.Delay(2000);
     }
     
