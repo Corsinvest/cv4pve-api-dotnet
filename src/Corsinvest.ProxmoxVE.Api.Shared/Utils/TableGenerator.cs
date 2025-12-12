@@ -76,11 +76,11 @@ public class TableGenerator
         var columnLengths = cols.Select((t, index) => rows.Select(r => r.ToArray()[index])
                                 .Union([cols[index]])
                                 .Where(x => x != null)
-                                .Select(x => (x + "").Length).Max())
+                                .Select(x => (x + string.Empty).Length).Max())
                                 .ToList();
 
         var columnAlignment = Enumerable.Range(0, cols.Length)
-                                        .Select(a => _numericTypes.Contains(cols[a].GetType()) ? "" : "-")
+                                        .Select(a => _numericTypes.Contains(cols[a].GetType()) ? string.Empty : "-")
                                         .ToList();
 
         var delimiterStr = delimiter == char.MinValue ? string.Empty : delimiter.ToString();
@@ -166,7 +166,7 @@ public class TableGenerator
 
         static string CreateRow(string tag, IEnumerable<object> values)
             => "<tr>" +
-                string.Concat(values.Select(a => $"<{tag} style='border: 1px solid black;'>{(a + "").Trim()}</{tag}>")) +
+                string.Concat(values.Select(a => $"<{tag} style='border: 1px solid black;'>{(a + string.Empty).Trim()}</{tag}>")) +
                 "</tr>";
 
         return "<table style='width: 100%;border-collapse: collapse;border: 1px solid black;'>" +
