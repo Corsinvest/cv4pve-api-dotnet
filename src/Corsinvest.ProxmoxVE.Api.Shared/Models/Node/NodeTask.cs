@@ -70,7 +70,7 @@ public class NodeTask : ModelBase, IStatusItem, INodeItem
     {
         get
         {
-            var durationInfo = "";
+            var durationInfo = string.Empty;
             if (Duration.HasValue)
             {
                 var duration = Duration.Value;

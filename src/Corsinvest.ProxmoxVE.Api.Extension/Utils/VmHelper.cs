@@ -108,7 +108,7 @@ public static class VmHelper
         {
             //string check name
             var name = data.Name.ToLower();
-            var vmIdOrNameLower = vmIdOrName.Replace("%", "").ToLower();
+            var vmIdOrNameLower = vmIdOrName.Replace("%", string.Empty).ToLower();
             if (vmIdOrName.Contains('%'))
             {
                 if (vmIdOrName.StartsWith("%") && vmIdOrName.EndsWith("%")) { return name.Contains(vmIdOrNameLower); }
@@ -196,7 +196,7 @@ public static class VmHelper
         }
 
         var vms = resources.Where(a => a.ResourceType == ClusterResourceType.Vm && !a.IsUnknown);
-        if (addVmId) { vmIds.AddRange(vms.Select(a => a.VmId + "").OrderBy(a => a)); }
+        if (addVmId) { vmIds.AddRange(vms.Select(a => a.VmId + string.Empty).OrderBy(a => a)); }
         if (addVmName) { vmIds.AddRange(vms.Select(a => a.Name).OrderBy(a => a)); }
 
         return vmIds.Distinct();

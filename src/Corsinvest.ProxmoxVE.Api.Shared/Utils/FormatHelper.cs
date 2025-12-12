@@ -87,7 +87,7 @@ public static class FormatHelper
     /// <returns></returns>
     public static string UptimeInfo(double value)
         => value == 0
-            ? ""
+            ? string.Empty
             : string.Format($"{TimeSpan.FromSeconds(Convert.ToDouble(value)):d' days 'hh':'mm':'ss}");
 
     /// <summary>
@@ -105,6 +105,6 @@ public static class FormatHelper
             "rootdir" => "Container",
             "snippets" => "Snippets",
             "import" => "Import",
-            _ => "",
+            _ => string.Empty,
         };
 }

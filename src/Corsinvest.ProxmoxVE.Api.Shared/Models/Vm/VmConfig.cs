@@ -125,7 +125,7 @@ public class VmConfig : ModelBase
                 var network = new VmNetwork();
                 network.Id = key;
 
-                foreach (var item in (ExtensionData[key] + "").Split(','))
+                foreach (var item in (ExtensionData[key] + string.Empty).Split(','))
                 {
                     Match match;
                     if (this is VmConfigQemu)
@@ -233,7 +233,7 @@ public class VmConfig : ModelBase
         var disks = new List<VmDisk>();
         foreach (var key in ExtensionData.Keys)
         {
-            var def = ExtensionData[key] + "";
+            var def = ExtensionData[key] + string.Empty;
             if (key == "rootfs"
                 //bus match
                 || (Regex.IsMatch(key, @"(efidisk|tpmstate|virtio|ide|scsi|sata|mp)\d+") && !Regex.IsMatch(def, "media=cdrom")))

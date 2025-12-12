@@ -114,7 +114,7 @@ public static class ClientExtension
     /// <param name="vmId"></param>
     /// <returns></returns>
     public static async Task<IClusterResourceVm> GetVmAsync(this PveClient client, long vmId)
-        => await client.GetVmAsync(vmId + "");
+        => await client.GetVmAsync(vmId + string.Empty);
 
     /// <summary>
     /// Get VM/CT from id or name.
@@ -185,8 +185,8 @@ public static class ClientExtension
             {
                 //all in specific tag
                 var tagName = id[5..];
-                data = allVms.Where(a => (a.Tags + "").ToLower().Split(';').Contains(tagName.ToLower())
-                                        || (a.Tags + "").Split(';').Contains(tagName));
+                data = allVms.Where(a => (a.Tags + string.Empty).ToLower().Split(';').Contains(tagName.ToLower())
+                                        || (a.Tags + string.Empty).Split(';').Contains(tagName));
             }
             else
             {
@@ -372,7 +372,7 @@ public static class ClientExtension
         }
 
         var vms = resources.Where(a => a.ResourceType == ClusterResourceType.Vm && !a.IsUnknown);
-        if (addVmId) { vmIds.AddRange(vms.Select(a => a.VmId + "").OrderBy(a => a)); }
+        if (addVmId) { vmIds.AddRange(vms.Select(a => a.VmId + string.Empty).OrderBy(a => a)); }
         if (addVmName) { vmIds.AddRange(vms.Select(a => a.Name).OrderBy(a => a)); }
 
         return vmIds.Distinct();

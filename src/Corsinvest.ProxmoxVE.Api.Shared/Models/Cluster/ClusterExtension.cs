@@ -60,7 +60,7 @@ public static class ClusterExtension
             var s when s == PveConstants.KeyApiStorage => $"{((IStorageItem)data).Storage} ({data.Node})",
             var s when s == PveConstants.KeyApiQemu || s == PveConstants.KeyApiLxc => $"{((IVmBase)data).VmId} ({((IVmBase)data).Name})",
             var s when s == PveConstants.KeyApiPool => ((IPoolItem)data).Pool,
-            _ => "",
+            _ => string.Empty,
         };
 
         data.IsUnknown = data.Status == PveConstants.StatusUnknown;

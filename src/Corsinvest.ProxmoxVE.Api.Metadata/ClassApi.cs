@@ -26,7 +26,7 @@ public class ClassApi
     public ClassApi(JToken token, ClassApi parent)
     {
         Name = token["text"].ToString().Replace("-", "_");
-        IndexName = Name.Replace("{", "").Replace("}", "");
+        IndexName = Name.Replace("{", string.Empty).Replace("}", string.Empty);
         Parent = parent;
         Resource = token["path"].ToString();
 
