@@ -1,5 +1,3 @@
-<div align="center">
-
 # Corsinvest.ProxmoxVE.Api
 
 ```
@@ -14,8 +12,6 @@ Proxmox VE API Client for .NET (Made in Italy)
 
 [![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg?style=flat-square)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-8.0%2B-blue?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
-
-</div>
 
 ---
 
@@ -49,40 +45,13 @@ if (await client.Login("root", "your-password"))
 
 ## Package Suite
 
-### [Corsinvest.ProxmoxVE.Api](./docs/api.md)
-
-[![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api)
-[![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api)
-
-Core .NET client library for Proxmox VE API. Foundation package with complete API coverage.
-
-### [Corsinvest.ProxmoxVE.Api.Extension](./docs/extension.md)
-
-[![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Extension.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Extension)
-[![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Extension.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Extension)
-
-Extension methods and helper utilities for common operations and task management.
-
-### [Corsinvest.ProxmoxVE.Api.Shared](./docs/shared.md)
-
-[![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Shared.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shared)
-[![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Shared.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shared)
-
-Shared models, utilities, and common types used across the package suite.
-
-### [Corsinvest.ProxmoxVE.Api.Console](./docs/console.md)
-
-[![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Console.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Console)
-[![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Console.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Console)
-
-Console application helpers for building CLI tools with Proxmox VE.
-
-### [Corsinvest.ProxmoxVE.Api.Metadata](./docs/metadata.md)
-
-[![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Metadata.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Metadata)
-[![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Metadata.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Metadata)
-
-API metadata extraction and documentation generation tools.
+| Package | Version | Downloads | Description |
+|---------|---------|-----------|-------------|
+| [Corsinvest.ProxmoxVE.Api](./docs/api.md) | [![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api) | [![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api) | Core .NET client library for Proxmox VE API. Foundation package with complete API coverage. |
+| [Corsinvest.ProxmoxVE.Api.Extension](./docs/extension.md) | [![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Extension.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Extension) | [![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Extension.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Extension) | Extension methods and helper utilities for common operations and task management. |
+| [Corsinvest.ProxmoxVE.Api.Shared](./docs/shared.md) | [![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Shared.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shared) | [![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Shared.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shared) | Shared models, utilities, and common types used across the package suite. |
+| [Corsinvest.ProxmoxVE.Api.Console](./docs/console.md) | [![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Console.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Console) | [![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Console.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Console) | Console application helpers for building CLI tools with Proxmox VE. |
+| [Corsinvest.ProxmoxVE.Api.Metadata](./docs/metadata.md) | [![NuGet](https://img.shields.io/nuget/v/Corsinvest.ProxmoxVE.Api.Metadata.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Metadata) | [![Downloads](https://img.shields.io/nuget/dt/Corsinvest.ProxmoxVE.Api.Metadata.svg?style=flat-square)](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Metadata) | API metadata extraction and documentation generation tools. |
 
 ---
 
@@ -188,8 +157,6 @@ Professional support and consulting available through [Corsinvest](https://www.c
 
 ---
 
-<div align="center">
-  <sub>Part of <a href="https://www.corsinvest.it/cv4pve">cv4pve</a> suite | Made with ❤️ in Italy by <a href="https://www.corsinvest.it">Corsinvest</a></sub>
-  <br>
-  <sub>Copyright © Corsinvest Srl</sub>
-</div>
+Part of [cv4pve](https://www.corsinvest.it/cv4pve) suite | Made with ❤️ in Italy by [Corsinvest](https://www.corsinvest.it)
+
+Copyright © Corsinvest Srl
