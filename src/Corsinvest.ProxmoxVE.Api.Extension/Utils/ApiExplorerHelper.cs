@@ -176,7 +176,7 @@ public static class ApiExplorerHelper
                             ? ["name", "description", "command", "args", "sys"]
                             : new[] { "name", "description", "sys" };
 
-            static string EncodeSystem(bool system) => system ? "X" : "";
+            static string EncodeSystem(bool system) => system ? "X" : string.Empty;
 
             var rows = Alias.OrderByDescending(a => a.System)
                             .ThenBy(a => a.Name)
@@ -395,16 +395,17 @@ public static class ApiExplorerHelper
     {
         var columns = new List<string>();
         var rows = new List<object[]>();
+        var print = false;
 
         if (data is ExpandoObject)
         {
-            //dictionary
             var dic = (IDictionary<string, object>)data;
 
             columns.Add("key");
             columns.Add("value");
 
             keys ??= [.. dic.Select(a => a.Key)];
+            print = true;
 
             foreach (var key in keys.OrderBy(a => a))
             {
@@ -438,25 +439,29 @@ public static class ApiExplorerHelper
                         value = GetValue(value, title, returnParameters);
                     }
 
-                    value ??= "";
+                    value ??= string.Empty;
                     row.Add(value);
                 }
 
-                rowsTmp.Add(new KeyValuePair<object, object[]>(row[0] + "", [.. row]));
+                rowsTmp.Add(new KeyValuePair<object, object[]>(row[0] + string.Empty, [.. row]));
             }
 
             //order row by first column
             rows.AddRange([.. rowsTmp.OrderBy(a => a.Key).Select(a => a.Value)]);
-            if (rows.Count == 0) { data = ""; }
+            if (rows.Count == 0) { data = string.Empty; }
         }
 
         if (rows.Count > 0)
         {
             return TableGenerator.To(columns, rows, output);
         }
+        else if (print)
+        {
+            return string.Empty;
+        }
         else
         {
-            return data;
+            return data + string.Empty;
         }
     }
 
@@ -491,7 +496,7 @@ public static class ApiExplorerHelper
                 if (!string.IsNullOrWhiteSpace(param.TypeText))
                 {
                     //explicit text
-                    partsType = JoinWord(param.TypeText.Split(' '), 18, "");
+                    partsType = JoinWord(param.TypeText.Split(' '), 18, string.Empty);
                 }
                 else if (param.EnumValues.Any())
                 {
@@ -501,9 +506,9 @@ public static class ApiExplorerHelper
 
                 for (var i = 0; i < Math.Max(partsType.Length, partsComment.Length); i++)
                 {
-                    values.Add([ i == 0  ? param.Name : "",
-                                 i < partsType.Length ? partsType[i] : "",
-                                 i < partsComment.Length ? partsComment[i] : "" ]);
+                    values.Add([ i == 0  ? param.Name : string.Empty,
+                                 i < partsType.Length ? partsType[i] : string.Empty,
+                                 i < partsComment.Length ? partsComment[i] : string.Empty ]);
                 }
             }
 
@@ -550,7 +555,7 @@ public static class ApiExplorerHelper
                 //only parameters no keys
                 var parameters = method.Parameters.Where(a => !classApi.Keys.Contains(a.Name));
 
-                var opts = string.Join("", parameters.Where(a => !a.Optional).Select(a => $" {a.Name}:<{a.Type}>"));
+                var opts = string.Join(string.Empty, parameters.Where(a => !a.Optional).Select(a => $" {a.Name}:<{a.Type}>"));
                 if (!string.IsNullOrWhiteSpace(opts)) { ret.Append(opts); }
 
                 //optional parameter
@@ -609,7 +614,7 @@ public static class ApiExplorerHelper
                                                                                                                    string resource)
     {
         var values = new List<(string Attribute, string Value)>();
-        var error = "";
+        var error = string.Empty;
 
         var classApi = ClassApi.GetFromResource(classApiRoot, resource);
         if (classApi == null)
@@ -645,7 +650,7 @@ public static class ApiExplorerHelper
                                 var returnLinkHRef = classApi.Methods.FirstOrDefault(a => a.IsGet).ReturnLinkHRef;
                                 if (!string.IsNullOrWhiteSpace(returnLinkHRef))
                                 {
-                                    key = returnLinkHRef.Replace("{", "").Replace("}", "");
+                                    key = returnLinkHRef.Replace("{", string.Empty).Replace("}", string.Empty);
                                 }
                             }
 
@@ -653,7 +658,7 @@ public static class ApiExplorerHelper
                             {
                                 var data = new List<object>();
                                 foreach (IDictionary<string, object> item in result.ToData()) { data.Add(item[key]); }
-                                foreach (var item in data.OrderBy(a => a)) { values.Add((attribute, item + "")); }
+                                foreach (var item in data.OrderBy(a => a)) { values.Add((attribute, item + string.Empty)); }
                             }
                         }
                     }
@@ -679,7 +684,9 @@ public static class ApiExplorerHelper
     {
         var (values, error) = await ListValuesAsync(client, classApiRoot, resource);
         return string.Join(Environment.NewLine, values.Select(a => $"{a.Attribute}        {a.Value}")) +
-               (string.IsNullOrWhiteSpace(error) ? "" : Environment.NewLine + error) +
+               (string.IsNullOrWhiteSpace(error) 
+                    ? string.Empty 
+                    : Environment.NewLine + error) +
                Environment.NewLine;
     }
 }
