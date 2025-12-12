@@ -76,7 +76,7 @@ public static class ResultExtension
         {
             if (reader.ValueType == typeof(string))
             {
-                return !string.IsNullOrWhiteSpace(reader.Value + "") && Convert.ToBoolean(Convert.ToByte(reader.Value));
+                return !string.IsNullOrWhiteSpace(reader.Value + string.Empty) && Convert.ToBoolean(Convert.ToByte(reader.Value));
             }
             else
             {
