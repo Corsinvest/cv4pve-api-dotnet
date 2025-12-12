@@ -88,12 +88,14 @@ public static class ShellHelper
 
         if (dryRun)
         {
-            return ("", 0);
+            return (string.Empty, 0);
         }
         else
         {
             process.Start();
-            var standardOutput = redirectStandardOutput ? process.StandardOutput.ReadToEnd() : "";
+            var standardOutput = redirectStandardOutput 
+                                    ? process.StandardOutput.ReadToEnd() 
+                                    : string.Empty;
             var exitCode = 0;
             if (waitForExit)
             {
