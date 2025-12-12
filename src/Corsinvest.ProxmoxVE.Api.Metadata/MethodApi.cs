@@ -21,13 +21,13 @@ public class MethodApi
     {
         MethodType = token["method"].ToString();
         MethodName = token["name"].ToString();
-        Comment = token["description"] + "";
+        Comment = token["description"] + string.Empty;
         ClassApi = classApi;
 
         var returns = token["returns"];
         if (returns != null)
         {
-            ReturnType = returns["type"] + "";
+            ReturnType = returns["type"] + string.Empty;
 
             if (returns["properties"] != null)
             {

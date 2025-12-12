@@ -22,17 +22,17 @@ public class ParameterApi
     public ParameterApi(JToken token)
     {
         Name = ((JProperty)token.Parent).Name;
-        NameIndexed = Name.Replace("[n]", "");
+        NameIndexed = Name.Replace("[n]", string.Empty);
         IsIndexed = Name.EndsWith("[n]");
-        Description = token["description"] + "";
-        VerboseDescription = token["verbose_description"] + "";
+        Description = token["description"] + string.Empty;
+        VerboseDescription = token["verbose_description"] + string.Empty;
         Optional = (token["optional"] ?? 0).ToString() == "1";
-        Type = token["type"] + "";
-        TypeText = token["typetext"] + "";
+        Type = token["type"] + string.Empty;
+        TypeText = token["typetext"] + string.Empty;
         Maximum = token["maximum"] == null ? null : (long?)token["maximum"];
         Minimum = token["minimum"] == null ? null : (int?)token["minimum"];
-        Renderer = token["renderer"] + "";
-        Default = token["default"] == null ? null : token["default"] + "";
+        Renderer = token["renderer"] + string.Empty;
+        Default = token["default"] == null ? null : token["default"] + string.Empty;
 
         if (token["properties"] != null)
         {
@@ -111,11 +111,11 @@ public class ParameterApi
             case "fraction_as_percentage":
                 value = double.TryParse(value.ToString(), out var perValue) && perValue > 0
                         ? Math.Round(perValue * 100, 2) + "%"
-                        : "";
+                        : string.Empty;
                 break;
 
             case "bytes":
-                if (long.TryParse(value.ToString(), out var bytesValue) && bytesValue > 0)
+                if (value != null && long.TryParse(value.ToString(), out var bytesValue) && bytesValue > 0)
                 {
                     var sizes = new string[] { "B", "KiB", "MiB", "GiB", "TiB" };
                     var order = 0;
@@ -125,36 +125,17 @@ public class ParameterApi
                         bytesValue /= 1024;
                     }
                     value = $"{bytesValue} {sizes[order]}";
-
-
-                    // if (bytesValue > Math.Pow(1024, 4))
-                    // {
-                    //     value = Math.Round(bytesValue / Math.Pow(1024, 4), 2) + " TiB";
-                    // }
-                    // else if (bytesValue > Math.Pow(1024, 3))
-                    // {
-                    //     value = Math.Round(bytesValue / Math.Pow(1024, 3), 2) + " GiB";
-                    // }
-                    // else if (bytesValue > Math.Pow(1024, 2))
-                    // {
-                    //     value = Math.Round(bytesValue / Math.Pow(1024, 2), 2) + " MiB";
-                    // }
-                    // else if (bytesValue > 1024)
-                    // {
-                    //     value = Math.Round(bytesValue / 1024.0, 0) + " KiB";
-                    // }
-                    // else { value = bytesValue + " B"; }
                 }
                 else
                 {
-                    value = "";
+                    value = string.Empty;
                 }
                 break;
 
             case "duration":
                 value = int.TryParse(value.ToString(), out var duration) && duration > 0
                             ? new TimeSpan(0, 0, duration).ToString(@"d\d\ h\h\ m\m\ ss\s")
-                            : "";
+                            : string.Empty;
                 break;
 
             case "timestamp": break;
