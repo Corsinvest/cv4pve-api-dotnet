@@ -59,11 +59,11 @@ jobs:
         for file in ./nupkgs/*.nupkg; do
           if [ -f "$file" ]; then
             echo "Publishing $file..."
-            dotnet nuget push "$file" --api-key ${{ secrets.NUGET_API_KEY_CV4PVE }} --source https://api.nuget.org/v3/index.json
+            dotnet nuget push "$file" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
           fi
         done
       env:
-        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY_CV4PVE }}
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
 
     - name: Create Release
       id: create_release
