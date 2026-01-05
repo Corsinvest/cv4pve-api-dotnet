@@ -126,7 +126,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
                     throw new PveException($"Authentication failed for host {endpoint}: {errorMessage}");
                 }
 
-                loggerFactory?.CreateLogger<T>()?.LogInformation("Successfully connected to Proxmox VE at {0}", endpoint);
+                loggerFactory?.CreateLogger<T>()?.LogDebug("Successfully connected to Proxmox VE at {0}", endpoint);
                 return client;
             }
             catch

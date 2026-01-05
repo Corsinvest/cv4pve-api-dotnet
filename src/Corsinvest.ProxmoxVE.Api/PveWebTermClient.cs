@@ -317,7 +317,7 @@ echo '{endMarker}'
 
         _pingTimer?.Dispose();
         _ws.Dispose();
-        Logger.LogInformation("Disconnected");
+        Logger.LogDebug("Disconnected");
     }
 
     private async Task<Match> ExtractBracketedPasteContentAsync()
