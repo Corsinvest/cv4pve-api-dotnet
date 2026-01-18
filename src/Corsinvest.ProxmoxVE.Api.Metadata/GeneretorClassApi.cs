@@ -26,7 +26,13 @@ public static class GeneratorClassApi
         return classApi;
     }
 
-    private static async Task<string> GetJsonSchemaFromApiDocAsync(string host, int port)
+    /// <summary>
+    /// Fetches the JSON schema from the Proxmox VE API documentation.
+    /// </summary>
+    /// <param name="host">The Proxmox VE host address.</param>
+    /// <param name="port">The port number.</param>
+    /// <returns>The JSON schema string extracted from the API documentation.</returns>
+    public static async Task<string> GetJsonSchemaFromApiDocAsync(string host, int port)
     {
         var url = $"https://{host}:{port}/pve-docs/api-viewer/apidoc.js";
         var json = new StringBuilder();
@@ -42,7 +48,7 @@ public static class GeneratorClassApi
         {
             var data = await response.Content.ReadAsStringAsync();
             //start Json API
-            data = data[data.IndexOf("[")..];
+            data = data[data.IndexOf('[')..];
 
             foreach (var line in data.Split('\n'))
             {
