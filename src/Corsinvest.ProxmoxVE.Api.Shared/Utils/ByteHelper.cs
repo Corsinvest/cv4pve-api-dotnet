@@ -28,7 +28,7 @@ public static class ByteHelper
     {
         if (string.IsNullOrWhiteSpace(input)) { throw new ArgumentException("Invalid input."); }
 
-        var pattern = @"^(\d+(\.\d+)?)\s*(" + string.Join("|", DecimalUnits) + string.Join("|", BinaryUnits) + ")$";
+        var pattern = @"^(\d+(\.\d+)?)\s*(" + string.Join("|", DecimalUnits) + "|" + string.Join("|", BinaryUnits) + ")$";
         //@"^(\d+(\.\d+)?)\s*(B|KB|MB|GB|TB|PB|EB|KIB|MIB|GIB|TIB|PIB|EIB)$"
         var match = Regex.Match(input.Trim(), pattern, RegexOptions.IgnoreCase);
         if (!match.Success) { throw new FormatException("Invalid format. Use '1.5 GB' or '2 MiB'."); }
