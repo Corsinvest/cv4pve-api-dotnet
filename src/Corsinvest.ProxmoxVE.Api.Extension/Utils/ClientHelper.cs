@@ -64,24 +64,17 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
 
             if (client == null) { throw new PveException("No reachable hosts found in the provided list"); }
 
-            try
-            {
-                client.ValidateCertificate = validateCertificate;
-                client.LoggerFactory = loggerFactory;
+            client.ValidateCertificate = validateCertificate;
+            client.LoggerFactory = loggerFactory;
 
-                if (!await AuthenticateAsync(client, username, password, apiToken))
-                {
-                    var errorMessage = client.LastResult?.ReasonPhrase ?? "Authentication failed";
-                    throw new PveException($"Authentication failed for host {endpoint}: {errorMessage}");
-                }
-
-                loggerFactory?.CreateLogger<PveClient>()?.LogDebug("Successfully connected to Proxmox VE at {0}", endpoint);
-                return client;
-            }
-            catch
+            if (!await AuthenticateAsync(client, username, password, apiToken))
             {
-                throw;
+                var errorMessage = client.LastResult?.ReasonPhrase ?? "Authentication failed";
+                throw new PveException($"Authentication failed for host {endpoint}: {errorMessage}");
             }
+
+            loggerFactory?.CreateLogger<PveClient>()?.LogDebug("Successfully connected to Proxmox VE at {0}", endpoint);
+            return client;
         }
 
         /// <summary>
@@ -115,24 +108,17 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
 
             if (client == null) { throw new PveException("No reachable hosts found in the provided list"); }
 
-            try
-            {
-                client.ValidateCertificate = validateCertificate;
-                client.LoggerFactory = loggerFactory;
+            client.ValidateCertificate = validateCertificate;
+            client.LoggerFactory = loggerFactory;
 
-                if (!await AuthenticateAsync(client, username, password, apiToken))
-                {
-                    var errorMessage = client.LastResult?.ReasonPhrase ?? "Authentication failed";
-                    throw new PveException($"Authentication failed for host {endpoint}: {errorMessage}");
-                }
-
-                loggerFactory?.CreateLogger<T>()?.LogDebug("Successfully connected to Proxmox VE at {0}", endpoint);
-                return client;
-            }
-            catch
+            if (!await AuthenticateAsync(client, username, password, apiToken))
             {
-                throw;
+                var errorMessage = client.LastResult?.ReasonPhrase ?? "Authentication failed";
+                throw new PveException($"Authentication failed for host {endpoint}: {errorMessage}");
             }
+
+            loggerFactory?.CreateLogger<T>()?.LogDebug("Successfully connected to Proxmox VE at {0}", endpoint);
+            return client;
         }
 
         /// <summary>

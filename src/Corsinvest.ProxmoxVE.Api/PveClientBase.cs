@@ -5,6 +5,7 @@
 
 using System.ComponentModel;
 using System.Dynamic;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Web;
@@ -25,8 +26,8 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     private ILogger<PveClientBase> _logger = NullLoggerFactory.Instance.CreateLogger<PveClientBase>();
     private ILoggerFactory _loggerFactory;
 
-    private HttpClient _httpClient;
-    private readonly HttpClient? _externalHttpClient = httpClient;
+    private HttpClient _internalHttpClient;
+    private HttpClientHandler _internalHttpClientHandler;
 
     /// <summary>
     /// Logger Factory
@@ -112,6 +113,12 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
 
             CSRFPreventionToken = result.Response.data.CSRFPreventionToken;
             PVEAuthCookie = result.Response.data.ticket;
+
+            // Add cookie to CookieContainer for proper authentication in subsequent requests
+            if (_internalHttpClientHandler?.CookieContainer != null)
+            {
+                _internalHttpClientHandler.CookieContainer.Add(new Uri(BaseAddress), new Cookie("PVEAuthCookie", PVEAuthCookie));
+            }
         }
 
         return result.IsSuccessStatusCode;
@@ -181,16 +188,21 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// <returns></returns>
     public virtual HttpClient GetHttpClient()
     {
-        if (_externalHttpClient != null) return _externalHttpClient;
+        if (httpClient != null) return httpClient;
 
-        _httpClient ??= new HttpClient(new HttpClientHandler
+        if (_internalHttpClient == null)
         {
-            ServerCertificateCustomValidationCallback = !ValidateCertificate
-                                                            ? (message, cert, chain, errors) => true
-                                                            : null
-        });
+            _internalHttpClientHandler = new HttpClientHandler
+            {
+                CookieContainer = new CookieContainer(),
+                ServerCertificateCustomValidationCallback = !ValidateCertificate
+                                                                ? (message, cert, chain, errors) => true
+                                                                : null
+            };
+            _internalHttpClient = new HttpClient(_internalHttpClientHandler);
+        }
 
-        return _httpClient;
+        return _internalHttpClient;
     }
 
     /// <summary>
@@ -250,7 +262,7 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
             _logger.LogDebug("Method: {httpMethod}, Url: {uriString}", httpMethod, uriString);
             if (httpMethod != HttpMethod.Get)
             {
-                var sensitiveParams = new[] { "password", "token", "ticket", "otp", "apitoken"};
+                var sensitiveParams = new[] { "password", "token", "ticket", "otp", "apitoken" };
                 _logger.LogDebug("Parameters: {parameters}", string.Join(Environment.NewLine, @params.Select(a =>
                 {
                     var paramName = a.Key.ToLower();
@@ -302,6 +314,20 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
         catch (TaskCanceledException ex) when (!cts.Token.IsCancellationRequested)
         {
             _logger.LogError(ex, ex.Message);
+
+            response = new(HttpStatusCode.RequestTimeout)
+            {
+                ReasonPhrase = ex.Message,
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+
+            response = new(HttpStatusCode.InternalServerError)
+            {
+                ReasonPhrase = ex.Message,
+            };
         }
 
         if (_logger.IsEnabled(LogLevel.Debug))
@@ -378,14 +404,14 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
         if (timeout < wait) { timeout = wait + 5000; }
         var timeStart = DateTime.Now;
 
-        while (isRunning && (DateTime.Now - timeStart).Milliseconds < timeout)
+        while (isRunning && (DateTime.Now - timeStart).TotalMilliseconds < timeout)
         {
-            Thread.Sleep(wait);
+            await Task.Delay(wait);
             isRunning = await TaskIsRunningAsync(task);
         }
 
         //check timeout
-        return (DateTime.Now - timeStart).Milliseconds < timeout;
+        return (DateTime.Now - timeStart).TotalMilliseconds < timeout;
     }
 
     /// <summary>
