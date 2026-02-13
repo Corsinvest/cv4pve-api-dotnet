@@ -53,9 +53,10 @@ public class ParameterApi
         #endregion
 
         #region formats
-        if (token["format"] != null)
+        // PVE format is typically a string (like "pve-configid"), but check for JObject with properties just in case
+        if (token["format"] is JObject formatObj && formatObj["properties"] is JObject formatProperties)
         {
-            Formats.AddRange([.. token["format"].Select(a => new ParameterFormatApi(a.Parent[((JProperty)a).Name]))]);
+            Formats.AddRange([.. ((IEnumerable<JToken>)formatProperties).Select(a => new ParameterFormatApi(a.Parent[((JProperty)a).Name]))]);
         }
         #endregion
     }
