@@ -45,6 +45,14 @@ public static class ModelsExtensionsAutoGen
         => (await item.ReadAcl()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessAcl>>();
 
     /// <summary>
+    /// List TFA configurations of users.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessTfa>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveAccess.PveTfa item)
+        => (await item.ListTfa()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessTfa>>();
+
+    /// <summary>
     /// Authentication domain index.
     /// </summary>
     /// <param name="item"></param>
@@ -316,7 +324,7 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <param name="errors">Only list tasks with a status of ERROR.</param>
-    /// <param name="limit">Only list this amount of tasks.</param>
+    /// <param name="limit">Only list this number of tasks.</param>
     /// <param name="since">Only list tasks since this UNIX epoch.</param>
     /// <param name="source">List archived, active or all tasks.
     ///   Enum: archive,active,all</param>
