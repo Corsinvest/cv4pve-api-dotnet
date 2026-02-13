@@ -28,7 +28,7 @@ public class NodeCertificate : ModelBase
     /// Notafter
     /// </summary>
     [JsonProperty("notafter")]
-    public long Notafter { get; set; }
+    public long NotAfter { get; set; }
 
     /// <summary>
     /// Issuer
@@ -70,5 +70,5 @@ public class NodeCertificate : ModelBase
     /// Notbefore
     /// </summary>
     [JsonProperty("notbefore")]
-    public long Notbefore { get; set; }
+    public long NotBefore { get; set; }
 }
