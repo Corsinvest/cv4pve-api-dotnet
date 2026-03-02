@@ -13,72 +13,62 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 public class NodeNetwork : ModelBase
 {
     /// <summary>
-    /// Method6
+    /// The network configuration method for IPv6.
     /// </summary>
-    /// <value></value>
     [JsonProperty("method6")]
     public string Method6 { get; set; }
 
     /// <summary>
-    /// Priority
+    /// The order of the interface.
     /// </summary>
-    /// <value></value>
     [JsonProperty("priority")]
     public int Priority { get; set; }
 
     /// <summary>
-    /// Type
+    /// Network interface type
     /// </summary>
-    /// <value></value>
     [JsonProperty("type")]
     public string Type { get; set; }
 
     /// <summary>
-    /// BondMode
+    /// Bonding mode.
     /// </summary>
-    /// <value></value>
     [JsonProperty("bond_mode")]
     public string BondMode { get; set; }
 
     /// <summary>
-    /// Cidr
+    /// IPv4 CIDR.
     /// </summary>
-    /// <value></value>
     [JsonProperty("cidr")]
     public string Cidr { get; set; }
 
     /// <summary>
-    /// Active
+    /// Set to true if the interface is active.
     /// </summary>
-    /// <value></value>
     [JsonProperty("active")]
     public bool Active { get; set; }
 
     /// <summary>
-    /// Address
+    /// IP address.
     /// </summary>
-    /// <value></value>
     [JsonProperty("address")]
     public string Address { get; set; }
 
     /// <summary>
     /// Comments
     /// </summary>
-    /// <value></value>
     [JsonProperty("comments")]
     public string Comments { get; set; }
 
     /// <summary>
-    /// Families
+    /// The network families.
     /// </summary>
-    /// <value></value>
     [JsonProperty("families")]
     public IEnumerable<string> Families { get; set; } = [];
 
     /// <summary>
-    /// Interface
+    /// Network interface name.
     /// </summary>
-    /// <value></value>
     [JsonProperty("iface")]
     public string Interface { get; set; }
 
@@ -90,37 +80,32 @@ public class NodeNetwork : ModelBase
     public string BondMiimon { get; set; }
 
     /// <summary>
-    /// Slaves
+    /// Specify the interfaces used by the bonding device.
     /// </summary>
-    /// <value></value>
     [JsonProperty("slaves")]
     public string Slaves { get; set; }
 
     /// <summary>
-    /// Auto Start
+    /// Automatically start interface on boot.
     /// </summary>
-    /// <value></value>
     [JsonProperty("autostart")]
-    public int AutoStart { get; set; }
+    public bool AutoStart { get; set; }
 
     /// <summary>
-    /// BondPrimary
+    /// Specify the primary interface for active-backup bond.
     /// </summary>
-    /// <value></value>
     [JsonProperty("bond-primary")]
     public string BondPrimary { get; set; }
 
     /// <summary>
-    /// Method
+    /// The network configuration method for IPv4.
     /// </summary>
-    /// <value></value>
     [JsonProperty("method")]
     public string Method { get; set; }
 
     /// <summary>
-    /// Netmask
+    /// Network mask.
     /// </summary>
-    /// <value></value>
     [JsonProperty("netmask")]
     public string Netmask { get; set; }
 
@@ -132,16 +117,14 @@ public class NodeNetwork : ModelBase
     public string BridgeStp { get; set; }
 
     /// <summary>
-    /// Bridge Vlan Aware
+    /// Enable bridge vlan support.
     /// </summary>
-    /// <value></value>
     [JsonProperty("bridge_vlan_aware")]
-    public int? BridgeVlanAware { get; set; }
+    public bool? BridgeVlanAware { get; set; }
 
     /// <summary>
-    /// Bridge Vids
+    /// Specify the allowed VLANs. For example: '2 4 100-200'. Only used if the bridge is VLAN aware.
     /// </summary>
-    /// <value></value>
     [JsonProperty("bridge_vids")]
     public string BridgeVids { get; set; }
 
@@ -153,23 +136,188 @@ public class NodeNetwork : ModelBase
     public string BridgeFd { get; set; }
 
     /// <summary>
-    /// BridgePorts
+    /// Specify the interfaces you want to add to your bridge.
     /// </summary>
-    /// <value></value>
     [JsonProperty("bridge_ports")]
     public string BridgePorts { get; set; }
 
     /// <summary>
-    /// Exists
+    /// Set to true if the interface physically exists.
     /// </summary>
-    /// <value></value>
     [JsonProperty("exists")]
-    public int? Exists { get; set; }
+    public bool? Exists { get; set; }
 
     /// <summary>
-    /// Gateway
+    /// Default gateway address.
     /// </summary>
-    /// <value></value>
     [JsonProperty("gateway")]
     public string Gateway { get; set; }
+
+    /// <summary>
+    /// IP address.
+    /// </summary>
+    [JsonProperty("address6")]
+    public string Address6 { get; set; }
+
+    /// <summary>
+    /// IPv6 CIDR.
+    /// </summary>
+    [JsonProperty("cidr6")]
+    public string Cidr6 { get; set; }
+
+    /// <summary>
+    /// Default ipv6 gateway address.
+    /// </summary>
+    [JsonProperty("gateway6")]
+    public string Gateway6 { get; set; }
+
+    /// <summary>
+    /// Network mask.
+    /// </summary>
+    [JsonProperty("netmask6")]
+    public int? Netmask6 { get; set; }
+
+    /// <summary>
+    /// Comments
+    /// </summary>
+    [JsonProperty("comments6")]
+    public string Comments6 { get; set; }
+
+    /// <summary>
+    /// MTU.
+    /// </summary>
+    [JsonProperty("mtu")]
+    public int? Mtu { get; set; }
+
+    /// <summary>
+    /// The link type.
+    /// </summary>
+    [JsonProperty("link-type")]
+    public string LinkType { get; set; }
+
+    /// <summary>
+    /// The uplink ID.
+    /// </summary>
+    [JsonProperty("uplink-id")]
+    public string UplinkId { get; set; }
+
+    /// <summary>
+    /// vlan-id for a custom named vlan interface (ifupdown2 only).
+    /// </summary>
+    [JsonProperty("vlan-id")]
+    public int? VlanId { get; set; }
+
+    /// <summary>
+    /// The VLAN protocol.
+    /// </summary>
+    [JsonProperty("vlan-protocol")]
+    public string VlanProtocol { get; set; }
+
+    /// <summary>
+    /// Specify the raw interface for the vlan interface.
+    /// </summary>
+    [JsonProperty("vlan-raw-device")]
+    public string VlanRawDevice { get; set; }
+
+    /// <summary>
+    /// Selects the transmit hash policy to use for slave selection in balance-xor and 802.3ad modes.
+    /// </summary>
+    [JsonProperty("bond_xmit_hash_policy")]
+    public string BondXmitHashPolicy { get; set; }
+
+    /// <summary>
+    /// A list of additional interface options for IPv4.
+    /// </summary>
+    [JsonProperty("options")]
+    public IEnumerable<string> Options { get; set; } = [];
+
+    /// <summary>
+    /// A list of additional interface options for IPv6.
+    /// </summary>
+    [JsonProperty("options6")]
+    public IEnumerable<string> Options6 { get; set; } = [];
+
+    /// <summary>
+    /// The bridge port access VLAN.
+    /// </summary>
+    [JsonProperty("bridge-access")]
+    public int? BridgeAccess { get; set; }
+
+    /// <summary>
+    /// Bridge port ARP/ND suppress flag.
+    /// </summary>
+    [JsonProperty("bridge-arp-nd-suppress")]
+    public bool? BridgeArpNdSuppress { get; set; }
+
+    /// <summary>
+    /// Bridge port learning flag.
+    /// </summary>
+    [JsonProperty("bridge-learning")]
+    public bool? BridgeLearning { get; set; }
+
+    /// <summary>
+    /// Bridge port multicast flood flag.
+    /// </summary>
+    [JsonProperty("bridge-multicast-flood")]
+    public bool? BridgeMulticastFlood { get; set; }
+
+    /// <summary>
+    /// Bridge port unicast flood flag.
+    /// </summary>
+    [JsonProperty("bridge-unicast-flood")]
+    public bool? BridgeUnicastFlood { get; set; }
+
+    /// <summary>
+    /// Specify the interfaces used by the bonding device.
+    /// </summary>
+    [JsonProperty("ovs_bonds")]
+    public string OvsBonds { get; set; }
+
+    /// <summary>
+    /// The OVS bridge associated with a OVS port. This is required when you create an OVS port.
+    /// </summary>
+    [JsonProperty("ovs_bridge")]
+    public string OvsBridge { get; set; }
+
+    /// <summary>
+    /// OVS interface options.
+    /// </summary>
+    [JsonProperty("ovs_options")]
+    public string OvsOptions { get; set; }
+
+    /// <summary>
+    /// Specify the interfaces you want to add to your bridge.
+    /// </summary>
+    [JsonProperty("ovs_ports")]
+    public string OvsPorts { get; set; }
+
+    /// <summary>
+    /// Specify a VLan tag (used by OVSPort, OVSIntPort, OVSBond)
+    /// </summary>
+    [JsonProperty("ovs_tag")]
+    public int? OvsTag { get; set; }
+
+    /// <summary>
+    /// The VXLAN ID.
+    /// </summary>
+    [JsonProperty("vxlan-id")]
+    public int? VxlanId { get; set; }
+
+    /// <summary>
+    /// The VXLAN local tunnel IP.
+    /// </summary>
+    [JsonProperty("vxlan-local-tunnelip")]
+    public string VxlanLocalTunnelIp { get; set; }
+
+    /// <summary>
+    /// The physical device for the VXLAN tunnel.
+    /// </summary>
+    [JsonProperty("vxlan-physdev")]
+    public string VxlanPhysDev { get; set; }
+
+    /// <summary>
+    /// The VXLAN SVC node IP.
+    /// </summary>
+    [JsonProperty("vxlan-svcnodeip")]
+    public string VxlanSvcNodeIp { get; set; }
 }

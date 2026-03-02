@@ -131,6 +131,41 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public double RootUsage { get; set; }
 
+    /// <summary>
+    /// PSI CPU pressure (some) — requires PVE 9.0+.
+    /// Percentage of time at least one task was stalled waiting for CPU.
+    /// </summary>
+    [JsonProperty("pressurecpusome")]
+    public double PressureCpuSome { get; set; }
+
+    /// <summary>
+    /// PSI I/O pressure (some) — requires PVE 9.0+.
+    /// Percentage of time at least one task was stalled waiting for I/O.
+    /// </summary>
+    [JsonProperty("pressureiosome")]
+    public double PressureIoSome { get; set; }
+
+    /// <summary>
+    /// PSI I/O pressure (full) — requires PVE 9.0+.
+    /// Percentage of time all tasks were stalled waiting for I/O.
+    /// </summary>
+    [JsonProperty("pressureiofull")]
+    public double PressureIoFull { get; set; }
+
+    /// <summary>
+    /// PSI memory pressure (some) — requires PVE 9.0+.
+    /// Percentage of time at least one task was stalled waiting for memory.
+    /// </summary>
+    [JsonProperty("pressurememorysome")]
+    public double PressureMemorySome { get; set; }
+
+    /// <summary>
+    /// PSI memory pressure (full) — requires PVE 9.0+.
+    /// Percentage of time all tasks were stalled waiting for memory.
+    /// </summary>
+    [JsonProperty("pressurememoryfull")]
+    public double PressureMemoryFull { get; set; }
+
     [OnDeserialized]
     internal void OnSerializedMethod(StreamingContext context)
     {

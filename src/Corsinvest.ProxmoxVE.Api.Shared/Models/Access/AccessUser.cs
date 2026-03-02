@@ -13,23 +13,20 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Access;
 public class AccessUser : ModelBase
 {
     /// <summary>
-    /// Enabled
+    /// Enable the account (default). You can set this to '0' to disable the account
     /// </summary>
-    /// <value></value>
     [JsonProperty("enable")]
-    public int Enable { get; set; }
+    public bool Enable { get; set; }
 
     /// <summary>
-    /// Id
+    /// Full User ID, in the `name@realm` format.
     /// </summary>
-    /// <value></value>
     [JsonProperty("userid")]
     public string Id { get; set; }
 
     /// <summary>
-    /// Expire
+    /// Account expiration date (seconds since epoch). '0' means no expiration date.
     /// </summary>
-    /// <value></value>
     [JsonProperty("expire")]
     public int Expire { get; set; }
 
@@ -47,7 +44,37 @@ public class AccessUser : ModelBase
     public string Comment { get; set; }
 
     /// <summary>
-    /// Realm Type
+    /// First name.
+    /// </summary>
+    [JsonProperty("firstname")]
+    public string Firstname { get; set; }
+
+    /// <summary>
+    /// Last name.
+    /// </summary>
+    [JsonProperty("lastname")]
+    public string Lastname { get; set; }
+
+    /// <summary>
+    /// Keys for two factor auth (yubico).
+    /// </summary>
+    [JsonProperty("keys")]
+    public string Keys { get; set; }
+
+    /// <summary>
+    /// Contains a timestamp until when a user is locked out of 2nd factors.
+    /// </summary>
+    [JsonProperty("tfa-locked-until")]
+    public long? TfaLockedUntil { get; set; }
+
+    /// <summary>
+    /// True if the user is currently locked out of TOTP factors.
+    /// </summary>
+    [JsonProperty("totp-locked")]
+    public bool TotpLocked { get; set; }
+
+    /// <summary>
+    /// The type of the users realm
     /// </summary>
     [JsonProperty("realm-type")]
     public string RealmType { get; set; }
@@ -76,7 +103,7 @@ public class AccessUser : ModelBase
         public string Id { get; set; }
 
         /// <summary>
-        /// Expire
+        /// Account expiration date (seconds since epoch). '0' means no expiration date.
         /// </summary>
         [JsonProperty("expire")]
         public int Expire { get; set; }

@@ -15,7 +15,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 public class NodeStatus : ModelBase
 {
     /// <summary>
-    /// Proxmox VE Version
+    /// The PVE version string.
     /// </summary>
     [JsonProperty("pveversion")]
     public string PveVersion { get; set; }
@@ -64,7 +64,7 @@ public class NodeStatus : ModelBase
     public int Uptime { get; set; }
 
     /// <summary>
-    /// Load average
+    /// An array of load avg for 1, 5 and 15 minutes respectively.
     /// </summary>
     [JsonProperty("loadavg")]
     public IEnumerable<string> LoadAvg { get; set; } = [];
@@ -76,7 +76,7 @@ public class NodeStatus : ModelBase
     public NodeStatusRootFs RootFs { get; set; }
 
     /// <summary>
-    /// Cpu
+    /// The current cpu usage.
     /// </summary>
     [JsonProperty("cpu")]
     public double Cpu { get; set; }
@@ -86,6 +86,66 @@ public class NodeStatus : ModelBase
     /// </summary>
     [JsonProperty("idle")]
     public int Idle { get; set; }
+
+    /// <summary>
+    /// Meta-information about the boot mode.
+    /// </summary>
+    [JsonProperty("boot-info")]
+    public NodeStatusBootInfo BootInfo { get; set; }
+
+    /// <summary>
+    /// Meta-information about the currently booted kernel of this node.
+    /// </summary>
+    [JsonProperty("current-kernel")]
+    public NodeStatusCurrentKernel CurrentKernel { get; set; }
+
+    /// <summary>
+    /// Boot info
+    /// </summary>
+    public class NodeStatusBootInfo
+    {
+        /// <summary>
+        /// Mode — Boot mode: legacy BIOS or UEFI.
+        /// </summary>
+        [JsonProperty("mode")]
+        public string Mode { get; set; }
+
+        /// <summary>
+        /// Secureboot — Whether Secure Boot is enabled.
+        /// </summary>
+        [JsonProperty("secureboot")]
+        public bool Secureboot { get; set; }
+    }
+
+    /// <summary>
+    /// Current kernel info
+    /// </summary>
+    public class NodeStatusCurrentKernel
+    {
+        /// <summary>
+        /// Machine — Hardware (machine) type.
+        /// </summary>
+        [JsonProperty("machine")]
+        public string Machine { get; set; }
+
+        /// <summary>
+        /// Release — OS kernel release (e.g. "6.8.12-8-pve").
+        /// </summary>
+        [JsonProperty("release")]
+        public string Release { get; set; }
+
+        /// <summary>
+        /// Sysname — OS kernel name (e.g. "Linux").
+        /// </summary>
+        [JsonProperty("sysname")]
+        public string Sysname { get; set; }
+
+        /// <summary>
+        /// Version — OS kernel version.
+        /// </summary>
+        [JsonProperty("version")]
+        public string Version { get; set; }
+    }
 
     /// <summary>
     /// Node status Swap

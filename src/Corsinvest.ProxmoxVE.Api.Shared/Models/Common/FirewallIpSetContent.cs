@@ -29,4 +29,9 @@ public class FirewallIpSetContent : ModelBase
     /// </summary>
     [JsonProperty("comment")]
     public string Comment { get; set; }
+    /// <summary>
+    /// Nomatch.
+    /// </summary>
+    [JsonProperty("nomatch")]
+    public bool Nomatch { get; set; }
 }

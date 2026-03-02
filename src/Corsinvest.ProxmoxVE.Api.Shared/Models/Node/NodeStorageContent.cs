@@ -27,7 +27,7 @@ public class NodeStorageContent : ModelBase
     public string ContentDescription => FormatHelper.ContentToDescription(Content);
 
     /// <summary>
-    /// Creation unix
+    /// Creation time (seconds since the UNIX Epoch).
     /// </summary>
     [JsonProperty("ctime")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime )]
@@ -50,13 +50,13 @@ public class NodeStorageContent : ModelBase
     public string FileName => Volume.Split(':')[1];
 
     /// <summary>
-    /// Format
+    /// Format identifier ('raw', 'qcow2', 'subvol', 'iso', 'tgz' ...)
     /// </summary>
     [JsonProperty("format")]
     public string Format { get; set; }
 
     /// <summary>
-    /// File size
+    /// Volume size in bytes.
     /// </summary>
     [JsonProperty("size")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
@@ -68,13 +68,13 @@ public class NodeStorageContent : ModelBase
     public string SizeInfo => FormatHelper.FromBytes(Size);
 
     /// <summary>
-    /// VmId
+    /// Associated Owner VMID.
     /// </summary>
     [JsonProperty("vmid")]
     public long VmId { get; set; }
 
     /// <summary>
-    /// Volume Id
+    /// Volume identifier.
     /// </summary>
     [JsonProperty("volid")]
     public string Volume { get; set; }
@@ -86,25 +86,32 @@ public class NodeStorageContent : ModelBase
     public string Name { get; set; }
 
     /// <summary>
-    /// Parent
+    /// Volume identifier of parent (for linked cloned).
     /// </summary>
     [JsonProperty("parent")]
     public string Parent { get; set; }
 
     /// <summary>
-    /// notes
+    /// Optional notes. If they contain multiple lines, only the first one is returned here.
     /// </summary>
     [JsonProperty("notes")]
     public string Notes { get; set; }
 
     /// <summary>
-    /// excripted
+    /// Whether the backup is encrypted. Only useful for the Proxmox Backup Server storage type.
     /// </summary>
-    [JsonProperty("excripted")]
+    [JsonProperty("encrypted")]
     public bool Encrypted { get; set; }
 
     /// <summary>
-    /// Protected
+    /// Used space. Please note that most storage plugins do not report anything useful here.
+    /// </summary>
+    [JsonProperty("used")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    public long? Used { get; set; }
+
+    /// <summary>
+    /// Protection status. Currently only supported for backups.
     /// </summary>
     [JsonProperty("protected")]
     public bool Protected { get; set; }

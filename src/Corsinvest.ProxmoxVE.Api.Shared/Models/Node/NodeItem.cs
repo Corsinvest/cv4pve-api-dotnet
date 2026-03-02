@@ -48,9 +48,8 @@ public class NodeItem : ModelBase, IClusterResourceNode
     public ClusterResourceType ResourceType { get; set; }
 
     /// <summary>
-    /// Status
+    /// Node status.
     /// </summary>
-    /// <value></value>
     [JsonProperty("status")]
     public string Status { get; set; }
 
@@ -87,24 +86,22 @@ public class NodeItem : ModelBase, IClusterResourceNode
     public double DiskUsagePercentage { get; set; }
 
     /// <summary>
-    /// Node
+    /// The cluster node name.
     /// </summary>
     [JsonProperty("node")]
     public string Node { get; set; }
 
     /// <summary>
-    /// Memory usage
+    /// Used memory in bytes.
     /// </summary>
-    /// <value></value>
     [JsonProperty("mem")]
     [Display(Name = "Memory")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public ulong MemoryUsage { get; set; }
 
     /// <summary>
-    ///Memory size
+    /// Number of available memory in bytes.
     /// </summary>
-    /// <value></value>
     [JsonProperty("maxmem")]
     [Display(Name = "Max Memory")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
@@ -126,18 +123,16 @@ public class NodeItem : ModelBase, IClusterResourceNode
     public double MemoryUsagePercentage { get; set; }
 
     /// <summary>
-    /// Cpu usage
+    /// CPU utilization.
     /// </summary>
-    /// <value></value>
     [Display(Name = "CPU Usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     [JsonProperty("cpu")]
     public double CpuUsagePercentage { get; set; }
 
     /// <summary>
-    /// Cpu size
+    /// Number of available CPUs.
     /// </summary>
-    /// <value></value>
     [JsonProperty("maxcpu")]
     public long CpuSize { get; set; }
 
@@ -149,24 +144,21 @@ public class NodeItem : ModelBase, IClusterResourceNode
     public string CpuInfo { get; set; }
 
     /// <summary>
-    /// Uptime
+    /// Node uptime in seconds.
     /// </summary>
-    /// <value></value>
     [JsonProperty("uptime")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatUptimeUnixTime)]
     public long Uptime { get; set; }
 
     /// <summary>
-    /// Ssl Fingerprint
+    /// The SSL fingerprint for the node certificate.
     /// </summary>
-    /// <value></value>
     [JsonProperty("ssl_fingerprint")]
     public string SslFingerprint { get; set; }
 
     /// <summary>
-    /// Level
+    /// Support level.
     /// </summary>
-    /// <value></value>
     [JsonProperty("level")]
     public string Level { get; set; }
 

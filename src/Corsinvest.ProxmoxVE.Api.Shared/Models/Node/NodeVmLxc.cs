@@ -15,7 +15,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 public class NodeVmLxc : NodeVmBase
 {
     /// <summary>
-    /// Swap size
+    /// Maximum SWAP memory in bytes.
     /// </summary>
     [JsonProperty("maxswap")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]

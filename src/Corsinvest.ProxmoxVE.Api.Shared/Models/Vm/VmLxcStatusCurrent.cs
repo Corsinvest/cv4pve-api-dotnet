@@ -29,7 +29,7 @@ public class VmLxcStatusCurrent : VmBaseStatusCurrent
     public ulong SwapUsage { get; set; }
 
     /// <summary>
-    /// Swap
+    /// Maximum SWAP memory in bytes.
     /// </summary>
     [JsonProperty("maxswap")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]

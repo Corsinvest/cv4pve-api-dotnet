@@ -88,4 +88,9 @@ public class NodeHardwareUsb : ModelBase
     /// <value></value>
     [JsonProperty("usbpath")]
     public string UsbPath { get; set; }
+    /// <summary>
+    /// Serial number.
+    /// </summary>
+    [JsonProperty("serial")]
+    public string Serial { get; set; }
 }

@@ -17,32 +17,29 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, IDiskIO, IDisk, IStatusItem, IUptimeItem
 {
     /// <summary>
-    /// Uptime
+    /// Uptime in seconds.
     /// </summary>
-    /// <value></value>
     [JsonProperty("uptime")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatUptimeUnixTime)]
     public long Uptime { get; set; }
 
     /// <summary>
-    /// Status
+    /// Current status of the guest.
     /// </summary>
     [JsonProperty("status")]
     public string Status { get; set; }
 
     /// <summary>
-    /// Disk usage
+    /// Root disk image space-usage in bytes.
     /// </summary>
-    /// <value></value>
     [JsonProperty("disk")]
     [Display(Name = "Disk usage")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public ulong DiskUsage { get; set; }
 
     /// <summary>
-    /// Disk size
+    /// Root disk size in bytes.
     /// </summary>
-    /// <value></value>
     [JsonProperty("maxdisk")]
     [Display(Name = "Disk size")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
@@ -57,34 +54,30 @@ public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, ID
     public double DiskUsagePercentage { get; set; }
 
     /// <summary>
-    /// Disk read
+    /// The amount of bytes the guest read from it's block devices since the guest was started. (Note: This info is not available for all storage types.)
     /// </summary>
-    /// <value></value>
     [JsonProperty("diskread")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long DiskRead { get; set; }
 
     /// <summary>
-    /// Disk write
+    /// The amount of bytes the guest wrote from it's block devices since the guest was started. (Note: This info is not available for all storage types.)
     /// </summary>
-    /// <value></value>
     [JsonProperty("diskwrite")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long DiskWrite { get; set; }
 
     /// <summary>
-    /// Memory usage
+    /// Currently used memory in bytes.
     /// </summary>
-    /// <value></value>
     [JsonProperty("mem")]
     [Display(Name = "Memory")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public ulong MemoryUsage { get; set; }
 
     /// <summary>
-    ///Memory size
+    /// Maximum memory in bytes.
     /// </summary>
-    /// <value></value>
     [JsonProperty("maxmem")]
     [Display(Name = "Max Memory")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
@@ -106,35 +99,31 @@ public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, ID
     public double MemoryUsagePercentage { get; set; }
 
     /// <summary>
-    /// Net in
+    /// The amount of traffic in bytes that was sent to the guest over the network since it was started.
     /// </summary>
-    /// <value></value>
     [JsonProperty("netin")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long NetIn { get; set; }
 
     /// <summary>
-    /// Net out
+    /// The amount of traffic in bytes that was sent from the guest over the network since it was started.
     /// </summary>
-    /// <value></value>
     [JsonProperty("netout")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long NetOut { get; set; }
 
     /// <summary>
-    /// Cpu usage
+    /// Current CPU usage.
     /// </summary>
-    /// <value></value>
     [Display(Name = "CPU Usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     [JsonProperty("cpu")]
     public double CpuUsagePercentage { get; set; }
 
     /// <summary>
-    /// Cpu size
+    /// Maximum usable CPUs.
     /// </summary>
-    /// <value></value>
-    [JsonProperty("maxcpu")]
+    [JsonProperty("cpus")]
     public long CpuSize { get; set; }
 
     /// <summary>
@@ -145,22 +134,20 @@ public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, ID
     public string CpuInfo { get; set; }
 
     /// <summary>
-    /// Pid
+    /// PID of the QEMU process, if the VM is running.
     /// </summary>
     [JsonProperty("pid")]
     public string Pid { get; set; }
 
     /// <summary>
-    /// Vm name
+    /// Guest name.
     /// </summary>
-    /// <value></value>
     [JsonProperty("name")]
     public string Name { get; set; }
 
     /// <summary>
-    /// Vm Id
+    /// The (unique) ID of the VM.
     /// </summary>
-    /// <value></value>
     [JsonProperty("vmid")]
     public long VmId { get; set; }
 
@@ -183,11 +170,49 @@ public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, ID
     public bool IsPaused { get; set; }
 
     /// <summary>
-    /// Is template
+    /// Determines if the guest is a template.
     /// </summary>
-    /// <value></value>
     [JsonProperty("template")]
     public bool IsTemplate { get; set; }
+
+    /// <summary>
+    /// The current config lock, if any.
+    /// </summary>
+    [JsonProperty("lock")]
+    public string Lock { get; set; }
+
+    /// <summary>
+    /// The current configured tags, if any
+    /// </summary>
+    [JsonProperty("tags")]
+    public string Tags { get; set; }
+
+    /// <summary>
+    /// Current memory usage on the host.
+    /// </summary>
+    [JsonProperty("memhost")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    public ulong MemoryHostUsage { get; set; }
+
+    /// <summary>PSI CPU pressure (some) — requires PVE 9.0+.</summary>
+    [JsonProperty("pressurecpusome")]
+    public double PressureCpuSome { get; set; }
+
+    /// <summary>PSI I/O pressure (some) — requires PVE 9.0+.</summary>
+    [JsonProperty("pressureiosome")]
+    public double PressureIoSome { get; set; }
+
+    /// <summary>PSI I/O pressure (full) — requires PVE 9.0+.</summary>
+    [JsonProperty("pressureiofull")]
+    public double PressureIoFull { get; set; }
+
+    /// <summary>PSI memory pressure (some) — requires PVE 9.0+.</summary>
+    [JsonProperty("pressurememorysome")]
+    public double PressureMemorySome { get; set; }
+
+    /// <summary>PSI memory pressure (full) — requires PVE 9.0+.</summary>
+    [JsonProperty("pressurememoryfull")]
+    public double PressureMemoryFull { get; set; }
 
     [OnDeserialized]
     internal void OnSerializedMethod(StreamingContext context)

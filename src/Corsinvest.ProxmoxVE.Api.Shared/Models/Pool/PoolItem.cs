@@ -25,4 +25,9 @@ public class PoolItem : ModelBase
     /// <value></value>
     [JsonProperty("comment")]
     public string Comment { get; set; }
+    /// <summary>
+    /// Members.
+    /// </summary>
+    [JsonProperty("members")]
+    public IEnumerable<object> Members { get; set; } = [];
 }

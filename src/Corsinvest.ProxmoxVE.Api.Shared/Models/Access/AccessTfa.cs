@@ -13,9 +13,8 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Access;
 public class AccessTfa : ModelBase
 {
     /// <summary>
-    /// User id
+    /// User this entry belongs to.
     /// </summary>
-    /// <value></value>
     [JsonProperty("userid")]
     public string UserId { get; set; }
 
@@ -25,6 +24,18 @@ public class AccessTfa : ModelBase
     /// <value></value>
     [JsonProperty("entries")]
     public IEnumerable<AccessTfaEntry> Entries { get; set; }
+
+    /// <summary>
+    /// Contains a timestamp until when a user is locked out of 2nd factors.
+    /// </summary>
+    [JsonProperty("tfa-locked-until")]
+    public long? TfaLockedUntil { get; set; }
+
+    /// <summary>
+    /// True if the user is currently locked out of TOTP factors.
+    /// </summary>
+    [JsonProperty("totp-locked")]
+    public bool TotpLocked { get; set; }
 
     /// <summary>
     /// TFA Entry

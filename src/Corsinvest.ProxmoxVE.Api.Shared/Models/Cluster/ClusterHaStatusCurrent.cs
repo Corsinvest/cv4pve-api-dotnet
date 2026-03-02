@@ -13,80 +13,80 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 public class ClusterHaStatusCurrent : ModelBase
 {
     /// <summary>
-    /// Id
+    /// Status entry ID (quorum, master, lrm:&lt;node&gt;, service:&lt;sid&gt;).
     /// </summary>
     [JsonProperty("id")]
     public string Id { get; set; }
 
     /// <summary>
-    /// Node
+    /// Node associated to status entry.
     /// </summary>
     [JsonProperty("node")]
     public string Node { get; set; }
 
     /// <summary>
-    /// Quorate
+    /// For type 'quorum'. Whether the cluster is quorate or not.
     /// </summary>
     [JsonProperty("quorate")]
-    public int Quorate { get; set; }
+    public bool Quorate { get; set; }
 
     /// <summary>
-    /// Status
+    /// Status of the entry (value depends on type).
     /// </summary>
     [JsonProperty("status")]
     public string Status { get; set; }
 
     /// <summary>
-    /// Type
+    /// Type of status entry.
     /// </summary>
     [JsonProperty("type")]
     public string Type { get; set; }
 
     /// <summary>
-    /// Timestamp
+    /// For type 'lrm','master'. Timestamp of the status information.
     /// </summary>
     [JsonProperty("timestamp")]
     public long Timestamp { get; set; }
 
     /// <summary>
-    /// CrmState
+    /// For type 'service'. Service state as seen by the CRM.
     /// </summary>
     [JsonProperty("crm_state")]
     public string CrmState { get; set; }
 
     /// <summary>
-    /// Group
-    /// </summary>
-    [JsonProperty("group")]
-    public string Group { get; set; }
-
-    /// <summary>
-    /// MaxRelocate
+    /// For type 'service'.
     /// </summary>
     [JsonProperty("max_relocate")]
     public int MaxRelocate { get; set; }
 
     /// <summary>
-    /// MaxRestart
+    /// For type 'service'.
     /// </summary>
     [JsonProperty("max_restart")]
     public int MaxRestart { get; set; }
 
     /// <summary>
-    /// RequestState
+    /// For type 'service'. Requested service state.
     /// </summary>
     [JsonProperty("request_state")]
     public string RequestState { get; set; }
 
     /// <summary>
-    /// Sid
+    /// For type 'service'. Service ID.
     /// </summary>
     [JsonProperty("sid")]
     public string Sid { get; set; }
 
     /// <summary>
-    /// State
+    /// For type 'service'. Verbose service state.
     /// </summary>
     [JsonProperty("state")]
     public string State { get; set; }
+
+    /// <summary>
+    /// The HA resource is automatically migrated to the node with the highest priority according to their node affinity rule, if a node with a higher priority than the current node comes online.
+    /// </summary>
+    [JsonProperty("failback")]
+    public bool Failback { get; set; }
 }

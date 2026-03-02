@@ -23,39 +23,34 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     public NodeLevel NodeLevel { get; set; }
 
     /// <summary>
-    /// Pool
+    /// The pool name (for types 'pool', 'qemu' and 'lxc').
     /// </summary>
-    /// <value></value>
     [JsonProperty("pool")]
     public string Pool { get; set; }
 
     /// <summary>
-    /// Net in
+    /// The amount of traffic in bytes that was sent to the guest over the network since it was started. (for types 'qemu' and 'lxc')
     /// </summary>
-    /// <value></value>
     [JsonProperty("netin")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long NetIn { get; set; }
 
     /// <summary>
-    /// Net out
+    /// The amount of traffic in bytes that was sent from the guest over the network since it was started. (for types 'qemu' and 'lxc')
     /// </summary>
-    /// <value></value>
     [JsonProperty("netout")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long NetOut { get; set; }
 
     /// <summary>
-    /// Vm name
+    /// Name of the resource.
     /// </summary>
-    /// <value></value>
     [JsonProperty("name")]
     public string Name { get; set; }
 
     /// <summary>
-    /// Vm Id
+    /// The numerical vmid (for types 'qemu' and 'lxc').
     /// </summary>
-    /// <value></value>
     [JsonProperty("vmid")]
     public long VmId { get; set; }
 
@@ -78,24 +73,21 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     public bool IsPaused { get; set; }
 
     /// <summary>
-    /// Is template
+    /// Determines if the guest is a template. (for types 'qemu' and 'lxc')
     /// </summary>
-    /// <value></value>
     [JsonProperty("template")]
     public bool IsTemplate { get; set; }
 
     /// <summary>
-    /// Disk read
+    /// The number of bytes the guest read from its block devices since the guest was started. This info is not available for all storage types. (for types 'qemu' and 'lxc')
     /// </summary>
-    /// <value></value>
     [JsonProperty("diskread")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long DiskRead { get; set; }
 
     /// <summary>
-    /// Disk write
+    /// The number of bytes the guest wrote to its block devices since the guest was started. This info is not available for all storage types. (for types 'qemu' and 'lxc')
     /// </summary>
-    /// <value></value>
     [JsonProperty("diskwrite")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long DiskWrite { get; set; }
@@ -107,9 +99,8 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     public VmType VmType { get; set; }
 
     /// <summary>
-    /// Vm is lock
+    /// The guest's current config lock (for types 'qemu' and 'lxc')
     /// </summary>
-    /// <value></value>
     [JsonProperty("lock")]
     public string Lock { get; set; }
 
@@ -145,7 +136,7 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     public ulong NodeMemoryAssigned { get; set; }
 
     /// <summary>
-    /// Storage
+    /// The storage identifier (for type 'storage').
     /// </summary>
     [JsonProperty("storage")]
     public string Storage { get; set; }
@@ -157,13 +148,13 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     public bool Shared { get; set; }
 
     /// <summary>
-    /// Plugin Type
+    /// More specific type, if available.
     /// </summary>
     [JsonProperty("plugintype")]
     public string PluginType { get; set; }
 
     /// <summary>
-    /// Content
+    /// Allowed storage content types (for type 'storage').
     /// </summary>
     [JsonProperty("content")]
     public string Content { get; set; }
@@ -174,16 +165,14 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     public string Description { get; set; }
 
     /// <summary>
-    /// Id
+    /// Resource id.
     /// </summary>
-    /// <value></value>
     [JsonProperty("id")]
     public string Id { get; set; }
 
     /// <summary>
-    /// Type
+    /// Resource type.
     /// </summary>
-    /// <value></value>
     [JsonProperty("type")]
     public string Type { get; set; }
 
@@ -194,9 +183,8 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     public ClusterResourceType ResourceType { get; set; }
 
     /// <summary>
-    /// Status
+    /// Resource type dependent status.
     /// </summary>
-    /// <value></value>
     [JsonProperty("status")]
     public string Status { get; set; }
 
@@ -207,18 +195,16 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     public bool IsUnknown { get; set; }
 
     /// <summary>
-    /// Disk usage
+    /// Used disk space in bytes (for type 'storage'), used root image space for VMs (for types 'qemu' and 'lxc').
     /// </summary>
-    /// <value></value>
     [JsonProperty("disk")]
     [Display(Name = "Disk usage")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public ulong DiskUsage { get; set; }
 
     /// <summary>
-    /// Disk size
+    /// Storage size in bytes (for type 'storage'), root image size for VMs (for types 'qemu' and 'lxc').
     /// </summary>
-    /// <value></value>
     [JsonProperty("maxdisk")]
     [Display(Name = "Disk size")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
@@ -233,24 +219,22 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     public double DiskUsagePercentage { get; set; }
 
     /// <summary>
-    /// Node
+    /// The cluster node name (for types 'node', 'storage', 'qemu', and 'lxc').
     /// </summary>
     [JsonProperty("node")]
     public string Node { get; set; }
 
     /// <summary>
-    /// Memory usage
+    /// Used memory in bytes (for types 'node', 'qemu' and 'lxc').
     /// </summary>
-    /// <value></value>
     [JsonProperty("mem")]
     [Display(Name = "Memory")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public ulong MemoryUsage { get; set; }
 
     /// <summary>
-    ///Memory size
+    /// Number of available memory in bytes (for types 'node', 'qemu' and 'lxc').
     /// </summary>
-    /// <value></value>
     [JsonProperty("maxmem")]
     [Display(Name = "Max Memory")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
@@ -272,18 +256,16 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     public double MemoryUsagePercentage { get; set; }
 
     /// <summary>
-    /// Cpu usage
+    /// CPU utilization (for types 'node', 'qemu' and 'lxc').
     /// </summary>
-    /// <value></value>
     [Display(Name = "CPU Usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     [JsonProperty("cpu")]
     public double CpuUsagePercentage { get; set; }
 
     /// <summary>
-    /// Cpu size
+    /// Number of available CPUs (for types 'node', 'qemu' and 'lxc').
     /// </summary>
-    /// <value></value>
     [JsonProperty("maxcpu")]
     public long CpuSize { get; set; }
 
@@ -295,24 +277,22 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     public string CpuInfo { get; set; }
 
     /// <summary>
-    /// Uptime
+    /// Uptime of node or virtual guest in seconds (for types 'node', 'qemu' and 'lxc').
     /// </summary>
-    /// <value></value>
     [JsonProperty("uptime")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatUptimeUnixTime)]
     public long Uptime { get; set; }
 
     /// <summary>
-    /// Cgroup Mode
+    /// The cgroup mode the node operates under (for type 'node').
     /// </summary>
     [Display(Name = "Cgroup mode")]
     [JsonProperty("cgroup-mode")]
     public int CgroupMode { get; set; }
 
     /// <summary>
-    /// Level
+    /// Support level (for type 'node').
     /// </summary>
-    /// <value></value>
     [JsonProperty("level")]
     public string Level { get; set; }
 
@@ -328,11 +308,53 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     public bool IsAvailable { get; set; }
 
     /// <summary>
-    /// Tags
+    /// The guest's tags (for types 'qemu' and 'lxc')
     /// </summary>
-    /// <value></value>
     [JsonProperty("tags")]
     public string Tags { get; set; }
+
+    /// <summary>
+    /// HA service status (for HA managed VMs).
+    /// </summary>
+    [JsonProperty("hastate")]
+    public string HaState { get; set; }
+
+    /// <summary>
+    /// Used memory in bytes from the point of view of the host (for types 'qemu').
+    /// </summary>
+    [JsonProperty("memhost")]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
+    public ulong MemoryHostUsage { get; set; }
+
+    /// <summary>
+    /// The name of a Network entity (for type 'network').
+    /// </summary>
+    [JsonProperty("network")]
+    public string Network { get; set; }
+
+    /// <summary>
+    /// The type of network resource (for type 'network').
+    /// </summary>
+    [JsonProperty("network-type")]
+    public string NetworkType { get; set; }
+
+    /// <summary>
+    /// The protocol of a fabric (for type 'network', network-type 'fabric').
+    /// </summary>
+    [JsonProperty("protocol")]
+    public string Protocol { get; set; }
+
+    /// <summary>
+    /// The name of an SDN entity (for type 'sdn')
+    /// </summary>
+    [JsonProperty("sdn")]
+    public string Sdn { get; set; }
+
+    /// <summary>
+    /// The type of an SDN zone (for type 'sdn').
+    /// </summary>
+    [JsonProperty("zone-type")]
+    public string ZoneType { get; set; }
 
     [OnDeserialized]
     internal void OnSerializedMethod(StreamingContext context) => this.ImproveData();

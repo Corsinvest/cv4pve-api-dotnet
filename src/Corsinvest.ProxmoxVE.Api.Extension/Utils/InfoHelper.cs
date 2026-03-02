@@ -17,6 +17,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils;
 /// <summary>
 /// Global Info
 /// </summary>
+[Obsolete("This class is deprecated and will be removed in future versions. It is recommended to use specific API calls to retrieve the necessary information instead of relying on a global info collection.")]
 public static class InfoHelper
 {
     /// <summary>

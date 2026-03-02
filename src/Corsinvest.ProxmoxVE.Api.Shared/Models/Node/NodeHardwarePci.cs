@@ -13,16 +13,14 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 public class NodeHardwarePci : ModelBase
 {
     /// <summary>
-    /// Subsystem Device
+    /// The Subsystem Device ID.
     /// </summary>
-    /// <value></value>
     [JsonProperty("subsystem_device")]
     public string SubsystemDevice { get; set; }
 
     /// <summary>
-    /// Subsystem Vendor
+    /// The Subsystem Vendor ID.
     /// </summary>
-    /// <value></value>
     [JsonProperty("subsystem_vendor")]
     public string SubsystemVendor { get; set; }
 
@@ -34,9 +32,8 @@ public class NodeHardwarePci : ModelBase
     public string DeviceName { get; set; }
 
     /// <summary>
-    /// Vendor
+    /// The Vendor ID.
     /// </summary>
-    /// <value></value>
     [JsonProperty("vendor")]
     public string Vendor { get; set; }
 
@@ -48,9 +45,8 @@ public class NodeHardwarePci : ModelBase
     public string VendorName { get; set; }
 
     /// <summary>
-    /// Device
+    /// The Device ID.
     /// </summary>
-    /// <value></value>
     [JsonProperty("device")]
     public string Device { get; set; }
 
@@ -62,23 +58,20 @@ public class NodeHardwarePci : ModelBase
     public string SubsystemVendorName { get; set; }
 
     /// <summary>
-    /// Class
+    /// The PCI Class of the device.
     /// </summary>
-    /// <value></value>
     [JsonProperty("class")]
     public string Class { get; set; }
 
     /// <summary>
-    /// Iommu Group
+    /// The IOMMU group in which the device is in. If no IOMMU group is detected, it is set to -1.
     /// </summary>
-    /// <value></value>
     [JsonProperty("iommugroup")]
     public int IommuGroup { get; set; }
 
     /// <summary>
-    /// Id
+    /// The PCI ID.
     /// </summary>
-    /// <value></value>
     [JsonProperty("id")]
     public string Id { get; set; }
 
@@ -88,4 +81,9 @@ public class NodeHardwarePci : ModelBase
     /// <value></value>
     [JsonProperty("subsystem_device_name")]
     public string SubsystemDeviceName { get; set; }
+    /// <summary>
+    /// If set, marks that the device is capable of creating mediated devices.
+    /// </summary>
+    [JsonProperty("mdev")]
+    public bool Mdev { get; set; }
 }
