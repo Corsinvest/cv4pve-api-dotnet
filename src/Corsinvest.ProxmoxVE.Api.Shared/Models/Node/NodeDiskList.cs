@@ -15,13 +15,13 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 public class NodeDiskList : ModelBase
 {
     /// <summary>
-    /// Device path
+    /// The device path
     /// </summary>
     [JsonProperty("devpath")]
     public string DevPath { get; set; }
 
     /// <summary>
-    /// Parent
+    /// For partitions only. The device path of the disk the partition resides on.
     /// </summary>
     [JsonProperty("parent")]
     public string Parent { get; set; }
@@ -109,4 +109,15 @@ public class NodeDiskList : ModelBase
     [JsonProperty("size")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long Size { get; set; }
+    /// <summary>
+    /// Mounted.
+    /// </summary>
+    [JsonProperty("mounted")]
+    public bool Mounted { get; set; }
+
+    /// <summary>
+    /// OSD ID list.
+    /// </summary>
+    [JsonProperty("osdid-list")]
+    public IEnumerable<int> OsdIdList { get; set; } = [];
 }

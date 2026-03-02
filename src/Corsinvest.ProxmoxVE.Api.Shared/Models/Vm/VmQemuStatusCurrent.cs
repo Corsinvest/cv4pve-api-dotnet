@@ -17,34 +17,46 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 public class VmQemuStatusCurrent : VmBaseStatusCurrent
 {
     /// <summary>
-    /// Spice
+    /// QEMU VGA configuration supports spice.
     /// </summary>
     [JsonProperty("spice")]
     public bool Spice { get; set; }
 
     /// <summary>
-    /// Agent
+    /// QEMU Guest Agent is enabled in config.
     /// </summary>
     [JsonProperty("agent")]
     public bool Agent { get; set; }
 
     /// <summary>
-    /// Running Qemu
+    /// The QEMU version the VM is currently using (if running).
     /// </summary>
     [JsonProperty("running-qemu")]
     public string RunningQemu { get; set; }
 
     /// <summary>
-    /// Running Machine
+    /// The currently running machine type (if running).
     /// </summary>
     [JsonProperty("running-machine")]
     public string RunningMachine { get; set; }
 
     /// <summary>
-    /// Qmp status
+    /// VM run state from the 'query-status' QMP monitor command.
     /// </summary>
     [JsonProperty("qmpstatus")]
     public string Qmpstatus { get; set; }
+
+    /// <summary>
+    /// Enable a specific clipboard. If not set, depending on the display type the SPICE one will be added.
+    /// </summary>
+    [JsonProperty("clipboard")]
+    public string Clipboard { get; set; }
+
+    /// <summary>
+    /// Guest has serial device configured.
+    /// </summary>
+    [JsonProperty("serial")]
+    public bool Serial { get; set; }
 
     /// <summary>
     /// Nigs
@@ -85,17 +97,15 @@ public class VmQemuStatusCurrent : VmBaseStatusCurrent
     public class NicsInt : INetIO
     {
         /// <summary>
-        /// Net in
+        /// The amount of traffic in bytes that was sent to the guest over the network since it was started.
         /// </summary>
-        /// <value></value>
         [JsonProperty("netin")]
         [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
         public long NetIn { get; set; }
 
         /// <summary>
-        /// Net out
+        /// The amount of traffic in bytes that was sent from the guest over the network since it was started.
         /// </summary>
-        /// <value></value>
         [JsonProperty("netout")]
         [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
         public long NetOut { get; set; }

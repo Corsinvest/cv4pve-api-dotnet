@@ -81,12 +81,29 @@ public class FirewallRule : ModelBase
     /// <summary>
     /// Marco
     /// </summary>
-    [JsonProperty("marco")]
-    public string Marco { get; set; }
+    [JsonProperty("macro")]
+    public string Macro { get; set; }
 
     /// <summary>
     /// Digest
     /// </summary>
     [JsonProperty("digest")]
     public string Digest { get; set; }
+    /// <summary>
+    /// ICMP type.
+    /// </summary>
+    [JsonProperty("icmp-type")]
+    public string IcmpType { get; set; }
+
+    /// <summary>
+    /// Interface.
+    /// </summary>
+    [JsonProperty("iface")]
+    public string Iface { get; set; }
+
+    /// <summary>
+    /// IP version.
+    /// </summary>
+    [JsonProperty("ipversion")]
+    public int? IpVersion { get; set; }
 }

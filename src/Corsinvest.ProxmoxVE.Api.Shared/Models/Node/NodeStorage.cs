@@ -16,39 +16,39 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 public class NodeStorage : ModelBase, IStorageItem
 {
     /// <summary>
-    /// Type
+    /// Storage type.
     /// </summary>
     [JsonProperty("type")]
     public string Type { get; set; }
 
     /// <summary>
-    /// Used
+    /// Used storage space in bytes.
     /// </summary>
     [JsonProperty("used")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long Used { get; set; }
 
     /// <summary>
-    /// Available
+    /// Available storage space in bytes.
     /// </summary>
     [JsonProperty("avail")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long Available { get; set; }
 
     /// <summary>
-    /// Content
+    /// Allowed storage content types.
     /// </summary>
     [JsonProperty("content")]
     public string Content { get; set; }
 
     /// <summary>
-    /// Active
+    /// Set when storage is accessible.
     /// </summary>
     [JsonProperty("active")]
     public bool Active { get; set; }
 
     /// <summary>
-    /// Usage Percentage
+    /// Used fraction (used/total).
     /// </summary>
     [JsonProperty("used_fraction")]
     [Display(Name = "Usage %")]
@@ -56,27 +56,39 @@ public class NodeStorage : ModelBase, IStorageItem
     public double UsagePercentage { get; set; }
 
     /// <summary>
-    /// Shared
+    /// Shared flag from storage configuration.
     /// </summary>
     [JsonProperty("shared")]
     public bool Shared { get; set; }
 
     /// <summary>
-    /// Size
+    /// Total storage space in bytes.
     /// </summary>
     [JsonProperty("total")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long Size { get; set; }
 
     /// <summary>
-    /// Storage
+    /// The storage identifier.
     /// </summary>
     [JsonProperty("storage")]
     public string Storage { get; set; }
 
     /// <summary>
-    /// Enabled
+    /// Set when storage is enabled (not disabled).
     /// </summary>
     [JsonProperty("enabled")]
     public bool Enabled { get; set; }
+
+    /// <summary>
+    /// Lists the supported and default format. Use 'formats' instead. Only included if 'format' parameter is set.
+    /// </summary>
+    [JsonProperty("formats")]
+    public object Formats { get; set; }
+
+    /// <summary>
+    /// Instead of creating new volumes, one must select one that is already existing. Only included if 'format' parameter is set.
+    /// </summary>
+    [JsonProperty("select_existing")]
+    public bool SelectExisting { get; set; }
 }

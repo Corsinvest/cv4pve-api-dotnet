@@ -13,25 +13,25 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 public class NodeSubscription : ModelBase
 {
     /// <summary>
-    /// Status
+    /// The current subscription status.
     /// </summary>
     [JsonProperty("status")]
     public string Status { get; set; }
 
     /// <summary>
-    /// Next Duedate
+    /// Next due date of the set subscription.
     /// </summary>
     [JsonProperty("nextduedate")]
     public string NextDuedate { get; set; }
 
     /// <summary>
-    /// Product Name
+    /// Human readable productname of the set subscription.
     /// </summary>
     [JsonProperty("productname")]
     public string ProductName { get; set; }
 
     /// <summary>
-    /// Key
+    /// The subscription key, if set and permitted to access.
     /// </summary>
     [JsonProperty("key")]
     public string Key { get; set; }
@@ -43,38 +43,49 @@ public class NodeSubscription : ModelBase
     public string ValidDirectory { get; set; }
 
     /// <summary>
-    /// Reg date
+    /// Register date of the set subscription.
     /// </summary>
     [JsonProperty("regdate")]
     public string RegDate { get; set; }
 
     /// <summary>
-    /// Check time
+    /// Timestamp of the last check done.
     /// </summary>
     [JsonProperty("checktime")]
     public string CheckTime { get; set; }
 
     /// <summary>
-    /// Level
+    /// A short code for the subscription level.
     /// </summary>
     [JsonProperty("level")]
     public string Level { get; set; }
 
     /// <summary>
-    /// Server id
+    /// The server ID, if permitted to access.
     /// </summary>
     [JsonProperty("serverid")]
     public string Serverid { get; set; }
 
     /// <summary>
-    /// Url
+    /// URL to the web shop.
     /// </summary>
     [JsonProperty("url")]
     public string Url { get; set; }
 
     /// <summary>
-    /// Sockets
+    /// The number of sockets for this host.
     /// </summary>
     [JsonProperty("sockets")]
     public int Sockets { get; set; }
+    /// <summary>
+    /// A more human readable status message.
+    /// </summary>
+    [JsonProperty("message")]
+    public string Message { get; set; }
+
+    /// <summary>
+    /// Signature for offline keys
+    /// </summary>
+    [JsonProperty("signature")]
+    public string Signature { get; set; }
 }

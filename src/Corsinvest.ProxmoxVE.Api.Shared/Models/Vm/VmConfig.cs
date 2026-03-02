@@ -16,25 +16,25 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 public class VmConfig : ModelBase
 {
     /// <summary>
-    /// Architecture type.
+    /// Virtual processor architecture. Defaults to the host.
     /// </summary>
     [JsonProperty("arch")]
     public string Arch { get; set; }
 
     /// <summary>
-    /// Parent
+    /// Parent snapshot name. This is used internally, and should not be modified.
     /// </summary>
     [JsonProperty("parent")]
     public string Parent { get; set; }
 
     /// <summary>
-    /// Memory
+    /// Memory properties.
     /// </summary>
     [JsonProperty("memory")]
     public long Memory { get; set; }
 
     /// <summary>
-    /// Os type
+    /// Specify guest operating system.
     /// </summary>
     [JsonProperty("ostype")]
     public string OsType { get; set; }
@@ -75,24 +75,42 @@ public class VmConfig : ModelBase
         };
 
     /// <summary>
+    /// Tags of the VM. This is only meta information.
+    /// </summary>
+    [JsonProperty("tags")]
+    public string Tags { get; set; }
+
+    /// <summary>
+    /// SHA1 digest of configuration file. This can be used to prevent concurrent modifications.
+    /// </summary>
+    [JsonProperty("digest")]
+    public string Digest { get; set; }
+
+    /// <summary>
+    /// Enable/disable Template.
+    /// </summary>
+    [JsonProperty("template")]
+    public bool Template { get; set; }
+
+    /// <summary>
     /// Lock
     /// </summary>
     public bool IsLocked => !string.IsNullOrWhiteSpace(Lock);
 
     /// <summary>
-    /// On boot
+    /// Specifies whether a VM will be started during system bootup.
     /// </summary>
     [JsonProperty("onboot")]
     public bool OnBoot { get; set; }
 
     /// <summary>
-    /// On boot
+    /// Sets the protection flag of the VM. This will disable the remove VM and remove disk operations.
     /// </summary>
     [JsonProperty("protection")]
     public bool Protection { get; set; }
 
     /// <summary>
-    /// On boot
+    /// Lock/unlock the VM.
     /// </summary>
     [JsonProperty("lock")]
     public string Lock { get; set; }

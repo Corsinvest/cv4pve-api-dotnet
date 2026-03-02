@@ -127,6 +127,20 @@ public static class ClusterExtension
         ];
 
     /// <summary>
+    /// Get web URL path for a cluster resource
+    /// </summary>
+    public static string GetWebUrl(this ClusterResource resource)
+        => resource.ResourceType switch
+        {
+            ClusterResourceType.Node    => PveWebUrlHelper.GetWebUrlNode(resource.Node),
+            ClusterResourceType.Storage => PveWebUrlHelper.GetWebUrlStorage(resource.Node, resource.Storage),
+            ClusterResourceType.Pool    => PveWebUrlHelper.GetWebUrlPool(resource.Pool),
+            ClusterResourceType.Vm when resource.VmType == VmType.Qemu => PveWebUrlHelper.GetWebUrlQemu(resource.Node, resource.VmId),
+            ClusterResourceType.Vm when resource.VmType == VmType.Lxc  => PveWebUrlHelper.GetWebUrlLxc(resource.Node, resource.VmId),
+            _ => string.Empty,
+        };
+
+    /// <summary>
     /// Column for VM/CT
     /// </summary>
     public static IEnumerable<string> GetVmColumns()

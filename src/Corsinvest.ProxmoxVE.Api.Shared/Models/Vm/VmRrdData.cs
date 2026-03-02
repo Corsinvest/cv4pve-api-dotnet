@@ -143,6 +143,30 @@ public class VmRrdData : ModelBase, IDisk, INetIO, IDiskIO, ICpu, IMemory
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     public double MemoryUsagePercentage { get; set; }
 
+    /// <summary>PSI CPU pressure (some) — requires PVE 9.0+.</summary>
+    [JsonProperty("pressurecpusome")]
+    public double PressureCpuSome { get; set; }
+
+    /// <summary>PSI CPU pressure (full) — requires PVE 9.0+. Only on QEMU.</summary>
+    [JsonProperty("pressurecpufull")]
+    public double PressureCpuFull { get; set; }
+
+    /// <summary>PSI I/O pressure (some) — requires PVE 9.0+.</summary>
+    [JsonProperty("pressureiosome")]
+    public double PressureIoSome { get; set; }
+
+    /// <summary>PSI I/O pressure (full) — requires PVE 9.0+.</summary>
+    [JsonProperty("pressureiofull")]
+    public double PressureIoFull { get; set; }
+
+    /// <summary>PSI memory pressure (some) — requires PVE 9.0+.</summary>
+    [JsonProperty("pressurememorysome")]
+    public double PressureMemorySome { get; set; }
+
+    /// <summary>PSI memory pressure (full) — requires PVE 9.0+.</summary>
+    [JsonProperty("pressurememoryfull")]
+    public double PressureMemoryFull { get; set; }
+
     [OnDeserialized]
     internal void OnSerializedMethod(StreamingContext context)
     {

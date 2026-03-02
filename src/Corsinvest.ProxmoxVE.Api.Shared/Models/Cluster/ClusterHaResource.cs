@@ -47,4 +47,21 @@ public class ClusterHaResource : ModelBase
     /// </summary>
     [JsonProperty("comment")]
     public string Comment { get; set; }
+    /// <summary>
+    /// Failback.
+    /// </summary>
+    [JsonProperty("failback")]
+    public bool Failback { get; set; }
+
+    /// <summary>
+    /// Max relocate.
+    /// </summary>
+    [JsonProperty("max_relocate")]
+    public int MaxRelocate { get; set; }
+
+    /// <summary>
+    /// Max restart.
+    /// </summary>
+    [JsonProperty("max_restart")]
+    public int MaxRestart { get; set; }
 }

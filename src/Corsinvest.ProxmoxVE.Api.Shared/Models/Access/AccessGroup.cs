@@ -20,9 +20,8 @@ public class AccessGroup : ModelBase
     public string Id { get; set; }
 
     /// <summary>
-    /// Users
+    /// list of users which form this group
     /// </summary>
-    /// <value></value>
     [JsonProperty("users")]
     public string Users { get; set; }
 

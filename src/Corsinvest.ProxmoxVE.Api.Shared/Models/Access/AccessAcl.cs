@@ -13,9 +13,8 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Access;
 public class AccessAcl: ModelBase
 {
     /// <summary>
-    /// Path
+    /// Access control path
     /// </summary>
-    /// <value></value>
     [JsonProperty("path")]
     public string Path { get; set; }
 
@@ -34,9 +33,8 @@ public class AccessAcl: ModelBase
     public string UsersGroupid { get; set; }
 
     /// <summary>
-    /// Propagate
+    /// Allow to propagate (inherit) permissions.
     /// </summary>
-    /// <value></value>
     [JsonProperty("propagate")]
     public int Propagate { get; set; }
 

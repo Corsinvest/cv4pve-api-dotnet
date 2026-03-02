@@ -13,13 +13,13 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 public class NodeService : ModelBase
 {
     /// <summary>
-    /// Name
+    /// Short identifier for the service (e.g., "pveproxy").
     /// </summary>
     [JsonProperty("name")]
     public string Name { get; set; }
 
     /// <summary>
-    /// State
+    /// Execution status of the service (systemd SubState).
     /// </summary>
     [JsonProperty("state")]
     public string State { get; set; }
@@ -31,14 +31,25 @@ public class NodeService : ModelBase
     public bool IsRunning => State == "running";
 
     /// <summary>
-    /// Service
+    /// Systemd unit name (e.g., pveproxy).
     /// </summary>
     [JsonProperty("service")]
     public string Service { get; set; }
 
     /// <summary>
-    /// Description
+    /// Description of the service.
     /// </summary>
     [JsonProperty("desc")]
     public string Description { get; set; }
+    /// <summary>
+    /// Current state of the service process (systemd ActiveState).
+    /// </summary>
+    [JsonProperty("active-state")]
+    public string ActiveState { get; set; }
+
+    /// <summary>
+    /// Whether the service is enabled (systemd UnitFileState).
+    /// </summary>
+    [JsonProperty("unit-state")]
+    public string UnitState { get; set; }
 }

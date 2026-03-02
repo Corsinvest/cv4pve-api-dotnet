@@ -76,7 +76,10 @@ public static class ResultExtension
         {
             if (reader.ValueType == typeof(string))
             {
-                return !string.IsNullOrWhiteSpace(reader.Value + string.Empty) && Convert.ToBoolean(Convert.ToByte(reader.Value));
+                var value = reader.Value + string.Empty;
+                if (string.IsNullOrWhiteSpace(value)) return false;
+                if (byte.TryParse(value, out var b)) return Convert.ToBoolean(b);
+                return true; // non-empty non-numeric string (e.g. fingerprint) => true
             }
             else
             {

@@ -20,9 +20,8 @@ public class AccessDomain : ModelBase
     public string Realm { get; set; }
 
     /// <summary>
-    /// Comment
+    /// A comment. The GUI use this text when you select a domain (Realm) on the login window.
     /// </summary>
-    /// <value></value>
     [JsonProperty("comment")]
     public string Comment { get; set; }
 
@@ -32,4 +31,10 @@ public class AccessDomain : ModelBase
     /// <value></value>
     [JsonProperty("type")]
     public string Type { get; set; }
+
+    /// <summary>
+    /// Two-factor authentication provider.
+    /// </summary>
+    [JsonProperty("tfa")]
+    public string Tfa { get; set; }
 }
