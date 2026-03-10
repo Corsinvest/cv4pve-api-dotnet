@@ -10,10 +10,10 @@ However, includes several third-party Open-Source libraries, which are licensed 
 License: MIT
 
 [Corsinvest.ProxmoxVE.Api.Meta](https://github.com/Corsinvest/cv4pve-api-dotnet/tree/master/src/Corsinvest.ProxmoxVE.Api.Metadata)
-License: GPL3
+License: MIT
 
 [Corsinvest.ProxmoxVE.Api](https://github.com/Corsinvest/cv4pve-api-dotnet/tree/master/src/Corsinvest.ProxmoxVE.Api)
-License: GPL3
+License: MIT
 
 [Corsinvest.ProxmoxVE.Shared](https://github.com/Corsinvest/cv4pve-api-dotnet/tree/master/src/Corsinvest.ProxmoxVE.Shared)
-License: GPL3
+License: MIT
