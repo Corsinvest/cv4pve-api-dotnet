@@ -1,6 +1,6 @@
 ﻿/*
  * SPDX-FileCopyrightText: Copyright Corsinvest Srl
- * SPDX-License-Identifier: GPL-3.0-only
+ * SPDX-License-Identifier: MIT
  */
 
 using Newtonsoft.Json;
@@ -35,4 +35,10 @@ public class FirewallRef : ModelBase
     /// </summary>
     [JsonProperty("type")]
     public string Type { get; set; }
+
+    /// <summary>
+    /// Scope
+    /// </summary>
+    [JsonProperty("scope")]
+    public string Scope { get; set; }
 }

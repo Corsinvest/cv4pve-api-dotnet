@@ -1,6 +1,6 @@
 ﻿/*
  * SPDX-FileCopyrightText: Copyright Corsinvest Srl
- * SPDX-License-Identifier: GPL-3.0-only
+ * SPDX-License-Identifier: MIT
  */
 
 using Newtonsoft.Json;
@@ -23,4 +23,16 @@ public class KeyValue
     /// </summary>
     [JsonProperty("key")]
     public string Key { get; set; }
+
+    /// <summary>
+    /// Pending value
+    /// </summary>
+    [JsonProperty("pending")]
+    public object Pending { get; set; }
+
+    /// <summary>
+    /// Indicates a pending delete
+    /// </summary>
+    [JsonProperty("delete")]
+    public int? Delete { get; set; }
 }

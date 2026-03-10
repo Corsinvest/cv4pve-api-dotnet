@@ -1,6 +1,6 @@
 ﻿/*
  * SPDX-FileCopyrightText: Copyright Corsinvest Srl
- * SPDX-License-Identifier: GPL-3.0-only
+ * SPDX-License-Identifier: MIT
  */
 
 using Newtonsoft.Json;
@@ -29,6 +29,12 @@ public class NodeVersion : ModelBase
     /// </summary>
     [JsonProperty("version")]
     public string Version { get; set; }
+
+    /// <summary>
+    /// The default console viewer to use.
+    /// </summary>
+    [JsonProperty("console")]
+    public string Console { get; set; }
 
     /// <summary>
     /// Is equal
