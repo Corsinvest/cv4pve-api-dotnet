@@ -19,6 +19,20 @@ public class ClassApi
     public ClassApi() { IsRoot = true; }
 
     /// <summary>
+    /// Constructor for rebuilding from flat cache
+    /// </summary>
+    internal ClassApi(string resource, string name, bool isIndexed, ClassApi parent)
+    {
+        Resource  = resource;
+        Name      = name;
+        IsIndexed = isIndexed;
+        Parent    = parent;
+        parent.SubClasses.Add(this);
+        Keys.AddRange(parent.Keys);
+        if (isIndexed) { Keys.Add(name.Replace("{", string.Empty).Replace("}", string.Empty)); }
+    }
+
+    /// <summary>
     /// Constructor
     /// </summary>
     /// <param name="token"></param>

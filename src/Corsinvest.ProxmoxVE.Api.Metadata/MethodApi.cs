@@ -12,11 +12,25 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata;
 /// </summary>
 public class MethodApi
 {
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="token"></param>
-    /// <param name="classApi"></param>
+    /// <summary>Constructor from flat cache</summary>
+    /// <param name="httpMethod">HTTP method (get/post/put/delete)</param>
+    /// <param name="flat">Flat cache method info</param>
+    /// <param name="classApi">Parent ClassApi node</param>
+    internal MethodApi(string httpMethod, FlatMethodInfo flat, ClassApi classApi)
+    {
+        MethodType       = httpMethod.ToUpper();
+        MethodName       = httpMethod;
+        Comment          = flat.Comment ?? string.Empty;
+        ReturnType       = flat.ReturnType ?? string.Empty;
+        ReturnLinkHRef   = flat.ReturnLinkHRef ?? string.Empty;
+        ReturnIsArray    = ReturnType == "array";
+        ReturnIsNull     = ReturnType == "null";
+        ClassApi         = classApi;
+        if (flat.Params != null)     { Parameters.AddRange(flat.Params.Select(p => new ParameterApi(p))); }
+        if (flat.ReturnParams != null) { ReturnParameters.AddRange(flat.ReturnParams.Select(p => new ParameterApi(p))); }
+    }
+
+    /// <summary>Constructor from JSON token</summary>
     public MethodApi(JToken token, ClassApi classApi)
     {
         MethodType = token["method"].ToString();
