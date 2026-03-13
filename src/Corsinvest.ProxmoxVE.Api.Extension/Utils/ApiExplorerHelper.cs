@@ -280,6 +280,55 @@ public static class ApiExplorerHelper
                                       .Select(a => a.Groups[1].Value)];
 
     /// <summary>
+    /// Get parameter names for a resource and method (excludes path keys).
+    /// </summary>
+    public static string[] GetMethodParameters(ClassApi classApiRoot, string resource, MethodType methodType)
+    {
+        var classApi = ClassApi.GetFromResource(classApiRoot, resource);
+        if (classApi == null) { return []; }
+        var humanized = methodType switch
+        {
+            MethodType.Get    => "get",
+            MethodType.Set    => "put",
+            MethodType.Create => "post",
+            MethodType.Delete => "delete",
+            _                 => methodType.ToString().ToLower()
+        };
+        var method = classApi.Methods.FirstOrDefault(m =>
+            string.Equals(m.MethodType, humanized, StringComparison.OrdinalIgnoreCase));
+        if (method == null) { return []; }
+        return [.. method.Parameters
+                         .Where(p => !classApi.Keys.Contains(p.Name))
+                         .Select(p => p.Name)];
+    }
+
+    /// <summary>
+    /// Get enum values for a specific parameter of a resource/method. Returns empty if not an enum.
+    /// </summary>
+    public static string[] GetMethodParameterEnumValues(ClassApi classApiRoot, string resource, MethodType methodType, string paramName)
+    {
+        var classApi = ClassApi.GetFromResource(classApiRoot, resource);
+        if (classApi == null) { return []; }
+        var humanized = methodType switch
+        {
+            MethodType.Get    => "get",
+            MethodType.Set    => "put",
+            MethodType.Create => "post",
+            MethodType.Delete => "delete",
+            _                 => methodType.ToString().ToLower()
+        };
+        var method = classApi.Methods.FirstOrDefault(m =>
+            string.Equals(m.MethodType, humanized, StringComparison.OrdinalIgnoreCase));
+        if (method == null) { return []; }
+        var param = method.Parameters.FirstOrDefault(p =>
+            string.Equals(p.Name, paramName, StringComparison.OrdinalIgnoreCase));
+        if (param == null) { return []; }
+        if (param.EnumValues.Length > 0) { return param.EnumValues; }
+        if (string.Equals(param.Type, "boolean", StringComparison.OrdinalIgnoreCase)) { return ["0", "1"]; }
+        return [];
+    }
+
+    /// <summary>
     /// Create parameter resource split ':'
     /// </summary>
     /// <param name="items"></param>
@@ -475,7 +524,10 @@ public static class ApiExplorerHelper
         }
         else
         {
-            return returnParameters.FirstOrDefault(a => a.Name == key).RendererValue(value);
+            var param = returnParameters.FirstOrDefault(a => a.Name == key);
+            return param != null
+                        ? param.RendererValue(value)
+                        : (value is ExpandoObject || value is IList) ? JsonConvert.SerializeObject(value) : value;
         }
     }
 
@@ -525,13 +577,15 @@ public static class ApiExplorerHelper
     /// <param name="returnsType"></param>
     /// <param name="command"></param>
     /// <param name="verbose"></param>
+    /// <param name="optionStyle"></param>
     /// <returns></returns>
     public static string Usage(ClassApi classApiRoot,
                                string resource,
                                TableGenerator.Output output,
                                bool returnsType = false,
                                string command = null,
-                               bool verbose = false)
+                               bool verbose = false,
+                               bool optionStyle = false)
     {
         var ret = new StringBuilder();
         var classApi = ClassApi.GetFromResource(classApiRoot, resource);
@@ -555,7 +609,8 @@ public static class ApiExplorerHelper
                 //only parameters no keys
                 var parameters = method.Parameters.Where(a => !classApi.Keys.Contains(a.Name));
 
-                var opts = string.Join(string.Empty, parameters.Where(a => !a.Optional).Select(a => $" {a.Name}:<{a.Type}>"));
+                var opts = string.Join(string.Empty, parameters.Where(a => !a.Optional)
+                    .Select(a => optionStyle ? $" --{a.Name} <{a.Type}>" : $" {a.Name}:<{a.Type}>"));
                 if (!string.IsNullOrWhiteSpace(opts)) { ret.Append(opts); }
 
                 //optional parameter

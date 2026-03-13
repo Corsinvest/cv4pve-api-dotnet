@@ -15,10 +15,25 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata;
 /// </summary>
 public class ParameterApi
 {
-    /// <summary>
-    /// Parameter Api
-    /// </summary>
-    /// <param name="token"></param>
+    /// <summary>Constructor from flat cache</summary>
+    /// <param name="flat">Flat cache parameter info</param>
+    internal ParameterApi(FlatParamInfo flat)
+    {
+        Name        = flat.Name;
+        NameIndexed = flat.Name.Replace("[n]", string.Empty);
+        IsIndexed   = flat.Name.EndsWith("[n]");
+        Type        = flat.Type ?? string.Empty;
+        TypeText    = flat.TypeText ?? string.Empty;
+        Description = flat.Description ?? string.Empty;
+        Optional    = flat.Optional ?? false;
+        Default     = flat.Default ?? string.Empty;
+        Minimum     = flat.Minimum.HasValue ? (int?)flat.Minimum.Value : null;
+        Maximum     = flat.Maximum;
+        EnumValues  = flat.EnumValues ?? [];
+    }
+
+    /// <summary>Constructor from JSON token</summary>
+    /// <param name="token">JSON token representing the parameter</param>
     public ParameterApi(JToken token)
     {
         Name = ((JProperty)token.Parent).Name;
@@ -139,8 +154,17 @@ public class ParameterApi
                             : string.Empty;
                 break;
 
-            case "timestamp": break;
-            case "timestamp_gmt": break;
+            case "timestamp":
+                value = long.TryParse(value?.ToString(), out var ts) && ts > 0
+                            ? DateTimeOffset.FromUnixTimeSeconds(ts).ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")
+                            : string.Empty;
+                break;
+
+            case "timestamp_gmt":
+                value = long.TryParse(value?.ToString(), out var tsGmt) && tsGmt > 0
+                            ? DateTimeOffset.FromUnixTimeSeconds(tsGmt).UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")
+                            : string.Empty;
+                break;
 
             default:
                 if (value is ExpandoObject || value is IList)
