@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Dynamic;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Net.Sockets;
 using System.Text;
 using System.Web;
 using Microsoft.Extensions.Logging;
@@ -109,7 +110,9 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
         {
             var data = (IDictionary<string, object>)result.Response.data;
             if (data.ContainsKey("NeedTFA"))
+            {
                 throw new PveAuthenticationException(result, "Missing Two Factor Authentication (TFA)");
+            }
 
             CSRFPreventionToken = result.Response.data.CSRFPreventionToken;
             PVEAuthCookie = result.Response.data.ticket;
@@ -122,6 +125,105 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
         }
 
         return result.IsSuccessStatusCode;
+    }
+
+    /// <summary>
+    /// Verify OpenID authorization code and create a ticket.
+    /// </summary>
+    /// <param name="code">OpenID authorization code received from the callback</param>
+    /// <param name="state">OpenID state received from the callback</param>
+    /// <param name="redirectUrl">Same redirect URL used in GetOpenIdAuthUrlAsync</param>
+    /// <returns>True if login succeeded</returns>
+    public async Task<bool> LoginOpenIdAsync(string code, string state, string redirectUrl)
+    {
+        var result = await CreateAsync("/access/openid/login", new Dictionary<string, object>
+        {
+            { "code", code },
+            { "state", state },
+            { "redirect-url", redirectUrl }
+        });
+
+        if (result.IsSuccessStatusCode)
+        {
+            CSRFPreventionToken = result.Response.data.CSRFPreventionToken;
+            PVEAuthCookie = result.Response.data.ticket;
+
+            if (_internalHttpClientHandler?.CookieContainer != null)
+            {
+                _internalHttpClientHandler.CookieContainer.Add(new Uri(BaseAddress), new Cookie("PVEAuthCookie", PVEAuthCookie));
+            }
+        }
+
+        return result.IsSuccessStatusCode;
+    }
+
+
+    /// <summary>
+    /// Full OpenID login flow: starts a local HTTP listener, opens the browser,
+    /// waits for the authorization callback, and exchanges the code for a ticket.
+    /// </summary>
+    /// <param name="realm">Authentication domain ID (OIDC realm configured in PVE)</param>
+    /// <param name="openBrowser">Action to open the browser with the given URL</param>
+    /// <param name="timeoutSeconds">Seconds to wait for the user to complete login</param>
+    /// <returns>True if login succeeded</returns>
+    public async Task<bool> LoginOpenIdAsync(string realm, Action<string> openBrowser, int timeoutSeconds = 60)
+    {
+#if NETSTANDARD2_0
+        var tcpListenerFreePort = new TcpListener(IPAddress.Loopback, 0);
+#else
+        using var tcpListenerFreePort = new TcpListener(IPAddress.Loopback, 0);
+#endif
+        tcpListenerFreePort.Start();
+        var port = ((IPEndPoint)tcpListenerFreePort.LocalEndpoint).Port;
+        tcpListenerFreePort.Stop();
+
+        var redirectUrl = $"http://localhost:{port}/callback";
+
+        var result = await CreateAsync("/access/openid/auth-url", new Dictionary<string, object>
+        {
+            { "realm", realm },
+            { "redirect-url", redirectUrl }
+        });
+
+        var authUrl = result.IsSuccessStatusCode ? (string)result.Response.data : null;
+        if (string.IsNullOrEmpty(authUrl)) { return false; }
+
+        var listener = new HttpListener();
+        listener.Prefixes.Add($"http://localhost:{port}/");
+        listener.Start();
+
+        try
+        {
+            openBrowser(authUrl);
+
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds));
+            var contextTask = listener.GetContextAsync();
+            var completedTask = await Task.WhenAny(contextTask, Task.Delay(System.Threading.Timeout.Infinite, cts.Token));
+            if (completedTask != contextTask) { return false; }
+
+            var context = await contextTask;
+            var query = context.Request.QueryString;
+            var code = query["code"];
+            var state = query["state"];
+
+            var responseHtml = "<html><body><h2>Authentication complete. You can close this window.</h2></body></html>"u8.ToArray();
+            context.Response.ContentType = "text/html";
+            context.Response.ContentLength64 = responseHtml.Length;
+#if NETSTANDARD2_0
+            await context.Response.OutputStream.WriteAsync(responseHtml, 0, responseHtml.Length);
+#else
+            await context.Response.OutputStream.WriteAsync(responseHtml);
+#endif
+            context.Response.Close();
+
+            return !string.IsNullOrEmpty(code) 
+                    && !string.IsNullOrEmpty(state) 
+                    && await LoginOpenIdAsync(code, state, redirectUrl);
+        }
+        finally
+        {
+            listener.Stop();
+        }
     }
 
     /// <summary>
@@ -188,8 +290,7 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// <returns></returns>
     public virtual HttpClient GetHttpClient()
     {
-        if (httpClient != null) return httpClient;
-
+        if (httpClient != null) { return httpClient; }
         if (_internalHttpClient == null)
         {
             _internalHttpClientHandler = new HttpClientHandler
