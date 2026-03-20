@@ -73,6 +73,28 @@ public static class ClientExtension
     public static async Task<IClusterResourceNode> GetNodeAsync(this PveClient client, string node)
         => (await GetNodesAsync(client)).FirstOrDefault(a => a.Node == node) ??
                     throw new ArgumentException($"Node '{node}' not found!");
+
+    /// <summary>
+    /// Returns the x86-64 CPU compatibility level for each online node in the cluster.
+    /// The minimum level across all nodes is the safest CPU type to assign to VMs
+    /// for live migration compatibility.
+    /// </summary>
+    /// <param name="client"></param>
+    /// <returns>List of (Node name, CpuX86Level) tuples</returns>
+    public static async Task<IEnumerable<(string Node, CpuX86Level Level)>> GetClusterCpuX86LevelsAsync(this PveClient client)
+    {
+        var resources = await client.Cluster.Resources.GetAsync();
+        var onlineNodes = resources.Where(a => a.ResourceType == ClusterResourceType.Node && a.IsOnline);
+
+        var result = new List<(string, CpuX86Level)>();
+        foreach (var node in onlineNodes)
+        {
+            var status = await client.Nodes[node.Node].Status.GetAsync();
+            var flags = status?.CpuInfo?.Flags ?? string.Empty;
+            result.Add((node.Node, NodeHelper.GetCpuX86Level(flags)));
+        }
+        return result;
+    }
     #endregion
 
     #region Storage

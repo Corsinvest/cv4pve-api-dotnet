@@ -61,6 +61,120 @@ public static class ModelsExtensionsAutoGen
         => (await item.Index()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessDomain>>();
 
     /// <summary>
+    /// Get user API tokens.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessUserToken>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveAccess.PveUsers.PveUseridItem.PveToken item)
+        => (await item.TokenIndex()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessUserToken>>();
+
+    /// <summary>
+    /// List TFA configurations of users.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessTfaEntry>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveAccess.PveTfa.PveUseridItem item)
+        => (await item.ListUserTfa()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Access.AccessTfaEntry>>();
+
+    /// <summary>
+    /// List configured metric servers.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterMetricsServer>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveMetrics.PveServer item)
+        => (await item.ServerIndex()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterMetricsServer>>();
+
+    /// <summary>
+    /// Get HA rules.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="resource">Limit the returned list to rules affecting the specified resource.</param>
+    /// <param name="type">Limit the returned list to the specified rule type.
+    ///   Enum: node-affinity,resource-affinity</param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterHaRule>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveHa.PveRules item, string resource = null, string type = null)
+        => (await item.Index(resource, type)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterHaRule>>();
+
+    /// <summary>
+    /// ACME plugin index.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="type">Only list ACME plugins of a specific type
+    ///   Enum: dns,standalone</param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterAcmePlugin>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveAcme.PvePlugins item, string type = null)
+        => (await item.Index(type)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterAcmePlugin>>();
+
+    /// <summary>
+    /// List configured realm-sync-jobs.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterJobRealmSync>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveJobs.PveRealmSync item)
+        => (await item.SyncjobIndex()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterJobRealmSync>>();
+
+    /// <summary>
+    /// List directory mapping
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="check_node">If given, checks the configurations on the given node for correctness, and adds relevant diagnostics for the directory to the response.</param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterMappingDir>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveMapping.PveDir item, string check_node = null)
+        => (await item.Index(check_node)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterMappingDir>>();
+
+    /// <summary>
+    /// List PCI Hardware Mapping
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="check_node">If given, checks the configurations on the given node for correctness, and adds relevant diagnostics for the devices to the response.</param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterMappingPci>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveMapping.PvePci item, string check_node = null)
+        => (await item.Index(check_node)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterMappingPci>>();
+
+    /// <summary>
+    /// List USB Hardware Mappings
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="check_node">If given, checks the configurations on the given node for correctness, and adds relevant errors to the devices.</param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterMappingUsb>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveMapping.PveUsb item, string check_node = null)
+        => (await item.Index(check_node)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterMappingUsb>>();
+
+    /// <summary>
+    /// SDN vnets index.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="pending">Display pending config.</param>
+    /// <param name="running">Display running config.</param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterSdnVnet>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveSdn.PveVnets item, bool? pending = null, bool? running = null)
+        => (await item.Index(pending, running)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterSdnVnet>>();
+
+    /// <summary>
+    /// SDN zones index.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="pending">Display pending config.</param>
+    /// <param name="running">Display running config.</param>
+    /// <param name="type">Only list SDN zones of specific type
+    ///   Enum: evpn,faucet,qinq,simple,vlan,vxlan</param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterSdnZone>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveSdn.PveZones item, bool? pending = null, bool? running = null, string type = null)
+        => (await item.Index(pending, running, type)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterSdnZone>>();
+
+    /// <summary>
+    /// SDN controllers index.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="pending">Display pending config.</param>
+    /// <param name="running">Display running config.</param>
+    /// <param name="type">Only list sdn controllers of specific type
+    ///   Enum: bgp,evpn,faucet,isis</param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterSdnController>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveSdn.PveControllers item, bool? pending = null, bool? running = null, string type = null)
+        => (await item.Index(pending, running, type)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterSdnController>>();
+
+    /// <summary>
     /// List recent tasks (cluster wide).
     /// </summary>
     /// <param name="item"></param>
@@ -296,14 +410,6 @@ public static class ModelsExtensionsAutoGen
         => (await item.ListUpdates()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeAptUpdate>>();
 
     /// <summary>
-    /// Get APT repository information.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeAptRepositories>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveApt.PveRepositories item)
-        => (await item.Repositories()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeAptRepositories>>();
-
-    /// <summary>
     /// Read tap/vm network device interface counters
     /// </summary>
     /// <param name="item"></param>
@@ -411,6 +517,70 @@ public static class ModelsExtensionsAutoGen
     /// <returns></returns>
     public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeBackupFile>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveStorage.PveStorageItem.PveFileRestore.PveList item, string filepath, string volume)
         => (await item.List(filepath, volume)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeBackupFile>>();
+
+    /// <summary>
+    /// MDS directory index.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeCephMds>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveCeph.PveMds item)
+        => (await item.Index()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeCephMds>>();
+
+    /// <summary>
+    /// MGR directory index.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeCephMgr>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveCeph.PveMgr item)
+        => (await item.Index()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeCephMgr>>();
+
+    /// <summary>
+    /// Get Ceph monitor list.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeCephMon>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveCeph.PveMon item)
+        => (await item.Listmon()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeCephMon>>();
+
+    /// <summary>
+    /// Directory index.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeCephFs>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveCeph.PveFs item)
+        => (await item.Index()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeCephFs>>();
+
+    /// <summary>
+    /// List all pools and their settings (which are settable by the POST/PUT endpoints).
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeCephPool>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveCeph.PvePool item)
+        => (await item.Lspools()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeCephPool>>();
+
+    /// <summary>
+    /// List LVM thinpools
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeDiskLvmThin>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveDisks.PveLvmthin item)
+        => (await item.Index()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeDiskLvmThin>>();
+
+    /// <summary>
+    /// PVE Managed Directory storages.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeDiskDirectory>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveDisks.PveDirectory item)
+        => (await item.Index()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeDiskDirectory>>();
+
+    /// <summary>
+    /// Get IP addresses of the specified container interface.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeLxcInterfaces>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveInterfaces item)
+        => (await item.Ip()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeLxcInterfaces>>();
 
     /// <summary>
     /// Get information about node's certificates.
@@ -693,6 +863,30 @@ public static class ModelsExtensionsAutoGen
     /// <returns></returns>
     public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeFirewallOptions> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveFirewall.PveOptions item)
         => (await item.GetOptions()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeFirewallOptions>();
+
+    /// <summary>
+    /// Read server time and time zone settings.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeTime> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveTime item)
+        => (await item.Time()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeTime>();
+
+    /// <summary>
+    /// Read task status.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeTaskStatus> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveTasks.PveUpidItem.PveStatus item)
+        => (await item.ReadTaskStatus()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeTaskStatus>();
+
+    /// <summary>
+    /// Get APT repository information.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeAptRepositories> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveApt.PveRepositories item)
+        => (await item.Repositories()).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeAptRepositories>();
 
     /// <summary>
     /// Get pool configuration (deprecated, no support for nested pools, use 'GET /pools/?poolid={poolid}').
