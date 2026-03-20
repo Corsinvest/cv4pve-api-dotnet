@@ -121,6 +121,18 @@ public class VmConfigLxc : VmConfig
     public string Features { get; set; }
 
     /// <summary>
+    /// True if nesting=1 is enabled in Features.
+    /// </summary>
+    public bool HasNesting
+        => (Features ?? string.Empty).Split(',').Any(p => p.Trim() == "nesting=1");
+
+    /// <summary>
+    /// True if keyctl=1 is enabled in Features.
+    /// </summary>
+    public bool HasKeyctl
+        => (Features ?? string.Empty).Split(',').Any(p => p.Trim() == "keyctl=1");
+
+    /// <summary>
     /// Array of lxc low-level configurations ([[key1, value1], [key2, value2] ...]).
     /// </summary>
     [JsonProperty("lxc")]

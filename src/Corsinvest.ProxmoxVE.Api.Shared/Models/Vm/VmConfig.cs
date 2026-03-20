@@ -239,6 +239,7 @@ public class VmConfig : ModelBase
                     }
                 }
 
+                network.RawDefinition = ExtensionData[key] + string.Empty;
                 networks.Add(network);
             }
         }
@@ -252,7 +253,9 @@ public class VmConfig : ModelBase
         foreach (var key in ExtensionData.Keys)
         {
             var def = ExtensionData[key] + string.Empty;
+
             if (key == "rootfs"
+                || key.StartsWith("unused")
                 //bus match
                 || (Regex.IsMatch(key, @"(efidisk|tpmstate|virtio|ide|scsi|sata|mp)\d+") && !Regex.IsMatch(def, "media=cdrom")))
             {
@@ -303,7 +306,10 @@ public class VmConfig : ModelBase
                     Size = infos.Where(a => a.StartsWith("size=")).Select(a => a[5..]).FirstOrDefault(),
                     MountPoint = infos.Where(a => a.StartsWith("mp=")).Select(a => a[3..]).FirstOrDefault(),
                     MountSourcePath = mountSourcePath,
-                    Backup = backup
+                    Cache = infos.Where(a => a.StartsWith("cache=")).Select(a => a[6..]).FirstOrDefault(),
+                    IsUnused = key.StartsWith("unused"),
+                    Backup = backup,
+                    RawDefinition = def,
                 });
             }
         }

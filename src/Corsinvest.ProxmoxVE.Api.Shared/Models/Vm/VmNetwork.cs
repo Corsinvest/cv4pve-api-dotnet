@@ -99,4 +99,10 @@ public class VmNetwork
     /// LinkDown
     /// </summary>
     public bool LinkDown { get; set; }
+
+    /// <summary>
+    /// Raw definition string from the VM config (e.g. "virtio=AA:BB:CC:DD:EE:FF,bridge=vmbr0,firewall=1").
+    /// Useful for accessing keys not yet parsed into dedicated properties.
+    /// </summary>
+    public string RawDefinition { get; set; }
 }
