@@ -77,4 +77,10 @@ public class ClusterStatus : ModelBase
     /// </summary>
     [JsonProperty("online")]
     public bool IsOnline { get; set; }
+
+    /// <summary>
+    /// Expected votes for quorum (Corosync). Only present on cluster-type entries.
+    /// </summary>
+    [JsonProperty("expected_votes")]
+    public int? ExpectedVotes { get; set; }
 }

@@ -46,12 +46,33 @@ public class VmDisk
     public string MountSourcePath { get; set; }
 
     /// <summary>
-    /// Size
+    /// Size (PVE format, e.g. "32G", "500M")
     /// </summary>
     public string Size { get; set; }
+
+    /// <summary>
+    /// Size in bytes, parsed from <see cref="Size"/>. Returns 0 if not available or not parseable.
+    /// </summary>
+    public long SizeBytes => Utils.ByteHelper.ParsePveSize(Size);
+
+    /// <summary>
+    /// Disk cache mode (e.g. "none", "writeback", "unsafe", "directsync", "writethrough").
+    /// </summary>
+    public string Cache { get; set; }
+
+    /// <summary>
+    /// True if this disk is detached (unused) from the VM config but still present in storage.
+    /// </summary>
+    public bool IsUnused { get; set; }
 
     /// <summary>
     /// Backup enabled.
     /// </summary>
     public bool Backup { get; set; }
+
+    /// <summary>
+    /// Raw definition string from the VM config (e.g. "local-zfs:vm-100-disk-0,size=32G,cache=writeback").
+    /// Useful for accessing keys not yet parsed into dedicated properties.
+    /// </summary>
+    public string RawDefinition { get; set; }
 }

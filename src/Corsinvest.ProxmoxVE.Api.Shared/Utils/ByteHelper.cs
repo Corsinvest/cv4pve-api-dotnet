@@ -56,6 +56,30 @@ public static class ByteHelper
     }
 
     /// <summary>
+    /// Parses a PVE disk size string (e.g. "32G", "500M", "1T") to bytes.
+    /// Returns 0 if the format is not recognized or the input is null/empty.
+    /// </summary>
+    public static long ParsePveSize(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) { return 0; }
+        input = input.Trim().ToUpperInvariant();
+        if (input.Length < 2) { return 0; }
+
+        var unit = input[^1];
+        if (!long.TryParse(input[..^1], out var value)) { return 0; }
+
+        return unit switch
+        {
+            'K' => value * 1_024L,
+            'M' => value * 1_048_576L,
+            'G' => value * 1_073_741_824L,
+            'T' => value * 1_099_511_627_776L,
+            'P' => value * 1_125_899_906_842_624L,
+            _   => 0,
+        };
+    }
+
+    /// <summary>
     /// Converts a byte value into a human-readable string (e.g., "1.5 GiB").
     /// Uses binary units (MiB, GiB) for values above 1 KiB.
     /// </summary>
