@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-using Corsinvest.ProxmoxVE.Api;
 using Corsinvest.ProxmoxVE.Api.Console.Helpers;
 using Microsoft.Extensions.Logging;
 
