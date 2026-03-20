@@ -310,7 +310,16 @@ range 100:107,-105,200:204
                 var fileName = password[5..];
                 if (File.Exists(fileName))
                 {
-                    password = StringHelper.Decrypt(File.ReadAllText(fileName, Encoding.UTF8), key);
+                    var fileContent = File.ReadAllText(fileName, Encoding.UTF8).Trim();
+                    try
+                    {
+                        password = StringHelper.Decrypt(fileContent, key);
+                    }
+                    catch
+                    {
+                        // File contains plain text password (not encrypted), use as-is
+                        password = fileContent;
+                    }
                 }
                 else
                 {
