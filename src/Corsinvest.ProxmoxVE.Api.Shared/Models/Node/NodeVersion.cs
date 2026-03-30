@@ -40,9 +40,8 @@ public class NodeVersion : ModelBase
     /// Is equal
     /// </summary>
     /// <param name="version"></param>
-    /// <returns></returns>
     public bool IsEqual(NodeVersion version)
-        => Version == version.Version
-           && Release == version.Release
-           && RepositoryId == version.RepositoryId;
+    => Version == version.Version
+       && Release == version.Release
+       && RepositoryId == version.RepositoryId;
 }

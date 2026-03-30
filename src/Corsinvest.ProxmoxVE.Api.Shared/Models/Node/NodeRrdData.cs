@@ -14,7 +14,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// Rrd Data Node
 /// </summary>
-public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
+public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory, IPressureInfo
 {
     /// <summary>
     /// Net in
@@ -54,7 +54,7 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     /// Time unix time
     /// </summary>
     [JsonProperty("time")]
-    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime )]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime)]
     long Time { get; set; }
 
     /// <summary>
@@ -169,7 +169,7 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory
     [OnDeserialized]
     internal void OnSerializedMethod(StreamingContext context)
     {
-        ((ICpu)this).ImproveData();
-        ((IMemory)this).ImproveData();
+        ((ICpu)this).EnrichData();
+        ((IMemory)this).EnrichData();
     }
 }

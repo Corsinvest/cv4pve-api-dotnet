@@ -21,7 +21,7 @@ public class VmSnapshot : ModelBase
     /// Time
     /// </summary>
     [JsonProperty("snaptime")]
-    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime )]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime)]
     public long Time
     {
         get => _time == 0 ? DateTimeOffset.Now.ToUnixTimeSeconds() : _time;

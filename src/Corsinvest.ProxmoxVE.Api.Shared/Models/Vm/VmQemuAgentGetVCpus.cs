@@ -15,7 +15,6 @@ public class VmQemuAgentGetVCpus : ModelBase
     /// <summary>
     /// Data
     /// </summary>
-    /// <value></value>
     [JsonProperty("result")]
     public IEnumerable<ResultInt> Result { get; set; } = [];
 
@@ -27,21 +26,18 @@ public class VmQemuAgentGetVCpus : ModelBase
         /// <summary>
         /// Can Offline
         /// </summary>
-        /// <value></value>
         [JsonProperty("can-offline")]
         public bool CanOffline { get; set; }
 
         /// <summary>
         /// Logical Id
         /// </summary>
-        /// <value></value>
         [JsonProperty("logical-id")]
         public int LogicalId { get; set; }
 
         /// <summary>
         /// Online
         /// </summary>
-        /// <value></value>
         [JsonProperty("online")]
         public bool Online { get; set; }
     }

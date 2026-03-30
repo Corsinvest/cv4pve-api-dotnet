@@ -13,7 +13,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Utils;
 /// <summary>
 /// Table generator
 /// </summary>
-public class TableGenerator
+public static class TableGenerator
 {
     /// <summary>
     /// Export to
@@ -94,11 +94,6 @@ public class TableGenerator
     /// <summary>
     /// Export to
     /// </summary>
-    /// <param name="columns"></param>
-    /// <param name="rows"></param>
-    /// <param name="output"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidEnumArgumentException"></exception>
     public static string To(IEnumerable<string> columns, IEnumerable<IEnumerable<object>> rows, Output output)
         => output switch
         {
@@ -113,9 +108,6 @@ public class TableGenerator
     /// <summary>
     /// To Markdown
     /// </summary>
-    /// <param name="columns"></param>
-    /// <param name="rows"></param>
-    /// <returns></returns>
     public static string ToMarkdown(IEnumerable<string> columns, IEnumerable<IEnumerable<object>> rows)
     {
         CheckData(columns, rows);
@@ -133,9 +125,6 @@ public class TableGenerator
     /// <summary>
     /// To Text
     /// </summary>
-    /// <param name="columns"></param>
-    /// <param name="rows"></param>
-    /// <returns></returns>
     public static string ToText(IEnumerable<string> columns, IEnumerable<IEnumerable<object>> rows)
     {
         CheckData(columns, rows);
@@ -157,9 +146,6 @@ public class TableGenerator
     /// <summary>
     /// To Html
     /// </summary>
-    /// <param name="columns"></param>
-    /// <param name="rows"></param>
-    /// <returns></returns>
     public static string ToHtml(IEnumerable<string> columns, IEnumerable<IEnumerable<object>> rows)
     {
         CheckData(columns, rows);
@@ -178,10 +164,6 @@ public class TableGenerator
     /// <summary>
     /// To Json
     /// </summary>
-    /// <param name="columns"></param>
-    /// <param name="rows"></param>
-    /// <param name="pretty"></param>
-    /// <returns></returns>
     public static string ToJson(IEnumerable<string> columns, IEnumerable<IEnumerable<object>> rows, bool pretty)
     {
         CheckData(columns, rows);

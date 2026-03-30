@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
@@ -15,7 +16,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 /// <summary>
 /// Resources
 /// </summary>
-public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResourceVm, IClusterResourceStorage
+public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResourceVm, IClusterResourceStorage, ISdnItem
 {
     /// <summary>
     /// Node Level
@@ -57,19 +58,16 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     /// <summary>
     /// Status Is running
     /// </summary>
-    /// <value></value>
     public bool IsRunning { get; set; }
 
     /// <summary>
     /// Status Is stopped
     /// </summary>
-    /// <value></value>
     public bool IsStopped { get; set; }
 
     /// <summary>
     /// Status Is paused
     /// </summary>
-    /// <value></value>
     public bool IsPaused { get; set; }
 
     /// <summary>
@@ -95,7 +93,6 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     /// <summary>
     /// Vm type
     /// </summary>
-    /// <value></value>
     public VmType VmType { get; set; }
 
     /// <summary>
@@ -112,14 +109,12 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     /// <summary>
     /// Host cpu usage
     /// </summary>
-    /// <value></value>
     [Display(Name = "Host Cpu Usage")]
     public string HostCpuUsage { get; set; }
 
     /// <summary>
     /// Host memory usage
     /// </summary>
-    /// <value></value>
     [Display(Name = "Host Memory Usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     public double HostMemoryUsage { get; set; }
@@ -179,7 +174,6 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     /// <summary>
     /// Resource Type
     /// </summary>
-    /// <value></value>
     public ClusterResourceType ResourceType { get; set; }
 
     /// <summary>
@@ -191,7 +185,6 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     /// <summary>
     /// Status Is Unknown
     /// </summary>
-    /// <value></value>
     public bool IsUnknown { get; set; }
 
     /// <summary>
@@ -213,7 +206,6 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     /// <summary>
     /// Disk usage percentage
     /// </summary>
-    /// <value></value>
     [Display(Name = "Disk usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     public double DiskUsagePercentage { get; set; }
@@ -243,14 +235,12 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     /// <summary>
     /// Memory info
     /// </summary>
-    /// <value></value>
     [Display(Name = "Memory")]
     public string MemoryInfo { get; set; }
 
     /// <summary>
     /// Memory usage percentage
     /// </summary>
-    /// <value></value>
     [Display(Name = "Memory Usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     public double MemoryUsagePercentage { get; set; }
@@ -272,7 +262,6 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     /// <summary>
     /// Cpu info
     /// </summary>
-    /// <value></value>
     [Display(Name = "Cpu")]
     public string CpuInfo { get; set; }
 
@@ -299,7 +288,6 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     /// <summary>
     /// Is online
     /// </summary>
-    /// <value></value>
     public bool IsOnline { get; set; }
 
     /// <summary>
@@ -357,5 +345,5 @@ public class ClusterResource : ModelBase, IClusterResourceNode, IClusterResource
     public string ZoneType { get; set; }
 
     [OnDeserialized]
-    internal void OnSerializedMethod(StreamingContext context) => this.ImproveData();
+    internal void OnSerializedMethod(StreamingContext context) => this.EnrichData();
 }

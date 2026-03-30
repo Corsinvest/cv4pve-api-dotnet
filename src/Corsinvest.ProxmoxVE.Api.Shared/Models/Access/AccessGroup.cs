@@ -15,7 +15,6 @@ public class AccessGroup : ModelBase
     /// <summary>
     /// Group Id
     /// </summary>
-    /// <value></value>
     [JsonProperty("groupid")]
     public string Id { get; set; }
 
@@ -28,7 +27,6 @@ public class AccessGroup : ModelBase
     /// <summary>
     /// Comment
     /// </summary>
-    /// <value></value>
     [JsonProperty("comment")]
     public string Comment { get; set; }
 }

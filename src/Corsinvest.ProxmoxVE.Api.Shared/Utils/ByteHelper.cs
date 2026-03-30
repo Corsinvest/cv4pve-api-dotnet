@@ -19,17 +19,11 @@ public static class ByteHelper
     /// <summary>
     /// Converts a string with a unit of measurement (MB, MiB, GB, GiB, etc.) into bytes.
     /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
-    /// <exception cref="FormatException"></exception>
-    /// <exception cref="NotSupportedException"></exception>
     public static long ToBytes(string input)
     {
         if (string.IsNullOrWhiteSpace(input)) { throw new ArgumentException("Invalid input."); }
 
         var pattern = @"^(\d+(\.\d+)?)\s*(" + string.Join("|", DecimalUnits) + "|" + string.Join("|", BinaryUnits) + ")$";
-        //@"^(\d+(\.\d+)?)\s*(B|KB|MB|GB|TB|PB|EB|KIB|MIB|GIB|TIB|PIB|EIB)$"
         var match = Regex.Match(input.Trim(), pattern, RegexOptions.IgnoreCase);
         if (!match.Success) { throw new FormatException("Invalid format. Use '1.5 GB' or '2 MiB'."); }
 
@@ -75,7 +69,7 @@ public static class ByteHelper
             'G' => value * 1_073_741_824L,
             'T' => value * 1_099_511_627_776L,
             'P' => value * 1_125_899_906_842_624L,
-            _   => 0,
+            _ => 0,
         };
     }
 
@@ -83,10 +77,6 @@ public static class ByteHelper
     /// Converts a byte value into a human-readable string (e.g., "1.5 GiB").
     /// Uses binary units (MiB, GiB) for values above 1 KiB.
     /// </summary>
-    /// <param name="bytes"></param>
-    /// <param name="useBinaryUnits"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public static string ToSizeString(this double bytes, bool useBinaryUnits)
     {
         if (bytes < 0) { throw new ArgumentOutOfRangeException(nameof(bytes), "The value must be positive."); }

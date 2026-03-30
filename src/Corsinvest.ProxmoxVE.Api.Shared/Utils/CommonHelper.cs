@@ -13,8 +13,6 @@ public static class CommonHelper
     /// <summary>
     /// Get application data directory. If not exists create.
     /// </summary>
-    /// <param name="appName"></param>
-    /// <returns></returns>
     public static string GetApplicationDataDirectory(string appName)
     {
         var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Corsinvest", appName);

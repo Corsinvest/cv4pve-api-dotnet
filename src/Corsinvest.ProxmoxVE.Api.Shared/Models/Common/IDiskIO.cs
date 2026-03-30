@@ -17,7 +17,6 @@ public interface IDiskIO
     /// <summary>
     /// Disk read
     /// </summary>
-    /// <value></value>
     [JsonProperty("diskread")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     long DiskRead { get; set; }
@@ -25,7 +24,6 @@ public interface IDiskIO
     /// <summary>
     /// Disk write
     /// </summary>
-    /// <value></value>
     [JsonProperty("diskwrite")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     long DiskWrite { get; set; }

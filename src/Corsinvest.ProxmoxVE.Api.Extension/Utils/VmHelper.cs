@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: MIT
  */
 
-using System.ComponentModel;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
+using System.ComponentModel;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Utils;
 
@@ -27,23 +27,22 @@ public static class VmHelper
     /// <param name="noVnc"></param>
     /// <param name="xtermJs"></param>
     /// <param name="parameters"></param>
-    /// <returns></returns>
     public static async Task<HttpResponseMessage> GetConsoleNoVncAsync(PveClient client,
-                                                                       string node,
-                                                                       long vmId,
-                                                                       string vmName,
-                                                                       VmType vmType,
-                                                                       bool noVnc,
-                                                                       bool xtermJs,
-                                                                       string parameters = null)
-        => await GetConsoleNoVncAsync(client,
-                                      node,
-                                      vmId,
-                                      vmName,
-                                      NoVncHelper.GetConsoleType(vmType),
-                                      noVnc,
-                                      xtermJs,
-                                      parameters);
+                                                                   string node,
+                                                                   long vmId,
+                                                                   string vmName,
+                                                                   VmType vmType,
+                                                                   bool noVnc,
+                                                                   bool xtermJs,
+                                                                   string parameters = null)
+    => await GetConsoleNoVncAsync(client,
+                                  node,
+                                  vmId,
+                                  vmName,
+                                  NoVncHelper.GetConsoleType(vmType),
+                                  noVnc,
+                                  xtermJs,
+                                  parameters);
 
     /// <summary>
     /// Get console NoVnc
@@ -56,15 +55,14 @@ public static class VmHelper
     /// <param name="noVnc"></param>
     /// <param name="xtermJs"></param>
     /// <param name="parameters"></param>
-    /// <returns></returns>
     public static async Task<HttpResponseMessage> GetConsoleNoVncAsync(PveClient client,
-                                                                       string node,
-                                                                       long vmId,
-                                                                       string vmName,
-                                                                       string console,
-                                                                       bool noVnc,
-                                                                       bool xtermJs,
-                                                                       string parameters = null)
+                                                                   string node,
+                                                                   long vmId,
+                                                                   string vmName,
+                                                                   string console,
+                                                                   bool noVnc,
+                                                                   bool xtermJs,
+                                                                   string parameters = null)
     {
         var url = NoVncHelper.GetConsoleUrl(client.Host,
                                             client.Port,
@@ -85,9 +83,6 @@ public static class VmHelper
     /// <summary>
     /// Vm check Id or Name
     /// </summary>
-    /// <param name="data"></param>
-    /// <param name="vmIdOrName"></param>
-    /// <returns></returns>
     public static bool CheckIdOrName(IClusterResourceVm data, string vmIdOrName)
     {
         if (vmIdOrName.Contains(":"))
@@ -126,13 +121,6 @@ public static class VmHelper
     /// <summary>
     /// Change Status Vm
     /// </summary>
-    /// <param name="client"></param>
-    /// <param name="node"></param>
-    /// <param name="vmType"></param>
-    /// <param name="vmId"></param>
-    /// <param name="status"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidEnumArgumentException"></exception>
     public static async Task<Result> ChangeStatusVmAsync(PveClient client, string node, VmType vmType, long vmId, VmStatus status)
         => vmType switch
         {
@@ -164,13 +152,6 @@ public static class VmHelper
     /// <summary>
     /// Get Vms Jolly Keys
     /// </summary>
-    /// <param name="client"></param>
-    /// <param name="addAll"></param>
-    /// <param name="addNodes"></param>
-    /// <param name="addPools"></param>
-    /// <param name="addVmId"></param>
-    /// <param name="addVmName"></param>
-    /// <returns></returns>
     public static async Task<IEnumerable<string>> GetVmsJollyKeysAsync(PveClient client,
                                                                        bool addAll,
                                                                        bool addNodes,
@@ -205,11 +186,6 @@ public static class VmHelper
     /// <summary>
     /// Populate VM/CT Os INfo
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="client"></param>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidEnumArgumentException"></exception>
     public static async Task PopulateVmOsInfoAsync<T>(PveClient client, T item)
          where T : IClusterResourceVm, IClusterResourceVmOsInfo
     {

@@ -4632,7 +4632,7 @@ public class ClusterCephStatus : ModelBase
         public string Name { get; set; }
 
         [JsonProperty("tags")]
-        public IEnumerable<object> Tags { get; set; } =[];
+        public IEnumerable<object> Tags { get; set; } = [];
 
         [JsonProperty("see_also")]
         public IEnumerable<object> SeeAlso { get; set; } = [];

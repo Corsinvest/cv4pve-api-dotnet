@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: MIT
  */
 
-using System.ComponentModel;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
+using System.ComponentModel;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 
@@ -32,7 +32,7 @@ public static class ClusterExtension
                 item.HostMemoryUsage = (double)item.MemoryUsage / node.MemorySize;
             }
 
-            node.NodeCpuAssigned = vms.Sum(a=> a.CpuSize);
+            node.NodeCpuAssigned = vms.Sum(a => a.CpuSize);
             node.NodeMemoryAssigned = vms.Sum(a => a.MemorySize);
         }
 
@@ -43,7 +43,7 @@ public static class ClusterExtension
     /// Improve data
     /// </summary>
     /// <param name="data"></param>
-    public static void ImproveData(this IClusterResourceBase data)
+    public static void EnrichData(this IClusterResourceBase data)
     {
         data.ResourceType = data.Type switch
         {
@@ -51,15 +51,17 @@ public static class ClusterExtension
             var s when s == PveConstants.KeyApiNode => ClusterResourceType.Node,
             var s when s == PveConstants.KeyApiStorage => ClusterResourceType.Storage,
             var s when s == PveConstants.KeyApiPool => ClusterResourceType.Pool,
+            var s when s == PveConstants.KeyApiSdn => ClusterResourceType.Sdn,
             _ => ClusterResourceType.Unknown,
         };
 
-        data.Description = data.Type switch
+        data.Description = data.ResourceType switch
         {
-            var s when s == PveConstants.KeyApiNode => data.Node,
-            var s when s == PveConstants.KeyApiStorage => $"{((IStorageItem)data).Storage} ({data.Node})",
-            var s when s == PveConstants.KeyApiQemu || s == PveConstants.KeyApiLxc => $"{((IVmBase)data).VmId} ({((IVmBase)data).Name})",
-            var s when s == PveConstants.KeyApiPool => ((IPoolItem)data).Pool,
+            ClusterResourceType.Node => data.Node,
+            ClusterResourceType.Storage => $"{((IStorageItem)data).Storage} ({data.Node})",
+            ClusterResourceType.Vm => $"{((IVmBase)data).VmId} ({((IVmBase)data).Name})",
+            ClusterResourceType.Pool => ((IPoolItem)data).Pool,
+            ClusterResourceType.Sdn => ((ISdnItem)data).Sdn,
             _ => string.Empty,
         };
 
@@ -70,14 +72,14 @@ public static class ClusterExtension
     /// Improve data
     /// </summary>
     /// <param name="data"></param>
-    public static void ImproveData(this IClusterResourceNode data)
+    public static void EnrichData(this IClusterResourceNode data)
     {
         data.IsOnline = data.Status == PveConstants.StatusOnline;
 
-        ((ICpu)data).ImproveData();
-        ((IMemory)data).ImproveData();
-        ((IDisk)data).ImproveData();
-        ((IClusterResourceBase)data).ImproveData();
+        ((ICpu)data).EnrichData();
+        ((IMemory)data).EnrichData();
+        ((IDisk)data).EnrichData();
+        ((IClusterResourceBase)data).EnrichData();
 
         data.NodeLevel = NodeHelper.DecodeLevelSupport(data.Level);
     }
@@ -85,31 +87,29 @@ public static class ClusterExtension
     /// <summary>
     /// Improve data
     /// </summary>
-    /// <param name="data"></param>
-    /// <exception cref="InvalidEnumArgumentException"></exception>
-    public static void ImproveData(this ClusterResource data)
+    public static void EnrichData(this ClusterResource data)
     {
-        ((IClusterResourceBase)data).ImproveData();
+        ((IClusterResourceBase)data).EnrichData();
 
         data.IsLocked = !string.IsNullOrWhiteSpace(data.Lock);
         if (data.ResourceType == ClusterResourceType.Vm && data is IClusterResourceVm itemVm)
         {
-            itemVm.ImproveData(itemVm.Status);
+            itemVm.EnrichData(itemVm.Status);
 
             itemVm.VmType = (VmType)Enum.Parse(typeof(VmType), itemVm.Type, true);
         }
         else if (data.ResourceType == ClusterResourceType.Node && data is IClusterResourceNode itemNode)
         {
-            itemNode.ImproveData();
+            itemNode.EnrichData();
         }
         else if (data.ResourceType == ClusterResourceType.Storage && data is IClusterResourceStorage itemStorage)
         {
             itemStorage.IsAvailable = data.Status == PveConstants.StatusAvailable;
         }
 
-        if (data is IDisk itemDisk) { itemDisk.ImproveData(); }
-        if (data is ICpu itemHostCpu) { itemHostCpu.ImproveData(); }
-        if (data is IMemory itemHostMemory) { itemHostMemory.ImproveData(); }
+        if (data is IDisk itemDisk) { itemDisk.EnrichData(); }
+        if (data is ICpu itemHostCpu) { itemHostCpu.EnrichData(); }
+        if (data is IMemory itemHostMemory) { itemHostMemory.EnrichData(); }
     }
 
     /// <summary>
@@ -132,11 +132,11 @@ public static class ClusterExtension
     public static string GetWebUrl(this ClusterResource resource)
         => resource.ResourceType switch
         {
-            ClusterResourceType.Node    => PveWebUrlHelper.GetWebUrlNode(resource.Node),
+            ClusterResourceType.Node => PveWebUrlHelper.GetWebUrlNode(resource.Node),
             ClusterResourceType.Storage => PveWebUrlHelper.GetWebUrlStorage(resource.Node, resource.Storage),
-            ClusterResourceType.Pool    => PveWebUrlHelper.GetWebUrlPool(resource.Pool),
+            ClusterResourceType.Pool => PveWebUrlHelper.GetWebUrlPool(resource.Pool),
             ClusterResourceType.Vm when resource.VmType == VmType.Qemu => PveWebUrlHelper.GetWebUrlQemu(resource.Node, resource.VmId),
-            ClusterResourceType.Vm when resource.VmType == VmType.Lxc  => PveWebUrlHelper.GetWebUrlLxc(resource.Node, resource.VmId),
+            ClusterResourceType.Vm when resource.VmType == VmType.Lxc => PveWebUrlHelper.GetWebUrlLxc(resource.Node, resource.VmId),
             _ => string.Empty,
         };
 

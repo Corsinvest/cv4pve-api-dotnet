@@ -14,7 +14,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 /// <summary>
 /// vm base
 /// </summary>
-public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, IDiskIO, IDisk, IStatusItem, IUptimeItem
+public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, IDiskIO, IDisk, IStatusItem, IUptimeItem, IPressureInfo
 {
     /// <summary>
     /// Uptime in seconds.
@@ -48,7 +48,6 @@ public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, ID
     /// <summary>
     /// Disk usage percentage
     /// </summary>
-    /// <value></value>
     [Display(Name = "Disk usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     public double DiskUsagePercentage { get; set; }
@@ -86,14 +85,12 @@ public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, ID
     /// <summary>
     /// Memory info
     /// </summary>
-    /// <value></value>
     [Display(Name = "Memory")]
     public string MemoryInfo { get; set; }
 
     /// <summary>
     /// Memory usage percentage
     /// </summary>
-    /// <value></value>
     [Display(Name = "Memory Usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     public double MemoryUsagePercentage { get; set; }
@@ -129,7 +126,6 @@ public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, ID
     /// <summary>
     /// Cpu info
     /// </summary>
-    /// <value></value>
     [Display(Name = "Cpu")]
     public string CpuInfo { get; set; }
 
@@ -154,19 +150,16 @@ public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, ID
     /// <summary>
     /// Status Is running
     /// </summary>
-    /// <value></value>
     public bool IsRunning { get; set; }
 
     /// <summary>
     /// Status Is stopped
     /// </summary>
-    /// <value></value>
     public bool IsStopped { get; set; }
 
     /// <summary>
     /// Status Is paused
     /// </summary>
-    /// <value></value>
     public bool IsPaused { get; set; }
 
     /// <summary>
@@ -217,9 +210,9 @@ public abstract class NodeVmBase : ModelBase, IVmBase, ICpu, INetIO, IMemory, ID
     [OnDeserialized]
     internal void OnSerializedMethod(StreamingContext context)
     {
-        this.ImproveData(Status);
-        ((ICpu)this).ImproveData();
-        ((IMemory)this).ImproveData();
-        ((IDisk)this).ImproveData();
+        this.EnrichData(Status);
+        ((ICpu)this).EnrichData();
+        ((IMemory)this).EnrichData();
+        ((IDisk)this).EnrichData();
     }
 }

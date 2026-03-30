@@ -15,7 +15,6 @@ public class AccessDomain : ModelBase
     /// <summary>
     /// Realm
     /// </summary>
-    /// <value></value>
     [JsonProperty("realm")]
     public string Realm { get; set; }
 
@@ -28,7 +27,6 @@ public class AccessDomain : ModelBase
     /// <summary>
     /// Type
     /// </summary>
-    /// <value></value>
     [JsonProperty("type")]
     public string Type { get; set; }
 

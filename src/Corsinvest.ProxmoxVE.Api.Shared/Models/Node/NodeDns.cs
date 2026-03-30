@@ -40,10 +40,9 @@ public class NodeDns : ModelBase
     /// Is equal
     /// </summary>
     /// <param name="dns"></param>
-    /// <returns></returns>
     public bool IsEqual(NodeDns dns)
-        => Search == dns.Search
-            && Dns1 == dns.Dns1
-            && Dns2 == dns.Dns2
-            && Dns3 == dns.Dns3;
+    => Search == dns.Search
+        && Dns1 == dns.Dns1
+        && Dns2 == dns.Dns2
+        && Dns3 == dns.Dns3;
 }

@@ -27,7 +27,6 @@ public class NodeService : ModelBase
     /// <summary>
     /// IS running
     /// </summary>
-    /// <value></value>
     public bool IsRunning => State == "running";
 
     /// <summary>

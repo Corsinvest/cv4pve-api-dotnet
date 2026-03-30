@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: MIT
  */
 
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Newtonsoft.Json;
 using System.ComponentModel;
 using System.Dynamic;
 using System.Net;
@@ -10,18 +13,12 @@ using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Text;
 using System.Web;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Newtonsoft.Json;
 
 namespace Corsinvest.ProxmoxVE.Api;
 
 /// <summary>
 /// Proxmox VE Client Base
 /// </summary>
-/// <param name="host"></param>
-/// <param name="port"></param>
-/// <param name="httpClient"></param>
 public class PveClientBase(string host, int port = 8006, HttpClient? httpClient = null)
 {
     private ILogger<PveClientBase> _logger = NullLoggerFactory.Instance.CreateLogger<PveClientBase>();
@@ -216,8 +213,8 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
 #endif
             context.Response.Close();
 
-            return !string.IsNullOrEmpty(code) 
-                    && !string.IsNullOrEmpty(state) 
+            return !string.IsNullOrEmpty(code)
+                    && !string.IsNullOrEmpty(state)
                     && await LoginOpenIdAsync(code, state, redirectUrl);
         }
         finally
@@ -253,41 +250,36 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// </summary>
     /// <param name="resource">Url request</param>
     /// <param name="parameters">Additional parameters</param>
-    /// <returns>Result</returns>
     public async Task<Result> GetAsync(string resource, IDictionary<string, object> parameters = null)
-        => await ExecuteRequestAsync(resource, MethodType.Get, parameters);
+    => await ExecuteRequestAsync(resource, MethodType.Get, parameters);
 
     /// <summary>
     /// Execute method POST
     /// </summary>
     /// <param name="resource">Url request</param>
     /// <param name="parameters">Additional parameters</param>
-    /// <returns>Result</returns>
     public async Task<Result> CreateAsync(string resource, IDictionary<string, object> parameters = null)
-        => await ExecuteRequestAsync(resource, MethodType.Create, parameters);
+    => await ExecuteRequestAsync(resource, MethodType.Create, parameters);
 
     /// <summary>
     /// Execute method PUT
     /// </summary>
     /// <param name="resource">Url request</param>
     /// <param name="parameters">Additional parameters</param>
-    /// <returns>Result</returns>
     public async Task<Result> SetAsync(string resource, IDictionary<string, object> parameters = null)
-        => await ExecuteRequestAsync(resource, MethodType.Set, parameters);
+    => await ExecuteRequestAsync(resource, MethodType.Set, parameters);
 
     /// <summary>
     /// Execute method DELETE
     /// </summary>
     /// <param name="resource">Url request</param>
     /// <param name="parameters">Additional parameters</param>
-    /// <returns>Result</returns>
     public async Task<Result> DeleteAsync(string resource, IDictionary<string, object> parameters = null)
-        => await ExecuteRequestAsync(resource, MethodType.Delete, parameters);
+    => await ExecuteRequestAsync(resource, MethodType.Delete, parameters);
 
     /// <summary>
     /// Get http client
     /// </summary>
-    /// <returns></returns>
     public virtual HttpClient GetHttpClient()
     {
         if (httpClient != null) { return httpClient; }
@@ -321,12 +313,6 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// <summary>
     /// Execute Request.
     /// </summary>
-    /// <param name="resource"></param>
-    /// <param name="methodType"></param>
-    /// <param name="parameters"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    /// <exception cref="InvalidEnumArgumentException"></exception>
     protected virtual async Task<Result> ExecuteRequestAsync(string resource,
                                                              MethodType methodType,
                                                              IDictionary<string, object> parameters = null)
@@ -456,15 +442,11 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// <summary>
     /// Last result action
     /// </summary>
-    /// <value></value>
     public Result LastResult { get; private set; }
 
     /// <summary>
     /// Adds indexed parameters to a dictionary.
     /// </summary>
-    /// <param name="parameters"></param>
-    /// <param name="name"></param>
-    /// <param name="value"></param>
     public static void AddIndexedParameter(Dictionary<string, object> parameters,
                                            string name,
                                            IDictionary<int, string> value)
@@ -476,17 +458,11 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// <summary>
     /// Extracts the node name from a task identifier.
     /// </summary>
-    /// <param name="task"></param>
-    /// <returns></returns>
     public static string GetNodeFromTask(string task) => task.Split(':')[1];
 
     /// <summary>
     /// Waits for a background task to finish.
     /// </summary>
-    /// <param name="result"></param>
-    /// <param name="wait"></param>
-    /// <param name="timeout"></param>
-    /// <returns></returns>
     public async Task<bool> WaitForTaskToFinishAsync(Result result, int wait = 500, long timeout = 10000)
         => !(result != null && !result.ResponseInError && timeout > 0) ||
                 await WaitForTaskToFinishAsync(result.ToData(), wait, timeout);
@@ -518,24 +494,18 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// <summary>
     /// Checks whether a task is still running.
     /// </summary>
-    /// <param name="task"></param>
-    /// <returns></returns>
     public async Task<bool> TaskIsRunningAsync(string task)
         => (await ReadTaskStatusAsync(task)).Response.data.status == "running";
 
     /// <summary>
     /// Gets the exit status of a task.
     /// </summary>
-    /// <param name="task"></param>
-    /// <returns></returns>
     public async Task<string> GetExitStatusTaskAsync(string task)
         => (await ReadTaskStatusAsync(task)).Response.data.exitstatus;
 
     /// <summary>
     /// Reads the current status of a task.
     /// </summary>
-    /// <param name="task"></param>
-    /// <returns></returns>
     private async Task<Result> ReadTaskStatusAsync(string task)
         => await GetAsync($"/nodes/{GetNodeFromTask(task)}/tasks/{task}/status");
 }

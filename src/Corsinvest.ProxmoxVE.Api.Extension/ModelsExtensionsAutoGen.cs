@@ -175,6 +175,36 @@ public static class ModelsExtensionsAutoGen
         => (await item.Index(pending, running, type)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterSdnController>>();
 
     /// <summary>
+    /// SDN ipams index.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="type">Only list sdn ipams of specific type
+    ///   Enum: netbox,phpipam,pve</param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterSdnIpam>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveSdn.PveIpams item, string type = null)
+        => (await item.Index(type)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterSdnIpam>>();
+
+    /// <summary>
+    /// SDN dns index.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="type">Only list sdn dns of specific type
+    ///   Enum: powerdns</param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterSdnDns>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveSdn.PveDns item, string type = null)
+        => (await item.Index(type)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterSdnDns>>();
+
+    /// <summary>
+    /// SDN subnets index.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="pending">Display pending config.</param>
+    /// <param name="running">Display running config.</param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterSdnSubnet>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveSdn.PveVnets.PveVnetItem.PveSubnets item, bool? pending = null, bool? running = null)
+        => (await item.Index(pending, running)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterSdnSubnet>>();
+
+    /// <summary>
     /// List recent tasks (cluster wide).
     /// </summary>
     /// <param name="item"></param>

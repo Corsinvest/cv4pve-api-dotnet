@@ -16,12 +16,6 @@ public static class SnapshotHelper
     /// <summary>
     /// Get Snapshot
     /// </summary>
-    /// <param name="client"></param>
-    /// <param name="node"></param>
-    /// <param name="vmType"></param>
-    /// <param name="vmId"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidEnumArgumentException"></exception>
     public static async Task<IEnumerable<VmSnapshot>> GetSnapshotsAsync(PveClient client, string node, VmType vmType, long vmId)
         => (vmType switch
         {
@@ -33,16 +27,6 @@ public static class SnapshotHelper
     /// <summary>
     /// Create snapshot
     /// </summary>
-    /// <param name="client"></param>
-    /// <param name="node"></param>
-    /// <param name="vmType"></param>
-    /// <param name="vmId"></param>
-    /// <param name="name"></param>
-    /// <param name="description"></param>
-    /// <param name="state"></param>
-    /// <param name="timeout"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidEnumArgumentException"></exception>
     public static async Task<Result> CreateSnapshotAsync(PveClient client,
                                                          string node,
                                                          VmType vmType,
@@ -66,15 +50,6 @@ public static class SnapshotHelper
     /// <summary>
     /// Remove snapshot
     /// </summary>
-    /// <param name="client"></param>
-    /// <param name="node"></param>
-    /// <param name="vmType"></param>
-    /// <param name="vmId"></param>
-    /// <param name="name"></param>
-    /// <param name="timeout"></param>
-    /// <param name="force"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidEnumArgumentException"></exception>
     public static async Task<Result> RemoveSnapshotAsync(PveClient client,
                                                          string node,
                                                          VmType vmType,
@@ -97,13 +72,6 @@ public static class SnapshotHelper
     /// <summary>
     /// Get config snapshot
     /// </summary>
-    /// <param name="client"></param>
-    /// <param name="node"></param>
-    /// <param name="vmType"></param>
-    /// <param name="vmId"></param>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidEnumArgumentException"></exception>
     public static async Task<Result> GetConfigSnapshotAsync(PveClient client,
                                                             string node,
                                                             VmType vmType,
@@ -119,14 +87,6 @@ public static class SnapshotHelper
     /// <summary>
     /// Update snapshot
     /// </summary>
-    /// <param name="client"></param>
-    /// <param name="node"></param>
-    /// <param name="vmType"></param>
-    /// <param name="vmId"></param>
-    /// <param name="name"></param>
-    /// <param name="description"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidEnumArgumentException"></exception>
     public static async Task<Result> UpdateSnapshotAsync(PveClient client,
                                                          string node,
                                                          VmType vmType,
@@ -143,14 +103,6 @@ public static class SnapshotHelper
     /// <summary>
     /// Rollback snapshot
     /// </summary>
-    /// <param name="client"></param>
-    /// <param name="node"></param>
-    /// <param name="vmType"></param>
-    /// <param name="vmId"></param>
-    /// <param name="name"></param>
-    /// <param name="timeout"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidEnumArgumentException"></exception>
     public static async Task<Result> RollbackSnapshotAsync(PveClient client,
                                                            string node,
                                                            VmType vmType,

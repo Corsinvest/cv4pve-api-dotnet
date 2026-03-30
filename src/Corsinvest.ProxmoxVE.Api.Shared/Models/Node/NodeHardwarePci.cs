@@ -27,7 +27,6 @@ public class NodeHardwarePci : ModelBase
     /// <summary>
     /// Device Name
     /// </summary>
-    /// <value></value>
     [JsonProperty("device_name")]
     public string DeviceName { get; set; }
 
@@ -40,7 +39,6 @@ public class NodeHardwarePci : ModelBase
     /// <summary>
     /// Vendor Name
     /// </summary>
-    /// <value></value>
     [JsonProperty("vendor_name")]
     public string VendorName { get; set; }
 
@@ -53,7 +51,6 @@ public class NodeHardwarePci : ModelBase
     /// <summary>
     /// Subsystem Vendor Name
     /// </summary>
-    /// <value></value>
     [JsonProperty("subsystem_vendor_name")]
     public string SubsystemVendorName { get; set; }
 
@@ -78,7 +75,6 @@ public class NodeHardwarePci : ModelBase
     /// <summary>
     /// Subsystem Device Name
     /// </summary>
-    /// <value></value>
     [JsonProperty("subsystem_device_name")]
     public string SubsystemDeviceName { get; set; }
     /// <summary>

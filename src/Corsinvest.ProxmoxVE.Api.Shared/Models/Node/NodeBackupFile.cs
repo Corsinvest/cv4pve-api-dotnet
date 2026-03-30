@@ -47,7 +47,7 @@ public class NodeBackupFile : ModelBase
     /// Modified Time Unix
     /// </summary>
     [JsonProperty("mtime")]
-    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime )]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime)]
     public long ModifiedTime { get; set; }
 
     /// <summary>

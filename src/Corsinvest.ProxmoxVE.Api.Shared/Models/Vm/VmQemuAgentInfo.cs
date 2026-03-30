@@ -15,7 +15,6 @@ public class VmQemuAgentInfo : ModelBase
     /// <summary>
     /// Result
     /// </summary>
-    /// <value></value>
     [JsonProperty("result")]
     public ResultInt Result { get; set; }
 
@@ -27,14 +26,12 @@ public class VmQemuAgentInfo : ModelBase
         /// <summary>
         /// Supported Commands
         /// </summary>
-        /// <value></value>
         [JsonProperty("supported_commands")]
         public IEnumerable<SupportedCommand> SupportedCommands { get; set; } = [];
 
         /// <summary>
         /// Version
         /// </summary>
-        /// <value></value>
         [JsonProperty("version")]
         public string Version { get; set; }
     }
@@ -59,7 +56,6 @@ public class VmQemuAgentInfo : ModelBase
         /// <summary>
         /// Success Response
         /// </summary>
-        /// <value></value>
         [JsonProperty("success-response")]
         public bool SuccessResponse { get; set; }
     }

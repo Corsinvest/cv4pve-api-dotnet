@@ -17,7 +17,6 @@ public interface ICpu
     /// <summary>
     /// Cpu usage
     /// </summary>
-    /// <value></value>
     [Display(Name = "CPU Usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     [JsonProperty("cpu")]
@@ -26,14 +25,12 @@ public interface ICpu
     /// <summary>
     /// Cpu size
     /// </summary>
-    /// <value></value>
     [JsonProperty("maxcpu")]
     long CpuSize { get; set; }
 
     /// <summary>
     /// Cpu info
     /// </summary>
-    /// <value></value>
     [Display(Name = "Cpu")]
     string CpuInfo { get; set; }
 }

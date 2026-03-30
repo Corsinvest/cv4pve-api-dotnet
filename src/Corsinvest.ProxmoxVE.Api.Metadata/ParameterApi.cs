@@ -19,17 +19,17 @@ public class ParameterApi
     /// <param name="flat">Flat cache parameter info</param>
     internal ParameterApi(FlatParamInfo flat)
     {
-        Name        = flat.Name;
+        Name = flat.Name;
         NameIndexed = flat.Name.Replace("[n]", string.Empty);
-        IsIndexed   = flat.Name.EndsWith("[n]");
-        Type        = flat.Type ?? string.Empty;
-        TypeText    = flat.TypeText ?? string.Empty;
+        IsIndexed = flat.Name.EndsWith("[n]");
+        Type = flat.Type ?? string.Empty;
+        TypeText = flat.TypeText ?? string.Empty;
         Description = flat.Description ?? string.Empty;
-        Optional    = flat.Optional ?? false;
-        Default     = flat.Default ?? string.Empty;
-        Minimum     = flat.Minimum.HasValue ? (int?)flat.Minimum.Value : null;
-        Maximum     = flat.Maximum;
-        EnumValues  = flat.EnumValues ?? [];
+        Optional = flat.Optional ?? false;
+        Default = flat.Default ?? string.Empty;
+        Minimum = flat.Minimum.HasValue ? flat.Minimum.Value : null;
+        Maximum = flat.Maximum;
+        EnumValues = flat.EnumValues ?? [];
     }
 
     /// <summary>Constructor from JSON token</summary>
@@ -79,31 +79,26 @@ public class ParameterApi
     /// <summary>
     /// Name Indexed
     /// </summary>
-    /// <returns></returns>
     public string NameIndexed { get; }
 
     /// <summary>
     /// Enum values
     /// </summary>
-    /// <value></value>
     public string[] EnumValues { get; }
 
     /// <summary>
     /// Parameters
     /// </summary>
-    /// <returns></returns>
     public List<ParameterFormatApi> Formats { get; } = [];
 
     /// <summary>
     /// Items
     /// </summary>
-    /// <returns></returns>
     public List<ParameterApi> Items { get; } = [];
 
     /// <summary>
     /// Get alignment value
     /// </summary>
-    /// <returns></returns>
     public string GetAlignmentValue()
         => Renderer switch
         {
@@ -118,8 +113,6 @@ public class ParameterApi
     /// <summary>
     /// Renderer value.
     /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
     public object RendererValue(object value)
     {
         switch (Renderer)
@@ -180,66 +173,55 @@ public class ParameterApi
     /// <summary>
     /// Name
     /// </summary>
-    /// <value></value>
     public string Name { get; }
 
     /// <summary>
     /// Type
     /// </summary>
-    /// <value></value>
     public string Type { get; }
 
     /// <summary>
     /// Type text
     /// </summary>
-    /// <value></value>
     public string TypeText { get; }
 
     /// <summary>
     /// Comment
     /// </summary>
-    /// <value></value>
     public string Description { get; }
 
     /// <summary>
     /// Verbose description
     /// </summary>
-    /// <value></value>
     public string VerboseDescription { get; }
 
     /// <summary>
     /// Optional
     /// </summary>
-    /// <value></value>
     public bool Optional { get; }
 
     /// <summary>
     /// Is Indexed
     /// </summary>
-    /// <returns></returns>
     public bool IsIndexed { get; }
 
     /// <summary>
     /// Minimum
     /// </summary>
-    /// <value></value>
     public int? Minimum { get; }
 
     /// <summary>
     /// Render
     /// </summary>
-    /// <value></value>
     public string Renderer { get; }
 
     /// <summary>
     /// Default
     /// </summary>
-    /// <value></value>
     public string Default { get; }
 
     /// <summary>
     /// Maximum
     /// </summary>
-    /// <value></value>
     public long? Maximum { get; }
 }

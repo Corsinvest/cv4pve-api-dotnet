@@ -13,20 +13,14 @@ public class PveFormatProvider : IFormatProvider, ICustomFormatter
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="formatType"></param>
-    /// <returns></returns>
     public object GetFormat(Type formatType)
-        => formatType == typeof(ICustomFormatter)
-            ? this
-            : null;
+    => formatType == typeof(ICustomFormatter)
+        ? this
+        : null;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="format"></param>
-    /// <param name="arg"></param>
-    /// <param name="formatProvider"></param>
-    /// <returns></returns>
     public string Format(string format, object arg, IFormatProvider formatProvider)
     {
         // Check whether this is an appropriate callback

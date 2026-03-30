@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 using Newtonsoft.Json;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Pool;
@@ -15,19 +16,17 @@ public class PoolItem : ModelBase
     /// <summary>
     /// Id
     /// </summary>
-    /// <value></value>
     [JsonProperty("poolid")]
     public string Id { get; set; }
 
     /// <summary>
     /// Comment
     /// </summary>
-    /// <value></value>
     [JsonProperty("comment")]
     public string Comment { get; set; }
     /// <summary>
     /// Members.
     /// </summary>
     [JsonProperty("members")]
-    public IEnumerable<object> Members { get; set; } = [];
+    public IEnumerable<ClusterResource> Members { get; set; } = [];
 }

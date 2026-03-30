@@ -23,20 +23,18 @@ public class NodeStorageContent : ModelBase
     /// <summary>
     /// Content Description
     /// </summary>
-    /// <value></value>
     public string ContentDescription => FormatHelper.ContentToDescription(Content);
 
     /// <summary>
     /// Creation time (seconds since the UNIX Epoch).
     /// </summary>
     [JsonProperty("ctime")]
-    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime )]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime)]
     public long Creation { get; set; }
 
     /// <summary>
     /// Creation date
     /// </summary>
-    /// <returns></returns>
     public DateTime CreationDate => DateTimeOffset.FromUnixTimeSeconds(Creation).DateTime;
 
     /// <summary>
@@ -119,9 +117,9 @@ public class NodeStorageContent : ModelBase
     /// <summary>
     /// Verified
     /// </summary>
-        [JsonIgnore]
+    [JsonIgnore]
     public bool Verified
-        => ExtensionData != null
-            && ExtensionData.TryGetValue("verification", out dynamic verification)
-            && verification.state == "ok";
+    => ExtensionData != null
+        && ExtensionData.TryGetValue("verification", out dynamic verification)
+        && verification.state == "ok";
 }

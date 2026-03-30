@@ -13,7 +13,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 /// <summary>
 /// Vm Base Status Current
 /// </summary>
-public class VmBaseStatusCurrent : ModelBase, IVmBase, INetIO, IDisk, IMemory, ICpu, IDiskIO
+public class VmBaseStatusCurrent : ModelBase, IVmBase, INetIO, IDisk, IMemory, ICpu, IDiskIO, IPressureInfo
 {
     /// <summary>
     /// The amount of traffic in bytes that was sent to the guest over the network since it was started.
@@ -48,7 +48,6 @@ public class VmBaseStatusCurrent : ModelBase, IVmBase, INetIO, IDisk, IMemory, I
     /// <summary>
     /// Disk usage percentage
     /// </summary>
-    /// <value></value>
     [Display(Name = "Disk usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     public double DiskUsagePercentage { get; set; }
@@ -72,14 +71,12 @@ public class VmBaseStatusCurrent : ModelBase, IVmBase, INetIO, IDisk, IMemory, I
     /// <summary>
     /// Memory info
     /// </summary>
-    /// <value></value>
     [Display(Name = "Memory")]
     public string MemoryInfo { get; set; }
 
     /// <summary>
     /// Memory usage percentage
     /// </summary>
-    /// <value></value>
     [Display(Name = "Memory Usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     public double MemoryUsagePercentage { get; set; }
@@ -101,7 +98,6 @@ public class VmBaseStatusCurrent : ModelBase, IVmBase, INetIO, IDisk, IMemory, I
     /// <summary>
     /// Cpu info
     /// </summary>
-    /// <value></value>
     [Display(Name = "Cpu")]
     public string CpuInfo { get; set; }
 
@@ -146,19 +142,16 @@ public class VmBaseStatusCurrent : ModelBase, IVmBase, INetIO, IDisk, IMemory, I
     /// <summary>
     /// Status Is running
     /// </summary>
-    /// <value></value>
     public bool IsRunning { get; set; }
 
     /// <summary>
     /// Status Is stopped
     /// </summary>
-    /// <value></value>
     public bool IsStopped { get; set; }
 
     /// <summary>
     /// Status Is paused
     /// </summary>
-    /// <value></value>
     public bool IsPaused { get; set; }
 
     /// <summary>
@@ -240,9 +233,9 @@ public class VmBaseStatusCurrent : ModelBase, IVmBase, INetIO, IDisk, IMemory, I
     /// </summary>
     protected void OnSerializedMethodBase()
     {
-        ((IDisk)this).ImproveData();
-        ((IMemory)this).ImproveData();
-        ((ICpu)this).ImproveData();
-        ((IVmBase)this).ImproveData(Status);
+        ((IDisk)this).EnrichData();
+        ((IMemory)this).EnrichData();
+        ((ICpu)this).EnrichData();
+        this.EnrichData(Status);
     }
 }

@@ -21,7 +21,6 @@ public class AccessTfa : ModelBase
     /// <summary>
     /// TFA entries
     /// </summary>
-    /// <value></value>
     [JsonProperty("entries")]
     public IEnumerable<AccessTfaEntry> Entries { get; set; }
 
@@ -45,28 +44,24 @@ public class AccessTfa : ModelBase
         /// <summary>
         /// TFA type (totp, u2f, webauthn, yubico, recovery)
         /// </summary>
-        /// <value></value>
         [JsonProperty("type")]
         public string Type { get; set; }
 
         /// <summary>
         /// Creation timestamp
         /// </summary>
-        /// <value></value>
         [JsonProperty("created")]
         public long Created { get; set; }
 
         /// <summary>
         /// Description
         /// </summary>
-        /// <value></value>
         [JsonProperty("description")]
         public string Description { get; set; }
 
         /// <summary>
         /// Entry id
         /// </summary>
-        /// <value></value>
         [JsonProperty("id")]
         public string Id { get; set; }
     }

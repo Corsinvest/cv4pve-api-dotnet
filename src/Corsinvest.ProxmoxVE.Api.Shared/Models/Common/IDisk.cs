@@ -17,7 +17,6 @@ public interface IDisk
     /// <summary>
     /// Disk usage
     /// </summary>
-    /// <value></value>
     [JsonProperty("disk")]
     [Display(Name = "Disk usage")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
@@ -26,7 +25,6 @@ public interface IDisk
     /// <summary>
     /// Disk size
     /// </summary>
-    /// <value></value>
     [JsonProperty("maxdisk")]
     [Display(Name = "Disk size")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
@@ -35,7 +33,6 @@ public interface IDisk
     /// <summary>
     /// Disk usage percentage
     /// </summary>
-    /// <value></value>
     [Display(Name = "Disk usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     double DiskUsagePercentage { get; set; }

@@ -28,10 +28,6 @@ public static class ApiExplorerHelper
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="description"></param>
-        /// <param name="command"></param>
-        /// <param name="system"></param>
         public AliasDef(string name, string description, string command, bool system)
         {
             Name = name;
@@ -43,45 +39,36 @@ public static class ApiExplorerHelper
         /// <summary>
         /// Name
         /// </summary>
-        /// <value></value>
         public string Name { get; }
 
         /// <summary>
         /// Description
         /// </summary>
-        /// <value></value>
         public string Description { get; }
 
         /// <summary>
         /// Command
         /// </summary>
-        /// <value></value>
         public string Command { get; }
 
         /// <summary>
         /// System
         /// </summary>
-        /// <value></value>
         public bool System { get; }
 
         /// <summary>
         /// Check exists name or alias
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
         public bool Exists(string name) => name.Split(',').Any(a => Names.Contains(a));
 
         /// <summary>
         /// Name alias
         /// </summary>
-        /// <returns></returns>
         public string[] Names => Name.Split(',');
 
         /// <summary>
         /// Check name is valid
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
         public static bool IsValid(string name) => new Regex("^[a-zA-Z0-9,_-]*$").IsMatch(name);
     }
 
@@ -161,15 +148,11 @@ public static class ApiExplorerHelper
         /// <summary>
         /// Alias
         /// </summary>
-        /// <returns></returns>
         public ReadOnlyCollection<AliasDef> Alias => _alias.AsReadOnly();
 
         /// <summary>
         /// To table
         /// </summary>
-        /// <param name="verbose"></param>
-        /// <param name="output"></param>
-        /// <returns></returns>
         public string ToTable(bool verbose, TableGenerator.Output output)
         {
             var columns = verbose
@@ -182,10 +165,10 @@ public static class ApiExplorerHelper
                             .ThenBy(a => a.Name)
                             .Select(a => verbose
                                     ? [ a.Name,
-                                              a.Description,
-                                              a.Command,
-                                              string.Join(",", GetArgumentTags(a.Command)),
-                                              EncodeSystem(a.System) ]
+                                        a.Description,
+                                        a.Command,
+                                        string.Join(",", GetArgumentTags(a.Command)),
+                                        EncodeSystem(a.System) ]
 
                                     : new[] { a.Name,
                                               a.Description,
@@ -197,11 +180,6 @@ public static class ApiExplorerHelper
         /// <summary>
         /// Create new alias
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="description"></param>
-        /// <param name="command"></param>
-        /// <param name="system"></param>
-        /// <returns></returns>
         public bool Create(string name, string description, string command, bool system)
         {
             if (!AliasDef.IsValid(name) || Exists(name)) { return false; }
@@ -212,8 +190,6 @@ public static class ApiExplorerHelper
         /// <summary>
         /// Exists alias
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
         public bool Exists(string name) => _alias.Any(a => a.Exists(name));
 
         /// <summary>
@@ -224,8 +200,6 @@ public static class ApiExplorerHelper
         /// <summary>
         /// Remove alias
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
         public bool Remove(string name)
         {
             var item = _alias.FirstOrDefault(a => a.Names.Contains(name) && !a.System);
@@ -236,7 +210,6 @@ public static class ApiExplorerHelper
         /// <summary>
         /// Filename
         /// </summary>
-        /// <value></value>
         public string FileName { get; set; }
 
         /// <summary>
@@ -264,15 +237,11 @@ public static class ApiExplorerHelper
     /// <summary>
     /// Create tag argument
     /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
     public static string CreateArgumentTag(string name) => "{" + name + "}";
 
     /// <summary>
     /// Get argument into command start "{" end "}"
     /// </summary>
-    /// <param name="command"></param>
-    /// <returns></returns>
     public static string[] GetArgumentTags(string command)
         => [.. new Regex(@"{\s*(.+?)\s*}").Matches(command)
                                       .OfType<Match>()
@@ -288,11 +257,11 @@ public static class ApiExplorerHelper
         if (classApi == null) { return []; }
         var humanized = methodType switch
         {
-            MethodType.Get    => "get",
-            MethodType.Set    => "put",
+            MethodType.Get => "get",
+            MethodType.Set => "put",
             MethodType.Create => "post",
             MethodType.Delete => "delete",
-            _                 => methodType.ToString().ToLower()
+            _ => methodType.ToString().ToLower()
         };
         var method = classApi.Methods.FirstOrDefault(m =>
             string.Equals(m.MethodType, humanized, StringComparison.OrdinalIgnoreCase));
@@ -311,11 +280,11 @@ public static class ApiExplorerHelper
         if (classApi == null) { return []; }
         var humanized = methodType switch
         {
-            MethodType.Get    => "get",
-            MethodType.Set    => "put",
+            MethodType.Get => "get",
+            MethodType.Set => "put",
             MethodType.Create => "post",
             MethodType.Delete => "delete",
-            _                 => methodType.ToString().ToLower()
+            _ => methodType.ToString().ToLower()
         };
         var method = classApi.Methods.FirstOrDefault(m =>
             string.Equals(m.MethodType, humanized, StringComparison.OrdinalIgnoreCase));
@@ -331,8 +300,6 @@ public static class ApiExplorerHelper
     /// <summary>
     /// Create parameter resource split ':'
     /// </summary>
-    /// <param name="items"></param>
-    /// <returns></returns>
     public static IDictionary<string, object> CreateParameterResource(IEnumerable<string> items)
     {
         var parameters = new Dictionary<string, object>();
@@ -347,16 +314,6 @@ public static class ApiExplorerHelper
     /// <summary>
     /// Execute methods
     /// </summary>
-    /// <param name="client"></param>
-    /// <param name="classApiRoot"></param>
-    /// <param name="resource"></param>
-    /// <param name="methodType"></param>
-    /// <param name="parameters"></param>
-    /// <param name="wait"></param>
-    /// <param name="output"></param>
-    /// <param name="verbose"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidEnumArgumentException"></exception>
     public static async Task<(int ResultCode, string ResultText)> ExecuteAsync(PveClient client,
                                                                                ClassApi classApiRoot,
                                                                                string resource,
@@ -435,11 +392,6 @@ public static class ApiExplorerHelper
     /// <summary>
     /// Create table
     /// </summary>
-    /// <param name="data"></param>
-    /// <param name="keys"></param>
-    /// <param name="output"></param>
-    /// <param name="returnParameters"></param>
-    /// <returns></returns>
     private static string CreateTableDynamic(dynamic data, string[] keys, TableGenerator.Output output, List<ParameterApi> returnParameters)
     {
         var columns = new List<string>();
@@ -527,7 +479,9 @@ public static class ApiExplorerHelper
             var param = returnParameters.FirstOrDefault(a => a.Name == key);
             return param != null
                         ? param.RendererValue(value)
-                        : (value is ExpandoObject || value is IList) ? JsonConvert.SerializeObject(value) : value;
+                        : (value is ExpandoObject || value is IList)
+                            ? JsonConvert.SerializeObject(value)
+                            : value;
         }
     }
 
@@ -571,14 +525,6 @@ public static class ApiExplorerHelper
     /// <summary>
     /// Usage resource
     /// </summary>
-    /// <param name="classApiRoot"></param>
-    /// <param name="resource"></param>
-    /// <param name="output"></param>
-    /// <param name="returnsType"></param>
-    /// <param name="command"></param>
-    /// <param name="verbose"></param>
-    /// <param name="optionStyle"></param>
-    /// <returns></returns>
     public static string Usage(ClassApi classApiRoot,
                                string resource,
                                TableGenerator.Output output,
@@ -610,7 +556,9 @@ public static class ApiExplorerHelper
                 var parameters = method.Parameters.Where(a => !classApi.Keys.Contains(a.Name));
 
                 var opts = string.Join(string.Empty, parameters.Where(a => !a.Optional)
-                    .Select(a => optionStyle ? $" --{a.Name} <{a.Type}>" : $" {a.Name}:<{a.Type}>"));
+                                                               .Select(a => optionStyle
+                                                                            ? $" --{a.Name} <{a.Type}>"
+                                                                            : $" {a.Name}:<{a.Type}>"));
                 if (!string.IsNullOrWhiteSpace(opts)) { ret.Append(opts); }
 
                 //optional parameter
@@ -660,10 +608,6 @@ public static class ApiExplorerHelper
     /// <summary>
     /// List values resource
     /// </summary>
-    /// <param name="client"></param>
-    /// <param name="classApiRoot"></param>
-    /// <param name="resource"></param>
-    /// <returns></returns>
     public static async Task<(IEnumerable<(string Attribute, string Value)> Values, string Error)> ListValuesAsync(PveClient client,
                                                                                                                    ClassApi classApiRoot,
                                                                                                                    string resource)
@@ -731,16 +675,12 @@ public static class ApiExplorerHelper
     /// <summary>
     /// List structure
     /// </summary>
-    /// <param name="client"></param>
-    /// <param name="classApiRoot"></param>
-    /// <param name="resource"></param>
-    /// <returns></returns>
     public static async Task<string> ListAsync(PveClient client, ClassApi classApiRoot, string resource)
     {
         var (values, error) = await ListValuesAsync(client, classApiRoot, resource);
         return string.Join(Environment.NewLine, values.Select(a => $"{a.Attribute}        {a.Value}")) +
-               (string.IsNullOrWhiteSpace(error) 
-                    ? string.Empty 
+               (string.IsNullOrWhiteSpace(error)
+                    ? string.Empty
                     : Environment.NewLine + error) +
                Environment.NewLine;
     }
