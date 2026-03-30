@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: MIT
  */
 
+#nullable enable
+
 namespace Corsinvest.ProxmoxVE.Api.Metadata;
 
 /// <summary>Flat cache resource — keys, children, methods</summary>
