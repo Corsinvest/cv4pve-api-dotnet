@@ -16,29 +16,21 @@ public static class ResultExtension
     /// <summary>
     /// Enumerable result for Linq.
     /// </summary>
-    /// <param name="result"></param>
-    /// <returns></returns>
     public static IEnumerable<dynamic> ToEnumerable(this Result result) => (IEnumerable<dynamic>)result.ToData();
 
     /// <summary>
     /// Enumerable result data.
     /// </summary>
-    /// <param name="result"></param>
-    /// <returns></returns>
     public static dynamic ToData(this Result result) => result.Response.data;
 
     /// <summary>
     /// Enumerable result data.
     /// </summary>
-    /// <param name="result"></param>
-    /// <returns></returns>
     public static T ToData<T>(this Result result) => (T)Convert.ChangeType(result.ToData(), typeof(T));
 
     /// <summary>
     /// Convert result (t and n) to logs
     /// </summary>
-    /// <param name="result"></param>
-    /// <returns></returns>
     public static IEnumerable<string> ToLogs(this Result result)
         => result.ToData() is ExpandoObject
                 ? [(result.ToData().t as string)]
@@ -49,16 +41,11 @@ public static class ResultExtension
     /// <summary>
     /// Check result in error.
     /// </summary>
-    /// <param name="result"></param>
-    /// <returns></returns>
     public static bool InError(this Result result) => result != null && result.ResponseInError;
 
     /// <summary>
     /// Convert result to model
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="result"></param>
-    /// <returns></returns>
     public static T ToModel<T>(this Result result)
         => result.InError() || !result.IsSuccessStatusCode //check exists error
             ? throw new PveResultException(result, !result.IsSuccessStatusCode ? result.ReasonPhrase : result.GetError())

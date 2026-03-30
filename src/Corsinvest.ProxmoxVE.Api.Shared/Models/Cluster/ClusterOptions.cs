@@ -27,7 +27,6 @@ public class ClusterOptions : ModelBase
     /// <summary>
     /// Allowed Tags
     /// </summary>
-    /// <value></value>
     [JsonProperty("allowed-tags")]
     public IEnumerable<string> AllowedTags { get; set; } = [];
 

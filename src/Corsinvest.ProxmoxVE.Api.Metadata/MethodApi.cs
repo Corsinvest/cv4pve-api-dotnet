@@ -18,15 +18,15 @@ public class MethodApi
     /// <param name="classApi">Parent ClassApi node</param>
     internal MethodApi(string httpMethod, FlatMethodInfo flat, ClassApi classApi)
     {
-        MethodType       = httpMethod.ToUpper();
-        MethodName       = httpMethod;
-        Comment          = flat.Comment ?? string.Empty;
-        ReturnType       = flat.ReturnType ?? string.Empty;
-        ReturnLinkHRef   = flat.ReturnLinkHRef ?? string.Empty;
-        ReturnIsArray    = ReturnType == "array";
-        ReturnIsNull     = ReturnType == "null";
-        ClassApi         = classApi;
-        if (flat.Params != null)     { Parameters.AddRange(flat.Params.Select(p => new ParameterApi(p))); }
+        MethodType = httpMethod.ToUpper();
+        MethodName = httpMethod;
+        Comment = flat.Comment ?? string.Empty;
+        ReturnType = flat.ReturnType ?? string.Empty;
+        ReturnLinkHRef = flat.ReturnLinkHRef ?? string.Empty;
+        ReturnIsArray = ReturnType == "array";
+        ReturnIsNull = ReturnType == "null";
+        ClassApi = classApi;
+        if (flat.Params != null) { Parameters.AddRange(flat.Params.Select(p => new ParameterApi(p))); }
         if (flat.ReturnParams != null) { ReturnParameters.AddRange(flat.ReturnParams.Select(p => new ParameterApi(p))); }
     }
 
@@ -71,55 +71,46 @@ public class MethodApi
     /// <summary>
     /// Href
     /// </summary>
-    /// <value></value>
     public string ReturnLinkHRef { get; }
 
     /// <summary>
     /// Rel
     /// </summary>
-    /// <value></value>
     public string ReturnLinkRel { get; }
 
     /// <summary>
     /// Parameter
     /// </summary>
-    /// <returns></returns>
     public List<ParameterApi> Parameters { get; } = [];
 
     /// <summary>
     /// Return parameter
     /// </summary>
-    /// <returns></returns>
     public List<ParameterApi> ReturnParameters { get; } = [];
 
     /// <summary>
     /// Method Type
     /// </summary>
-    /// <value></value>
     public string MethodType { get; }
 
     /// <summary>
     /// Is Get
     /// </summary>
-    /// <returns></returns>
     public bool IsGet => string.Equals(MethodType, "get", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Is Post
     /// </summary>
-    /// <returns></returns>
     public bool IsPost => string.Equals(MethodType, "post", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Is Post
     /// </summary>
-    /// <returns></returns>
     public bool IsPut => string.Equals(MethodType, "put", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Get Method Type Humanized
     /// </summary>
-    /// <returns></returns>
     public string GetMethodTypeHumanized()
     {
         var name = MethodType.ToLower();
@@ -159,6 +150,5 @@ public class MethodApi
     /// <summary>
     /// Class Api
     /// </summary>
-    /// <value></value>
     public ClassApi ClassApi { get; }
 }

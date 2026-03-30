@@ -10,7 +10,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Access;
 /// <summary>
 /// Acl
 /// </summary>
-public class AccessAcl: ModelBase
+public class AccessAcl : ModelBase
 {
     /// <summary>
     /// Access control path
@@ -21,14 +21,12 @@ public class AccessAcl: ModelBase
     /// <summary>
     /// Role id
     /// </summary>
-    /// <value></value>
     [JsonProperty("roleid")]
     public string Roleid { get; set; }
 
     /// <summary>
     /// User group id
     /// </summary>
-    /// <value></value>
     [JsonProperty("ugid")]
     public string UsersGroupid { get; set; }
 
@@ -41,7 +39,6 @@ public class AccessAcl: ModelBase
     /// <summary>
     /// Type
     /// </summary>
-    /// <value></value>
     [JsonProperty("type")]
     public string Type { get; set; }
 }

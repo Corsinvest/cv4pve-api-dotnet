@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: MIT
  */
 
-using System.Net.Sockets;
 using Corsinvest.ProxmoxVE.Api.Shared;
 using Microsoft.Extensions.Logging;
+using System.Net.Sockets;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
 {
@@ -47,7 +47,6 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
         /// <param name="httpClient">Optional HTTP client</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Authenticated PveClient</returns>
-        /// <exception cref="PveException">Thrown when no hosts are reachable or authentication fails</exception>
         public static async Task<PveClient> GetClientAndTryLoginAsync(string hostsAndPortHA,
                                                                       string username = null,
                                                                       string password = null,
@@ -140,8 +139,8 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
             var reachableEndpoint = await FindFirstReachableHostAsync(endpoints, timeout, cancellationToken);
 
             return reachableEndpoint != null
-                ? (clientFactory(reachableEndpoint.Host, reachableEndpoint.Port), reachableEndpoint)
-                : (null, null);
+                    ? (clientFactory(reachableEndpoint.Host, reachableEndpoint.Port), reachableEndpoint)
+                    : (null, null);
         }
 
         /// <summary>

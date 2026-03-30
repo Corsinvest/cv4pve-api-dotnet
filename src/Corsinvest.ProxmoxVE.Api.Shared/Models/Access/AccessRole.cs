@@ -15,21 +15,18 @@ public class AccessRole : ModelBase
     /// <summary>
     /// Privileges
     /// </summary>
-    /// <value></value>
     [JsonProperty("privs")]
     public string Privileges { get; set; }
 
     /// <summary>
     /// Role Id
     /// </summary>
-    /// <value></value>
     [JsonProperty("roleid")]
     public string Id { get; set; }
 
     /// <summary>
     /// Special
     /// </summary>
-    /// <value></value>
     [JsonProperty("special")]
     public int Special { get; set; }
 }

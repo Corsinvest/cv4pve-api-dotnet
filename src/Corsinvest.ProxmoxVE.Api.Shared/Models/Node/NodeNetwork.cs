@@ -75,7 +75,6 @@ public class NodeNetwork : ModelBase
     /// <summary>
     /// Bond Miimon
     /// </summary>
-    /// <value></value>
     [JsonProperty("bond_miimon")]
     public string BondMiimon { get; set; }
 
@@ -112,7 +111,6 @@ public class NodeNetwork : ModelBase
     /// <summary>
     /// Bridge Stp
     /// </summary>
-    /// <value></value>
     [JsonProperty("bridge_stp")]
     public string BridgeStp { get; set; }
 
@@ -131,7 +129,6 @@ public class NodeNetwork : ModelBase
     /// <summary>
     /// Bridge Fd
     /// </summary>
-    /// <value></value>
     [JsonProperty("bridge_fd")]
     public string BridgeFd { get; set; }
 

@@ -33,7 +33,6 @@ public class AccessUser : ModelBase
     /// <summary>
     /// Email
     /// </summary>
-    /// <value></value>
     [JsonProperty("email")]
     public string Email { get; set; }
 
@@ -89,7 +88,7 @@ public class AccessUser : ModelBase
     /// Tokens
     /// </summary>
     [JsonProperty("tokens")]
-    public IEnumerable<Token> Tokens { get; set; }=[];
+    public IEnumerable<Token> Tokens { get; set; } = [];
 
     /// <summary>
     /// Token

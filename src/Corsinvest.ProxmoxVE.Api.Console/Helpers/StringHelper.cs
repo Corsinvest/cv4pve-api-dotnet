@@ -43,7 +43,7 @@ internal static class StringHelper
         else
         {
             // Old format without version prefix - uses ECB mode
-            #pragma warning disable CA5351 // Accettabile per retrocompatibilità con formato dati esistenti
+#pragma warning disable CA5351 // Accettabile per retrocompatibilità con formato dati esistenti
             var dataArray = Convert.FromBase64String(data);
 
             using var tDes = TripleDES.Create();
@@ -55,7 +55,7 @@ internal static class StringHelper
             var resultArray = cTransform.TransformFinalBlock(dataArray, 0, dataArray.Length);
             tDes.Clear();
 
-            #pragma warning restore CA5351
+#pragma warning restore CA5351
             return Encoding.UTF8.GetString(resultArray);
         }
     }
@@ -85,6 +85,5 @@ internal static class StringHelper
     /// <summary>
     /// Get the version prefix used for new encrypted data
     /// </summary>
-    /// <returns></returns>
     public static string GetVersionPrefix() => VERSION_PREFIX;
 }

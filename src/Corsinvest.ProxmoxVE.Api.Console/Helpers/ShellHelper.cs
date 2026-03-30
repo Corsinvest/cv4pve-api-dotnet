@@ -16,13 +16,6 @@ public static class ShellHelper
     /// <summary>
     /// Execute Console command
     /// </summary>
-    /// <param name="cmd"></param>
-    /// <param name="redirectStandardOutput"></param>
-    /// <param name="environmentVariables"></param>
-    /// <param name="out"></param>
-    /// <param name="dryRun"></param>
-    /// <param name="debug"></param>
-    /// <returns></returns>
     public static (string StandardOutput, int ExitCode) Execute(string cmd,
                                                                 bool redirectStandardOutput,
                                                                 IDictionary<string, string> environmentVariables,
@@ -34,14 +27,6 @@ public static class ShellHelper
     /// <summary>
     /// Execute Console command
     /// </summary>
-    /// <param name="cmd"></param>
-    /// <param name="redirectStandardOutput"></param>
-    /// <param name="environmentVariables"></param>
-    /// <param name="out"></param>
-    /// <param name="dryRun"></param>
-    /// <param name="debug"></param>
-    /// <param name="waitForExit"></param>
-    /// <returns></returns>
     public static (string StandardOutput, int ExitCode) Execute(string cmd,
                                                                 bool redirectStandardOutput,
                                                                 IDictionary<string, string> environmentVariables,
@@ -93,8 +78,8 @@ public static class ShellHelper
         else
         {
             process.Start();
-            var standardOutput = redirectStandardOutput 
-                                    ? process.StandardOutput.ReadToEnd() 
+            var standardOutput = redirectStandardOutput
+                                    ? process.StandardOutput.ReadToEnd()
                                     : string.Empty;
             var exitCode = 0;
             if (waitForExit)

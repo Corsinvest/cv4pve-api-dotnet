@@ -17,7 +17,6 @@ public static class ConsoleHelper
     /// <summary>
     /// Logo Corsinvest art ascii.
     /// </summary>
-    /// <returns></returns>
     public static readonly string Logo = @"
    ______                _                      __
   / ____/___  __________(_)___ _   _____  _____/ /_
@@ -38,8 +37,6 @@ Good job";
     /// <summary>
     /// Make string logo and title.
     /// </summary>
-    /// <param name="title"></param>
-    /// <returns></returns>
     public static string MakeLogoAndTitle(string title)
     {
         var space = new string(' ', title.Length < 47
@@ -54,7 +51,6 @@ Good job";
     /// <summary>
     /// Read password from console
     /// </summary>
-    /// <returns></returns>
     public static string ReadPassword()
     {
         var pass = string.Empty;
@@ -82,9 +78,6 @@ Good job";
     /// <summary>
     /// Get yes or no from console
     /// </summary>
-    /// <param name="prompt"></param>
-    /// <param name="defaultAnswer"></param>
-    /// <returns></returns>
     public static bool ReadYesNo(string prompt, bool defaultAnswer)
     {
         var message = defaultAnswer
@@ -120,7 +113,6 @@ Good job";
     /// <summary>
     /// Get current version application
     /// </summary>
-    /// <returns></returns>
     public static string GetCurrentVersionApp()
         => Assembly.GetEntryAssembly()
                    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
@@ -129,9 +121,6 @@ Good job";
     /// <summary>
     /// Create console application.
     /// </summary>
-    /// <param name="name"></param>
-    /// <param name="description"></param>
-    /// <returns></returns>
     public static RootCommand CreateApp(string name, string description)
     {
         var rc = new RootCommand(description);
@@ -146,9 +135,6 @@ Good job";
     /// <summary>
     /// Create LoggerFactory
     /// </summary>
-    /// <param name="logLevel"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
     public static ILoggerFactory CreateLoggerFactory<T>(LogLevel logLevel = LogLevel.Warning)
         => LoggerFactory.Create(builder =>
            {
@@ -162,10 +148,6 @@ Good job";
     /// <summary>
     /// Execute console application.
     /// </summary>
-    /// <param name="rootCommand"></param>
-    /// <param name="args"></param>
-    /// <param name="logger"></param>
-    /// <returns></returns>
     public static async Task<int> ExecuteAppAsync(this RootCommand rootCommand, string[] args, ILogger logger)
     {
         var resultCode = 0;

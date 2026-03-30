@@ -8,25 +8,25 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 /// <summary>
 /// VM/CT extra Info
 /// </summary>
-public interface IClusterResourceVmOsInfo
+public class ClusterResourceVmOsInfo : IClusterResourceVmOsInfo
 {
     /// <summary>
     /// Qemu Agent OsInfo
     /// </summary>
-    VmQemuAgentOsInfo VmQemuAgentOsInfo { get; set; }
+    public VmQemuAgentOsInfo VmQemuAgentOsInfo { get; set; }
 
     /// <summary>
     /// HostName
     /// </summary>
-    string HostName { get; set; }
+    public string HostName { get; set; }
 
     /// <summary>
     /// OsVersion
     /// </summary>
-    string OsVersion { get; set; }
+    public string OsVersion { get; set; }
 
     /// <summary>
     /// OsType
     /// </summary>
-    VmOsType? OsType { get; set; }
+    public VmOsType? OsType { get; set; }
 }

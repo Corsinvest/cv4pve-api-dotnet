@@ -20,7 +20,6 @@ public static class CommandOptionExtension
     /// <summary>
     /// Add fullName and logo
     /// </summary>
-    /// <param name="command"></param>
     public static void AddFullNameLogo(this Command command)
     {
         command.Description = ConsoleHelper.MakeLogoAndTitle(command.Description) + $@"
@@ -32,32 +31,22 @@ For more information visit https://www.corsinvest.it/cv4pve";
     /// <summary>
     /// Get option
     /// </summary>
-    /// <param name="command"></param>
-    /// <param name="name"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
     public static Option<T> GetOption<T>(this Command command, string name)
         => (Option<T>)command.Options.FirstOrDefault(a => a.Name == name || a.Aliases.Contains(name));
 
     /// <summary>
     /// Dry run is active
     /// </summary>
-    /// <param name="command"></param>
-    /// <returns></returns>
     public static bool DryRunIsActive(this Command command) => command.GetValue(command.GetOption<bool>($"--{DryRunOptionName}"));
 
     /// <summary>
     /// Debug is active
     /// </summary>
-    /// <param name="command"></param>
-    /// <returns></returns>
     public static bool DebugIsActive(this Command command) => command.GetValue(command.GetOption<bool>($"--{DebugOptionName}"));
 
     /// <summary>
     /// Get LogLevel from debug
     /// </summary>
-    /// <param name="command"></param>
-    /// <returns></returns>
     public static LogLevel GetLogLevelFromDebug(this Command command)
         => command.DebugIsActive()
             ? LogLevel.Trace
@@ -66,8 +55,6 @@ For more information visit https://www.corsinvest.it/cv4pve";
     /// <summary>
     /// Debug option
     /// </summary>
-    /// <param name="command"></param>
-    /// <returns></returns>
     public static Option<bool> AddDebugOption(this Command command)
     {
         var opt = command.AddOption<bool>($"--{DebugOptionName}", "Debug application");
@@ -80,8 +67,6 @@ For more information visit https://www.corsinvest.it/cv4pve";
     /// <summary>
     /// Dry run option
     /// </summary>
-    /// <param name="command"></param>
-    /// <returns></returns>
     public static Option<bool> AddDryRunOption(this Command command)
     {
         var opt = command.AddOption<bool>($"--{DryRunOptionName}", "Dry run application");
@@ -98,15 +83,11 @@ For more information visit https://www.corsinvest.it/cv4pve";
     /// <summary>
     /// Id or name option
     /// </summary>
-    /// <param name="command"></param>
-    /// <returns></returns>
     public static Option<string> VmIdOrNameOption(this Command command) => command.AddOption<string>("--vmid", "The id or name VM/CT");
 
     /// <summary>
     /// Ids or names option
     /// </summary>
-    /// <param name="command"></param>
-    /// <returns></returns>
     public static Option<string> VmIdsOrNamesOption(this Command command)
     {
         var opt = command.VmIdOrNameOption();
@@ -125,36 +106,26 @@ range 100:107,-105,200:204
     /// <summary>
     /// Get Api token option
     /// </summary>
-    /// <param name="command"></param>
-    /// <returns></returns>
     public static Option<string> GetApiTokenOption(this Command command) => command.GetOption<string>($"--{ApiTokenOptionName}");
 
     /// <summary>
     /// Get Validate Certificate option
     /// </summary>
-    /// <param name="command"></param>
-    /// <returns></returns>
     public static Option<bool> GetValidateCertificateOption(this Command command) => command.GetOption<bool>($"--{ValidateCertificateOptionName}");
 
     /// <summary>
     /// Get username option
     /// </summary>
-    /// <param name="command"></param>
-    /// <returns></returns>
     public static Option<string> GetUsernameOption(this Command command) => command.GetOption<string>($"--{UsernameOptionName}");
 
     /// <summary>
     /// Get password option
     /// </summary>
-    /// <param name="command"></param>
-    /// <returns></returns>
     public static Option<string> GetPasswordOption(this Command command) => command.GetOption<string>($"--{PasswordOptionName}");
 
     /// <summary>
     /// Get host option
     /// </summary>
-    /// <param name="command"></param>
-    /// <returns></returns>
     public static Option<string> GetHostOption(this Command command) => command.GetOption<string>($"--{HostOptionName}");
 
     #region Login option
@@ -230,7 +201,6 @@ range 100:107,-105,200:204
     /// Host option
     /// </summary>
     /// <param name="command"></param>
-    /// <returns></returns>
     public static Option<string> HostOption(this Command command)
     {
         var option = command.AddOption<string>($"--{HostOptionName}", "The host name host[:port],host1[:port],host2[:port]");
@@ -242,7 +212,6 @@ range 100:107,-105,200:204
     /// Table output enum
     /// </summary>
     /// <param name="command"></param>
-    /// <returns></returns>
     public static Option<TableGenerator.Output> TableOutputOption(this Command command)
     {
         var opt = command.AddOption<TableGenerator.Output>("--output|-o", "Type output");
@@ -254,30 +223,26 @@ range 100:107,-105,200:204
     /// username options
     /// </summary>
     /// <param name="command"></param>
-    /// <returns></returns>
     public static Option<string> UsernameOption(this Command command) => command.AddOption<string>($"--{UsernameOptionName}", "User name");
 
     /// <summary>
     /// Verbose
     /// </summary>
     /// <param name="command"></param>
-    /// <returns></returns>
     public static Option<bool> VerboseOption(this Command command) => command.AddOption<bool>("--verbose|-v", "Verbose.");
 
     /// <summary>
     /// Validate Certificate
     /// </summary>
     /// <param name="command"></param>
-    /// <returns></returns>
     public static Option<bool> ValidateCertificateOption(this Command command)
-        => command.AddOption<bool>($"--{ValidateCertificateOptionName}", "Validate SSL Certificate Proxmox VE node.");
+    => command.AddOption<bool>($"--{ValidateCertificateOptionName}", "Validate SSL Certificate Proxmox VE node.");
 
     /// <summary>
     /// Try login client api
     /// </summary>
     /// <param name="command"></param>
     /// <param name="loggerFactory"></param>
-    /// <returns></returns>
     public static async Task<PveClient> ClientTryLoginAsync(this Command command, ILoggerFactory loggerFactory)
     {
         var result = command.Parse(Environment.GetCommandLineArgs());
@@ -294,7 +259,6 @@ range 100:107,-105,200:204
     /// Return password from option
     /// </summary>
     /// <param name="command"></param>
-    /// <returns></returns>
     public static string GetPasswordFromOption(this Command command)
     {
         const string key = "012345678901234567890123";
@@ -337,28 +301,17 @@ range 100:107,-105,200:204
     /// <summary>
     /// Vm Id option
     /// </summary>
-    /// <param name="command"></param>
-    /// <returns></returns>
     public static Option<int> VmIdOption(this Command command) => command.AddOption<int>("--vmid", "The id VM/CT");
 
     /// <summary>
     /// Add argument
     /// </summary>
-    /// <param name="command"></param>
-    /// <param name="name"></param>
-    /// <param name="description"></param>
-    /// <returns></returns>
     public static Argument<string> AddArgument(this Command command, string name, string description)
         => command.AddArgument<string>(name, description);
 
     /// <summary>
     /// Add argument
     /// </summary>
-    /// <param name="command"></param>
-    /// <param name="name"></param>
-    /// <param name="description"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
     public static Argument<T> AddArgument<T>(this Command command, string name, string description)
     {
         var argument = new Argument<T>(name)
@@ -372,10 +325,6 @@ range 100:107,-105,200:204
     /// <summary>
     /// Add command
     /// </summary>
-    /// <param name="command"></param>
-    /// <param name="name"></param>
-    /// <param name="description"></param>
-    /// <returns></returns>
     public static Command AddCommand(this Command command, string name, string description)
     {
         var names = name.Split('|');
@@ -388,11 +337,6 @@ range 100:107,-105,200:204
     /// <summary>
     /// Add option
     /// </summary>
-    /// <param name="command"></param>
-    /// <param name="name"></param>
-    /// <param name="description"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
     public static Option<T> AddOption<T>(this Command command, string name, string description)
     {
         var names = name.Split('|');
@@ -409,10 +353,6 @@ range 100:107,-105,200:204
     /// <summary>
     /// Add validator range
     /// </summary>
-    /// <param name="option"></param>
-    /// <param name="min"></param>
-    /// <param name="max"></param>
-    /// <returns></returns>
     public static Option<T> AddValidatorRange<T>(this Option<T> option, T min, T max) where T : INumber<T>
     {
         option.Validators.Add(e =>
@@ -430,10 +370,6 @@ range 100:107,-105,200:204
     /// <summary>
     /// Add validator range
     /// </summary>
-    /// <param name="option"></param>
-    /// <param name="min"></param>
-    /// <param name="max"></param>
-    /// <returns></returns>
     public static Option<int> AddValidatorRange(this Option<int> option, int min, int max)
     {
         option.Validators.Add(e =>
@@ -450,10 +386,6 @@ range 100:107,-105,200:204
     /// <summary>
     /// Add validator range
     /// </summary>
-    /// <param name="option"></param>
-    /// <param name="min"></param>
-    /// <param name="max"></param>
-    /// <returns></returns>
     public static Option<long> AddValidatorRange(this Option<long> option, long min, long max)
     {
         option.Validators.Add(e =>
@@ -470,10 +402,6 @@ range 100:107,-105,200:204
     /// <summary>
     /// Add validator range
     /// </summary>
-    /// <param name="option"></param>
-    /// <param name="min"></param>
-    /// <param name="max"></param>
-    /// <returns></returns>
     public static Option<short> AddValidatorRange(this Option<short> option, short min, short max)
     {
         option.Validators.Add(e =>
@@ -490,10 +418,6 @@ range 100:107,-105,200:204
     /// <summary>
     /// Add validator range
     /// </summary>
-    /// <param name="option"></param>
-    /// <param name="min"></param>
-    /// <param name="max"></param>
-    /// <returns></returns>
     public static Option<byte> AddValidatorRange(this Option<byte> option, byte min, byte max)
     {
         option.Validators.Add(e =>
@@ -510,10 +434,6 @@ range 100:107,-105,200:204
     /// <summary>
     /// Add validator range
     /// </summary>
-    /// <param name="option"></param>
-    /// <param name="min"></param>
-    /// <param name="max"></param>
-    /// <returns></returns>
     public static Option<float> AddValidatorRange(this Option<float> option, float min, float max)
     {
         option.Validators.Add(e =>
@@ -530,10 +450,6 @@ range 100:107,-105,200:204
     /// <summary>
     /// Add validator range
     /// </summary>
-    /// <param name="option"></param>
-    /// <param name="min"></param>
-    /// <param name="max"></param>
-    /// <returns></returns>
     public static Option<double> AddValidatorRange(this Option<double> option, double min, double max)
     {
         option.Validators.Add(e =>
@@ -551,7 +467,6 @@ range 100:107,-105,200:204
     /// <summary>
     /// Add validator exist file
     /// </summary>
-    /// <param name="option"></param>
     public static Option<string> AddValidatorExistFile(this Option<string> option)
     {
         option.Validators.Add(e =>
@@ -569,7 +484,6 @@ range 100:107,-105,200:204
     /// <summary>
     /// Add validator exist directory
     /// </summary>
-    /// <param name="option"></param>
     public static Option<string> AddValidatorExistDirectory(this Option<string> option)
     {
         option.Validators.Add(e =>
@@ -587,8 +501,6 @@ range 100:107,-105,200:204
     /// <summary>
     /// Script file option
     /// </summary>
-    /// <param name="command"></param>
-    /// <returns></returns>
     public static Option<string> ScriptFileOption(this Command command)
         => command.AddOption<string>("--script", "Use specified hook script")
                   .AddValidatorExistFile();
@@ -596,7 +508,5 @@ range 100:107,-105,200:204
     /// <summary>
     /// Timeout operation
     /// </summary>
-    /// <param name="command"></param>
-    /// <returns></returns>
     public static Option<long> TimeoutOption(this Command command) => command.AddOption<long>("--timeout", "Timeout operation in seconds");
 }

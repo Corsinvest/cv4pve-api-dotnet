@@ -11,10 +11,10 @@ System.Console.WriteLine("pippo");
 
 var app = ConsoleHelper.CreateApp("Test", "Automatic snapshot VM/CT with retention");
 var loggerFactory = ConsoleHelper.CreateLoggerFactory<Program>(app.GetLogLevelFromDebug());
- await app.ExecuteAppAsync(args, loggerFactory.CreateLogger(typeof(Program)));
+await app.ExecuteAppAsync(args, loggerFactory.CreateLogger(typeof(Program)));
 
 
- 
+
 // _ = new Commands(app, loggerFactory);
 // return await app.ExecuteAppAsync(args, loggerFactory.CreateLogger(typeof(Program)));
 

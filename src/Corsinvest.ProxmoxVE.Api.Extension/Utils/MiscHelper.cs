@@ -4,9 +4,9 @@ using System.Runtime.InteropServices;
  * SPDX-License-Identifier: MIT
  */
 
+using Corsinvest.ProxmoxVE.Api.Shared;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using Corsinvest.ProxmoxVE.Api.Shared;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Utils;
 
@@ -25,9 +25,6 @@ public static class MiscHelper
     /// <summary>
     /// Parse Calendar Event
     /// </summary>
-    /// <param name="schedule"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
     public static (string dow, string hours, string minutes) ParseCalendarEvent(string schedule)
     {
         var dow = DayOfWeek;
@@ -125,7 +122,10 @@ public static class MiscHelper
             if (match.Groups.Count == 3 && !string.IsNullOrWhiteSpace(match.Groups[2].Value))
             {
                 var repetition = int.Parse(match.Groups[2].Value);
-                var start = match.Groups[1].Value == "*" ? 0 : int.Parse(match.Groups[1].Value);
+                var start = match.Groups[1].Value == "*"
+                             ? 0
+                             : int.Parse(match.Groups[1].Value);
+
                 if (start >= max) { throw new ArgumentOutOfRangeException($"Value '{start}' out of range"); }
                 if (repetition >= max) { throw new ArgumentOutOfRangeException($"Repetition  '{repetition}' out of range"); }
 
@@ -178,6 +178,4 @@ public static class MiscHelper
             System.Diagnostics.Process.Start("open", url);
         }
     }
-
-
 }

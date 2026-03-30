@@ -17,35 +17,30 @@ public class ClusterLog : ModelBase
     /// <summary>
     /// Message
     /// </summary>
-    /// <value></value>
     [JsonProperty("msg")]
     public string Message { get; set; }
 
     /// <summary>
     /// Uid
     /// </summary>
-    /// <value></value>
     [JsonProperty("uid")]
     public string Uid { get; set; }
 
     /// <summary>
     /// User
     /// </summary>
-    /// <value></value>
     [JsonProperty("user")]
     public string User { get; set; }
 
     /// <summary>
     /// Pid
     /// </summary>
-    /// <value></value>
     [JsonProperty("pid")]
     public int Pid { get; set; }
 
     /// <summary>
     /// Severity
     /// </summary>
-    /// <value></value>
     [JsonProperty("pri")]
     public int Severity { get; set; }
 
@@ -58,28 +53,24 @@ public class ClusterLog : ModelBase
     /// <summary>
     /// Id
     /// </summary>
-    /// <value></value>
     [JsonProperty("id")]
     public string Id { get; set; }
 
     /// <summary>
     /// Service
     /// </summary>
-    /// <value></value>
     [JsonProperty("tag")]
     public string Service { get; set; }
 
     /// <summary>
     /// Node
     /// </summary>
-    /// <value></value>
     [JsonProperty("node")]
     public string Node { get; set; }
 
     /// <summary>
     /// Time unix format
     /// </summary>
-    /// <value></value>
     [JsonProperty("time")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime)]
     public int Time { get; set; }

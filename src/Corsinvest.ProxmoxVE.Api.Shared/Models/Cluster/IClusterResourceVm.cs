@@ -19,13 +19,11 @@ public interface IClusterResourceVm : IVmBase, IClusterResourceHost, IDiskIO, IN
     /// <summary>
     /// Vm type
     /// </summary>
-    /// <value></value>
     VmType VmType { get; set; }
 
     /// <summary>
     /// Vm is lock
     /// </summary>
-    /// <value></value>
     [JsonProperty("lock")]
     string Lock { get; set; }
 
@@ -37,14 +35,12 @@ public interface IClusterResourceVm : IVmBase, IClusterResourceHost, IDiskIO, IN
     /// <summary>
     /// Host cpu usage
     /// </summary>
-    /// <value></value>
     [Display(Name = "Host Cpu Usage")]
     string HostCpuUsage { get; set; }
 
     /// <summary>
     /// Host memory usage
     /// </summary>
-    /// <value></value>
     [Display(Name = "Host Memory Usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     double HostMemoryUsage { get; set; }
@@ -52,7 +48,6 @@ public interface IClusterResourceVm : IVmBase, IClusterResourceHost, IDiskIO, IN
     /// <summary>
     /// Tags
     /// </summary>
-    /// <value></value>
     string Tags { get; set; }
 
     /// <summary>

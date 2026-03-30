@@ -1,4 +1,4 @@
-﻿/*
+/*
  * SPDX-FileCopyrightText: Copyright Corsinvest Srl
  * SPDX-License-Identifier: MIT
  */
@@ -8,13 +8,13 @@ using Newtonsoft.Json;
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
 
 /// <summary>
-/// Pool item
+/// Sdn item
 /// </summary>
-public interface IPoolItem
+public interface ISdnItem
 {
     /// <summary>
-    /// Pool
+    /// Sdn
     /// </summary>
-    [JsonProperty("pool")]
-    string Pool { get; set; }
+    [JsonProperty("sdn")]
+    string Sdn { get; set; }
 }

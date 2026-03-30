@@ -23,10 +23,10 @@ public class ClassApi
     /// </summary>
     internal ClassApi(string resource, string name, bool isIndexed, ClassApi parent)
     {
-        Resource  = resource;
-        Name      = name;
+        Resource = resource;
+        Name = name;
         IsIndexed = isIndexed;
-        Parent    = parent;
+        Parent = parent;
         parent.SubClasses.Add(this);
         Keys.AddRange(parent.Keys);
         if (isIndexed) { Keys.Add(name.Replace("{", string.Empty).Replace("}", string.Empty)); }
@@ -35,8 +35,6 @@ public class ClassApi
     /// <summary>
     /// Constructor
     /// </summary>
-    /// <param name="token"></param>
-    /// <param name="parent"></param>
     public ClassApi(JToken token, ClassApi parent)
     {
         Name = token["text"].ToString().Replace("-", "_");
@@ -67,19 +65,12 @@ public class ClassApi
     /// <summary>
     /// Get From Resource
     /// </summary>
-    /// <param name="host"></param>
-    /// <param name="port"></param>
-    /// <param name="resource"></param>
-    /// <returns></returns>
     public static async Task<ClassApi> GetFromResourceAsync(string host, int port, string resource)
         => GetFromResource(await GeneratorClassApi.GenerateAsync(host, port), resource);
 
     /// <summary>
     /// Get From Resource
     /// </summary>
-    /// <param name="classApiRoot"></param>
-    /// <param name="resource"></param>
-    /// <returns></returns>
     public static ClassApi GetFromResource(ClassApi classApiRoot, string resource)
     {
         var classApi = classApiRoot;
@@ -98,54 +89,45 @@ public class ClassApi
     /// <summary>
     /// Is Root
     /// </summary>
-    /// <value></value>
     public bool IsRoot { get; }
 
     /// <summary>
     /// Name of class
     /// </summary>
-    /// <value></value>
     public string Name { get; }
 
     /// <summary>
     /// Index Name
     /// </summary>
-    /// <returns></returns>
     public string IndexName { get; }
 
     /// <summary>
     /// Parent class
     /// </summary>
-    /// <value></value>
     public ClassApi Parent { get; }
 
     /// <summary>
     /// Sub classes
     /// </summary>
-    /// <returns></returns>
     public IList<ClassApi> SubClasses { get; } = [];
 
     /// <summary>
     /// Methods
     /// </summary>
-    /// <returns></returns>
     public List<MethodApi> Methods { get; } = [];
 
     /// <summary>
     /// Keys class
     /// </summary>
-    /// <returns></returns>
     public List<string> Keys { get; } = [];
 
     /// <summary>
     /// Is Index
     /// </summary>
-    /// <value></value>
     public bool IsIndexed { get; }
 
     /// <summary>
     /// Path resource
     /// </summary>
-    /// <value></value>
     public string Resource { get; }
 }

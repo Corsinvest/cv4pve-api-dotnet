@@ -14,14 +14,13 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 /// <summary>
 /// rrd data structure
 /// </summary>
-public class VmRrdData : ModelBase, IDisk, INetIO, IDiskIO, ICpu, IMemory
+public class VmRrdData : ModelBase, IDisk, INetIO, IDiskIO, ICpu, IMemory, IPressureInfo
 {
     /// <summary>
     /// Time unix time
     /// </summary>
-    /// <value></value>
     [JsonProperty("time")]
-    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime )]
+    [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime)]
     public long Time { get; set; }
 
     /// <summary>
@@ -32,7 +31,6 @@ public class VmRrdData : ModelBase, IDisk, INetIO, IDiskIO, ICpu, IMemory
     /// <summary>
     /// Disk usage
     /// </summary>
-    /// <value></value>
     [JsonProperty("disk")]
     [Display(Name = "Disk usage")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
@@ -41,7 +39,6 @@ public class VmRrdData : ModelBase, IDisk, INetIO, IDiskIO, ICpu, IMemory
     /// <summary>
     /// Disk size
     /// </summary>
-    /// <value></value>
     [JsonProperty("maxdisk")]
     [Display(Name = "Disk size")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
@@ -50,7 +47,6 @@ public class VmRrdData : ModelBase, IDisk, INetIO, IDiskIO, ICpu, IMemory
     /// <summary>
     /// Disk usage percentage
     /// </summary>
-    /// <value></value>
     [Display(Name = "Disk usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     public double DiskUsagePercentage { get; set; }
@@ -58,7 +54,6 @@ public class VmRrdData : ModelBase, IDisk, INetIO, IDiskIO, ICpu, IMemory
     /// <summary>
     /// Net in
     /// </summary>
-    /// <value></value>
     [JsonProperty("netin")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long NetIn { get; set; }
@@ -66,7 +61,6 @@ public class VmRrdData : ModelBase, IDisk, INetIO, IDiskIO, ICpu, IMemory
     /// <summary>
     /// Net out
     /// </summary>
-    /// <value></value>
     [JsonProperty("netout")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long NetOut { get; set; }
@@ -74,7 +68,6 @@ public class VmRrdData : ModelBase, IDisk, INetIO, IDiskIO, ICpu, IMemory
     /// <summary>
     /// Disk read
     /// </summary>
-    /// <value></value>
     [JsonProperty("diskread")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long DiskRead { get; set; }
@@ -82,7 +75,6 @@ public class VmRrdData : ModelBase, IDisk, INetIO, IDiskIO, ICpu, IMemory
     /// <summary>
     /// Disk write
     /// </summary>
-    /// <value></value>
     [JsonProperty("diskwrite")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public long DiskWrite { get; set; }
@@ -90,7 +82,6 @@ public class VmRrdData : ModelBase, IDisk, INetIO, IDiskIO, ICpu, IMemory
     /// <summary>
     /// Cpu usage
     /// </summary>
-    /// <value></value>
     [Display(Name = "CPU Usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     [JsonProperty("cpu")]
@@ -99,21 +90,18 @@ public class VmRrdData : ModelBase, IDisk, INetIO, IDiskIO, ICpu, IMemory
     /// <summary>
     /// Cpu size
     /// </summary>
-    /// <value></value>
     [JsonProperty("maxcpu")]
     public long CpuSize { get; set; }
 
     /// <summary>
     /// Cpu info
     /// </summary>
-    /// <value></value>
     [Display(Name = "Cpu")]
     public string CpuInfo { get; set; }
 
     /// <summary>
     /// Memory usage
     /// </summary>
-    /// <value></value>
     [JsonProperty("mem")]
     [Display(Name = "Memory")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
@@ -122,7 +110,6 @@ public class VmRrdData : ModelBase, IDisk, INetIO, IDiskIO, ICpu, IMemory
     /// <summary>
     ///Memory size
     /// </summary>
-    /// <value></value>
     [JsonProperty("maxmem")]
     [Display(Name = "Max Memory")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
@@ -131,14 +118,12 @@ public class VmRrdData : ModelBase, IDisk, INetIO, IDiskIO, ICpu, IMemory
     /// <summary>
     /// Memory info
     /// </summary>
-    /// <value></value>
     [Display(Name = "Memory")]
     public string MemoryInfo { get; set; }
 
     /// <summary>
     /// Memory usage percentage
     /// </summary>
-    /// <value></value>
     [Display(Name = "Memory Usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     public double MemoryUsagePercentage { get; set; }
@@ -170,8 +155,8 @@ public class VmRrdData : ModelBase, IDisk, INetIO, IDiskIO, ICpu, IMemory
     [OnDeserialized]
     internal void OnSerializedMethod(StreamingContext context)
     {
-        ((ICpu)this).ImproveData();
-        ((IMemory)this).ImproveData();
-        ((IDisk)this).ImproveData();
+        ((ICpu)this).EnrichData();
+        ((IMemory)this).EnrichData();
+        ((IDisk)this).EnrichData();
     }
 }

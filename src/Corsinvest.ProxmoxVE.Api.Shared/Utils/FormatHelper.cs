@@ -54,14 +54,12 @@ public static class FormatHelper
     /// From bytes
     /// </summary>
     /// <param name="bytes"></param>
-    /// <returns></returns>
     public static string FromBytes(double bytes) => ByteHelper.ToSizeString(bytes, false);
 
     /// <summary>
     /// From bit
     /// </summary>
     /// <param name="bits"></param>
-    /// <returns></returns>
     public static string FromBits(long bits) => ByteHelper.ToSizeString(bits, false);
 
     /// <summary>
@@ -84,27 +82,25 @@ public static class FormatHelper
     /// Uptime
     /// </summary>
     /// <param name="value"></param>
-    /// <returns></returns>
     public static string UptimeInfo(double value)
-        => value == 0
-            ? string.Empty
-            : string.Format($"{TimeSpan.FromSeconds(Convert.ToDouble(value)):d' days 'hh':'mm':'ss}");
+    => value == 0
+        ? string.Empty
+        : string.Format($"{TimeSpan.FromSeconds(Convert.ToDouble(value)):d' days 'hh':'mm':'ss}");
 
     /// <summary>
     /// Content To Description
     /// </summary>
     /// <param name="content"></param>
-    /// <returns></returns>
     public static string ContentToDescription(string content)
-        => content switch
-        {
-            "images" => "Disk image",
-            "backup" => "VZDump backup file",
-            "vztmpl" => "Container template",
-            "iso" => "ISO image",
-            "rootdir" => "Container",
-            "snippets" => "Snippets",
-            "import" => "Import",
-            _ => string.Empty,
-        };
+    => content switch
+    {
+        "images" => "Disk image",
+        "backup" => "VZDump backup file",
+        "vztmpl" => "Container template",
+        "iso" => "ISO image",
+        "rootdir" => "Container",
+        "snippets" => "Snippets",
+        "import" => "Import",
+        _ => string.Empty,
+    };
 }

@@ -46,6 +46,11 @@ public static class PveConstants
     public static string KeyApiTemplate => "template";
 
     /// <summary>
+    /// Key api sdn
+    /// </summary>
+    public static string KeyApiSdn => "sdn";
+
+    /// <summary>
     /// Status Online
     /// </summary>
     public static string StatusOnline => "online";

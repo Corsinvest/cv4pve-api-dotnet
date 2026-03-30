@@ -30,21 +30,18 @@ public class NodeItem : ModelBase, IClusterResourceNode
     /// <summary>
     /// Id
     /// </summary>
-    /// <value></value>
     [JsonProperty("id")]
     public string Id { get; set; }
 
     /// <summary>
     /// Type
     /// </summary>
-    /// <value></value>
     [JsonProperty("type")]
     public string Type { get; set; }
 
     /// <summary>
     /// Resource Type
     /// </summary>
-    /// <value></value>
     public ClusterResourceType ResourceType { get; set; }
 
     /// <summary>
@@ -56,13 +53,11 @@ public class NodeItem : ModelBase, IClusterResourceNode
     /// <summary>
     /// Status Is Unknown
     /// </summary>
-    /// <value></value>
     public bool IsUnknown { get; set; }
 
     /// <summary>
     /// Disk usage
     /// </summary>
-    /// <value></value>
     [JsonProperty("disk")]
     [Display(Name = "Disk usage")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
@@ -71,7 +66,6 @@ public class NodeItem : ModelBase, IClusterResourceNode
     /// <summary>
     /// Disk size
     /// </summary>
-    /// <value></value>
     [JsonProperty("maxdisk")]
     [Display(Name = "Disk size")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
@@ -80,7 +74,6 @@ public class NodeItem : ModelBase, IClusterResourceNode
     /// <summary>
     /// Disk usage percentage
     /// </summary>
-    /// <value></value>
     [Display(Name = "Disk usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     public double DiskUsagePercentage { get; set; }
@@ -110,14 +103,12 @@ public class NodeItem : ModelBase, IClusterResourceNode
     /// <summary>
     /// Memory info
     /// </summary>
-    /// <value></value>
     [Display(Name = "Memory")]
     public string MemoryInfo { get; set; }
 
     /// <summary>
     /// Memory usage percentage
     /// </summary>
-    /// <value></value>
     [Display(Name = "Memory Usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     public double MemoryUsagePercentage { get; set; }
@@ -139,7 +130,6 @@ public class NodeItem : ModelBase, IClusterResourceNode
     /// <summary>
     /// Cpu info
     /// </summary>
-    /// <value></value>
     [Display(Name = "Cpu")]
     public string CpuInfo { get; set; }
 
@@ -165,9 +155,8 @@ public class NodeItem : ModelBase, IClusterResourceNode
     /// <summary>
     /// Is online
     /// </summary>
-    /// <value></value>
     public bool IsOnline { get; set; }
 
     [OnDeserialized]
-    internal void OnSerializedMethod(StreamingContext context) => ((IClusterResourceNode)this).ImproveData();
+    internal void OnSerializedMethod(StreamingContext context) => this.EnrichData();
 }

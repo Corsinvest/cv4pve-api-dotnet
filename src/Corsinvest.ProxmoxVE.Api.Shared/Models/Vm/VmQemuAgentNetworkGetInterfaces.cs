@@ -50,56 +50,48 @@ public class VmQemuAgentNetworkGetInterfaces : ModelBase
         /// <summary>
         /// Rx Packets
         /// </summary>
-        /// <value></value>
         [JsonProperty("rx-packets")]
         public long RxPackets { get; set; }
 
         /// <summary>
         /// Rx Bytes
         /// </summary>
-        /// <value></value>
         [JsonProperty("rx-bytes")]
         public long RxBytes { get; set; }
 
         /// <summary>
         /// Tx Errors
         /// </summary>
-        /// <value></value>
         [JsonProperty("tx-errs")]
         public long TxErrors { get; set; }
 
         /// <summary>
         /// Tx Dropped
         /// </summary>
-        /// <value></value>
         [JsonProperty("tx-dropped")]
         public long TxDropped { get; set; }
 
         /// <summary>
         /// Rx Dropped
         /// </summary>
-        /// <value></value>
         [JsonProperty("rx-dropped")]
         public long RxDropped { get; set; }
 
         /// <summary>
         /// Rx Errors
         /// </summary>
-        /// <value></value>
         [JsonProperty("rx-errs")]
         public long RxErrors { get; set; }
 
         /// <summary>
         /// Tx Bytes
         /// </summary>
-        /// <value></value>
         [JsonProperty("tx-bytes")]
         public long TxBytes { get; set; }
 
         /// <summary>
         /// Tx Packets
         /// </summary>
-        /// <value></value>
         [JsonProperty("tx-packets")]
         public long TxPackets { get; set; }
     }

@@ -16,14 +16,12 @@ public interface IClusterResourceNode : IClusterResourceHost
     /// <summary>
     /// Level
     /// </summary>
-    /// <value></value>
     [JsonProperty("level")]
     string Level { get; set; }
 
     /// <summary>
     /// Is online
     /// </summary>
-    /// <value></value>
     bool IsOnline { get; set; }
 
     /// <summary>

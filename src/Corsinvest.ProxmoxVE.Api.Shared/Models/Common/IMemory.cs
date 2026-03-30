@@ -17,7 +17,6 @@ public interface IMemory
     /// <summary>
     /// Memory usage
     /// </summary>
-    /// <value></value>
     [JsonProperty("mem")]
     [Display(Name = "Memory")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
@@ -26,7 +25,6 @@ public interface IMemory
     /// <summary>
     ///Memory size
     /// </summary>
-    /// <value></value>
     [JsonProperty("maxmem")]
     [Display(Name = "Max Memory")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
@@ -35,14 +33,12 @@ public interface IMemory
     /// <summary>
     /// Memory info
     /// </summary>
-    /// <value></value>
     [Display(Name = "Memory")]
     string MemoryInfo { get; set; }
 
     /// <summary>
     /// Memory usage percentage
     /// </summary>
-    /// <value></value>
     [Display(Name = "Memory Usage %")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatPercentage)]
     double MemoryUsagePercentage { get; set; }

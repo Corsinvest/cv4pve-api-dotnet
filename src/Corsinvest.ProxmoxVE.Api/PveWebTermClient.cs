@@ -2,21 +2,19 @@
  * SPDX-FileCopyrightText: Copyright Corsinvest Srl
  * SPDX-License-Identifier: MIT
  */
+using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-using Microsoft.Extensions.Logging;
 
 namespace Corsinvest.ProxmoxVE.Api;
 
 /// <summary>
 /// PVE Web Terminal Client
 /// </summary>
-/// <param name="client"></param>
-/// <param name="node"></param>
 public class PveWebTermClient(PveClient client, string node) : IAsyncDisposable
 {
     private readonly ClientWebSocket _ws = new();
@@ -52,7 +50,6 @@ public class PveWebTermClient(PveClient client, string node) : IAsyncDisposable
     /// <summary>
     /// Connect to the terminal
     /// </summary>
-    /// <returns></returns>
     public async Task<bool> ConnectAsync()
     {
         // Get terminal proxy ticket
@@ -167,9 +164,6 @@ public class PveWebTermClient(PveClient client, string node) : IAsyncDisposable
     /// <summary>
     /// Send command
     /// </summary>
-    /// <param name="command"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
     public async Task SendCommandAsync(string command)
     {
         if (!_connected) { throw new InvalidOperationException("WebSocket not connected."); }
@@ -194,7 +188,6 @@ public class PveWebTermClient(PveClient client, string node) : IAsyncDisposable
     /// Wait for prompt
     /// </summary>
     /// <param name="timeoutMs"></param>
-    /// <returns></returns>
     public async Task<bool> WaitForPromptAsync(int timeoutMs = 10000)
     {
         var start = DateTime.UtcNow;
@@ -214,10 +207,6 @@ public class PveWebTermClient(PveClient client, string node) : IAsyncDisposable
     /// <summary>
     /// Execute command
     /// </summary>
-    /// <param name="command"></param>
-    /// <param name="timeoutMs"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
     public async Task<(string StdOut, string StdErr, int ExitCode)> ExecuteCommandAsync(string command, int timeoutMs = 20000)
     {
         if (string.IsNullOrWhiteSpace(command)) { throw new ArgumentException("Value cannot be null or whitespace.", nameof(command)); }
@@ -304,7 +293,6 @@ echo '{endMarker}'
     /// <summary>
     /// Disconnect from the terminal
     /// </summary>
-    /// <returns></returns>
     public async Task DisconnectAsync()
     {
         Logger.LogDebug("Disconnecting WebSocket");
@@ -330,11 +318,10 @@ echo '{endMarker}'
     /// <param name="stream"></param>
     /// <param name="chunkSizeKB"></param>
     /// <param name="timeoutMs"></param>
-    /// <returns></returns>
     public async Task<(bool Success, string? ErrorMessage)> DownloadFileAsync(string remotePath,
-                                                                              FileStream stream,
-                                                                              int chunkSizeKB = 128,
-                                                                              int timeoutMs = 20000)
+                                                                          FileStream stream,
+                                                                          int chunkSizeKB = 128,
+                                                                          int timeoutMs = 20000)
     {
         if (string.IsNullOrWhiteSpace(remotePath)) { return (false, "Invalid remote path."); }
 
@@ -411,7 +398,6 @@ echo '{endMarker}'
     /// <summary>
     /// Dispose async
     /// </summary>
-    /// <returns></returns>
     public async ValueTask DisposeAsync()
     {
         await DisconnectAsync();

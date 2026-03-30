@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: MIT
  */
 
+#nullable enable
+
 namespace Corsinvest.ProxmoxVE.Api.Metadata;
 
 /// <summary>Flat cache method info</summary>
-public record FlatMethodInfo(
-    string? Comment,
-    string? ReturnType,
-    string? ReturnLinkHRef,
-    FlatParamInfo[]? Params,
-    FlatParamInfo[]? ReturnParams);
+public record FlatMethodInfo(string? Comment,
+                             string? ReturnType,
+                             string? ReturnLinkHRef,
+                             FlatParamInfo[]? Params,
+                             FlatParamInfo[]? ReturnParams);

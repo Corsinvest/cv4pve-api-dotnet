@@ -13,10 +13,6 @@ public static class EnumerableExtensions
     /// <summary>
     /// Sum for ulong
     /// </summary>
-    /// <typeparam name="TSource"></typeparam>
-    /// <param name="source"></param>
-    /// <param name="summer"></param>
-    /// <returns></returns>
     public static ulong Sum<TSource>(this IEnumerable<TSource> source, Func<TSource, ulong> summer)
     {
         ulong total = 0;
@@ -27,10 +23,6 @@ public static class EnumerableExtensions
     /// <summary>
     /// Average for ulong
     /// </summary>
-    /// <typeparam name="TSource"></typeparam>
-    /// <param name="source"></param>
-    /// <param name="summer"></param>
-    /// <returns></returns>
     public static ulong Average<TSource>(this IEnumerable<TSource> source, Func<TSource, ulong> summer)
         => source.Sum(summer) / Convert.ToUInt64(source.Count());
 }

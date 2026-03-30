@@ -16,14 +16,12 @@ public class PoolDetail : ModelBase
     /// <summary>
     /// Comment
     /// </summary>
-    /// <value></value>
     [JsonProperty("comment")]
     public string Comment { get; set; }
 
     /// <summary>
     /// Id
     /// </summary>
-    /// <value></value>
     [JsonProperty("members")]
     public IEnumerable<ClusterResource> Members { get; set; } = [];
 }

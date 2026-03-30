@@ -1,0 +1,25 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Elementi di soluzione/">
+    <File Path=".gitignore" />
+    <File Path="3rd-party-licenses.md" />
+    <File Path="Corsinvest.ProxmoxVE.Api.sln.licenseheader" />
+    <File Path="Directory.Packages.props" />
+    <File Path="icon.png" />
+    <File Path="LICENSE" />
+    <File Path="publish-nuget.ps1" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Corsinvest.ProxmoxVE.Api.Console/Corsinvest.ProxmoxVE.Api.Console.csproj" />
+    <Project Path="src/Corsinvest.ProxmoxVE.Api.Extension/Corsinvest.ProxmoxVE.Api.Extension.csproj" />
+    <Project Path="src/Corsinvest.ProxmoxVE.Api.Metadata/Corsinvest.ProxmoxVE.Api.Metadata.csproj" />
+    <Project Path="src/Corsinvest.ProxmoxVE.Api.Shared/Corsinvest.ProxmoxVE.Api.Shared.csproj" />
+    <Project Path="src/Corsinvest.ProxmoxVE.Api.Test/Corsinvest.ProxmoxVE.Api.Test.csproj" />
+    <Project Path="src/Corsinvest.ProxmoxVE.Api/Corsinvest.ProxmoxVE.Api.csproj" />
+  </Folder>
+</Solution>
