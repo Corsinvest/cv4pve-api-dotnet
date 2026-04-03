@@ -75,4 +75,14 @@ public class VmDisk
     /// Useful for accessing keys not yet parsed into dedicated properties.
     /// </summary>
     public string RawDefinition { get; set; }
+
+    /// <summary>
+    /// Disk format (e.g. "qcow2", "raw", "vmdk"). Parsed from <see cref="RawDefinition"/>.
+    /// </summary>
+    public string Format { get; set; }
+
+    /// <summary>
+    /// Preallocation mode (e.g. "1" for preallocated). Parsed from <see cref="RawDefinition"/>.
+    /// </summary>
+    public string Prealloc { get; set; }
 }

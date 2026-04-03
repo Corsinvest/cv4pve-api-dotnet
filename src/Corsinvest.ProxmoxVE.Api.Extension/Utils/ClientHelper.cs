@@ -31,6 +31,9 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
             /// Port
             /// </summary>
             public int Port { get; } = port;
+
+            /// <inheritdoc/>
+            public override string ToString() => $"{Host}:{Port}";
         }
 
 

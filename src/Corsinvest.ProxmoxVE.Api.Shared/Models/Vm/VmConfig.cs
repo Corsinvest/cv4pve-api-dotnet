@@ -257,7 +257,8 @@ public class VmConfig : ModelBase
             if (key == "rootfs"
                 || key.StartsWith("unused")
                 //bus match
-                || (Regex.IsMatch(key, @"(efidisk|tpmstate|virtio|ide|scsi|sata|mp)\d+") && !Regex.IsMatch(def, "media=cdrom")))
+                || (Regex.IsMatch(key, @"(efidisk|tpmstate|virtio|ide|scsi|sata|mp)\d+") 
+                    && !Regex.IsMatch(def, "media=cdrom")))
             {
                 var infos = def.Split(',');
                 var storage = string.Empty;
@@ -310,6 +311,8 @@ public class VmConfig : ModelBase
                     IsUnused = key.StartsWith("unused"),
                     Backup = backup,
                     RawDefinition = def,
+                    Format = infos.Where(a => a.StartsWith("format=")).Select(a => a[7..]).FirstOrDefault(),
+                    Prealloc = infos.Where(a => a.StartsWith("prealloc=")).Select(a => a[9..]).FirstOrDefault(),
                 });
             }
         }
