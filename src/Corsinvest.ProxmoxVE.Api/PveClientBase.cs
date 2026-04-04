@@ -288,8 +288,9 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
             _internalHttpClientHandler = new HttpClientHandler
             {
                 CookieContainer = new CookieContainer(),
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
                 ServerCertificateCustomValidationCallback = !ValidateCertificate
-                                                                ? (message, cert, chain, errors) => true
+                                                                ? (_, _, _, _) => true
                                                                 : null
             };
             _internalHttpClient = new HttpClient(_internalHttpClientHandler);

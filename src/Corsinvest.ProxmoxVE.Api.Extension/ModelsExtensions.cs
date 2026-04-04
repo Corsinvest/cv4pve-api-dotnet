@@ -55,6 +55,29 @@ public static class ModelsExtensions
         => (await item.ReadTaskLog(null, limit, start)).ToLogs();
 
     /// <summary>
+    /// Read Journal
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="endcursor">End before the given Cursor. Conflicts with 'until'</param>
+    /// <param name="lastentries">Limit to the last X lines. Conflicts with a range.</param>
+    /// <param name="since">Display all log since this UNIX epoch. Conflicts with 'startcursor'.</param>
+    /// <param name="startcursor">Start after the given Cursor. Conflicts with 'since'</param>
+    /// <param name="until">Display all log until this UNIX epoch. Conflicts with 'endcursor'.</param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<string>> GetAsync(this PveClient.PveNodes.PveNodeItem.PveJournal item,
+                                                           string endcursor = null,
+                                                           int? lastentries = null,
+                                                           int? since = null,
+                                                           string startcursor = null,
+                                                           int? until = null)
+    {
+        var result = await item.Journal(endcursor, lastentries, since, startcursor, until);
+        return result.ResponseToDictionary.TryGetValue("data", out var _)
+                ? [.. result.ToEnumerable().OfType<string>().Where(l => !string.IsNullOrWhiteSpace(l) && !l.StartsWith("s="))]
+                : [];
+    }
+
+    /// <summary>
     /// Read firewall log
     /// </summary>
     /// <param name="item"></param>
