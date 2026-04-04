@@ -257,7 +257,7 @@ public class VmConfig : ModelBase
             if (key == "rootfs"
                 || key.StartsWith("unused")
                 //bus match
-                || (Regex.IsMatch(key, @"(efidisk|tpmstate|virtio|ide|scsi|sata|mp)\d+") 
+                || (Regex.IsMatch(key, @"(efidisk|tpmstate|virtio|ide|scsi|sata|mp)\d+")
                     && !Regex.IsMatch(def, "media=cdrom")))
             {
                 var infos = def.Split(',');
