@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Project>
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net9.0;net10.0;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Version>9.1.11</Version>
+        <Version>9.1.12</Version>
         <!-- <NoWarn>$(NoWarn);CS1591;CS0436</NoWarn> -->
         <Company>Corsinvest Srl</Company>
         <Authors>Corsinvest Srl</Authors>
@@ -62,18 +62,6 @@
                           Version="10.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Console"
                           Version="10.0.0" />
-    </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"
-                          Version="9.0.5" />
-        <PackageReference Include="Microsoft.Extensions.Logging"
-                          Version="9.0.5" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Console"
-                          Version="9.0.5" />
-        <PackageReference Include="Microsoft.CSharp"
-                          Version="4.7.0" />
-        <PackageReference Include="IndexRange"
-                          Version="1.0.3" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Newtonsoft.Json"
