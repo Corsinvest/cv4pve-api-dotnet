@@ -418,38 +418,51 @@ public static class ApiExplorerHelper
         }
         else if (data is IList list)
         {
-            if (keys == null)
+            // Check if the list contains plain strings (e.g. /nodes/{node}/journal returns string[])
+            var firstItem = list.Count > 0 
+                                ? list[0] 
+                                : null;
+            if (firstItem is string)
             {
-                var keysTmp = new List<string>();
-                foreach (IDictionary<string, object> item in data) { keysTmp.AddRange([.. item.Keys]); }
-                keys = [.. keysTmp.Distinct().OrderBy(a => a)];
+                columns.Add("value");
+                foreach (string item in list) { rows.Add([item]); }
+                print = true;
             }
-
-            columns.AddRange(keys);
-            var rowsTmp = new List<KeyValuePair<object, object[]>>();
-
-            //array data
-            foreach (IDictionary<string, object> item in list)
+            else
             {
-                //create rows
-                var row = new List<object>();
-                foreach (var title in columns)
+                if (keys == null)
                 {
-                    if (item.TryGetValue(title, out var value))
-                    {
-                        value = GetValue(value, title, returnParameters);
-                    }
-
-                    value ??= string.Empty;
-                    row.Add(value);
+                    var keysTmp = new List<string>();
+                    foreach (IDictionary<string, object> item in data) { keysTmp.AddRange([.. item.Keys]); }
+                    keys = [.. keysTmp.Distinct().OrderBy(a => a)];
                 }
 
-                rowsTmp.Add(new KeyValuePair<object, object[]>(row[0] + string.Empty, [.. row]));
-            }
+                columns.AddRange(keys);
+                var rowsTmp = new List<KeyValuePair<object, object[]>>();
 
-            //order row by first column
-            rows.AddRange([.. rowsTmp.OrderBy(a => a.Key).Select(a => a.Value)]);
-            if (rows.Count == 0) { data = string.Empty; }
+                //array data
+                foreach (IDictionary<string, object> item in list)
+                {
+                    //create rows
+                    var row = new List<object>();
+                    foreach (var title in columns)
+                    {
+                        if (item.TryGetValue(title, out var value))
+                        {
+                            value = GetValue(value, title, returnParameters);
+                        }
+
+                        value ??= string.Empty;
+                        row.Add(value);
+                    }
+
+                    rowsTmp.Add(new KeyValuePair<object, object[]>(row[0] + string.Empty, [.. row]));
+                }
+
+                //order row by first column
+                rows.AddRange([.. rowsTmp.OrderBy(a => a.Key).Select(a => a.Value)]);
+                if (rows.Count == 0) { data = string.Empty; }
+            }
         }
 
         if (rows.Count > 0)

@@ -165,11 +165,7 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// <returns>True if login succeeded</returns>
     public async Task<bool> LoginOpenIdAsync(string realm, Action<string> openBrowser, int timeoutSeconds = 60)
     {
-#if NETSTANDARD2_0
-        var tcpListenerFreePort = new TcpListener(IPAddress.Loopback, 0);
-#else
         using var tcpListenerFreePort = new TcpListener(IPAddress.Loopback, 0);
-#endif
         tcpListenerFreePort.Start();
         var port = ((IPEndPoint)tcpListenerFreePort.LocalEndpoint).Port;
         tcpListenerFreePort.Stop();
@@ -206,11 +202,7 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
             var responseHtml = "<html><body><h2>Authentication complete. You can close this window.</h2></body></html>"u8.ToArray();
             context.Response.ContentType = "text/html";
             context.Response.ContentLength64 = responseHtml.Length;
-#if NETSTANDARD2_0
-            await context.Response.OutputStream.WriteAsync(responseHtml, 0, responseHtml.Length);
-#else
             await context.Response.OutputStream.WriteAsync(responseHtml);
-#endif
             context.Response.Close();
 
             return !string.IsNullOrEmpty(code)
