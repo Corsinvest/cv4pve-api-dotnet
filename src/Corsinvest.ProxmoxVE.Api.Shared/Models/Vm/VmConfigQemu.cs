@@ -25,7 +25,8 @@ public class VmConfigQemu : VmConfig
     public string Cpu { get; set; }
 
     /// <summary>
-    /// Keyboard layout for VNC server. This option is generally not required and is often better handled from within the guest OS.
+    /// Keyboard layout for VNC server.
+    /// This option is generally not required and is often better handled from within the guest OS.
     /// </summary>
     [JsonProperty("keyboard")]
     public string Keyboard { get; set; }
@@ -58,7 +59,8 @@ public class VmConfigQemu : VmConfig
     /// Agent enabled.
     /// </summary>
     public bool AgentEnabled
-        => !string.IsNullOrWhiteSpace(Agent) && Agent.Split(',').Select(a => a.Trim()).Any(a => a == "1");
+        => !string.IsNullOrWhiteSpace(Agent)
+            && Agent.Split(',').Select(a => a.Trim()).Any(a => a == "1");
 
     /// <summary>
     /// Enable booting from specified disk. Deprecated: Use 'boot: order=foo;bar' instead.
@@ -94,7 +96,7 @@ public class VmConfigQemu : VmConfig
     /// Amount of target RAM for the VM in MiB. Using zero disables the ballon driver.
     /// </summary>
     [JsonProperty("balloon")]
-    public int Balloon { get; set; }
+    public int? Balloon { get; set; }
 
     /// <summary>
     /// cloud-init: Sets DNS search domains for a container. Create will automatically use the setting from the host if neither searchdomain nor nameserver are set.
@@ -295,7 +297,7 @@ public class VmConfigQemu : VmConfig
     public string Ivshmem { get; set; }
 
     /// <summary>
-    /// Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.
+    /// Use together with hugepages. If enabled, hugepages will not be deleted after VM shutdown and can be used for subsequent starts.
     /// </summary>
     [JsonProperty("keephugepages")]
     public bool Keephugepages { get; set; }

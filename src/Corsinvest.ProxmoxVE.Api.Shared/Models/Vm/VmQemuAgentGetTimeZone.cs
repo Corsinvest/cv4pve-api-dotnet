@@ -16,12 +16,12 @@ public class VmQemuAgentGetTimeZone : ModelBase
     /// Result
     /// </summary>
     [JsonProperty("result")]
-    public ResultInt Result { get; set; }
+    public ResultInfo Result { get; set; }
 
     /// <summary>
     /// Result
     /// </summary>
-    public class ResultInt
+    public class ResultInfo
     {
         /// <summary>
         /// Offset

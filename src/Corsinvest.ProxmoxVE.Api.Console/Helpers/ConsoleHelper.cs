@@ -121,11 +121,12 @@ Good job";
     /// <summary>
     /// Create console application.
     /// </summary>
-    public static RootCommand CreateApp(string name, string description)
+    public static RootCommand CreateApp(string description)
     {
         var rc = new RootCommand(description);
         rc.AddFullNameLogo();
         rc.AddDebugOption();
+        rc.AddLogLevelOption();
         rc.AddDryRunOption();
         rc.AddLoginOptions();
 
@@ -165,7 +166,7 @@ Good job";
 
             if (rootCommand.DebugIsActive())
             {
-                logger.LogError(ex, ex.Message);
+                logger.LogError(ex, "{Message}", ex.Message);
 
                 System.Console.Out.WriteLine("================ EXCEPTION ================ ");
                 System.Console.Out.WriteLine(ex.GetType().FullName);

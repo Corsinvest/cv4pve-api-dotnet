@@ -48,9 +48,12 @@ For more information visit https://www.corsinvest.it/cv4pve";
     /// Get LogLevel from debug
     /// </summary>
     public static LogLevel GetLogLevelFromDebug(this Command command)
-        => command.DebugIsActive()
-            ? LogLevel.Trace
-            : LogLevel.Warning;
+    {
+        var logLevel = command.GetValue(command.GetOption<LogLevel?>($"--{LogLevelOptionName}"));
+        return logLevel ?? (command.DebugIsActive()
+                ? LogLevel.Debug
+                : LogLevel.Warning);
+    }
 
     /// <summary>
     /// Debug option
@@ -58,6 +61,18 @@ For more information visit https://www.corsinvest.it/cv4pve";
     public static Option<bool> AddDebugOption(this Command command)
     {
         var opt = command.AddOption<bool>($"--{DebugOptionName}", "Debug application");
+        opt.Hidden = true;
+        opt.Recursive = true;
+
+        return opt;
+    }
+
+    /// <summary>
+    /// Log level option
+    /// </summary>
+    public static Option<LogLevel?> AddLogLevelOption(this Command command)
+    {
+        var opt = command.AddOption<LogLevel?>($"--{LogLevelOptionName}", "Log level (Trace, Debug, Information, Warning, Error, Critical)");
         opt.Hidden = true;
         opt.Recursive = true;
 
@@ -95,10 +110,10 @@ For more information visit https://www.corsinvest.it/cv4pve";
 -vmid,-name,-@node-???,-@tag-?? exclude from list (e.g. @all,-200,-TestUbuntu,-@tag-customer1)
 range 100:107,-105,200:204
 '@pool-???' for all VM/CT in specific pool (e.g. @pool-customer1),
-'@tag-???' for all VM/CT in specific tags (e.g. @tag-customerA),
+'@tag-???' for all VM/CT with specific tag (e.g. @tag-customerA),
 '@node-???' for all VM/CT in specific node (e.g. @node-pve1, @node-\$(hostname)),
-'@all-???' for all VM/CT in specific host (e.g. @all-pve1, @all-\$(hostname)),
-'@all' for all VM/CT in cluster";
+'@all-???' or 'all-???' for all VM/CT in specific host (e.g. @all-pve1, all-pve1),
+'@all' or 'all' for all VM/CT in cluster";
 
         return opt;
     }
@@ -191,6 +206,11 @@ range 100:107,-105,200:204
     /// Password option
     /// </summary>
     public static readonly string DebugOptionName = "debug";
+
+    /// <summary>
+    /// Log level option
+    /// </summary>
+    public static readonly string LogLevelOptionName = "log-level";
 
     /// <summary>
     /// Dry run
@@ -349,7 +369,6 @@ range 100:107,-105,200:204
         return option;
     }
 
-#if !NETSTANDARD
     /// <summary>
     /// Add validator range
     /// </summary>
@@ -366,104 +385,6 @@ range 100:107,-105,200:204
 
         return option;
     }
-#else
-    /// <summary>
-    /// Add validator range
-    /// </summary>
-    public static Option<int> AddValidatorRange(this Option<int> option, int min, int max)
-    {
-        option.Validators.Add(e =>
-        {
-            var range = e.GetValueOrDefault<int>();
-            if (range < min || range > max)
-            {
-                e.AddError($"Option {e.Tokens.Single().Value} whit value '{range}' is not in range!");
-            }
-        });
-
-        return option;
-    }
-    /// <summary>
-    /// Add validator range
-    /// </summary>
-    public static Option<long> AddValidatorRange(this Option<long> option, long min, long max)
-    {
-        option.Validators.Add(e =>
-        {
-            var range = e.GetValueOrDefault<int>();
-            if (range < min || range > max)
-            {
-                e.AddError($"Option {e.Tokens.Single().Value} whit value '{range}' is not in range!");
-            }
-        });
-
-        return option;
-    }
-    /// <summary>
-    /// Add validator range
-    /// </summary>
-    public static Option<short> AddValidatorRange(this Option<short> option, short min, short max)
-    {
-        option.Validators.Add(e =>
-        {
-            var range = e.GetValueOrDefault<int>();
-            if (range < min || range > max)
-            {
-                e.AddError($"Option {e.Tokens.Single().Value} whit value '{range}' is not in range!");
-            }
-        });
-
-        return option;
-    }
-    /// <summary>
-    /// Add validator range
-    /// </summary>
-    public static Option<byte> AddValidatorRange(this Option<byte> option, byte min, byte max)
-    {
-        option.Validators.Add(e =>
-        {
-            var range = e.GetValueOrDefault<int>();
-            if (range < min || range > max)
-            {
-                e.AddError($"Option {e.Tokens.Single().Value} whit value '{range}' is not in range!");
-            }
-        });
-
-        return option;
-    }
-    /// <summary>
-    /// Add validator range
-    /// </summary>
-    public static Option<float> AddValidatorRange(this Option<float> option, float min, float max)
-    {
-        option.Validators.Add(e =>
-        {
-            var range = e.GetValueOrDefault<int>();
-            if (range < min || range > max)
-            {
-                e.AddError($"Option {e.Tokens.Single().Value} whit value '{range}' is not in range!");
-            }
-        });
-
-        return option;
-    }
-    /// <summary>
-    /// Add validator range
-    /// </summary>
-    public static Option<double> AddValidatorRange(this Option<double> option, double min, double max)
-    {
-        option.Validators.Add(e =>
-        {
-            var range = e.GetValueOrDefault<int>();
-            if (range < min || range > max)
-            {
-                e.AddError($"Option {e.Tokens.Single().Value} whit value '{range}' is not in range!");
-            }
-        });
-
-        return option;
-    }
-#endif
     /// <summary>
     /// Add validator exist file
     /// </summary>

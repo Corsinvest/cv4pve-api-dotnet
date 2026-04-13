@@ -244,29 +244,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
             try
             {
                 using var tcpClient = new TcpClient();
-#if NET7_0_OR_GREATER
-                // .NET 7+ supports CancellationToken in ConnectAsync
                 using (var timeoutCts = new CancellationTokenSource(timeout))
                 using (var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token))
                 {
                     await tcpClient.ConnectAsync(endpoint.Host, endpoint.Port).ConfigureAwait(false);
                     return tcpClient.Connected;
                 }
-#else
-                // .NET Standard 2.0 and older versions don't support CancellationToken in ConnectAsync
-                var connectTask = tcpClient.ConnectAsync(endpoint.Host, endpoint.Port);
-                var completedTask = await Task.WhenAny(connectTask, Task.Delay(timeout, cancellationToken));
-
-                if (completedTask == connectTask)
-                {
-                    await connectTask; // Await to get any exceptions
-                    return tcpClient.Connected;
-                }
-                else
-                {
-                    return false; // Timeout
-                }
-#endif
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {

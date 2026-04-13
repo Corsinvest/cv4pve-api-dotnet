@@ -13,8 +13,10 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Utils;
 /// <summary>
 /// Table generator
 /// </summary>
-public static class TableGenerator
+public static partial class TableGenerator
 {
+    [GeneratedRegex("[^|]")]
+    private static partial Regex NonPipeCharRegex();
     /// <summary>
     /// Export to
     /// </summary>
@@ -117,7 +119,7 @@ public static class TableGenerator
         var columnHeaders = string.Format(format, [.. columns]);
 
         ret.AppendLine(columnHeaders);
-        ret.AppendLine(Regex.Replace(columnHeaders, "[^|]", "-"));
+        ret.AppendLine(NonPipeCharRegex().Replace(columnHeaders, "-"));
         rows.Select(row => string.Format(format, [.. row])).ToList().ForEach(row => ret.AppendLine(row));
         return ret.ToString();
     }
@@ -132,7 +134,7 @@ public static class TableGenerator
         var ret = new StringBuilder();
         var format = CreateStringFormat(columns, rows);
         var columnHeaders = string.Format(format, [.. columns]);
-        var dividerPlus = Regex.Replace(columnHeaders, "[^|]", "-").Replace("|", "+");
+        var dividerPlus = NonPipeCharRegex().Replace(columnHeaders, "-").Replace("|", "+");
 
         ret.AppendLine(dividerPlus);
         ret.AppendLine(columnHeaders);

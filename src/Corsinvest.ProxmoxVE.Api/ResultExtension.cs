@@ -41,7 +41,7 @@ public static class ResultExtension
     /// <summary>
     /// Check result in error.
     /// </summary>
-    public static bool InError(this Result result) => result != null && result.ResponseInError;
+    public static bool InError(this Result result) => result?.ResponseInError is true;
 
     /// <summary>
     /// Convert result to model

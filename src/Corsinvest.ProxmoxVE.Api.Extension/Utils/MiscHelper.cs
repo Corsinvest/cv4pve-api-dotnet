@@ -13,7 +13,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils;
 /// <summary>
 /// BackupHelper
 /// </summary>
-public static class MiscHelper
+public static partial class MiscHelper
 {
     //public static DateTime ParseDateBackup(string value) => DateTime.ParseExact(value, "yyyy-MM-dd HH:mm:ss", null);
 
@@ -83,7 +83,7 @@ public static class MiscHelper
         if (parts.Count == 0) { throw new ArgumentException("Missing time specification"); }
 
         // Date spec (e.g. 2024-01-01) — not implemented
-        if (Regex.IsMatch(parts[0], @"^\d{4}-\d{2}-\d{2}$"))
+        if (DateSpecRegex().IsMatch(parts[0]))
         {
             throw new PveException("Date specification not implemented");
         }
@@ -110,13 +110,13 @@ public static class MiscHelper
         }
 
         return (string.Join(",", dowHash),
-                string.Join(",", matchAllHours ? Enumerable.Range(0, 24) : hoursHash.OrderBy(a => a)),
-                string.Join(",", matchAllMinutes ? Enumerable.Range(0, 60) : minutesHash.OrderBy(a => a)));
+                string.Join(",", matchAllHours ? Enumerable.Range(0, 24) : hoursHash.Order()),
+                string.Join(",", matchAllMinutes ? Enumerable.Range(0, 60) : minutesHash.Order()));
     }
 
     private static void ParseSingleTimeSpec(string item, int max, ref bool matchAll, List<int> hash)
     {
-        var match = Regex.Match(item, @"^((?:\*|[0-9]+))(?:\/([1-9][0-9]*))?$");
+        var match = TimeSpecRegex().Match(item);
         if (match.Success)
         {
             if (match.Groups.Count == 3 && !string.IsNullOrWhiteSpace(match.Groups[2].Value))
@@ -148,7 +148,7 @@ public static class MiscHelper
         }
         else
         {
-            match = Regex.Match(item, @"^([0-9]+)\.\.([1-9][0-9]*)$");
+            match = TimeRangeRegex().Match(item);
             if (!match.Success) { throw new ArgumentException($"Unable to parse calendar event '{item}"); }
 
             var start = int.Parse(match.Groups[1].Value);
@@ -159,6 +159,13 @@ public static class MiscHelper
             for (int i = start; i <= end; i++) { hash.Add(i); }
         }
     }
+
+    [GeneratedRegex(@"^\d{4}-\d{2}-\d{2}$")]
+    private static partial Regex DateSpecRegex();
+    [GeneratedRegex(@"^((?:\*|[0-9]+))(?:\/([1-9][0-9]*))?$")]
+    private static partial Regex TimeSpecRegex();
+    [GeneratedRegex(@"^([0-9]+)\.\.([1-9][0-9]*)$")]
+    private static partial Regex TimeRangeRegex();
 
     /// <summary>
     /// Opens a URL in the default system browser (cross-platform).

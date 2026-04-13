@@ -34,7 +34,7 @@ public class ClusterOptions : ModelBase
     /// Migration
     /// </summary>
     [JsonProperty("migration")]
-    public MigrationInt Migration { get; set; }
+    public MigrationInfo Migration { get; set; }
 
     /// <summary>
     /// Mac Prefix
@@ -52,12 +52,12 @@ public class ClusterOptions : ModelBase
     /// Tag Style
     /// </summary>
     [JsonProperty("tag-style")]
-    public TagStyleInt TagStyle { get; set; }
+    public TagStyleInfo TagStyle { get; set; }
 
     /// <summary>
     /// Tag Style
     /// </summary>
-    public class TagStyleInt
+    public class TagStyleInfo
     {
         /// <summary>
         /// Color Map
@@ -69,7 +69,7 @@ public class ClusterOptions : ModelBase
     /// <summary>
     /// Migration
     /// </summary>
-    public class MigrationInt
+    public class MigrationInfo
     {
         /// <summary>
         /// Network
