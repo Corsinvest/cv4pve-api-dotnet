@@ -19,8 +19,8 @@ public static class ModelsExtensions
     /// <summary>
     /// Resources index (cluster wide).
     /// </summary>
-    public static async Task<IEnumerable<ClusterResource>> GetAsync(this PveClient.PveCluster.PveResources item, ClusterResourceType resourceType)
-        => await item.GetAsync(resourceType switch
+    public static Task<IEnumerable<ClusterResource>> GetAsync(this PveClient.PveCluster.PveResources item, ClusterResourceType resourceType)
+        => item.GetAsync(resourceType switch
         {
             ClusterResourceType.Storage or ClusterResourceType.Node or ClusterResourceType.Vm => resourceType.ToString().ToLower(),
             ClusterResourceType.All => null,
@@ -30,18 +30,18 @@ public static class ModelsExtensions
     /// <summary>
     /// Read storage RRD statistics.
     /// </summary>
-    public static async Task<IEnumerable<NodeStorageRrdData>> GetAsync(this PveClient.PveNodes.PveNodeItem.PveStorage.PveStorageItem.PveRrddata item,
-                                                                       RrdDataTimeFrame dataTimeFrame,
-                                                                       RrdDataConsolidation dataConsolidation)
-        => await item.GetAsync(dataTimeFrame.GetValue(), dataConsolidation.GetValue());
+    public static Task<IEnumerable<NodeStorageRrdData>> GetAsync(this PveClient.PveNodes.PveNodeItem.PveStorage.PveStorageItem.PveRrddata item,
+                                                                 RrdDataTimeFrame dataTimeFrame,
+                                                                 RrdDataConsolidation dataConsolidation)
+        => item.GetAsync(dataTimeFrame.GetValue(), dataConsolidation.GetValue());
 
     /// <summary>
     /// Read node RRD statistics
     /// </summary>
-    public static async Task<IEnumerable<NodeRrdData>> GetAsync(this PveClient.PveNodes.PveNodeItem.PveRrddata item,
-                                                                RrdDataTimeFrame dataTimeFrame,
-                                                                RrdDataConsolidation dataConsolidation)
-        => await item.GetAsync(dataTimeFrame.GetValue(), dataConsolidation.GetValue());
+    public static Task<IEnumerable<NodeRrdData>> GetAsync(this PveClient.PveNodes.PveNodeItem.PveRrddata item,
+                                                          RrdDataTimeFrame dataTimeFrame,
+                                                          RrdDataConsolidation dataConsolidation)
+        => item.GetAsync(dataTimeFrame.GetValue(), dataConsolidation.GetValue());
 
     /// <summary>
     /// Read task log
@@ -50,8 +50,8 @@ public static class ModelsExtensions
     /// <param name="limit">The maximum amount of lines that should be printed.</param>
     /// <param name="start">The line number to start printing at.</param>
     public static async Task<IEnumerable<string>> GetAsync(this PveClient.PveNodes.PveNodeItem.PveTasks.PveUpidItem.PveLog item,
-                                                       int? limit = null,
-                                                       int? start = null)
+                                                           int? limit = null,
+                                                           int? start = null)
         => (await item.ReadTaskLog(null, limit, start)).ToLogs();
 
     /// <summary>
@@ -131,8 +131,8 @@ public static class ModelsExtensions
     /// <param name="limit">The maximum amount of lines that should be printed.</param>
     /// <param name="start">The line number to start printing at.</param>
     public static async Task<IEnumerable<string>> GetAsync(this PveClient.PveNodes.PveNodeItem.PveReplication.PveIdItem.PveLog item,
-                                                       int? limit = null,
-                                                       int? start = null)
+                                                           int? limit = null,
+                                                           int? start = null)
         => (await item.ReadJobLog(limit, start)).ToLogs();
 
 
@@ -143,7 +143,7 @@ public static class ModelsExtensions
                                                                                            int? vmId = null)
     {
         var ret = new List<NodeStorageContent>();
-        foreach (var item1 in await item.Storage.GetAsync(enabled: true, content: "backup"))
+        foreach (var item1 in await item.Storage.GetAsync(content: "backup", enabled: true))
         {
             if (item1.Active)
             {
@@ -157,18 +157,18 @@ public static class ModelsExtensions
     /// <summary>
     /// Read VM RRD statistics
     /// </summary>
-    public static async Task<IEnumerable<VmRrdData>> GetAsync(this PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveRrddata item,
-                                                              RrdDataTimeFrame dataTimeFrame,
-                                                              RrdDataConsolidation dataConsolidation)
-        => await item.GetAsync(dataTimeFrame.GetValue(), dataConsolidation.GetValue());
+    public static Task<IEnumerable<VmRrdData>> GetAsync(this PveClient.PveNodes.PveNodeItem.PveQemu.PveVmidItem.PveRrddata item,
+                                                        RrdDataTimeFrame dataTimeFrame,
+                                                        RrdDataConsolidation dataConsolidation)
+        => item.GetAsync(dataTimeFrame.GetValue(), dataConsolidation.GetValue());
 
     /// <summary>
     /// Read VM RRD statistics
     /// </summary>
-    public static async Task<IEnumerable<VmRrdData>> GetAsync(this PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveRrddata item,
-                                                              RrdDataTimeFrame dataTimeFrame,
-                                                              RrdDataConsolidation dataConsolidation)
-        => await item.GetAsync(dataTimeFrame.GetValue(), dataConsolidation.GetValue());
+    public static Task<IEnumerable<VmRrdData>> GetAsync(this PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveRrddata item,
+                                                        RrdDataTimeFrame dataTimeFrame,
+                                                        RrdDataConsolidation dataConsolidation)
+        => item.GetAsync(dataTimeFrame.GetValue(), dataConsolidation.GetValue());
 
     #region Spice
     /// <summary>
@@ -186,8 +186,8 @@ public static class ModelsExtensions
     /// <param name="item"></param>
     /// <param name="proxy"></param>
     public static async Task<(bool Success, string ReasonPhrase, string Content)> GetSpiceFileVVAsync(this PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveSpiceproxy item,
-                                                                                                  string proxy)
-    => CreateSpiceFileVV(await item.Spiceproxy(proxy));
+                                                                                                      string proxy)
+        => CreateSpiceFileVV(await item.Spiceproxy(proxy));
 
     /// <summary>
     /// Get file for SPICE client using spice config
@@ -195,8 +195,8 @@ public static class ModelsExtensions
     /// <param name="item"></param>
     /// <param name="proxy"></param>
     public static async Task<(bool Success, string ReasonPhrase, string Content)> GetSpiceFileVVAsync(this PveClient.PveNodes.PveNodeItem.PveSpiceshell item,
-                                                                                                  string proxy)
-    => CreateSpiceFileVV(await item.Spiceshell(proxy: proxy));
+                                                                                                      string proxy)
+        => CreateSpiceFileVV(await item.Spiceshell(proxy: proxy));
 
     private static (bool Success, string ReasonPhrase, string Content) CreateSpiceFileVV(Result response)
     {

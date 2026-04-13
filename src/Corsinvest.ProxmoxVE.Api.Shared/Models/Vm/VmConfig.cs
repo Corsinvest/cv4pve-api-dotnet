@@ -13,7 +13,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 /// <summary>
 /// Vm Config
 /// </summary>
-public class VmConfig : ModelBase
+public partial class VmConfig : ModelBase
 {
     /// <summary>
     /// Virtual processor architecture. Defaults to the host.
@@ -140,99 +140,101 @@ public class VmConfig : ModelBase
         {
             if (key.StartsWith("net"))
             {
-                var network = new VmNetwork();
-                network.Id = key;
+                var network = new VmNetwork
+                {
+                    Id = key
+                };
 
                 foreach (var item in (ExtensionData[key] + string.Empty).Split(','))
                 {
                     Match match;
                     if (this is VmConfigQemu)
                     {
-                        if ((match = Regex.Match(item, "^(ne2k_pci|e1000e?|e1000-82540em|e1000-82544gc|e1000-82545em|vmxnet3|rtl8139|pcnet|virtio|ne2k_isa|i82551|i82557b|i82559er)(=([0-9a-f]{2}(:[0-9a-f]{2}){5}))?$", RegexOptions.IgnoreCase)).Success)
+                        if ((match = NicModelRegex().Match(item)).Success)
                         {
                             network.Model = match.Groups[1].Value.ToLower();
                             if (match.Groups[3].Success) { network.MacAddress = match.Groups[3].Value; }
                         }
-                        else if ((match = Regex.Match(item, @"^bridge=(\S+)$")).Success)
+                        else if ((match = BridgeRegex().Match(item)).Success)
                         {
                             network.Bridge = match.Groups[1].Value;
                         }
-                        else if ((match = Regex.Match(item, @"^rate=(\d+(\.\d+)?|\.\d+)$")).Success)
+                        else if ((match = RateRegex().Match(item)).Success)
                         {
                             network.Rate = double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
                         }
-                        else if ((match = Regex.Match(item, @"^tag=(\d+(\.\d+)?)$")).Success)
+                        else if ((match = TagRegex().Match(item)).Success)
                         {
                             network.Tag = int.Parse(match.Groups[1].Value);
                         }
-                        else if ((match = Regex.Match(item, @"^firewall=(\d+)$")).Success)
+                        else if ((match = FirewallRegex().Match(item)).Success)
                         {
                             network.Firewall = match.Groups[1].Value == "1";
                         }
-                        else if ((match = Regex.Match(item, @"^link_down=(\d+)$")).Success)
+                        else if ((match = LinkDownRegex().Match(item)).Success)
                         {
                             network.Disconnect = match.Groups[1].Value == "1";
                         }
-                        else if ((match = Regex.Match(item, @"^queues=(\d+)$")).Success)
+                        else if ((match = QueuesRegex().Match(item)).Success)
                         {
                             network.Queues = int.Parse(match.Groups[1].Value);
                         }
-                        else if ((match = Regex.Match(item, @"^trunks=(\d+(?:-\d+)?(?:;\d+(?:-\d+)?)*)$")).Success)
+                        else if ((match = TrunksRegex().Match(item)).Success)
                         {
                             network.Trunks = match.Groups[1].Value;
                         }
-                        else if ((match = Regex.Match(item, @"^mtu=(\d+)$")).Success)
+                        else if ((match = MtuRegex().Match(item)).Success)
                         {
                             network.Mtu = int.Parse(match.Groups[1].Value);
                         }
                     }
                     else if (this is VmConfigLxc)
                     {
-                        if ((match = Regex.Match(item, @"^(bridge)=(\S+)$")).Success)
+                        if ((match = BridgeRegex().Match(item)).Success)
                         {
-                            network.Bridge = match.Groups[2].Value;
+                            network.Bridge = match.Groups[1].Value;
                         }
-                        else if ((match = Regex.Match(item, @"^(gw)=(\S+)$")).Success)
+                        else if ((match = GwRegex().Match(item)).Success)
                         {
                             network.Gateway = match.Groups[2].Value;
                         }
-                        else if ((match = Regex.Match(item, @"^(gw6)=(\S+)$")).Success)
+                        else if ((match = Gw6Regex().Match(item)).Success)
                         {
                             network.Gateway6 = match.Groups[2].Value;
                         }
-                        else if ((match = Regex.Match(item, @"^(hwaddr)=(\S+)$")).Success)
+                        else if ((match = HwAddrRegex().Match(item)).Success)
                         {
                             network.MacAddress = match.Groups[2].Value;
                         }
-                        else if ((match = Regex.Match(item, @"^(rate)=(\S+)$")).Success)
+                        else if ((match = RateRegex().Match(item)).Success)
                         {
-                            network.Rate = double.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture);
+                            network.Rate = double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
                         }
-                        else if ((match = Regex.Match(item, @"^(tag)=(\S+)$")).Success)
+                        else if ((match = TagRegex().Match(item)).Success)
                         {
-                            network.Tag = int.Parse(match.Groups[2].Value);
+                            network.Tag = int.Parse(match.Groups[1].Value);
                         }
-                        else if ((match = Regex.Match(item, @"^(mtu)=(\S+)$")).Success)
+                        else if ((match = MtuRegex().Match(item)).Success)
                         {
-                            network.Mtu = int.Parse(match.Groups[2].Value);
+                            network.Mtu = int.Parse(match.Groups[1].Value);
                         }
-                        else if ((match = Regex.Match(item, @"^(name)=(\S+)$")).Success)
+                        else if ((match = NameRegex().Match(item)).Success)
                         {
                             network.Name = match.Groups[2].Value;
                         }
-                        else if ((match = Regex.Match(item, @"^(ip)=(\S+)$")).Success)
+                        else if ((match = IpRegex().Match(item)).Success)
                         {
                             network.IpAddress = match.Groups[2].Value;
                         }
-                        else if ((match = Regex.Match(item, @"^(ip6)=(\S+)$")).Success)
+                        else if ((match = Ip6Regex().Match(item)).Success)
                         {
                             network.IpAddress6 = match.Groups[2].Value;
                         }
-                        else if ((match = Regex.Match(item, @"^firewall=(\d+)$")).Success)
+                        else if ((match = FirewallRegex().Match(item)).Success)
                         {
                             network.Firewall = match.Groups[1].Value == "1";
                         }
-                        else if ((match = Regex.Match(item, @"^link_down=(\d+)$")).Success)
+                        else if ((match = LinkDownRegex().Match(item)).Success)
                         {
                             network.LinkDown = match.Groups[1].Value == "1";
                         }
@@ -257,8 +259,8 @@ public class VmConfig : ModelBase
             if (key == "rootfs"
                 || key.StartsWith("unused")
                 //bus match
-                || (Regex.IsMatch(key, @"(efidisk|tpmstate|virtio|ide|scsi|sata|mp)\d+")
-                    && !Regex.IsMatch(def, "media=cdrom")))
+                || (DiskKeyRegex().IsMatch(key)
+                    && !CdromMediaRegex().IsMatch(def)))
             {
                 var infos = def.Split(',');
                 var storage = string.Empty;
@@ -267,7 +269,7 @@ public class VmConfig : ModelBase
                 var device = string.Empty;
                 var mountSourcePath = string.Empty;
 
-                if (infos[0].Contains(":"))
+                if (infos[0].Contains(':'))
                 {
                     var data = infos[0].Split(':');
                     storage = data[0];
@@ -318,4 +320,39 @@ public class VmConfig : ModelBase
         }
         Disks = disks;
     }
+
+    [GeneratedRegex(@"(efidisk|tpmstate|virtio|ide|scsi|sata|mp)\d+")]
+    private static partial Regex DiskKeyRegex();
+    [GeneratedRegex("media=cdrom")]
+    private static partial Regex CdromMediaRegex();
+    [GeneratedRegex("^(ne2k_pci|e1000e?|e1000-82540em|e1000-82544gc|e1000-82545em|vmxnet3|rtl8139|pcnet|virtio|ne2k_isa|i82551|i82557b|i82559er)(=([0-9a-f]{2}(:[0-9a-f]{2}){5}))?$", RegexOptions.IgnoreCase)]
+    private static partial Regex NicModelRegex();
+    [GeneratedRegex(@"^bridge=(\S+)$")]
+    private static partial Regex BridgeRegex();
+    [GeneratedRegex(@"^rate=(\d+(\.\d+)?|\.\d+)$")]
+    private static partial Regex RateRegex();
+    [GeneratedRegex(@"^tag=(\d+(\.\d+)?)$")]
+    private static partial Regex TagRegex();
+    [GeneratedRegex(@"^firewall=(\d+)$")]
+    private static partial Regex FirewallRegex();
+    [GeneratedRegex(@"^link_down=(\d+)$")]
+    private static partial Regex LinkDownRegex();
+    [GeneratedRegex(@"^queues=(\d+)$")]
+    private static partial Regex QueuesRegex();
+    [GeneratedRegex(@"^trunks=(\d+(?:-\d+)?(?:;\d+(?:-\d+)?)*)$")]
+    private static partial Regex TrunksRegex();
+    [GeneratedRegex(@"^mtu=(\d+)$")]
+    private static partial Regex MtuRegex();
+    [GeneratedRegex(@"^(gw)=(\S+)$")]
+    private static partial Regex GwRegex();
+    [GeneratedRegex(@"^(gw6)=(\S+)$")]
+    private static partial Regex Gw6Regex();
+    [GeneratedRegex(@"^(hwaddr)=(\S+)$")]
+    private static partial Regex HwAddrRegex();
+    [GeneratedRegex(@"^(name)=(\S+)$")]
+    private static partial Regex NameRegex();
+    [GeneratedRegex(@"^(ip)=(\S+)$")]
+    private static partial Regex IpRegex();
+    [GeneratedRegex(@"^(ip6)=(\S+)$")]
+    private static partial Regex Ip6Regex();
 }

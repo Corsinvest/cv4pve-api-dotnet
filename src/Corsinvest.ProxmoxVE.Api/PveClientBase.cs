@@ -68,7 +68,7 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// <summary>
     /// Gets the base URL for the Proxmox API.
     /// </summary>
-    public string GetApiUrl() => $"{BaseAddress}/api2/{Enum.GetName(typeof(ResponseType), ResponseType)?.ToLower()}";
+    public string GetApiUrl() => $"{BaseAddress}/api2/{Enum.GetName<ResponseType>(ResponseType)?.ToLower()}";
 
     /// <summary>
     /// BaseAddress
@@ -242,32 +242,32 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// </summary>
     /// <param name="resource">Url request</param>
     /// <param name="parameters">Additional parameters</param>
-    public async Task<Result> GetAsync(string resource, IDictionary<string, object> parameters = null)
-    => await ExecuteRequestAsync(resource, MethodType.Get, parameters);
+    public Task<Result> GetAsync(string resource, IDictionary<string, object> parameters = null)
+        => ExecuteRequestAsync(resource, MethodType.Get, parameters);
 
     /// <summary>
     /// Execute method POST
     /// </summary>
     /// <param name="resource">Url request</param>
     /// <param name="parameters">Additional parameters</param>
-    public async Task<Result> CreateAsync(string resource, IDictionary<string, object> parameters = null)
-    => await ExecuteRequestAsync(resource, MethodType.Create, parameters);
+    public Task<Result> CreateAsync(string resource, IDictionary<string, object> parameters = null)
+        => ExecuteRequestAsync(resource, MethodType.Create, parameters);
 
     /// <summary>
     /// Execute method PUT
     /// </summary>
     /// <param name="resource">Url request</param>
     /// <param name="parameters">Additional parameters</param>
-    public async Task<Result> SetAsync(string resource, IDictionary<string, object> parameters = null)
-    => await ExecuteRequestAsync(resource, MethodType.Set, parameters);
+    public Task<Result> SetAsync(string resource, IDictionary<string, object> parameters = null)
+        => ExecuteRequestAsync(resource, MethodType.Set, parameters);
 
     /// <summary>
     /// Execute method DELETE
     /// </summary>
     /// <param name="resource">Url request</param>
     /// <param name="parameters">Additional parameters</param>
-    public async Task<Result> DeleteAsync(string resource, IDictionary<string, object> parameters = null)
-    => await ExecuteRequestAsync(resource, MethodType.Delete, parameters);
+    public Task<Result> DeleteAsync(string resource, IDictionary<string, object> parameters = null)
+        => ExecuteRequestAsync(resource, MethodType.Delete, parameters);
 
     /// <summary>
     /// Get http client
@@ -366,10 +366,12 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
 
         HttpResponseMessage response = null!;
         dynamic result = null;
+        var sw = System.Diagnostics.Stopwatch.StartNew();
 
         try
         {
             response = await GetHttpClient().SendAsync(request, cts.Token);
+            sw.Stop();
 
             switch (ResponseType)
             {
@@ -377,13 +379,13 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
                     result = JsonConvert.DeserializeObject<ExpandoObject>(await response.Content.ReadAsStringAsync());
                     if (_logger.IsEnabled(LogLevel.Trace))
                     {
-                        _logger.LogTrace(JsonConvert.SerializeObject(result, Formatting.Indented) as string);
+                        _logger.LogTrace("{Json}", JsonConvert.SerializeObject(result, Formatting.Indented) as string);
                     }
                     break;
 
                 case ResponseType.Png:
                     result = "data:image/png;base64," + Convert.ToBase64String(await response.Content.ReadAsByteArrayAsync());
-                    if (_logger.IsEnabled(LogLevel.Trace)) { _logger.LogTrace(result as string); }
+                    if (_logger.IsEnabled(LogLevel.Trace)) { _logger.LogTrace("{Data}", (string)result); }
                     break;
 
                 case ResponseType.Response: result = response; break;
@@ -393,7 +395,8 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
         }
         catch (TaskCanceledException ex) when (!cts.Token.IsCancellationRequested)
         {
-            _logger.LogError(ex, ex.Message);
+            sw.Stop();
+            _logger.LogError(ex, "{Message}", ex.Message);
 
             response = new(HttpStatusCode.RequestTimeout)
             {
@@ -402,7 +405,8 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, ex.Message);
+            sw.Stop();
+            _logger.LogError(ex, "{Message}", ex.Message);
 
             response = new(HttpStatusCode.InternalServerError)
             {
@@ -412,10 +416,11 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug("StatusCode: {StatusCode} ReasonPhrase: {ReasonPhrase} IsSuccessStatusCode: {IsSuccessStatusCode}",
+            _logger.LogDebug("StatusCode: {StatusCode} ReasonPhrase: {ReasonPhrase} IsSuccessStatusCode: {IsSuccessStatusCode} Duration: {ElapsedMilliseconds}ms",
                              response.StatusCode,
                              response.ReasonPhrase,
-                             response.IsSuccessStatusCode);
+                             response.IsSuccessStatusCode,
+                             sw.ElapsedMilliseconds);
         }
 
         result ??= new ExpandoObject();
@@ -457,7 +462,7 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// Waits for a background task to finish.
     /// </summary>
     public async Task<bool> WaitForTaskToFinishAsync(Result result, int wait = 500, long timeout = 10000)
-        => !(result != null && !result.ResponseInError && timeout > 0) ||
+        => !(result?.ResponseInError is false && timeout > 0) ||
                 await WaitForTaskToFinishAsync(result.ToData(), wait, timeout);
 
     /// <summary>
@@ -499,6 +504,6 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// <summary>
     /// Reads the current status of a task.
     /// </summary>
-    private async Task<Result> ReadTaskStatusAsync(string task)
-        => await GetAsync($"/nodes/{GetNodeFromTask(task)}/tasks/{task}/status");
+    private Task<Result> ReadTaskStatusAsync(string task)
+        => GetAsync($"/nodes/{GetNodeFromTask(task)}/tasks/{task}/status");
 }

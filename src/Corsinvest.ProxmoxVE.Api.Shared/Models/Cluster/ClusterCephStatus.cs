@@ -11,19 +11,19 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 public class ClusterCephStatus : ModelBase
 {
     [JsonProperty("fsmap")]
-    public FsmapInt Fsmap { get; set; }
+    public FsmapInfo Fsmap { get; set; }
 
     [JsonProperty("servicemap")]
-    public ServicemapInt Servicemap { get; set; }
+    public ServicemapInfo Servicemap { get; set; }
 
     [JsonProperty("progress_events")]
-    public ProgressEventsInt ProgressEvents { get; set; }
+    public ProgressEventsInfo ProgressEvents { get; set; }
 
     [JsonProperty("quorum")]
     public IEnumerable<int> Quorum { get; set; } = [];
 
     [JsonProperty("osdmap")]
-    public OsdmapInt Osdmap { get; set; }
+    public OsdmapInfo Osdmap { get; set; }
 
     [JsonProperty("quorum_age")]
     public int QuorumAge { get; set; }
@@ -32,10 +32,10 @@ public class ClusterCephStatus : ModelBase
     public string Fsid { get; set; }
 
     [JsonProperty("monmap")]
-    public MonmapInt Monmap { get; set; }
+    public MonmapInfo Monmap { get; set; }
 
     [JsonProperty("pgmap")]
-    public PgmapInt Pgmap { get; set; }
+    public PgmapInfo Pgmap { get; set; }
 
     [JsonProperty("election_epoch")]
     public int ElectionEpoch { get; set; }
@@ -44,10 +44,10 @@ public class ClusterCephStatus : ModelBase
     public IEnumerable<string> QuorumNames { get; set; } = [];
 
     [JsonProperty("mgrmap")]
-    public MgrmapInt Mgrmap { get; set; }
+    public MgrmapInfo Mgrmap { get; set; }
 
     [JsonProperty("health")]
-    public HealthInt Health { get; set; }
+    public HealthInfo Health { get; set; }
 
     public class Active
     {
@@ -1131,7 +1131,7 @@ public class ClusterCephStatus : ModelBase
         public IEnumerable<string> Persistent { get; set; } = [];
     }
 
-    public class FsmapInt
+    public class FsmapInfo
     {
         [JsonProperty("epoch")]
         public int Epoch { get; set; }
@@ -1143,7 +1143,7 @@ public class ClusterCephStatus : ModelBase
         public int UpStandby { get; set; }
     }
 
-    public class HealthInt
+    public class HealthInfo
     {
         [JsonProperty("mutes")]
         public IEnumerable<object> Mutes { get; set; } = [];
@@ -1700,7 +1700,7 @@ public class ClusterCephStatus : ModelBase
         public int Flags { get; set; }
     }
 
-    public class MgrmapInt
+    public class MgrmapInfo
     {
         [JsonProperty("active_change")]
         public DateTime ActiveChange { get; set; }
@@ -2234,7 +2234,7 @@ public class ClusterCephStatus : ModelBase
         public string Addr { get; set; }
     }
 
-    public class MonmapInt
+    public class MonmapInfo
     {
         [JsonProperty("quorum")]
         public IEnumerable<int> Quorum { get; set; } = [];
@@ -2432,7 +2432,7 @@ public class ClusterCephStatus : ModelBase
         public string DefaultValue { get; set; }
     }
 
-    public class OsdmapInt
+    public class OsdmapInfo
     {
         [JsonProperty("num_up_osds")]
         public int NumUpOsds { get; set; }
@@ -2495,7 +2495,7 @@ public class ClusterCephStatus : ModelBase
         public string Desc { get; set; }
     }
 
-    public class PgmapInt
+    public class PgmapInfo
     {
         [JsonProperty("num_pools")]
         public int NumPools { get; set; }
@@ -2738,7 +2738,7 @@ public class ClusterCephStatus : ModelBase
         public IEnumerable<object> Tags { get; set; } = [];
     }
 
-    public class ProgressEventsInt;
+    public class ProgressEventsInfo;
 
     public class Proxy
     {
@@ -3448,7 +3448,7 @@ public class ClusterCephStatus : ModelBase
         public IEnumerable<object> Tags { get; set; } = [];
     }
 
-    public class ServicemapInt
+    public class ServicemapInfo
     {
         [JsonProperty("epoch")]
         public int Epoch { get; set; }

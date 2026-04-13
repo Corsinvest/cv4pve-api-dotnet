@@ -18,43 +18,33 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils;
 /// <summary>
 /// Api Explorer
 /// </summary>
-public static class ApiExplorerHelper
+public static partial class ApiExplorerHelper
 {
     /// <summary>
     /// Alias command.
     /// </summary>
-    public class AliasDef
+    public partial class AliasDef(string name, string description, string command, bool system)
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public AliasDef(string name, string description, string command, bool system)
-        {
-            Name = name;
-            Description = description;
-            Command = command;
-            System = system;
-        }
 
         /// <summary>
         /// Name
         /// </summary>
-        public string Name { get; }
+        public string Name { get; } = name;
 
         /// <summary>
         /// Description
         /// </summary>
-        public string Description { get; }
+        public string Description { get; } = description;
 
         /// <summary>
         /// Command
         /// </summary>
-        public string Command { get; }
+        public string Command { get; } = command;
 
         /// <summary>
         /// System
         /// </summary>
-        public bool System { get; }
+        public bool System { get; } = system;
 
         /// <summary>
         /// Check exists name or alias
@@ -69,7 +59,9 @@ public static class ApiExplorerHelper
         /// <summary>
         /// Check name is valid
         /// </summary>
-        public static bool IsValid(string name) => new Regex("^[a-zA-Z0-9,_-]*$").IsMatch(name);
+        public static bool IsValid(string name) => ValidNameRegex().IsMatch(name);
+        [GeneratedRegex("^[a-zA-Z0-9,_-]*$")]
+        private static partial Regex ValidNameRegex();
     }
 
     /// <summary>
@@ -243,7 +235,7 @@ public static class ApiExplorerHelper
     /// Get argument into command start "{" end "}"
     /// </summary>
     public static string[] GetArgumentTags(string command)
-        => [.. new Regex(@"{\s*(.+?)\s*}").Matches(command)
+        => [.. ArgumentTagRegex().Matches(command)
                                       .OfType<Match>()
                                       .Where(a => a.Success)
                                       .Select(a => a.Groups[1].Value)];
@@ -305,7 +297,7 @@ public static class ApiExplorerHelper
         var parameters = new Dictionary<string, object>();
         foreach (var item in items)
         {
-            var pos = item.IndexOf(":");
+            var pos = item.IndexOf(':');
             if (pos >= 0) { parameters.Add(item[..pos], item[(pos + 1)..]); }
         }
         return parameters;
@@ -398,9 +390,9 @@ public static class ApiExplorerHelper
         var rows = new List<object[]>();
         var print = false;
 
-        if (data is ExpandoObject)
+        if (data is ExpandoObject expandoObject)
         {
-            var dic = (IDictionary<string, object>)data;
+            var dic = (IDictionary<string, object>)expandoObject;
 
             columns.Add("key");
             columns.Add("value");
@@ -408,7 +400,7 @@ public static class ApiExplorerHelper
             keys ??= [.. dic.Select(a => a.Key)];
             print = true;
 
-            foreach (var key in keys.OrderBy(a => a))
+            foreach (var key in keys.Order())
             {
                 if (dic.TryGetValue(key, out var value))
                 {
@@ -419,8 +411,8 @@ public static class ApiExplorerHelper
         else if (data is IList list)
         {
             // Check if the list contains plain strings (e.g. /nodes/{node}/journal returns string[])
-            var firstItem = list.Count > 0 
-                                ? list[0] 
+            var firstItem = list.Count > 0
+                                ? list[0]
                                 : null;
             if (firstItem is string)
             {
@@ -434,7 +426,7 @@ public static class ApiExplorerHelper
                 {
                     var keysTmp = new List<string>();
                     foreach (IDictionary<string, object> item in data) { keysTmp.AddRange([.. item.Keys]); }
-                    keys = [.. keysTmp.Distinct().OrderBy(a => a)];
+                    keys = [.. keysTmp.Distinct().Order()];
                 }
 
                 columns.AddRange(keys);
@@ -517,7 +509,7 @@ public static class ApiExplorerHelper
                     //explicit text
                     partsType = JoinWord(param.TypeText.Split(' '), 18, string.Empty);
                 }
-                else if (param.EnumValues.Any())
+                else if (param.EnumValues.Length != 0)
                 {
                     //enums
                     partsType = JoinWord(param.EnumValues, 18, ",");
@@ -568,10 +560,10 @@ public static class ApiExplorerHelper
                 //only parameters no keys
                 var parameters = method.Parameters.Where(a => !classApi.Keys.Contains(a.Name));
 
-                var opts = string.Join(string.Empty, parameters.Where(a => !a.Optional)
-                                                               .Select(a => optionStyle
-                                                                            ? $" --{a.Name} <{a.Type}>"
-                                                                            : $" {a.Name}:<{a.Type}>"));
+                var opts = string.Concat(parameters.Where(a => !a.Optional)
+                                                   .Select(a => optionStyle
+                                                                ? $" --{a.Name} <{a.Type}>"
+                                                                : $" {a.Name}:<{a.Type}>"));
                 if (!string.IsNullOrWhiteSpace(opts)) { ret.Append(opts); }
 
                 //optional parameter
@@ -670,7 +662,7 @@ public static class ApiExplorerHelper
                             {
                                 var data = new List<object>();
                                 foreach (IDictionary<string, object> item in result.ToData()) { data.Add(item[key]); }
-                                foreach (var item in data.OrderBy(a => a)) { values.Add((attribute, item + string.Empty)); }
+                                foreach (var item in data.Order()) { values.Add((attribute, item + string.Empty)); }
                             }
                         }
                     }
@@ -697,4 +689,7 @@ public static class ApiExplorerHelper
                     : Environment.NewLine + error) +
                Environment.NewLine;
     }
+
+    [GeneratedRegex(@"{\s*(.+?)\s*}")]
+    private static partial Regex ArgumentTagRegex();
 }

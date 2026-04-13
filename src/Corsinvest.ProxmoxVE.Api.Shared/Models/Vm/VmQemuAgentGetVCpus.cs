@@ -16,12 +16,12 @@ public class VmQemuAgentGetVCpus : ModelBase
     /// Data
     /// </summary>
     [JsonProperty("result")]
-    public IEnumerable<ResultInt> Result { get; set; } = [];
+    public IEnumerable<ResultInfo> Result { get; set; } = [];
 
     /// <summary>
     /// Result
     /// </summary>
-    public class ResultInt
+    public class ResultInfo
     {
         /// <summary>
         /// Can Offline

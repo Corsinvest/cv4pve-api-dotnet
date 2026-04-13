@@ -62,13 +62,13 @@ public class VmQemuStatusCurrent : VmBaseStatusCurrent
     /// Nigs
     /// </summary>
     [JsonProperty("nics")]
-    public IDictionary<string, NicsInt> Nics { get; set; }
+    public IDictionary<string, NicsInfo> Nics { get; set; }
 
     /// <summary>
     /// Block Stat
     /// </summary>
     [JsonProperty("blockstat")]
-    public IDictionary<string, BlockstatInt> BlockStat { get; set; }
+    public IDictionary<string, BlockstatInfo> BlockStat { get; set; }
 
     /// <summary>
     /// Balloon
@@ -80,13 +80,13 @@ public class VmQemuStatusCurrent : VmBaseStatusCurrent
     /// Balloon info
     /// </summary>
     [JsonProperty("ballooninfo")]
-    public BalloonInfoInt Ballooninfo { get; set; }
+    public BalloonInfoData Ballooninfo { get; set; }
 
     /// <summary>
     /// Proxmox Support
     /// </summary>
     [JsonProperty("proxmox-support")]
-    public ProxmoxSupportInt ProxmoxSupport { get; set; }
+    public ProxmoxSupportInfo ProxmoxSupport { get; set; }
 
     [OnDeserialized]
     internal void OnSerializedMethod(StreamingContext context) => OnSerializedMethodBase();
@@ -94,7 +94,7 @@ public class VmQemuStatusCurrent : VmBaseStatusCurrent
     /// <summary>
     /// Nics
     /// </summary>
-    public class NicsInt : INetIO
+    public class NicsInfo : INetIO
     {
         /// <summary>
         /// The amount of traffic in bytes that was sent to the guest over the network since it was started.
@@ -114,7 +114,7 @@ public class VmQemuStatusCurrent : VmBaseStatusCurrent
     /// <summary>
     /// Block stat
     /// </summary>
-    public class BlockstatInt
+    public class BlockstatInfo
     {
         /// <summary>
         /// Unmap Bytes
@@ -276,7 +276,7 @@ public class VmQemuStatusCurrent : VmBaseStatusCurrent
     /// <summary>
     /// Balloon info
     /// </summary>
-    public class BalloonInfoInt
+    public class BalloonInfoData
     {
         /// <summary>
         /// Actual
@@ -300,7 +300,7 @@ public class VmQemuStatusCurrent : VmBaseStatusCurrent
     /// <summary>
     /// Proxmox Support
     /// </summary>
-    public class ProxmoxSupportInt
+    public class ProxmoxSupportInfo
     {
         /// <summary>
         /// Pbs Dirty Bitmap Save Vm

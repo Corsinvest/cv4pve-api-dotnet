@@ -11,7 +11,7 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata;
 /// <summary>
 /// Class Api
 /// </summary>
-public class ClassApi
+public partial class ClassApi
 {
     /// <summary>
     /// Constructor
@@ -42,12 +42,12 @@ public class ClassApi
         Parent = parent;
         Resource = token["path"].ToString();
 
-        Resource = Regex.Replace(Resource, @"\{([^}]*)\}", match => "{" + match.Groups[1].Value.Replace('-', '_') + "}");
+        Resource = ResourcePlaceholderRegex().Replace(Resource, match => "{" + match.Groups[1].Value.Replace('-', '_') + "}");
 
         Keys.AddRange(parent.Keys);
         parent.SubClasses.Add(this);
 
-        IsIndexed = token["text"].ToString().StartsWith("{");
+        IsIndexed = token["text"].ToString().StartsWith('{');
         if (IsIndexed) { Keys.Add(IndexName); }
 
         if (token["info"] != null)
@@ -130,4 +130,7 @@ public class ClassApi
     /// Path resource
     /// </summary>
     public string Resource { get; }
+
+    [GeneratedRegex(@"\{([^}]*)\}")]
+    private static partial Regex ResourcePlaceholderRegex();
 }

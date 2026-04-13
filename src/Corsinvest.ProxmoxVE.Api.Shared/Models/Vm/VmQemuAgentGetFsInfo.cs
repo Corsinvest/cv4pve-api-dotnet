@@ -18,12 +18,12 @@ public class VmQemuAgentGetFsInfo : ModelBase
     /// Result
     /// </summary>
     [JsonProperty("result")]
-    public IEnumerable<ResultInt> Result { get; set; } = [];
+    public IEnumerable<ResultInfo> Result { get; set; } = [];
 
     /// <summary>
     /// Result
     /// </summary>
-    public class ResultInt
+    public class ResultInfo
     {
         /// <summary>
         /// Error

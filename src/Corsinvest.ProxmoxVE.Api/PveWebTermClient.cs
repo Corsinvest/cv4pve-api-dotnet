@@ -15,7 +15,7 @@ namespace Corsinvest.ProxmoxVE.Api;
 /// <summary>
 /// PVE Web Terminal Client
 /// </summary>
-public class PveWebTermClient(PveClient client, string node) : IAsyncDisposable
+public partial class PveWebTermClient(PveClient client, string node) : IAsyncDisposable
 {
     private readonly ClientWebSocket _ws = new();
     private readonly CancellationTokenSource _cts = new();
@@ -26,8 +26,14 @@ public class PveWebTermClient(PveClient client, string node) : IAsyncDisposable
     private readonly SemaphoreSlim _bufferLock = new(1, 1);
     private ILogger<PveWebTermClient> _logger;
 
-    private static readonly Regex _shellPromptRegex = new(@"root@\w+:~#\s*", RegexOptions.Compiled);
-    private static readonly Regex _bracketedPasteEndRegex = new(@"\x1b\[\?2004h", RegexOptions.Compiled);
+    [GeneratedRegex(@"root@\w+:~#\s*")]
+    private static partial Regex ShellPromptRegex();
+    [GeneratedRegex(@"\x1b\[\?2004h")]
+    private static partial Regex BracketedPasteEndRegex();
+    [GeneratedRegex(@"\x1B\[\?2004l\r(.*?)\r?\x1B\[\?2004h", RegexOptions.Singleline)]
+    private static partial Regex BracketedPasteContentRegex();
+    [GeneratedRegex("([a-fA-F0-9]{64})")]
+    private static partial Regex Sha256HashRegex();
 
     private ILogger<PveWebTermClient> Logger => _logger ??= client.LoggerFactory.CreateLogger<PveWebTermClient>();
 
@@ -68,11 +74,7 @@ public class PveWebTermClient(PveClient client, string node) : IAsyncDisposable
 
         if (!client.ValidateCertificate)
         {
-#if NET7_0_OR_GREATER
             _ws.Options.RemoteCertificateValidationCallback = (_, _, _, _) => true;
-#else
-            ServicePointManager.ServerCertificateValidationCallback = (sender, cert, chain, sslPolicyErrors) => true;
-#endif
         }
 
         await _ws.ConnectAsync(uri, _cts.Token);
@@ -194,8 +196,8 @@ public class PveWebTermClient(PveClient client, string node) : IAsyncDisposable
         while ((DateTime.UtcNow - start).TotalMilliseconds < timeoutMs)
         {
             if (_loginConfirmed
-                && (_shellPromptRegex.IsMatch(await GetOutputAsync())
-                    || _bracketedPasteEndRegex.IsMatch(await GetOutputAsync())))
+                && (ShellPromptRegex().IsMatch(await GetOutputAsync())
+                    || BracketedPasteEndRegex().IsMatch(await GetOutputAsync())))
             {
                 return true;
             }
@@ -309,7 +311,7 @@ echo '{endMarker}'
     }
 
     private async Task<Match> ExtractBracketedPasteContentAsync()
-        => Regex.Match(await GetOutputAsync(), @"\x1B\[\?2004l\r(.*?)\r?\x1B\[\?2004h", RegexOptions.Singleline);
+        => BracketedPasteContentRegex().Match(await GetOutputAsync());
 
     /// <summary>
     /// Download file from remote path
@@ -336,7 +338,7 @@ echo '{endMarker}'
             var match = await ExtractBracketedPasteContentAsync();
             if (!match.Success) { return (false, "SHA256 command output not found."); }
 
-            match = Regex.Match(match.Groups[1].Value, "([a-fA-F0-9]{64})");
+            match = Sha256HashRegex().Match(match.Groups[1].Value);
             if (!match.Success) { return (false, "Could not retrieve remote SHA256 hash."); }
             var remoteHash = match.Groups[1].Value.ToLowerInvariant();
 
@@ -369,11 +371,7 @@ echo '{endMarker}'
 
                 if (chunkBytes.Length == 0) { break; }
                 sha256.TransformBlock(chunkBytes, 0, chunkBytes.Length, null, 0);
-#if NET7_0_OR_GREATER
                 await stream.WriteAsync(chunkBytes);
-#else
-                await stream.WriteAsync(chunkBytes, 0, chunkBytes.Length);
-#endif
             }
 
             sha256.TransformFinalBlock([], 0, 0);
@@ -402,5 +400,6 @@ echo '{endMarker}'
     {
         await DisconnectAsync();
         _cts.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

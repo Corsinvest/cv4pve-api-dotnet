@@ -171,12 +171,12 @@ public class VmBaseStatusCurrent : ModelBase, IVmBase, INetIO, IDisk, IMemory, I
     /// HA manager service status.
     /// </summary>
     [JsonProperty("ha")]
-    public HaInt Ha { get; set; }
+    public HaInfo Ha { get; set; }
 
     /// <summary>
     /// Ha
     /// </summary>
-    public class HaInt
+    public class HaInfo
     {
         /// <summary>
         /// Managed

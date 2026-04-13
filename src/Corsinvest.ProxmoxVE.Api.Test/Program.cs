@@ -9,9 +9,9 @@ using Microsoft.Extensions.Logging;
 System.Console.WriteLine("pippo");
 
 
-var app = ConsoleHelper.CreateApp("Test", "Automatic snapshot VM/CT with retention");
+var app = ConsoleHelper.CreateApp("Automatic snapshot VM/CT with retention");
 var loggerFactory = ConsoleHelper.CreateLoggerFactory<Program>(app.GetLogLevelFromDebug());
-await app.ExecuteAppAsync(args, loggerFactory.CreateLogger(typeof(Program)));
+await app.ExecuteAppAsync(args, loggerFactory.CreateLogger<Program>());
 
 
 
