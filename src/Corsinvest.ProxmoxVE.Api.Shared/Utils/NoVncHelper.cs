@@ -28,14 +28,14 @@ public static class NoVncHelper
     /// Get urn NoVncConsole
     /// </summary>
     public static string GetConsoleUrl(string host,
-                                   int port,
-                                   string console,
-                                   string node,
-                                   long vmId,
-                                   string vmName,
-                                   bool noVnc,
-                                   bool xtermJs,
-                                   string parameters = null)
+                                       int port,
+                                       string console,
+                                       string node,
+                                       long vmId,
+                                       string vmName,
+                                       bool noVnc,
+                                       bool xtermJs,
+                                       string parameters = null)
     {
         var url = $"https://{host}:{port}/?console={console}&vmid={vmId}&vmname={vmName}&node={node}";
         if (noVnc) { url += "&novnc=1"; }
