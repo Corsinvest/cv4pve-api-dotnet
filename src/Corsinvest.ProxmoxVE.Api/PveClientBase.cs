@@ -432,10 +432,20 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
                                 resource,
                                 parameters,
                                 methodType,
-                                ResponseType);
+                                ResponseType,
+                                sw.Elapsed);
+
+        RequestCompleted?.Invoke(this, LastResult);
 
         return LastResult;
     }
+
+    /// <summary>
+    /// Raised after each API request completes. Fires for both successful and failed requests
+    /// (including transport-level failures, which are translated into a synthetic <see cref="Result"/>
+    /// with <see cref="HttpStatusCode.RequestTimeout"/> or <see cref="HttpStatusCode.InternalServerError"/>).
+    /// </summary>
+    public event EventHandler<Result> RequestCompleted;
 
     /// <summary>
     /// Last result action
