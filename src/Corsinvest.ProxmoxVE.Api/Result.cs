@@ -19,7 +19,8 @@ public class Result(dynamic response,
                     string requestResource,
                     IDictionary<string, object> requestParameters,
                     MethodType methodType,
-                    ResponseType responseType)
+                    ResponseType responseType,
+                    TimeSpan duration)
 {
     /// <summary>
     /// Method type
@@ -70,6 +71,11 @@ public class Result(dynamic response,
     /// Gets a value that indicates if the HTTP response was successful.
     /// </summary>
     public bool IsSuccessStatusCode { get; } = isSuccessStatusCode;
+
+    /// <summary>
+    /// Total wall-clock duration of the request.
+    /// </summary>
+    public TimeSpan Duration { get; } = duration;
 
     /// <summary>
     /// Get error

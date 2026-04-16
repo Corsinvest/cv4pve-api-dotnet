@@ -154,14 +154,14 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
         /// <param name="httpClient">Optional HTTP client</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Named tuple of client and endpoint, or (null, null) if no hosts are reachable</returns>
-        public static async Task<(PveClient client, HostEndpoint endpoint)> GetClientFromHAAsync(string hostsAndPortHA,
+        public static Task<(PveClient client, HostEndpoint endpoint)> GetClientFromHAAsync(string hostsAndPortHA,
                                                                                                  int timeout = DEFAULT_TIMEOUT,
                                                                                                  HttpClient httpClient = null,
                                                                                                  CancellationToken cancellationToken = default(CancellationToken))
-            => await GetClientFromHAAsync(hostsAndPortHA,
-                                          (host, port) => new PveClient(host, port, httpClient),
-                                          timeout,
-                                          cancellationToken);
+            => GetClientFromHAAsync(hostsAndPortHA,
+                                    (host, port) => new PveClient(host, port, httpClient),
+                                    timeout,
+                                    cancellationToken);
 
         /// <summary>
         /// Parse host endpoints from string
@@ -222,7 +222,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
                 }
             }
 
-            if (errors.Any())
+            if (errors.Count != 0)
             {
                 throw new PveException($"No reachable hosts found. Errors: {string.Join("; ", errors)}");
             }

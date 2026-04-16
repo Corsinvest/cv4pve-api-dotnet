@@ -27,7 +27,7 @@ public class ParameterApi
         Description = flat.Description ?? string.Empty;
         Optional = flat.Optional ?? false;
         Default = flat.Default ?? string.Empty;
-        Minimum = flat.Minimum.HasValue ? flat.Minimum.Value : null;
+        Minimum = flat.Minimum;
         Maximum = flat.Maximum;
         EnumValues = flat.EnumValues ?? [];
     }
