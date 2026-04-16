@@ -3,6 +3,9 @@
  * SPDX-License-Identifier: MIT
  */
 
+using System.ComponentModel;
+using System.Dynamic;
+using System.Net.Http.Headers;
 using Corsinvest.ProxmoxVE.Api.Extension.Utils;
 using Corsinvest.ProxmoxVE.Api.Shared;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
@@ -11,9 +14,6 @@ using Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using Newtonsoft.Json;
-using System.ComponentModel;
-using System.Dynamic;
-using System.Net.Http.Headers;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension;
 
@@ -26,14 +26,14 @@ public static class ClientExtension
     /// <summary>
     /// Get resources
     /// </summary>
-    public static async Task<IEnumerable<ClusterResource>> GetResourcesAsync(this PveClient client, ClusterResourceType resourceType)
-        => await client.Cluster.Resources.GetAsync(resourceType);
+    public static Task<IEnumerable<ClusterResource>> GetResourcesAsync(this PveClient client, ClusterResourceType resourceType)
+        => client.Cluster.Resources.GetAsync(resourceType);
 
     /// <summary>
     /// Get resource type
     /// </summary>
-    public static async Task<IEnumerable<ClusterResource>> GetResourcesAsync(this PveClient client, string type)
-        => await client.Cluster.Resources.GetAsync(type);
+    public static Task<IEnumerable<ClusterResource>> GetResourcesAsync(this PveClient client, string type)
+        => client.Cluster.Resources.GetAsync(type);
 
     /// <summary>
     /// Get host and ip
@@ -109,8 +109,8 @@ public static class ClientExtension
     /// <summary>
     /// Get VM/CT from id or name.
     /// </summary>
-    public static async Task<IClusterResourceVm> GetVmAsync(this PveClient client, long vmId)
-        => await client.GetVmAsync(vmId + string.Empty);
+    public static Task<IClusterResourceVm> GetVmAsync(this PveClient client, long vmId)
+        => client.GetVmAsync(vmId + string.Empty);
 
     /// <summary>
     /// Get VM/CT from id or name.
@@ -196,7 +196,7 @@ public static class ClientExtension
         ret = [.. ret.Distinct()];
 
         //exclude data
-        foreach (var id in jolly.Split(',').Where(a => a.StartsWith("-")).Select(a => a[1..]))
+        foreach (var id in jolly.Split(',').Where(a => a.StartsWith('-')).Select(a => a[1..]))
         {
             foreach (var item in await GetVmsFromIdAsync(id))
             {
@@ -210,8 +210,8 @@ public static class ClientExtension
     /// <summary>
     /// Change status VM/CT
     /// </summary>
-    public static async Task<Result> ChangeStatusVmAsync(this PveClient client, long vmId, string status)
-        => await client.ChangeStatusVmAsync(vmId, (VmStatus)Enum.Parse(typeof(VmStatus), status, true));
+    public static Task<Result> ChangeStatusVmAsync(this PveClient client, long vmId, string status)
+        => client.ChangeStatusVmAsync(vmId, Enum.Parse<VmStatus>(status, true));
 
     /// <summary>
     /// Change status VM/CT
@@ -322,8 +322,8 @@ public static class ClientExtension
         }
 
         var vms = resources.Where(a => a.ResourceType == ClusterResourceType.Vm && !a.IsUnknown);
-        if (addVmId) { vmIds.AddRange(vms.Select(a => a.VmId + string.Empty).OrderBy(a => a)); }
-        if (addVmName) { vmIds.AddRange(vms.Select(a => a.Name).OrderBy(a => a)); }
+        if (addVmId) { vmIds.AddRange(vms.Select(a => a.VmId + string.Empty).Order()); }
+        if (addVmName) { vmIds.AddRange(vms.Select(a => a.Name).Order()); }
 
         return vmIds.Distinct();
     }

@@ -8,7 +8,7 @@ namespace Corsinvest.ProxmoxVE.Api.Shared.Utils;
 /// <summary>
 /// x86-64 CPU compatibility level for safe live migration across cluster nodes.
 /// </summary>
-public class CpuX86Level : IComparable<CpuX86Level>
+public sealed class CpuX86Level : IComparable<CpuX86Level>
 {
     /// <summary>x86-64-v1 — any x86-64 CPU</summary>
     public static readonly CpuX86Level V1 = new(1, "x86-64-v1");
@@ -28,7 +28,7 @@ public class CpuX86Level : IComparable<CpuX86Level>
     private CpuX86Level(int level, string name) { Level = level; Name = name; }
 
     /// <inheritdoc/>
-    public int CompareTo(CpuX86Level other) => Level.CompareTo(other == null ? 0 : other.Level);
+    public int CompareTo(CpuX86Level other) => Level.CompareTo((other?.Level) ?? 0);
 
     /// <inheritdoc/>
     public override string ToString() => Name;

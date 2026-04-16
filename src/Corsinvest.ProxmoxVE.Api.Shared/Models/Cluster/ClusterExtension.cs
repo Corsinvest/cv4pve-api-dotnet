@@ -95,7 +95,7 @@ public static class ClusterExtension
         {
             itemVm.EnrichData(itemVm.Status);
 
-            itemVm.VmType = (VmType)Enum.Parse(typeof(VmType), itemVm.Type, true);
+            itemVm.VmType = Enum.Parse<VmType>(itemVm.Type, true);
         }
         else if (data.ResourceType == ClusterResourceType.Node && data is IClusterResourceNode itemNode)
         {

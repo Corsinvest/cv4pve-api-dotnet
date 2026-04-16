@@ -27,7 +27,7 @@ public static class VmHelper
     /// <param name="noVnc"></param>
     /// <param name="xtermJs"></param>
     /// <param name="parameters"></param>
-    public static async Task<HttpResponseMessage> GetConsoleNoVncAsync(PveClient client,
+    public static Task<HttpResponseMessage> GetConsoleNoVncAsync(PveClient client,
                                                                    string node,
                                                                    long vmId,
                                                                    string vmName,
@@ -35,14 +35,14 @@ public static class VmHelper
                                                                    bool noVnc,
                                                                    bool xtermJs,
                                                                    string parameters = null)
-    => await GetConsoleNoVncAsync(client,
-                                  node,
-                                  vmId,
-                                  vmName,
-                                  NoVncHelper.GetConsoleType(vmType),
-                                  noVnc,
-                                  xtermJs,
-                                  parameters);
+        => GetConsoleNoVncAsync(client,
+                                node,
+                                vmId,
+                                vmName,
+                                NoVncHelper.GetConsoleType(vmType),
+                                noVnc,
+                                xtermJs,
+                                parameters);
 
     /// <summary>
     /// Get console NoVnc
@@ -85,7 +85,7 @@ public static class VmHelper
     /// </summary>
     public static bool CheckIdOrName(IClusterResourceVm data, string vmIdOrName)
     {
-        if (vmIdOrName.Contains(":"))
+        if (vmIdOrName.Contains(':'))
         {
             //range number
             var range = vmIdOrName.Split(':');
@@ -106,9 +106,9 @@ public static class VmHelper
             var vmIdOrNameLower = vmIdOrName.Replace("%", string.Empty).ToLower();
             if (vmIdOrName.Contains('%'))
             {
-                if (vmIdOrName.StartsWith("%") && vmIdOrName.EndsWith("%")) { return name.Contains(vmIdOrNameLower); }
-                else if (vmIdOrName.StartsWith("%")) { return name.StartsWith(vmIdOrNameLower); }
-                else if (vmIdOrName.EndsWith("%")) { return name.EndsWith(vmIdOrNameLower); }
+                if (vmIdOrName.StartsWith('%') && vmIdOrName.EndsWith('%')) { return name.Contains(vmIdOrNameLower); }
+                else if (vmIdOrName.StartsWith('%')) { return name.StartsWith(vmIdOrNameLower); }
+                else if (vmIdOrName.EndsWith('%')) { return name.EndsWith(vmIdOrNameLower); }
                 else { return false; }
             }
             else
@@ -177,8 +177,8 @@ public static class VmHelper
         }
 
         var vms = resources.Where(a => a.ResourceType == ClusterResourceType.Vm && !a.IsUnknown);
-        if (addVmId) { vmIds.AddRange(vms.Select(a => a.VmId + string.Empty).OrderBy(a => a)); }
-        if (addVmName) { vmIds.AddRange(vms.Select(a => a.Name).OrderBy(a => a)); }
+        if (addVmId) { vmIds.AddRange(vms.Select(a => a.VmId + string.Empty).Order()); }
+        if (addVmName) { vmIds.AddRange(vms.Select(a => a.Name).Order()); }
 
         return vmIds.Distinct();
     }

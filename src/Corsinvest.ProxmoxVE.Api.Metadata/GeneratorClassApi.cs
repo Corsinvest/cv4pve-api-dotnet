@@ -36,11 +36,9 @@ public static class GeneratorClassApi
         var url = $"https://{host}:{port}/pve-docs/api-viewer/apidoc.js";
         var json = new StringBuilder();
 
-#pragma warning disable S4830 // Server certificates should be verified during SSL/TLS connections
         using (var httpClientHandler = new HttpClientHandler
         {
-            ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; }
-#pragma warning restore S4830 // Server certificates should be verified during SSL/TLS connections
+            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
         })
         using (var client = new HttpClient(httpClientHandler))
         using (var response = await client.GetAsync(url))
@@ -100,11 +98,11 @@ public static class GeneratorClassApi
             var path = kv.Key;
             var info = kv.Value;
             var segments = path.Split(['/'], StringSplitOptions.RemoveEmptyEntries);
-            var name = segments.Last();
-            var isIndexed = name.StartsWith("{");
+            var name = segments[^1];
+            var isIndexed = name.StartsWith('{');
 
             // Find or create parent node
-            var parentPath = "/" + string.Join("/", segments.Take(segments.Length - 1).ToArray());
+            var parentPath = "/" + string.Join("/", [.. segments.Take(segments.Length - 1)]);
             var parent = segments.Length == 1
                             ? root
                             : ClassApi.GetFromResource(root, parentPath) ?? root;

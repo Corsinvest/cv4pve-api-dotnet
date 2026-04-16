@@ -151,7 +151,7 @@ Good job";
     /// </summary>
     public static async Task<int> ExecuteAppAsync(this RootCommand rootCommand, string[] args, ILogger logger)
     {
-        var resultCode = 0;
+        int resultCode;
 
         try
         {
