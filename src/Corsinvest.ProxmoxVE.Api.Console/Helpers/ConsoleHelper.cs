@@ -151,6 +151,9 @@ Good job";
     /// </summary>
     public static async Task<int> ExecuteAppAsync(this RootCommand rootCommand, string[] args, ILogger logger)
     {
+        var appName = Assembly.GetEntryAssembly()?.GetName().Name ?? string.Empty;
+        var (updateCheck, updateCts) = UpdateHelper.StartCheck(appName);
+
         int resultCode;
 
         try
@@ -176,6 +179,9 @@ Good job";
 
             resultCode = 1;
         }
+
+        UpdateHelper.PrintIfNewVersion(appName, updateCheck, updateCts);
+
         return resultCode;
     }
 }
