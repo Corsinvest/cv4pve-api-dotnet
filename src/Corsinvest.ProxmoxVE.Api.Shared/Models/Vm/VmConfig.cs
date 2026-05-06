@@ -136,6 +136,12 @@ public partial class VmConfig : ModelBase
     {
         var networks = new List<VmNetwork>();
 
+        if (ExtensionData == null)
+        {
+            Networks = networks;
+            return;
+        }
+
         foreach (var key in ExtensionData.Keys)
         {
             if (key.StartsWith("net"))
@@ -252,6 +258,13 @@ public partial class VmConfig : ModelBase
     private void ReadDisks()
     {
         var disks = new List<VmDisk>();
+
+        if (ExtensionData == null)
+        {
+            Disks = disks;
+            return;
+        }
+
         foreach (var key in ExtensionData.Keys)
         {
             var def = ExtensionData[key] + string.Empty;
