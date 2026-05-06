@@ -157,7 +157,7 @@ range 100:107,-105,200:204
 
         var optHost = new Option<string>($"--{HostOptionName}")
         {
-            Description = "The host name host[:port],host1[:port],host2[:port]",
+            Description = "Comma-separated list of hosts. Each entry: host[:port] where host can be a hostname (pve1), IPv4 (10.1.1.90), or IPv6 in brackets ([fe80::1]). Port defaults to 8006. Examples: pve1:8006, 10.1.1.90, [fe80::1]:8006, pve1:8006,pve2:8006",
             Required = true,
             CustomParser = (e) =>
             {
@@ -223,7 +223,7 @@ range 100:107,-105,200:204
     /// <param name="command"></param>
     public static Option<string> HostOption(this Command command)
     {
-        var option = command.AddOption<string>($"--{HostOptionName}", "The host name host[:port],host1[:port],host2[:port]");
+        var option = command.AddOption<string>($"--{HostOptionName}", "Comma-separated list of hosts. Each entry: host[:port] where host can be a hostname (pve1), IPv4 (10.1.1.90), or IPv6 in brackets ([fe80::1]). Port defaults to 8006. Examples: pve1:8006, 10.1.1.90, [fe80::1]:8006, pve1:8006,pve2:8006");
         option.Required = true;
         return option;
     }

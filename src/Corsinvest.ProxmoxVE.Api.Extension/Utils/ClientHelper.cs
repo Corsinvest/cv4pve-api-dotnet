@@ -40,7 +40,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
         /// <summary>
         /// Get Client and try login with improved error handling (simplified version without factory)
         /// </summary>
-        /// <param name="hostsAndPortHA">Comma-separated list of hosts (e.g., "10.1.1.90:8006,10.1.1.91:8006")</param>
+        /// <param name="hostsAndPortHA">Comma-separated list of hosts. Each entry: host[:port] where host can be a hostname (pve1), IPv4 (10.1.1.90), or IPv6 in brackets ([fe80::1]). Port defaults to 8006. Examples: pve1:8006, 10.1.1.90, [fe80::1]:8006, pve1:8006,pve2:8006</param>
         /// <param name="username">Username for authentication</param>
         /// <param name="password">Password for authentication</param>
         /// <param name="apiToken">API token for authentication (alternative to username/password)</param>
@@ -83,7 +83,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
         /// Get Client and try login with factory for advanced scenarios
         /// </summary>
         /// <typeparam name="T">Type derived from PveClient</typeparam>
-        /// <param name="hostsAndPortHA">Comma-separated list of hosts</param>
+        /// <param name="hostsAndPortHA">Comma-separated list of hosts. Each entry: host[:port] where host can be a hostname (pve1), IPv4 (10.1.1.90), or IPv6 in brackets ([fe80::1]). Port defaults to 8006. Examples: pve1:8006, 10.1.1.90, [fe80::1]:8006, pve1:8006,pve2:8006</param>
         /// <param name="clientFactory">Factory function to create client instance</param>
         /// <param name="username">Username for authentication</param>
         /// <param name="password">Password for authentication</param>
@@ -127,7 +127,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
         /// Get client from HA list with async connectivity check (generic version)
         /// </summary>
         /// <typeparam name="T">Type derived from PveClient</typeparam>
-        /// <param name="hostsAndPortHA">Comma-separated list of hosts</param>
+        /// <param name="hostsAndPortHA">Comma-separated list of hosts. Each entry: host[:port] where host can be a hostname (pve1), IPv4 (10.1.1.90), or IPv6 in brackets ([fe80::1]). Port defaults to 8006. Examples: pve1:8006, 10.1.1.90, [fe80::1]:8006, pve1:8006,pve2:8006</param>
         /// <param name="clientFactory">Factory function to create client instance</param>
         /// <param name="timeout">Connection timeout in milliseconds</param>
         /// <param name="cancellationToken">Cancellation token</param>
@@ -149,7 +149,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
         /// <summary>
         /// Get client from HA list with async connectivity check (non-generic overload for backward compatibility)
         /// </summary>
-        /// <param name="hostsAndPortHA">Comma-separated list of hosts</param>
+        /// <param name="hostsAndPortHA">Comma-separated list of hosts. Each entry: host[:port] where host can be a hostname (pve1), IPv4 (10.1.1.90), or IPv6 in brackets ([fe80::1]). Port defaults to 8006. Examples: pve1:8006, 10.1.1.90, [fe80::1]:8006, pve1:8006,pve2:8006</param>
         /// <param name="timeout">Connection timeout in milliseconds</param>
         /// <param name="httpClient">Optional HTTP client</param>
         /// <param name="cancellationToken">Cancellation token</param>
@@ -166,34 +166,77 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
         /// <summary>
         /// Parse host endpoints from string
         /// </summary>
-        /// <param name="hostsAndPorts">Comma-separated host:port pairs</param>
+        /// <param name="hostsAndPorts">Comma-separated list of hosts. Each entry: host[:port] where host can be a hostname (pve1), IPv4 (10.1.1.90), or IPv6 in brackets ([fe80::1]). Port defaults to 8006.</param>
         /// <returns>List of parsed endpoints</returns>
         public static List<HostEndpoint> ParseHostEndpoints(string hostsAndPorts)
         {
             if (string.IsNullOrWhiteSpace(hostsAndPorts)) { return []; }
 
             var endpoints = new List<HostEndpoint>();
-
-            foreach (var hostAndPort in hostsAndPorts.Split(','))
+            foreach (var entry in hostsAndPorts.Split(','))
             {
-                var trimmed = hostAndPort.Trim();
+                var trimmed = entry.Trim();
                 if (string.IsNullOrEmpty(trimmed)) { continue; }
 
-                var parts = trimmed.Split(':');
-                var host = parts[0].Trim();
+                var (host, port) = ParseHostAndPort(trimmed);
+                if (!string.IsNullOrEmpty(host)) { endpoints.Add(new HostEndpoint(host, port)); }
+            }
+            return endpoints;
+        }
 
-                if (string.IsNullOrEmpty(host)) { continue; }
-
-                var port = DEFAULT_PORT;
-                if (parts.Length > 1 && int.TryParse(parts[1].Trim(), out int parsedPort))
-                {
-                    port = parsedPort;
-                }
-
-                endpoints.Add(new HostEndpoint(host, port));
+        /// <summary>
+        /// Parse a single host[:port] entry. Supports hostname, IPv4, bare IPv6 (fe80::1) and bracketed IPv6 ([fe80::1]:8006).
+        /// Port defaults to 8006 if omitted. Throws <see cref="ArgumentException"/> on malformed input.
+        /// </summary>
+        /// <param name="hostAndPort">Single host entry without commas, e.g. pve1, 10.1.1.90:8006, [fe80::1]:8006</param>
+        /// <returns>Parsed host and port</returns>
+        /// <exception cref="ArgumentException">Thrown when the input is malformed (empty, contains commas, missing ']', invalid or out-of-range port).</exception>
+        public static (string Host, int Port) ParseHostAndPort(string hostAndPort)
+        {
+            if (string.IsNullOrWhiteSpace(hostAndPort))
+            {
+                throw new ArgumentException("Host entry cannot be null or empty", nameof(hostAndPort));
+            }
+            if (hostAndPort.Contains(','))
+            {
+                throw new ArgumentException($"Single host entry cannot contain ',': '{hostAndPort}' (use ParseHostEndpoints for lists)", nameof(hostAndPort));
             }
 
-            return endpoints;
+            // IPv6 with brackets: [fe80::1] or [fe80::1]:8006
+            if (hostAndPort.StartsWith('['))
+            {
+                var close = hostAndPort.IndexOf(']');
+                if (close < 0) { throw new ArgumentException($"Invalid IPv6 format, missing ']': '{hostAndPort}'"); }
+
+                var host = hostAndPort[1..close];
+                if (string.IsNullOrEmpty(host)) { throw new ArgumentException($"Empty IPv6 host: '{hostAndPort}'"); }
+
+                var rest = hostAndPort[(close + 1)..];
+                if (rest.Length == 0) { return (host, DEFAULT_PORT); }
+                if (!rest.StartsWith(':')) { throw new ArgumentException($"Expected ':' after ']' in '{hostAndPort}'"); }
+
+                return (host, ParsePort(rest[1..], hostAndPort));
+            }
+
+            // Bare IPv6 (multiple colons, no brackets): fe80::1
+            if (hostAndPort.IndexOf(':') != hostAndPort.LastIndexOf(':')) { return (hostAndPort, DEFAULT_PORT); }
+
+            // hostname or IPv4, with optional :port
+            var idx = hostAndPort.IndexOf(':');
+            if (idx < 0) { return (hostAndPort, DEFAULT_PORT); }
+            if (idx == 0) { throw new ArgumentException($"Empty host before ':' in '{hostAndPort}'"); }
+
+            return (hostAndPort[..idx], ParsePort(hostAndPort[(idx + 1)..], hostAndPort));
+        }
+
+        private static int ParsePort(string portStr, string original)
+        {
+            if (string.IsNullOrEmpty(portStr)) { throw new ArgumentException($"Empty port after ':' in '{original}'"); }
+            if (!int.TryParse(portStr, out var port) || port is <= 0 or > 65535)
+            {
+                throw new ArgumentException($"Invalid port '{portStr}' in '{original}' (expected 1-65535)");
+            }
+            return port;
         }
 
         /// <summary>
