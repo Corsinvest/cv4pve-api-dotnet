@@ -61,7 +61,7 @@ public class NodeStatus : ModelBase
     /// </summary>
     [JsonProperty("uptime")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatUptimeUnixTime)]
-    public int Uptime { get; set; }
+    public long Uptime { get; set; }
 
     /// <summary>
     /// An array of load avg for 1, 5 and 15 minutes respectively.

@@ -52,7 +52,7 @@ public class NodeReplication : ModelBase
     /// Last Sync
     /// </summary>
     [JsonProperty("last_sync")]
-    public int LastSync { get; set; }
+    public long LastSync { get; set; }
 
     /// <summary>
     /// Job Num
@@ -64,7 +64,7 @@ public class NodeReplication : ModelBase
     /// Next Sync
     /// </summary>
     [JsonProperty("next_sync")]
-    public int NextSync { get; set; }
+    public long NextSync { get; set; }
 
     /// <summary>
     /// Guest
@@ -94,7 +94,7 @@ public class NodeReplication : ModelBase
     /// Last Try
     /// </summary>
     [JsonProperty("last_try")]
-    public int LastTry { get; set; }
+    public long LastTry { get; set; }
 
     /// <summary>
     /// Target

@@ -110,10 +110,10 @@ public class ClusterBackup : ModelBase, IStorageItem
     public string NotesTemplate { get; set; }
 
     /// <summary>
-    /// NextRun
+    /// NextRun (seconds since epoch)
     /// </summary>
     [JsonProperty("next-run")]
-    public int NextRun { get; set; }
+    public long NextRun { get; set; }
 
     /// <summary>
     /// Node
