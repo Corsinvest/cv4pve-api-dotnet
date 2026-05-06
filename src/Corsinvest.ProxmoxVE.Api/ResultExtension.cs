@@ -14,9 +14,11 @@ namespace Corsinvest.ProxmoxVE.Api;
 public static class ResultExtension
 {
     /// <summary>
-    /// Enumerable result for Linq.
+    /// Enumerable result for Linq. Returns an empty sequence when the
+    /// endpoint has no data (data is null or absent).
     /// </summary>
-    public static IEnumerable<dynamic> ToEnumerable(this Result result) => (IEnumerable<dynamic>)result.ToData();
+    public static IEnumerable<dynamic> ToEnumerable(this Result result)
+        => result?.ToData() is IEnumerable<dynamic> seq ? seq : [];
 
     /// <summary>
     /// Enumerable result data.
@@ -29,14 +31,16 @@ public static class ResultExtension
     public static T ToData<T>(this Result result) => (T)Convert.ChangeType(result.ToData(), typeof(T));
 
     /// <summary>
-    /// Convert result (t and n) to logs
+    /// Convert result (t and n) to logs. Returns an empty sequence when the
+    /// endpoint has no data (e.g. firewall log when logging is disabled or empty).
     /// </summary>
     public static IEnumerable<string> ToLogs(this Result result)
-        => result.ToData() is ExpandoObject
-                ? [(result.ToData().t as string)]
-                : result.ToEnumerable()
-                        .OrderBy(a => a.n)
-                        .Select(a => a.t as string);
+    {
+        var data = result?.ToData();
+        if (data == null) { return []; }
+        if (data is ExpandoObject) { return [((dynamic)data).t as string]; }
+        return ((IEnumerable<dynamic>)data).OrderBy(a => a.n).Select(a => a.t as string);
+    }
 
     /// <summary>
     /// Check result in error.
