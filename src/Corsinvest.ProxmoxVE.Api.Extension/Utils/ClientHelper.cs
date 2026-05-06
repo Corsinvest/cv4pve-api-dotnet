@@ -185,25 +185,37 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
         }
 
         /// <summary>
-        /// Parse a single host[:port] entry. Supports hostname, IPv4, and bracketed IPv6 ([fe80::1]:8006).
-        /// Port defaults to 8006 if omitted or invalid.
+        /// Parse a single host[:port] entry. Supports hostname, IPv4, bare IPv6 (fe80::1) and bracketed IPv6 ([fe80::1]:8006).
+        /// Port defaults to 8006 if omitted. Throws <see cref="ArgumentException"/> on malformed input.
         /// </summary>
-        /// <param name="hostAndPort">Single host entry, e.g. pve1, 10.1.1.90:8006, [fe80::1]:8006</param>
+        /// <param name="hostAndPort">Single host entry without commas, e.g. pve1, 10.1.1.90:8006, [fe80::1]:8006</param>
         /// <returns>Parsed host and port</returns>
+        /// <exception cref="ArgumentException">Thrown when the input is malformed (empty, contains commas, missing ']', invalid or out-of-range port).</exception>
         public static (string Host, int Port) ParseHostAndPort(string hostAndPort)
         {
+            if (string.IsNullOrWhiteSpace(hostAndPort))
+            {
+                throw new ArgumentException("Host entry cannot be null or empty", nameof(hostAndPort));
+            }
+            if (hostAndPort.Contains(','))
+            {
+                throw new ArgumentException($"Single host entry cannot contain ',': '{hostAndPort}' (use ParseHostEndpoints for lists)", nameof(hostAndPort));
+            }
+
             // IPv6 with brackets: [fe80::1] or [fe80::1]:8006
             if (hostAndPort.StartsWith('['))
             {
                 var close = hostAndPort.IndexOf(']');
-                if (close < 0) { return (hostAndPort, DEFAULT_PORT); }
+                if (close < 0) { throw new ArgumentException($"Invalid IPv6 format, missing ']': '{hostAndPort}'"); }
 
                 var host = hostAndPort[1..close];
+                if (string.IsNullOrEmpty(host)) { throw new ArgumentException($"Empty IPv6 host: '{hostAndPort}'"); }
+
                 var rest = hostAndPort[(close + 1)..];
                 if (rest.Length == 0) { return (host, DEFAULT_PORT); }
-                if (rest.StartsWith(':') && int.TryParse(rest[1..], out var p6) && p6 is > 0 and <= 65535)
-                    return (host, p6);
-                return (host, DEFAULT_PORT);
+                if (!rest.StartsWith(':')) { throw new ArgumentException($"Expected ':' after ']' in '{hostAndPort}'"); }
+
+                return (host, ParsePort(rest[1..], hostAndPort));
             }
 
             // Bare IPv6 (multiple colons, no brackets): fe80::1
@@ -212,11 +224,19 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils
             // hostname or IPv4, with optional :port
             var idx = hostAndPort.IndexOf(':');
             if (idx < 0) { return (hostAndPort, DEFAULT_PORT); }
+            if (idx == 0) { throw new ArgumentException($"Empty host before ':' in '{hostAndPort}'"); }
 
-            var h = hostAndPort[..idx];
-            return int.TryParse(hostAndPort[(idx + 1)..], out var port) && port is > 0 and <= 65535
-                ? (h, port)
-                : (h, DEFAULT_PORT);
+            return (hostAndPort[..idx], ParsePort(hostAndPort[(idx + 1)..], hostAndPort));
+        }
+
+        private static int ParsePort(string portStr, string original)
+        {
+            if (string.IsNullOrEmpty(portStr)) { throw new ArgumentException($"Empty port after ':' in '{original}'"); }
+            if (!int.TryParse(portStr, out var port) || port is <= 0 or > 65535)
+            {
+                throw new ArgumentException($"Invalid port '{portStr}' in '{original}' (expected 1-65535)");
+            }
+            return port;
         }
 
         /// <summary>
