@@ -26,7 +26,7 @@ public class NodeStorageRrdData : ModelBase
     /// </summary>
     [JsonProperty("time")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime)]
-    public int Time { get; set; }
+    public long Time { get; set; }
 
     /// <summary>
     /// Size

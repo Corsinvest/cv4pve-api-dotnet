@@ -28,7 +28,7 @@ public class AccessUser : ModelBase
     /// Account expiration date (seconds since epoch). '0' means no expiration date.
     /// </summary>
     [JsonProperty("expire")]
-    public int Expire { get; set; }
+    public long Expire { get; set; }
 
     /// <summary>
     /// Email
@@ -105,7 +105,7 @@ public class AccessUser : ModelBase
         /// Account expiration date (seconds since epoch). '0' means no expiration date.
         /// </summary>
         [JsonProperty("expire")]
-        public int Expire { get; set; }
+        public long Expire { get; set; }
         /// <summary>
         /// Token Name
         /// </summary>
