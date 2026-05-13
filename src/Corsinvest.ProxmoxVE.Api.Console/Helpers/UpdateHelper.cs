@@ -44,7 +44,7 @@ internal static class UpdateHelper
             if (string.IsNullOrEmpty(latestVersion)) { return; }
 
             var currentVersion = ConsoleHelper.GetCurrentVersionApp();
-            if (latestVersion != currentVersion && !System.Console.IsOutputRedirected)
+            if (IsNewer(latestVersion, currentVersion) && !System.Console.IsOutputRedirected)
             {
                 System.Console.Out.WriteLine();
                 System.Console.Out.WriteLine($"*** New version available: {latestVersion} (current: {currentVersion}) ***");
@@ -57,7 +57,22 @@ internal static class UpdateHelper
     private static async Task RefreshCacheIfStaleAsync(string appName, CancellationToken ct)
     {
         var cache = ReadCache();
+        var currentVersion = ConsoleHelper.GetCurrentVersionApp();
+
+        // Self-heal: if the running binary is newer than the cached "latest"
+        // (the user upgraded since the last check), refresh the cache locally
+        // so this run won't print a stale "new version available" notice even
+        // when the GitHub fetch below is skipped or cancelled.
         if (cache.TryGetValue(appName, out var entry)
+            && IsNewer(currentVersion, entry.LatestVersion))
+        {
+            entry.LastCheck = DateTime.UtcNow;
+            entry.LatestVersion = currentVersion;
+            WriteCache(cache);
+        }
+
+        // Skip the network round-trip if the cache is still fresh.
+        if (cache.TryGetValue(appName, out entry)
             && DateTime.UtcNow - entry.LastCheck < CacheTtl) { return; }
 
         string? newVersion = null;
@@ -79,6 +94,11 @@ internal static class UpdateHelper
         };
         WriteCache(cache);
     }
+
+    private static bool IsNewer(string? candidate, string? baseline)
+        => Version.TryParse(candidate, out var c)
+           && Version.TryParse(baseline, out var b)
+           && c > b;
 
     private static Dictionary<string, CacheEntry> ReadCache()
     {
