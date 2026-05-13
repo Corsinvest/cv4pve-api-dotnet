@@ -22,7 +22,16 @@ public static class NetworkDiagramBuilder
     private static string JoinAsString<T>(this IEnumerable<T> source, string separator)
         => string.Join(separator, source);
 
-    private  static string[] SplitWords(this string source)
+    private static string BuildSdnComment(SdnVnetRow v)
+    {
+        var parts = new List<string> { $"SDN vnet · zone {v.Zone} ({v.ZoneType})" };
+        if (v.Tag is int tag) { parts.Add($"VLAN {tag}"); }
+        if (!string.IsNullOrWhiteSpace(v.ZoneBridge)) { parts.Add($"via {v.ZoneBridge}"); }
+        if (!string.IsNullOrWhiteSpace(v.Alias)) { parts.Add(v.Alias); }
+        return string.Join(" · ", parts);
+    }
+
+    private static string[] SplitWords(this string source)
         => string.IsNullOrEmpty(source)
             ? []
             : source.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -39,6 +48,15 @@ public static class NetworkDiagramBuilder
                                string? Hostname,
                                VmNetwork Network,
                                bool IsInternal = false);
+
+    /// <summary>SDN virtual network row (one per SDN vnet, repeated for each node if attached to multiple nodes).</summary>
+    public record SdnVnetRow(string Vnet,
+                             string Zone,
+                             string ZoneType,
+                             string? ZoneBridge,
+                             int? Tag,
+                             string? Alias,
+                             IReadOnlyList<string> Nodes);
 
     /// <summary>Metadata shown in the diagram info panel.</summary>
     public record DiagramInfo(string ApplicationName, string ApplicationUrl, string ApplicationVersion);
@@ -75,18 +93,20 @@ public static class NetworkDiagramBuilder
     /// </summary>
     public static string BuildSvg(
         IEnumerable<NodeNetworkRow> hostNets,
+        IEnumerable<SdnVnetRow> sdnVnets,
         IEnumerable<VmNetworkRow> vmNets,
         IEnumerable<StorageItem> storages,
         DiagramInfo info)
     {
         var hostNetsList = hostNets.ToList();
+        var sdnList = sdnVnets.ToList();
         var vmNetsList = vmNets.ToList();
         var storagesList = storages.ToList();
 
         var nodeNames = hostNetsList.Select(r => r.Node).Distinct().Order().ToList();
         if (nodeNames.Count == 0) { return "<svg xmlns='http://www.w3.org/2000/svg'/>"; }
 
-        var sections = nodeNames.ConvertAll(n => BuildNodeSection(n, hostNetsList, vmNetsList, storagesList));
+        var sections = nodeNames.ConvertAll(n => BuildNodeSection(n, hostNetsList, vmNetsList, storagesList, sdnList));
 
         const int legendW = 360;
         const int infoW = 360;
@@ -453,7 +473,8 @@ public static class NetworkDiagramBuilder
     private static NodeSection BuildNodeSection(string nodeName,
                                                 List<NodeNetworkRow> hostNets,
                                                 List<VmNetworkRow> vmNets,
-                                                List<StorageItem> storageConfigs)
+                                                List<StorageItem> storageConfigs,
+                                                List<SdnVnetRow> sdnVnets)
     {
         var hostNetworks = hostNets.Where(r => r.Node == nodeName).Select(r => r.Network).ToList();
 
@@ -464,6 +485,18 @@ public static class NetworkDiagramBuilder
         var bridgeByName = hostNetworks.Where(n => n.Type is "bridge" or "OVSBridge").ToDictionary(n => n.Interface);
         var bondByName = hostNetworks.Where(n => n.Type is "bond" or "OVSBond").ToDictionary(n => n.Interface);
         var nicByName = hostNetworks.Where(n => n.Type is "eth" or "InfiniBand").ToDictionary(n => n.Interface);
+
+        foreach (var item in sdnVnets.Where(v => v.Nodes.Count == 0 || v.Nodes.Contains(nodeName)))
+        {
+            if (bridgeByName.ContainsKey(item.Vnet)) { continue; }
+            bridgeByName[item.Vnet] = new NodeNetwork
+            {
+                Interface = item.Vnet,
+                Type = "bridge",
+                Active = true,
+                Comments = BuildSdnComment(item),
+            };
+        }
 
         var vmsByBridge = new Dictionary<string, HashSet<long>>();
         foreach (var (vmId, nics) in vmsInNode)
