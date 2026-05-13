@@ -261,12 +261,6 @@ public class VmConfigQemu : VmConfig
     public string Ciuser { get; set; }
 
     /// <summary>
-    /// Configure a disk for storing EFI vars.
-    /// </summary>
-    [JsonProperty("efidisk0")]
-    public string Efidisk0 { get; set; }
-
-    /// <summary>
     /// Freeze CPU at startup (use 'c' monitor command to start execution).
     /// </summary>
     [JsonProperty("freeze")]
@@ -379,12 +373,6 @@ public class VmConfigQemu : VmConfig
     /// </summary>
     [JsonProperty("startdate")]
     public string Startdate { get; set; }
-
-    /// <summary>
-    /// Configure a Disk for storing TPM state. The format is fixed to 'raw'.
-    /// </summary>
-    [JsonProperty("tpmstate0")]
-    public string Tpmstate0 { get; set; }
 
     /// <summary>
     /// Set VM Generation ID. Use '1' to autogenerate on create or update, pass '0' to disable explicitly.

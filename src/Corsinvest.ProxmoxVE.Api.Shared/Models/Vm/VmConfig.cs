@@ -121,6 +121,12 @@ public partial class VmConfig : ModelBase
     public IEnumerable<VmDisk> Disks { get; private set; } = [];
 
     /// <summary>
+    /// Lookup a disk by its id (e.g. <c>"scsi0"</c>, <c>"efidisk0"</c>, <c>"tpmstate0"</c>, <c>"rootfs"</c>).
+    /// Returns null when no disk with that id is configured.
+    /// </summary>
+    public VmDisk GetDisk(string id) => Disks.FirstOrDefault(d => d.Id == id);
+
+    /// <summary>
     /// Networks
     /// </summary>
     public IEnumerable<VmNetwork> Networks { get; private set; } = [];
