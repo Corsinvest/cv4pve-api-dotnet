@@ -116,9 +116,16 @@ public partial class VmConfig : ModelBase
     public string Lock { get; set; }
 
     /// <summary>
-    /// Disks
+    /// Data disks only (<see cref="VmDiskKind.Disk"/>), both active and unused.
+    /// Does not include CD-ROM/ISO/cloud-init drives — for those, use <see cref="DisksAll"/>.
     /// </summary>
     public IEnumerable<VmDisk> Disks { get; private set; } = [];
+
+    /// <summary>
+    /// All volume entries from the config: data disks, CD-ROMs, cloud-init drives.
+    /// Distinguish entries by <see cref="VmDisk.Kind"/>.
+    /// </summary>
+    public IEnumerable<VmDisk> DisksAll { get; private set; } = [];
 
     /// <summary>
     /// Lookup a disk by its id (e.g. <c>"scsi0"</c>, <c>"efidisk0"</c>, <c>"tpmstate0"</c>, <c>"rootfs"</c>).
@@ -263,11 +270,12 @@ public partial class VmConfig : ModelBase
 
     private void ReadDisks()
     {
-        var disks = new List<VmDisk>();
+        var all = new List<VmDisk>();
 
         if (ExtensionData == null)
         {
-            Disks = disks;
+            Disks = all;
+            DisksAll = all;
             return;
         }
 
@@ -275,73 +283,94 @@ public partial class VmConfig : ModelBase
         {
             var def = ExtensionData[key] + string.Empty;
 
-            if (key == "rootfs"
-                || key.StartsWith("unused")
-                //bus match
-                || (DiskKeyRegex().IsMatch(key)
-                    && !CdromMediaRegex().IsMatch(def)))
+            var isBusEntry = DiskKeyRegex().IsMatch(key);
+            var isCdrom = isBusEntry && CdromMediaRegex().IsMatch(def);
+
+            if (key != "rootfs"
+                && !key.StartsWith("unused")
+                && !isBusEntry)
             {
-                var infos = def.Split(',');
-                var storage = string.Empty;
-                var fileName = string.Empty;
-                var passthrough = false;
-                var device = string.Empty;
-                var mountSourcePath = string.Empty;
+                continue;
+            }
 
-                if (infos[0].Contains(':'))
-                {
-                    var data = infos[0].Split(':');
-                    storage = data[0];
-                    fileName = data[1];
-                }
-                else if (infos[0].StartsWith("/dev"))
-                {
-                    passthrough = true;
-                    device = infos[0];
-                }
-                else if (key.StartsWith("mp"))
-                {
-                    mountSourcePath = infos[0];
-                }
-                else
-                {
-                    storage = infos[0];
-                }
+            var infos = def.Split(',');
+            var storage = string.Empty;
+            var fileName = string.Empty;
+            var passthrough = false;
+            var device = string.Empty;
+            var mountSourcePath = string.Empty;
 
+            if (infos[0].Contains(':'))
+            {
+                var data = infos[0].Split(':');
+                storage = data[0];
+                fileName = data[1];
+            }
+            else if (infos[0].StartsWith("/dev"))
+            {
+                passthrough = true;
+                device = infos[0];
+            }
+            else if (key.StartsWith("mp"))
+            {
+                mountSourcePath = infos[0];
+            }
+            else
+            {
+                storage = infos[0];
+            }
+
+            VmDiskKind kind;
+            bool backup;
+            if (isCdrom)
+            {
+                kind = !string.IsNullOrEmpty(fileName) && CloudInitFileNameRegex().IsMatch(fileName)
+                        ? VmDiskKind.CloudInit
+                        : VmDiskKind.Cdrom;
+                // CD-ROM / cloud-init drives are never backed up by Proxmox
+                backup = false;
+            }
+            else
+            {
+                kind = VmDiskKind.Disk;
                 // Proxmox defaults for the 'backup' flag:
                 //   Qemu disks: included unless backup=0
                 //   LXC rootfs: always included (no backup property exists for rootfs)
                 //   LXC mp*:    excluded unless backup=1
-                var backup = this is VmConfigLxc
+                backup = this is VmConfigLxc
                     ? key == "rootfs" || infos.Contains("backup=1")
                     : !infos.Contains("backup=0");
-
-                disks.Add(new VmDisk
-                {
-                    Id = key,
-                    Storage = storage,
-                    FileName = fileName,
-                    Device = device,
-                    Passthrough = passthrough,
-                    Size = infos.Where(a => a.StartsWith("size=")).Select(a => a[5..]).FirstOrDefault(),
-                    MountPoint = infos.Where(a => a.StartsWith("mp=")).Select(a => a[3..]).FirstOrDefault(),
-                    MountSourcePath = mountSourcePath,
-                    Cache = infos.Where(a => a.StartsWith("cache=")).Select(a => a[6..]).FirstOrDefault(),
-                    IsUnused = key.StartsWith("unused"),
-                    Backup = backup,
-                    RawDefinition = def,
-                    Format = infos.Where(a => a.StartsWith("format=")).Select(a => a[7..]).FirstOrDefault(),
-                    Prealloc = infos.Where(a => a.StartsWith("prealloc=")).Select(a => a[9..]).FirstOrDefault(),
-                });
             }
+
+            all.Add(new VmDisk
+            {
+                Id = key,
+                Kind = kind,
+                Storage = storage,
+                FileName = fileName,
+                Device = device,
+                Passthrough = passthrough,
+                Size = infos.Where(a => a.StartsWith("size=")).Select(a => a[5..]).FirstOrDefault(),
+                MountPoint = infos.Where(a => a.StartsWith("mp=")).Select(a => a[3..]).FirstOrDefault(),
+                MountSourcePath = mountSourcePath,
+                Cache = infos.Where(a => a.StartsWith("cache=")).Select(a => a[6..]).FirstOrDefault(),
+                IsUnused = key.StartsWith("unused"),
+                Backup = backup,
+                RawDefinition = def,
+                Format = infos.Where(a => a.StartsWith("format=")).Select(a => a[7..]).FirstOrDefault(),
+                Prealloc = infos.Where(a => a.StartsWith("prealloc=")).Select(a => a[9..]).FirstOrDefault(),
+            });
         }
-        Disks = disks;
+        DisksAll = all;
+        Disks = all.Where(d => d.Kind == VmDiskKind.Disk).ToList();
     }
 
     [GeneratedRegex(@"(efidisk|tpmstate|virtio|ide|scsi|sata|mp)\d+")]
     private static partial Regex DiskKeyRegex();
     [GeneratedRegex("media=cdrom")]
     private static partial Regex CdromMediaRegex();
+    [GeneratedRegex(@"^vm-\d+-cloudinit$")]
+    private static partial Regex CloudInitFileNameRegex();
     [GeneratedRegex("^(ne2k_pci|e1000e?|e1000-82540em|e1000-82544gc|e1000-82545em|vmxnet3|rtl8139|pcnet|virtio|ne2k_isa|i82551|i82557b|i82559er)(=([0-9a-f]{2}(:[0-9a-f]{2}){5}))?$", RegexOptions.IgnoreCase)]
     private static partial Regex NicModelRegex();
     [GeneratedRegex(@"^bridge=(\S+)$")]

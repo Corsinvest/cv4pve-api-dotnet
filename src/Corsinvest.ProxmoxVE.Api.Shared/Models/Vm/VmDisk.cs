@@ -16,6 +16,13 @@ public class VmDisk
     public string Id { get; set; }
 
     /// <summary>
+    /// Kind of volume entry. Defaults to <see cref="VmDiskKind.Disk"/>.
+    /// CD-ROM and cloud-init drives are not exposed in <see cref="VmConfig.Disks"/>
+    /// but appear in <see cref="VmConfig.DisksAll"/>.
+    /// </summary>
+    public VmDiskKind Kind { get; set; }
+
+    /// <summary>
     /// Storage
     /// </summary>
     public string Storage { get; set; }
