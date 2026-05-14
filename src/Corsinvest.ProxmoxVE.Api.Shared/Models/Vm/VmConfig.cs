@@ -308,15 +308,13 @@ public partial class VmConfig : ModelBase
                     storage = infos[0];
                 }
 
-                var backup = false;
-                if (this is VmConfigQemu)
-                {
-                    backup = !infos.Contains("backup=0");
-                }
-                else if (this is VmConfigLxc)
-                {
-                    backup = infos.Contains("backup=1");
-                }
+                // Proxmox defaults for the 'backup' flag:
+                //   Qemu disks: included unless backup=0
+                //   LXC rootfs: always included (no backup property exists for rootfs)
+                //   LXC mp*:    excluded unless backup=1
+                var backup = this is VmConfigLxc
+                    ? key == "rootfs" || infos.Contains("backup=1")
+                    : !infos.Contains("backup=0");
 
                 disks.Add(new VmDisk
                 {
