@@ -6,9 +6,6 @@ However, includes several third-party Open-Source libraries, which are licensed 
 
 ## Libraries directly included
 
-[Dotnet Core](https://github.com/dotnet/core)
-License: MIT
-
 [Corsinvest.ProxmoxVE.Api.Meta](https://github.com/Corsinvest/cv4pve-api-dotnet/tree/master/src/Corsinvest.ProxmoxVE.Api.Metadata)
 License: MIT
 
