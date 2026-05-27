@@ -264,7 +264,7 @@ public static class ModelsExtensionsAutoGen
         => (await item.Nodes()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterConfigNode>>();
 
     /// <summary>
-    /// Get HA manger status.
+    /// Get HA manager status.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
