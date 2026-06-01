@@ -629,6 +629,26 @@ public static class ModelsExtensionsAutoGen
         => (await item.GetRules()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Common.FirewallRule>>();
 
     /// <summary>
+    /// List all custom and default CPU models.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="arch">Virtual processor architecture. Defaults to the host architecture.
+    ///   Enum: x86_64,aarch64</param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeCapabilitiesQemuCpu>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveCapabilities.PveQemu.PveCpu item, string arch = null)
+        => (await item.Index(arch)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeCapabilitiesQemuCpu>>();
+
+    /// <summary>
+    /// Get available QEMU/KVM machine types.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="arch">Virtual processor architecture. Defaults to the host architecture.
+    ///   Enum: x86_64,aarch64</param>
+    /// <returns></returns>
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeCapabilitiesQemuMachine>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveCapabilities.PveQemu.PveMachines item, string arch = null)
+        => (await item.Types(arch)).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeCapabilitiesQemuMachine>>();
+
+    /// <summary>
     /// Storage index.
     /// </summary>
     /// <param name="item"></param>
