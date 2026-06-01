@@ -17,6 +17,7 @@
   <Folder Name="/src/">
     <Project Path="src/Corsinvest.ProxmoxVE.Api.Console/Corsinvest.ProxmoxVE.Api.Console.csproj" />
     <Project Path="src/Corsinvest.ProxmoxVE.Api.Extension/Corsinvest.ProxmoxVE.Api.Extension.csproj" />
+    <Project Path="src/Corsinvest.ProxmoxVE.Api.Extension.Tests/Corsinvest.ProxmoxVE.Api.Extension.Tests.csproj" />
     <Project Path="src/Corsinvest.ProxmoxVE.Api.Metadata/Corsinvest.ProxmoxVE.Api.Metadata.csproj" />
     <Project Path="src/Corsinvest.ProxmoxVE.Api.Shared/Corsinvest.ProxmoxVE.Api.Shared.csproj" />
     <Project Path="src/Corsinvest.ProxmoxVE.Api.Test/Corsinvest.ProxmoxVE.Api.Test.csproj" />
