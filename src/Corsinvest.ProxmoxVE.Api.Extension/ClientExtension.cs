@@ -162,16 +162,26 @@ public static class ClientExtension
             }
             else if (id.StartsWith("@pool-"))
             {
-                //all in specific pool
+                //all in specific pool and its nested pools
                 var name = id[6..];
                 pools ??= await client.Pools.GetAsync();
-                var poolName = pools.Select(a => a.Id)
-                                    .FirstOrDefault(a => a == name || string.Equals(a, name, StringComparison.OrdinalIgnoreCase));
 
-                if (!string.IsNullOrEmpty(poolName))
+                //nested pool ids are separated by '/', a child starts with the parent id followed by '/'
+                var poolNames = pools.Select(a => a.Id)
+                                     .Where(a => string.Equals(a, name, StringComparison.OrdinalIgnoreCase)
+                                                    || a.StartsWith(name + "/", StringComparison.OrdinalIgnoreCase))
+                                     .ToList();
+
+                var members = new List<IClusterResourceVm>();
+                foreach (var poolName in poolNames)
                 {
-                    data = (await client.Pools[poolName].GetAsync()).Members.Where(a => vms.Any(b => b.Id == a.Id));
+                    //use 'GET /pools?poolid=' because 'GET /pools/{poolid}' does not support nested pools
+                    var pool = (await client.Pools.GetAsync(poolName)).FirstOrDefault();
+                    if (pool == null) { continue; }
+                    members.AddRange(pool.Members.Where(a => vms.Any(b => b.Id == a.Id)));
                 }
+
+                data = members.Distinct();
             }
             else if (id.StartsWith("@tag-"))
             {
