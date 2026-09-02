@@ -501,18 +501,42 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// <summary>
     /// Checks whether a task is still running.
     /// </summary>
+    /// <exception cref="PveResultException">Task status cannot be read.</exception>
     public async Task<bool> TaskIsRunningAsync(string task)
-        => (await ReadTaskStatusAsync(task)).Response.data.status == "running";
+        => EnsureTaskStatus(await ReadTaskStatusAsync(task), task).Response.data.status == "running";
 
     /// <summary>
     /// Gets the exit status of a task.
     /// </summary>
+    /// <exception cref="PveResultException">Task status cannot be read.</exception>
     public async Task<string> GetExitStatusTaskAsync(string task)
-        => (await ReadTaskStatusAsync(task)).Response.data.exitstatus;
+        => EnsureTaskStatus(await ReadTaskStatusAsync(task), task).Response.data.exitstatus;
 
     /// <summary>
     /// Reads the current status of a task.
     /// </summary>
     private Task<Result> ReadTaskStatusAsync(string task)
         => GetAsync($"/nodes/{GetNodeFromTask(task)}/tasks/{task}/status");
+
+    /// <summary>
+    /// Validates a task status result before accessing its dynamic members, so that an API
+    /// failure is reported with the original HTTP status and Proxmox VE error envelope
+    /// instead of a RuntimeBinderException on the missing 'data' member.
+    /// </summary>
+    private static Result EnsureTaskStatus(Result result, string task)
+    {
+        if (result == null) { throw new PveResultException(null, $"Read status of task '{task}' returned no result"); }
+
+        if (result.InError() || !result.IsSuccessStatusCode || !result.ResponseHasData)
+        {
+            var detail = result.InError() ? result.GetError()
+                            : !result.IsSuccessStatusCode ? result.ReasonPhrase
+                            : "response does not contain 'data'";
+
+            throw new PveResultException(result,
+                $"Read status of task '{task}' failed ({(int)result.StatusCode} {result.ReasonPhrase}): {detail}");
+        }
+
+        return result;
+    }
 }
