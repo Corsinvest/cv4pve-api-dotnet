@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: MIT
  */
 
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
+
 namespace Corsinvest.ProxmoxVE.Api;
 
 /// <summary>
@@ -2602,32 +2606,8 @@ public class PveClient : PveClientBase
                     /// <summary>
                     /// Update HA rule.
                     /// </summary>
-                    /// <param name="type">HA rule type.
-                    ///   Enum: node-affinity,resource-affinity</param>
-                    /// <param name="affinity">Describes whether the HA resources are supposed to be kept on the same node ('positive'), or are supposed to be kept on separate nodes ('negative').
-                    ///   Enum: positive,negative</param>
-                    /// <param name="comment">HA rule description.</param>
-                    /// <param name="delete">A list of settings you want to delete.</param>
-                    /// <param name="digest">Prevent changes if current configuration file has a different digest. This can be used to prevent concurrent modifications.</param>
-                    /// <param name="disable">Whether the HA rule is disabled.</param>
-                    /// <param name="nodes">List of cluster node names with optional priority.</param>
-                    /// <param name="resources">List of HA resource IDs. This consists of a list of resource types followed by a resource specific name separated with a colon (example: vm:100,ct:101).</param>
-                    /// <param name="strict">Describes whether the node affinity rule is strict or non-strict.</param>
                     /// <returns></returns>
-                    public async Task<Result> UpdateRule(string type, string affinity = null, string comment = null, string delete = null, string digest = null, bool? disable = null, string nodes = null, string resources = null, bool? strict = null)
-                    {
-                        var parameters = new Dictionary<string, object>();
-                        parameters.Add("type", type);
-                        parameters.Add("affinity", affinity);
-                        parameters.Add("comment", comment);
-                        parameters.Add("delete", delete);
-                        parameters.Add("digest", digest);
-                        parameters.Add("disable", disable);
-                        parameters.Add("nodes", nodes);
-                        parameters.Add("resources", resources);
-                        parameters.Add("strict", strict);
-                        return await _client.SetAsync($"/cluster/ha/rules/{_rule}", parameters);
-                    }
+                    public async Task<Result> UpdateRule() { return await _client.SetAsync($"/cluster/ha/rules/{_rule}"); }
                 }
                 /// <summary>
                 /// Get HA rules.
@@ -2646,30 +2626,8 @@ public class PveClient : PveClientBase
                 /// <summary>
                 /// Create HA rule.
                 /// </summary>
-                /// <param name="resources">List of HA resource IDs. This consists of a list of resource types followed by a resource specific name separated with a colon (example: vm:100,ct:101).</param>
-                /// <param name="rule">HA rule identifier.</param>
-                /// <param name="type">HA rule type.
-                ///   Enum: node-affinity,resource-affinity</param>
-                /// <param name="affinity">Describes whether the HA resources are supposed to be kept on the same node ('positive'), or are supposed to be kept on separate nodes ('negative').
-                ///   Enum: positive,negative</param>
-                /// <param name="comment">HA rule description.</param>
-                /// <param name="disable">Whether the HA rule is disabled.</param>
-                /// <param name="nodes">List of cluster node names with optional priority.</param>
-                /// <param name="strict">Describes whether the node affinity rule is strict or non-strict.</param>
                 /// <returns></returns>
-                public async Task<Result> CreateRule(string resources, string rule, string type, string affinity = null, string comment = null, bool? disable = null, string nodes = null, bool? strict = null)
-                {
-                    var parameters = new Dictionary<string, object>();
-                    parameters.Add("resources", resources);
-                    parameters.Add("rule", rule);
-                    parameters.Add("type", type);
-                    parameters.Add("affinity", affinity);
-                    parameters.Add("comment", comment);
-                    parameters.Add("disable", disable);
-                    parameters.Add("nodes", nodes);
-                    parameters.Add("strict", strict);
-                    return await _client.CreateAsync($"/cluster/ha/rules", parameters);
-                }
+                public async Task<Result> CreateRule() { return await _client.CreateAsync($"/cluster/ha/rules"); }
             }
             /// <summary>
             /// Status
@@ -3066,6 +3024,11 @@ public class PveClient : PveClientBase
             /// Status
             /// </summary>
             public PveStatus Status => _status ??= new(_client);
+            private PveRestartBulk _restartBulk;
+            /// <summary>
+            /// RestartBulk
+            /// </summary>
+            public PveRestartBulk RestartBulk => _restartBulk ??= new(_client);
             private PveFlags _flags;
             /// <summary>
             /// Flags
@@ -3105,6 +3068,35 @@ public class PveClient : PveClientBase
                 /// </summary>
                 /// <returns></returns>
                 public async Task<Result> Status() { return await _client.GetAsync($"/cluster/ceph/status"); }
+            }
+            /// <summary>
+            /// RestartBulk
+            /// </summary>
+            public class PveRestartBulk
+            {
+                private readonly PveClient _client;
+
+                internal PveRestartBulk(PveClient client) { _client = client; }
+                /// <summary>
+                /// Cluster-wide rolling restart of all Ceph daemons of the given type. For MON/MGR/MDS each daemon is restarted only after Ceph reports the previous one is back up and the next one is safe to stop. For OSDs the cluster path orchestrates the per-node endpoint at /nodes/{node}/ceph/restart-bulk on each node in turn, inheriting that endpoint's per-OSD 'noout' handling and resume support. The 'noout' flag itself is not exposed by this endpoint as it is OSD-specific (and for OSDs handled by the per-node sub-tasks).
+                /// </summary>
+                /// <param name="service_type">Ceph daemon type to restart cluster-wide.
+                ///   Enum: mon,mgr,mds,osd</param>
+                /// <param name="dry_run">Log the plan (which daemons would be restarted, in what order) without actually doing anything.</param>
+                /// <param name="force">Proceed past a HEALTH_WARN with non-benign checks like PG_DEGRADED, SLOW_OPS, or MON_DOWN. HEALTH_ERR is always fatal regardless. The operator is responsible for confirming the cluster is stable enough to absorb a rolling restart.</param>
+                /// <param name="only_outdated">OSDs only: restart only OSDs whose running version differs from the locally-installed ceph-osd binary on their host. Forwarded to each per-node sub-task so the per-host installed version is used (a partial upgrade where one host is on a newer build is handled correctly).</param>
+                /// <param name="timeout">Per-daemon timeout (in seconds) for the up-wait phase. Note: for daemons on remote nodes the same timeout also bounds the remote restart task, so the per-daemon budget can be up to 2x this value. Default sized for slow MDS journal replay or MON paxos settle on busy clusters; bump higher if the cluster routinely takes longer to stabilize after a daemon restart.</param>
+                /// <returns></returns>
+                public async Task<Result> RestartBulk(string service_type, bool? dry_run = null, bool? force = null, bool? only_outdated = null, int? timeout = null)
+                {
+                    var parameters = new Dictionary<string, object>();
+                    parameters.Add("service-type", service_type);
+                    parameters.Add("dry-run", dry_run);
+                    parameters.Add("force", force);
+                    parameters.Add("only-outdated", only_outdated);
+                    parameters.Add("timeout", timeout);
+                    return await _client.CreateAsync($"/cluster/ceph/restart-bulk", parameters);
+                }
             }
             /// <summary>
             /// Flags
@@ -8369,7 +8361,7 @@ public class PveClient : PveClientBase
                             /// <summary>
                             /// Resume virtual machine.
                             /// </summary>
-                            /// <param name="nocheck"></param>
+                            /// <param name="nocheck">Do not check whether the VM is running, used internally during migration. Only root may use this option.</param>
                             /// <param name="skiplock">Ignore locks - only root is allowed to use this option.</param>
                             /// <returns></returns>
                             public async Task<Result> VmResume(bool? nocheck = null, bool? skiplock = null)
@@ -8460,7 +8452,7 @@ public class PveClient : PveClientBase
                         /// <param name="newid">VMID for the clone.</param>
                         /// <param name="bwlimit">Override I/O bandwidth limit (in KiB/s).</param>
                         /// <param name="description">Description for the new VM.</param>
-                        /// <param name="format">Target format for file storage. Only valid for full clone.
+                        /// <param name="format">Target disk format. Only valid for full clone. If the target storage does not support the format, the storage's default format is used instead.
                         ///   Enum: raw,qcow2,vmdk</param>
                         /// <param name="full">Create a full copy of all disks. This is always done when you clone a normal VM. For VM templates, we try to create a linked clone by default.</param>
                         /// <param name="name">Set a name for the new VM.</param>
@@ -8506,7 +8498,7 @@ public class PveClient : PveClientBase
                         /// <param name="bwlimit">Override I/O bandwidth limit (in KiB/s).</param>
                         /// <param name="delete">Delete the original disk after successful copy. By default the original disk is kept as unused disk.</param>
                         /// <param name="digest">Prevent changes if current configuration file has different SHA1 digest. This can be used to prevent concurrent modifications.</param>
-                        /// <param name="format">Target Format.
+                        /// <param name="format">Target disk format. Only used when moving to a different storage. If the target storage does not support the format, the storage's default format is used instead.
                         ///   Enum: raw,qcow2,vmdk</param>
                         /// <param name="storage">Target storage.</param>
                         /// <param name="target_digest">Prevent changes if the current config file of the target VM has a different SHA1 digest. This can be used to detect concurrent modifications.</param>
@@ -10948,6 +10940,11 @@ public class PveClient : PveClientBase
                 /// Pool
                 /// </summary>
                 public PvePool Pool => _pool ??= new(_client, _node);
+                private PveReleases _releases;
+                /// <summary>
+                /// Releases
+                /// </summary>
+                public PveReleases Releases => _releases ??= new(_client, _node);
                 private PveInit _init;
                 /// <summary>
                 /// Init
@@ -10968,6 +10965,11 @@ public class PveClient : PveClientBase
                 /// Restart
                 /// </summary>
                 public PveRestart Restart => _restart ??= new(_client, _node);
+                private PveRestartBulk _restartBulk;
+                /// <summary>
+                /// RestartBulk
+                /// </summary>
+                public PveRestartBulk RestartBulk => _restartBulk ??= new(_client, _node);
                 private PveStatus _status;
                 /// <summary>
                 /// Status
@@ -11619,6 +11621,20 @@ public class PveClient : PveClientBase
                     }
                 }
                 /// <summary>
+                /// Releases
+                /// </summary>
+                public class PveReleases
+                {
+                    private readonly PveClient _client;
+                    private readonly object _node;
+                    internal PveReleases(PveClient client, object node) { _client = client; _node = node; }
+                    /// <summary>
+                    /// List all known Ceph releases, marking which ones can be installed on this node.
+                    /// </summary>
+                    /// <returns></returns>
+                    public async Task<Result> Releases() { return await _client.GetAsync($"/nodes/{_node}/ceph/releases"); }
+                }
+                /// <summary>
                 /// Init
                 /// </summary>
                 public class PveInit
@@ -11706,6 +11722,39 @@ public class PveClient : PveClientBase
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("service", service);
                         return await _client.CreateAsync($"/nodes/{_node}/ceph/restart", parameters);
+                    }
+                }
+                /// <summary>
+                /// RestartBulk
+                /// </summary>
+                public class PveRestartBulk
+                {
+                    private readonly PveClient _client;
+                    private readonly object _node;
+                    internal PveRestartBulk(PveClient client, object node) { _client = client; _node = node; }
+                    /// <summary>
+                    /// Rolling restart of all Ceph OSDs on this node. Each OSD is restarted only after Ceph reports the previous one is back up and the next one is safe to stop. For non-OSD Ceph daemons, use the cluster-wide endpoint at /cluster/ceph/restart-bulk. The 'noout' flag is applied only to the OSDs targeted by this run, so unrelated OSDs on other nodes that fail during the restart window still get out-marked normally. Aborting the resulting task (for example via 'pvesh task stop') triggers a SIGTERM handler that unsets the per-OSD 'noout' if this endpoint set it. Per-daemon progress is checkpointed in Ceph's config-key store ('pve/ceph-bulk-restart/node/&amp;lt;node&amp;gt;'), so an aborted run can be resumed by re-issuing this endpoint with 'resume=1'.
+                    /// </summary>
+                    /// <param name="service_type">Ceph daemon type to restart. Only OSDs can be rolling-restarted on a per-node basis.
+                    ///   Enum: osd</param>
+                    /// <param name="dry_run">Log the plan (which OSDs would be restarted, in what order) without actually doing anything.</param>
+                    /// <param name="force">Proceed past a HEALTH_WARN with non-benign checks like PG_DEGRADED, SLOW_OPS, or MON_DOWN. HEALTH_ERR is always fatal regardless. The operator is responsible for confirming the cluster is stable enough to absorb a rolling restart.</param>
+                    /// <param name="only_outdated">Restart only OSDs whose running version differs from the locally-installed ceph-osd binary. Useful for post-upgrade rolling restarts that should touch only daemons that need it. Refuses if the local binary version cannot be determined. Ignored on resume (the saved plan is used as-is).</param>
+                    /// <param name="resume">Resume an aborted bulk-restart from the checkpoint stored in Ceph's config-key store. The plan and noout decision from the prior run are honored; 'set-noout' is ignored. When false (default), the endpoint refuses to start if a checkpoint exists for this node, to avoid silently overwriting in-progress work.</param>
+                    /// <param name="set_noout">Set the 'noout' flag on each OSD targeted by this run for the duration of the rolling restart, and unset it on completion. Per-OSD rather than cluster-wide so that unrelated OSDs failing on other nodes still trigger backfill normally.</param>
+                    /// <param name="timeout">Per-OSD timeout (in seconds). Bounds both the wait for a restarted OSD to come back up and the wait for recovery to quiesce enough that Ceph reports the next OSD safe to stop. Default sized for busy clusters where multi-TB OSDs with many PGs can need several minutes to clear peering after a restart; bump higher for very large or heavily-loaded OSDs.</param>
+                    /// <returns></returns>
+                    public async Task<Result> RestartBulk(string service_type, bool? dry_run = null, bool? force = null, bool? only_outdated = null, bool? resume = null, bool? set_noout = null, int? timeout = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("service-type", service_type);
+                        parameters.Add("dry-run", dry_run);
+                        parameters.Add("force", force);
+                        parameters.Add("only-outdated", only_outdated);
+                        parameters.Add("resume", resume);
+                        parameters.Add("set-noout", set_noout);
+                        parameters.Add("timeout", timeout);
+                        return await _client.CreateAsync($"/nodes/{_node}/ceph/restart-bulk", parameters);
                     }
                 }
                 /// <summary>
@@ -15054,18 +15103,32 @@ public class PveClient : PveClientBase
                 /// Read Journal
                 /// </summary>
                 /// <param name="endcursor">End before the given Cursor. Conflicts with 'until'</param>
+                /// <param name="identifiers">Also return a record listing the distinct syslog identifiers present, for filter completion. Only honored together with 'structured'.</param>
+                /// <param name="kernel">Only print kernel messages.</param>
                 /// <param name="lastentries">Limit to the last X lines. Conflicts with a range.</param>
+                /// <param name="priority">Only print messages of this syslog priority: a single level from 0 (emerg) to 7 (debug), selecting that level and everything more severe, or a 'LOW..HIGH' range. Empty means no priority filter.</param>
+                /// <param name="service">Only print messages whose syslog identifier matches this glob, for example 'pve*' or 'postfix/*'.</param>
                 /// <param name="since">Display all log since this UNIX epoch. Conflicts with 'startcursor'.</param>
                 /// <param name="startcursor">Start after the given Cursor. Conflicts with 'since'</param>
+                /// <param name="structured">Return one JSON object per entry with separate fields (timestamp, identifier, message, priority, ...) instead of pre-rendered text lines.</param>
+                /// <param name="unit">Only print messages of this systemd unit (the .service suffix is implied).</param>
+                /// <param name="units">Also return a record listing the distinct systemd units present, for filter completion. Only honored together with 'structured'.</param>
                 /// <param name="until">Display all log until this UNIX epoch. Conflicts with 'endcursor'.</param>
                 /// <returns></returns>
-                public async Task<Result> Journal(string endcursor = null, int? lastentries = null, int? since = null, string startcursor = null, int? until = null)
+                public async Task<Result> Journal(string endcursor = null, bool? identifiers = null, bool? kernel = null, int? lastentries = null, string priority = null, string service = null, int? since = null, string startcursor = null, bool? structured = null, string unit = null, bool? units = null, int? until = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("endcursor", endcursor);
+                    parameters.Add("identifiers", identifiers);
+                    parameters.Add("kernel", kernel);
                     parameters.Add("lastentries", lastentries);
+                    parameters.Add("priority", priority);
+                    parameters.Add("service", service);
                     parameters.Add("since", since);
                     parameters.Add("startcursor", startcursor);
+                    parameters.Add("structured", structured);
+                    parameters.Add("unit", unit);
+                    parameters.Add("units", units);
                     parameters.Add("until", until);
                     return await _client.GetAsync($"/nodes/{_node}/journal", parameters);
                 }
