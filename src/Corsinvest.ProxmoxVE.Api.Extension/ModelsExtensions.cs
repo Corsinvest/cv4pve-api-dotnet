@@ -71,7 +71,11 @@ public static class ModelsExtensions
                                                            string startcursor = null,
                                                            int? until = null)
     {
-        var result = await item.Journal(endcursor, lastentries, since, startcursor, until);
+        var result = await item.Journal(endcursor: endcursor,
+                                        lastentries: lastentries,
+                                        since: since,
+                                        startcursor: startcursor,
+                                        until: until);
         return result.ResponseToDictionary.TryGetValue("data", out var _)
                 ? [.. result.ToEnumerable().OfType<string>().Where(l => !string.IsNullOrWhiteSpace(l) && !l.StartsWith("s="))]
                 : [];
