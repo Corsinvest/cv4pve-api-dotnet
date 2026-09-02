@@ -48,6 +48,11 @@ public class Result(dynamic response,
     public bool ResponseInError => Response is ExpandoObject && ResponseToDictionary.ContainsKey("errors");
 
     /// <summary>
+    /// Get if response Proxmox VE contain 'data' member
+    /// </summary>
+    public bool ResponseHasData => Response is ExpandoObject && ResponseToDictionary.ContainsKey("data");
+
+    /// <summary>
     /// Proxmox VE response.
     /// </summary>
     public dynamic Response { get; } = response;
