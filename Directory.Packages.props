@@ -4,7 +4,7 @@
         <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Version>9.2.1</Version>
+        <Version>9.2.2</Version>
         <!-- <NoWarn>$(NoWarn);CS1591;CS0436</NoWarn> -->
         <Company>Corsinvest Srl</Company>
         <Authors>Corsinvest Srl</Authors>
@@ -49,19 +49,19 @@
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"
-                          Version="9.0.5" />
+                          Version="9.0.20" />
         <PackageReference Include="Microsoft.Extensions.Logging"
-                          Version="9.0.5" />
+                          Version="9.0.20" />
         <PackageReference Include="Microsoft.Extensions.Logging.Console"
-                          Version="9.0.5" />
+                          Version="9.0.20" />
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"
-                          Version="10.0.0" />
+                          Version="10.0.12" />
         <PackageReference Include="Microsoft.Extensions.Logging"
-                          Version="10.0.0" />
+                          Version="10.0.12" />
         <PackageReference Include="Microsoft.Extensions.Logging.Console"
-                          Version="10.0.0" />
+                          Version="10.0.12" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Newtonsoft.Json"
@@ -69,6 +69,6 @@
         <PackageReference Include="System.ComponentModel.Annotations"
                           Version="5.0.0" />
         <PackageReference Include="System.CommandLine"
-                          Version="2.0.6" />
+                          Version="2.0.12" />
     </ItemGroup>
 </Project>
