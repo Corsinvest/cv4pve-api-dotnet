@@ -609,8 +609,8 @@ public static class ModelsExtensionsAutoGen
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeLxcInterfaces>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveInterfaces item)
-        => (await item.Ip()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeLxcInterfaces>>();
+    public static async Task<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmLxcInterface>> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveNodes.PveNodeItem.PveLxc.PveVmidItem.PveInterfaces item)
+        => (await item.Ip()).ToModel<IEnumerable<Corsinvest.ProxmoxVE.Api.Shared.Models.Vm.VmLxcInterface>>();
 
     /// <summary>
     /// Get information about node's certificates.
