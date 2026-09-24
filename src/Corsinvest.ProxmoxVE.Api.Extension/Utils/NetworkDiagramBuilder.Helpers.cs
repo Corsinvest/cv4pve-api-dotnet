@@ -45,6 +45,22 @@ public static partial class NetworkDiagramBuilder
     private static string? LabeledValue(string key, string? value)
         => string.IsNullOrWhiteSpace(value) ? null : $"{key}: {value}";
 
+    // Older PVE releases (and hand-written interfaces files) report address + netmask
+    // without cidr; netmask can be a prefix length ("24") or dotted ("255.255.255.0").
+    private static string? CidrOf(Corsinvest.ProxmoxVE.Api.Shared.Models.Node.NodeNetwork n)
+    {
+        if (!string.IsNullOrWhiteSpace(n.Cidr)) { return n.Cidr; }
+        if (string.IsNullOrWhiteSpace(n.Address)) { return null; }
+        if (n.Address.Contains('/')) { return n.Address; }
+        if (int.TryParse(n.Netmask, out var prefix)) { return $"{n.Address}/{prefix}"; }
+        if (System.Net.IPAddress.TryParse(n.Netmask, out var mask))
+        {
+            var bits = mask.GetAddressBytes().Sum(b => System.Numerics.BitOperations.PopCount(b));
+            return $"{n.Address}/{bits}";
+        }
+        return n.Address;
+    }
+
     private static string BuildSdnComment(SdnVnetRow v)
     {
         var parts = new List<string> { $"SDN vnet · zone {v.Zone} ({v.ZoneType})" };
