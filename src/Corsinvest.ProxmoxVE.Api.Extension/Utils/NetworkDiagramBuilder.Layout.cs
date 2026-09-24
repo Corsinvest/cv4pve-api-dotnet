@@ -135,7 +135,7 @@ public static partial class NetworkDiagramBuilder
 
             sb.AppendLine($"""
                 <rect x="{offsetX - 8}" y="{offsetY}" width="{Width + 16}" height="{Height}" rx="8" fill="{SvgColBg}" stroke="{SvgColBorder}" stroke-width="1"/>
-                <text x="{offsetX}" y="{offsetY + 18}" font-size="13" font-weight="bold" fill="{SvgColTextHeader}">Node: {NodeName}</text>
+                <text x="{offsetX}" y="{offsetY + 18}" font-size="13" font-weight="bold" fill="{SvgColTextHeader}">Node: {Escape(NodeName)}</text>
                 """);
 
             var edgesByTarget = Edges.Where(e => pos.ContainsKey(e.FromId) && pos.ContainsKey(e.ToId))
@@ -211,15 +211,7 @@ public static partial class NetworkDiagramBuilder
                 }
             }
 
-            var arrowDefs = $"""
-                <defs>
-                  <marker id="arrow" markerWidth="8" markerHeight="8" refX="8" refY="3" orient="auto">
-                    <path d="M0,0 L0,6 L8,3 z" fill="{SvgColLine}"/>
-                  </marker>
-                </defs>
-
-                """;
-            return arrowDefs + sb;
+            return sb.ToString();
         }
     }
 }

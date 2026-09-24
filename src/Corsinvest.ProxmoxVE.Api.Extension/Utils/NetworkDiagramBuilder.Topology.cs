@@ -20,13 +20,35 @@ public static partial class NetworkDiagramBuilder
     {
         var hostNetworks = hostNets.Where(r => r.Node == nodeName).Select(r => r.Network).ToList();
 
+        // Sorted here so the output does not depend on the caller's row order:
+        // configured NICs first (net0, net1, ... net10), guest-only interfaces after.
         var vmsInNode = vmNets.Where(v => v.Node == nodeName)
                               .GroupBy(v => v.VmId)
-                              .ToDictionary(g => g.Key, g => g.ToList());
+                              .ToDictionary(g => g.Key,
+                                            g => g.OrderBy(v => string.IsNullOrEmpty(v.Network.Id))
+                                                  .ThenBy(v => v.Network.Id, NaturalStringComparer.Instance)
+                                                  .ThenBy(v => v.Network.Name, NaturalStringComparer.Instance)
+                                                  .ToList());
 
         var bridgeByName = hostNetworks.Where(n => n.Type is "bridge" or "OVSBridge").ToDictionary(n => n.Interface);
         var bondByName = hostNetworks.Where(n => n.Type is "bond" or "OVSBond").ToDictionary(n => n.Interface);
-        var nicByName = hostNetworks.Where(n => n.Type is "eth" or "InfiniBand").ToDictionary(n => n.Interface);
+        var nicByName = hostNetworks.Where(n => n.Type is "eth" or "InfiniBand" or "OVSPort").ToDictionary(n => n.Interface);
+
+        // OVS host ports (management IP on an OVS bridge), keyed by the bridge they sit on.
+        var intPortsByBridge = hostNetworks.Where(n => n.Type == "OVSIntPort" && !string.IsNullOrEmpty(n.OvsBridge))
+                                           .GroupBy(n => n.OvsBridge)
+                                           .ToDictionary(g => g.Key, g => g.OrderBy(n => n.Interface, NaturalStringComparer.Instance).ToList());
+
+        // OVS declares membership on either side: ovs_ports/ovs_bonds on the bridge, or
+        // ovs_bridge on the port itself. Linux bridges only use bridge_ports.
+        List<string> PortsOf(NodeNetwork br)
+            => [.. br.BridgePorts.SplitWords()
+                     .Concat(br.OvsBonds.SplitWords())
+                     .Concat(br.OvsPorts.SplitWords())
+                     .Concat(hostNetworks.Where(n => n.OvsBridge == br.Interface && n.Type != "OVSIntPort")
+                                         .Select(n => n.Interface))
+                     .Distinct()
+                     .Order(NaturalStringComparer.Instance)];
 
         // SDN vnets aren't reported by /nodes/{node}/network, but VMs attach to them
         // by name. Inject them as synthetic bridges so VM NICs targeting an SDN vnet
@@ -62,9 +84,7 @@ public static partial class NetworkDiagramBuilder
         // (i.e. it can reach the LAN). Bridges without such ports are "internal" — typical
         // for VM-only networks used as private segments behind a gateway VM.
         var externalBridges = bridgeByName.Values
-                                .Where(br => br.BridgePorts.SplitWords()
-                                               .Concat(br.OvsBonds.SplitWords())
-                                               .Any(p => bondByName.ContainsKey(p) || nicByName.ContainsKey(p)))
+                                .Where(br => PortsOf(br).Any(p => bondByName.ContainsKey(p) || nicByName.ContainsKey(p)))
                                 .Select(br => br.Interface).ToHashSet();
 
         var internalBridges = bridgeByName.Keys.Where(b => !externalBridges.Contains(b)).ToHashSet();
@@ -120,11 +140,11 @@ public static partial class NetworkDiagramBuilder
                     BoxLabel(InterfaceTitle(nic.Interface, nic.Comments),
                     !nic.Active ? "DOWN" : null,
                     nic.Type != "eth" ? nic.Type : null,
-                    showIpGw ? LabeledValue("IP", nic.Cidr ?? nic.Address) : null,
+                    showIpGw ? LabeledValue("IP", CidrOf(nic)) : null,
                     showIpGw ? LabeledValue("GW", nic.Gateway) : null,
                     MtuLabel(nic.Mtu)),
                     TooltipLines(("Type", nic.Type),
-                                 ("IPv4", nic.Cidr ?? nic.Address),
+                                 ("IPv4", CidrOf(nic)),
                                  ("GW", nic.Gateway),
                                  ("MTU", nic.Mtu?.ToString()),
                                  ("Status", ActiveStatus(nic.Active)),
@@ -137,11 +157,14 @@ public static partial class NetworkDiagramBuilder
             if (!visited.Add($"br_{brName}")) { return; }
 
             var br = bridgeByName[brName];
+            var intPorts = intPortsByBridge.GetValueOrDefault(brName, [])
+                                           .Select(n => $"{n.Interface}: {CidrOf(n) ?? "-"}")
+                                           .ToList();
             AddNode($"br_{brName}",
                     BoxLabel(InterfaceTitle(br.Interface, br.Comments),
                              !br.Active ? "DOWN" : null,
                              br.Type != "bridge" ? br.Type : null,
-                             LabeledValue("IP", br.Cidr ?? br.Address),
+                             LabeledValue("IP", CidrOf(br)),
                              LabeledValue("IP6", br.Cidr6 ?? br.Address6),
                              LabeledValue("GW", br.Gateway),
                              LabeledValue("GW6", br.Gateway6),
@@ -149,9 +172,11 @@ public static partial class NetworkDiagramBuilder
                              LabeledValue("VLANs", br.BridgeVids),
                              br.BridgeVlanAware is true ? "VLAN-aware" : null,
                              LabeledValue("Ports", br.BridgePorts),
-                             LabeledValue("OVS Bonds", br.OvsBonds)),
+                             LabeledValue("OVS Bonds", br.OvsBonds),
+                             LabeledValue("OVS Ports", br.OvsPorts),
+                             LabeledValue("IntPort", intPorts.JoinAsString(", "))),
                     TooltipLines(("Type", br.Type),
-                                 ("IPv4", br.Cidr ?? br.Address),
+                                 ("IPv4", CidrOf(br)),
                                  ("GW", br.Gateway),
                                  ("IPv6", br.Cidr6 ?? br.Address6),
                                  ("GW6", br.Gateway6),
@@ -160,6 +185,8 @@ public static partial class NetworkDiagramBuilder
                                  ("VLAN-aware", br.BridgeVlanAware is true ? "Yes" : null),
                                  ("Ports", br.BridgePorts),
                                  ("OVS Bonds", br.OvsBonds),
+                                 ("OVS Ports", br.OvsPorts),
+                                 ("IntPort", intPorts.JoinAsString(", ")),
                                  ("Status", ActiveStatus(br.Active)),
                                  ("Comment", br.Comments)),
                     br.Active ? SvgColBridge : SvgColDown,
@@ -168,12 +195,30 @@ public static partial class NetworkDiagramBuilder
 
             if (!vmsByBridge.TryGetValue(brName, out var connectedVms)) { return; }
 
+            string EdgeLabel(List<VmNetworkRow> nics)
+            {
+                var net = nics.FirstOrDefault(n => n.Network.Bridge == brName)?.Network;
+                return net?.Tag.HasValue is true
+                        ? $"VLAN {net.Tag}"
+                        : !string.IsNullOrEmpty(net?.Trunks)
+                            ? $"trunks {net.Trunks}"
+                            : "";
+            }
+
             void RenderVm(long vmId)
             {
                 var nodeId = $"vm_{vmId}";
-                if (nodeAttrs.ContainsKey(nodeId)) { return; }
-
                 var nics = vmsInNode[vmId];
+
+                // Already drawn from another bridge: a VM on several bridges still needs
+                // an edge from each one, unless it would point backwards (a gateway's
+                // internal bridge sits to its right and is linked vm -> bridge instead).
+                if (nodeAttrs.ContainsKey(nodeId))
+                {
+                    if (colMap[nodeId] > colMap[$"br_{brName}"]) { AddEdge($"br_{brName}", nodeId, EdgeLabel(nics)); }
+                    return;
+                }
+
                 var first = nics[0];
                 var vmPrefix = first.Type?.ToLowerInvariant() switch
                 {
@@ -202,6 +247,7 @@ public static partial class NetworkDiagramBuilder
                     }
                     return $"{id} → {n.Network.Bridge}"
                          + (n.Network.Tag.HasValue ? $" VLAN {n.Network.Tag}" : "")
+                         + (!string.IsNullOrEmpty(n.Network.Trunks) ? $" trunks {n.Network.Trunks}" : "")
                          + (!string.IsNullOrEmpty(n.Network.IpAddress) ? $" IP:{n.Network.IpAddress}" : "")
                          + (!string.IsNullOrEmpty(n.Network.Gateway) ? $" GW:{n.Network.Gateway}" : "");
                 }
@@ -253,11 +299,7 @@ public static partial class NetworkDiagramBuilder
                         isDown || isGateway ? SvgColWhite : SvgColText,
                         depth + 1);
 
-                var nicOnThisBridge = nics.FirstOrDefault(n => n.Network.Bridge == brName);
-                var vlan = nicOnThisBridge?.Network.Tag.HasValue is true
-                            ? $"VLAN {nicOnThisBridge.Network.Tag}"
-                            : "";
-                AddEdge($"br_{brName}", nodeId, vlan);
+                AddEdge($"br_{brName}", nodeId, EdgeLabel(nics));
             }
 
             // Render gateways first, then walk into their internal bridges. The
@@ -288,10 +330,7 @@ public static partial class NetworkDiagramBuilder
         {
             if (!bridgeByName.TryGetValue(brName, out var br)) { return; }
 
-            var ports = br.BridgePorts.SplitWords()
-                                      .Concat(br.OvsBonds.SplitWords())
-                                      .Distinct()
-                                      .ToList();
+            var ports = PortsOf(br);
 
             foreach (var port in ports)
             {
@@ -344,7 +383,8 @@ public static partial class NetworkDiagramBuilder
 
             foreach (var nic in nicByName.Values.Where(n => !bondSlaves.Contains(n.Interface)
                                                             && (!string.IsNullOrEmpty(n.Cidr)
-                                                                || !string.IsNullOrEmpty(n.Address))))
+                                                                || !string.IsNullOrEmpty(n.Address)))
+                                                .OrderBy(n => n.Interface, NaturalStringComparer.Instance))
             {
                 AddNicNode(nic, depth: 0, showIpGw: true);
             }
@@ -361,15 +401,23 @@ public static partial class NetworkDiagramBuilder
         // this node. Walks every bridge's CIDR and checks if the server IP falls in
         // the same subnet by comparing the high `prefix` bits byte-by-byte.
         // Returns null when the server is a hostname (not an IP) or no bridge matches.
+        // Ceph monhost is a list ("10.0.0.1 10.0.0.2" or comma/semicolon separated).
         string? FindBridgeForServer(string? server)
+            => (server ?? "").Split([' ', ',', ';'], StringSplitOptions.RemoveEmptyEntries)
+                             .Select(FindBridgeForAddress)
+                             .FirstOrDefault(b => b != null);
+
+        string? FindBridgeForAddress(string server)
         {
-            if (string.IsNullOrWhiteSpace(server)) { return null; }
             if (!System.Net.IPAddress.TryParse(server.Trim(), out var ip)) { return null; }
             var ipBytes = ip.GetAddressBytes();
 
-            foreach (var br in bridgeByName.Values)
+            // A bridge's subnet comes from its own address or from an OVS IntPort on it.
+            var candidates = bridgeByName.Values.Select(br => (br.Interface, Cidr: CidrOf(br)))
+                                                .Concat(intPortsByBridge.SelectMany(kv => kv.Value.Select(n => (Interface: kv.Key, Cidr: CidrOf(n)))));
+
+            foreach (var (brInterface, cidr) in candidates)
             {
-                var cidr = br.Cidr ?? br.Address;
                 if (string.IsNullOrWhiteSpace(cidr)) { continue; }
                 var slash = cidr.IndexOf('/');
                 if (slash < 0) { continue; }
@@ -392,7 +440,7 @@ public static partial class NetworkDiagramBuilder
                         ok = (ipBytes[i] & mask) == (netBytes[i] & mask);
                     }
                 }
-                if (ok) { return br.Interface; }
+                if (ok) { return brInterface; }
             }
             return null;
         }
@@ -401,7 +449,7 @@ public static partial class NetworkDiagramBuilder
 
         void CollectStorages()
         {
-            foreach (var st in storageConfigs)
+            foreach (var st in storageConfigs.OrderBy(s => s.Storage, NaturalStringComparer.Instance))
             {
                 if (!IsNetworkStorageType(st.Type)) { continue; }
 
@@ -460,13 +508,13 @@ public static partial class NetworkDiagramBuilder
         // picked up recursively by WalkBridge. The second pass catches any bridge
         // not reached from an external (e.g. isolated internal networks with no
         // gateway VM in the dataset).
-        foreach (var brName in externalBridges.Order())
+        foreach (var brName in externalBridges.Order(NaturalStringComparer.Instance))
         {
             WalkBridge(brName, 2);
             AddPhysical(brName, 2);
         }
 
-        foreach (var brName in bridgeByName.Keys.Where(b => !visited.Contains($"br_{b}")).Order())
+        foreach (var brName in bridgeByName.Keys.Where(b => !visited.Contains($"br_{b}")).Order(NaturalStringComparer.Instance))
         {
             WalkBridge(brName, 2);
             AddPhysical(brName, 2);
@@ -475,18 +523,7 @@ public static partial class NetworkDiagramBuilder
         AddStandaloneNics();
         CollectStorages();
 
-        // Assign row index per column: nodes are sorted by column then by id so the
-        // order is stable across renders. `rowPerCol` tracks the next free row in
-        // each column as we iterate.
-        var rowPerCol = new Dictionary<int, int>();
-        var rowMap = new Dictionary<string, int>();
-        foreach (var id in nodeAttrs.Keys.OrderBy(id => colMap.GetValueOrDefault(id)).ThenBy(id => id))
-        {
-            var c = colMap.GetValueOrDefault(id);
-            if (!rowPerCol.TryGetValue(c, out var r)) { r = 0; }
-            rowMap[id] = r;
-            rowPerCol[c] = r + 1;
-        }
+        var rowMap = OrderRows([.. nodeAttrs.Keys], colMap, edges);
 
         return new NodeSection(nodeName,
                                [.. nodeAttrs.Select(a => new SvgNode(a.Key,
@@ -498,5 +535,80 @@ public static partial class NetworkDiagramBuilder
                                                       rowMap[a.Key]))],
                                edges,
                                storages);
+    }
+
+    // Row order inside each column. Starts from the walk order (a bridge is followed by
+    // the VMs it feeds, VMs by numeric id) and refines it with barycenter sweeps: each
+    // box moves towards the average row of its neighbours in the previous (then next)
+    // column. The ordering with the fewest edge crossings wins, the walk order on ties.
+    private static Dictionary<string, int> OrderRows(List<string> ids,
+                                                     Dictionary<string, int> colMap,
+                                                     List<SvgEdge> edges)
+    {
+        var cols = ids.GroupBy(id => colMap.GetValueOrDefault(id))
+                      .OrderBy(g => g.Key)
+                      .Select(g => g.ToList())
+                      .ToList();
+
+        Dictionary<string, int> Rows(List<List<string>> layers)
+            => layers.SelectMany(l => l.Select((id, row) => (id, row))).ToDictionary(a => a.id, a => a.row);
+
+        int Crossings(Dictionary<string, int> rows)
+        {
+            var spans = edges.Where(e => rows.ContainsKey(e.FromId) && rows.ContainsKey(e.ToId))
+                             .Select(e => (From: colMap[e.FromId], To: colMap[e.ToId], R1: rows[e.FromId], R2: rows[e.ToId]))
+                             .ToList();
+
+            var count = 0;
+            for (var i = 0; i < spans.Count; i++)
+            {
+                for (var j = i + 1; j < spans.Count; j++)
+                {
+                    var (a, b) = (spans[i], spans[j]);
+                    if (a.From != b.From || a.To != b.To) { continue; }
+                    if ((a.R1 - b.R1) * (a.R2 - b.R2) < 0) { count++; }
+                }
+            }
+            return count;
+        }
+
+        var best = Rows(cols);
+        var bestCrossings = Crossings(best);
+
+        for (var pass = 0; pass < 4 && bestCrossings > 0; pass++)
+        {
+            var forward = pass % 2 == 0;
+            var rows = Rows(cols);
+            var order = forward
+                            ? Enumerable.Range(1, cols.Count - 1)
+                            : Enumerable.Range(0, cols.Count - 1).Reverse();
+
+            foreach (var c in order)
+            {
+                var col = cols[c];
+                var layer = colMap[col[0]];
+                double Barycenter(string id, int index)
+                {
+                    var neighbours = edges.Where(e => e.ToId == id && forward && colMap.GetValueOrDefault(e.FromId) < layer)
+                                          .Select(e => e.FromId)
+                                          .Concat(edges.Where(e => e.FromId == id && !forward && colMap.GetValueOrDefault(e.ToId) > layer)
+                                                       .Select(e => e.ToId))
+                                          .Where(rows.ContainsKey)
+                                          .ToList();
+                    return neighbours.Count == 0 ? index : neighbours.Average(n => rows[n]);
+                }
+
+                cols[c] = [.. col.Select((id, index) => (id, key: Barycenter(id, index), index))
+                                 .OrderBy(a => a.key)
+                                 .ThenBy(a => a.index)
+                                 .Select(a => a.id)];
+                rows = Rows(cols);
+            }
+
+            var crossings = Crossings(rows);
+            if (crossings < bestCrossings) { (best, bestCrossings) = (rows, crossings); }
+        }
+
+        return best;
     }
 }

@@ -93,7 +93,7 @@ public static partial class NetworkDiagramBuilder
         var vmNetsList = vmNets.ToList();
         var storagesList = storages.ToList();
 
-        var nodeNames = hostNetsList.Select(r => r.Node).Distinct().Order().ToList();
+        var nodeNames = hostNetsList.Select(r => r.Node).Distinct().Order(NaturalStringComparer.Instance).ToList();
         if (nodeNames.Count == 0) { return "<svg xmlns='http://www.w3.org/2000/svg'/>"; }
 
         var sections = nodeNames.ConvertAll(n => BuildNodeSection(n, hostNetsList, vmNetsList, storagesList, sdnList));
@@ -111,6 +111,13 @@ public static partial class NetworkDiagramBuilder
 
         var sb = new StringBuilder();
         sb.AppendLine($"""<svg xmlns="http://www.w3.org/2000/svg" width="{totalW}" height="{totalH}" viewBox="0 0 {totalW} {totalH}" preserveAspectRatio="xMinYMin meet" font-family="Segoe UI,Arial,sans-serif">""");
+        sb.AppendLine($"""
+            <defs>
+              <marker id="arrow" markerWidth="8" markerHeight="8" refX="8" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="{SvgColLine}"/>
+              </marker>
+            </defs>
+            """);
 
         sb.Append(RenderLegend(SvgMarginX, SvgMarginY, legendW, headerH));
         sb.Append(RenderInfo(SvgMarginX + legendW + headerGap, SvgMarginY, infoW, headerH, sections.Count,

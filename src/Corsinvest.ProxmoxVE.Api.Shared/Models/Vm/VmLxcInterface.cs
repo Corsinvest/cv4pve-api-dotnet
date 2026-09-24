@@ -5,12 +5,12 @@
 
 using Newtonsoft.Json;
 
-namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
+namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 
 /// <summary>
-/// Node LXC Interfaces
+/// Live network interface of a running container
 /// </summary>
-public class NodeLxcInterfaces : ModelBase
+public class VmLxcInterface : ModelBase
 {
     /// <summary>
     /// Interface name
@@ -46,5 +46,10 @@ public class NodeLxcInterfaces : ModelBase
     /// IP addresses
     /// </summary>
     [JsonProperty("ip-addresses")]
-    public IEnumerable<object> IpAddresses { get; set; } = [];
+    public IEnumerable<VmQemuAgentNetworkGetInterfaces.Ip> IpAddresses { get; set; } = [];
+
+    /// <summary>
+    /// MAC address from whichever field the PVE release fills
+    /// </summary>
+    public string MacAddress => string.IsNullOrEmpty(HardwareAddress) ? HwAddr : HardwareAddress;
 }
