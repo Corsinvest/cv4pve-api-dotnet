@@ -257,6 +257,10 @@ public partial class VmConfig : ModelBase
                         {
                             network.LinkDown = match.Groups[1].Value == "1";
                         }
+                        else if ((match = TrunksRegex().Match(item)).Success)
+                        {
+                            network.Trunks = match.Groups[1].Value;
+                        }
                     }
                 }
 

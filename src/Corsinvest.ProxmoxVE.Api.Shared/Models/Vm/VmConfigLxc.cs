@@ -144,45 +144,7 @@ public class VmConfigLxc : VmConfig
     [JsonProperty("startup")]
     public string Startup { get; set; }
 
-    /// <summary>
-    /// OS architecture type.
-    /// </summary>
-    [JsonProperty("arch")]
-    public new string Arch { get; set; }
-
-    /// <summary>
-    /// Amount of RAM for the container in MB.
-    /// </summary>
-    [JsonProperty("memory")]
-    public new long Memory { get; set; }
-
-    /// <summary>
-    /// OS type. This is used to setup configuration inside the container, and corresponds to the --os-type LXC option.
-    /// </summary>
-    [JsonProperty("ostype")]
-    public new string OsType { get; set; }
-
-    /// <summary>
-    /// Tags of the Container. This is only meta information.
-    /// </summary>
-    [JsonProperty("tags")]
-    public new string Tags { get; set; }
-
-    /// <summary>
-    /// Specifies whether a container will be started during system bootup.
-    /// </summary>
-    [JsonProperty("onboot")]
-    public new bool OnBoot { get; set; }
-
-    /// <summary>
-    /// Lock/unlock the container.
-    /// </summary>
-    [JsonProperty("lock")]
-    public new string Lock { get; set; }
-
-    /// <summary>
-    /// Sets the protection flag of the container. This will prevent the CT or CT's disk removal.
-    /// </summary>
-    [JsonProperty("protection")]
-    public new bool Protection { get; set; }
+    // Arch, Memory, OsType, Tags, OnBoot, Lock and Protection are inherited from VmConfig
+    // (same JSON names). Redeclaring them here with 'new' split each value in two: JSON filled
+    // only this copy, so code reading a container through VmConfig always saw the defaults.
 }
