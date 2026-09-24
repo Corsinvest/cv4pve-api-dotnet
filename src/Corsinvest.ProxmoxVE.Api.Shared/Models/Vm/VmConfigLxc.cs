@@ -31,10 +31,10 @@ public class VmConfigLxc : VmConfig
     public string SearchDomain { get; set; }
 
     /// <summary>
-    /// Amount of SWAP for the container in MB.
+    /// Amount of SWAP for the container in MB. PVE default when the option is not set: 512.
     /// </summary>
     [JsonProperty("swap")]
-    public int Swap { get; set; }
+    public int Swap { get; set; } = 512;
 
     /// <summary>
     /// The number of cores assigned to the container. A container can use all available cores by default.

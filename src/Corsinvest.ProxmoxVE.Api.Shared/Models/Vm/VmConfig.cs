@@ -31,7 +31,7 @@ public partial class VmConfig : ModelBase
     /// Memory properties.
     /// </summary>
     [JsonProperty("memory")]
-    public long Memory { get; set; }
+    public long Memory { get; set; } = 512;
 
     /// <summary>
     /// Specify guest operating system.
@@ -373,7 +373,8 @@ public partial class VmConfig : ModelBase
     private static partial Regex DiskKeyRegex();
     [GeneratedRegex("media=cdrom")]
     private static partial Regex CdromMediaRegex();
-    [GeneratedRegex(@"^vm-\d+-cloudinit$")]
+    // "vm-100-cloudinit" on block storages, "100/vm-100-cloudinit.qcow2" on file storages (dir, NFS, CIFS).
+    [GeneratedRegex(@"(^|/)vm-\d+-cloudinit(\.\w+)?$")]
     private static partial Regex CloudInitFileNameRegex();
     [GeneratedRegex("^(ne2k_pci|e1000e?|e1000-82540em|e1000-82544gc|e1000-82545em|vmxnet3|rtl8139|pcnet|virtio|ne2k_isa|i82551|i82557b|i82559er)(=([0-9a-f]{2}(:[0-9a-f]{2}){5}))?$", RegexOptions.IgnoreCase)]
     private static partial Regex NicModelRegex();

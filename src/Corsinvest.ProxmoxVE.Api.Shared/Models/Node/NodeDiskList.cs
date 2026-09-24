@@ -47,7 +47,7 @@ public class NodeDiskList : ModelBase
     /// <summary>
     /// Is ssd
     /// </summary>
-    public bool IsSsd => Type == "ssd";
+    public bool IsSsd => Type is "ssd" or "nvme";
 
     /// <summary>
     /// Model

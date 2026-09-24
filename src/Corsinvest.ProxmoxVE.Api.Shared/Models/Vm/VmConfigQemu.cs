@@ -56,11 +56,13 @@ public class VmConfigQemu : VmConfig
     public string Agent { get; set; }
 
     /// <summary>
-    /// Agent enabled.
+    /// Agent enabled. The option is <c>[enabled=]&lt;1|0&gt;[,fstrim_cloned_disks=&lt;1|0&gt;][,type=...]</c>:
+    /// the enabled flag is either the bare first value or the <c>enabled=</c> key.
     /// </summary>
     public bool AgentEnabled
-        => !string.IsNullOrWhiteSpace(Agent)
-            && Agent.Split(',').Select(a => a.Trim()).Any(a => a == "1");
+        => (Agent ?? string.Empty).Split(',')
+                                  .Select(a => a.Trim())
+                                  .Any(a => a == "1" || a == "enabled=1");
 
     /// <summary>
     /// Enable booting from specified disk. Deprecated: Use 'boot: order=foo;bar' instead.
