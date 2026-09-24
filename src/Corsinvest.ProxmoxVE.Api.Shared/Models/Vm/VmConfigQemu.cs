@@ -19,10 +19,17 @@ public class VmConfigQemu : VmConfig
     public bool Acpi { get; set; } = true;
 
     /// <summary>
+    /// Specify guest operating system.
+    /// </summary>
+    /// <remarks>PVE default when the option is not set: other.</remarks>
+    public override string OsType { get; set; } = "other";
+
+    /// <summary>
     /// Emulated CPU type.
     /// </summary>
+    /// <remarks>PVE default when the option is not set: kvm64.</remarks>
     [JsonProperty("cpu")]
-    public string Cpu { get; set; }
+    public string Cpu { get; set; } = "kvm64";
 
     /// <summary>
     /// Keyboard layout for VNC server.
@@ -56,11 +63,13 @@ public class VmConfigQemu : VmConfig
     public string Agent { get; set; }
 
     /// <summary>
-    /// Agent enabled.
+    /// Agent enabled. The option is <c>[enabled=]&lt;1|0&gt;[,fstrim_cloned_disks=&lt;1|0&gt;][,type=...]</c>:
+    /// the enabled flag is either the bare first value or the <c>enabled=</c> key.
     /// </summary>
     public bool AgentEnabled
-        => !string.IsNullOrWhiteSpace(Agent)
-            && Agent.Split(',').Select(a => a.Trim()).Any(a => a == "1");
+        => (Agent ?? string.Empty).Split(',')
+                                  .Select(a => a.Trim())
+                                  .Any(a => a == "1" || a == "enabled=1");
 
     /// <summary>
     /// Enable booting from specified disk. Deprecated: Use 'boot: order=foo;bar' instead.
@@ -87,10 +96,10 @@ public class VmConfigQemu : VmConfig
     public int Sockets { get; set; } = 1;
 
     /// <summary>
-    /// SCSI controller model
+    /// SCSI controller model. PVE default when the option is not set: lsi.
     /// </summary>
     [JsonProperty("scsihw")]
-    public string ScsiHw { get; set; }
+    public string ScsiHw { get; set; } = "lsi";
 
     /// <summary>
     /// Amount of target RAM for the VM in MiB. Using zero disables the ballon driver.
@@ -195,10 +204,10 @@ public class VmConfigQemu : VmConfig
     public string Nameserver { get; set; }
 
     /// <summary>
-    /// Allow reboot. If set to '0' the VM exit on reboot.
+    /// Allow reboot. If set to '0' the VM exit on reboot. PVE default when the option is not set: 1.
     /// </summary>
     [JsonProperty("reboot")]
-    public bool Reboot { get; set; }
+    public bool Reboot { get; set; } = true;
 
     /// <summary>
     /// Enable/disable time drift fix.
@@ -249,10 +258,10 @@ public class VmConfigQemu : VmConfig
     public string Citype { get; set; }
 
     /// <summary>
-    /// cloud-init: do an automatic package upgrade after the first boot.
+    /// cloud-init: do an automatic package upgrade after the first boot. PVE default when the option is not set: 1.
     /// </summary>
     [JsonProperty("ciupgrade")]
-    public bool Ciupgrade { get; set; }
+    public bool Ciupgrade { get; set; } = true;
 
     /// <summary>
     /// cloud-init: User name to change ssh keys and password for instead of the image's configured default user.
@@ -269,8 +278,9 @@ public class VmConfigQemu : VmConfig
     /// <summary>
     /// Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory', 'usb' and 'cloudinit'. Use '0' to disable hotplug completely. Using '1' as ...
     /// </summary>
+    /// <remarks>PVE default when the option is not set: network,disk,usb.</remarks>
     [JsonProperty("hotplug")]
-    public string Hotplug { get; set; }
+    public string Hotplug { get; set; } = "network,disk,usb";
 
     /// <summary>
     /// Enables hugepages memory. Sets the size of hugepages in MiB. If the value is set to 'any' then 1 GiB hugepages will be used if possible, otherwise the size will fall back to 2 MiB.
@@ -311,8 +321,9 @@ public class VmConfigQemu : VmConfig
     /// <summary>
     /// Set maximum tolerated downtime (in seconds) for migrations. Should the migration not be able to converge in the very end, because too much newly dirtied RAM needs to be transferred, the limit will be ...
     /// </summary>
+    /// <remarks>PVE default when the option is not set: 0.1.</remarks>
     [JsonProperty("migrate_downtime")]
-    public double MigrateDowntime { get; set; }
+    public double MigrateDowntime { get; set; } = 0.1;
 
     /// <summary>
     /// Set maximum speed (in MB/s) for migrations. Value 0 is no limit.

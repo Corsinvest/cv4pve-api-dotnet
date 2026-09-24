@@ -31,10 +31,10 @@ public class VmConfigLxc : VmConfig
     public string SearchDomain { get; set; }
 
     /// <summary>
-    /// Amount of SWAP for the container in MB.
+    /// Amount of SWAP for the container in MB. PVE default when the option is not set: 512.
     /// </summary>
     [JsonProperty("swap")]
-    public int Swap { get; set; }
+    public int Swap { get; set; } = 512;
 
     /// <summary>
     /// The number of cores assigned to the container. A container can use all available cores by default.
@@ -79,22 +79,23 @@ public class VmConfigLxc : VmConfig
     public string Timezone { get; set; }
 
     /// <summary>
-    /// Specify the number of tty available to the container
+    /// Specify the number of tty available to the container. PVE default when the option is not set: 2.
     /// </summary>
     [JsonProperty("tty")]
-    public int Tty { get; set; }
+    public int Tty { get; set; } = 2;
 
     /// <summary>
     /// Console mode. By default, the console command tries to open a connection to one of the available tty devices. By setting cmode to 'console' it tries to attach to /dev/console instead. If you set cmode...
+    /// PVE default when the option is not set: tty.
     /// </summary>
     [JsonProperty("cmode")]
-    public string Cmode { get; set; }
+    public string Cmode { get; set; } = "tty";
 
     /// <summary>
-    /// Attach a console device (/dev/console) to the container.
+    /// Attach a console device (/dev/console) to the container. PVE default when the option is not set: 1.
     /// </summary>
     [JsonProperty("console")]
-    public bool Console { get; set; }
+    public bool Console { get; set; } = true;
 
     /// <summary>
     /// Try to be more verbose. For now this only enables debug log-level on start.
@@ -144,7 +145,12 @@ public class VmConfigLxc : VmConfig
     [JsonProperty("startup")]
     public string Startup { get; set; }
 
-    // Arch, Memory, OsType, Tags, OnBoot, Lock and Protection are inherited from VmConfig
+    /// <summary>
+    /// OS architecture type. PVE default when the option is not set: amd64.
+    /// </summary>
+    public override string Arch { get; set; } = "amd64";
+
+    // Memory, OsType, Tags, OnBoot, Lock and Protection are inherited from VmConfig
     // (same JSON names). Redeclaring them here with 'new' split each value in two: JSON filled
     // only this copy, so code reading a container through VmConfig always saw the defaults.
 }

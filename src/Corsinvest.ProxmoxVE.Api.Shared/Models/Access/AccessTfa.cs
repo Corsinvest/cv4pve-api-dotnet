@@ -64,6 +64,13 @@ public class AccessTfa : ModelBase
         /// </summary>
         [JsonProperty("id")]
         public string Id { get; set; }
+
+        /// <summary>
+        /// Whether the entry can be used to log in. PVE omits it for enabled entries, hence the
+        /// default true.
+        /// </summary>
+        [JsonProperty("enable")]
+        public bool Enable { get; set; } = true;
     }
 }
 
