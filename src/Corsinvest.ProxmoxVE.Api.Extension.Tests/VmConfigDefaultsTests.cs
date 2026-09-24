@@ -142,9 +142,61 @@ public class VmConfigDefaultsTests
     }
 
     [Fact]
-    public void Qemu_has_no_arch_option_so_it_stays_null()
+    public void Qemu_arch_has_no_fixed_default()
     {
-        // 'arch' is an LXC-only option: a VM must not claim an architecture it never reported.
+        // On a VM 'arch' defaults to the host architecture: there is no value to assume, so it
+        // stays null when absent and is read when set.
         Assert.Null(JsonConvert.DeserializeObject<VmConfigQemu>("""{"name":"vm"}""")!.Arch);
+        Assert.Equal("aarch64", JsonConvert.DeserializeObject<VmConfigQemu>("""{"arch":"aarch64"}""")!.Arch);
+    }
+
+    [Fact]
+    public void Qemu_hotplug_and_migrate_downtime_absent_are_the_pve_defaults()
+    {
+        var qemu = JsonConvert.DeserializeObject<VmConfigQemu>("""{"name":"vm"}""")!;
+
+        Assert.Equal("network,disk,usb", qemu.Hotplug);
+        Assert.Equal(0.1, qemu.MigrateDowntime);
+    }
+
+    [Fact]
+    public void Qemu_hotplug_and_migrate_downtime_set_explicitly_win()
+    {
+        var qemu = JsonConvert.DeserializeObject<VmConfigQemu>("""{"hotplug":"0","migrate_downtime":0.5}""")!;
+
+        Assert.Equal("0", qemu.Hotplug);
+        Assert.Equal(0.5, qemu.MigrateDowntime);
+    }
+
+    [Fact]
+    public void Qemu_cpu_and_ostype_absent_are_the_pve_defaults()
+    {
+        var qemu = JsonConvert.DeserializeObject<VmConfigQemu>("""{"name":"vm"}""")!;
+
+        Assert.Equal("kvm64", qemu.Cpu);
+        Assert.Equal("other", qemu.OsType);
+        // The default flows through the derived views of ostype.
+        Assert.Equal(VmOsType.Other, qemu.VmOsType);
+        Assert.Equal("Other", qemu.OsTypeDecode);
+    }
+
+    [Fact]
+    public void Qemu_cpu_and_ostype_set_explicitly_win()
+    {
+        var qemu = JsonConvert.DeserializeObject<VmConfigQemu>(
+            """{"cpu":"host","ostype":"win11"}""")!;
+
+        Assert.Equal("host", qemu.Cpu);
+        Assert.Equal("win11", qemu.OsType);
+        Assert.Equal(VmOsType.Windows, qemu.VmOsType);
+        Assert.Equal("win11", ((VmConfig)qemu).OsType);   // one backing store
+    }
+
+    [Fact]
+    public void Lxc_ostype_has_no_qemu_default()
+    {
+        // 'other' is the QEMU default; pct.conf documents none, so a container keeps null.
+        Assert.Null(JsonConvert.DeserializeObject<VmConfigLxc>("""{"hostname":"ct"}""")!.OsType);
+        Assert.Equal("debian", JsonConvert.DeserializeObject<VmConfigLxc>("""{"ostype":"debian"}""")!.OsType);
     }
 }

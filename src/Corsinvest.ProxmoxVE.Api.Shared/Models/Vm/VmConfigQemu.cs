@@ -19,10 +19,17 @@ public class VmConfigQemu : VmConfig
     public bool Acpi { get; set; } = true;
 
     /// <summary>
+    /// Specify guest operating system.
+    /// </summary>
+    /// <remarks>PVE default when the option is not set: other.</remarks>
+    public override string OsType { get; set; } = "other";
+
+    /// <summary>
     /// Emulated CPU type.
     /// </summary>
+    /// <remarks>PVE default when the option is not set: kvm64.</remarks>
     [JsonProperty("cpu")]
-    public string Cpu { get; set; }
+    public string Cpu { get; set; } = "kvm64";
 
     /// <summary>
     /// Keyboard layout for VNC server.
@@ -271,8 +278,9 @@ public class VmConfigQemu : VmConfig
     /// <summary>
     /// Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory', 'usb' and 'cloudinit'. Use '0' to disable hotplug completely. Using '1' as ...
     /// </summary>
+    /// <remarks>PVE default when the option is not set: network,disk,usb.</remarks>
     [JsonProperty("hotplug")]
-    public string Hotplug { get; set; }
+    public string Hotplug { get; set; } = "network,disk,usb";
 
     /// <summary>
     /// Enables hugepages memory. Sets the size of hugepages in MiB. If the value is set to 'any' then 1 GiB hugepages will be used if possible, otherwise the size will fall back to 2 MiB.
@@ -313,8 +321,9 @@ public class VmConfigQemu : VmConfig
     /// <summary>
     /// Set maximum tolerated downtime (in seconds) for migrations. Should the migration not be able to converge in the very end, because too much newly dirtied RAM needs to be transferred, the limit will be ...
     /// </summary>
+    /// <remarks>PVE default when the option is not set: 0.1.</remarks>
     [JsonProperty("migrate_downtime")]
-    public double MigrateDowntime { get; set; }
+    public double MigrateDowntime { get; set; } = 0.1;
 
     /// <summary>
     /// Set maximum speed (in MB/s) for migrations. Value 0 is no limit.

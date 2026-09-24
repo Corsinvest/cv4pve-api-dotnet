@@ -37,7 +37,7 @@ public partial class VmConfig : ModelBase
     /// Specify guest operating system.
     /// </summary>
     [JsonProperty("ostype")]
-    public string OsType { get; set; }
+    public virtual string OsType { get; set; }
 
     /// <summary>
     /// Vm Os Type
