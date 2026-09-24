@@ -19,7 +19,7 @@ public partial class VmConfig : ModelBase
     /// Virtual processor architecture. Defaults to the host.
     /// </summary>
     [JsonProperty("arch")]
-    public string Arch { get; set; }
+    public virtual string Arch { get; set; }
 
     /// <summary>
     /// Parent snapshot name. This is used internally, and should not be modified.

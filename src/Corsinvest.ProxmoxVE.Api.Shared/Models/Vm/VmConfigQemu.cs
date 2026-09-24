@@ -89,10 +89,10 @@ public class VmConfigQemu : VmConfig
     public int Sockets { get; set; } = 1;
 
     /// <summary>
-    /// SCSI controller model
+    /// SCSI controller model. PVE default when the option is not set: lsi.
     /// </summary>
     [JsonProperty("scsihw")]
-    public string ScsiHw { get; set; }
+    public string ScsiHw { get; set; } = "lsi";
 
     /// <summary>
     /// Amount of target RAM for the VM in MiB. Using zero disables the ballon driver.
@@ -197,10 +197,10 @@ public class VmConfigQemu : VmConfig
     public string Nameserver { get; set; }
 
     /// <summary>
-    /// Allow reboot. If set to '0' the VM exit on reboot.
+    /// Allow reboot. If set to '0' the VM exit on reboot. PVE default when the option is not set: 1.
     /// </summary>
     [JsonProperty("reboot")]
-    public bool Reboot { get; set; }
+    public bool Reboot { get; set; } = true;
 
     /// <summary>
     /// Enable/disable time drift fix.
@@ -251,10 +251,10 @@ public class VmConfigQemu : VmConfig
     public string Citype { get; set; }
 
     /// <summary>
-    /// cloud-init: do an automatic package upgrade after the first boot.
+    /// cloud-init: do an automatic package upgrade after the first boot. PVE default when the option is not set: 1.
     /// </summary>
     [JsonProperty("ciupgrade")]
-    public bool Ciupgrade { get; set; }
+    public bool Ciupgrade { get; set; } = true;
 
     /// <summary>
     /// cloud-init: User name to change ssh keys and password for instead of the image's configured default user.

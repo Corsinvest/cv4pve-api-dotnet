@@ -1,4 +1,4 @@
-/*
+﻿/*
  * SPDX-FileCopyrightText: Copyright Corsinvest Srl
  * SPDX-License-Identifier: MIT
  */
@@ -82,5 +82,69 @@ public class VmConfigDefaultsTests
             """{"userid":"root@pam","entries":[{"id":"a","type":"totp"},{"id":"b","type":"totp","enable":0},{"id":"c","type":"webauthn","enable":1}]}""")!;
 
         Assert.Equal(["a", "c"], tfa.Entries.Where(e => e.Enable).Select(e => e.Id));
+    }
+
+    [Fact]
+    public void Qemu_options_absent_from_the_payload_are_the_pve_defaults()
+    {
+        var qemu = JsonConvert.DeserializeObject<VmConfigQemu>("""{"name":"vm"}""")!;
+
+        // PVE omits an option when it holds the default, so absent must not read as 0/false/null.
+        Assert.True(qemu.Reboot);
+        Assert.True(qemu.Ciupgrade);
+        Assert.Equal("lsi", qemu.ScsiHw);
+    }
+
+    [Fact]
+    public void Qemu_options_set_to_zero_stay_off()
+    {
+        var qemu = JsonConvert.DeserializeObject<VmConfigQemu>(
+            """{"reboot":0,"ciupgrade":0,"scsihw":"virtio-scsi-single"}""")!;
+
+        Assert.False(qemu.Reboot);
+        Assert.False(qemu.Ciupgrade);
+        Assert.Equal("virtio-scsi-single", qemu.ScsiHw);
+    }
+
+    [Fact]
+    public void Lxc_options_absent_from_the_payload_are_the_pve_defaults()
+    {
+        var lxc = JsonConvert.DeserializeObject<VmConfigLxc>("""{"hostname":"ct"}""")!;
+
+        Assert.True(lxc.Console);
+        Assert.Equal(2, lxc.Tty);
+        Assert.Equal("tty", lxc.Cmode);
+        Assert.Equal("amd64", lxc.Arch);
+    }
+
+    [Fact]
+    public void Lxc_options_set_explicitly_win_over_the_defaults()
+    {
+        var lxc = JsonConvert.DeserializeObject<VmConfigLxc>(
+            """{"console":0,"tty":0,"cmode":"shell","arch":"arm64"}""")!;
+
+        Assert.False(lxc.Console);
+        Assert.Equal(0, lxc.Tty);
+        Assert.Equal("shell", lxc.Cmode);
+        Assert.Equal("arm64", lxc.Arch);
+    }
+
+    [Fact]
+    public void Lxc_arch_is_the_same_value_through_the_base_type()
+    {
+        // Arch is declared on VmConfig and overridden on VmConfigLxc to carry the LXC default:
+        // one backing store, so both views agree.
+        var lxc = JsonConvert.DeserializeObject<VmConfigLxc>("""{"arch":"riscv64"}""")!;
+        Assert.Equal("riscv64", ((VmConfig)lxc).Arch);
+
+        var byDefault = JsonConvert.DeserializeObject<VmConfigLxc>("""{"hostname":"ct"}""")!;
+        Assert.Equal("amd64", ((VmConfig)byDefault).Arch);
+    }
+
+    [Fact]
+    public void Qemu_has_no_arch_option_so_it_stays_null()
+    {
+        // 'arch' is an LXC-only option: a VM must not claim an architecture it never reported.
+        Assert.Null(JsonConvert.DeserializeObject<VmConfigQemu>("""{"name":"vm"}""")!.Arch);
     }
 }
