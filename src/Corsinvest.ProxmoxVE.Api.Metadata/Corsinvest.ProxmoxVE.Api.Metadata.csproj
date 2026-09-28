@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<Product>Corsinvest for Proxmox VE Metadati Api</Product>
-		<AssemblyTitle>Corsinvest for Proxmox VE Metadati Api</AssemblyTitle>
-		<Description>Corsinvest for Proxmox VE Metadati Api</Description>
+		<Product>Corsinvest for Proxmox VE Api Metadata</Product>
+		<AssemblyTitle>Corsinvest for Proxmox VE Api Metadata</AssemblyTitle>
+		<Description>Corsinvest for Proxmox VE Api Metadata</Description>
 	</PropertyGroup>
 </Project>

@@ -10,7 +10,7 @@
 Proxmox VE API Client for .NET (Made in Italy)
 ```
 
-[![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg?style=flat-square)](LICENSE)
+[![License](https://img.shields.io/github/license/Corsinvest/cv4pve-api-dotnet.svg?style=flat-square)](LICENSE.md)
 [![.NET](https://img.shields.io/badge/.NET-8.0%2B-blue?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 
 ---

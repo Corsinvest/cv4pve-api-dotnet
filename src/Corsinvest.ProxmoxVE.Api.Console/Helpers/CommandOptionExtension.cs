@@ -1,14 +1,14 @@
-﻿/*
+/*
  * SPDX-FileCopyrightText: Copyright Corsinvest Srl
  * SPDX-License-Identifier: MIT
  */
 
-using Corsinvest.ProxmoxVE.Api.Extension.Utils;
-using Corsinvest.ProxmoxVE.Api.Shared.Utils;
-using Microsoft.Extensions.Logging;
 using System.CommandLine;
 using System.Numerics;
 using System.Text;
+using Corsinvest.ProxmoxVE.Api.Extension.Utils;
+using Corsinvest.ProxmoxVE.Api.Shared.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace Corsinvest.ProxmoxVE.Api.Console.Helpers;
 
@@ -93,7 +93,6 @@ For more information visit https://www.corsinvest.it/cv4pve";
 
     private static T GetValue<T>(this Command command, Option<T> option)
         => command.Parse(Environment.GetCommandLineArgs()).GetValue(option);
-
 
     /// <summary>
     /// Id or name option

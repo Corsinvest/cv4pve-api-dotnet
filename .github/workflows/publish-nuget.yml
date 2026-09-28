@@ -25,8 +25,8 @@ jobs:
 
     - name: Validate version consistency
       run: |
-        # Extract version from Directory.Packages.props
-        PROPS_VERSION=$(grep -oPm1 '<Version>\K[^<]*' Directory.Packages.props)
+        # Extract version from Directory.Build.props
+        PROPS_VERSION=$(grep -oPm1 '<Version>\K[^<]*' Directory.Build.props)
         # Remove 'v' prefix from tag and compare
         TAG_VERSION=${GITHUB_REF#refs/tags/v}
 
@@ -34,7 +34,7 @@ jobs:
         echo "Tag version: $TAG_VERSION"
 
         if [ "$PROPS_VERSION" != "$TAG_VERSION" ]; then
-          echo "Error: Version in Directory.Packages.props ($PROPS_VERSION) does not match tag version ($TAG_VERSION)"
+          echo "Error: Version in Directory.Build.props ($PROPS_VERSION) does not match tag version ($TAG_VERSION)"
           exit 1
         fi
 

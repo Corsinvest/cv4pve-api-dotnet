@@ -1,4 +1,4 @@
-﻿/*
+/*
  * SPDX-FileCopyrightText: Copyright Corsinvest Srl
  * SPDX-License-Identifier: MIT
  */
@@ -34,5 +34,5 @@ public interface IClusterResourceStorage : IClusterResourceBase, IDisk, IStorage
     /// <summary>
     /// Is Available
     /// </summary>
-    public bool IsAvailable { get; set; }
+    bool IsAvailable { get; set; }
 }

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * SPDX-FileCopyrightText: Copyright Corsinvest Srl
  * SPDX-License-Identifier: MIT
  */
@@ -16,5 +16,5 @@ public interface INodeItem
     /// Node
     /// </summary>
     [JsonProperty("node")]
-    public string Node { get; set; }
+    string Node { get; set; }
 }

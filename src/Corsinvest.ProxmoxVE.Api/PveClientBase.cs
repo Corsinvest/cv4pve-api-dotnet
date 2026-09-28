@@ -1,11 +1,8 @@
-﻿/*
+/*
  * SPDX-FileCopyrightText: Copyright Corsinvest Srl
  * SPDX-License-Identifier: MIT
  */
 
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Newtonsoft.Json;
 using System.ComponentModel;
 using System.Dynamic;
 using System.Net;
@@ -13,6 +10,9 @@ using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Text;
 using System.Web;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Newtonsoft.Json;
 
 namespace Corsinvest.ProxmoxVE.Api;
 
@@ -153,7 +153,6 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
 
         return result.IsSuccessStatusCode;
     }
-
 
     /// <summary>
     /// Full OpenID login flow: starts a local HTTP listener, opens the browser,

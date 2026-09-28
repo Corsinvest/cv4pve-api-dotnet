@@ -27,5 +27,5 @@ public interface IClusterResourceNode : IClusterResourceHost
     /// <summary>
     /// Node Level
     /// </summary>
-    public NodeLevel NodeLevel { get; set; }
+    NodeLevel NodeLevel { get; set; }
 }
