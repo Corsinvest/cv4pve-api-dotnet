@@ -23,3 +23,8 @@ License: MIT
 
 [System.ComponentModel.Annotations](https://github.com/dotnet/runtime)
 License: MIT
+
+## Artwork
+
+The braces pictogram in `icon.svg` / `icon.png` comes from [Lucide](https://lucide.dev) (icon `braces`)
+License: ISC

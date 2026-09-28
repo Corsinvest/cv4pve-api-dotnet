@@ -10,7 +10,7 @@
         <Authors>Corsinvest Srl</Authors>
         <Copyright>Corsinvest Srl</Copyright>
         <PackageProjectUrl>https://github.com/Corsinvest/cv4pve-api-dotnet</PackageProjectUrl>
-        <PackageTags>ProxmoxVE;Api,Client;Rest;Corsinvest;</PackageTags>
+        <PackageTags>ProxmoxVE;Api;Client;Rest;Corsinvest</PackageTags>
         <PackageIcon>icon.png</PackageIcon>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -19,8 +19,13 @@
         <RepositoryUrl>https://github.com/Corsinvest/cv4pve-api-dotnet</RepositoryUrl>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <!-- Symbols and Source Link (built into the .NET SDK) -->
+        <DebugType>portable</DebugType>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <OutputType>Library</OutputType>
-        <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <!-- Include symbol files (*.pdb) in the built .nupkg -->
         <AllowedOutputExtensionsInPackageBuildOutputFolder>            
             $(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb
@@ -28,14 +33,15 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
+    <!-- Deterministic build with normalized paths, only in CI -->
+    <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
     <ItemGroup>
-        <None Include="..\..\LICENSE"
-              Pack="true"
-              PackagePath="" />
         <None Include="..\..\icon.png"
               Pack="true"
               PackagePath="" />
-        <none Include="..\..\README.md"
+        <None Include="..\..\README.md"
               Pack="true"
               PackagePath="" />
     </ItemGroup>
