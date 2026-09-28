@@ -1,4 +1,4 @@
-﻿/*
+/*
  * SPDX-FileCopyrightText: Copyright Corsinvest Srl
  * SPDX-License-Identifier: MIT
  */
@@ -51,7 +51,6 @@ public static class ClientExtension
     /// </summary>
     public static async Task<IEnumerable<IClusterResourceNode>> GetNodesAsync(this PveClient client)
         => await client.GetResourcesAsync(ClusterResourceType.Node);
-
 
     /// <summary>
     /// Get node info from id.

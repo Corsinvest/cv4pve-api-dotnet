@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: MIT
  */
 
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 
@@ -55,7 +55,7 @@ public class NodeRrdData : ModelBase, ICpu, INetIO, IMemory, IPressureInfo
     /// </summary>
     [JsonProperty("time")]
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatUnixTime)]
-    long Time { get; set; }
+    private long Time { get; set; }
 
     /// <summary>
     /// Time

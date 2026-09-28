@@ -1,10 +1,10 @@
-﻿/*
+/*
  * SPDX-FileCopyrightText: Copyright Corsinvest Srl
  * SPDX-License-Identifier: MIT
  */
 
-using Newtonsoft.Json;
 using System.Dynamic;
+using Newtonsoft.Json;
 
 namespace Corsinvest.ProxmoxVE.Api;
 
@@ -59,7 +59,7 @@ public static class ResultExtension
                 Converters = [new CustomBooleanJsonConverter()]
             });
 
-    class CustomBooleanJsonConverter : JsonConverter
+    private class CustomBooleanJsonConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType) => objectType == typeof(bool);
 

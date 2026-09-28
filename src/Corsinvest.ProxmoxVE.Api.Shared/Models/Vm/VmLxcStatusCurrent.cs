@@ -1,12 +1,12 @@
-﻿/*
+/*
  * SPDX-FileCopyrightText: Copyright Corsinvest Srl
  * SPDX-License-Identifier: MIT
  */
 
-using Corsinvest.ProxmoxVE.Api.Shared.Utils;
-using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using Corsinvest.ProxmoxVE.Api.Shared.Utils;
+using Newtonsoft.Json;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 

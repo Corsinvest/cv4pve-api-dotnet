@@ -1,11 +1,11 @@
-﻿/*
+/*
  * SPDX-FileCopyrightText: Copyright Corsinvest Srl
  * SPDX-License-Identifier: MIT
  */
 
-using Microsoft.Extensions.Logging;
 using System.CommandLine;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 
 namespace Corsinvest.ProxmoxVE.Api.Console.Helpers;
 

@@ -1,13 +1,13 @@
-﻿/*
+/*
  * SPDX-FileCopyrightText: Copyright Corsinvest Srl
  * SPDX-License-Identifier: MIT
  */
 
+using System.ComponentModel;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
-using System.ComponentModel;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension;
 
@@ -138,7 +138,6 @@ public static class ModelsExtensions
                                                            int? limit = null,
                                                            int? start = null)
         => (await item.ReadJobLog(limit, start)).ToLogs();
-
 
     /// <summary>
     /// Get backups in all storages

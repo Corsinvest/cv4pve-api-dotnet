@@ -436,7 +436,7 @@ public static partial class NetworkDiagramBuilder
                     if (bitsLeft >= 8) { ok = ipBytes[i] == netBytes[i]; }
                     else if (bitsLeft > 0)
                     {
-                        int mask = 0xFF << (8 - bitsLeft) & 0xFF;
+                        int mask = (0xFF << (8 - bitsLeft)) & 0xFF;
                         ok = (ipBytes[i] & mask) == (netBytes[i] & mask);
                     }
                 }

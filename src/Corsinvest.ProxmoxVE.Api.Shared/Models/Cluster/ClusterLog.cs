@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: MIT
  */
 
+using System.ComponentModel.DataAnnotations;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 

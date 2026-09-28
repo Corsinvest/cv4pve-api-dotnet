@@ -24,7 +24,7 @@ public class PveFormatProvider : IFormatProvider, ICustomFormatter
     public string Format(string format, object arg, IFormatProvider formatProvider)
     {
         // Check whether this is an appropriate callback
-        if (!this.Equals(formatProvider)) { return null; }
+        if (!Equals(formatProvider)) { return null; }
         //return FormatHelper.Format(format, arg);
 
         return format switch
