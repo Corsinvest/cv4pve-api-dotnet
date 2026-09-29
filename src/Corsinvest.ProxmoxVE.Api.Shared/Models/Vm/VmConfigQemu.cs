@@ -72,6 +72,81 @@ public class VmConfigQemu : VmConfig
                                   .Any(a => a == "1" || a == "enabled=1");
 
     /// <summary>
+    /// Display with SPICE: <c>vga</c> type <c>qxl</c>, <c>qxl2</c>, <c>qxl3</c>, <c>qxl4</c>, or a VirtIO-GPU
+    /// type (<c>virtio</c>, <c>virtio-gl</c>). qemu-server starts the SPICE server for those, and
+    /// <c>status/current</c> reports them as <c>spice</c>. The option is
+    /// <c>[[type=]&lt;type&gt;][,memory=...][,clipboard=vnc]</c>: the type is the bare first value or the
+    /// <c>type=</c> key.
+    /// </summary>
+    public bool IsSpiceDisplay
+        => GetPropertyValue(Vga, "type") is { } type
+            && (type is "qxl" or "qxl2" or "qxl3" or "qxl4" || type.StartsWith("virtio"));
+
+    /// <summary>
+    /// Audio device with the SPICE driver: <c>audio0</c> is set and its <c>driver</c> is <c>spice</c>, which is
+    /// also the PVE default when the driver is not written (<c>device=ich9-intel-hda</c> alone).
+    /// </summary>
+    public bool HasSpiceAudio
+        => !string.IsNullOrWhiteSpace(Audio0)
+            && (GetPropertyValue(Audio0, "driver") ?? "spice") == "spice";
+
+    /// <summary>
+    /// A USB port is redirected to SPICE: a <c>usbN</c> option whose <c>host</c> is <c>spice</c>. The web UI
+    /// writes it as the bare value (<c>usb0: spice,usb3=1</c>), <c>host=spice</c> is the same; PVE accepts it
+    /// in any case.
+    /// </summary>
+    public bool HasSpiceUsb
+        => ExtensionData?.Any(a => a.Key.StartsWith("usb")
+                                   && a.Key.Length > 3
+                                   && a.Key[3..].All(char.IsDigit)
+                                   && string.Equals(GetPropertyValue(a.Value + string.Empty, "host"),
+                                                    "spice",
+                                                    StringComparison.OrdinalIgnoreCase)) == true;
+
+    /// <summary>
+    /// Number of monitors the SPICE display offers: <c>qxl2</c>, <c>qxl3</c>, <c>qxl4</c> give 2, 3, 4;
+    /// <c>qxl</c> and the VirtIO-GPU types 1; 0 when the display is not SPICE.
+    /// </summary>
+    public int SpiceMonitors
+        => GetPropertyValue(Vga, "type") switch
+        {
+            "qxl2" => 2,
+            "qxl3" => 3,
+            "qxl4" => 4,
+            _ => IsSpiceDisplay ? 1 : 0
+        };
+
+    /// <summary>
+    /// Folder sharing over SPICE: <c>spice_enhancements</c> has <c>foldersharing</c> on
+    /// (PVE boolean: <c>1</c>, <c>on</c>, <c>yes</c> or <c>true</c>). The VM needs the SPICE WebDAV daemon.
+    /// </summary>
+    public bool HasSpiceFolderSharing
+        => (SpiceEnhancements ?? string.Empty).Split(',')
+                                              .Select(a => a.Trim().Split('=', 2))
+                                              .Any(a => a.Length == 2
+                                                        && a[0] == "foldersharing"
+                                                        && a[1].ToLowerInvariant() is "1" or "on" or "yes" or "true");
+
+    /// <summary>
+    /// Value of <paramref name="key"/> in a PVE property string (<c>a=1,b=2</c>); <paramref name="key"/> is the
+    /// format's default key, so a value written without a key is its value too.
+    /// </summary>
+    private static string GetPropertyValue(string propertyString, string key)
+    {
+        foreach (var part in (propertyString ?? string.Empty).Split(','))
+        {
+            var item = part.Trim();
+            if (item.Length == 0) { continue; }
+
+            var idx = item.IndexOf('=');
+            if (idx < 0) { return item; }
+            if (item[..idx] == key) { return item[(idx + 1)..]; }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Enable booting from specified disk. Deprecated: Use 'boot: order=foo;bar' instead.
     /// </summary>
     [JsonProperty("bootdisk")]

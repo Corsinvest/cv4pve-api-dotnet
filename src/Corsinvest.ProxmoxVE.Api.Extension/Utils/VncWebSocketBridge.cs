@@ -31,11 +31,20 @@ public sealed class VncWebSocketBridge : IAsyncDisposable
         LocalPort = ((IPEndPoint)_listener.LocalEndpoint).Port;
     }
 
-    /// <summary>Connects to the Proxmox VNC WebSocket and waits for remote-viewer to connect.</summary>
-    public void Start(string wsUrl, string host, string pveAuthCookie)
-        => _acceptLoop = AcceptLoopAsync(wsUrl, host, pveAuthCookie, _cts.Token);
+    /// <summary>
+    /// Connects to the Proxmox VNC WebSocket and waits for remote-viewer to connect.
+    /// The node's certificate is checked when <paramref name="validateCertificate"/> is true: pass
+    /// <c>PveClient.ValidateCertificate</c>, since the session cookie is sent on this connection too.
+    /// Default false, the same default as <c>PveClient</c>.
+    /// </summary>
+    public void Start(string wsUrl, string host, string pveAuthCookie, bool validateCertificate = false)
+        => _acceptLoop = AcceptLoopAsync(wsUrl, host, pveAuthCookie, validateCertificate, _cts.Token);
 
-    private async Task AcceptLoopAsync(string wsUrl, string host, string pveAuthCookie, CancellationToken ct)
+    private async Task AcceptLoopAsync(string wsUrl,
+                                       string host,
+                                       string pveAuthCookie,
+                                       bool validateCertificate,
+                                       CancellationToken ct)
     {
         try
         {
@@ -44,7 +53,7 @@ public sealed class VncWebSocketBridge : IAsyncDisposable
             var cookies = new CookieContainer();
             cookies.Add(new Cookie("PVEAuthCookie", pveAuthCookie, "/", host) { Secure = true });
             ws.Options.Cookies = cookies;
-            ws.Options.RemoteCertificateValidationCallback = (_, _, _, _) => true;
+            if (!validateCertificate) { ws.Options.RemoteCertificateValidationCallback = (_, _, _, _) => true; }
 
             await ws.ConnectAsync(new Uri(wsUrl), ct);
 
