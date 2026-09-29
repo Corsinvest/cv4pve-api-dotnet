@@ -8,7 +8,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
 using System.Web;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
@@ -18,14 +17,12 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils;
 /// <summary>
 /// Helper for launching SPICE and VNC remote-viewer sessions against Proxmox VE.
 /// </summary>
-public static partial class RemoteViewerHelper
+public static class RemoteViewerHelper
 {
-    [GeneratedRegex(@"^(http|https|)://.*$")]
-    private static partial Regex HttpRegex();
-
     /// <summary>
     /// Prepares a SPICE .vv file for the given VM/CT and returns its path.
-    /// If <paramref name="proxy"/> is null or whitespace, defaults to <c>client.Host</c>.
+    /// <paramref name="proxy"/> is the SPICE proxy the viewer connects to, on port 3128: an IP address or a
+    /// host name, without scheme or port (PVE rejects anything else). Null or whitespace: <c>client.Host</c>.
     /// </summary>
     public static async Task<(string? Error, string? FileName)>
         PrepareSpiceAsync(PveClient client,
@@ -46,7 +43,7 @@ public static partial class RemoteViewerHelper
 
         if (!success) { return (reasonPhrase, null); }
 
-        content = await ReplaceProxyInContentAsync(content, proxy, output);
+        if (output != null) { await output.WriteLineAsync($"SPICE proxy: {proxy}"); }
 
         var fileName = Path.GetTempFileName().Replace(".tmp", ".vv");
         await File.WriteAllTextAsync(fileName, content);
@@ -110,7 +107,7 @@ public static partial class RemoteViewerHelper
         var (success, reasonPhrase, content) = await client.Nodes[node].Spiceshell.GetSpiceFileVVAsync(proxy);
         if (!success) { return (reasonPhrase, null); }
 
-        content = await ReplaceProxyInContentAsync(content, proxy, output);
+        if (output != null) { await output.WriteLineAsync($"SPICE proxy: {proxy}"); }
 
         var fileName = Path.GetTempFileName().Replace(".tmp", ".vv");
         await File.WriteAllTextAsync(fileName, content);
@@ -150,7 +147,7 @@ public static partial class RemoteViewerHelper
                                       TextWriter? output = null)
     {
         var bridge = new VncWebSocketBridge();
-        bridge.Start(wsUrl, client.Host, client.PVEAuthCookie);
+        bridge.Start(wsUrl, client.Host, client.PVEAuthCookie, client.ValidateCertificate);
 
         var vvContent = $"""
             [virt-viewer]
@@ -168,31 +165,6 @@ public static partial class RemoteViewerHelper
         if (output != null) { await output.WriteLineAsync($"VNC local port: {bridge.LocalPort}"); }
 
         return (null, fileName, bridge);
-    }
-
-    private static async Task<string> ReplaceProxyInContentAsync(string content, string proxy, TextWriter? output)
-    {
-        if (HttpRegex().IsMatch(proxy))
-        {
-            var lines = content.Split("\n");
-            for (var i = 0; i < lines.Length; i++)
-            {
-                if (lines[i].StartsWith("proxy="))
-                {
-                    lines[i] = $"proxy={proxy}";
-                    break;
-                }
-            }
-            content = string.Join("\n", lines);
-
-            if (output != null)
-            {
-                await output.WriteLineAsync($"Replace Proxy: {proxy}");
-                await output.WriteLineAsync(content);
-            }
-        }
-
-        return content;
     }
 
     /// <summary>
