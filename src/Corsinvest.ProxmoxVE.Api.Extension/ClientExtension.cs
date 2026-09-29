@@ -134,86 +134,31 @@ public static class ClientExtension
     /// </param>
     public static async Task<IEnumerable<IClusterResourceVm>> GetVmsAsync(this PveClient client, string jolly)
     {
-        var vms = await GetVmsAsync(client);
         IEnumerable<Shared.Models.Pool.PoolItem> pools = null;
 
-        async Task<IEnumerable<IClusterResourceVm>> GetVmsFromIdAsync(string id)
+        async Task<IEnumerable<string>> GetPoolMemberIdsAsync(string name)
         {
-            var data = Enumerable.Empty<IClusterResourceVm>();
+            pools ??= await client.Pools.GetAsync();
 
-            if (id == "all" || id == "@all")
-            {
-                //all nodes
-                data = vms;
-            }
-            else if (id.StartsWith("all-") || id.StartsWith("@all-"))
-            {
-                //all in specific node
-                var idx = id.StartsWith("all-") ? 4 : 5;
-                var nodeName = id[idx..];
-                data = vms.Where(a => a.Node == nodeName || string.Equals(a.Node, nodeName, StringComparison.OrdinalIgnoreCase));
-            }
-            else if (id.StartsWith("@node-"))
-            {
-                //all in specific node
-                var nodeName = id[6..];
-                data = vms.Where(a => a.Node == nodeName || string.Equals(a.Node, nodeName, StringComparison.OrdinalIgnoreCase));
-            }
-            else if (id.StartsWith("@pool-"))
-            {
-                //all in specific pool and its nested pools
-                var name = id[6..];
-                pools ??= await client.Pools.GetAsync();
+            //nested pool ids are separated by '/', a child starts with the parent id followed by '/'
+            var poolNames = pools.Select(a => a.Id)
+                                 .Where(a => string.Equals(a, name, StringComparison.OrdinalIgnoreCase)
+                                                || a.StartsWith(name + "/", StringComparison.OrdinalIgnoreCase))
+                                 .ToList();
 
-                //nested pool ids are separated by '/', a child starts with the parent id followed by '/'
-                var poolNames = pools.Select(a => a.Id)
-                                     .Where(a => string.Equals(a, name, StringComparison.OrdinalIgnoreCase)
-                                                    || a.StartsWith(name + "/", StringComparison.OrdinalIgnoreCase))
-                                     .ToList();
-
-                var members = new List<IClusterResourceVm>();
-                foreach (var poolName in poolNames)
-                {
-                    //use 'GET /pools?poolid=' because 'GET /pools/{poolid}' does not support nested pools
-                    var pool = (await client.Pools.GetAsync(poolName)).FirstOrDefault();
-                    if (pool == null) { continue; }
-                    members.AddRange(pool.Members.Where(a => vms.Any(b => b.Id == a.Id)));
-                }
-
-                data = members.Distinct();
-            }
-            else if (id.StartsWith("@tag-"))
+            var memberIds = new HashSet<string>();
+            foreach (var poolName in poolNames)
             {
-                //all in specific tag
-                var tagName = id[5..];
-                data = vms.Where(a => (a.Tags + string.Empty).ToLower().Split(';').Contains(tagName.ToLower())
-                                        || (a.Tags + string.Empty).Split(';').Contains(tagName));
-            }
-            else
-            {
-                data = vms.Where(a => VmHelper.CheckIdOrName(a, id));
+                //use 'GET /pools?poolid=' because 'GET /pools/{poolid}' does not support nested pools
+                var pool = (await client.Pools.GetAsync(poolName)).FirstOrDefault();
+                if (pool == null) { continue; }
+                memberIds.UnionWith(pool.Members.Select(a => a.Id));
             }
 
-            return data;
+            return memberIds;
         }
 
-        var ret = new List<IClusterResourceVm>();
-
-        //add
-        foreach (var id in jolly.Split(',')) { ret.AddRange(await GetVmsFromIdAsync(id)); }
-
-        ret = [.. ret.Distinct()];
-
-        //exclude data
-        foreach (var id in jolly.Split(',').Where(a => a.StartsWith('-')).Select(a => a[1..]))
-        {
-            foreach (var item in await GetVmsFromIdAsync(id))
-            {
-                ret.Remove(item);
-            }
-        }
-
-        return [.. ret];
+        return await VmHelper.GetVmsFromJollyAsync(await GetVmsAsync(client), jolly, GetPoolMemberIdsAsync);
     }
 
     /// <summary>

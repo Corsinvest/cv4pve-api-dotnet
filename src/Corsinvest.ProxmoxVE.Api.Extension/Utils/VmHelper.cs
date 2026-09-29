@@ -81,6 +81,72 @@ public static class VmHelper
     #endregion
 
     /// <summary>
+    /// Select VM/CT from a jolly: comma separated items, applied to <paramref name="vms"/>.
+    /// <para>'@all' or 'all' all VM/CT; '@all-node', 'all-node' or '@node-node' all VM/CT on a node;
+    /// '@pool-name' all VM/CT in a pool and its nested pools; '@tag-name' all VM/CT with a tag;
+    /// id, name, range '100:110', '%text%' (contains), 'text%' (starts with), '%text' (ends with).</para>
+    /// <para>An item starting with '-' excludes the VM/CT it selects.</para>
+    /// </summary>
+    /// <param name="vms">All VM/CT of the cluster.</param>
+    /// <param name="jolly">Selection.</param>
+    /// <param name="getPoolMemberIdsAsync">Ids ('qemu/100', 'lxc/101') of the members of a pool and its nested pools.</param>
+    /// <returns>Items of <paramref name="vms"/>, each once.</returns>
+    public static async Task<IEnumerable<IClusterResourceVm>> GetVmsFromJollyAsync(IEnumerable<IClusterResourceVm> vms,
+                                                                                    string jolly,
+                                                                                    Func<string, Task<IEnumerable<string>>> getPoolMemberIdsAsync)
+    {
+        async Task<IEnumerable<IClusterResourceVm>> GetVmsFromIdAsync(string id)
+        {
+            if (id == "all" || id == "@all")
+            {
+                //all nodes
+                return vms;
+            }
+            else if (id.StartsWith("all-") || id.StartsWith("@all-") || id.StartsWith("@node-"))
+            {
+                //all in specific node
+                var nodeName = id[(id.IndexOf('-') + 1)..];
+                return vms.Where(a => string.Equals(a.Node, nodeName, StringComparison.OrdinalIgnoreCase));
+            }
+            else if (id.StartsWith("@pool-"))
+            {
+                //all in specific pool and its nested pools
+                //return the items of 'vms', not the pool members: Distinct and Remove compare by reference
+                var memberIds = (await getPoolMemberIdsAsync(id[6..])).ToHashSet();
+                return vms.Where(a => memberIds.Contains(a.Id));
+            }
+            else if (id.StartsWith("@tag-"))
+            {
+                //all in specific tag
+                var tagName = id[5..];
+                return vms.Where(a => (a.Tags + string.Empty).Split(';').Contains(tagName, StringComparer.OrdinalIgnoreCase));
+            }
+            else
+            {
+                return vms.Where(a => CheckIdOrName(a, id));
+            }
+        }
+
+        var ret = new List<IClusterResourceVm>();
+
+        //add: exclusions are applied below, here '-100:110' would be read as the range -100 to 110
+        foreach (var id in jolly.Split(',').Where(a => !a.StartsWith('-'))) { ret.AddRange(await GetVmsFromIdAsync(id)); }
+
+        ret = [.. ret.Distinct()];
+
+        //exclude data
+        foreach (var id in jolly.Split(',').Where(a => a.StartsWith('-')).Select(a => a[1..]))
+        {
+            foreach (var item in await GetVmsFromIdAsync(id))
+            {
+                ret.Remove(item);
+            }
+        }
+
+        return ret;
+    }
+
+    /// <summary>
     /// Vm check Id or Name
     /// </summary>
     public static bool CheckIdOrName(IClusterResourceVm data, string vmIdOrName)
@@ -107,8 +173,8 @@ public static class VmHelper
             if (vmIdOrName.Contains('%'))
             {
                 if (vmIdOrName.StartsWith('%') && vmIdOrName.EndsWith('%')) { return name.Contains(vmIdOrNameLower); }
-                else if (vmIdOrName.StartsWith('%')) { return name.StartsWith(vmIdOrNameLower); }
-                else if (vmIdOrName.EndsWith('%')) { return name.EndsWith(vmIdOrNameLower); }
+                else if (vmIdOrName.StartsWith('%')) { return name.EndsWith(vmIdOrNameLower); }
+                else if (vmIdOrName.EndsWith('%')) { return name.StartsWith(vmIdOrNameLower); }
                 else { return false; }
             }
             else
