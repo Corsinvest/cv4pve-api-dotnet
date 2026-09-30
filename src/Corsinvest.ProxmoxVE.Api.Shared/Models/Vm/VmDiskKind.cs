@@ -22,7 +22,7 @@ public enum VmDiskKind
     Cdrom,
 
     /// <summary>
-    /// Cloud-init drive — a CD-ROM whose filename matches <c>vm-{vmid}-cloudinit</c>.
+    /// Cloud-init drive: a CD-ROM whose filename matches <c>vm-{vmid}-cloudinit</c>.
     /// Auto-created by Proxmox when a cloud-init drive is attached.
     /// </summary>
     CloudInit,

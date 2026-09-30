@@ -184,7 +184,7 @@ public static partial class NetworkDiagramBuilder
 
         var copyY = y + h - 10;
         sb.AppendLine($"""
-            <text x="{x + 12}" y="{copyY}" font-size="10" font-style="italic" fill="{SvgColTextMuted}">© Corsinvest Srl —</text>
+            <text x="{x + 12}" y="{copyY}" font-size="10" font-style="italic" fill="{SvgColTextMuted}">© Corsinvest Srl ·</text>
             <a href="https://www.corsinvest.it" target="_blank">
               <text x="{x + 130}" y="{copyY}" font-size="10" font-style="italic" fill="{SvgColLink}" text-decoration="underline">www.corsinvest.it</text>
             </a>

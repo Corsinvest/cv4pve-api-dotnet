@@ -16,7 +16,7 @@ public static class ClusterResourceHealthExtensions
     extension(IClusterResourceHost resource)
     {
         /// <summary>
-        /// Health score 0–100 (higher = healthier) for a Node or running VM, computed from
+        /// Health score 0-100 (higher = healthier) for a Node or running VM, computed from
         /// CPU, memory and (Node only) disk usage. Returns <c>null</c> when not measurable
         /// (stopped VM, or a resource type that is neither Node nor VM).
         ///   Node         = 100 − (CPU·0.4 + RAM·0.4 + Disk·0.2)
@@ -49,7 +49,7 @@ public static class ClusterResourceHealthExtensions
     extension(IClusterResourceStorage resource)
     {
         /// <summary>
-        /// Health score 0–100 (higher = healthier) for a Storage resource, computed from
+        /// Health score 0-100 (higher = healthier) for a Storage resource, computed from
         /// disk usage (100 − Disk%). Returns <c>null</c> for non-storage resource types.
         /// </summary>
         public double? HealthScoreStorage
@@ -70,8 +70,8 @@ public static class ClusterResourceHealthExtensions
     extension(ClusterResource resource)
     {
         /// <summary>
-        /// Overall health score 0–100 (higher = healthier) dispatched by resource type.
-        /// Returns <c>null</c> when not measurable (stopped VM, or an unsupported type) —
+        /// Overall health score 0-100 (higher = healthier) dispatched by resource type.
+        /// Returns <c>null</c> when not measurable (stopped VM, or an unsupported type);
         /// callers should render this as "not available" rather than a low score.
         /// Same formula as cv4pve-admin so the number matches across tools.
         /// </summary>

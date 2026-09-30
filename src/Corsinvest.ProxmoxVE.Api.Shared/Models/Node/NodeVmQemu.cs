@@ -36,7 +36,7 @@ public class NodeVmQemu : NodeVmBase
     [JsonProperty("serial")]
     public bool Serial { get; set; }
 
-    /// <summary>PSI CPU pressure (full) — requires PVE 9.0+. Only on QEMU.</summary>
+    /// <summary>PSI CPU pressure (full). Requires PVE 9.0+. Only on QEMU.</summary>
     [JsonProperty("pressurecpufull")]
     public double PressureCpuFull { get; set; }
 }

@@ -105,13 +105,13 @@ public class NodeStatus : ModelBase
     public class NodeStatusBootInfo
     {
         /// <summary>
-        /// Mode — Boot mode: legacy BIOS or UEFI.
+        /// Mode: Boot mode (legacy BIOS or UEFI).
         /// </summary>
         [JsonProperty("mode")]
         public string Mode { get; set; }
 
         /// <summary>
-        /// Secureboot — Whether Secure Boot is enabled.
+        /// Secureboot: Whether Secure Boot is enabled.
         /// </summary>
         [JsonProperty("secureboot")]
         public bool Secureboot { get; set; }
@@ -123,25 +123,25 @@ public class NodeStatus : ModelBase
     public class NodeStatusCurrentKernel
     {
         /// <summary>
-        /// Machine — Hardware (machine) type.
+        /// Machine: Hardware (machine) type.
         /// </summary>
         [JsonProperty("machine")]
         public string Machine { get; set; }
 
         /// <summary>
-        /// Release — OS kernel release (e.g. "6.8.12-8-pve").
+        /// Release: OS kernel release (e.g. "6.8.12-8-pve").
         /// </summary>
         [JsonProperty("release")]
         public string Release { get; set; }
 
         /// <summary>
-        /// Sysname — OS kernel name (e.g. "Linux").
+        /// Sysname: OS kernel name (e.g. "Linux").
         /// </summary>
         [JsonProperty("sysname")]
         public string Sysname { get; set; }
 
         /// <summary>
-        /// Version — OS kernel version.
+        /// Version: OS kernel version.
         /// </summary>
         [JsonProperty("version")]
         public string Version { get; set; }
