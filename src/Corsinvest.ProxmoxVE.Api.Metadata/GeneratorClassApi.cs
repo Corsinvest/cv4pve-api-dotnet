@@ -58,6 +58,12 @@ public static class GeneratorClassApi
         return json.ToString();
     }
 
+    /// <summary>
+    /// Format of the flat cache written by <see cref="BuildFlatCache"/>. A cache of another version is not loaded
+    /// (<see cref="LoadFlatCache"/> returns null): build it again from the API schema.
+    /// </summary>
+    public const int FlatCacheFormatVersion = 2;
+
     private static readonly JsonSerializerOptions FlatWriteOpts = new()
     {
         WriteIndented = false,
@@ -77,14 +83,29 @@ public static class GeneratorClassApi
     {
         var dict = new Dictionary<string, FlatResourceInfo>();
         Traverse(root, dict);
-        return JsonSerializer.Serialize(dict, FlatWriteOpts);
+        return JsonSerializer.Serialize(new { formatVersion = FlatCacheFormatVersion, resources = dict }, FlatWriteOpts);
     }
 
     /// <summary>
     /// Load a flat cache from a JSON string previously built with BuildFlatCache.
     /// </summary>
+    /// <returns>The resources; null for a cache of another <see cref="FlatCacheFormatVersion"/>. A JSON object of
+    /// resources without version (written by hand, e.g. in tests) is read as it is.</returns>
     public static Dictionary<string, FlatResourceInfo>? LoadFlatCache(string json)
-        => JsonSerializer.Deserialize<Dictionary<string, FlatResourceInfo>>(json, FlatReadOpts);
+    {
+        using var document = JsonDocument.Parse(json);
+        var root = document.RootElement;
+        if (root.TryGetProperty("formatVersion", out var version))
+        {
+            return version.TryGetInt32(out var number)
+                   && number == FlatCacheFormatVersion
+                   && root.TryGetProperty("resources", out var resources)
+                    ? resources.Deserialize<Dictionary<string, FlatResourceInfo>>(FlatReadOpts)
+                    : null;
+        }
+
+        return root.Deserialize<Dictionary<string, FlatResourceInfo>>(FlatReadOpts);
+    }
 
     /// <summary>
     /// Rebuild a ClassApi tree from a flat cache dictionary.
@@ -120,18 +141,37 @@ public static class GeneratorClassApi
         return root;
     }
 
+    private static string NullIfEmpty(string value) => string.IsNullOrEmpty(value) ? null : value;
+
+    // A copy of every field: a field left out here is lost for every caller that reads the cache.
     private static FlatParamInfo ToFlatParam(ParameterApi p)
         => new(p.Name,
-               string.IsNullOrEmpty(p.Type) ? null : p.Type,
-               string.IsNullOrEmpty(p.TypeText) ? null : p.TypeText,
-               string.IsNullOrEmpty(p.Description) ? null : p.Description,
+               NullIfEmpty(p.Type),
+               NullIfEmpty(p.TypeText),
+               NullIfEmpty(p.Description),
                p.Optional ? true : null,
-               string.IsNullOrEmpty(p.Default) ? null : p.Default,
+               p.Default,
                p.Minimum,
                p.Maximum,
-               p.EnumValues.Length > 0
-                ? p.EnumValues
-                : string.Equals(p.Type, "boolean", StringComparison.OrdinalIgnoreCase) ? ["0", "1"] : null);
+               p.EnumValues.Length > 0 ? p.EnumValues : null,
+               NullIfEmpty(p.Renderer),
+               NullIfEmpty(p.VerboseDescription),
+               p.Formats.Count > 0 ? [.. p.Formats.Select(ToFlatFormat)] : null,
+               p.Items.Count > 0 ? [.. p.Items.Select(ToFlatParam)] : null);
+
+    private static FlatFormatInfo ToFlatFormat(ParameterFormatApi f)
+        => new(f.Name,
+               NullIfEmpty(f.Type),
+               NullIfEmpty(f.Description),
+               f.Optional ? true : null,
+               f.Minimum,
+               f.Maximum,
+               NullIfEmpty(f.DefaultKey),
+               NullIfEmpty(f.FormatDescription),
+               NullIfEmpty(f.Format),
+               NullIfEmpty(f.Alias),
+               f.MaxLength,
+               f.EnumValues.Length > 0 ? f.EnumValues : null);
 
     private static void Traverse(ClassApi node, Dictionary<string, FlatResourceInfo> dict)
     {
@@ -140,13 +180,15 @@ public static class GeneratorClassApi
             var methods = new Dictionary<string, FlatMethodInfo>();
             foreach (var method in node.Methods)
             {
-                var ps = method.Parameters.Where(p => !node.Keys.Contains(p.Name)).ToArray();
+                var ps = method.Parameters.ToArray();
                 var rps = method.ReturnParameters.ToArray();
-                methods[method.MethodType.ToLower()] = new(string.IsNullOrEmpty(method.Comment) ? null : method.Comment,
-                                                            string.IsNullOrEmpty(method.ReturnType) ? null : method.ReturnType,
-                                                            string.IsNullOrEmpty(method.ReturnLinkHRef) ? null : method.ReturnLinkHRef,
+                methods[method.MethodType.ToLower()] = new(NullIfEmpty(method.Comment),
+                                                            method.ReturnType,
+                                                            method.ReturnLinkHRef,
                                                             ps.Length > 0 ? [.. ps.Select(ToFlatParam)] : null,
-                                                            rps.Length > 0 ? [.. rps.Select(ToFlatParam)] : null);
+                                                            rps.Length > 0 ? [.. rps.Select(ToFlatParam)] : null,
+                                                            method.MethodName,
+                                                            method.ReturnLinkRel);
             }
 
             var children = node.SubClasses.Select(c => new FlatChildInfo(c.Name,

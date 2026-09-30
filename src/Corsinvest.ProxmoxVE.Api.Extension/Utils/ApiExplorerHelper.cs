@@ -3,12 +3,10 @@
  * SPDX-License-Identifier: MIT
  */
 
-using System.Collections;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Dynamic;
 using System.Text;
 using System.Text.RegularExpressions;
+using Corsinvest.ProxmoxVE.Api.Extension.Shell;
 using Corsinvest.ProxmoxVE.Api.Metadata;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using Newtonsoft.Json;
@@ -18,6 +16,7 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils;
 /// <summary>
 /// Api Explorer
 /// </summary>
+[Obsolete("Use the classes in Corsinvest.ProxmoxVE.Api.Extension.Shell: ApiRequest, ApiCommandLine, ApiSchema.")]
 public static partial class ApiExplorerHelper
 {
     /// <summary>
@@ -146,28 +145,13 @@ public static partial class ApiExplorerHelper
         /// To table
         /// </summary>
         public string ToTable(bool verbose, TableGenerator.Output output)
-        {
-            var columns = verbose
-                            ? ["name", "description", "command", "args", "sys"]
-                            : new[] { "name", "description", "sys" };
-
-            static string EncodeSystem(bool system) => system ? "X" : string.Empty;
-
-            var rows = Alias.OrderByDescending(a => a.System)
-                            .ThenBy(a => a.Name)
-                            .Select(a => verbose
-                                    ? [ a.Name,
-                                        a.Description,
-                                        a.Command,
-                                        string.Join(",", GetArgumentTags(a.Command)),
-                                        EncodeSystem(a.System) ]
-
-                                    : new[] { a.Name,
-                                              a.Description,
-                                              EncodeSystem(a.System) });
-
-            return TableGenerator.To(columns, rows, output);
-        }
+            => TableGenerator.From(Alias.OrderByDescending(a => a.System).ThenBy(a => a.Name))
+                             .Column(a => a.Name).Title("name")
+                             .Column(a => a.Description).Title("description")
+                             .Column(a => a.Command).Title("command").When(verbose)
+                             .Column(a => string.Join(",", ApiCommandLine.GetPlaceholders(a.Command))).Title("args").When(verbose)
+                             .Column(a => a.System ? "X" : string.Empty).Title("sys")
+                             .To(output);
 
         /// <summary>
         /// Create new alias
@@ -234,71 +218,43 @@ public static partial class ApiExplorerHelper
     /// <summary>
     /// Get argument into command start "{" end "}"
     /// </summary>
-    public static string[] GetArgumentTags(string command)
-        => [.. ArgumentTagRegex().Matches(command)
-                                      .OfType<Match>()
-                                      .Where(a => a.Success)
-                                      .Select(a => a.Groups[1].Value)];
+    [Obsolete("Use Corsinvest.ProxmoxVE.Api.Extension.Shell.ApiCommandLine.GetPlaceholders.")]
+    public static string[] GetArgumentTags(string command) => [.. ApiCommandLine.GetPlaceholders(command)];
 
     /// <summary>
     /// Get parameter names for a resource and method (excludes path keys).
     /// </summary>
     public static string[] GetMethodParameters(ClassApi classApiRoot, string resource, MethodType methodType)
-    {
-        var classApi = ClassApi.GetFromResource(classApiRoot, resource);
-        if (classApi == null) { return []; }
-        var humanized = methodType switch
-        {
-            MethodType.Get => "get",
-            MethodType.Set => "put",
-            MethodType.Create => "post",
-            MethodType.Delete => "delete",
-            _ => methodType.ToString().ToLower()
-        };
-        var method = classApi.Methods.FirstOrDefault(m =>
-            string.Equals(m.MethodType, humanized, StringComparison.OrdinalIgnoreCase));
-        if (method == null) { return []; }
-        return [.. method.Parameters
-                         .Where(p => !classApi.Keys.Contains(p.Name))
-                         .Select(p => p.Name)];
-    }
+        => [.. ApiSchema.GetMethod(classApiRoot, resource, methodType)?.Parameters.Select(p => p.Name) ?? []];
 
     /// <summary>
     /// Get enum values for a specific parameter of a resource/method. Returns empty if not an enum.
     /// </summary>
     public static string[] GetMethodParameterEnumValues(ClassApi classApiRoot, string resource, MethodType methodType, string paramName)
     {
-        var classApi = ClassApi.GetFromResource(classApiRoot, resource);
-        if (classApi == null) { return []; }
-        var humanized = methodType switch
-        {
-            MethodType.Get => "get",
-            MethodType.Set => "put",
-            MethodType.Create => "post",
-            MethodType.Delete => "delete",
-            _ => methodType.ToString().ToLower()
-        };
-        var method = classApi.Methods.FirstOrDefault(m =>
-            string.Equals(m.MethodType, humanized, StringComparison.OrdinalIgnoreCase));
-        if (method == null) { return []; }
-        var param = method.Parameters.FirstOrDefault(p =>
-            string.Equals(p.Name, paramName, StringComparison.OrdinalIgnoreCase));
-        if (param == null) { return []; }
-        if (param.EnumValues.Length > 0) { return param.EnumValues; }
-        if (string.Equals(param.Type, "boolean", StringComparison.OrdinalIgnoreCase)) { return ["0", "1"]; }
-        return [];
+        var parameter = ApiSchema.GetMethod(classApiRoot, resource, methodType)?
+                                 .Parameters
+                                 .FirstOrDefault(p => string.Equals(p.Name, paramName, StringComparison.OrdinalIgnoreCase));
+        return parameter == null ? [] : [.. ApiSchema.GetAllowedValues(parameter)];
     }
 
     /// <summary>
     /// Create parameter resource split ':'
     /// </summary>
+    /// <exception cref="ArgumentException">A parameter is given more than once.</exception>
     public static IDictionary<string, object> CreateParameterResource(IEnumerable<string> items)
     {
         var parameters = new Dictionary<string, object>();
         foreach (var item in items)
         {
             var pos = item.IndexOf(':');
-            if (pos >= 0) { parameters.Add(item[..pos], item[(pos + 1)..]); }
+            if (pos < 0) { continue; }
+
+            var key = item[..pos];
+            if (!parameters.TryAdd(key, item[(pos + 1)..]))
+            {
+                throw new ArgumentException($"Parameter '{key}' is given more than once.");
+            }
         }
         return parameters;
     }
@@ -306,6 +262,16 @@ public static partial class ApiExplorerHelper
     /// <summary>
     /// Execute methods
     /// </summary>
+    /// <param name="client">Client.</param>
+    /// <param name="classApiRoot">API schema.</param>
+    /// <param name="resource">API path.</param>
+    /// <param name="methodType">Method.</param>
+    /// <param name="parameters">Parameters of the call.</param>
+    /// <param name="wait">Wait for the task started by the call to finish.</param>
+    /// <param name="output">Output format.</param>
+    /// <param name="verbose">Return the full JSON answer.</param>
+    /// <param name="waitTimeout">Milliseconds to wait with <paramref name="wait"/>; 0 or less waits until the task ends.</param>
+    [Obsolete("Use Corsinvest.ProxmoxVE.Api.Extension.Shell.ApiRequest.ExecuteAsync, which returns the answer as data.")]
     public static async Task<(int ResultCode, string ResultText)> ExecuteAsync(PveClient client,
                                                                                ClassApi classApiRoot,
                                                                                string resource,
@@ -313,218 +279,48 @@ public static partial class ApiExplorerHelper
                                                                                IDictionary<string, object> parameters,
                                                                                bool wait = false,
                                                                                TableGenerator.Output output = TableGenerator.Output.Text,
-                                                                               bool verbose = false)
+                                                                               bool verbose = false,
+                                                                               long waitTimeout = 30000)
     {
-        //create result
-        var result = methodType switch
-        {
-            MethodType.Get => await client.GetAsync(resource, parameters),
-            MethodType.Set => await client.SetAsync(resource, parameters),
-            MethodType.Create => await client.CreateAsync(resource, parameters),
-            MethodType.Delete => await client.DeleteAsync(resource, parameters),
-            _ => throw new InvalidEnumArgumentException(),
-        };
+        var response = await ApiRequest.ExecuteAsync(client,
+                                                     new ApiCommand(methodType, resource, new Dictionary<string, object>(parameters ?? new Dictionary<string, object>())),
+                                                     wait
+                                                        ? new ApiWaitOptions(waitTimeout > 0 ? TimeSpan.FromMilliseconds(waitTimeout) : null)
+                                                        : null);
 
         var ret = new StringBuilder();
-        if (!result.IsSuccessStatusCode)
+        if (response.StatusCode is < 200 or > 299)
         {
-            ret.AppendLine(result.ReasonPhrase);
+            ret.AppendLine(response.Error);
             ret.AppendLine(verbose
-                                ? JsonConvert.SerializeObject((string)result.Response.errors, Formatting.Indented)
-                                : result.GetError());
+                            ? JsonConvert.SerializeObject(response.Raw, Formatting.Indented)
+                            : string.Join(Environment.NewLine, response.ParameterErrors.Select(a => $"{a.Key} : {a.Value}")));
         }
-        else if (result.InError())
+        else if (!response.IsSuccess)
         {
-            ret.AppendLine(result.ReasonPhrase);
+            // 200 with "errors": reported as text with status 200, as before.
+            ret.AppendLine(response.Error);
+        }
+        else if (verbose)
+        {
+            ret.AppendLine(JsonConvert.SerializeObject(response.Raw, Formatting.Indented));
         }
         else
         {
-            if (verbose)
+            var classApi = ClassApi.GetFromResource(classApiRoot, resource);
+            if (classApi == null)
             {
-                //verbose full response json
-                ret.AppendLine(JsonConvert.SerializeObject(result.Response, Formatting.Indented));
+                ret.AppendLine($"no such resource '{resource}'");
             }
-            else
+            else if (response.Data != null)
             {
-                var data = result.ToData();
-                var classApi = ClassApi.GetFromResource(classApiRoot, resource);
-                if (classApi == null)
-                {
-                    ret.AppendLine($"no such resource '{resource}'");
-                }
-                else if (data != null)
-                {
-                    var returnParameters = classApi.Methods.FirstOrDefault(a => a.IsGet)?.ReturnParameters;
-                    if (returnParameters == null || returnParameters.Count == 0)
-                    {
-                        //no return defined
-                        ret.Append(CreateTableDynamic(data, null, output, null));
-                    }
-                    else
-                    {
-                        var keys = returnParameters.OrderBy(a => a.Optional)
-                                                   .ThenBy(a => a.Name)
-                                                   .Select(a => a.Name)
-                                                   .ToArray();
-
-                        ret.Append(CreateTableDynamic(data, keys, output, returnParameters));
-                    }
-                }
-            }
-
-            if (wait)
-            {
-                await client.WaitForTaskToFinishAsync(result, 1000, 30000);
+                var json = output is TableGenerator.Output.Json or TableGenerator.Output.JsonPretty;
+                var table = ApiSchema.ToTable(response.Data, classApiRoot, resource, new ApiTableOptions(AllColumns: json, HumanReadable: !json));
+                ret.Append(table == null ? response.Data + string.Empty : table.To(output));
             }
         }
 
-        return ((int)result.StatusCode, ret.ToString());
-    }
-
-    /// <summary>
-    /// Create table
-    /// </summary>
-    private static string CreateTableDynamic(dynamic data, string[] keys, TableGenerator.Output output, List<ParameterApi> returnParameters)
-    {
-        var columns = new List<string>();
-        var rows = new List<object[]>();
-        var print = false;
-
-        if (data is ExpandoObject expandoObject)
-        {
-            var dic = (IDictionary<string, object>)expandoObject;
-
-            columns.Add("key");
-            columns.Add("value");
-
-            keys ??= [.. dic.Select(a => a.Key)];
-            print = true;
-
-            foreach (var key in keys.Order())
-            {
-                if (dic.TryGetValue(key, out var value))
-                {
-                    rows.Add([key, GetValue(value, key, returnParameters)]);
-                }
-            }
-        }
-        else if (data is IList list)
-        {
-            // Check if the list contains plain strings (e.g. /nodes/{node}/journal returns string[])
-            var firstItem = list.Count > 0
-                                ? list[0]
-                                : null;
-            if (firstItem is string)
-            {
-                columns.Add("value");
-                foreach (string item in list) { rows.Add([item]); }
-                print = true;
-            }
-            else
-            {
-                if (keys == null)
-                {
-                    var keysTmp = new List<string>();
-                    foreach (IDictionary<string, object> item in data) { keysTmp.AddRange([.. item.Keys]); }
-                    keys = [.. keysTmp.Distinct().Order()];
-                }
-
-                columns.AddRange(keys);
-                var rowsTmp = new List<KeyValuePair<object, object[]>>();
-
-                //array data
-                foreach (IDictionary<string, object> item in list)
-                {
-                    //create rows
-                    var row = new List<object>();
-                    foreach (var title in columns)
-                    {
-                        if (item.TryGetValue(title, out var value))
-                        {
-                            value = GetValue(value, title, returnParameters);
-                        }
-
-                        value ??= string.Empty;
-                        row.Add(value);
-                    }
-
-                    rowsTmp.Add(new KeyValuePair<object, object[]>(row[0] + string.Empty, [.. row]));
-                }
-
-                //order row by first column
-                rows.AddRange([.. rowsTmp.OrderBy(a => a.Key).Select(a => a.Value)]);
-                if (rows.Count == 0) { data = string.Empty; }
-            }
-        }
-
-        if (rows.Count > 0)
-        {
-            return TableGenerator.To(columns, rows, output);
-        }
-        else if (print)
-        {
-            return string.Empty;
-        }
-        else
-        {
-            return data + string.Empty;
-        }
-    }
-
-    private static object GetValue(object value, string key, List<ParameterApi> returnParameters)
-    {
-        if (returnParameters == null)
-        {
-            return (value is ExpandoObject || value is IList)
-                        ? JsonConvert.SerializeObject(value)
-                        : value;
-        }
-        else
-        {
-            var param = returnParameters.FirstOrDefault(a => a.Name == key);
-            return param != null
-                        ? param.RendererValue(value)
-                        : (value is ExpandoObject || value is IList)
-                            ? JsonConvert.SerializeObject(value)
-                            : value;
-        }
-    }
-
-    private static void CreateTable(IEnumerable<ParameterApi> parameters, StringBuilder resultText, TableGenerator.Output output)
-    {
-        if (parameters.Any())
-        {
-            var values = new List<object[]>();
-            foreach (var param in parameters)
-            {
-                var partsComment = JoinWord(param.Description
-                                                 .Replace("\n", " ")
-                                                 .Trim()
-                                                 .Split([" "], StringSplitOptions.None), 45, " ");
-
-                //type
-                var partsType = new[] { param.Type };
-                if (!string.IsNullOrWhiteSpace(param.TypeText))
-                {
-                    //explicit text
-                    partsType = JoinWord(param.TypeText.Split(' '), 18, string.Empty);
-                }
-                else if (param.EnumValues.Length != 0)
-                {
-                    //enums
-                    partsType = JoinWord(param.EnumValues, 18, ",");
-                }
-
-                for (var i = 0; i < Math.Max(partsType.Length, partsComment.Length); i++)
-                {
-                    values.Add([ i == 0  ? param.Name : string.Empty,
-                                 i < partsType.Length ? partsType[i] : string.Empty,
-                                 i < partsComment.Length ? partsComment[i] : string.Empty ]);
-                }
-            }
-
-            resultText.Append(TableGenerator.To(["param", "type", "description"], values, output));
-        }
+        return (response.StatusCode, ret.ToString());
     }
 
     /// <summary>
@@ -538,77 +334,28 @@ public static partial class ApiExplorerHelper
                                bool verbose = false,
                                bool optionStyle = false)
     {
-        var ret = new StringBuilder();
-        var classApi = ClassApi.GetFromResource(classApiRoot, resource);
-        if (classApi == null)
-        {
-            ret.AppendLine($"no such resource '{resource}'");
-        }
-        else
-        {
-            foreach (var method in classApi.Methods.OrderBy(a => a.MethodType))
-            {
-                //exclude other command
-                if (!string.IsNullOrWhiteSpace(command)
-                    && !string.Equals(method.GetMethodTypeHumanized(), command, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
+        var methods = ApiSchema.GetMethods(classApiRoot, resource);
+        if (methods == null) { return $"no such resource '{resource}'{Environment.NewLine}"; }
 
-                ret.Append($"USAGE: {method.GetMethodTypeHumanized()} {resource}");
-
-                //only parameters no keys
-                var parameters = method.Parameters.Where(a => !classApi.Keys.Contains(a.Name));
-
-                var opts = string.Concat(parameters.Where(a => !a.Optional)
-                                                   .Select(a => optionStyle
-                                                                ? $" --{a.Name} <{a.Type}>"
-                                                                : $" {a.Name}:<{a.Type}>"));
-                if (!string.IsNullOrWhiteSpace(opts)) { ret.Append(opts); }
-
-                //optional parameter
-                if (parameters.Any(a => a.Optional)) { ret.Append(" [OPTIONS]"); }
-
-                ret.AppendLine();
-
-                if (verbose)
-                {
-                    ret.AppendLine().AppendLine("  " + method.Comment);
-                    CreateTable(parameters, ret, output);
-                }
-
-                if (returnsType)
-                {
-                    //show returns
-                    ret.AppendLine("RETURNS:");
-                    CreateTable(method.ReturnParameters, ret, output);
-                }
-
-                if (verbose) { ret.AppendLine(); }
-            }
-        }
-
-        return ret.ToString();
+        // Same order as before: by HTTP method name (DELETE, GET, POST, PUT).
+        return ApiSchemaText.Usage(resource,
+                                   methods.Where(a => string.IsNullOrWhiteSpace(command)
+                                                      || string.Equals(a.Method.ToString(), command, StringComparison.OrdinalIgnoreCase))
+                                          .OrderBy(a => HttpMethodName(a.Method), StringComparer.Ordinal),
+                                   verbose,
+                                   returnsType,
+                                   output,
+                                   optionStyle);
     }
 
-    private static string[] JoinWord(string[] words, int numChar, string separator)
-    {
-        var ret = new List<string>();
-        var line = new StringBuilder();
-        foreach (var item in words)
+    private static string HttpMethodName(MethodType method)
+        => method switch
         {
-            if (!string.IsNullOrWhiteSpace(line.ToString())) { line.Append(separator); }
-            line.Append(item);
-            if (line.Length >= numChar)
-            {
-                ret.Add(line.ToString().Trim());
-                line.Clear();
-            }
-        }
-
-        if (!string.IsNullOrWhiteSpace(line.ToString())) { ret.Add(line.ToString().Trim()); }
-        return [.. ret];
-    }
+            MethodType.Get => "GET",
+            MethodType.Set => "PUT",
+            MethodType.Create => "POST",
+            _ => "DELETE",
+        };
 
     /// <summary>
     /// List values resource
@@ -617,79 +364,14 @@ public static partial class ApiExplorerHelper
                                                                                                                    ClassApi classApiRoot,
                                                                                                                    string resource)
     {
-        var values = new List<(string Attribute, string Value)>();
-        var error = string.Empty;
-
-        var classApi = ClassApi.GetFromResource(classApiRoot, resource);
-        if (classApi == null)
-        {
-            error = $"no such resource '{resource}'";
-        }
-        else
-        {
-            if (classApi.SubClasses.Count == 0)
-            {
-                error = $"resource '{resource}' does not define child links";
-            }
-            else
-            {
-                string key = null;
-                foreach (var subClass in classApi.SubClasses.OrderBy(a => a.Name))
-                {
-                    var attribute = string.Concat([ subClass.SubClasses.Count > 0 ? "D" : "-",
-                                                    "r--",
-                                                     subClass.Methods.Any(a => a.IsPost) ? "c" : "-"]);
-
-                    if (subClass.IsIndexed)
-                    {
-                        var result = await client.GetAsync(resource);
-                        if (result.InError())
-                        {
-                            error = result.GetError();
-                        }
-                        else
-                        {
-                            if (key == null)
-                            {
-                                var returnLinkHRef = classApi.Methods.FirstOrDefault(a => a.IsGet).ReturnLinkHRef;
-                                if (!string.IsNullOrWhiteSpace(returnLinkHRef))
-                                {
-                                    key = returnLinkHRef.Replace("{", string.Empty).Replace("}", string.Empty);
-                                }
-                            }
-
-                            if (result.ToData() != null && !string.IsNullOrWhiteSpace(key))
-                            {
-                                var data = new List<object>();
-                                foreach (IDictionary<string, object> item in result.ToData()) { data.Add(item[key]); }
-                                foreach (var item in data.Order()) { values.Add((attribute, item + string.Empty)); }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        values.Add((attribute, subClass.Name));
-                    }
-                }
-            }
-        }
-
-        return (values, error);
+        var result = await ApiSchema.GetChildrenAsync(client, classApiRoot, resource);
+        return ([.. result.Children.Select(a => (string.Concat(a.HasChildren ? "D" : "-", "r--", a.AcceptsCreate ? "c" : "-"), a.Name))],
+                result.Error ?? string.Empty);
     }
 
     /// <summary>
     /// List structure
     /// </summary>
     public static async Task<string> ListAsync(PveClient client, ClassApi classApiRoot, string resource)
-    {
-        var (values, error) = await ListValuesAsync(client, classApiRoot, resource);
-        return string.Join(Environment.NewLine, values.Select(a => $"{a.Attribute}        {a.Value}")) +
-               (string.IsNullOrWhiteSpace(error)
-                    ? string.Empty
-                    : Environment.NewLine + error) +
-               Environment.NewLine;
-    }
-
-    [GeneratedRegex(@"{\s*(.+?)\s*}")]
-    private static partial Regex ArgumentTagRegex();
+        => ApiSchemaText.List(await ApiSchema.GetChildrenAsync(client, classApiRoot, resource));
 }

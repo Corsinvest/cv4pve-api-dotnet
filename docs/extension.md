@@ -6,7 +6,7 @@ dotnet add package Corsinvest.ProxmoxVE.Api.Extension
 
 ## Key Features
 
-- **ApiExplorer** - Explore and discover API endpoints
+- **Shell** - Run API calls, expand aliases and read the API schema as data
 - **Strongly-Typed Results** - Extension method **Get()** to decode JSON from Result
 - **VM/CT Discovery** - Retrieve VM/CT data from name or ID  
 - **Simplified Management** - Simplified VM/CT and snapshot operations
@@ -158,20 +158,94 @@ foreach (var storage in storages)
 
 ---
 
-## ApiExplorer
+## Shell: API calls from a command line or a chat
 
-Discover available API endpoints and their structure:
+`Corsinvest.ProxmoxVE.Api.Extension.Shell` runs API calls and expands aliases, returning data. It is used by
+cv4pve-cli and the bots; formatting and storing aliases are up to the caller.
 
 ```csharp
-// Note: ApiExplorer functionality allows you to explore the API structure
-// This is useful for development and debugging purposes
+using Corsinvest.ProxmoxVE.Api.Extension.Shell;
 
-// Example: Explore available methods on a VM
-var vm = client.Nodes["pve1"].Qemu[100];
+// --key value parameters, as typed on a command line
+var (parameters, _) = ApiCommandLine.ParseParameters(["--type", "vm"]);
+var command = new ApiCommand(MethodType.Get, "/cluster/resources",
+                             parameters.ToDictionary(a => a.Key, a => (object)a.Value));
 
-// The extension provides better IntelliSense and discoverability
-// of available methods and their return types
+var response = await ApiRequest.ExecuteAsync(client, command);
+if (!response.IsSuccess)
+{
+    Console.Error.WriteLine($"{response.StatusCode} {response.Error}");
+    foreach (var (name, error) in response.ParameterErrors) { Console.Error.WriteLine($"{name}: {error}"); }
+}
+
+// An alias: placeholders filled by position, --guest looked up in the cluster, --yes for confirmation
+var alias = new ApiAlias("do start vm", "Start a VM", "create /nodes/{node}/qemu/{vmid}/status/start");
+var expanded = await ApiCommandLine.ExpandAliasAsync(alias, ["--guest", "web01"], client);
+if (expanded.Command != null)
+{
+    var started = await ApiRequest.ExecuteAsync(client, expanded.Command, new ApiWaitOptions(TimeSpan.FromMinutes(5)));
+    Console.WriteLine(started.Task?.Succeeded == true ? "started" : started.Task?.ExitStatus);
+}
 ```
+
+`ApiSchema` reads the API schema as data: the methods of a path with their parameters and returned fields,
+the values a parameter accepts, and what is under a path (fixed names, or values read from the cluster).
+
+```csharp
+var root = await GeneratorClassApi.GenerateAsync("pve01.example.com"); // schema read from a node
+
+foreach (var method in ApiSchema.GetMethods(root, "/nodes/pve01/qemu/100/config") ?? [])
+{
+    Console.WriteLine($"{method.Method}: {method.Description}");
+    foreach (var parameter in method.Parameters)
+    {
+        Console.WriteLine($"  --{parameter.Name} {string.Join(",", ApiSchema.GetAllowedValues(parameter))}");
+    }
+}
+
+var children = await ApiSchema.GetChildrenAsync(client, root, "/nodes");
+foreach (var child in children.Children) { Console.WriteLine(child.Name); }
+if (children.Error != null) { Console.Error.WriteLine(children.Error); }
+```
+
+`ApiExplorerHelper` is obsolete: it returns text and is kept only for existing callers. It now runs on these
+classes; use them instead.
+
+---
+
+## Tables: TableGenerator
+
+`Corsinvest.ProxmoxVE.Api.Shared.Utils.TableGenerator` writes a list as Text, Markdown, Html or Json
+(`TableGenerator.Output`, the values of the `-o` option of the cv4pve tools). Numbers are aligned right.
+
+```csharp
+// typed items: title from the member name unless .Title() says otherwise
+Console.Write(TableGenerator.From(snapshots)
+                            .Column(a => a.Node).Title("NODE")
+                            .Column(a => a.VmId).Title("VM")
+                            .Column(a => a.Running ? "X" : "").Title("RUNNING")
+                            .To(TableGenerator.Output.Text));
+
+// API answers: columns read by key, a missing key is an empty cell
+IEnumerable<dynamic> tasks = (await client.Cluster.Tasks.Tasks()).ToEnumerable();
+Console.Write(TableGenerator.From(tasks)
+                            .Column("upid")
+                            .Column("status").Format(v => v ?? "running")
+                            .ToMarkdown());
+
+// rows by hand
+Console.Write(new TableGenerator("key", "value").AddRow("memory", 4096).ToText());
+```
+
+`ApiSchema.ToTable(response.Data, root, resource)` turns the data of an API answer into a `TableGenerator`, as
+pvesh shows it: an object with every key, a list with the columns the schema describes (values rendered as the schema
+says), or null for a single value. `ApiTableOptions` chooses what to show:
+`ToTable(data, root, resource, new ApiTableOptions(AllColumns: true), out var hidden)` shows every column of a list
+(without it, `hidden` names the columns left out); `HumanReadable: false` keeps the values as the API returns them
+instead of sizes, percentages, durations and dates as text (use it for Json).
+
+The static `TableGenerator.To(columns, rows, output)` and `ToText/ToMarkdown/ToHtml/ToJson(columns, rows)` of previous
+versions are removed: use `new TableGenerator(columns).AddRows(rows).To(output)`.
 
 ---
 

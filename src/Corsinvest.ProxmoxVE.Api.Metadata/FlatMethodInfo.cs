@@ -12,4 +12,6 @@ public record FlatMethodInfo(string? Comment,
                              string? ReturnType,
                              string? ReturnLinkHRef,
                              FlatParamInfo[]? Params,
-                             FlatParamInfo[]? ReturnParams);
+                             FlatParamInfo[]? ReturnParams,
+                             string? Name = null,
+                             string? ReturnLinkRel = null);

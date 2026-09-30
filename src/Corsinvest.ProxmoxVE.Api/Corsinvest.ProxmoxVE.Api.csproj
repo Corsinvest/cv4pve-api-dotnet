@@ -8,4 +8,7 @@ SPDX-License-Identifier: MIT
 		<AssemblyTitle>Corsinvest for Proxmox VE Api Client</AssemblyTitle>
 		<Description>Corsinvest for Proxmox VE Api Client</Description>
 	</PropertyGroup>
+	<ItemGroup>
+		<InternalsVisibleTo Include="Corsinvest.ProxmoxVE.Api.Extension.Tests" />
+	</ItemGroup>
 </Project>

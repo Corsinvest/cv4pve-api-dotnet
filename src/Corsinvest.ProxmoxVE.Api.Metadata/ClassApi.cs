@@ -23,13 +23,15 @@ public partial class ClassApi
     /// </summary>
     internal ClassApi(string resource, string name, bool isIndexed, ClassApi parent)
     {
+        // Same values as the constructor from the API schema.
         Resource = resource;
-        Name = name;
+        Name = name.Replace("-", "_");
+        IndexName = Name.Replace("{", string.Empty).Replace("}", string.Empty);
         IsIndexed = isIndexed;
         Parent = parent;
         parent.SubClasses.Add(this);
         Keys.AddRange(parent.Keys);
-        if (isIndexed) { Keys.Add(name.Replace("{", string.Empty).Replace("}", string.Empty)); }
+        if (isIndexed) { Keys.Add(IndexName); }
     }
 
     /// <summary>
