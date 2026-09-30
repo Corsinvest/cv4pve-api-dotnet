@@ -59,13 +59,69 @@ public class MethodApi
             }
         }
 
-        if (token["parameters"]?["properties"] != null)
-        {
-            Parameters.AddRange([.. token["parameters"]["properties"].Select(a => new ParameterApi(a.Parent[((JProperty)a).Name]))]);
-        }
+        var parameters = MergeProperties(token["parameters"]);
+        Parameters.AddRange([.. parameters.Properties().Select(a => new ParameterApi(a.Value))]);
 
         ReturnIsArray = ReturnType == "array";
         ReturnIsNull = ReturnType == "null";
+    }
+
+    /// <summary>
+    /// Parameters of a schema as one object, name to definition: its 'properties', also inside 'allOf'
+    /// (all parts apply) and 'oneOf' (one variant applies, chosen by 'type-property'), as in
+    /// POST /cluster/ha/rules. A parameter required in only some 'oneOf' variants becomes optional; the
+    /// 'type-property' that chooses the variant is added, required, with its allowed values.
+    /// </summary>
+    /// <param name="schema">'parameters' of a method, or a part of it.</param>
+    private static JObject MergeProperties(JToken schema)
+    {
+        var ret = new JObject();
+        if (schema == null || schema.Type != JTokenType.Object) { return ret; }
+
+        void Add(string name, JToken definition)
+        {
+            if (ret[name] == null) { ret[name] = definition.DeepClone(); }
+        }
+
+        if (schema["properties"] is JObject properties)
+        {
+            foreach (var item in properties.Properties()) { Add(item.Name, item.Value); }
+        }
+
+        if (schema["allOf"] is JArray allOf)
+        {
+            foreach (var part in allOf)
+            {
+                foreach (var item in MergeProperties(part).Properties()) { Add(item.Name, item.Value); }
+            }
+        }
+
+        if (schema["oneOf"] is JArray oneOf)
+        {
+            var variants = oneOf.Select(MergeProperties).ToList();
+
+            //the parameter that chooses the variant
+            var typeProperty = schema["type-property"]?.ToString();
+            if (!string.IsNullOrEmpty(typeProperty) && schema["type-property-schema"] is JObject typeSchema)
+            {
+                var definition = (JObject)typeSchema.DeepClone();
+                definition["optional"] = 0;
+                Add(typeProperty, definition);
+            }
+
+            foreach (var name in variants.SelectMany(a => a.Properties().Select(b => b.Name)).Distinct())
+            {
+                var definition = (JObject)variants.First(a => a[name] != null)[name].DeepClone();
+
+                //required only if required in every variant
+                var requiredEverywhere = variants.All(a => a[name] != null && (a[name]["optional"] ?? 0).ToString() != "1");
+                if (!requiredEverywhere) { definition["optional"] = 1; }
+
+                Add(name, definition);
+            }
+        }
+
+        return ret;
     }
 
     /// <summary>
