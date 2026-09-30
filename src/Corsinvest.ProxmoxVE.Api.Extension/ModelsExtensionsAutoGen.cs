@@ -835,7 +835,7 @@ public static class ModelsExtensionsAutoGen
     /// Get information needed to join this cluster over the connected node.
     /// </summary>
     /// <param name="item"></param>
-    /// <param name="node">The node for which the joinee gets the nodeinfo. </param>
+    /// <param name="node">The node for which the joinee gets the nodeinfo.</param>
     /// <returns></returns>
     public static async Task<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterConfigJoin> GetAsync(this Corsinvest.ProxmoxVE.Api.PveClient.PveCluster.PveConfig.PveJoin item, string node = null)
         => (await item.JoinInfo(node)).ToModel<Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterConfigJoin>();
