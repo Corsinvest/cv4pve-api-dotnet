@@ -243,7 +243,7 @@ public class PveClient : PveClientBase
             /// <summary>
             /// Create a new replication job
             /// </summary>
-            /// <param name="id">Replication Job ID. The ID is composed of a Guest ID and a job number, separated by a hyphen, i.e. '&amp;lt;GUEST&amp;gt;-&amp;lt;JOBNUM&amp;gt;'.</param>
+            /// <param name="id">Replication Job ID. The ID is composed of a Guest ID and a job number, separated by a hyphen, i.e. '&lt;GUEST&gt;-&lt;JOBNUM&gt;'.</param>
             /// <param name="target">Target node.</param>
             /// <param name="type">Section type.
             ///   Enum: local</param>
@@ -325,7 +325,7 @@ public class PveClient : PveClientBase
                     /// <param name="server">server dns name or IP address</param>
                     /// <param name="type">Plugin type.
                     ///   Enum: graphite,influxdb,opentelemetry</param>
-                    /// <param name="api_path_prefix">An API path prefix inserted between '&amp;lt;host&amp;gt;:&amp;lt;port&amp;gt;/' and '/api2/'. Can be useful if the InfluxDB service runs behind a reverse proxy.</param>
+                    /// <param name="api_path_prefix">An API path prefix inserted between '&lt;host&gt;:&lt;port&gt;/' and '/api2/'. Can be useful if the InfluxDB service runs behind a reverse proxy.</param>
                     /// <param name="bucket">The InfluxDB bucket/db. Only necessary when using the http v2 api.</param>
                     /// <param name="disable">Flag to disable the plugin.</param>
                     /// <param name="influxdbproto">
@@ -383,7 +383,7 @@ public class PveClient : PveClientBase
                     /// </summary>
                     /// <param name="port">server network port</param>
                     /// <param name="server">server dns name or IP address</param>
-                    /// <param name="api_path_prefix">An API path prefix inserted between '&amp;lt;host&amp;gt;:&amp;lt;port&amp;gt;/' and '/api2/'. Can be useful if the InfluxDB service runs behind a reverse proxy.</param>
+                    /// <param name="api_path_prefix">An API path prefix inserted between '&lt;host&gt;:&lt;port&gt;/' and '/api2/'. Can be useful if the InfluxDB service runs behind a reverse proxy.</param>
                     /// <param name="bucket">The InfluxDB bucket/db. Only necessary when using the http v2 api.</param>
                     /// <param name="delete">A list of settings you want to delete.</param>
                     /// <param name="digest">Prevent changes if current configuration file has a different digest. This can be used to prevent concurrent modifications.</param>
@@ -460,7 +460,7 @@ public class PveClient : PveClientBase
                 /// <param name="history">Also return historic values. Returns full available metric history unless `start-time` is also set</param>
                 /// <param name="local_only">Only return metrics for the current node instead of the whole cluster</param>
                 /// <param name="node_list">Only return metrics from nodes passed as comma-separated list</param>
-                /// <param name="start_time">Only include metrics with a timestamp &amp;gt; start-time.</param>
+                /// <param name="start_time">Only include metrics with a timestamp &gt; start-time.</param>
                 /// <returns></returns>
                 public async Task<Result> Export(bool? history = null, bool? local_only = null, string node_list = null, int? start_time = null)
                 {
@@ -874,10 +874,10 @@ public class PveClient : PveClientBase
                         /// <param name="delete">A list of settings you want to delete.</param>
                         /// <param name="digest">Prevent changes if current configuration file has a different digest. This can be used to prevent concurrent modifications.</param>
                         /// <param name="disable">Disable this target</param>
-                        /// <param name="header">HTTP headers to set. These have to be formatted as a property string in the format name=&amp;lt;name&amp;gt;,value=&amp;lt;base64 of value&amp;gt;</param>
+                        /// <param name="header">HTTP headers to set. These have to be formatted as a property string in the format name=&lt;name&gt;,value=&lt;base64 of value&gt;</param>
                         /// <param name="method">HTTP method
                         ///   Enum: post,put,get</param>
-                        /// <param name="secret">Secrets to set. These have to be formatted as a property string in the format name=&amp;lt;name&amp;gt;,value=&amp;lt;base64 of value&amp;gt;</param>
+                        /// <param name="secret">Secrets to set. These have to be formatted as a property string in the format name=&lt;name&gt;,value=&lt;base64 of value&gt;</param>
                         /// <param name="url">Server URL</param>
                         /// <returns></returns>
                         public async Task<Result> UpdateWebhookEndpoint(string body = null, string comment = null, IEnumerable<object> delete = null, string digest = null, bool? disable = null, IEnumerable<object> header = null, string method = null, IEnumerable<object> secret = null, string url = null)
@@ -910,8 +910,8 @@ public class PveClient : PveClientBase
                     /// <param name="body">HTTP body, base64 encoded</param>
                     /// <param name="comment">Comment</param>
                     /// <param name="disable">Disable this target</param>
-                    /// <param name="header">HTTP headers to set. These have to be formatted as a property string in the format name=&amp;lt;name&amp;gt;,value=&amp;lt;base64 of value&amp;gt;</param>
-                    /// <param name="secret">Secrets to set. These have to be formatted as a property string in the format name=&amp;lt;name&amp;gt;,value=&amp;lt;base64 of value&amp;gt;</param>
+                    /// <param name="header">HTTP headers to set. These have to be formatted as a property string in the format name=&lt;name&gt;,value=&lt;base64 of value&gt;</param>
+                    /// <param name="secret">Secrets to set. These have to be formatted as a property string in the format name=&lt;name&gt;,value=&lt;base64 of value&gt;</param>
                     /// <returns></returns>
                     public async Task<Result> CreateWebhookEndpoint(string method, string name, string url, string body = null, string comment = null, bool? disable = null, IEnumerable<object> header = null, IEnumerable<object> secret = null)
                     {
@@ -1018,7 +1018,7 @@ public class PveClient : PveClientBase
                     /// <param name="disable">Disable this matcher</param>
                     /// <param name="invert_match">Invert match of the whole matcher</param>
                     /// <param name="match_calendar">Match notification timestamp</param>
-                    /// <param name="match_field">Metadata fields to match (regex or exact match). Must be in the form (regex|exact):&amp;lt;field&amp;gt;=&amp;lt;value&amp;gt;</param>
+                    /// <param name="match_field">Metadata fields to match (regex or exact match). Must be in the form (regex|exact):&lt;field&gt;=&lt;value&gt;</param>
                     /// <param name="match_severity">Notification severities to match</param>
                     /// <param name="mode">Choose between 'all' and 'any' for when multiple properties are specified
                     ///   Enum: all,any</param>
@@ -1053,7 +1053,7 @@ public class PveClient : PveClientBase
                 /// <param name="disable">Disable this matcher</param>
                 /// <param name="invert_match">Invert match of the whole matcher</param>
                 /// <param name="match_calendar">Match notification timestamp</param>
-                /// <param name="match_field">Metadata fields to match (regex or exact match). Must be in the form (regex|exact):&amp;lt;field&amp;gt;=&amp;lt;value&amp;gt;</param>
+                /// <param name="match_field">Metadata fields to match (regex or exact match). Must be in the form (regex|exact):&lt;field&gt;=&lt;value&gt;</param>
                 /// <param name="match_severity">Notification severities to match</param>
                 /// <param name="mode">Choose between 'all' and 'any' for when multiple properties are specified
                 ///   Enum: all,any</param>
@@ -1166,7 +1166,7 @@ public class PveClient : PveClientBase
                     /// <param name="reported_model">CPU model and vendor to report to the guest. Must be a QEMU/KVM supported model. Only valid for custom CPU model definitions, default models will always report themselves to the guest OS.
                     ///   Enum: 486,a64fx,athlon,Broadwell,Broadwell-IBRS,Broadwell-noTSX,Broadwell-noTSX-IBRS,Cascadelake-Server,Cascadelake-Server-noTSX,Cascadelake-Server-v2,Cascadelake-Server-v4,Cascadelake-Server-v5,ClearwaterForest,ClearwaterForest-v2,ClearwaterForest-v3,Conroe,Cooperlake,Cooperlake-v2,core2duo,coreduo,cortex-a35,cortex-a53,cortex-a55,cortex-a57,cortex-a710,cortex-a72,cortex-a76,cortex-a78ae,DiamondRapids,EPYC,EPYC-Genoa,EPYC-Genoa-v2,EPYC-IBPB,EPYC-Milan,EPYC-Milan-v2,EPYC-Milan-v3,EPYC-Rome,EPYC-Rome-v2,EPYC-Rome-v3,EPYC-Rome-v4,EPYC-Rome-v5,EPYC-Turin,EPYC-v3,EPYC-v4,EPYC-v5,GraniteRapids,GraniteRapids-v2,GraniteRapids-v3,GraniteRapids-v4,GraniteRapids-v5,Haswell,Haswell-IBRS,Haswell-noTSX,Haswell-noTSX-IBRS,host,Icelake-Client,Icelake-Client-noTSX,Icelake-Server,Icelake-Server-noTSX,Icelake-Server-v3,Icelake-Server-v4,Icelake-Server-v5,Icelake-Server-v6,Icelake-Server-v7,IvyBridge,IvyBridge-IBRS,KnightsMill,kvm32,kvm64,max,Nehalem,Nehalem-IBRS,neoverse-n1,neoverse-n2,neoverse-v1,Opteron_G1,Opteron_G2,Opteron_G3,Opteron_G4,Opteron_G5,Penryn,pentium,pentium2,pentium3,phenom,qemu32,qemu64,SandyBridge,SandyBridge-IBRS,SapphireRapids,SapphireRapids-v2,SapphireRapids-v3,SapphireRapids-v4,SapphireRapids-v5,SapphireRapids-v6,SierraForest,SierraForest-v2,SierraForest-v3,SierraForest-v4,SierraForest-v5,Skylake-Client,Skylake-Client-IBRS,Skylake-Client-noTSX-IBRS,Skylake-Client-v4,Skylake-Server,Skylake-Server-IBRS,Skylake-Server-noTSX-IBRS,Skylake-Server-v4,Skylake-Server-v5,Westmere,Westmere-IBRS</param>
                     /// <returns></returns>
-                    public async Task<Result> Update(string delete = null, string digest = null, string flags = null, int? guest_phys_bits = null, bool? hidden = null, string hv_vendor_id = null, int? level = null, string phys_bits = null, string reported_model = null)
+                    public async Task<Result> Update(string delete = null, string digest = null, string flags = null, int? guest_phys_bits = null, bool? hidden = null, string hv_vendor_id = null, long? level = null, string phys_bits = null, string reported_model = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("delete", delete);
@@ -1199,7 +1199,7 @@ public class PveClient : PveClientBase
                 /// <param name="level">Maximum input value for the basic CPUID leaves the guest can query - that is the vendor (leaf 0), family/model/stepping and feature bits (leaf 1), cache and topology info (leaves 4 and B), and so on. Higher-numbered leaves are hidden. Setting '30' is a common workaround for Hyper-V boot failures on Windows guests running on recent Intel hosts. Only applies when the vCPU architecture is x86_64.</param>
                 /// <param name="phys_bits">The physical memory address bits that are reported to the guest OS. Should be smaller or equal to the host's. Set to 'host' to use value from host CPU, but note that doing so will break live migration to CPUs with other values.</param>
                 /// <returns></returns>
-                public async Task<Result> Create(string cputype, string reported_model, string flags = null, int? guest_phys_bits = null, bool? hidden = null, string hv_vendor_id = null, int? level = null, string phys_bits = null)
+                public async Task<Result> Create(string cputype, string reported_model, string flags = null, int? guest_phys_bits = null, bool? hidden = null, string hv_vendor_id = null, long? level = null, string phys_bits = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("cputype", cputype);
@@ -1330,7 +1330,7 @@ public class PveClient : PveClientBase
                 /// <summary>
                 /// Get information needed to join this cluster over the connected node.
                 /// </summary>
-                /// <param name="node">The node for which the joinee gets the nodeinfo. </param>
+                /// <param name="node">The node for which the joinee gets the nodeinfo.</param>
                 /// <returns></returns>
                 public async Task<Result> JoinInfo(string node = null)
                 {
@@ -1526,7 +1526,7 @@ public class PveClient : PveClientBase
                         /// <param name="log">Log level for firewall rule.
                         ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                         /// <param name="macro">Use predefined standard macro.</param>
-                        /// <param name="moveto">Move rule to new position &amp;lt;moveto&amp;gt;. Other arguments are ignored.</param>
+                        /// <param name="moveto">Move rule to new position &lt;moveto&gt;. Other arguments are ignored.</param>
                         /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                         /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                         /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -1581,7 +1581,7 @@ public class PveClient : PveClientBase
                     /// <param name="log">Log level for firewall rule.
                     ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                     /// <param name="macro">Use predefined standard macro.</param>
-                    /// <param name="pos">Update rule at position &amp;lt;pos&amp;gt;.</param>
+                    /// <param name="pos">Update rule at position &lt;pos&gt;.</param>
                     /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                     /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                     /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -1681,7 +1681,7 @@ public class PveClient : PveClientBase
                     /// <param name="log">Log level for firewall rule.
                     ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                     /// <param name="macro">Use predefined standard macro.</param>
-                    /// <param name="moveto">Move rule to new position &amp;lt;moveto&amp;gt;. Other arguments are ignored.</param>
+                    /// <param name="moveto">Move rule to new position &lt;moveto&gt;. Other arguments are ignored.</param>
                     /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                     /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                     /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -1731,7 +1731,7 @@ public class PveClient : PveClientBase
                 /// <param name="log">Log level for firewall rule.
                 ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                 /// <param name="macro">Use predefined standard macro.</param>
-                /// <param name="pos">Update rule at position &amp;lt;pos&amp;gt;.</param>
+                /// <param name="pos">Update rule at position &lt;pos&gt;.</param>
                 /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                 /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                 /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -2117,7 +2117,7 @@ public class PveClient : PveClientBase
                 /// <param name="pbs_change_detection_mode">PBS mode used to detect file changes and switch encoding format for container backups.
                 ///   Enum: legacy,data,metadata</param>
                 /// <param name="performance">Other performance-related settings.</param>
-                /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
+                /// <param name="pigz">Use pigz instead of gzip when N&gt;0. N=1 uses half of cores, N&gt;1 uses N as thread count.</param>
                 /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
                 /// <param name="protected_">If true, mark backup(s) as protected.</param>
                 /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
@@ -2213,7 +2213,7 @@ public class PveClient : PveClientBase
             /// <param name="pbs_change_detection_mode">PBS mode used to detect file changes and switch encoding format for container backups.
             ///   Enum: legacy,data,metadata</param>
             /// <param name="performance">Other performance-related settings.</param>
-            /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
+            /// <param name="pigz">Use pigz instead of gzip when N&gt;0. N=1 uses half of cores, N&gt;1 uses N as thread count.</param>
             /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
             /// <param name="protected_">If true, mark backup(s) as protected.</param>
             /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
@@ -2606,8 +2606,32 @@ public class PveClient : PveClientBase
                     /// <summary>
                     /// Update HA rule.
                     /// </summary>
+                    /// <param name="type">HA rule type.
+                    ///   Enum: node-affinity,resource-affinity</param>
+                    /// <param name="delete">A list of settings you want to delete.</param>
+                    /// <param name="digest">Prevent changes if current configuration file has a different digest. This can be used to prevent concurrent modifications.</param>
+                    /// <param name="affinity">Describes whether the HA resources are supposed to be placed on the given nodes ('positive'), or are supposed to be placed on any but the given nodes ('negative').
+                    ///   Enum: positive,negative</param>
+                    /// <param name="comment">HA rule description.</param>
+                    /// <param name="disable">Whether the HA rule is disabled.</param>
+                    /// <param name="nodes">List of cluster node names with optional priority.</param>
+                    /// <param name="resources">List of HA resource IDs. This consists of a list of resource types followed by a resource specific name separated with a colon (example: vm:100,ct:101).</param>
+                    /// <param name="strict">Describes whether the node affinity rule is strict or non-strict.</param>
                     /// <returns></returns>
-                    public async Task<Result> UpdateRule() { return await _client.SetAsync($"/cluster/ha/rules/{_rule}"); }
+                    public async Task<Result> UpdateRule(string type, string delete = null, string digest = null, string affinity = null, string comment = null, bool? disable = null, string nodes = null, string resources = null, bool? strict = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("type", type);
+                        parameters.Add("delete", delete);
+                        parameters.Add("digest", digest);
+                        parameters.Add("affinity", affinity);
+                        parameters.Add("comment", comment);
+                        parameters.Add("disable", disable);
+                        parameters.Add("nodes", nodes);
+                        parameters.Add("resources", resources);
+                        parameters.Add("strict", strict);
+                        return await _client.SetAsync($"/cluster/ha/rules/{_rule}", parameters);
+                    }
                 }
                 /// <summary>
                 /// Get HA rules.
@@ -2626,8 +2650,30 @@ public class PveClient : PveClientBase
                 /// <summary>
                 /// Create HA rule.
                 /// </summary>
+                /// <param name="rule">HA rule identifier.</param>
+                /// <param name="type">HA rule type.
+                ///   Enum: node-affinity,resource-affinity</param>
+                /// <param name="resources">List of HA resource IDs. This consists of a list of resource types followed by a resource specific name separated with a colon (example: vm:100,ct:101).</param>
+                /// <param name="affinity">Describes whether the HA resources are supposed to be placed on the given nodes ('positive'), or are supposed to be placed on any but the given nodes ('negative').
+                ///   Enum: positive,negative</param>
+                /// <param name="comment">HA rule description.</param>
+                /// <param name="disable">Whether the HA rule is disabled.</param>
+                /// <param name="nodes">List of cluster node names with optional priority.</param>
+                /// <param name="strict">Describes whether the node affinity rule is strict or non-strict.</param>
                 /// <returns></returns>
-                public async Task<Result> CreateRule() { return await _client.CreateAsync($"/cluster/ha/rules"); }
+                public async Task<Result> CreateRule(string rule, string type, string resources, string affinity = null, string comment = null, bool? disable = null, string nodes = null, bool? strict = null)
+                {
+                    var parameters = new Dictionary<string, object>();
+                    parameters.Add("rule", rule);
+                    parameters.Add("type", type);
+                    parameters.Add("resources", resources);
+                    parameters.Add("affinity", affinity);
+                    parameters.Add("comment", comment);
+                    parameters.Add("disable", disable);
+                    parameters.Add("nodes", nodes);
+                    parameters.Add("strict", strict);
+                    return await _client.CreateAsync($"/cluster/ha/rules", parameters);
+                }
             }
             /// <summary>
             /// Status
@@ -3034,6 +3080,11 @@ public class PveClient : PveClientBase
             /// Flags
             /// </summary>
             public PveFlags Flags => _flags ??= new(_client);
+            private PveHealthMute _healthMute;
+            /// <summary>
+            /// HealthMute
+            /// </summary>
+            public PveHealthMute HealthMute => _healthMute ??= new(_client);
             /// <summary>
             /// Metadata
             /// </summary>
@@ -3083,7 +3134,7 @@ public class PveClient : PveClientBase
                 /// <param name="service_type">Ceph daemon type to restart cluster-wide.
                 ///   Enum: mon,mgr,mds,osd</param>
                 /// <param name="dry_run">Log the plan (which daemons would be restarted, in what order) without actually doing anything.</param>
-                /// <param name="force">Proceed past a HEALTH_WARN with non-benign checks like PG_DEGRADED, SLOW_OPS, or MON_DOWN. HEALTH_ERR is always fatal regardless. The operator is responsible for confirming the cluster is stable enough to absorb a rolling restart.</param>
+                /// <param name="force">Proceed past a HEALTH_WARN with non-benign checks like PG_DEGRADED, SLOW_OPS, or MON_DOWN. A blocking HEALTH_ERR is fatal regardless of this flag. Checks that ceph reports as muted, and checks known to be harmless for a rolling restart, never block and are named in the task log. The cluster-wide OSD map flags are only ever evaluated for an OSD restart, since they govern nothing a mon, mgr or mds restart touches. The operator is responsible for confirming the cluster is stable enough to absorb a rolling restart.</param>
                 /// <param name="only_outdated">OSDs only: restart only OSDs whose running version differs from the locally-installed ceph-osd binary on their host. Forwarded to each per-node sub-task so the per-host installed version is used (a partial upgrade where one host is on a newer build is handled correctly).</param>
                 /// <param name="timeout">Per-daemon timeout (in seconds) for the up-wait phase. Note: for daemons on remote nodes the same timeout also bounds the remote restart task, so the per-daemon budget can be up to 2x this value. Default sized for slow MDS journal replay or MON paxos settle on busy clusters; bump higher if the cluster routinely takes longer to stabilize after a daemon restart.</param>
                 /// <returns></returns>
@@ -3171,6 +3222,48 @@ public class PveClient : PveClientBase
                     parameters.Add("pause", pause);
                     return await _client.SetAsync($"/cluster/ceph/flags", parameters);
                 }
+            }
+            /// <summary>
+            /// HealthMute
+            /// </summary>
+            public class PveHealthMute
+            {
+                private readonly PveClient _client;
+
+                internal PveHealthMute(PveClient client) { _client = client; }
+                /// <summary>
+                /// CodeItem
+                /// </summary>
+                public PveCodeItem this[object code] => new(_client, code);
+                /// <summary>
+                /// CodeItem
+                /// </summary>
+                public class PveCodeItem
+                {
+                    private readonly PveClient _client;
+                    private readonly object _code;
+                    internal PveCodeItem(PveClient client, object code) { _client = client; _code = code; }
+                    /// <summary>
+                    /// Mute or unmute a Ceph health check. A muted check no longer counts towards the cluster status, but stays visible and keeps being evaluated.
+                    /// </summary>
+                    /// <param name="value">Whether to mute (true) or unmute (false) the check.</param>
+                    /// <param name="sticky">Keep the mute even when the check gets worse. Without this a mute clears itself as soon as the number of affected items grows, which brings the check back to attention. Only used when muting.</param>
+                    /// <param name="ttl">How long the mute lasts, for example '2h', '3d' or '1w'. Without it the mute has no expiry. Only used when muting.</param>
+                    /// <returns></returns>
+                    public async Task<Result> HealthMute(bool value, bool? sticky = null, string ttl = null)
+                    {
+                        var parameters = new Dictionary<string, object>();
+                        parameters.Add("value", value);
+                        parameters.Add("sticky", sticky);
+                        parameters.Add("ttl", ttl);
+                        return await _client.SetAsync($"/cluster/ceph/health-mute/{_code}", parameters);
+                    }
+                }
+                /// <summary>
+                /// Get the currently muted Ceph health checks.
+                /// </summary>
+                /// <returns></returns>
+                public async Task<Result> HealthMuteIndex() { return await _client.GetAsync($"/cluster/ceph/health-mute"); }
             }
             /// <summary>
             /// Cluster ceph index.
@@ -3910,7 +4003,7 @@ public class PveClient : PveClientBase
                                 /// <param name="log">Log level for firewall rule.
                                 ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                                 /// <param name="macro">Use predefined standard macro.</param>
-                                /// <param name="moveto">Move rule to new position &amp;lt;moveto&amp;gt;. Other arguments are ignored.</param>
+                                /// <param name="moveto">Move rule to new position &lt;moveto&gt;. Other arguments are ignored.</param>
                                 /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                                 /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                                 /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -3960,7 +4053,7 @@ public class PveClient : PveClientBase
                             /// <param name="log">Log level for firewall rule.
                             ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                             /// <param name="macro">Use predefined standard macro.</param>
-                            /// <param name="pos">Update rule at position &amp;lt;pos&amp;gt;.</param>
+                            /// <param name="pos">Update rule at position &lt;pos&gt;.</param>
                             /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                             /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                             /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -4083,7 +4176,7 @@ public class PveClient : PveClientBase
                             /// <param name="dhcp_dns_server">IP address for the DNS server</param>
                             /// <param name="dhcp_range">A list of DHCP ranges for this subnet</param>
                             /// <param name="digest">Prevent changes if current configuration file has a different digest. This can be used to prevent concurrent modifications.</param>
-                            /// <param name="dnszoneprefix">dns domain zone prefix  ex: 'adm' -&amp;gt; &amp;lt;hostname&amp;gt;.adm.mydomain.com</param>
+                            /// <param name="dnszoneprefix">dns domain zone prefix  ex: 'adm' -&gt; &lt;hostname&gt;.adm.mydomain.com</param>
                             /// <param name="gateway">Subnet Gateway: Will be assign on vnet for layer3 zones</param>
                             /// <param name="lock_token">the token for unlocking the global SDN configuration</param>
                             /// <param name="snat">enable masquerade for this subnet if pve-firewall</param>
@@ -4123,7 +4216,7 @@ public class PveClient : PveClientBase
                         ///   Enum: subnet</param>
                         /// <param name="dhcp_dns_server">IP address for the DNS server</param>
                         /// <param name="dhcp_range">A list of DHCP ranges for this subnet</param>
-                        /// <param name="dnszoneprefix">dns domain zone prefix  ex: 'adm' -&amp;gt; &amp;lt;hostname&amp;gt;.adm.mydomain.com</param>
+                        /// <param name="dnszoneprefix">dns domain zone prefix  ex: 'adm' -&gt; &lt;hostname&gt;.adm.mydomain.com</param>
                         /// <param name="gateway">Subnet Gateway: Will be assign on vnet for layer3 zones</param>
                         /// <param name="lock_token">the token for unlocking the global SDN configuration</param>
                         /// <param name="snat">enable masquerade for this subnet if pve-firewall</param>
@@ -4553,7 +4646,7 @@ public class PveClient : PveClientBase
                     /// <param name="route_map_in">Route Map that should be applied for incoming routes</param>
                     /// <param name="route_map_out">Route Map that should be applied for outgoing routes</param>
                     /// <returns></returns>
-                    public async Task<Result> Update(int? asn = null, string bgp_mode = null, bool? bgp_multipath_as_path_relax = null, string delete = null, string digest = null, bool? ebgp = null, int? ebgp_multihop = null, string fabric = null, string isis_domain = null, string isis_ifaces = null, string isis_net = null, string lock_token = null, string loopback = null, string node = null, string nodes = null, string peer_group_name = null, string peers = null, string route_map_in = null, string route_map_out = null)
+                    public async Task<Result> Update(long? asn = null, string bgp_mode = null, bool? bgp_multipath_as_path_relax = null, string delete = null, string digest = null, bool? ebgp = null, int? ebgp_multihop = null, string fabric = null, string isis_domain = null, string isis_ifaces = null, string isis_net = null, string lock_token = null, string loopback = null, string node = null, string nodes = null, string peer_group_name = null, string peers = null, string route_map_in = null, string route_map_out = null)
                     {
                         var parameters = new Dictionary<string, object>();
                         parameters.Add("asn", asn);
@@ -4619,7 +4712,7 @@ public class PveClient : PveClientBase
                 /// <param name="route_map_in">Route Map that should be applied for incoming routes</param>
                 /// <param name="route_map_out">Route Map that should be applied for outgoing routes</param>
                 /// <returns></returns>
-                public async Task<Result> Create(string controller, string type, int? asn = null, string bgp_mode = null, bool? bgp_multipath_as_path_relax = null, bool? ebgp = null, int? ebgp_multihop = null, string fabric = null, string isis_domain = null, string isis_ifaces = null, string isis_net = null, string lock_token = null, string loopback = null, string node = null, string nodes = null, string peer_group_name = null, string peers = null, string route_map_in = null, string route_map_out = null)
+                public async Task<Result> Create(string controller, string type, long? asn = null, string bgp_mode = null, bool? bgp_multipath_as_path_relax = null, bool? ebgp = null, int? ebgp_multihop = null, string fabric = null, string isis_domain = null, string isis_ifaces = null, string isis_net = null, string lock_token = null, string loopback = null, string node = null, string nodes = null, string peer_group_name = null, string peers = null, string route_map_in = null, string route_map_out = null)
                 {
                     var parameters = new Dictionary<string, object>();
                     parameters.Add("controller", controller);
@@ -5252,7 +5345,7 @@ public class PveClient : PveClientBase
                             /// <param name="prefix"></param>
                             /// <param name="seq"></param>
                             /// <returns></returns>
-                            public async Task<Result> UpdatePrefixListEntry(string action = null, IEnumerable<object> delete = null, string digest = null, int? ge = null, int? le = null, string lock_token = null, string prefix = null, int? seq = null)
+                            public async Task<Result> UpdatePrefixListEntry(string action = null, IEnumerable<object> delete = null, string digest = null, int? ge = null, int? le = null, string lock_token = null, string prefix = null, long? seq = null)
                             {
                                 var parameters = new Dictionary<string, object>();
                                 parameters.Add("action", action);
@@ -5282,7 +5375,7 @@ public class PveClient : PveClientBase
                         /// <param name="lock_token">the token for unlocking the global SDN configuration</param>
                         /// <param name="seq"></param>
                         /// <returns></returns>
-                        public async Task<Result> CreatePrefixListEntry(string action, string prefix, int? ge = null, int? le = null, string lock_token = null, int? seq = null)
+                        public async Task<Result> CreatePrefixListEntry(string action, string prefix, int? ge = null, int? le = null, string lock_token = null, long? seq = null)
                         {
                             var parameters = new Dictionary<string, object>();
                             parameters.Add("action", action);
@@ -5427,31 +5520,22 @@ public class PveClient : PveClientBase
                                 /// <summary>
                                 /// Delete Route Map Entry
                                 /// </summary>
-                                /// <param name="route_map_id">The SDN route map identifier</param>
                                 /// <param name="lock_token">the token for unlocking the global SDN configuration</param>
                                 /// <returns></returns>
-                                public async Task<Result> DeleteRouteMapEntry(string route_map_id, string lock_token = null)
+                                public async Task<Result> DeleteRouteMapEntry(string lock_token = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
-                                    parameters.Add("route-map-id", route_map_id);
                                     parameters.Add("lock-token", lock_token);
                                     return await _client.DeleteAsync($"/cluster/sdn/route-maps/entries/{_route_map_id}/entry/{_order}", parameters);
                                 }
                                 /// <summary>
                                 /// Get Route Map Entry
                                 /// </summary>
-                                /// <param name="route_map_id">The SDN route map identifier</param>
                                 /// <returns></returns>
-                                public async Task<Result> GetRouteMapEntry(string route_map_id)
-                                {
-                                    var parameters = new Dictionary<string, object>();
-                                    parameters.Add("route-map-id", route_map_id);
-                                    return await _client.GetAsync($"/cluster/sdn/route-maps/entries/{_route_map_id}/entry/{_order}", parameters);
-                                }
+                                public async Task<Result> GetRouteMapEntry() { return await _client.GetAsync($"/cluster/sdn/route-maps/entries/{_route_map_id}/entry/{_order}"); }
                                 /// <summary>
                                 /// Update Route Map Entry
                                 /// </summary>
-                                /// <param name="route_map_id">The SDN route map identifier</param>
                                 /// <param name="action">Matching policy of a route map entry.
                                 ///   Enum: permit,deny</param>
                                 /// <param name="call">The SDN route map identifier</param>
@@ -5462,10 +5546,9 @@ public class PveClient : PveClientBase
                                 /// <param name="match"></param>
                                 /// <param name="set"></param>
                                 /// <returns></returns>
-                                public async Task<Result> UpdateRouteMapEntry(string route_map_id, string action = null, string call = null, IEnumerable<object> delete = null, string digest = null, string exit_action = null, string lock_token = null, IEnumerable<object> match = null, IEnumerable<object> set = null)
+                                public async Task<Result> UpdateRouteMapEntry(string action = null, string call = null, IEnumerable<object> delete = null, string digest = null, string exit_action = null, string lock_token = null, IEnumerable<object> match = null, IEnumerable<object> set = null)
                                 {
                                     var parameters = new Dictionary<string, object>();
-                                    parameters.Add("route-map-id", route_map_id);
                                     parameters.Add("action", action);
                                     parameters.Add("call", call);
                                     parameters.Add("delete", delete);
@@ -5481,14 +5564,12 @@ public class PveClient : PveClientBase
                         /// <summary>
                         /// List all entries for a given Route Map
                         /// </summary>
-                        /// <param name="route_map_id">The SDN route map identifier</param>
                         /// <param name="pending">Display pending config.</param>
                         /// <param name="running">Display running config.</param>
                         /// <returns></returns>
-                        public async Task<Result> ListRouteMapEntriesForRouteMap(string route_map_id, bool? pending = null, bool? running = null)
+                        public async Task<Result> ListRouteMapEntriesForRouteMap(bool? pending = null, bool? running = null)
                         {
                             var parameters = new Dictionary<string, object>();
-                            parameters.Add("route-map-id", route_map_id);
                             parameters.Add("pending", pending);
                             parameters.Add("running", running);
                             return await _client.GetAsync($"/cluster/sdn/route-maps/entries/{_route_map_id}", parameters);
@@ -5721,7 +5802,7 @@ public class PveClient : PveClientBase
             /// <param name="delete">A list of settings you want to delete.</param>
             /// <param name="description">Datacenter description. Shown in the web-interface datacenter notes panel. This is saved as comment inside the configuration file.</param>
             /// <param name="email_from">Specify email address to send notification from (default is root@$hostname)</param>
-            /// <param name="fencing">Set the fencing mode of the HA cluster. Hardware mode needs a valid configuration of fence devices in /etc/pve/ha/fence.cfg. With both all two modes are used.  WARNING: 'hardware' and 'both' are EXPERIMENTAL &amp; WIP
+            /// <param name="fencing">Set the fencing mode of the HA cluster. Hardware mode needs a valid configuration of fence devices in /etc/pve/ha/fence.cfg. With both all two modes are used. WARNING: 'hardware' and 'both' are EXPERIMENTAL &amp; WIP
             ///   Enum: watchdog,hardware,both</param>
             /// <param name="ha">Cluster wide HA settings.</param>
             /// <param name="http_proxy">Specify external http proxy which is used for downloads (example: 'http://username:password@host:port/')</param>
@@ -6310,7 +6391,7 @@ public class PveClient : PveClientBase
                                 /// <param name="log">Log level for firewall rule.
                                 ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                                 /// <param name="macro">Use predefined standard macro.</param>
-                                /// <param name="moveto">Move rule to new position &amp;lt;moveto&amp;gt;. Other arguments are ignored.</param>
+                                /// <param name="moveto">Move rule to new position &lt;moveto&gt;. Other arguments are ignored.</param>
                                 /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                                 /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                                 /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -6360,7 +6441,7 @@ public class PveClient : PveClientBase
                             /// <param name="log">Log level for firewall rule.
                             ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                             /// <param name="macro">Use predefined standard macro.</param>
-                            /// <param name="pos">Update rule at position &amp;lt;pos&amp;gt;.</param>
+                            /// <param name="pos">Update rule at position &lt;pos&gt;.</param>
                             /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                             /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                             /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -6638,7 +6719,7 @@ public class PveClient : PveClientBase
                             /// <param name="dhcp">Enable DHCP.</param>
                             /// <param name="digest">Prevent changes if current configuration file has a different digest. This can be used to prevent concurrent modifications.</param>
                             /// <param name="enable">Enable/disable firewall rules.</param>
-                            /// <param name="ipfilter">Enable default IP filters. This is equivalent to adding an empty ipfilter-net&amp;lt;id&amp;gt; ipset for every interface. Such ipsets implicitly contain sane default restrictions such as restricting IPv6 link local addresses to the one derived from the interface's MAC address. For containers the configured IP addresses will be implicitly added.</param>
+                            /// <param name="ipfilter">Enable default IP filters. This is equivalent to adding an empty ipfilter-net&lt;id&gt; ipset for every interface. Such ipsets implicitly contain sane default restrictions such as restricting IPv6 link local addresses to the one derived from the interface's MAC address. For containers the configured IP addresses will be implicitly added.</param>
                             /// <param name="log_level_in">Log level for incoming traffic.
                             ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                             /// <param name="log_level_out">Log level for outgoing traffic.
@@ -7533,13 +7614,13 @@ public class PveClient : PveClientBase
                         /// <param name="freeze">Freeze CPU at startup (use 'c' monitor command to start execution).</param>
                         /// <param name="hookscript">Script that will be executed during various steps in the vms lifetime.</param>
                         /// <param name="hostpciN">Map host PCI devices into guest.</param>
-                        /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory', 'usb' and 'cloudinit'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`. USB hotplugging is possible for guests with machine version &amp;gt;= 7.1 and ostype l26 or windows &amp;gt; 7.</param>
-                        /// <param name="hugepages">Enables hugepages memory.  Sets the size of hugepages in MiB. If the value is set to 'any' then 1 GiB hugepages will be used if possible, otherwise the size will fall back to 2 MiB.
+                        /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory', 'usb' and 'cloudinit'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`. USB hotplugging is possible for guests with machine version &gt;= 7.1 and ostype l26 or windows &gt; 7.</param>
+                        /// <param name="hugepages">Enables hugepages memory. Sets the size of hugepages in MiB. If the value is set to 'any' then 1 GiB hugepages will be used if possible, otherwise the size will fall back to 2 MiB.
                         ///   Enum: any,2,1024</param>
                         /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
                         /// <param name="import_working_storage">A file-based storage with 'images' content-type enabled, which is used as an intermediary extraction storage during import. Defaults to the source storage.</param>
                         /// <param name="intel_tdx">Trusted Domain Extension (TDX) features by Intel CPUs</param>
-                        /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration. This requires cloud-init 19.4 or newer.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
+                        /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface. IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified. The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration. This requires cloud-init 19.4 or newer. If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4.</param>
                         /// <param name="ivshmem">Inter-VM shared memory. Useful for direct communication between VMs, or to the host.</param>
                         /// <param name="keephugepages">Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.</param>
                         /// <param name="keyboard">Keyboard layout for VNC server. This option is generally not required and is often better handled from within the guest OS.
@@ -7586,7 +7667,7 @@ public class PveClient : PveClientBase
                         /// <param name="template">Enable/disable Template.</param>
                         /// <param name="tpmstate0">Configure a Disk for storing TPM state. The format is fixed to 'raw'. Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Note that SIZE_IN_GiB is ignored here and 4 MiB will be used instead. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
                         /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
-                        /// <param name="usbN">Configure an USB device (n is 0 to 4, for machine version &amp;gt;= 7.1 and ostype l26 or windows &amp;gt; 7, n can be up to 14).</param>
+                        /// <param name="usbN">Configure an USB device (n is 0 to 4, for machine version &gt;= 7.1 and ostype l26 or windows &gt; 7, n can be up to 14).</param>
                         /// <param name="vcpus">Number of hotplugged vcpus.</param>
                         /// <param name="vga">Configure the VGA hardware.</param>
                         /// <param name="virtioN">Use volume as VIRTIO hard disk (n is 0 to 15). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
@@ -7725,12 +7806,12 @@ public class PveClient : PveClientBase
                         /// <param name="freeze">Freeze CPU at startup (use 'c' monitor command to start execution).</param>
                         /// <param name="hookscript">Script that will be executed during various steps in the vms lifetime.</param>
                         /// <param name="hostpciN">Map host PCI devices into guest.</param>
-                        /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory', 'usb' and 'cloudinit'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`. USB hotplugging is possible for guests with machine version &amp;gt;= 7.1 and ostype l26 or windows &amp;gt; 7.</param>
-                        /// <param name="hugepages">Enables hugepages memory.  Sets the size of hugepages in MiB. If the value is set to 'any' then 1 GiB hugepages will be used if possible, otherwise the size will fall back to 2 MiB.
+                        /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory', 'usb' and 'cloudinit'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`. USB hotplugging is possible for guests with machine version &gt;= 7.1 and ostype l26 or windows &gt; 7.</param>
+                        /// <param name="hugepages">Enables hugepages memory. Sets the size of hugepages in MiB. If the value is set to 'any' then 1 GiB hugepages will be used if possible, otherwise the size will fall back to 2 MiB.
                         ///   Enum: any,2,1024</param>
                         /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
                         /// <param name="intel_tdx">Trusted Domain Extension (TDX) features by Intel CPUs</param>
-                        /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration. This requires cloud-init 19.4 or newer.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
+                        /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface. IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified. The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration. This requires cloud-init 19.4 or newer. If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4.</param>
                         /// <param name="ivshmem">Inter-VM shared memory. Useful for direct communication between VMs, or to the host.</param>
                         /// <param name="keephugepages">Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.</param>
                         /// <param name="keyboard">Keyboard layout for VNC server. This option is generally not required and is often better handled from within the guest OS.
@@ -7777,7 +7858,7 @@ public class PveClient : PveClientBase
                         /// <param name="template">Enable/disable Template.</param>
                         /// <param name="tpmstate0">Configure a Disk for storing TPM state. The format is fixed to 'raw'. Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Note that SIZE_IN_GiB is ignored here and 4 MiB will be used instead. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
                         /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
-                        /// <param name="usbN">Configure an USB device (n is 0 to 4, for machine version &amp;gt;= 7.1 and ostype l26 or windows &amp;gt; 7, n can be up to 14).</param>
+                        /// <param name="usbN">Configure an USB device (n is 0 to 4, for machine version &gt;= 7.1 and ostype l26 or windows &gt; 7, n can be up to 14).</param>
                         /// <param name="vcpus">Number of hotplugged vcpus.</param>
                         /// <param name="vga">Configure the VGA hardware.</param>
                         /// <param name="virtioN">Use volume as VIRTIO hard disk (n is 0 to 15). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
@@ -8781,7 +8862,7 @@ public class PveClient : PveClientBase
                                 return await _client.DeleteAsync($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}", parameters);
                             }
                             /// <summary>
-                            /// 
+                            ///
                             /// </summary>
                             /// <returns></returns>
                             public async Task<Result> SnapshotCmdIdx() { return await _client.GetAsync($"/nodes/{_node}/qemu/{_vmid}/snapshot/{_snapname}"); }
@@ -8984,13 +9065,13 @@ public class PveClient : PveClientBase
                 /// <param name="ha_managed">Add the VM as a HA resource after it was created.</param>
                 /// <param name="hookscript">Script that will be executed during various steps in the vms lifetime.</param>
                 /// <param name="hostpciN">Map host PCI devices into guest.</param>
-                /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory', 'usb' and 'cloudinit'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`. USB hotplugging is possible for guests with machine version &amp;gt;= 7.1 and ostype l26 or windows &amp;gt; 7.</param>
-                /// <param name="hugepages">Enables hugepages memory.  Sets the size of hugepages in MiB. If the value is set to 'any' then 1 GiB hugepages will be used if possible, otherwise the size will fall back to 2 MiB.
+                /// <param name="hotplug">Selectively enable hotplug features. This is a comma separated list of hotplug features: 'network', 'disk', 'cpu', 'memory', 'usb' and 'cloudinit'. Use '0' to disable hotplug completely. Using '1' as value is an alias for the default `network,disk,usb`. USB hotplugging is possible for guests with machine version &gt;= 7.1 and ostype l26 or windows &gt; 7.</param>
+                /// <param name="hugepages">Enables hugepages memory. Sets the size of hugepages in MiB. If the value is set to 'any' then 1 GiB hugepages will be used if possible, otherwise the size will fall back to 2 MiB.
                 ///   Enum: any,2,1024</param>
                 /// <param name="ideN">Use volume as IDE hard disk or CD-ROM (n is 0 to 3). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
                 /// <param name="import_working_storage">A file-based storage with 'images' content-type enabled, which is used as an intermediary extraction storage during import. Defaults to the source storage.</param>
                 /// <param name="intel_tdx">Trusted Domain Extension (TDX) features by Intel CPUs</param>
-                /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface.  IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.  The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration. This requires cloud-init 19.4 or newer.  If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4. </param>
+                /// <param name="ipconfigN">cloud-init: Specify IP addresses and gateways for the corresponding interface. IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified. The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided. For IPv6 the special string 'auto' can be used to use stateless autoconfiguration. This requires cloud-init 19.4 or newer. If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4.</param>
                 /// <param name="ivshmem">Inter-VM shared memory. Useful for direct communication between VMs, or to the host.</param>
                 /// <param name="keephugepages">Use together with hugepages. If enabled, hugepages will not not be deleted after VM shutdown and can be used for subsequent starts.</param>
                 /// <param name="keyboard">Keyboard layout for VNC server. This option is generally not required and is often better handled from within the guest OS.
@@ -9040,7 +9121,7 @@ public class PveClient : PveClientBase
                 /// <param name="tpmstate0">Configure a Disk for storing TPM state. The format is fixed to 'raw'. Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Note that SIZE_IN_GiB is ignored here and 4 MiB will be used instead. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
                 /// <param name="unique">Assign a unique random ethernet address.</param>
                 /// <param name="unusedN">Reference to unused volumes. This is used internally, and should not be modified manually.</param>
-                /// <param name="usbN">Configure an USB device (n is 0 to 4, for machine version &amp;gt;= 7.1 and ostype l26 or windows &amp;gt; 7, n can be up to 14).</param>
+                /// <param name="usbN">Configure an USB device (n is 0 to 4, for machine version &gt;= 7.1 and ostype l26 or windows &gt; 7, n can be up to 14).</param>
                 /// <param name="vcpus">Number of hotplugged vcpus.</param>
                 /// <param name="vga">Configure the VGA hardware.</param>
                 /// <param name="virtioN">Use volume as VIRTIO hard disk (n is 0 to 15). Use the special syntax STORAGE_ID:SIZE_IN_GiB to allocate a new volume. Use STORAGE_ID:0 and the 'import-from' parameter to import from an existing volume.</param>
@@ -9312,7 +9393,7 @@ public class PveClient : PveClientBase
                         ///   Enum: shell,console,tty</param>
                         /// <param name="console">Attach a console device (/dev/console) to the container.</param>
                         /// <param name="cores">The number of cores assigned to the container. A container can use all available cores by default.</param>
-                        /// <param name="cpulimit">Limit of CPU usage.  NOTE: If the computer has 2 CPUs, it has a total of '2' CPU time. Value '0' indicates no CPU limit.</param>
+                        /// <param name="cpulimit">Limit of CPU usage. NOTE: If the computer has 2 CPUs, it has a total of '2' CPU time. Value '0' indicates no CPU limit.</param>
                         /// <param name="cpuunits">CPU weight for a container, will be clamped to [1, 10000] in cgroup v2.</param>
                         /// <param name="debug">Try to be more verbose. For now this only enables debug log-level on start.</param>
                         /// <param name="delete">A list of settings you want to delete.</param>
@@ -9331,7 +9412,7 @@ public class PveClient : PveClientBase
                         /// <param name="nameserver">Sets DNS server IP address for a container. Create will automatically use the setting from the host if you neither set searchdomain nor nameserver.</param>
                         /// <param name="netN">Specifies network interfaces for the container.</param>
                         /// <param name="onboot">Specifies whether a container will be started during system bootup.</param>
-                        /// <param name="ostype">OS type. This is used to setup configuration inside the container, and corresponds to lxc setup scripts in /usr/share/lxc/config/&amp;lt;ostype&amp;gt;.common.conf. Value 'unmanaged' can be used to skip and OS specific setup.
+                        /// <param name="ostype">OS type. This is used to setup configuration inside the container, and corresponds to lxc setup scripts in /usr/share/lxc/config/&lt;ostype&gt;.common.conf. Value 'unmanaged' can be used to skip and OS specific setup.
                         ///   Enum: debian,devuan,ubuntu,centos,fedora,opensuse,archlinux,alpine,gentoo,nixos,unmanaged</param>
                         /// <param name="protection">Sets the protection flag of the container. This will prevent the CT or CT's disk remove/update operation.</param>
                         /// <param name="revert">Revert a pending change.</param>
@@ -9717,7 +9798,7 @@ public class PveClient : PveClientBase
                                 return await _client.DeleteAsync($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}", parameters);
                             }
                             /// <summary>
-                            /// 
+                            ///
                             /// </summary>
                             /// <returns></returns>
                             public async Task<Result> SnapshotCmdIdx() { return await _client.GetAsync($"/nodes/{_node}/lxc/{_vmid}/snapshot/{_snapname}"); }
@@ -9847,7 +9928,7 @@ public class PveClient : PveClientBase
                                 /// <param name="log">Log level for firewall rule.
                                 ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                                 /// <param name="macro">Use predefined standard macro.</param>
-                                /// <param name="moveto">Move rule to new position &amp;lt;moveto&amp;gt;. Other arguments are ignored.</param>
+                                /// <param name="moveto">Move rule to new position &lt;moveto&gt;. Other arguments are ignored.</param>
                                 /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                                 /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                                 /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -9897,7 +9978,7 @@ public class PveClient : PveClientBase
                             /// <param name="log">Log level for firewall rule.
                             ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                             /// <param name="macro">Use predefined standard macro.</param>
-                            /// <param name="pos">Update rule at position &amp;lt;pos&amp;gt;.</param>
+                            /// <param name="pos">Update rule at position &lt;pos&gt;.</param>
                             /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                             /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                             /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -10175,7 +10256,7 @@ public class PveClient : PveClientBase
                             /// <param name="dhcp">Enable DHCP.</param>
                             /// <param name="digest">Prevent changes if current configuration file has a different digest. This can be used to prevent concurrent modifications.</param>
                             /// <param name="enable">Enable/disable firewall rules.</param>
-                            /// <param name="ipfilter">Enable default IP filters. This is equivalent to adding an empty ipfilter-net&amp;lt;id&amp;gt; ipset for every interface. Such ipsets implicitly contain sane default restrictions such as restricting IPv6 link local addresses to the one derived from the interface's MAC address. For containers the configured IP addresses will be implicitly added.</param>
+                            /// <param name="ipfilter">Enable default IP filters. This is equivalent to adding an empty ipfilter-net&lt;id&gt; ipset for every interface. Such ipsets implicitly contain sane default restrictions such as restricting IPv6 link local addresses to the one derived from the interface's MAC address. For containers the configured IP addresses will be implicitly added.</param>
                             /// <param name="log_level_in">Log level for incoming traffic.
                             ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                             /// <param name="log_level_out">Log level for outgoing traffic.
@@ -10654,9 +10735,9 @@ public class PveClient : PveClientBase
                         ///   Enum: rootfs,mp0,mp1,mp2,mp3,mp4,mp5,mp6,mp7,mp8,mp9,mp10,mp11,mp12,mp13,mp14,mp15,mp16,mp17,mp18,mp19,mp20,mp21,mp22,mp23,mp24,mp25,mp26,mp27,mp28,mp29,mp30,mp31,mp32,mp33,mp34,mp35,mp36,mp37,mp38,mp39,mp40,mp41,mp42,mp43,mp44,mp45,mp46,mp47,mp48,mp49,mp50,mp51,mp52,mp53,mp54,mp55,mp56,mp57,mp58,mp59,mp60,mp61,mp62,mp63,mp64,mp65,mp66,mp67,mp68,mp69,mp70,mp71,mp72,mp73,mp74,mp75,mp76,mp77,mp78,mp79,mp80,mp81,mp82,mp83,mp84,mp85,mp86,mp87,mp88,mp89,mp90,mp91,mp92,mp93,mp94,mp95,mp96,mp97,mp98,mp99,mp100,mp101,mp102,mp103,mp104,mp105,mp106,mp107,mp108,mp109,mp110,mp111,mp112,mp113,mp114,mp115,mp116,mp117,mp118,mp119,mp120,mp121,mp122,mp123,mp124,mp125,mp126,mp127,mp128,mp129,mp130,mp131,mp132,mp133,mp134,mp135,mp136,mp137,mp138,mp139,mp140,mp141,mp142,mp143,mp144,mp145,mp146,mp147,mp148,mp149,mp150,mp151,mp152,mp153,mp154,mp155,mp156,mp157,mp158,mp159,mp160,mp161,mp162,mp163,mp164,mp165,mp166,mp167,mp168,mp169,mp170,mp171,mp172,mp173,mp174,mp175,mp176,mp177,mp178,mp179,mp180,mp181,mp182,mp183,mp184,mp185,mp186,mp187,mp188,mp189,mp190,mp191,mp192,mp193,mp194,mp195,mp196,mp197,mp198,mp199,mp200,mp201,mp202,mp203,mp204,mp205,mp206,mp207,mp208,mp209,mp210,mp211,mp212,mp213,mp214,mp215,mp216,mp217,mp218,mp219,mp220,mp221,mp222,mp223,mp224,mp225,mp226,mp227,mp228,mp229,mp230,mp231,mp232,mp233,mp234,mp235,mp236,mp237,mp238,mp239,mp240,mp241,mp242,mp243,mp244,mp245,mp246,mp247,mp248,mp249,mp250,mp251,mp252,mp253,mp254,mp255,unused0,unused1,unused2,unused3,unused4,unused5,unused6,unused7,unused8,unused9,unused10,unused11,unused12,unused13,unused14,unused15,unused16,unused17,unused18,unused19,unused20,unused21,unused22,unused23,unused24,unused25,unused26,unused27,unused28,unused29,unused30,unused31,unused32,unused33,unused34,unused35,unused36,unused37,unused38,unused39,unused40,unused41,unused42,unused43,unused44,unused45,unused46,unused47,unused48,unused49,unused50,unused51,unused52,unused53,unused54,unused55,unused56,unused57,unused58,unused59,unused60,unused61,unused62,unused63,unused64,unused65,unused66,unused67,unused68,unused69,unused70,unused71,unused72,unused73,unused74,unused75,unused76,unused77,unused78,unused79,unused80,unused81,unused82,unused83,unused84,unused85,unused86,unused87,unused88,unused89,unused90,unused91,unused92,unused93,unused94,unused95,unused96,unused97,unused98,unused99,unused100,unused101,unused102,unused103,unused104,unused105,unused106,unused107,unused108,unused109,unused110,unused111,unused112,unused113,unused114,unused115,unused116,unused117,unused118,unused119,unused120,unused121,unused122,unused123,unused124,unused125,unused126,unused127,unused128,unused129,unused130,unused131,unused132,unused133,unused134,unused135,unused136,unused137,unused138,unused139,unused140,unused141,unused142,unused143,unused144,unused145,unused146,unused147,unused148,unused149,unused150,unused151,unused152,unused153,unused154,unused155,unused156,unused157,unused158,unused159,unused160,unused161,unused162,unused163,unused164,unused165,unused166,unused167,unused168,unused169,unused170,unused171,unused172,unused173,unused174,unused175,unused176,unused177,unused178,unused179,unused180,unused181,unused182,unused183,unused184,unused185,unused186,unused187,unused188,unused189,unused190,unused191,unused192,unused193,unused194,unused195,unused196,unused197,unused198,unused199,unused200,unused201,unused202,unused203,unused204,unused205,unused206,unused207,unused208,unused209,unused210,unused211,unused212,unused213,unused214,unused215,unused216,unused217,unused218,unused219,unused220,unused221,unused222,unused223,unused224,unused225,unused226,unused227,unused228,unused229,unused230,unused231,unused232,unused233,unused234,unused235,unused236,unused237,unused238,unused239,unused240,unused241,unused242,unused243,unused244,unused245,unused246,unused247,unused248,unused249,unused250,unused251,unused252,unused253,unused254,unused255</param>
                         /// <param name="bwlimit">Override I/O bandwidth limit (in KiB/s).</param>
                         /// <param name="delete">Delete the original volume after successful copy. By default the original is kept as an unused volume entry.</param>
-                        /// <param name="digest">Prevent changes if current configuration file has different SHA1 " . 		    "digest. This can be used to prevent concurrent modifications.</param>
+                        /// <param name="digest">Prevent changes if current configuration file has different SHA1 " . "digest. This can be used to prevent concurrent modifications.</param>
                         /// <param name="storage">Target Storage.</param>
-                        /// <param name="target_digest">Prevent changes if current configuration file of the target " . 		    "container has a different SHA1 digest. This can be used to prevent " . 		    "concurrent modifications.</param>
+                        /// <param name="target_digest">Prevent changes if current configuration file of the target " . "container has a different SHA1 digest. This can be used to prevent " . "concurrent modifications.</param>
                         /// <param name="target_vmid">The (unique) ID of the VM.</param>
                         /// <param name="target_volume">The config key the volume will be moved to. Default is the source volume key.
                         ///   Enum: rootfs,mp0,mp1,mp2,mp3,mp4,mp5,mp6,mp7,mp8,mp9,mp10,mp11,mp12,mp13,mp14,mp15,mp16,mp17,mp18,mp19,mp20,mp21,mp22,mp23,mp24,mp25,mp26,mp27,mp28,mp29,mp30,mp31,mp32,mp33,mp34,mp35,mp36,mp37,mp38,mp39,mp40,mp41,mp42,mp43,mp44,mp45,mp46,mp47,mp48,mp49,mp50,mp51,mp52,mp53,mp54,mp55,mp56,mp57,mp58,mp59,mp60,mp61,mp62,mp63,mp64,mp65,mp66,mp67,mp68,mp69,mp70,mp71,mp72,mp73,mp74,mp75,mp76,mp77,mp78,mp79,mp80,mp81,mp82,mp83,mp84,mp85,mp86,mp87,mp88,mp89,mp90,mp91,mp92,mp93,mp94,mp95,mp96,mp97,mp98,mp99,mp100,mp101,mp102,mp103,mp104,mp105,mp106,mp107,mp108,mp109,mp110,mp111,mp112,mp113,mp114,mp115,mp116,mp117,mp118,mp119,mp120,mp121,mp122,mp123,mp124,mp125,mp126,mp127,mp128,mp129,mp130,mp131,mp132,mp133,mp134,mp135,mp136,mp137,mp138,mp139,mp140,mp141,mp142,mp143,mp144,mp145,mp146,mp147,mp148,mp149,mp150,mp151,mp152,mp153,mp154,mp155,mp156,mp157,mp158,mp159,mp160,mp161,mp162,mp163,mp164,mp165,mp166,mp167,mp168,mp169,mp170,mp171,mp172,mp173,mp174,mp175,mp176,mp177,mp178,mp179,mp180,mp181,mp182,mp183,mp184,mp185,mp186,mp187,mp188,mp189,mp190,mp191,mp192,mp193,mp194,mp195,mp196,mp197,mp198,mp199,mp200,mp201,mp202,mp203,mp204,mp205,mp206,mp207,mp208,mp209,mp210,mp211,mp212,mp213,mp214,mp215,mp216,mp217,mp218,mp219,mp220,mp221,mp222,mp223,mp224,mp225,mp226,mp227,mp228,mp229,mp230,mp231,mp232,mp233,mp234,mp235,mp236,mp237,mp238,mp239,mp240,mp241,mp242,mp243,mp244,mp245,mp246,mp247,mp248,mp249,mp250,mp251,mp252,mp253,mp254,mp255,unused0,unused1,unused2,unused3,unused4,unused5,unused6,unused7,unused8,unused9,unused10,unused11,unused12,unused13,unused14,unused15,unused16,unused17,unused18,unused19,unused20,unused21,unused22,unused23,unused24,unused25,unused26,unused27,unused28,unused29,unused30,unused31,unused32,unused33,unused34,unused35,unused36,unused37,unused38,unused39,unused40,unused41,unused42,unused43,unused44,unused45,unused46,unused47,unused48,unused49,unused50,unused51,unused52,unused53,unused54,unused55,unused56,unused57,unused58,unused59,unused60,unused61,unused62,unused63,unused64,unused65,unused66,unused67,unused68,unused69,unused70,unused71,unused72,unused73,unused74,unused75,unused76,unused77,unused78,unused79,unused80,unused81,unused82,unused83,unused84,unused85,unused86,unused87,unused88,unused89,unused90,unused91,unused92,unused93,unused94,unused95,unused96,unused97,unused98,unused99,unused100,unused101,unused102,unused103,unused104,unused105,unused106,unused107,unused108,unused109,unused110,unused111,unused112,unused113,unused114,unused115,unused116,unused117,unused118,unused119,unused120,unused121,unused122,unused123,unused124,unused125,unused126,unused127,unused128,unused129,unused130,unused131,unused132,unused133,unused134,unused135,unused136,unused137,unused138,unused139,unused140,unused141,unused142,unused143,unused144,unused145,unused146,unused147,unused148,unused149,unused150,unused151,unused152,unused153,unused154,unused155,unused156,unused157,unused158,unused159,unused160,unused161,unused162,unused163,unused164,unused165,unused166,unused167,unused168,unused169,unused170,unused171,unused172,unused173,unused174,unused175,unused176,unused177,unused178,unused179,unused180,unused181,unused182,unused183,unused184,unused185,unused186,unused187,unused188,unused189,unused190,unused191,unused192,unused193,unused194,unused195,unused196,unused197,unused198,unused199,unused200,unused201,unused202,unused203,unused204,unused205,unused206,unused207,unused208,unused209,unused210,unused211,unused212,unused213,unused214,unused215,unused216,unused217,unused218,unused219,unused220,unused221,unused222,unused223,unused224,unused225,unused226,unused227,unused228,unused229,unused230,unused231,unused232,unused233,unused234,unused235,unused236,unused237,unused238,unused239,unused240,unused241,unused242,unused243,unused244,unused245,unused246,unused247,unused248,unused249,unused250,unused251,unused252,unused253,unused254,unused255</param>
@@ -10805,7 +10886,7 @@ public class PveClient : PveClientBase
                 ///   Enum: shell,console,tty</param>
                 /// <param name="console">Attach a console device (/dev/console) to the container.</param>
                 /// <param name="cores">The number of cores assigned to the container. A container can use all available cores by default.</param>
-                /// <param name="cpulimit">Limit of CPU usage.  NOTE: If the computer has 2 CPUs, it has a total of '2' CPU time. Value '0' indicates no CPU limit.</param>
+                /// <param name="cpulimit">Limit of CPU usage. NOTE: If the computer has 2 CPUs, it has a total of '2' CPU time. Value '0' indicates no CPU limit.</param>
                 /// <param name="cpuunits">CPU weight for a container, will be clamped to [1, 10000] in cgroup v2.</param>
                 /// <param name="debug">Try to be more verbose. For now this only enables debug log-level on start.</param>
                 /// <param name="description">Description for the Container. Shown in the web-interface CT's summary. This is saved as comment inside the configuration file.</param>
@@ -10825,7 +10906,7 @@ public class PveClient : PveClientBase
                 /// <param name="nameserver">Sets DNS server IP address for a container. Create will automatically use the setting from the host if you neither set searchdomain nor nameserver.</param>
                 /// <param name="netN">Specifies network interfaces for the container.</param>
                 /// <param name="onboot">Specifies whether a container will be started during system bootup.</param>
-                /// <param name="ostype">OS type. This is used to setup configuration inside the container, and corresponds to lxc setup scripts in /usr/share/lxc/config/&amp;lt;ostype&amp;gt;.common.conf. Value 'unmanaged' can be used to skip and OS specific setup.
+                /// <param name="ostype">OS type. This is used to setup configuration inside the container, and corresponds to lxc setup scripts in /usr/share/lxc/config/&lt;ostype&gt;.common.conf. Value 'unmanaged' can be used to skip and OS specific setup.
                 ///   Enum: debian,devuan,ubuntu,centos,fedora,opensuse,archlinux,alpine,gentoo,nixos,unmanaged</param>
                 /// <param name="password">Sets root password inside container.</param>
                 /// <param name="pool">Add the VM to the specified pool.</param>
@@ -11057,7 +11138,7 @@ public class PveClient : PveClientBase
                         /// <summary>
                         /// Get configured values from either ceph.conf or the mon config DB. Underscores in section and key names are normalised to hyphens in the response, regardless of how they're written in the source.
                         /// </summary>
-                        /// <param name="config_keys">List of &amp;lt;section&amp;gt;:&amp;lt;config key&amp;gt; items separated by semicolon, comma or space.</param>
+                        /// <param name="config_keys">List of &lt;section&gt;:&lt;config key&gt; items separated by semicolon, comma or space.</param>
                         /// <returns></returns>
                         public async Task<Result> Value(string config_keys)
                         {
@@ -11311,7 +11392,7 @@ public class PveClient : PveClientBase
                         /// <summary>
                         /// Create Ceph Metadata Server (MDS)
                         /// </summary>
-                        /// <param name="hotstandby">Determines whether a ceph-mds daemon should poll and replay the log of an active MDS. Faster switch on MDS failure, but needs more idle resources.</param>
+                        /// <param name="hotstandby">Determines whether a ceph-mds daemon should poll and replay the log of an active MDS. Faster switch on MDS failure, but needs more idle resources. Deprecated: the setting was removed in Ceph 14.1.1.</param>
                         /// <returns></returns>
                         public async Task<Result> Createmds(bool? hotstandby = null)
                         {
@@ -11646,10 +11727,10 @@ public class PveClient : PveClientBase
                     /// Create the initial Ceph default configuration and set up symlinks. Idempotent on re-call: if a [global] section already exists in ceph.conf, the existing fsid / auth / pool defaults are preserved and most parameters are silently ignored.
                     /// </summary>
                     /// <param name="cluster_network">Declare a separate cluster network, OSDs will route heartbeat, object replication and recovery traffic over it</param>
-                    /// <param name="disable_cephx">Disable cephx authentication.  WARNING: cephx is a security feature protecting against man-in-the-middle attacks. Only consider disabling cephx if your network is private!</param>
+                    /// <param name="disable_cephx">Disable cephx authentication. WARNING: cephx is a security feature protecting against man-in-the-middle attacks. Only consider disabling cephx if your network is private!</param>
                     /// <param name="min_size">Minimum number of available replicas per object to allow I/O</param>
                     /// <param name="network">Use specific network for all ceph related traffic</param>
-                    /// <param name="pg_bits">Placement group bits, used to specify the default number of placement groups.  Depreacted. This setting was deprecated in recent Ceph versions.</param>
+                    /// <param name="pg_bits">Placement group bits, used to specify the default number of placement groups. Depreacted. This setting was deprecated in recent Ceph versions.</param>
                     /// <param name="size">Targeted number of replicas per object</param>
                     /// <returns></returns>
                     public async Task<Result> Init(string cluster_network = null, bool? disable_cephx = null, int? min_size = null, string network = null, int? pg_bits = null, int? size = null)
@@ -11733,12 +11814,12 @@ public class PveClient : PveClientBase
                     private readonly object _node;
                     internal PveRestartBulk(PveClient client, object node) { _client = client; _node = node; }
                     /// <summary>
-                    /// Rolling restart of all Ceph OSDs on this node. Each OSD is restarted only after Ceph reports the previous one is back up and the next one is safe to stop. For non-OSD Ceph daemons, use the cluster-wide endpoint at /cluster/ceph/restart-bulk. The 'noout' flag is applied only to the OSDs targeted by this run, so unrelated OSDs on other nodes that fail during the restart window still get out-marked normally. Aborting the resulting task (for example via 'pvesh task stop') triggers a SIGTERM handler that unsets the per-OSD 'noout' if this endpoint set it. Per-daemon progress is checkpointed in Ceph's config-key store ('pve/ceph-bulk-restart/node/&amp;lt;node&amp;gt;'), so an aborted run can be resumed by re-issuing this endpoint with 'resume=1'.
+                    /// Rolling restart of all Ceph OSDs on this node. Each OSD is restarted only after Ceph reports the previous one is back up and the next one is safe to stop. For non-OSD Ceph daemons, use the cluster-wide endpoint at /cluster/ceph/restart-bulk. The 'noout' flag is applied only to the OSDs targeted by this run, so unrelated OSDs on other nodes that fail during the restart window still get out-marked normally. Aborting the resulting task (for example via 'pvesh task stop') triggers a SIGTERM handler that unsets the per-OSD 'noout' if this endpoint set it. Per-daemon progress is checkpointed in Ceph's config-key store ('pve/ceph-bulk-restart/node/&lt;node&gt;'), so an aborted run can be resumed by re-issuing this endpoint with 'resume=1'.
                     /// </summary>
                     /// <param name="service_type">Ceph daemon type to restart. Only OSDs can be rolling-restarted on a per-node basis.
                     ///   Enum: osd</param>
                     /// <param name="dry_run">Log the plan (which OSDs would be restarted, in what order) without actually doing anything.</param>
-                    /// <param name="force">Proceed past a HEALTH_WARN with non-benign checks like PG_DEGRADED, SLOW_OPS, or MON_DOWN. HEALTH_ERR is always fatal regardless. The operator is responsible for confirming the cluster is stable enough to absorb a rolling restart.</param>
+                    /// <param name="force">Proceed past a HEALTH_WARN with non-benign checks like PG_DEGRADED, SLOW_OPS, or MON_DOWN. A blocking HEALTH_ERR is fatal regardless of this flag. Checks that ceph reports as muted, and checks known to be harmless for a rolling restart, never block and are named in the task log. The cluster-wide OSD map flags are only ever evaluated for an OSD restart, since they govern nothing a mon, mgr or mds restart touches. The operator is responsible for confirming the cluster is stable enough to absorb a rolling restart.</param>
                     /// <param name="only_outdated">Restart only OSDs whose running version differs from the locally-installed ceph-osd binary. Useful for post-upgrade rolling restarts that should touch only daemons that need it. Refuses if the local binary version cannot be determined. Ignored on resume (the saved plan is used as-is).</param>
                     /// <param name="resume">Resume an aborted bulk-restart from the checkpoint stored in Ceph's config-key store. The plan and noout decision from the prior run are honored; 'set-noout' is ignored. When false (default), the endpoint refuses to start if a checkpoint exists for this node, to avoid silently overwriting in-progress work.</param>
                     /// <param name="set_noout">Set the 'noout' flag on each OSD targeted by this run for the duration of the rolling restart, and unset it on completion. Per-OSD rather than cluster-wide so that unrelated OSDs failing on other nodes still trigger backfill normally.</param>
@@ -11936,7 +12017,7 @@ public class PveClient : PveClientBase
                 /// <param name="pbs_change_detection_mode">PBS mode used to detect file changes and switch encoding format for container backups.
                 ///   Enum: legacy,data,metadata</param>
                 /// <param name="performance">Other performance-related settings.</param>
-                /// <param name="pigz">Use pigz instead of gzip when N&amp;gt;0. N=1 uses half of cores, N&amp;gt;1 uses N as thread count.</param>
+                /// <param name="pigz">Use pigz instead of gzip when N&gt;0. N=1 uses half of cores, N&gt;1 uses N as thread count.</param>
                 /// <param name="pool">Backup all known guest systems included in the specified pool.</param>
                 /// <param name="protected_">If true, mark backup(s) as protected.</param>
                 /// <param name="prune_backups">Use these retention options instead of those from the storage configuration.</param>
@@ -12478,7 +12559,7 @@ public class PveClient : PveClientBase
                     /// <returns></returns>
                     public async Task<Result> StopTask() { return await _client.DeleteAsync($"/nodes/{_node}/tasks/{_upid}"); }
                     /// <summary>
-                    /// 
+                    ///
                     /// </summary>
                     /// <returns></returns>
                     public async Task<Result> UpidIndex() { return await _client.GetAsync($"/nodes/{_node}/tasks/{_upid}"); }
@@ -12769,26 +12850,14 @@ public class PveClient : PveClientBase
                             /// <summary>
                             /// List mediated device types for given PCI device.
                             /// </summary>
-                            /// <param name="pci_id_or_mapping">The PCI ID or mapping to list the mdev types for.</param>
                             /// <returns></returns>
-                            public async Task<Result> Mdevscan(string pci_id_or_mapping)
-                            {
-                                var parameters = new Dictionary<string, object>();
-                                parameters.Add("pci-id-or-mapping", pci_id_or_mapping);
-                                return await _client.GetAsync($"/nodes/{_node}/hardware/pci/{_pci_id_or_mapping}/mdev", parameters);
-                            }
+                            public async Task<Result> Mdevscan() { return await _client.GetAsync($"/nodes/{_node}/hardware/pci/{_pci_id_or_mapping}/mdev"); }
                         }
                         /// <summary>
                         /// Index of available pci methods
                         /// </summary>
-                        /// <param name="pci_id_or_mapping"></param>
                         /// <returns></returns>
-                        public async Task<Result> PciIndex(string pci_id_or_mapping)
-                        {
-                            var parameters = new Dictionary<string, object>();
-                            parameters.Add("pci-id-or-mapping", pci_id_or_mapping);
-                            return await _client.GetAsync($"/nodes/{_node}/hardware/pci/{_pci_id_or_mapping}", parameters);
-                        }
+                        public async Task<Result> PciIndex() { return await _client.GetAsync($"/nodes/{_node}/hardware/pci/{_pci_id_or_mapping}"); }
                     }
                     /// <summary>
                     /// List local PCI devices.
@@ -12940,7 +13009,7 @@ public class PveClient : PveClientBase
                         private readonly object _node;
                         internal PveMigration(PveClient client, object node) { _client = client; _node = node; }
                         /// <summary>
-                        /// Get node-specific QEMU migration capabilities of the node. Requires the 'Sys.Audit' permission on '/nodes/&amp;lt;node&amp;gt;'.
+                        /// Get node-specific QEMU migration capabilities of the node. Requires the 'Sys.Audit' permission on '/nodes/&lt;node&gt;'.
                         /// </summary>
                         /// <returns></returns>
                         public async Task<Result> Capabilities() { return await _client.GetAsync($"/nodes/{_node}/capabilities/qemu/migration"); }
@@ -13495,7 +13564,7 @@ public class PveClient : PveClientBase
                         public async Task<Result> Identity() { return await _client.GetAsync($"/nodes/{_node}/storage/{_storage}/identity"); }
                     }
                     /// <summary>
-                    /// 
+                    ///
                     /// </summary>
                     /// <returns></returns>
                     public async Task<Result> Diridx() { return await _client.GetAsync($"/nodes/{_node}/storage/{_storage}"); }
@@ -14143,7 +14212,7 @@ public class PveClient : PveClientBase
                         /// <param name="log">Log level for firewall rule.
                         ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                         /// <param name="macro">Use predefined standard macro.</param>
-                        /// <param name="moveto">Move rule to new position &amp;lt;moveto&amp;gt;. Other arguments are ignored.</param>
+                        /// <param name="moveto">Move rule to new position &lt;moveto&gt;. Other arguments are ignored.</param>
                         /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                         /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                         /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -14193,7 +14262,7 @@ public class PveClient : PveClientBase
                     /// <param name="log">Log level for firewall rule.
                     ///   Enum: emerg,alert,crit,err,warning,notice,info,debug,nolog</param>
                     /// <param name="macro">Use predefined standard macro.</param>
-                    /// <param name="pos">Update rule at position &amp;lt;pos&amp;gt;.</param>
+                    /// <param name="pos">Update rule at position &lt;pos&gt;.</param>
                     /// <param name="proto">IP protocol. You can use protocol names ('tcp'/'udp') or simple numbers, as defined in '/etc/protocols'.</param>
                     /// <param name="source">Restrict packet source address. This can refer to a single IP address, an IP set ('+ipsetname') or an IP alias definition. You can also specify an address range like '20.34.101.207-201.3.9.99', or a list of IP addresses and networks (entries are separated by comma). Please do not mix IPv4 and IPv6 addresses inside such lists.</param>
                     /// <param name="sport">Restrict TCP/UDP source port. You can use service names or simple numbers (0-65535), as defined in '/etc/services'. Port ranges can be specified with '\d+:\d+', for example '80:85', and you can use comma separated list to match several ports or ranges.</param>
@@ -14913,7 +14982,7 @@ public class PveClient : PveClientBase
                             public async Task<Result> MacVrf() { return await _client.GetAsync($"/nodes/{_node}/sdn/vnets/{_vnet}/mac-vrf"); }
                         }
                         /// <summary>
-                        /// 
+                        ///
                         /// </summary>
                         /// <returns></returns>
                         public async Task<Result> Diridx() { return await _client.GetAsync($"/nodes/{_node}/sdn/vnets/{_vnet}"); }
@@ -15432,7 +15501,7 @@ public class PveClient : PveClientBase
                 /// <summary>
                 /// Suspend all VMs.
                 /// </summary>
-                /// <param name="max_workers">Maximal number of parallel migration job. If not set, uses'max_workers' from datacenter.cfg, and if that's not set the available'                     .' CPU threads, clamped to a maximum of 8, are used.</param>
+                /// <param name="max_workers">Maximal number of parallel migration job. If not set, uses'max_workers' from datacenter.cfg, and if that's not set the available' .' CPU threads, clamped to a maximum of 8, are used.</param>
                 /// <param name="vms">Only consider Guests with these IDs.</param>
                 /// <returns></returns>
                 public async Task<Result> Suspendall(int? max_workers = null, string vms = null)
@@ -15547,7 +15616,7 @@ public class PveClient : PveClientBase
             /// <param name="bwlimit">Set I/O bandwidth limit for various operations (in KiB/s).</param>
             /// <param name="comstar_hg">host group for comstar views</param>
             /// <param name="comstar_tg">target group for comstar views</param>
-            /// <param name="content">Allowed content types.  NOTE: the value 'rootdir' is used for Containers, and value 'images' for VMs. </param>
+            /// <param name="content">Allowed content types. NOTE: the value 'rootdir' is used for Containers, and value 'images' for VMs.</param>
             /// <param name="content_dirs">Overrides for default content type directories.</param>
             /// <param name="create_base_path">Create the base directory if it doesn't exist.</param>
             /// <param name="create_subdirs">Populate the directory with the default structure.</param>
@@ -15678,7 +15747,7 @@ public class PveClient : PveClientBase
         /// <param name="bwlimit">Set I/O bandwidth limit for various operations (in KiB/s).</param>
         /// <param name="comstar_hg">host group for comstar views</param>
         /// <param name="comstar_tg">target group for comstar views</param>
-        /// <param name="content">Allowed content types.  NOTE: the value 'rootdir' is used for Containers, and value 'images' for VMs. </param>
+        /// <param name="content">Allowed content types. NOTE: the value 'rootdir' is used for Containers, and value 'images' for VMs.</param>
         /// <param name="content_dirs">Overrides for default content type directories.</param>
         /// <param name="create_base_path">Create the base directory if it doesn't exist.</param>
         /// <param name="create_subdirs">Populate the directory with the default structure.</param>
@@ -16350,7 +16419,7 @@ public class PveClient : PveClientBase
                 /// <param name="issuer_url">OpenID Issuer Url</param>
                 /// <param name="mode">LDAP protocol mode.
                 ///   Enum: ldap,ldaps,ldap+starttls</param>
-                /// <param name="password">LDAP bind password. Will be stored in '/etc/pve/priv/realm/&amp;lt;REALM&amp;gt;.pw'.</param>
+                /// <param name="password">LDAP bind password. Will be stored in '/etc/pve/priv/realm/&lt;REALM&gt;.pw'.</param>
                 /// <param name="port">Server port.</param>
                 /// <param name="prompt">Specifies whether the Authorization Server prompts the End-User for reauthentication and consent.</param>
                 /// <param name="query_userinfo">Enables querying the userinfo endpoint for claims values.</param>
@@ -16452,7 +16521,7 @@ public class PveClient : PveClientBase
             /// <param name="issuer_url">OpenID Issuer Url</param>
             /// <param name="mode">LDAP protocol mode.
             ///   Enum: ldap,ldaps,ldap+starttls</param>
-            /// <param name="password">LDAP bind password. Will be stored in '/etc/pve/priv/realm/&amp;lt;REALM&amp;gt;.pw'.</param>
+            /// <param name="password">LDAP bind password. Will be stored in '/etc/pve/priv/realm/&lt;REALM&gt;.pw'.</param>
             /// <param name="port">Server port.</param>
             /// <param name="prompt">Specifies whether the Authorization Server prompts the End-User for reauthentication and consent.</param>
             /// <param name="query_userinfo">Enables querying the userinfo endpoint for claims values.</param>
@@ -16568,7 +16637,7 @@ public class PveClient : PveClientBase
 
                 internal PveLogin(PveClient client) { _client = client; }
                 /// <summary>
-                ///  Verify OpenID authorization code and create a ticket.
+                /// Verify OpenID authorization code and create a ticket.
                 /// </summary>
                 /// <param name="code">OpenId authorization code.</param>
                 /// <param name="redirect_url">Redirection Url. The client should set this to the used server url (location.origin).</param>
@@ -16714,7 +16783,7 @@ public class PveClient : PveClientBase
             /// <param name="otp">One-time password for Two-factor authentication.</param>
             /// <param name="path">Verify ticket, and check if user have access 'privs' on 'path'</param>
             /// <param name="privs">Verify ticket, and check if user have access 'privs' on 'path'</param>
-            /// <param name="realm">You can optionally pass the realm using this parameter. Normally the realm is simply added to the username &amp;lt;username&amp;gt;@&amp;lt;realm&amp;gt;.</param>
+            /// <param name="realm">You can optionally pass the realm using this parameter. Normally the realm is simply added to the username &lt;username&gt;@&lt;realm&gt;.</param>
             /// <param name="tfa_challenge">The signed TFA challenge string the user wants to respond to.</param>
             /// <returns></returns>
             public async Task<Result> CreateTicket(string password, string username, bool? new_format = null, string otp = null, string path = null, string privs = null, string realm = null, string tfa_challenge = null)
