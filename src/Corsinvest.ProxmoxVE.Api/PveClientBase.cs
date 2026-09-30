@@ -93,6 +93,11 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// <summary>
     /// Logs in to the Proxmox API using username and password.
     /// </summary>
+    /// <param name="userName">User name</param>
+    /// <param name="password">The secret password. This can also be a valid ticket.</param>
+    /// <param name="realm">Realm</param>
+    /// <param name="otp">Second factor of a user with two-factor authentication: a TOTP code (e.g. 123456)
+    /// or 'type:value' (e.g. recovery:abcd-1234).</param>
     public async Task<bool> LoginAsync(string userName, string password, string realm, string otp = null)
     {
         var result = await CreateAsync("/access/ticket", new Dictionary<string, object>
@@ -100,7 +105,6 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
             {"password", password},
             {"username", userName},
             {"realm", realm},
-            {"otp", otp},
         });
 
         if (result.IsSuccessStatusCode)
@@ -108,8 +112,24 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
             var data = (IDictionary<string, object>)result.Response.data;
             if (data.ContainsKey("NeedTFA"))
             {
-                throw new PveAuthenticationException(result, "Missing Two Factor Authentication (TFA)");
+                if (string.IsNullOrWhiteSpace(otp))
+                {
+                    throw new PveAuthenticationException(result, "Missing Two Factor Authentication (TFA)");
+                }
+
+                //second step: the response to the challenge of the first one
+                result = await CreateAsync("/access/ticket", new Dictionary<string, object>
+                {
+                    {"password", GetTfaResponse(otp)},
+                    {"username", userName},
+                    {"realm", realm},
+                    {"tfa-challenge", result.Response.data.ticket},
+                });
             }
+        }
+
+        if (result.IsSuccessStatusCode)
+        {
 
             CSRFPreventionToken = result.Response.data.CSRFPreventionToken;
             PVEAuthCookie = result.Response.data.ticket;
@@ -123,6 +143,13 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
 
         return result.IsSuccessStatusCode;
     }
+
+    /// <summary>
+    /// Second factor as Proxmox VE expects it in the response to a TFA challenge: 'type:value'.
+    /// A code without a type is a TOTP code.
+    /// </summary>
+    internal static string GetTfaResponse(string otp)
+        => otp.Contains(':') ? otp : $"totp:{otp}";
 
     /// <summary>
     /// Verify OpenID authorization code and create a ticket.
@@ -341,7 +368,7 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
             _logger.LogDebug("Method: {httpMethod}, Url: {uriString}", httpMethod, uriString);
             if (httpMethod != HttpMethod.Get)
             {
-                var sensitiveParams = new[] { "password", "token", "ticket", "otp", "apitoken" };
+                var sensitiveParams = new[] { "password", "token", "ticket", "otp", "apitoken", "tfa-challenge" };
                 _logger.LogDebug("Parameters: {parameters}", string.Join(Environment.NewLine, @params.Select(a =>
                 {
                     var paramName = a.Key.ToLower();
@@ -479,7 +506,8 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// <param name="task">Task identifier</param>
     /// <param name="wait">Millisecond wait next check</param>
     /// <param name="timeout">Millisecond timeout</param>
-    /// <return></return>
+    /// <returns>True when the task is finished, false when it is still running at the timeout.</returns>
+    /// <exception cref="PveResultException">Task status cannot be read.</exception>
     public async Task<bool> WaitForTaskToFinishAsync(string task, int wait = 500, long timeout = 10000)
     {
         var isRunning = true;
@@ -493,8 +521,8 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
             isRunning = await TaskIsRunningAsync(task);
         }
 
-        //check timeout
-        return (DateTime.Now - timeStart).TotalMilliseconds < timeout;
+        //finished, also when the last check came after the timeout
+        return !isRunning;
     }
 
     /// <summary>
