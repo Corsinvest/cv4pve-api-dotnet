@@ -52,6 +52,8 @@ bool success = await client.Login("admin@pve", "password", "123456");
 // The third parameter is the 6-digit code from your authenticator app
 ```
 
+Instead of the code you can pass a recovery key as `recovery:<key>`. Without a code, a user with two-factor authentication gets an exception.
+
 ---
 
 ## Creating API Tokens
