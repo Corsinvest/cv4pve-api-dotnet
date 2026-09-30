@@ -7,7 +7,7 @@
 
 namespace Corsinvest.ProxmoxVE.Api.Metadata;
 
-/// <summary>Flat cache resource — keys, children, methods</summary>
+/// <summary>Flat cache resource: keys, children, methods</summary>
 public record FlatResourceInfo(string[]? Keys,
                                FlatChildInfo[]? Children,
                                Dictionary<string,

@@ -237,7 +237,7 @@ public sealed partial class PveCalendarEvent
             throw new PveCalendarParseException(original, $"invalid date spec '{token}'");
         }
 
-        // 3-part: Y-M-D — only wildcard year is supported
+        // 3-part: Y-M-D (only wildcard year is supported)
         if (parts.Length == 3)
         {
             if (parts[0] != "*")

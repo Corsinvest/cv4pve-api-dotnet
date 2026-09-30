@@ -204,27 +204,27 @@ public class VmBaseStatusCurrent : ModelBase, IVmBase, INetIO, IDisk, IMemory, I
     [DisplayFormat(DataFormatString = FormatHelper.DataFormatBytes)]
     public ulong MemoryHostUsage { get; set; }
 
-    /// <summary>PSI CPU pressure (some) — requires PVE 9.0+.</summary>
+    /// <summary>PSI CPU pressure (some). Requires PVE 9.0+.</summary>
     [JsonProperty("pressurecpusome")]
     public double PressureCpuSome { get; set; }
 
-    /// <summary>PSI CPU pressure (full) — requires PVE 9.0+.</summary>
+    /// <summary>PSI CPU pressure (full). Requires PVE 9.0+.</summary>
     [JsonProperty("pressurecpufull")]
     public double PressureCpuFull { get; set; }
 
-    /// <summary>PSI I/O pressure (some) — requires PVE 9.0+.</summary>
+    /// <summary>PSI I/O pressure (some). Requires PVE 9.0+.</summary>
     [JsonProperty("pressureiosome")]
     public double PressureIoSome { get; set; }
 
-    /// <summary>PSI I/O pressure (full) — requires PVE 9.0+.</summary>
+    /// <summary>PSI I/O pressure (full). Requires PVE 9.0+.</summary>
     [JsonProperty("pressureiofull")]
     public double PressureIoFull { get; set; }
 
-    /// <summary>PSI memory pressure (some) — requires PVE 9.0+.</summary>
+    /// <summary>PSI memory pressure (some). Requires PVE 9.0+.</summary>
     [JsonProperty("pressurememorysome")]
     public double PressureMemorySome { get; set; }
 
-    /// <summary>PSI memory pressure (full) — requires PVE 9.0+.</summary>
+    /// <summary>PSI memory pressure (full). Requires PVE 9.0+.</summary>
     [JsonProperty("pressurememoryfull")]
     public double PressureMemoryFull { get; set; }
 

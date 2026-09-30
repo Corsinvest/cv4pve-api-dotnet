@@ -81,7 +81,7 @@ public static partial class NetworkDiagramBuilder
         }
 
         // A bridge is "external" if at least one of its ports is a physical NIC or a bond
-        // (i.e. it can reach the LAN). Bridges without such ports are "internal" — typical
+        // (i.e. it can reach the LAN). Bridges without such ports are "internal", typical
         // for VM-only networks used as private segments behind a gateway VM.
         var externalBridges = bridgeByName.Values
                                 .Where(br => PortsOf(br).Any(p => bondByName.ContainsKey(p) || nicByName.ContainsKey(p)))
@@ -94,7 +94,7 @@ public static partial class NetworkDiagramBuilder
         if (externalBridges.Count == 0) { externalBridges = [.. bridgeByName.Keys]; }
 
         // A VM is treated as a gateway (firewall/router) when it attaches to both an
-        // external and an internal bridge — i.e. it bridges traffic between segments.
+        // external and an internal bridge, i.e. it bridges traffic between segments.
         // Rendered in orange (SvgColFw) to make multi-homed VMs visually obvious.
         var gatewayVmIds = vmsInNode.Where(kv =>
         {
@@ -253,7 +253,7 @@ public static partial class NetworkDiagramBuilder
                 }
 
                 // Filter out interfaces that aren't meaningful in a topology view:
-                // loopback, container runtime veths/bridges (docker/cni) and tunnels —
+                // loopback, container runtime veths/bridges (docker/cni) and tunnels;
                 // they only clutter the box without adding routing information.
                 static bool IsRelevantNic(VmNetworkRow n)
                 {
@@ -289,7 +289,7 @@ public static partial class NetworkDiagramBuilder
 
                 AddNode(nodeId,
                         BoxLabel([.. labelParts]),
-                        TooltipLines((Key: vmPrefix, Value: $"{vmId} — {first.Name}"),
+                        TooltipLines((Key: vmPrefix, Value: $"{vmId} ({first.Name})"),
                                      ("Hostname", hostnameOk ? hostname : null),
                                      ("Status", first.Status),
                                      ("Bridges", bridgesUsed.JoinAsString(", ")),

@@ -117,7 +117,7 @@ public partial class VmConfig : ModelBase
 
     /// <summary>
     /// Data disks only (<see cref="VmDiskKind.Disk"/>), both active and unused.
-    /// Does not include CD-ROM/ISO/cloud-init drives — for those, use <see cref="DisksAll"/>.
+    /// Does not include CD-ROM/ISO/cloud-init drives; for those, use <see cref="DisksAll"/>.
     /// </summary>
     public IEnumerable<VmDisk> Disks { get; private set; } = [];
 

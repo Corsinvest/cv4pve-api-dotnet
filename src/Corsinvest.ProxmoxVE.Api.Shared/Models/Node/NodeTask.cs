@@ -215,7 +215,7 @@ public class NodeTask : ModelBase, IStatusItem, INodeItem
     public int Pid { get; set; }
 
     /// <summary>
-    /// Pstart — (Internal) Process start time used to verify that the process is still running.
+    /// Pstart: (Internal) Process start time used to verify that the process is still running.
     /// </summary>
     [JsonProperty("pstart")]
     public long Pstart { get; set; }
