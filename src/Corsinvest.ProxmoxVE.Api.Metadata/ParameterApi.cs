@@ -26,10 +26,14 @@ public class ParameterApi
         TypeText = flat.TypeText ?? string.Empty;
         Description = flat.Description ?? string.Empty;
         Optional = flat.Optional ?? false;
-        Default = flat.Default ?? string.Empty;
+        Default = flat.Default;
         Minimum = flat.Minimum;
         Maximum = flat.Maximum;
         EnumValues = flat.EnumValues ?? [];
+        Renderer = flat.Renderer ?? string.Empty;
+        VerboseDescription = flat.VerboseDescription ?? string.Empty;
+        if (flat.Formats != null) { Formats.AddRange(flat.Formats.Select(a => new ParameterFormatApi(a))); }
+        if (flat.Items != null) { Items.AddRange(flat.Items.Select(a => new ParameterApi(a))); }
     }
 
     /// <summary>Constructor from JSON token</summary>
@@ -113,50 +117,75 @@ public class ParameterApi
     /// <summary>
     /// Renderer value.
     /// </summary>
+    /// <remarks>As pvesh renders them: sizes with two decimals (<c>1.50 KiB</c>), percentages (<c>4.44%</c>),
+    /// durations without the leading empty units (<c>1h 0m 5s</c>), dates as <c>yyyy-MM-dd HH:mm:ss</c> (local, or
+    /// UTC for <c>timestamp_gmt</c>; 0 is no date). A value that is not a number stays as it is.</remarks>
     public object RendererValue(object value)
     {
+        var invariant = System.Globalization.CultureInfo.InvariantCulture;
+
+        // A number as the API returns it (long, double) or as text in invariant format: never through the culture.
+        bool TryNumber(out double number)
+        {
+            if (value is not string and IConvertible convertible and not bool)
+            {
+                try
+                {
+                    number = convertible.ToDouble(invariant);
+                    return true;
+                }
+                catch (FormatException) { }
+                catch (InvalidCastException) { }
+            }
+
+            return double.TryParse(value + string.Empty, System.Globalization.NumberStyles.Float, invariant, out number);
+        }
+
         switch (Renderer)
         {
             case "fraction_as_percentage":
-                value = double.TryParse(value.ToString(), out var perValue) && perValue > 0
-                        ? Math.Round(perValue * 100, 2) + "%"
-                        : string.Empty;
+                if (TryNumber(out var fraction))
+                {
+                    value = Math.Round(fraction * 100, 2).ToString(invariant) + "%";
+                }
                 break;
 
             case "bytes":
-                if (value != null && long.TryParse(value.ToString(), out var bytesValue) && bytesValue > 0)
+                if (TryNumber(out var bytes) && bytes >= 0)
                 {
-                    var sizes = new string[] { "B", "KiB", "MiB", "GiB", "TiB" };
+                    var sizes = new[] { "B", "KiB", "MiB", "GiB", "TiB", "PiB" };
                     var order = 0;
-                    while (bytesValue >= 1024 && order < sizes.Length - 1)
+                    while (bytes >= 1024 && order < sizes.Length - 1)
                     {
                         order++;
-                        bytesValue /= 1024;
+                        bytes /= 1024;
                     }
-                    value = $"{bytesValue} {sizes[order]}";
-                }
-                else
-                {
-                    value = string.Empty;
+                    value = order == 0 ? $"{bytes.ToString(invariant)} B" : $"{bytes.ToString("F2", invariant)} {sizes[order]}";
                 }
                 break;
 
             case "duration":
-                value = int.TryParse(value.ToString(), out var duration) && duration > 0
-                            ? new TimeSpan(0, 0, duration).ToString(@"d\d\ h\h\ m\m\ ss\s")
-                            : string.Empty;
+                if (TryNumber(out var seconds) && seconds >= 0)
+                {
+                    var time = TimeSpan.FromSeconds(Math.Floor(seconds));
+                    value = time.Days > 0
+                            ? $"{time.Days}d {time.Hours}h {time.Minutes}m {time.Seconds}s"
+                            : time.Hours > 0
+                                ? $"{time.Hours}h {time.Minutes}m {time.Seconds}s"
+                                : time.Minutes > 0 ? $"{time.Minutes}m {time.Seconds}s" : $"{time.Seconds}s";
+                }
                 break;
 
             case "timestamp":
-                value = long.TryParse(value?.ToString(), out var ts) && ts > 0
-                            ? DateTimeOffset.FromUnixTimeSeconds(ts).ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")
-                            : string.Empty;
-                break;
-
             case "timestamp_gmt":
-                value = long.TryParse(value?.ToString(), out var tsGmt) && tsGmt > 0
-                            ? DateTimeOffset.FromUnixTimeSeconds(tsGmt).UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss")
-                            : string.Empty;
+                if (TryNumber(out var unixValue))
+                {
+                    var unix = (long)unixValue;
+                    var date = DateTimeOffset.FromUnixTimeSeconds(unix);
+                    value = unix <= 0
+                            ? string.Empty
+                            : (Renderer == "timestamp" ? date.ToLocalTime() : date.ToUniversalTime()).ToString("yyyy-MM-dd HH:mm:ss", invariant);
+                }
                 break;
 
             default:

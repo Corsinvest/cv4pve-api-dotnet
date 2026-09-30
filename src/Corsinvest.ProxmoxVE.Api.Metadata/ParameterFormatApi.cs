@@ -12,6 +12,23 @@ namespace Corsinvest.ProxmoxVE.Api.Metadata;
 /// </summary>
 public class ParameterFormatApi
 {
+    /// <summary>Constructor from flat cache</summary>
+    internal ParameterFormatApi(FlatFormatInfo flat)
+    {
+        Name = flat.Name;
+        Description = flat.Description ?? string.Empty;
+        Optional = flat.Optional ?? false;
+        Type = flat.Type ?? string.Empty;
+        Maximum = flat.Maximum;
+        Minimum = flat.Minimum;
+        DefaultKey = flat.DefaultKey ?? string.Empty;
+        FormatDescription = flat.FormatDescription ?? string.Empty;
+        Format = flat.Format ?? string.Empty;
+        Alias = flat.Alias ?? string.Empty;
+        MaxLength = flat.MaxLength;
+        EnumValues = flat.EnumValues ?? [];
+    }
+
     /// <summary>
     /// Constructor
     /// </summary>

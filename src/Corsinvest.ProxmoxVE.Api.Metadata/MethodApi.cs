@@ -19,10 +19,11 @@ public class MethodApi
     internal MethodApi(string httpMethod, FlatMethodInfo flat, ClassApi classApi)
     {
         MethodType = httpMethod.ToUpper();
-        MethodName = httpMethod;
+        MethodName = flat.Name ?? httpMethod;
         Comment = flat.Comment ?? string.Empty;
-        ReturnType = flat.ReturnType ?? string.Empty;
-        ReturnLinkHRef = flat.ReturnLinkHRef ?? string.Empty;
+        ReturnType = flat.ReturnType;
+        ReturnLinkHRef = flat.ReturnLinkHRef;
+        ReturnLinkRel = flat.ReturnLinkRel;
         ReturnIsArray = ReturnType == "array";
         ReturnIsNull = ReturnType == "null";
         ClassApi = classApi;

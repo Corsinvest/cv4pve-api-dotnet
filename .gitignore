@@ -353,3 +353,6 @@ MigrationBackup/
 
 .claude
 .vscode
+
+# Design specs and plans (local)
+docs/superpowers/

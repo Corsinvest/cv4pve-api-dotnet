@@ -402,7 +402,19 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
             switch (ResponseType)
             {
                 case ResponseType.Json:
-                    result = JsonConvert.DeserializeObject<ExpandoObject>(await response.Content.ReadAsStringAsync());
+                    var body = await response.Content.ReadAsStringAsync();
+                    try
+                    {
+                        result = JsonConvert.DeserializeObject<ExpandoObject>(body);
+                    }
+                    catch (JsonException ex)
+                    {
+                        // Not an answer of the API (a proxy page, a path mangled by the shell…):
+                        // keep the HTTP status and show the start of the body instead of a stack trace.
+                        _logger.LogDebug(ex, "{Message}", ex.Message);
+                        response = NotJsonResponse(response.StatusCode, body);
+                        result = null;
+                    }
                     if (_logger.IsEnabled(LogLevel.Trace))
                     {
                         _logger.LogTrace("{Json}", JsonConvert.SerializeObject(result, Formatting.Indented) as string);
@@ -486,6 +498,19 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     {
         if (value == null) { return; }
         foreach (var item in value) { parameters.Add(name + item.Key, item.Value); }
+    }
+
+    /// <summary>
+    /// Response for an answer that is not JSON: the HTTP status is kept (a success becomes 502, since the
+    /// answer cannot be used) and the reason shows the start of the body.
+    /// </summary>
+    internal static HttpResponseMessage NotJsonResponse(HttpStatusCode statusCode, string body)
+    {
+        var start = (body.Length > 100 ? body[..100] + "…" : body).ReplaceLineEndings(" ").Trim();
+        return new(((int)statusCode) is >= 200 and <= 299 ? HttpStatusCode.BadGateway : statusCode)
+        {
+            ReasonPhrase = $"The answer is not JSON (HTTP {(int)statusCode}): {start}",
+        };
     }
 
     /// <summary>
