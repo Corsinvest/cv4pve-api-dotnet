@@ -45,6 +45,10 @@ export default defineConfig({
           label: 'Concepts',
           items: ['concepts/api-structure', 'concepts/results', 'concepts/indexed-parameters', 'concepts/tasks', 'concepts/errors'],
         },
+        {
+          label: 'Packages',
+          items: ['packages/api', 'packages/extension', 'packages/shared', 'packages/console', 'packages/metadata'],
+        },
       ],
     }),
   ],
