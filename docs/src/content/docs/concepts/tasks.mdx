@@ -37,10 +37,10 @@ returns `true` if it stopped within `timeout` milliseconds, `false` if the time 
 timeout is **10 seconds**: enough for a start or a snapshot, not for a clone, a migration or a backup.
 Set `timeout` to the longest time the task may take.
 
-<Aside type="caution">
-Pass only the result of a call that succeeded, as above. The method reads the UPID from the data of
-the result, and a failed call has none: with a failed result it returns `true` at once when Proxmox VE
-refused the parameters, and throws `RuntimeBinderException` for the other failures.
+<Aside>
+With the result of a call that failed, or that started no task, there is nothing to wait for: the
+method returns `true` at once. Check `IsSuccessStatusCode` of the call, as above, to tell a finished
+task from a call that never started one.
 </Aside>
 
 To check without waiting, `TaskIsRunningAsync(upid)` returns `true` while the task runs.
@@ -68,8 +68,8 @@ if (exitStatus != "OK" && !exitStatus.StartsWith("WARNINGS"))
 ```
 
 For example a snapshot with a name already in use ends with an exit status such as
-`snapshot name 'before-update' already used`. Read the exit status only of a task that has stopped: a
-running task has none.
+`snapshot name 'before-update' already used`. For a task that is still running the exit status is
+`null`.
 
 ## The log of a task
 

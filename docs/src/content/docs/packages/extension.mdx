@@ -149,14 +149,6 @@ result = await SnapshotHelper.RemoveSnapshotAsync(client, vm.Node, vm.VmType, vm
 request: check it, and read the exit status of the task as in
 [Tasks](/cv4pve-api-dotnet/concepts/tasks/#did-it-succeed).
 
-:::caution
-`CreateSnapshotAsync`, `RemoveSnapshotAsync` and `RollbackSnapshotAsync` wait for the task before they
-return. When Proxmox VE refuses the request outright (a missing privilege, a guest that does not exist)
-there is no task, and they throw `RuntimeBinderException` instead of returning the `Result`. Catch it,
-or call the API and wait yourself as in
-[Bulk operations](/cv4pve-api-dotnet/examples/bulk-operations/#one-at-a-time).
-:::
-
 ## Several nodes
 
 `ClientHelper.GetClientAndTryLoginAsync` takes a list of hosts and returns a client connected to the

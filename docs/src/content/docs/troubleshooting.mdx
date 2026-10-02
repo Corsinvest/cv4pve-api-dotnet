@@ -53,6 +53,7 @@ code means:
 | 400 | Proxmox VE refused the parameters. `ResponseInError` is `true` and `GetError()` lists each parameter with its problem | Fix the parameter named in the error |
 | 401 | The token or the ticket was refused: the token is wrong or revoked, or the ticket is older than two hours | Check the token, or log in again |
 | 403 | Authenticated, but without the privilege the endpoint requires on that path | Check the roles of the user and, with privilege separation, of the token: [Permissions](/cv4pve-api-dotnet/permissions/) |
+| 408 | The request ran out of time: the `Timeout` of the client, or the one of `HttpClient` | Check that the node answers; raise `Timeout` if the endpoint is slow |
 | 500 | Either Proxmox VE could not do what was asked (the reason is in `ReasonPhrase`, for example a VM id that does not exist), or the request never reached the node: name not resolved, connection refused, certificate refused | Read `ReasonPhrase`; for a certificate see [Connection](/cv4pve-api-dotnet/connection/#certificate) |
 | 502 | The answer is not JSON: something that is not the Proxmox VE API answered. `ReasonPhrase` shows the start of what it sent | Check host and port, and proxies in between |
 
