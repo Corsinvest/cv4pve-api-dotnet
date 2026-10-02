@@ -25,7 +25,10 @@ static async Task EnsureDoneAsync(PveClient client, Result result, int timeoutSe
     }
 
     var exitStatus = await client.GetExitStatusTaskAsync(upid);
-    if (exitStatus != "OK") { throw new InvalidOperationException($"Task failed: {exitStatus}"); }
+    if (exitStatus != "OK" && !exitStatus.StartsWith("WARNINGS"))
+    {
+        throw new InvalidOperationException($"Task failed: {exitStatus}");
+    }
 }
 ```
 
@@ -118,8 +121,9 @@ await EnsureDoneAsync(client, await vm.Status.Start.VmStart());
 Console.WriteLine($"VM {vmId} is starting at 192.168.1.102");
 ```
 
-With `full: false` (or left out, when the source is a template) the clone is a linked clone: it is
-created at once and shares the disk of the template, which then cannot be removed.
+The source here is a template, so with `full: false`, or with `full` left out, the clone is a linked
+clone: it is created at once and shares the disk of the template, which then cannot be removed. A VM
+that is not a template is always cloned in full.
 
 ## Remove a VM
 
@@ -136,6 +140,6 @@ are deleted.
 ## Permissions
 
 Creating and cloning need `VM.Allocate` on `/vms` (or on the pool), `Datastore.AllocateSpace` on the
-storage, `SDN.Use` on the bridge, and `VM.Clone` on the template for a clone. The configuration
-changes need the matching `VM.Config.*` privileges: see
+storage, `SDN.Use` on the bridge, and `VM.Clone` on the template for a clone. The options given when
+creating, and the configuration changes after it, need the matching `VM.Config.*` privileges: see
 [Permissions](/cv4pve-api-dotnet/permissions/).

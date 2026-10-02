@@ -18,8 +18,9 @@ var networks = new Dictionary<int, string>
 var result = await client.Nodes["pve01"].Qemu[100].Config.UpdateVm(netN: networks);
 ```
 
-Only the indexes in the dictionary are sent: the call above leaves `net2` as it is. The most used
-families:
+Only the indexes in the dictionary are sent: the call above leaves `net2` as it is. The value of an
+index replaces the whole device: when you change an existing network device keep its `macaddr`, or
+Proxmox VE generates a new one. The most used families:
 
 | Argument | Sent as | For |
 |---|---|---|

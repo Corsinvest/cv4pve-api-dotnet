@@ -33,6 +33,6 @@ jobs:
             9.0.x
             10.0.x
 
-      # offline tests (xunit, fake HTTP handler): no cluster needed
+      # no cluster needed (xunit, fake HTTP handler); one test downloads the API schema from pve.proxmox.com
       - name: Run tests
         run: dotnet test src/Corsinvest.ProxmoxVE.Api.Extension.Tests --configuration Release

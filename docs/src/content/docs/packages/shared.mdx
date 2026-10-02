@@ -1,0 +1,130 @@
+---
+title: Corsinvest.ProxmoxVE.Api.Shared
+description: "The typed models of the Proxmox VE data (cluster, nodes, VMs, containers, storage, access) and the utilities shared by the packages: tables, sizes, formats."
+sidebar:
+  label: Shared
+---
+
+The classes that give a type to what the Proxmox VE API returns, plus a few utilities used by the
+other packages and by the cv4pve tools. It has no client: it does not depend on
+[Api](/cv4pve-api-dotnet/packages/api/), so the models can also be used in a project that only shows
+or stores the data.
+
+```bash
+dotnet add package Corsinvest.ProxmoxVE.Api.Shared
+```
+
+[NuGet](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Shared) · installed with
+[Extension](/cv4pve-api-dotnet/packages/extension/), which is how it is normally used.
+
+## Models
+
+The models are in `Corsinvest.ProxmoxVE.Api.Shared.Models`, one namespace per area of the API:
+
+| Namespace | Models for | Examples |
+|---|---|---|
+| `Models.Cluster` | `/cluster`: resources, status, backup jobs, HA, replication, SDN, firewall | `ClusterResource`, `ClusterStatus`, `ClusterBackup`, `ClusterHaResource` |
+| `Models.Node` | `/nodes/{node}`: status, guests, storage and its content, disks, network, tasks, services | `NodeItem`, `NodeStatus`, `NodeVmQemu`, `NodeVmLxc`, `NodeStorageContent`, `NodeTask` |
+| `Models.Vm` | A VM or a container: configuration, status, snapshots, guest agent, metrics | `VmConfigQemu`, `VmConfigLxc`, `VmQemuStatusCurrent`, `VmSnapshot`, `VmRrdData` |
+| `Models.Storage` | `/storage` | `StorageItem` |
+| `Models.Pool` | `/pools` | `PoolItem` |
+| `Models.Access` | `/access`: users, groups, roles, ACL, tokens | `AccessUser`, `AccessGroup`, `AccessRole` |
+| `Models.Common` | Interfaces and enums shared by the others | `IVmBase`, `ICpu`, `IMemory`, `RrdDataTimeFrame` |
+
+Get them from the client with `ToModel<T>()`, or with the `GetAsync()` methods of the Extension
+package, which pick the right model for each endpoint:
+
+```csharp
+using Corsinvest.ProxmoxVE.Api;
+using Corsinvest.ProxmoxVE.Api.Extension;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
+
+// with the core package only
+var result = await client.Cluster.Resources.Resources();
+var resources = result.ToModel<IEnumerable<ClusterResource>>();
+
+// with the Extension package
+var status = await client.Nodes["pve01"].Qemu[100].Status.Current.GetAsync();
+Console.WriteLine($"{status.Name}: {status.CpuUsagePercentage:P1} CPU");
+```
+
+### Fields the model does not have
+
+Every model derives from `ModelBase`, which keeps in `ExtensionData` the members of the answer that
+have no property. A field added by a newer Proxmox VE version is still there. `ExtensionData` is `null`
+when the answer has no such member:
+
+```csharp
+var config = await client.Nodes["pve01"].Qemu[100].Config.GetAsync();
+
+foreach (var (key, value) in config.ExtensionData ?? new Dictionary<string, object>())
+{
+    Console.WriteLine($"{key} = {value}");
+}
+```
+
+### Computed members
+
+Besides what the API returns, several models add members computed from it, so the code does not
+repeat the arithmetic: `IsRunning` and `IsStopped` on guests, `MemoryUsagePercentage` where memory is
+reported, `Date` on a snapshot from its Unix time.
+
+## Enums
+
+| Enum | Values |
+|---|---|
+| `VmType` | `Qemu`, `Lxc` |
+| `VmStatus` | `Start`, `Stop`, `Shutdown`, `Reboot`, `Suspend`, `Resume`, `Reset` |
+| `ClusterResourceType` | `Unknown`, `Node`, `Vm`, `Storage`, `Pool`, `Sdn`, and `All` for every type |
+| `RrdDataTimeFrame`, `RrdDataConsolidation` | Time frame and consolidation of the metrics |
+
+## Tables
+
+`TableGenerator`, in `Corsinvest.ProxmoxVE.Api.Shared.Utils`, writes a list as text with borders,
+Markdown, HTML or JSON: the formats of the `--output` option of the cv4pve tools. Numbers are aligned
+to the right.
+
+```csharp
+using Corsinvest.ProxmoxVE.Api.Shared.Utils;
+
+// typed items: the title is the member name unless Title() says otherwise
+var vms = await client.GetVmsAsync();
+Console.Write(TableGenerator.From(vms)
+                            .Column(a => a.Node).Title("NODE")
+                            .Column(a => a.VmId).Title("VM")
+                            .Column(a => a.Name)
+                            .Column(a => a.IsRunning ? "X" : "").Title("RUNNING")
+                            .To(TableGenerator.Output.Text));
+
+// API answers: columns read by key, a missing key is an empty cell
+var tasks = (await client.Cluster.Tasks.Tasks()).ToEnumerable();
+Console.Write(TableGenerator.From(tasks)
+                            .Column("upid")
+                            .Column("status").Format(v => v ?? "running")
+                            .ToMarkdown());
+
+// rows by hand
+Console.Write(new TableGenerator("key", "value").AddRow("memory", 4096).ToText());
+```
+
+`TableGenerator.Output` is `Text`, `Html`, `Markdown`, `Json` or `JsonPretty`.
+
+## Utilities
+
+In `Corsinvest.ProxmoxVE.Api.Shared.Utils`:
+
+| Class | For |
+|---|---|
+| `ByteHelper` | Sizes: `ToBytes("4 GiB")`, `ParsePveSize("32G")` for the sizes in a Proxmox VE configuration, `ToSizeString` for a readable size |
+| `FormatHelper` | Text for values of the API: `FromBytes`, `UptimeInfo`, `CpuInfo`, `UsageInfo` |
+| `PveConstants` | The strings the API uses: `qemu`, `lxc`, `running`, `stopped`, `online` |
+| `PveWebUrlHelper` | The path of a node, a guest, a storage or a pool in the Proxmox VE web interface |
+| `NodeHelper` | The x86-64 level of a CPU from its flags, to choose a CPU type that allows live migration |
+| `NoVncHelper`, `BackupHelper` | URLs of the noVNC console and of a file inside a backup |
+
+```csharp
+Console.WriteLine(FormatHelper.FromBytes(8589934592));     // a readable size
+Console.WriteLine(ByteHelper.ParsePveSize("32G"));         // bytes
+```
+
+`PveException`, thrown by the helpers of the Extension and Console packages, is also here.

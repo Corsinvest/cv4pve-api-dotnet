@@ -60,15 +60,15 @@ installed on the nodes.
 4. Read some data. The path of the API is the path in the code:
 
    ```csharp
-   // GET /nodes/{node}/qemu/{vmid}/config
-   var config = await client.Nodes["pve01"].Qemu[100].Config.VmConfig();
-   Console.WriteLine(config.Response.data.name);
+   // GET /nodes/{node}/qemu/{vmid}/status/current
+   var current = await client.Nodes["pve01"].Qemu[100].Status.Current.VmStatus();
+   Console.WriteLine(current.Response.data.status);
 
-   // GET /cluster/resources
-   var resources = await client.Cluster.Resources.Resources();
+   // GET /cluster/resources?type=vm
+   var resources = await client.Cluster.Resources.Resources(type: "vm");
    foreach (var item in resources.ToEnumerable())
    {
-       Console.WriteLine($"{item.type} {item.id} {item.status}");
+       Console.WriteLine($"{item.vmid} {item.node} {item.status}");
    }
    ```
 

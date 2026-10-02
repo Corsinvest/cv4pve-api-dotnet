@@ -57,7 +57,7 @@ foreach (var vm in vms)
     }
 
     Console.WriteLine($"{vm.VmId} {vm.Name}: {outcome}");
-    if (outcome != "OK") { failed.Add($"{vm.VmId} {vm.Name}"); }
+    if (outcome != "OK" && !outcome.StartsWith("WARNINGS")) { failed.Add($"{vm.VmId} {vm.Name}"); }
 }
 
 if (failed.Count > 0) { Console.WriteLine($"Failed: {string.Join(", ", failed)}"); }
@@ -101,28 +101,41 @@ order stays readable in the log. Only the waiting runs in parallel.
 
 ## How many at once
 
-Proxmox VE accepts all the tasks you start, and runs them together. For operations that are heavy on
-disk or network (backup, clone, migration) limit how many run at the same time, in batches:
+Proxmox VE accepts every task you start. To limit how many run at the same time (a rolling reboot, or
+operations that are heavy on disk and network) work in batches, and wait for a batch before starting
+the next:
 
 ```csharp
-foreach (var batch in vms.Chunk(4))
+foreach (var batch in vms.Where(a => a.IsRunning).Chunk(4))
 {
-    var results = new List<Result>();
+    // start the batch
+    var rebooting = new List<(long VmId, Result Result)>();
     foreach (var vm in batch)
     {
-        results.Add(await client.Nodes[vm.Node].Vzdump.Vzdump(vmid: vm.VmId.ToString(),
-                                                              storage: "backup",
-                                                              mode: "snapshot"));
+        rebooting.Add((vm.VmId, await VmHelper.ChangeStatusVmAsync(client, vm.Node, vm.VmType, vm.VmId,
+                                                                   VmStatus.Reboot)));
     }
 
-    // an hour for each batch
-    await Task.WhenAll(results.Where(a => a.IsSuccessStatusCode)
-                              .Select(a => client.WaitForTaskToFinishAsync((string)a.ToData(), timeout: 3_600_000)));
+    // wait for it, up to 10 minutes
+    await Task.WhenAll(rebooting.Select(async item =>
+    {
+        var outcome = item.Result.ReasonPhrase;
+        if (item.Result.IsSuccessStatusCode)
+        {
+            var upid = (string)item.Result.ToData();
+            outcome = await client.WaitForTaskToFinishAsync(upid, wait: 2000, timeout: 600_000)
+                        ? await client.GetExitStatusTaskAsync(upid)
+                        : "still running after 10 minutes";
+        }
+
+        Console.WriteLine($"{item.VmId}: {outcome}");
+    }));
 }
 ```
 
-For backups on a schedule, a backup job of Proxmox VE itself is the better tool. For snapshots with
-retention see [cv4pve-autosnap](https://corsinvest.github.io/cv4pve-autosnap/), built on this library.
+Backups need no batches: a node runs one backup at a time and the others wait for it. For backups on a
+schedule, a backup job of Proxmox VE itself is the better tool. For snapshots with retention see
+[cv4pve-autosnap](https://corsinvest.github.io/cv4pve-autosnap/), built on this library.
 
 ## A report at the end
 

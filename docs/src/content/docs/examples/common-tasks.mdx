@@ -12,9 +12,21 @@ using Corsinvest.ProxmoxVE.Api;
 using Corsinvest.ProxmoxVE.Api.Extension;
 ```
 
-To keep them short the recipes check the result only where it matters for the example. In real code
-check every call, and wait only for the task of a call that succeeded: see
+The recipes that start a task use this helper: it checks the call, waits for the task and returns how
+it ended, `OK` or the reason of the failure. Why each step is needed is in
 [Errors](/cv4pve-api-dotnet/concepts/errors/) and [Tasks](/cv4pve-api-dotnet/concepts/tasks/).
+
+```csharp
+static async Task<string> RunAsync(PveClient client, Result result, long timeout = 60_000)
+{
+    if (!result.IsSuccessStatusCode) { return result.ReasonPhrase; }
+
+    var upid = (string)result.ToData();
+    return await client.WaitForTaskToFinishAsync(upid, timeout: timeout)
+            ? await client.GetExitStatusTaskAsync(upid)
+            : "still running";
+}
+```
 
 ## List VMs and containers
 
@@ -84,11 +96,7 @@ Each of these starts a task: wait for it and read how it ended.
 ```csharp
 var vm = client.Nodes["pve01"].Qemu[100];
 
-var result = await vm.Status.Start.VmStart();
-if (result.IsSuccessStatusCode && await client.WaitForTaskToFinishAsync(result, timeout: 60_000))
-{
-    Console.WriteLine(await client.GetExitStatusTaskAsync((string)result.ToData()));
-}
+Console.WriteLine(await RunAsync(client, await vm.Status.Start.VmStart()));
 ```
 
 | Action | Call |
@@ -117,8 +125,9 @@ Console.WriteLine($"{status.Status}, CPU {status.CpuUsagePercentage:P1}, "
 var vm = client.Nodes["pve01"].Qemu[100];
 
 // take
-var result = await vm.Snapshot.Snapshot("before-update", description: "Before the update");
-await client.WaitForTaskToFinishAsync(result, timeout: 120_000);
+var outcome = await RunAsync(client,
+                             await vm.Snapshot.Snapshot("before-update", description: "Before the update"),
+                             timeout: 120_000);
 
 // list
 foreach (var snapshot in await vm.Snapshot.GetAsync())
@@ -127,12 +136,10 @@ foreach (var snapshot in await vm.Snapshot.GetAsync())
 }
 
 // roll back
-result = await vm.Snapshot["before-update"].Rollback.Rollback();
-await client.WaitForTaskToFinishAsync(result, timeout: 300_000);
+outcome = await RunAsync(client, await vm.Snapshot["before-update"].Rollback.Rollback(), timeout: 300_000);
 
 // remove
-result = await vm.Snapshot["before-update"].Delsnapshot();
-await client.WaitForTaskToFinishAsync(result, timeout: 120_000);
+outcome = await RunAsync(client, await vm.Snapshot["before-update"].Delsnapshot(), timeout: 120_000);
 ```
 
 The list includes an entry named `current`, which is the present state of the VM, not a snapshot.
@@ -145,13 +152,12 @@ var result = await client.Nodes["pve01"].Vzdump.Vzdump(vmid: "100",
                                                        mode: "snapshot",
                                                        compress: "zstd");
 
-if (result.IsSuccessStatusCode && await client.WaitForTaskToFinishAsync(result, timeout: 3_600_000))
-{
-    Console.WriteLine(await client.GetExitStatusTaskAsync((string)result.ToData()));
-}
+Console.WriteLine(await RunAsync(client, result, timeout: 3_600_000));
 ```
 
-The token needs `VM.Backup` on the guest and `Datastore.AllocateSpace` on the storage.
+The token needs `VM.Backup` on the guest and `Datastore.AllocateSpace` on the storage. A node runs one
+backup at a time: a backup started while another is running waits for it, so allow for that in the
+timeout.
 
 ## Nodes and their load
 

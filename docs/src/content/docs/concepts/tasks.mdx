@@ -39,7 +39,8 @@ Set `timeout` to the longest time the task may take.
 
 <Aside type="caution">
 Pass only the result of a call that succeeded, as above. The method reads the UPID from the data of
-the result, and a failed call has none.
+the result, and a failed call has none: with a failed result it returns `true` at once when Proxmox VE
+refused the parameters, and throws `RuntimeBinderException` for the other failures.
 </Aside>
 
 To check without waiting, `TaskIsRunningAsync(upid)` returns `true` while the task runs.
@@ -50,7 +51,8 @@ The node of the task is read from the UPID, so none of these needs the node:
 ## Did it succeed?
 
 A finished task is not necessarily a successful one. `WaitForTaskToFinishAsync` only says the task
-stopped; `GetExitStatusTaskAsync` says how: `OK`, or the error of the task.
+stopped; `GetExitStatusTaskAsync` says how: `OK`, `WARNINGS: <n>` when it ended with warnings in its
+log, or the error of the task.
 
 ```csharp
 if (!await client.WaitForTaskToFinishAsync(upid, timeout: 600_000))
@@ -59,11 +61,15 @@ if (!await client.WaitForTaskToFinishAsync(upid, timeout: 600_000))
 }
 
 var exitStatus = await client.GetExitStatusTaskAsync(upid);
-if (exitStatus != "OK") { throw new InvalidOperationException($"Task failed: {exitStatus}"); }
+if (exitStatus != "OK" && !exitStatus.StartsWith("WARNINGS"))
+{
+    throw new InvalidOperationException($"Task failed: {exitStatus}");
+}
 ```
 
 For example a snapshot with a name already in use ends with an exit status such as
-`snapshot name 'before-update' already used`.
+`snapshot name 'before-update' already used`. Read the exit status only of a task that has stopped: a
+running task has none.
 
 ## The log of a task
 
@@ -73,9 +79,12 @@ turns the answer into lines:
 ```csharp
 var node = PveClientBase.GetNodeFromTask(upid);
 
-var log = await client.Nodes[node].Tasks[upid].Log.ReadTaskLog();
+var log = await client.Nodes[node].Tasks[upid].Log.ReadTaskLog(limit: 1000);
 foreach (var line in log.ToLogs()) { Console.WriteLine(line); }
 ```
+
+Without `limit` Proxmox VE returns the first 50 lines. For a longer log raise `limit`, or read it in
+pages with `start`.
 
 The other details of a task (type, user, start time) are in
 `client.Nodes[node].Tasks[upid].Status.ReadTaskStatus()`, and the tasks of a node in

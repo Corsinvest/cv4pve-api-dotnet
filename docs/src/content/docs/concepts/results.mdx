@@ -9,11 +9,11 @@ Every method of the client returns a `Result`. It holds two things: how the HTTP
 Proxmox VE answered.
 
 ```csharp
-var result = await client.Nodes["pve01"].Qemu[100].Config.VmConfig();
+var result = await client.Nodes["pve01"].Qemu[100].Status.Current.VmStatus();
 
 if (result.IsSuccessStatusCode)
 {
-    Console.WriteLine(result.Response.data.name);
+    Console.WriteLine(result.Response.data.status);
 }
 ```
 
@@ -42,8 +42,8 @@ extension methods `ToData()` and `ToEnumerable()` are shortcuts for it:
 
 ```csharp
 // an object: its members by name
-var config = (await client.Nodes["pve01"].Qemu[100].Config.VmConfig()).ToData();
-Console.WriteLine($"{config.name}: {config.cores} cores, {config.memory} MB");
+var status = (await client.Nodes["pve01"].Qemu[100].Status.Current.VmStatus()).ToData();
+Console.WriteLine($"VM {status.vmid}: {status.status}, {status.cpus} CPUs");
 
 // a list: usable with foreach and LINQ
 var vms = (await client.Nodes["pve01"].Qemu.Vmlist()).ToEnumerable();
@@ -56,13 +56,15 @@ foreach (var vm in vms.Where(a => a.status == "running"))
 string upid = (await client.Nodes["pve01"].Qemu[100].Status.Start.VmStart()).ToData();
 ```
 
-`ToEnumerable()` returns an empty sequence when the endpoint has no data, so the `foreach` needs no
-check for `null`.
+`ToEnumerable()` returns an empty sequence when a call that succeeded has no data, so the `foreach`
+needs no check for `null`. On a failed call these shortcuts throw like any other read of `data`: check
+`IsSuccessStatusCode` first.
 
 <Aside type="caution">
 Dynamic members are resolved at run time: a wrong name compiles and then throws
 `RuntimeBinderException`. A member that Proxmox VE leaves out throws too: many are optional, for
-example `name` of a VM that has none. To test for a member use the dictionary.
+example `name`, `cores` and `memory` in the configuration of a VM, which are not returned when they
+have no value or the default one. To test for a member use the dictionary.
 </Aside>
 
 ### Dictionary

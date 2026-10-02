@@ -54,7 +54,7 @@ check covers it:
 | An answer that is not JSON (a proxy page, another service on that port) | 502, or the status received if it was already an error | `The answer is not JSON (HTTP 200): ` and the start of the body |
 
 Status 500 is also what Proxmox VE itself returns when it cannot do what was asked, for example
-starting a VM that is already running. `ReasonPhrase` tells the two apart. The exception of a failed
+for a VM id that does not exist. `ReasonPhrase` tells the two apart. The exception of a failed
 request is written to the log at `Error` level: see
 [Troubleshooting](/cv4pve-api-dotnet/troubleshooting/#logging).
 
@@ -64,6 +64,7 @@ request is written to the log at `Error` level: see
 |---|---|---|
 | `ToModel<T>()`, and the typed `GetAsync()` of the Extension package | `PveResultException` | The call failed |
 | `WaitForTaskToFinishAsync`, `TaskIsRunningAsync`, `GetExitStatusTaskAsync` | `PveResultException` | The status of the task cannot be read |
+| `WaitForTaskToFinishAsync(result)` with a failed `Result` | `RuntimeBinderException` | The result has no task to wait for: check `IsSuccessStatusCode` before waiting |
 | `LoginAsync` | `PveAuthenticationException` | The user needs a second factor and none was given |
 | Reading `Response.data.member` | `RuntimeBinderException` | The member is not in the answer |
 
@@ -121,16 +122,20 @@ Because failures are results, a retry is a loop on the `Result`, not a `catch`. 
 safe to repeat, and only for failures that can pass:
 
 ```csharp
+using System.Net;
+
 Result result = null;
 
 for (var attempt = 1; attempt <= 3; attempt++)
 {
     result = await client.Cluster.Resources.Resources();
-    if (result.IsSuccessStatusCode || (int)result.StatusCode < 500) { break; }
+
+    var canPass = (int)result.StatusCode >= 500 || result.StatusCode == HttpStatusCode.RequestTimeout;
+    if (result.IsSuccessStatusCode || !canPass) { break; }
 
     await Task.Delay(TimeSpan.FromSeconds(attempt * 2));
 }
 ```
 
-A status below 500 (wrong parameters, no permission, not found) gives the same answer every time:
-retrying it is useless.
+The other statuses below 500 (wrong parameters, no permission, not found) give the same answer every
+time: retrying them is useless. A 401 from an expired ticket needs a new login, not a retry.
