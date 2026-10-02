@@ -1,0 +1,119 @@
+---
+title: Tasks
+description: "Long operations in Proxmox VE run as tasks: how to get the UPID, wait for the task to finish and check whether it succeeded."
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Starting a VM, cloning, migrating, taking a backup or a snapshot: Proxmox VE runs these as **tasks** in
+the background and the API answers at once, with the id of the task, the **UPID**. The same tasks
+appear in the *Tasks* panel of the web interface.
+
+```csharp
+var result = await client.Nodes["pve01"].Qemu[9000].Clone.CloneVm(newid: 121, name: "web02", full: true);
+
+string upid = result.ToData();
+// UPID:pve01:0012A3F4:05C1B2D3:6720F1A0:qmclone:9000:automation@pve!app:
+```
+
+The call returned when the task *started*. Before using the new VM the code has to wait for the task.
+
+## Wait for a task
+
+`WaitForTaskToFinishAsync` takes the `Result` of the call, or the UPID:
+
+```csharp
+if (!result.IsSuccessStatusCode)
+{
+    Console.WriteLine($"Clone not started: {result.ReasonPhrase}");
+    return;
+}
+
+var finished = await client.WaitForTaskToFinishAsync(result, timeout: 600_000);   // up to 10 minutes
+```
+
+It reads the status of the task every `wait` milliseconds (default 500) until the task stops, and
+returns `true` if it stopped within `timeout` milliseconds, `false` if the time ran out. The default
+timeout is **10 seconds**: enough for a start or a snapshot, not for a clone, a migration or a backup.
+Set `timeout` to the longest time the task may take.
+
+<Aside type="caution">
+Pass only the result of a call that succeeded, as above. The method reads the UPID from the data of
+the result, and a failed call has none.
+</Aside>
+
+To check without waiting, `TaskIsRunningAsync(upid)` returns `true` while the task runs.
+
+The node of the task is read from the UPID, so none of these needs the node:
+`PveClientBase.GetNodeFromTask(upid)` returns it.
+
+## Did it succeed?
+
+A finished task is not necessarily a successful one. `WaitForTaskToFinishAsync` only says the task
+stopped; `GetExitStatusTaskAsync` says how: `OK`, or the error of the task.
+
+```csharp
+if (!await client.WaitForTaskToFinishAsync(upid, timeout: 600_000))
+{
+    throw new TimeoutException($"Task still running after 10 minutes: {upid}");
+}
+
+var exitStatus = await client.GetExitStatusTaskAsync(upid);
+if (exitStatus != "OK") { throw new InvalidOperationException($"Task failed: {exitStatus}"); }
+```
+
+For example a snapshot with a name already in use ends with an exit status such as
+`snapshot name 'before-update' already used`.
+
+## The log of a task
+
+The log, the same text the web interface shows, comes from the `log` endpoint of the task. `ToLogs()`
+turns the answer into lines:
+
+```csharp
+var node = PveClientBase.GetNodeFromTask(upid);
+
+var log = await client.Nodes[node].Tasks[upid].Log.ReadTaskLog();
+foreach (var line in log.ToLogs()) { Console.WriteLine(line); }
+```
+
+The other details of a task (type, user, start time) are in
+`client.Nodes[node].Tasks[upid].Status.ReadTaskStatus()`, and the tasks of a node in
+`client.Nodes[node].Tasks.NodeTasks()`.
+
+## Show progress
+
+Proxmox VE reports no percentage for a task: what can be shown is the time and the last lines of the
+log. Poll with `TaskIsRunningAsync`:
+
+```csharp
+var started = DateTime.Now;
+
+while (await client.TaskIsRunningAsync(upid))
+{
+    Console.Write($"\rCloning... {(DateTime.Now - started):mm\\:ss}");
+    await Task.Delay(2000);
+}
+
+Console.WriteLine();
+Console.WriteLine(await client.GetExitStatusTaskAsync(upid));
+```
+
+## When the status cannot be read
+
+`TaskIsRunningAsync`, `GetExitStatusTaskAsync` and `WaitForTaskToFinishAsync` read the status of the
+task from its node. If they cannot (the node is down, or the account has no right to see the task),
+they **throw** `PveResultException` with the reason, for example
+`Read status of task 'UPID:…' failed (403 Forbidden): …`, instead of reporting a finished task. The
+failed `Result` is in the `Result` property of the exception.
+
+A token can always read the tasks it started itself; to read the tasks of other users it needs
+`Sys.Audit` on the node: see [Permissions](/cv4pve-api-dotnet/permissions/#tasks).
+
+## Calls that return no task
+
+Not every call returns a UPID. Calls that finish immediately (reading, most configuration changes)
+return their result directly. The [API viewer](https://pve.proxmox.com/pve-docs/api-viewer/) shows
+what an endpoint returns: a UPID is a `string` described as the task id. Some endpoints exist in both
+forms: for the configuration of a VM, `UpdateVm` (PUT) applies the change and returns nothing, while
+`UpdateVmAsync` (POST) returns a task, which is what you need when the change allocates a disk.

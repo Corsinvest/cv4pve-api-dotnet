@@ -1,0 +1,136 @@
+---
+title: Errors
+description: "A failed call does not throw: check the Result. What IsSuccessStatusCode, ResponseInError and the exceptions of the client mean, and which methods do throw."
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+The methods of the client **do not throw** when a call fails. A refused request, a missing privilege, a
+node that cannot be reached: each returns a `Result`, and the code decides what to do.
+
+```csharp
+var result = await client.Nodes["pve01"].Qemu[100].Status.Start.VmStart();
+
+if (!result.IsSuccessStatusCode)
+{
+    Console.WriteLine($"Start failed: {(int)result.StatusCode} {result.ReasonPhrase}");
+    return;
+}
+```
+
+A call whose `Result` is not checked fails silently: the code goes on as if the VM had started.
+
+## What to check
+
+| Check | True when |
+|---|---|
+| `IsSuccessStatusCode` | The HTTP status is 2xx: Proxmox VE accepted the request |
+| `ResponseInError` | The answer has an `errors` member: one or more parameters were refused. The status is 400 |
+| `GetError()` | Text of those errors, one parameter per line. Empty when `ResponseInError` is `false` |
+| `ReasonPhrase` | The reason of any failure: Proxmox VE writes its error message here |
+
+`IsSuccessStatusCode` is the one to test: it is `false` for every failure, including those that have
+`ResponseInError`. Use `GetError()` to show which parameter was wrong:
+
+```csharp
+var result = await client.Nodes["pve01"].Qemu[100].Config.UpdateVm(memory: "abc");
+
+if (!result.IsSuccessStatusCode)
+{
+    Console.WriteLine(result.ReasonPhrase);
+    if (result.ResponseInError) { Console.WriteLine(result.GetError()); }
+}
+```
+
+## Failures that never reached Proxmox VE
+
+A request that cannot be completed is also returned as a `Result`, built by the client, so the same
+check covers it:
+
+| Failure | `StatusCode` | `ReasonPhrase` |
+|---|---|---|
+| Name not resolved, connection refused, certificate refused | 500 | The message of the exception |
+| Request timed out | 408 or 500 | The message of the exception |
+| An answer that is not JSON (a proxy page, another service on that port) | 502, or the status received if it was already an error | `The answer is not JSON (HTTP 200): ` and the start of the body |
+
+Status 500 is also what Proxmox VE itself returns when it cannot do what was asked, for example
+starting a VM that is already running. `ReasonPhrase` tells the two apart. The exception of a failed
+request is written to the log at `Error` level: see
+[Troubleshooting](/cv4pve-api-dotnet/troubleshooting/#logging).
+
+## What does throw
+
+| Call | Exception | When |
+|---|---|---|
+| `ToModel<T>()`, and the typed `GetAsync()` of the Extension package | `PveResultException` | The call failed |
+| `WaitForTaskToFinishAsync`, `TaskIsRunningAsync`, `GetExitStatusTaskAsync` | `PveResultException` | The status of the task cannot be read |
+| `LoginAsync` | `PveAuthenticationException` | The user needs a second factor and none was given |
+| Reading `Response.data.member` | `RuntimeBinderException` | The member is not in the answer |
+
+`PveResultException` carries the failed call in its `Result` property;
+`PveAuthenticationException` derives from it.
+
+```csharp
+using Corsinvest.ProxmoxVE.Api.Extension;
+
+try
+{
+    var config = await client.Nodes["pve01"].Qemu[100].Config.GetAsync();
+    Console.WriteLine(config.Name);
+}
+catch (PveResultException ex)
+{
+    Console.WriteLine($"{(int)ex.Result.StatusCode} {ex.Message}");
+}
+```
+
+<Aside>
+`LoginAsync` returns `false`, without throwing, when the credentials are wrong: the reason is in
+`client.LastResult.ReasonPhrase`.
+</Aside>
+
+## Throw on every failure
+
+An application that prefers exceptions can turn every failed call into one with a small extension
+method of its own:
+
+```csharp
+public static class ResultExtensions
+{
+    public static Result EnsureSuccess(this Result result)
+        => result.IsSuccessStatusCode
+            ? result
+            : throw new PveResultException(result, result.ResponseInError
+                                                        ? result.GetError()
+                                                        : result.ReasonPhrase);
+}
+```
+
+```csharp
+var result = (await client.Nodes["pve01"].Qemu[100].Status.Start.VmStart()).EnsureSuccess();
+```
+
+## A successful call is not a finished operation
+
+For the operations that run as a task, a successful `Result` means the task was *started*. Whether it
+ended well is in the exit status of the task: see [Tasks](/cv4pve-api-dotnet/concepts/tasks/).
+
+## Retrying
+
+Because failures are results, a retry is a loop on the `Result`, not a `catch`. Retry only what is
+safe to repeat, and only for failures that can pass:
+
+```csharp
+Result result = null;
+
+for (var attempt = 1; attempt <= 3; attempt++)
+{
+    result = await client.Cluster.Resources.Resources();
+    if (result.IsSuccessStatusCode || (int)result.StatusCode < 500) { break; }
+
+    await Task.Delay(TimeSpan.FromSeconds(attempt * 2));
+}
+```
+
+A status below 500 (wrong parameters, no permission, not found) gives the same answer every time:
+retrying it is useless.

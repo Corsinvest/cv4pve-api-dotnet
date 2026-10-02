@@ -41,6 +41,10 @@ export default defineConfig({
           label: 'Start here',
           items: ['getting-started', 'connection', 'permissions', 'troubleshooting'],
         },
+        {
+          label: 'Concepts',
+          items: ['concepts/api-structure', 'concepts/results', 'concepts/indexed-parameters', 'concepts/tasks', 'concepts/errors'],
+        },
       ],
     }),
   ],
