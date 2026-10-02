@@ -50,7 +50,7 @@ check covers it:
 | Failure | `StatusCode` | `ReasonPhrase` |
 |---|---|---|
 | Name not resolved, connection refused, certificate refused | 500 | The message of the exception |
-| Request timed out | 408 or 500 | The message of the exception |
+| Request timed out (`Timeout` of the client or of the `HttpClient`) | 408 | The message of the exception |
 | An answer that is not JSON (a proxy page, another service on that port) | 502, or the status received if it was already an error | `The answer is not JSON (HTTP 200): ` and the start of the body |
 
 Status 500 is also what Proxmox VE itself returns when it cannot do what was asked, for example
@@ -64,7 +64,6 @@ request is written to the log at `Error` level: see
 |---|---|---|
 | `ToModel<T>()`, and the typed `GetAsync()` of the Extension package | `PveResultException` | The call failed |
 | `WaitForTaskToFinishAsync`, `TaskIsRunningAsync`, `GetExitStatusTaskAsync` | `PveResultException` | The status of the task cannot be read |
-| `WaitForTaskToFinishAsync(result)` with a failed `Result` | `RuntimeBinderException` | The result has no task to wait for: check `IsSuccessStatusCode` before waiting |
 | `LoginAsync` | `PveAuthenticationException` | The user needs a second factor and none was given |
 | Reading `Response.data.member` | `RuntimeBinderException` | The member is not in the answer |
 

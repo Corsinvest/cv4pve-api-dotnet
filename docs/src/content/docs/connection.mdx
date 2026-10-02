@@ -117,8 +117,8 @@ Set `ValidateCertificate` before the first call: the client reads it when it cre
 client.Timeout = TimeSpan.FromSeconds(30);
 ```
 
-A request that runs out of time does not throw: it returns a `Result` that is not successful, with the
-reason in `ReasonPhrase`. This is the time of the HTTP request, not of the operation it starts: a
+A request that runs out of time does not throw: it returns a `Result` with status 408 and the reason in
+`ReasonPhrase`. This is the time of the HTTP request, not of the operation it starts: a
 backup or a clone answers at once with the id of a [task](/cv4pve-api-dotnet/concepts/tasks/).
 
 ## Custom HttpClient
@@ -159,7 +159,8 @@ var client = await ClientHelper.GetClientAndTryLoginAsync("pve01,pve02:8006,[fe8
 ```
 
 Each entry is `host` or `host:port`, with an IPv6 address in brackets. The helper tries to open the port
-of each host in order, creates the client for the first one that answers and authenticates it with the
+of each host in order, waiting up to 4 seconds each (`timeout`, in milliseconds), creates the client for
+the first one that answers and authenticates it with the
 token or with `username` and `password`. It throws `PveException` if no host is reachable or the
 authentication fails, and `ArgumentException` if neither a token nor a user and password are given.
 Here `validateCertificate` is `true` unless you pass `false`.
