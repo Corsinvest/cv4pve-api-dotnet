@@ -1,0 +1,179 @@
+---
+title: Connection
+description: Connect to Proxmox VE from .NET with an API token or a user and password, two-factor authentication, OpenID, certificates, timeout and a custom HttpClient.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+A `PveClient` talks to one node, on port 8006 unless you give another:
+
+```csharp
+using Corsinvest.ProxmoxVE.Api;
+
+var client = new PveClient("pve01");
+var other = new PveClient("pve02.example.com", 443);
+```
+
+Any node of a cluster answers for the whole cluster. The client is then authenticated in one of the
+ways below.
+
+## API token
+
+An [API token](https://pve.proxmox.com/pve-docs/chapter-pveum.html#pveum_tokens) is the way for
+applications and scheduled jobs: it does not expire unless you say so, it can be revoked without
+touching the user, and it can have fewer privileges than the user. Set it and call the API, there is
+no login:
+
+```csharp
+var client = new PveClient("pve01")
+{
+    ApiToken = "automation@pve!app=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+};
+
+var version = await client.Version.Version();
+```
+
+The format is `USER@REALM!TOKENID=SECRET`. A wrong token is not reported when you set it: the first
+call returns a `Result` with status 401.
+
+## User and password
+
+`LoginAsync` asks Proxmox VE for a ticket and returns `true` if it got one:
+
+```csharp
+var client = new PveClient("pve01");
+
+if (!await client.LoginAsync("automation@pve", password))
+{
+    Console.WriteLine(client.LastResult.ReasonPhrase);
+    return;
+}
+```
+
+The realm is the part after `@`. Without it the realm is `pam`: `LoginAsync("root", password)` logs in
+`root@pam`. To pass the realm on its own use `LoginAsync("automation", password, "pve")`.
+
+<Aside>
+A ticket is valid for two hours and the client does not renew it. A process that runs longer calls
+`LoginAsync` again, or uses an API token.
+</Aside>
+
+## Two-factor authentication
+
+For a user with two-factor authentication, pass the second factor as the last argument:
+
+```csharp
+// the code of the authenticator app
+await client.LoginAsync("admin@pve", password, "123456");
+
+// a recovery key, or any other factor, as type:value
+await client.LoginAsync("admin@pve", password, "recovery:abcd-1234-efgh-5678");
+```
+
+A value without a type is a TOTP code. If the user needs a second factor and none is given,
+`LoginAsync` throws `PveAuthenticationException`. API tokens are not subject to two-factor
+authentication.
+
+## OpenID
+
+For a realm of type OpenID Connect, a desktop or command line application can run the whole login with
+the browser of the user:
+
+```csharp
+var ok = await client.LoginOpenIdAsync("my-oidc-realm",
+                                       url => Process.Start(new ProcessStartInfo(url) { UseShellExecute = true }),
+                                       timeoutSeconds: 120);
+```
+
+The client asks Proxmox VE for the authorization URL, listens on a free port of `localhost`, calls your
+action to open the browser, and waits for the redirect to `http://localhost:<port>/callback`. It returns
+`false` if the user does not complete the login within the timeout (60 seconds by default).
+
+A web application handles the redirect itself and calls
+`LoginOpenIdAsync(code, state, redirectUrl)` with the values it received, using the same redirect URL
+it asked the authorization URL for.
+
+## Certificate
+
+By default the certificate of the node is **not** validated, so the self-signed certificate of a new
+installation works. With a trusted certificate on the nodes, turn the validation on:
+
+```csharp
+var client = new PveClient("pve01.example.com")
+{
+    ValidateCertificate = true,
+    ApiToken = apiToken
+};
+```
+
+Set `ValidateCertificate` before the first call: the client reads it when it creates its `HttpClient`.
+
+## Timeout
+
+`Timeout` is the longest time a single request may take. Without it the limit is the one of
+`HttpClient`, 100 seconds:
+
+```csharp
+client.Timeout = TimeSpan.FromSeconds(30);
+```
+
+A request that runs out of time does not throw: it returns a `Result` that is not successful, with the
+reason in `ReasonPhrase`. This is the time of the HTTP request, not of the operation it starts: a
+backup or a clone answers at once with the id of a [task](/cv4pve-api-dotnet/concepts/tasks/).
+
+## Custom HttpClient
+
+To go through a proxy, to accept only one certificate, or to use an `HttpClient` from
+`IHttpClientFactory`, pass your own:
+
+```csharp
+var handler = new HttpClientHandler
+{
+    Proxy = new WebProxy("http://proxy.example.com:8080"),
+    UseProxy = true,
+    // accept only the certificate with this thumbprint
+    ServerCertificateCustomValidationCallback = (_, certificate, _, _)
+        => certificate?.GetCertHashString() == "0123456789ABCDEF0123456789ABCDEF01234567"
+};
+
+var client = new PveClient("pve01", httpClient: new HttpClient(handler))
+{
+    ApiToken = apiToken
+};
+```
+
+With your own `HttpClient` the certificate is validated as its handler says: `ValidateCertificate` is
+not used.
+
+## Several nodes
+
+A client is bound to one host. To give a list of nodes and use the first that answers, the
+[Extension package](/cv4pve-api-dotnet/packages/extension/) has `ClientHelper`:
+
+```csharp
+using Corsinvest.ProxmoxVE.Api.Extension.Utils;
+
+var client = await ClientHelper.GetClientAndTryLoginAsync("pve01,pve02:8006,[fe80::1]:8006",
+                                                          apiToken: apiToken,
+                                                          validateCertificate: false);
+```
+
+Each entry is `host` or `host:port`, with an IPv6 address in brackets. The helper tries to open the port
+of each host in order, creates the client for the first one that answers and authenticates it with the
+token or with `username` and `password`. It throws `PveException` if no host is reachable or the
+authentication fails. Here `validateCertificate` is `true` unless you pass `false`.
+
+## Secrets
+
+Keep tokens and passwords out of the source code: read them from the environment or from the secret
+store of your platform.
+
+```csharp
+var client = new PveClient(Environment.GetEnvironmentVariable("PVE_HOST"))
+{
+    ApiToken = Environment.GetEnvironmentVariable("PVE_API_TOKEN")
+};
+```
+
+With logging at `Debug` level the client masks the parameters that carry passwords, tickets and tokens:
+see [Troubleshooting](/cv4pve-api-dotnet/troubleshooting/#logging).

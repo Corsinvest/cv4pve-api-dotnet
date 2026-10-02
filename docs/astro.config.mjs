@@ -36,7 +36,12 @@ export default defineConfig({
         }),
       ],
       lastUpdated: true,
-      sidebar: [],
+      sidebar: [
+        {
+          label: 'Start here',
+          items: ['getting-started', 'connection', 'permissions', 'troubleshooting'],
+        },
+      ],
     }),
   ],
 });

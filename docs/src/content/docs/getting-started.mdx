@@ -1,0 +1,103 @@
+---
+title: Getting started
+description: Add Corsinvest.ProxmoxVE.Api to a .NET project, connect to a Proxmox VE cluster and make the first calls.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+cv4pve-api-dotnet is a set of NuGet packages. The main one, **Corsinvest.ProxmoxVE.Api**, is a client
+with a method for every endpoint of the Proxmox VE API. It runs in your application (a service, a
+scheduled job, a command line tool) and talks only to the Proxmox VE REST API on port 8006. Nothing is
+installed on the nodes.
+
+## Requirements
+
+- .NET 8, 9 or 10.
+- Network access to port 8006 of at least one node.
+- A Proxmox VE API token, or a user and password, with the privileges your application needs: see
+  [Permissions](/cv4pve-api-dotnet/permissions/).
+
+## Install
+
+<Steps>
+
+1. Add the package from [NuGet](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api):
+
+   ```bash
+   dotnet add package Corsinvest.ProxmoxVE.Api
+   ```
+
+2. Create the client with an API token. With a token there is no login call:
+
+   ```csharp
+   using Corsinvest.ProxmoxVE.Api;
+
+   var client = new PveClient("pve01")
+   {
+       ApiToken = "automation@pve!app=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+   };
+   ```
+
+   The certificate of the node is not validated unless you ask for it, so a new installation with its
+   self-signed certificate works as it is. All the ways to connect are in
+   [Connection](/cv4pve-api-dotnet/connection/).
+
+3. Make the first call and check its outcome:
+
+   ```csharp
+   var result = await client.Version.Version();
+
+   if (result.IsSuccessStatusCode)
+   {
+       Console.WriteLine($"Proxmox VE {result.Response.data.version}");
+   }
+   else
+   {
+       Console.WriteLine($"{(int)result.StatusCode} {result.ReasonPhrase}");
+   }
+   ```
+
+4. Read some data. The path of the API is the path in the code:
+
+   ```csharp
+   // GET /nodes/{node}/qemu/{vmid}/config
+   var config = await client.Nodes["pve01"].Qemu[100].Config.VmConfig();
+   Console.WriteLine(config.Response.data.name);
+
+   // GET /cluster/resources
+   var resources = await client.Cluster.Resources.Resources();
+   foreach (var item in resources.ToEnumerable())
+   {
+       Console.WriteLine($"{item.type} {item.id} {item.status}");
+   }
+   ```
+
+</Steps>
+
+Every call returns a `Result`: the HTTP outcome and, in `Response.data`, what Proxmox VE answered. A
+failed call does not throw, so check `IsSuccessStatusCode`:
+[Results](/cv4pve-api-dotnet/concepts/results/) and [Errors](/cv4pve-api-dotnet/concepts/errors/) explain why.
+
+## Find the method you need
+
+The client follows the tree of the Proxmox VE API: each part of a path is a property, each `{value}` in
+the path is an indexer, and each HTTP method of the endpoint is a C# method. The
+[Proxmox VE API viewer](https://pve.proxmox.com/pve-docs/api-viewer/) is therefore the reference for
+parameters and returned data, and IntelliSense shows the same descriptions while you type. The rule is
+in [API structure](/cv4pve-api-dotnet/concepts/api-structure/).
+
+## The other packages
+
+| Package | Adds |
+|---|---|
+| [Corsinvest.ProxmoxVE.Api.Extension](/cv4pve-api-dotnet/packages/extension/) | Typed helpers: VMs and containers by id, name or pattern, snapshots, status, cluster resources |
+| [Corsinvest.ProxmoxVE.Api.Shared](/cv4pve-api-dotnet/packages/shared/) | The typed models of the Proxmox VE data |
+| [Corsinvest.ProxmoxVE.Api.Console](/cv4pve-api-dotnet/packages/console/) | Helpers to build a command line tool: login options, client from the command line |
+| [Corsinvest.ProxmoxVE.Api.Metadata](/cv4pve-api-dotnet/packages/metadata/) | The schema of the Proxmox VE API as objects |
+
+## Next
+
+- [Connection](/cv4pve-api-dotnet/connection/): API token or password, two-factor authentication, certificates, timeout.
+- [Permissions](/cv4pve-api-dotnet/permissions/): the user, the token and the privileges an application needs.
+- [Concepts](/cv4pve-api-dotnet/concepts/api-structure/): API structure, results, tasks, errors.
+- [Common tasks](/cv4pve-api-dotnet/examples/common-tasks/): short recipes to copy.

@@ -1,0 +1,80 @@
+---
+title: Proxmox VE API permissions for .NET applications
+description: The Proxmox VE user, API token and privileges an application built on cv4pve-api-dotnet needs, and how missing privileges show up in the results.
+sidebar:
+  label: Permissions
+---
+
+The client works through the API, so an application can do exactly what its account is allowed to do,
+no more. Use a dedicated user with an API token rather than `root@pam`, and give it only the privileges
+the application needs.
+
+## User and token
+
+Create a [user](https://pve.proxmox.com/pve-docs/chapter-pveum.html#pveum_users) and an
+[API token](https://pve.proxmox.com/pve-docs/chapter-pveum.html#pveum_tokens), then
+[assign](https://pve.proxmox.com/pve-docs/chapter-pveum.html#pveum_permission_management) a role with
+the privileges below, on `/` or on the smallest path that covers what the application touches
+(`/vms/100`, `/pool/web`, `/storage/local`). From the shell of a node:
+
+```bash
+# a user in the Proxmox VE realm, without a password: only its tokens are used
+pveum user add automation@pve --comment "cv4pve-api-dotnet application"
+
+# a token for it: the secret is printed once, copy it
+pveum user token add automation@pve app
+
+# read-only access to the whole cluster, for the user and for the token
+pveum acl modify / --users automation@pve --roles PVEAuditor
+pveum acl modify / --tokens 'automation@pve!app' --roles PVEAuditor
+```
+
+The token to give to the client is `automation@pve!app=<secret>`: see
+[Connection](/cv4pve-api-dotnet/connection/#api-token).
+
+:::caution[Tokens with privilege separation]
+A token with privilege separation (the default) does **not** inherit the permissions of the user: it
+has what is granted to the token, limited to what the user has. Grant the role to both, as above, or
+the application sees an empty cluster.
+:::
+
+## Privileges
+
+The built-in `PVEAuditor` role covers the `*.Audit` privileges: enough for an application that only
+reads. For anything else, create a role with just the privileges it needs:
+
+```bash
+pveum role add SnapshotOperator --privs "VM.Audit VM.Snapshot VM.PowerMgmt"
+pveum acl modify /vms --tokens 'automation@pve!app' --users automation@pve --roles SnapshotOperator
+```
+
+| Privilege | On | Used for |
+|---|---|---|
+| `VM.Audit` | `/vms` | Reading VMs and containers: list, configuration, status, snapshots |
+| `Sys.Audit` | `/nodes` | Reading nodes, and tasks started by other users |
+| `Datastore.Audit` | `/storage` | Reading storage and its content |
+| `VM.PowerMgmt` | `/vms` | Start, stop, shut down, suspend, resume, reset |
+| `VM.Snapshot` | `/vms` | Taking, deleting and rolling back snapshots |
+| `VM.Config.*` | `/vms` | Changing the configuration |
+| `VM.Backup` | `/vms` | Backups, with `Datastore.AllocateSpace` on the storage |
+| `VM.Allocate` | `/vms` or `/pool` | Creating VMs and containers, with `Datastore.AllocateSpace` on the storage |
+| `VM.Clone` | `/vms` | Cloning, with `VM.Allocate` on the new id |
+
+The exact privilege of every endpoint is in the
+[Proxmox VE API viewer](https://pve.proxmox.com/pve-docs/api-viewer/), under *Required permissions*.
+
+## How missing privileges are reported
+
+Proxmox VE answers a request the caller is only partly entitled to by *filtering the response*, not by
+failing it. `/cluster/resources` leaves out the guests, storages and pools the account cannot audit, and
+the VM list of a node leaves out the VMs without `VM.Audit`. Both return `200 OK`: an empty list may
+mean a token without privileges, not an empty cluster.
+
+A request that is refused outright returns a `Result` with `StatusCode` 403 and the reason in
+`ReasonPhrase`, without throwing: see [Errors](/cv4pve-api-dotnet/concepts/errors/).
+
+## Tasks
+
+A token can always read the tasks it started itself, so waiting for the task of your own call needs
+nothing more. Reading the tasks of other users needs `Sys.Audit` on the node: see
+[Tasks](/cv4pve-api-dotnet/concepts/tasks/).
