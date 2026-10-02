@@ -1,0 +1,213 @@
+---
+title: Common tasks
+description: "Short C# recipes for Proxmox VE: list VMs and containers, read a configuration, start and stop, snapshots, backup, nodes, storage and metrics."
+---
+
+Short recipes to copy. They assume a connected `client` (see
+[Connection](/cv4pve-api-dotnet/connection/)) and, where they use typed helpers, the
+[Extension package](/cv4pve-api-dotnet/packages/extension/):
+
+```csharp
+using Corsinvest.ProxmoxVE.Api;
+using Corsinvest.ProxmoxVE.Api.Extension;
+```
+
+The recipes that start a task use this helper: it checks the call, waits for the task and returns how
+it ended, `OK` or the reason of the failure. Why each step is needed is in
+[Errors](/cv4pve-api-dotnet/concepts/errors/) and [Tasks](/cv4pve-api-dotnet/concepts/tasks/).
+
+```csharp
+static async Task<string> RunAsync(PveClient client, Result result, long timeout = 60_000)
+{
+    if (!result.IsSuccessStatusCode) { return result.ReasonPhrase; }
+
+    var upid = (string)result.ToData();
+    return await client.WaitForTaskToFinishAsync(upid, timeout: timeout)
+            ? await client.GetExitStatusTaskAsync(upid)
+            : "still running";
+}
+```
+
+## List VMs and containers
+
+One call for the whole cluster, whatever the node:
+
+```csharp
+foreach (var vm in await client.GetVmsAsync())
+{
+    Console.WriteLine($"{vm.VmId,6} {vm.VmType,-5} {vm.Name,-20} {vm.Node,-10} {vm.Status}");
+}
+```
+
+Only the running ones with a tag:
+
+```csharp
+var running = (await client.GetVmsAsync("@tag-production")).Where(a => a.IsRunning);
+```
+
+Without the Extension package the same data comes from `/cluster/resources`:
+
+```csharp
+var result = await client.Cluster.Resources.Resources(type: "vm");
+foreach (var vm in result.ToEnumerable())
+{
+    Console.WriteLine($"{vm.vmid} {vm.type} {vm.node} {vm.status}");
+}
+```
+
+## Find a VM by name
+
+The API addresses a guest by node and id. `GetVmAsync` finds both from the name:
+
+```csharp
+var vm = await client.GetVmAsync("web01");
+Console.WriteLine($"{vm.Name} is {vm.VmType} {vm.VmId} on {vm.Node}");
+```
+
+## Read the configuration of a VM
+
+```csharp
+var config = await client.Nodes["pve01"].Qemu[100].Config.GetAsync();
+
+Console.WriteLine($"{config.Name}: {config.Cores} cores, {config.Memory} MB, {config.OsTypeDecode}");
+
+foreach (var disk in config.Disks) { Console.WriteLine($"{disk.Id}: {disk.Storage} {disk.Size}"); }
+foreach (var network in config.Networks) { Console.WriteLine($"{network.Id}: {network.Bridge} {network.MacAddress}"); }
+```
+
+For a container use `client.Nodes["pve01"].Lxc[200].Config.GetAsync()`.
+
+## Change the configuration
+
+```csharp
+var result = await client.Nodes["pve01"].Qemu[100].Config.UpdateVm(cores: 4,
+                                                                    memory: "8192",
+                                                                    description: "Web server");
+if (!result.IsSuccessStatusCode) { Console.WriteLine(result.ReasonPhrase); }
+```
+
+Only the parameters you pass change. To remove a setting, name it in `delete`:
+`UpdateVm(delete: "description")`.
+
+## Start, stop, reboot
+
+Each of these starts a task: wait for it and read how it ended.
+
+```csharp
+var vm = client.Nodes["pve01"].Qemu[100];
+
+Console.WriteLine(await RunAsync(client, await vm.Status.Start.VmStart()));
+```
+
+| Action | Call |
+|---|---|
+| Start | `vm.Status.Start.VmStart()` |
+| Shut down from inside the guest | `vm.Status.Shutdown.VmShutdown(timeout: 120)` |
+| Stop at once, like pulling the plug | `vm.Status.Stop.VmStop()` |
+| Reboot | `vm.Status.Reboot.VmReboot()` |
+| Suspend, resume | `vm.Status.Suspend.VmSuspend()`, `vm.Status.Resume.VmResume()` |
+
+Without knowing node and type, `client.ChangeStatusVmAsync(100, VmStatus.Shutdown)` does the same for a
+VM or a container: see [Extension](/cv4pve-api-dotnet/packages/extension/#power-and-state).
+
+## Current status of a VM
+
+```csharp
+var status = await client.Nodes["pve01"].Qemu[100].Status.Current.GetAsync();
+
+Console.WriteLine($"{status.Status}, CPU {status.CpuUsagePercentage:P1}, "
+                  + $"memory {status.MemoryUsagePercentage:P1}, up {TimeSpan.FromSeconds(status.Uptime):g}");
+```
+
+## Snapshots
+
+```csharp
+var vm = client.Nodes["pve01"].Qemu[100];
+
+// take
+var outcome = await RunAsync(client,
+                             await vm.Snapshot.Snapshot("before-update", description: "Before the update"),
+                             timeout: 120_000);
+
+// list
+foreach (var snapshot in await vm.Snapshot.GetAsync())
+{
+    Console.WriteLine($"{snapshot.Name} {snapshot.Date:g} {snapshot.Description}");
+}
+
+// roll back
+outcome = await RunAsync(client, await vm.Snapshot["before-update"].Rollback.Rollback(), timeout: 300_000);
+
+// remove
+outcome = await RunAsync(client, await vm.Snapshot["before-update"].Delsnapshot(), timeout: 120_000);
+```
+
+The list includes an entry named `current`, which is the present state of the VM, not a snapshot.
+
+## Back up a VM
+
+```csharp
+var result = await client.Nodes["pve01"].Vzdump.Vzdump(vmid: "100",
+                                                       storage: "backup",
+                                                       mode: "snapshot",
+                                                       compress: "zstd");
+
+Console.WriteLine(await RunAsync(client, result, timeout: 3_600_000));
+```
+
+The token needs `VM.Backup` on the guest and `Datastore.AllocateSpace` on the storage. A node runs one
+backup at a time: a backup started while another is running waits for it, so allow for that in the
+timeout.
+
+## Nodes and their load
+
+```csharp
+foreach (var node in await client.GetNodesAsync())
+{
+    Console.WriteLine($"{node.Node,-10} {node.Status,-8} "
+                      + $"CPU {node.CpuUsagePercentage:P1} memory {node.MemoryUsagePercentage:P1}");
+}
+```
+
+## Cluster status
+
+```csharp
+foreach (var item in await client.Cluster.Status.GetAsync())
+{
+    Console.WriteLine($"{item.Type} {item.Name} {(item.IsOnline ? "online" : "")}");
+}
+```
+
+## Storage of a node
+
+```csharp
+var result = await client.Nodes["pve01"].Storage.Index();
+
+foreach (var storage in result.ToEnumerable().Where(a => a.active == 1))
+{
+    double usedGiB = storage.used / 1073741824.0;
+    double totalGiB = storage.total / 1073741824.0;
+    Console.WriteLine($"{storage.storage,-12} {storage.type,-8} {usedGiB:N0} of {totalGiB:N0} GiB");
+}
+```
+
+## Metrics of a VM
+
+The data behind the charts of the web interface, as numbers:
+
+```csharp
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Common;
+
+var data = await client.Nodes["pve01"].Qemu[100].Rrddata.GetAsync(RrdDataTimeFrame.Day,
+                                                                  RrdDataConsolidation.Average);
+foreach (var item in data)
+{
+    Console.WriteLine($"{item.TimeDate:g} CPU {item.CpuUsagePercentage:P1}");
+}
+```
+
+## The next free id
+
+```csharp
+int vmId = (await client.Cluster.Nextid.Nextid()).ToData<int>();
+```

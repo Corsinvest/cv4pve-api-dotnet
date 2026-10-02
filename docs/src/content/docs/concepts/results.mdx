@@ -1,0 +1,136 @@
+---
+title: Results
+description: "Every call returns a Result: the HTTP outcome and the Proxmox VE data, read as dynamic, as a dictionary or as a typed model. Charts as PNG."
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Every method of the client returns a `Result`. It holds two things: how the HTTP request went, and what
+Proxmox VE answered.
+
+```csharp
+var result = await client.Nodes["pve01"].Qemu[100].Status.Current.VmStatus();
+
+if (result.IsSuccessStatusCode)
+{
+    Console.WriteLine(result.Response.data.status);
+}
+```
+
+## The Result
+
+| Member | What it is |
+|---|---|
+| `IsSuccessStatusCode` | `true` when the HTTP status is 2xx |
+| `StatusCode`, `ReasonPhrase` | HTTP status and its text. On a failure Proxmox VE puts the reason here |
+| `Response` | The JSON answer as a dynamic object. The data is in `Response.data` |
+| `ResponseToDictionary` | The same answer as `IDictionary<string, object>` |
+| `ResponseHasData` | `true` when the answer has a `data` member |
+| `ResponseInError` | `true` when the answer has an `errors` member: Proxmox VE refused one or more parameters |
+| `GetError()` | The refused parameters, one per line, as `name : message` |
+| `RequestResource`, `RequestParameters`, `MethodType` | What was asked: path, parameters, and `Get`, `Set`, `Create` or `Delete` |
+| `Duration` | How long the request took |
+
+A failed call does not throw: [Errors](/cv4pve-api-dotnet/concepts/errors/) explains what to check.
+
+## Reading the data
+
+### Dynamic
+
+`Response.data` is what the API viewer shows under *Returns*: an object, a list or a single value. The
+extension methods `ToData()` and `ToEnumerable()` are shortcuts for it:
+
+```csharp
+// an object: its members by name
+var status = (await client.Nodes["pve01"].Qemu[100].Status.Current.VmStatus()).ToData();
+Console.WriteLine($"VM {status.vmid}: {status.status}, {status.cpus} CPUs");
+
+// a list: usable with foreach and LINQ
+var vms = (await client.Nodes["pve01"].Qemu.Vmlist()).ToEnumerable();
+foreach (var vm in vms.Where(a => a.status == "running"))
+{
+    Console.WriteLine($"{vm.vmid} {vm.name}");
+}
+
+// a single value, for example the id of a task
+string upid = (await client.Nodes["pve01"].Qemu[100].Status.Start.VmStart()).ToData();
+```
+
+`ToEnumerable()` returns an empty sequence when a call that succeeded has no data, so the `foreach`
+needs no check for `null`. On a failed call these shortcuts throw like any other read of `data`: check
+`IsSuccessStatusCode` first.
+
+<Aside type="caution">
+Dynamic members are resolved at run time: a wrong name compiles and then throws
+`RuntimeBinderException`. A member that Proxmox VE leaves out throws too: many are optional, for
+example `name`, `cores` and `memory` in the configuration of a VM, which are not returned when they
+have no value or the default one. To test for a member use the dictionary.
+</Aside>
+
+### Dictionary
+
+An object of the answer is also an `IDictionary<string, object>`. Use it for members that may be
+missing, or whose name is not a valid C# identifier:
+
+```csharp
+var result = await client.Nodes["pve01"].Qemu[100].Config.VmConfig();
+var config = (IDictionary<string, object>)result.ToData();
+
+if (config.TryGetValue("net0", out var net0)) { Console.WriteLine(net0); }
+
+foreach (var (key, value) in config) { Console.WriteLine($"{key} = {value}"); }
+```
+
+### Typed models
+
+`ToModel<T>()` converts the data to a class of yours or to one of the models of
+[Corsinvest.ProxmoxVE.Api.Shared](/cv4pve-api-dotnet/packages/shared/):
+
+```csharp
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
+
+var result = await client.Nodes["pve01"].Qemu.Vmlist();
+var vms = result.ToModel<IEnumerable<NodeVmQemu>>();
+
+foreach (var vm in vms.OrderBy(a => a.VmId))
+{
+    Console.WriteLine($"{vm.VmId} {vm.Name} {vm.Status}");
+}
+```
+
+Unlike the dynamic access, `ToModel<T>()` **throws** `PveResultException` when the call failed, so it
+needs no check before it.
+
+The [Extension package](/cv4pve-api-dotnet/packages/extension/) does this for you: it adds a `GetAsync()`
+to the endpoints that read data, which calls the API and returns the model.
+
+```csharp
+using Corsinvest.ProxmoxVE.Api.Extension;
+
+var vms = await client.Nodes["pve01"].Qemu.GetAsync();
+var config = await client.Nodes["pve01"].Qemu[100].Config.GetAsync();
+```
+
+## Charts as PNG
+
+Proxmox VE can answer the `rrd` endpoints with a chart instead of data. Set `ResponseType` to `Png`
+before the call: `Response` is then a string with the image as a data URI, ready for the `src` of an
+`img` tag.
+
+```csharp
+client.ResponseType = ResponseType.Png;
+var chart = await client.Nodes["pve01"].Rrd.Rrd("cpu", "day");
+string dataUri = chart.Response;   // data:image/png;base64,...
+
+client.ResponseType = ResponseType.Json;
+```
+
+`ResponseType` belongs to the client, not to the call: set it back to `Json`, the default, before the
+other calls.
+
+## The last result
+
+`client.LastResult` is the `Result` of the last request, also when a helper made the call for you: a
+failed `LoginAsync` returns `false`, and the reason is in `client.LastResult.ReasonPhrase`. The event
+`RequestCompleted` is raised with the `Result` of every request: see
+[Troubleshooting](/cv4pve-api-dotnet/troubleshooting/#without-a-logger).

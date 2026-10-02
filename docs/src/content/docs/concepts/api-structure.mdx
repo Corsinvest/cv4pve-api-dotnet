@@ -1,0 +1,114 @@
+---
+title: API structure
+description: "How the client maps the Proxmox VE API tree: paths become properties and indexers, the methods of an endpoint become C# methods, parameters become arguments."
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+`PveClient` is generated from the schema of the Proxmox VE API, the same one the
+[API viewer](https://pve.proxmox.com/pve-docs/api-viewer/) shows. It has a method for each of the about
+680 methods of the API, placed where the API has it. Knowing the path of an endpoint is enough to write
+the call.
+
+## From endpoint to method
+
+Three rules:
+
+1. Each fixed part of the path is a property: `/cluster/resources` is `client.Cluster.Resources`.
+2. Each `{value}` of the path is an indexer: `/nodes/{node}/qemu/{vmid}` is
+   `client.Nodes["pve01"].Qemu[100]`.
+3. Each HTTP method of the endpoint is a C# method named after the API method, with its parameters as
+   arguments.
+
+| Endpoint | Call |
+|---|---|
+| `GET /version` | `client.Version.Version()` |
+| `GET /cluster/resources` | `client.Cluster.Resources.Resources(type: "vm")` |
+| `GET /nodes` | `client.Nodes.Index()` |
+| `GET /nodes/{node}/qemu` | `client.Nodes["pve01"].Qemu.Vmlist()` |
+| `POST /nodes/{node}/qemu` | `client.Nodes["pve01"].Qemu.CreateVm(vmid: 100)` |
+| `GET /nodes/{node}/qemu/{vmid}/config` | `client.Nodes["pve01"].Qemu[100].Config.VmConfig()` |
+| `PUT /nodes/{node}/qemu/{vmid}/config` | `client.Nodes["pve01"].Qemu[100].Config.UpdateVm(memory: "4096")` |
+| `GET /nodes/{node}/qemu/{vmid}/status/current` | `client.Nodes["pve01"].Qemu[100].Status.Current.VmStatus()` |
+| `POST /nodes/{node}/qemu/{vmid}/status/start` | `client.Nodes["pve01"].Qemu[100].Status.Start.VmStart()` |
+| `GET /nodes/{node}/qemu/{vmid}/snapshot` | `client.Nodes["pve01"].Qemu[100].Snapshot.SnapshotList()` |
+| `POST /nodes/{node}/qemu/{vmid}/snapshot` | `client.Nodes["pve01"].Qemu[100].Snapshot.Snapshot("before-update")` |
+| `DELETE /nodes/{node}/qemu/{vmid}/snapshot/{snapname}` | `client.Nodes["pve01"].Qemu[100].Snapshot["before-update"].Delsnapshot()` |
+| `DELETE /nodes/{node}/qemu/{vmid}` | `client.Nodes["pve01"].Qemu[100].DestroyVm()` |
+
+Containers are the same under `Lxc` instead of `Qemu`.
+
+All of them return `Task<Result>`: see [Results](/cv4pve-api-dotnet/concepts/results/).
+
+## Method names
+
+The name of a method is the name Proxmox VE gives to that API method, in Pascal case: `vm_config`
+becomes `VmConfig`, `snapshot_list` becomes `SnapshotList`. Lists are often called `Index`, the others
+have names of their own, so there is no fixed name per HTTP method. In practice type the path and let
+IntelliSense list what the endpoint offers: each method carries the description of the API, and each
+argument the description of its parameter.
+
+```csharp
+var vm = client.Nodes["pve01"].Qemu[100];
+
+var config = await vm.Config.VmConfig();          // GET
+var update = await vm.Config.UpdateVm(cores: 4);  // PUT
+var start = await vm.Status.Start.VmStart();      // POST
+```
+
+<Aside>
+A node of the tree can be kept in a variable, as `vm` above: it holds only the path, no call is made
+until a method is called.
+</Aside>
+
+## Parameters
+
+Required parameters come first, the optional ones follow as named arguments with a `null` default. A
+parameter left `null` is not sent, so Proxmox VE applies its own default.
+
+```csharp
+var result = await client.Nodes["pve01"].Qemu[100].Snapshot.Snapshot("before-update",
+                                                                     description: "Before the update",
+                                                                     vmstate: true);
+```
+
+- Names are those of the API. A `-` in a name becomes `_`: `force-cpu` is `force_cpu`.
+- Booleans are `bool?` and are sent as `1` or `0`.
+- Parameters that exist with an index (`net0`, `net1`, `scsi0`) are one dictionary argument, `netN`,
+  `scsiN`: see [Indexed parameters](/cv4pve-api-dotnet/concepts/indexed-parameters/).
+- Type, format and allowed values of each parameter are in the API viewer; the client sends what you
+  give and Proxmox VE validates it. A refused parameter gives status 400: see
+  [Errors](/cv4pve-api-dotnet/concepts/errors/).
+
+## Raw calls
+
+The generated methods end in four methods of the client, which you can call with any path. They are
+useful for an endpoint added by a Proxmox VE version newer than the package, or when the path is built
+at run time:
+
+```csharp
+var config = await client.GetAsync("/nodes/pve01/qemu/100/config");
+
+var snapshot = await client.CreateAsync("/nodes/pve01/qemu/100/snapshot",
+                                        new Dictionary<string, object>
+                                        {
+                                            ["snapname"] = "before-update",
+                                            ["description"] = "Before the update",
+                                        });
+```
+
+| Method | HTTP |
+|---|---|
+| `GetAsync(resource, parameters)` | GET |
+| `CreateAsync(resource, parameters)` | POST |
+| `SetAsync(resource, parameters)` | PUT |
+| `DeleteAsync(resource, parameters)` | DELETE |
+
+Here the parameter names are exactly those of the API, with `-` where the API has it. For GET and
+DELETE the parameters go in the query string, for POST and PUT in a JSON body.
+
+## Versions
+
+The first two numbers of the package version are the Proxmox VE version it was generated from: package
+9.2.x matches the API of Proxmox VE 9.2. A package newer than the cluster may offer parameters the
+cluster does not know, and the cluster refuses them with status 400.

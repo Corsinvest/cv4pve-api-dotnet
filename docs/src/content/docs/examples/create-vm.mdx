@@ -1,0 +1,145 @@
+---
+title: Create a VM
+description: "Create a VM from C#: an empty VM with an installer ISO, or a clone of a cloud-init template with its network and SSH key, waiting for each task."
+---
+
+Two complete ways to get a new VM. Both use a small helper that waits for a task and throws if the
+call or the task failed, so the steps read in sequence:
+
+```csharp
+using Corsinvest.ProxmoxVE.Api;
+
+static async Task EnsureDoneAsync(PveClient client, Result result, int timeoutSeconds = 60)
+{
+    if (!result.IsSuccessStatusCode)
+    {
+        throw new InvalidOperationException(result.ResponseInError ? result.GetError() : result.ReasonPhrase);
+    }
+
+    // calls that finish at once return no task
+    if (result.ToData() is not string upid || !upid.StartsWith("UPID:")) { return; }
+
+    if (!await client.WaitForTaskToFinishAsync(upid, timeout: timeoutSeconds * 1000L))
+    {
+        throw new TimeoutException($"Task still running after {timeoutSeconds} seconds: {upid}");
+    }
+
+    var exitStatus = await client.GetExitStatusTaskAsync(upid);
+    if (exitStatus != "OK" && !exitStatus.StartsWith("WARNINGS"))
+    {
+        throw new InvalidOperationException($"Task failed: {exitStatus}");
+    }
+}
+```
+
+Why both checks are needed is in [Tasks](/cv4pve-api-dotnet/concepts/tasks/).
+
+## An empty VM with an installer
+
+A VM with a new disk, a network card and the installer ISO in the CD-ROM drive, ready to be installed
+from the console.
+
+```csharp
+const string node = "pve01";
+
+int vmId = (await client.Cluster.Nextid.Nextid()).ToData<int>();
+
+var result = await client.Nodes[node].Qemu.CreateVm(
+    vmid: vmId,
+    name: "debian13",
+    ostype: "l26",
+    memory: "4096",
+    cores: 2,
+    cpu: "x86-64-v2-AES",
+    scsihw: "virtio-scsi-single",
+    scsiN: new Dictionary<int, string>
+    {
+        [0] = "local-lvm:32,discard=on,iothread=1",
+    },
+    ideN: new Dictionary<int, string>
+    {
+        [2] = "local:iso/debian-13.1.0-amd64-netinst.iso,media=cdrom",
+    },
+    netN: new Dictionary<int, string>
+    {
+        [0] = "model=virtio,bridge=vmbr0,firewall=1",
+    },
+    boot: "order=scsi0;ide2",
+    agent: "1");
+
+await EnsureDoneAsync(client, result);
+
+await EnsureDoneAsync(client, await client.Nodes[node].Qemu[vmId].Status.Start.VmStart());
+
+Console.WriteLine($"VM {vmId} created and started");
+```
+
+The format of disks and network is in
+[Indexed parameters](/cv4pve-api-dotnet/concepts/indexed-parameters/). The storage names (`local-lvm`,
+`local`), the bridge and the ISO are those of your node.
+
+## A clone of a cloud-init template
+
+The fast way to a working system: a template made once from a cloud image, with a cloud-init drive,
+cloned for each new VM. The template is prepared as described in
+[Cloud-Init Support](https://pve.proxmox.com/pve-docs/chapter-qm.html#qm_cloud_init); here it is VM
+9000.
+
+```csharp
+const string node = "pve01";
+const int templateId = 9000;
+
+int vmId = (await client.Cluster.Nextid.Nextid()).ToData<int>();
+var publicKey = File.ReadAllText("id_ed25519.pub").Trim();
+
+// 1. clone: a full copy can take minutes
+var result = await client.Nodes[node].Qemu[templateId].Clone.CloneVm(newid: vmId, name: "web02", full: true);
+await EnsureDoneAsync(client, result, timeoutSeconds: 900);
+
+var vm = client.Nodes[node].Qemu[vmId];
+
+// 2. resources and cloud-init: user, key, address
+result = await vm.Config.UpdateVm(
+    cores: 2,
+    memory: "4096",
+    ciuser: "admin",
+    sshkeys: Uri.EscapeDataString(publicKey),
+    ipconfigN: new Dictionary<int, string>
+    {
+        [0] = "ip=192.168.1.102/24,gw=192.168.1.1",
+    },
+    nameserver: "192.168.1.1");
+await EnsureDoneAsync(client, result);
+
+// 3. grow the disk of the image to 32 GiB
+result = await vm.Resize.ResizeVm(disk: "scsi0", size: "32G");
+await EnsureDoneAsync(client, result);
+
+// 4. start
+await EnsureDoneAsync(client, await vm.Status.Start.VmStart());
+
+Console.WriteLine($"VM {vmId} is starting at 192.168.1.102");
+```
+
+The source here is a template, so with `full: false`, or with `full` left out, the clone is a linked
+clone: it is created at once and shares the disk of the template, which then cannot be removed. A VM
+that is not a template is always cloned in full.
+
+## Remove a VM
+
+```csharp
+var vm = client.Nodes["pve01"].Qemu[121];
+
+await EnsureDoneAsync(client, await vm.Status.Stop.VmStop());
+await EnsureDoneAsync(client, await vm.DestroyVm(purge: true));
+```
+
+`purge` also removes the VM from backup jobs, replication and HA. There is no confirmation: the disks
+are deleted.
+
+## Permissions
+
+Creating and cloning need `VM.Allocate` on `/vms` (or on the pool), `Datastore.AllocateSpace` on the
+storage, `SDN.Use` on the bridge, and `VM.Clone` on the template for a clone. The options given when
+creating, and the configuration changes after it, need the matching `VM.Config.*` privileges: see
+[Permissions](/cv4pve-api-dotnet/permissions/).

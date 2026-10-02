@@ -9,7 +9,7 @@
         <Company>Corsinvest Srl</Company>
         <Authors>Corsinvest Srl</Authors>
         <Copyright>Corsinvest Srl</Copyright>
-        <PackageProjectUrl>https://github.com/Corsinvest/cv4pve-api-dotnet</PackageProjectUrl>
+        <PackageProjectUrl>https://corsinvest.github.io/cv4pve-api-dotnet/</PackageProjectUrl>
         <PackageTags>ProxmoxVE;Api;Client;Rest;Corsinvest</PackageTags>
         <PackageIcon>icon.png</PackageIcon>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>

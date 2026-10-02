@@ -1,0 +1,117 @@
+---
+title: Corsinvest.ProxmoxVE.Api.Metadata
+description: "Read the schema of the Proxmox VE API as objects: resources, methods, parameters and returned fields, for code generators, command line completion and tools."
+sidebar:
+  label: Metadata
+---
+
+Proxmox VE describes its own API in a schema, the one behind the
+[API viewer](https://pve.proxmox.com/pve-docs/api-viewer/). This package reads it and gives it as a
+tree of objects. The API clients of the cv4pve suite, this one included, are generated from it, and
+cv4pve-cli uses it to list what is under a path and to describe parameters.
+
+```bash
+dotnet add package Corsinvest.ProxmoxVE.Api.Metadata
+```
+
+[NuGet](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Metadata) · no dependency on the other
+packages of this repository.
+
+## Read the schema
+
+```csharp
+using Corsinvest.ProxmoxVE.Api.Metadata;
+
+// from the public documentation of Proxmox VE: the latest version
+var root = await GeneratorClassApi.GenerateAsync();
+
+// from one of your nodes: the version that node runs
+var fromNode = await GeneratorClassApi.GenerateAsync("pve01.example.com", 8006);
+```
+
+The schema is downloaded from the API viewer page of the host. No authentication is needed.
+
+## The tree
+
+`GenerateAsync` returns the root `ClassApi`. Each `ClassApi` is one part of a path:
+
+| Member | Meaning |
+|---|---|
+| `Name` | The part of the path: `nodes`, `qemu`, `{vmid}` |
+| `Resource` | The full path: `/nodes/{node}/qemu/{vmid}` |
+| `IsIndexed`, `IndexName` | Whether the part is a value, like `{vmid}`, and its name |
+| `SubClasses` | What is under it |
+| `Methods` | The methods of the endpoint, as `MethodApi` |
+| `Parent`, `IsRoot` | Position in the tree |
+
+A `MethodApi` is one HTTP method of an endpoint:
+
+| Member | Meaning |
+|---|---|
+| `MethodType` | The HTTP method, as text; also `IsGet`, `IsPost`, `IsPut` |
+| `MethodName` | The name Proxmox VE gives to the method, the one the client uses in Pascal case |
+| `Comment` | Its description |
+| `Parameters` | The parameters, as `ParameterApi` |
+| `ReturnType`, `ReturnIsArray`, `ReturnIsNull`, `ReturnParameters` | What it returns |
+
+A `ParameterApi` has `Name`, `Type`, `Description`, `Optional`, `Default`, `Minimum`, `Maximum`,
+`EnumValues` for the parameters with a fixed set of values, `IsIndexed` for the families such as
+`net0`, `net1`, and `Formats` for the parts of a value like `model=virtio,bridge=vmbr0`.
+
+## Walk the tree
+
+```csharp
+void Print(ClassApi node)
+{
+    foreach (var method in node.Methods)
+    {
+        Console.WriteLine($"{method.MethodType,-6} {node.Resource}  {method.MethodName}");
+    }
+
+    foreach (var child in node.SubClasses) { Print(child); }
+}
+
+Print(root);
+```
+
+`ClassApi.GetFromResource(root, path)` goes straight to a path. It accepts a path with real values:
+
+```csharp
+var config = ClassApi.GetFromResource(root, "/nodes/pve01/qemu/100/config");
+
+foreach (var method in config.Methods)
+{
+    Console.WriteLine($"{method.MethodType} {method.Comment}");
+
+    foreach (var parameter in method.Parameters.Where(a => !a.Optional))
+    {
+        Console.WriteLine($"  {parameter.Name}: {parameter.Type}");
+    }
+}
+```
+
+## Cache the schema
+
+Downloading and parsing the schema takes time, too much for a command line tool to do at every start.
+`BuildFlatCache` writes the tree as compact JSON and `LoadFlatCache` with `BuildClassApiFromFlat` read
+it back:
+
+```csharp
+var cacheFile = Path.Combine(Path.GetTempPath(), "pve-api-schema.json");
+
+File.WriteAllText(cacheFile, GeneratorClassApi.BuildFlatCache(root));
+
+var flat = GeneratorClassApi.LoadFlatCache(File.ReadAllText(cacheFile));
+var cached = flat != null
+                ? GeneratorClassApi.BuildClassApiFromFlat(flat)
+                : await GeneratorClassApi.GenerateAsync();
+```
+
+`LoadFlatCache` returns `null` for a cache written by a version of the package with another cache
+format: build it again from the schema, as above.
+
+## On top of it
+
+The [Extension package](/cv4pve-api-dotnet/packages/extension/#shell-api-calls-as-data) has `ApiSchema`,
+which answers the usual questions on this tree (the methods of a path, the allowed values of a
+parameter, what is under a path, the columns of an answer) without walking it by hand.

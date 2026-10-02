@@ -1,0 +1,131 @@
+---
+title: Corsinvest.ProxmoxVE.Api.Console
+description: "Helpers to build a command line tool for Proxmox VE on System.CommandLine: the shared connection options, the client from the command line, logging and update check."
+sidebar:
+  label: Console
+---
+
+What the cv4pve command line tools have in common: the connection options (`--host`, `--api-token`,
+`--username`, `--password`), the client created from them, the hidden `--debug` option, the notice of a
+new version. A tool built on this package behaves like the others of the suite. It is based on
+[System.CommandLine](https://learn.microsoft.com/dotnet/standard/commandline/).
+
+```bash
+dotnet add package Corsinvest.ProxmoxVE.Api.Console
+```
+
+[NuGet](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Console) · brings in
+[Extension](/cv4pve-api-dotnet/packages/extension/) and, with it, the other packages.
+
+## A complete tool
+
+```csharp
+using System.CommandLine;
+using Corsinvest.ProxmoxVE.Api.Console.Helpers;
+using Corsinvest.ProxmoxVE.Api.Extension;
+using Corsinvest.ProxmoxVE.Api.Shared.Utils;
+using Microsoft.Extensions.Logging;
+
+var app = ConsoleHelper.CreateApp("List the guests of a Proxmox VE cluster");
+var loggerFactory = ConsoleHelper.CreateLoggerFactory<Program>(app.GetLogLevelFromDebug());
+
+var optVmId = app.VmIdsOrNamesOption();
+optVmId.DefaultValueFactory = _ => "@all";
+var optOutput = app.TableOutputOption();
+
+app.SetAction(async (parseResult, cancellationToken) =>
+{
+    var client = await app.ClientTryLoginAsync(loggerFactory);
+    var vms = await client.GetVmsAsync(parseResult.GetValue(optVmId));
+
+    Console.Out.Write(TableGenerator.From(vms)
+                                    .Column(a => a.VmId).Title("VMID")
+                                    .Column(a => a.Name)
+                                    .Column(a => a.Node)
+                                    .Column(a => a.Status)
+                                    .To(parseResult.GetValue(optOutput)));
+    return 0;
+});
+
+return await app.ExecuteAppAsync(args, loggerFactory.CreateLogger<Program>());
+```
+
+```bash
+mytool --host=pve01,pve02 --api-token='automation@pve!app=...' --vmid=@tag-production -o Markdown
+```
+
+## What CreateApp adds
+
+`ConsoleHelper.CreateApp(description)` returns a `RootCommand` with the Corsinvest logo in its
+description and these options:
+
+| Option | Meaning |
+|---|---|
+| `--host` | Required. One or more hosts separated by commas, each `host` or `host:port`, IPv6 in brackets. The first that answers is used |
+| `--api-token` | API token, `USER@REALM!TOKENID=UUID` |
+| `--username` | User, `user@realm` |
+| `--password` | Password. `file:<path>` reads it from a file |
+| `--validate-certificate` | Validate the certificate of the node. Off unless given |
+| `--debug` | Hidden. Log at `Debug` level and print the stack trace of an error |
+| `--log-level` | Hidden. `Trace`, `Debug`, `Information`, `Warning`, `Error` or `Critical` |
+| `--dry-run` | Hidden. For the tool to honour: `app.DryRunIsActive()` |
+
+Either `--api-token` or `--username` with `--password` must be given, or the parsing fails with an
+error. The three hidden options are recursive: they are accepted by every subcommand.
+
+With `--password=file:<path>`, if the file exists the password is read from it; if it does not, the
+tool asks for the password and writes it to the file for the next runs. The file is obfuscated with a
+key that is part of the package, not protected: restrict who can read it.
+
+## The client
+
+`app.ClientTryLoginAsync(loggerFactory)` reads the options above from the command line and returns a
+connected `PveClient`, using
+[`ClientHelper`](/cv4pve-api-dotnet/connection/#several-nodes): it throws `PveException` when no host
+answers or the authentication fails. There is no option for a second factor: a user with two-factor
+authentication cannot log in this way, use an API token.
+
+## Running the tool
+
+`app.ExecuteAppAsync(args, logger)` parses and runs the command. An exception thrown by the action is
+printed as `ERROR: <message>` and the exit code is 1; with `--debug` the type and the stack trace are
+printed too. Otherwise the exit code is what the action returns.
+
+It also checks, at most once every 24 hours, whether GitHub has a newer release of
+`Corsinvest/<name of the executable>`, and prints a notice after the output when the terminal is
+interactive. The check runs in the background and never delays or fails the command.
+
+`ConsoleHelper.CreateLoggerFactory<T>(logLevel)` creates a console logger that shows the requests of
+the client at the chosen level: with `app.GetLogLevelFromDebug()` the level is `--log-level` if given,
+`Debug` with `--debug`, otherwise `Warning`.
+
+## Commands, options, arguments
+
+Short forms over System.CommandLine, where names and aliases are separated by `|`:
+
+```csharp
+var cmdSnap = app.AddCommand("snap|s", "Snapshot the selected guests");
+var optName = cmdSnap.AddOption<string>("--name|-n", "Name of the snapshot");
+var optKeep = cmdSnap.AddOption<int>("--keep", "Snapshots to keep").AddValidatorRange(1, 100);
+var optScript = cmdSnap.ScriptFileOption();
+var optTimeout = cmdSnap.TimeoutOption();
+var argLabel = cmdSnap.AddArgument("label", "Label of the run");
+```
+
+| Method | Adds |
+|---|---|
+| `VmIdsOrNamesOption()` | `--vmid` with the description of the [pattern syntax](/cv4pve-api-dotnet/packages/extension/#vms-and-containers-by-pattern) |
+| `VmIdOrNameOption()`, `VmIdOption()` | `--vmid` for one guest, as text or as number |
+| `TableOutputOption()` | `--output`, `-o`: `Text` (default), `Html`, `Markdown`, `Json`, `JsonPretty` |
+| `TimeoutOption()` | `--timeout`, in seconds |
+| `VerboseOption()` | `--verbose`, `-v` |
+| `ScriptFileOption()` | `--script`, a file that must exist |
+| `AddValidatorRange`, `AddValidatorExistFile`, `AddValidatorExistDirectory` | Validators on an option |
+
+## Other helpers
+
+- `ConsoleHelper.ReadPassword()` reads a password showing `*` for each character;
+  `ReadYesNo(prompt, defaultAnswer)` asks for a confirmation.
+- `ShellHelper.Execute(...)` runs a command (through `/bin/bash -c` on Linux and macOS, as a program on
+  Windows), with extra environment variables: it is how the tools call a hook script. With `dryRun` the
+  command is not run. The exit code is read only with `waitForExit: true`; otherwise it is 0.

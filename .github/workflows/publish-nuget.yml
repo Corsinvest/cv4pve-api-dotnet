@@ -4,9 +4,18 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g. v9.2.4)'
+        required: true
 
 permissions:
   contents: write
+
+env:
+  # the tag pushed, or the one given to a manual run
+  TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
 
 jobs:
   build-and-publish:
@@ -16,6 +25,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
+        ref: ${{ env.TAG }}
         fetch-depth: 0
 
     - name: Setup .NET
@@ -28,7 +38,7 @@ jobs:
         # Extract version from Directory.Build.props
         PROPS_VERSION=$(grep -oPm1 '<Version>\K[^<]*' Directory.Build.props)
         # Remove 'v' prefix from tag and compare
-        TAG_VERSION=${GITHUB_REF#refs/tags/v}
+        TAG_VERSION=${TAG#v}
 
         echo "Props version: $PROPS_VERSION"
         echo "Tag version: $TAG_VERSION"
@@ -42,7 +52,7 @@ jobs:
       id: prerelease_check
       run: |
         # Check if the tag contains prerelease indicators
-        if [[ "${{ github.ref_name }}" =~ -(alpha|beta|rc|preview|pre|dev|experimental)$ ]]; then
+        if [[ "$TAG" =~ -(alpha|beta|rc|preview|pre|dev|experimental)$ ]]; then
           echo "IS_PRERELEASE=true" >> $GITHUB_OUTPUT
         else
           echo "IS_PRERELEASE=false" >> $GITHUB_OUTPUT
@@ -51,7 +61,7 @@ jobs:
     - name: Extract changelog section
       id: changelog
       run: |
-        VERSION=${GITHUB_REF#refs/tags/v}
+        VERSION=${TAG#v}
 
         if [ ! -f "CHANGELOG.md" ]; then
           exit 0
@@ -66,6 +76,9 @@ jobs:
         echo "Changelog section found for $VERSION"
         echo "notes<<EOF" >> $GITHUB_OUTPUT
         echo "$NOTES" >> $GITHUB_OUTPUT
+        # the release page carries no file to install: link to this version on NuGet
+        echo "" >> $GITHUB_OUTPUT
+        echo "[NuGet](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api/$VERSION)" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
 
     - name: Restore dependencies
@@ -82,7 +95,8 @@ jobs:
         for file in ./nupkgs/*.nupkg; do
           if [ -f "$file" ]; then
             echo "Publishing $file..."
-            dotnet nuget push "$file" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+            # --skip-duplicate: a manual rerun after a partial publish skips the packages already there
+            dotnet nuget push "$file" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
           fi
         done
       env:
@@ -92,8 +106,8 @@ jobs:
       id: create_release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ github.ref_name }}
-        name: Release ${{ github.ref_name }}
+        tag_name: ${{ env.TAG }}
+        name: Release ${{ env.TAG }}
         generate_release_notes: true
         body: ${{ steps.changelog.outputs.notes }}
         draft: false

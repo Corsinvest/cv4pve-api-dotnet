@@ -1,0 +1,65 @@
+---
+title: Corsinvest.ProxmoxVE.Api
+description: "The core package: PveClient, with a method for every endpoint of the Proxmox VE API, and the Result of every call."
+sidebar:
+  label: Api
+---
+
+The client. It is the only package an application needs to call the Proxmox VE API; the others build
+on it.
+
+```bash
+dotnet add package Corsinvest.ProxmoxVE.Api
+```
+
+[NuGet](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api) · targets .NET 8, 9 and 10.
+
+## What is in it
+
+| Type | For |
+|---|---|
+| `PveClient` | The whole API as a tree of properties, indexers and methods, generated from the Proxmox VE API schema: [API structure](/cv4pve-api-dotnet/concepts/api-structure/) |
+| `PveClientBase` | What `PveClient` derives from: connection, login, the four raw calls, task helpers. Usable on its own when only raw calls are needed |
+| `Result` | The outcome of every call: [Results](/cv4pve-api-dotnet/concepts/results/) |
+| `ResultExtension` | `ToData()`, `ToEnumerable()`, `ToModel<T>()`, `ToLogs()`, `InError()` |
+| `PveResultException`, `PveAuthenticationException` | The exceptions of the few methods that throw: [Errors](/cv4pve-api-dotnet/concepts/errors/) |
+| `ResponseType`, `MethodType` | JSON or PNG answers; the four kinds of call |
+
+## A complete program
+
+```csharp
+using Corsinvest.ProxmoxVE.Api;
+
+var client = new PveClient("pve01")
+{
+    ApiToken = Environment.GetEnvironmentVariable("PVE_API_TOKEN")
+};
+
+var result = await client.Cluster.Resources.Resources(type: "vm");
+if (!result.IsSuccessStatusCode)
+{
+    Console.Error.WriteLine($"{(int)result.StatusCode} {result.ReasonPhrase}");
+    return 1;
+}
+
+foreach (var guest in result.ToEnumerable().OrderBy(a => a.vmid))
+{
+    Console.WriteLine($"{guest.vmid,6} {guest.type,-5} {guest.node,-10} {guest.status}");
+}
+
+return 0;
+```
+
+## Where to go
+
+- Connect: [Connection](/cv4pve-api-dotnet/connection/), with token, password, two-factor authentication, OpenID, certificates, timeout and a custom `HttpClient`.
+- Find the method for an endpoint: [API structure](/cv4pve-api-dotnet/concepts/api-structure/).
+- Read the answer: [Results](/cv4pve-api-dotnet/concepts/results/).
+- Long operations: [Tasks](/cv4pve-api-dotnet/concepts/tasks/).
+- Failures: [Errors](/cv4pve-api-dotnet/concepts/errors/).
+- See the requests: [Troubleshooting](/cv4pve-api-dotnet/troubleshooting/#logging).
+
+## Dependencies
+
+The client reads the answers with `Newtonsoft.Json` and logs through `Microsoft.Extensions.Logging`.
+It does not depend on the other packages of this repository.

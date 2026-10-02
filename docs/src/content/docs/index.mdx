@@ -1,0 +1,108 @@
+---
+title: cv4pve-api-dotnet
+description: "Proxmox VE API client for .NET: the whole API as typed C# calls, with helpers for VMs, containers, tasks and command line tools."
+head:
+  # Search results and browser tab: the name and what it is, without Starlight's "| site title" suffix
+  - tag: title
+    content: "cv4pve-api-dotnet: Proxmox VE API client for .NET"
+  - tag: meta
+    attrs:
+      property: og:title
+      content: "cv4pve-api-dotnet: Proxmox VE API client for .NET"
+template: splash
+hero:
+  title: The <span class="accent-mark">Proxmox VE</span> API from .NET
+  tagline: A .NET client with a method for every endpoint of the Proxmox VE API (VMs, containers, storage, backups, cluster, access), plus helpers for the common jobs. It runs in your application and talks only to the API.
+  actions:
+    - text: Get started
+      link: /cv4pve-api-dotnet/getting-started/
+      icon: right-arrow
+    - text: API structure
+      link: /cv4pve-api-dotnet/concepts/api-structure/
+      icon: right-arrow
+      variant: secondary
+    - text: Examples
+      link: /cv4pve-api-dotnet/examples/common-tasks/
+      icon: right-arrow
+      variant: secondary
+---
+
+import { Image } from 'astro:assets';
+import { LinkCard } from '@astrojs/starlight/components';
+import FeatureGrid from '@corsinvest/cv4pve-docs-theme/components/FeatureGrid.astro';
+import CtaBand from '@corsinvest/cv4pve-docs-theme/components/CtaBand.astro';
+import proxmoxLogo from '../../assets/proxmox-logo.svg';
+import dotnetLogo from '../../assets/dotnet.svg';
+
+export const features = [
+  { title: 'The whole API', text: 'A method for every endpoint and HTTP method, generated from the Proxmox VE API schema, placed where the API has it: the path of an endpoint is the path in the code.', href: 'concepts/api-structure/' },
+  { title: 'One Result for every call', text: 'The HTTP outcome and the Proxmox VE data together: read it as dynamic, as a dictionary or as a typed model. A failed call does not throw.', href: 'concepts/results/' },
+  { title: 'API token or password', text: 'Connect with an API token or a user and password, with two-factor authentication, OpenID, your own HttpClient, and a list of nodes to try.', href: 'connection/' },
+  { title: 'Tasks', text: 'Start a backup, a clone or a migration, wait for its task to finish and read whether it succeeded.', href: 'concepts/tasks/' },
+  { title: 'VMs by id, name or pattern', text: 'The Extension package finds VMs and containers without knowing their node, by id, name, range, pool or tag, and reads the data as typed models.', href: 'packages/extension/' },
+  { title: 'Command line tools', text: 'The Console package gives a tool the connection options, the logging and the behaviour of the cv4pve suite.', href: 'packages/console/' },
+];
+
+<div style="text-align: center">
+  <Image src={dotnetLogo} alt=".NET logo" width={140} style="display: inline-block" />
+</div>
+
+## Why
+
+An application that manages Proxmox VE (a customer portal, a scheduled job, a monitoring or billing
+tool) has to speak its REST API: tickets and tokens, paths, parameters, JSON, tasks that end later.
+Written by hand it is a layer of HTTP code to build and to keep up with every Proxmox VE release.
+
+cv4pve-api-dotnet is that layer, generated from the API itself. The calls follow the tree of the API,
+so the [Proxmox VE API viewer](https://pve.proxmox.com/pve-docs/api-viewer/) is also the reference of
+the client, and IntelliSense shows the same descriptions while you type.
+
+```csharp
+using Corsinvest.ProxmoxVE.Api;
+
+var client = new PveClient("pve01")
+{
+    ApiToken = "automation@pve!app=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+};
+
+// GET /nodes/{node}/qemu/{vmid}/status/current
+var result = await client.Nodes["pve01"].Qemu[100].Status.Current.VmStatus();
+
+Console.WriteLine(result.IsSuccessStatusCode
+                    ? $"VM {result.Response.data.vmid} is {result.Response.data.status}"
+                    : $"{(int)result.StatusCode} {result.ReasonPhrase}");
+```
+
+<LinkCard
+  title="From endpoint to method"
+  description="Paths become properties and indexers, the methods of an endpoint become C# methods, parameters become arguments."
+  href="/cv4pve-api-dotnet/concepts/api-structure/"
+/>
+
+## In your application, API only
+
+The client runs where .NET 8, 9 or 10 runs (Windows, Linux, macOS, a container, a CI runner) and talks
+only to the Proxmox VE REST API on port 8006. Nothing is installed on the nodes and no SSH is needed.
+What an application can do is what its API token or user is allowed to do: give it a token with just
+the privileges it needs, see [Permissions](/cv4pve-api-dotnet/permissions/).
+
+## Where it fits
+
+The cv4pve suite follows the Unix philosophy: each tool does one thing and does it well. This library
+is what the .NET tools of the suite are built on, among them
+[cv4pve-cli](https://corsinvest.github.io/cv4pve-cli/),
+[cv4pve-autosnap](https://corsinvest.github.io/cv4pve-autosnap/),
+[cv4pve-diag](https://corsinvest.github.io/cv4pve-diag/) and
+[cv4pve-report](https://corsinvest.github.io/cv4pve-report/): use it to build your own. If a ready tool
+already does the job, use the tool. For scripts rather than applications, the same API is available
+from PowerShell with [cv4pve-api-powershell](https://corsinvest.github.io/cv4pve-api-powershell/).
+
+## What it does for you
+
+<FeatureGrid items={features} />
+
+<CtaBand
+  title="Write your first call"
+  text="Add the package from NuGet, connect to any node, read your VMs."
+  proxmoxLogo={proxmoxLogo}
+/>

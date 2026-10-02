@@ -1,0 +1,248 @@
+---
+title: Corsinvest.ProxmoxVE.Api.Extension
+description: "Typed helpers on top of the client: typed reads, VMs and containers by id, name or pattern, power, snapshots, several nodes, schedules and the API shell."
+sidebar:
+  label: Extension
+---
+
+Helpers built on the client for the jobs that every tool repeats: reading data as typed objects,
+finding VMs and containers without knowing their node, changing their state, snapshots. The cv4pve
+tools are built on this package.
+
+```bash
+dotnet add package Corsinvest.ProxmoxVE.Api.Extension
+```
+
+[NuGet](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api.Extension) · brings in
+[Api](/cv4pve-api-dotnet/packages/api/), [Shared](/cv4pve-api-dotnet/packages/shared/) and
+[Metadata](/cv4pve-api-dotnet/packages/metadata/).
+
+```csharp
+using Corsinvest.ProxmoxVE.Api;
+using Corsinvest.ProxmoxVE.Api.Extension;
+```
+
+## Typed reads
+
+The package adds a `GetAsync()` to the endpoints that read data. It calls the API and returns the
+answer as a model of the [Shared package](/cv4pve-api-dotnet/packages/shared/), with the same optional
+arguments as the generated method:
+
+```csharp
+var nodes = await client.Nodes.GetAsync();
+foreach (var node in nodes) { Console.WriteLine($"{node.Node} {node.Status}"); }
+
+var config = await client.Nodes["pve01"].Qemu[100].Config.GetAsync();
+Console.WriteLine($"{config.Name}: {config.Cores} cores");
+
+var snapshots = await client.Nodes["pve01"].Qemu[100].Snapshot.GetAsync();
+```
+
+`GetAsync()` **throws** `PveResultException` when the call fails, unlike the generated methods: see
+[Errors](/cv4pve-api-dotnet/concepts/errors/#what-does-throw). An endpoint without `GetAsync()` is read
+with its generated method and `ToModel<T>()`.
+
+## Cluster resources
+
+These read `/cluster/resources`, one call for the whole cluster, and return typed items:
+
+| Method | Returns |
+|---|---|
+| `GetResourcesAsync(ClusterResourceType.All)` | Every resource: nodes, guests, storages, pools, SDN |
+| `GetNodesAsync()`, `GetNodeAsync("pve01")` | Nodes |
+| `GetStoragesAsync()`, `GetStorageAsync("local")` | Storages |
+| `GetVmsAsync()` | VMs and containers, sorted by node and id |
+| `GetVmAsync(100)`, `GetVmAsync("web01")` | One VM or container, by id or by name |
+| `GetClusterInfoAsync()` | Whether the host is a cluster or a single node, and its name |
+
+```csharp
+foreach (var vm in await client.GetVmsAsync())
+{
+    Console.WriteLine($"{vm.VmId} {vm.Name} {vm.Node} {vm.VmType} {vm.Status}");
+}
+
+var web01 = await client.GetVmAsync("web01");
+var status = await client.GetVmStatusAsync(web01.Node, web01.VmType, web01.VmId);
+```
+
+`GetVmAsync`, `GetNodeAsync` and `GetStorageAsync` throw `ArgumentException` when nothing has that
+id or name.
+
+## VMs and containers by pattern
+
+`GetVmsAsync(pattern)` selects guests with the same syntax the cv4pve tools accept in `--vmid`:
+
+```csharp
+// every guest with the tag "production", except VM 105 and those on node pve03
+var vms = await client.GetVmsAsync("@tag-production,-105,-@node-pve03");
+```
+
+Items are separated by commas. An item selects:
+
+| Item | Selects |
+|---|---|
+| `100` | The guest with that id |
+| `web01` | The guest with that name, without regard to case |
+| `100:110` | The ids in the range, ends included |
+| `web%`, `%db`, `%test%` | Names that start with, end with, contain the text |
+| `@all` | Every guest of the cluster |
+| `@node-pve01` | Every guest on that node (also `@all-pve01`) |
+| `@pool-customer1` | Every guest of that pool and of its nested pools |
+| `@tag-production` | Every guest with that tag |
+
+An item that starts with `-` removes what it selects from the result: `@all,-@tag-test` is every guest
+without the tag `test`. Exclusions are applied after all the other items, whatever their position.
+
+## Power and state
+
+Without knowing the node or whether the id is a VM or a container:
+
+```csharp
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
+
+var result = await client.ChangeStatusVmAsync(100, VmStatus.Shutdown);
+if (result.IsSuccessStatusCode)
+{
+    await client.WaitForTaskToFinishAsync(result, timeout: 120_000);
+}
+```
+
+`VmStatus` is `Start`, `Stop`, `Shutdown`, `Reboot`, `Suspend`, `Resume` or `Reset` (`Reset` is not
+available for containers). The call returns the `Result` of the request, with the task to wait for.
+
+With node and type known, `GetVmStatusAsync` and `GetVmConfigAsync` return the status and the
+configuration of a VM or a container through one method, and `VmUnlockAsync` removes a lock:
+
+```csharp
+foreach (var vm in await client.GetVmsAsync("@pool-customer1"))
+{
+    var current = await client.GetVmStatusAsync(vm.Node, vm.VmType, vm.VmId);
+    var config = await client.GetVmConfigAsync(vm.Node, vm.VmType, vm.VmId);
+    Console.WriteLine($"{vm.VmId} {vm.Name} {current.Status} {config.Memory} MB");
+}
+```
+
+## Snapshots
+
+`SnapshotHelper` does the same operation for VMs and containers, and waits for the task. The timeout
+is in milliseconds:
+
+```csharp
+using Corsinvest.ProxmoxVE.Api.Extension.Utils;
+
+var vm = await client.GetVmAsync("web01");
+
+var result = await SnapshotHelper.CreateSnapshotAsync(client, vm.Node, vm.VmType, vm.VmId,
+                                                      "before-update", "Before the update",
+                                                      state: false, timeout: 60_000);
+
+foreach (var snapshot in await SnapshotHelper.GetSnapshotsAsync(client, vm.Node, vm.VmType, vm.VmId))
+{
+    Console.WriteLine($"{snapshot.Name} {snapshot.Date:g} {snapshot.Description}");
+}
+
+result = await SnapshotHelper.RemoveSnapshotAsync(client, vm.Node, vm.VmType, vm.VmId,
+                                                  "before-update", timeout: 60_000);
+```
+
+`RollbackSnapshotAsync` and `UpdateSnapshotAsync` complete the set. They return the `Result` of the
+request: check it, and read the exit status of the task as in
+[Tasks](/cv4pve-api-dotnet/concepts/tasks/#did-it-succeed).
+
+:::caution
+`CreateSnapshotAsync`, `RemoveSnapshotAsync` and `RollbackSnapshotAsync` wait for the task before they
+return. When Proxmox VE refuses the request outright (a missing privilege, a guest that does not exist)
+there is no task, and they throw `RuntimeBinderException` instead of returning the `Result`. Catch it,
+or call the API and wait yourself as in
+[Bulk operations](/cv4pve-api-dotnet/examples/bulk-operations/#one-at-a-time).
+:::
+
+## Several nodes
+
+`ClientHelper.GetClientAndTryLoginAsync` takes a list of hosts and returns a client connected to the
+first one that answers: see [Connection](/cv4pve-api-dotnet/connection/#several-nodes).
+
+## Schedules
+
+`PveCalendarEvent` reads the schedule syntax Proxmox VE uses for backup and replication jobs
+(`mon..fri 02:30`, `*:0/15`, `sat 03:00`):
+
+```csharp
+using Corsinvest.ProxmoxVE.Api.Extension.Scheduling;
+
+var schedule = PveCalendarEvent.Parse("mon..fri 02:30");
+Console.WriteLine(schedule.NextOccurrence(DateTime.Now));
+```
+
+`Parse` throws `PveCalendarParseException` for a text it cannot read; `TryParse` returns `false`.
+Fixed dates (`2026-12-25`) are not supported.
+
+## Shell: API calls as data
+
+`Corsinvest.ProxmoxVE.Api.Extension.Shell` runs an API call written as text (method, path,
+`--key value` parameters) and returns data. cv4pve-cli and the bots are built on it; formatting the
+output and storing aliases are up to the caller.
+
+```csharp
+using Corsinvest.ProxmoxVE.Api.Extension.Shell;
+
+// --key value parameters, as typed on a command line
+var (parameters, _) = ApiCommandLine.ParseParameters(["--type", "vm"]);
+var command = new ApiCommand(MethodType.Get, "/cluster/resources",
+                             parameters.ToDictionary(a => a.Key, a => (object)a.Value));
+
+var response = await ApiRequest.ExecuteAsync(client, command);
+if (!response.IsSuccess)
+{
+    Console.Error.WriteLine($"{response.StatusCode} {response.Error}");
+    foreach (var (name, error) in response.ParameterErrors) { Console.Error.WriteLine($"{name}: {error}"); }
+}
+```
+
+An alias is a command with placeholders, filled by position or looked up in the cluster:
+
+```csharp
+var alias = new ApiAlias("do start vm", "Start a VM", "create /nodes/{node}/qemu/{vmid}/status/start");
+var expanded = await ApiCommandLine.ExpandAliasAsync(alias, ["--guest", "web01"], client);
+if (expanded.Command != null)
+{
+    var started = await ApiRequest.ExecuteAsync(client, expanded.Command,
+                                                new ApiWaitOptions(TimeSpan.FromMinutes(5)));
+    Console.WriteLine(!started.IsSuccess ? started.Error
+                        : started.Task?.Succeeded == true ? "started"
+                        : started.Task?.ExitStatus);
+}
+```
+
+With `ApiWaitOptions` the call waits for the task it started and reports how it ended.
+
+`ApiSchema` reads the API schema as data: the methods of a path with their parameters and returned
+fields, the values a parameter accepts, and what is under a path.
+
+```csharp
+using Corsinvest.ProxmoxVE.Api.Metadata;
+
+var root = await GeneratorClassApi.GenerateAsync("pve01.example.com", 8006); // schema read from a node
+
+foreach (var method in ApiSchema.GetMethods(root, "/nodes/pve01/qemu/100/config") ?? [])
+{
+    Console.WriteLine($"{method.Method}: {method.Description}");
+    foreach (var parameter in method.Parameters)
+    {
+        Console.WriteLine($"  --{parameter.Name} {string.Join(",", ApiSchema.GetAllowedValues(parameter))}");
+    }
+}
+
+var children = await ApiSchema.GetChildrenAsync(client, root, "/nodes");
+foreach (var child in children.Children) { Console.WriteLine(child.Name); }
+if (children.Error != null) { Console.Error.WriteLine(children.Error); }
+```
+
+`ApiSchema.ToTable(response.Data, root, resource)` turns the data of an answer into a
+[`TableGenerator`](/cv4pve-api-dotnet/packages/shared/#tables), as `pvesh` shows it: an object with
+every key, a list with the columns the schema describes, or `null` for a single value.
+`ApiTableOptions` chooses what to show: `AllColumns: true` shows every column of a list, and
+`HumanReadable: false` keeps the values as the API returns them instead of sizes, percentages,
+durations and dates as text.
+
+`ApiExplorerHelper` is obsolete: it returns text and is kept only for existing callers.

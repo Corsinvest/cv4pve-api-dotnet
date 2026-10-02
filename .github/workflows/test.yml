@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: Copyright Corsinvest Srl
+# SPDX-License-Identifier: MIT
+
+name: Test
+
+on:
+  push:
+    branches: [ "master" ]
+    paths: [ "src/**", "Directory.Build.props", ".github/workflows/test.yml" ]
+  pull_request:
+    branches: [ "master" ]
+    paths: [ "src/**", "Directory.Build.props", ".github/workflows/test.yml" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # the test project runs on every target framework of Directory.Build.props
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      # no cluster needed (xunit, fake HTTP handler); one test downloads the API schema from pve.proxmox.com
+      - name: Run tests
+        run: dotnet test src/Corsinvest.ProxmoxVE.Api.Extension.Tests --configuration Release
