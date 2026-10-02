@@ -15,38 +15,21 @@ Create a [user](https://pve.proxmox.com/pve-docs/chapter-pveum.html#pveum_users)
 [API token](https://pve.proxmox.com/pve-docs/chapter-pveum.html#pveum_tokens), then
 [assign](https://pve.proxmox.com/pve-docs/chapter-pveum.html#pveum_permission_management) a role with
 the privileges below, on `/` or on the smallest path that covers what the application touches
-(`/vms/100`, `/pool/web`, `/storage/local`). From the shell of a node:
+(`/vms/100`, `/pool/web`, `/storage/local`).
 
-```bash
-# a user in the Proxmox VE realm, without a password: only its tokens are used
-pveum user add automation@pve --comment "cv4pve-api-dotnet application"
-
-# a token for it: the secret is printed once, copy it
-pveum user token add automation@pve app
-
-# read-only access to the whole cluster, for the user and for the token
-pveum acl modify / --users automation@pve --roles PVEAuditor
-pveum acl modify / --tokens 'automation@pve!app' --roles PVEAuditor
-```
-
-The token to give to the client is `automation@pve!app=<secret>`: see
+The token to give to the client has the form `automation@pve!app=<secret>`: see
 [Connection](/cv4pve-api-dotnet/connection/#api-token).
 
 :::caution[Tokens with privilege separation]
 A token with privilege separation (the default) does **not** inherit the permissions of the user: it
-has what is granted to the token, limited to what the user has. Grant the role to both, as above, or
-the application sees an empty cluster.
+has what is granted to the token, limited to what the user has. Grant the role to both, or the
+application sees an empty cluster.
 :::
 
 ## Privileges
 
 The built-in `PVEAuditor` role covers the `*.Audit` privileges: enough for an application that only
-reads. For anything else, create a role with just the privileges it needs:
-
-```bash
-pveum role add SnapshotOperator --privs "VM.Audit VM.Snapshot VM.PowerMgmt"
-pveum acl modify /vms --tokens 'automation@pve!app' --users automation@pve --roles SnapshotOperator
-```
+reads. For anything else, create a role with just the privileges it needs from the table.
 
 | Privilege | On | Used for |
 |---|---|---|
