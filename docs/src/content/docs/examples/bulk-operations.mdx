@@ -1,0 +1,139 @@
+---
+title: Bulk operations
+description: "Act on many VMs and containers at once from C#: select them with a pattern, start the tasks, wait for all of them and report which failed."
+---
+
+The same action on many guests: a snapshot of every production VM before an update, a shutdown of a
+lab every evening. The pattern is always select, start, wait, report. These examples use the
+[Extension package](/cv4pve-api-dotnet/packages/extension/).
+
+```csharp
+using Corsinvest.ProxmoxVE.Api;
+using Corsinvest.ProxmoxVE.Api.Extension;
+using Corsinvest.ProxmoxVE.Api.Extension.Utils;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
+```
+
+## Select
+
+`GetVmsAsync(pattern)` returns the guests, each with its node and type, so the rest of the code needs
+no lookup: see the
+[pattern syntax](/cv4pve-api-dotnet/packages/extension/#vms-and-containers-by-pattern).
+
+```csharp
+// every guest with the tag "production", except the templates
+var vms = (await client.GetVmsAsync("@tag-production")).Where(a => !a.IsTemplate).ToList();
+
+Console.WriteLine($"{vms.Count} guests selected");
+```
+
+## One at a time
+
+The simplest form, and the right one when the operations should not load the storage together: a
+snapshot of each guest, waiting for one before starting the next.
+
+```csharp
+var name = $"auto{DateTime.Now:yyMMddHHmm}";
+var failed = new List<string>();
+
+foreach (var vm in vms)
+{
+    var guest = client.Nodes[vm.Node];
+    var result = vm.VmType == VmType.Qemu
+                    ? await guest.Qemu[vm.VmId].Snapshot.Snapshot(name, "Before the update")
+                    : await guest.Lxc[vm.VmId].Snapshot.Snapshot(name, "Before the update");
+
+    string outcome;
+    if (!result.IsSuccessStatusCode)
+    {
+        outcome = result.ReasonPhrase;
+    }
+    else
+    {
+        var upid = (string)result.ToData();
+        outcome = await client.WaitForTaskToFinishAsync(upid, timeout: 300_000)
+                    ? await client.GetExitStatusTaskAsync(upid)
+                    : "still running after 5 minutes";
+    }
+
+    Console.WriteLine($"{vm.VmId} {vm.Name}: {outcome}");
+    if (outcome != "OK") { failed.Add($"{vm.VmId} {vm.Name}"); }
+}
+
+if (failed.Count > 0) { Console.WriteLine($"Failed: {string.Join(", ", failed)}"); }
+```
+
+## All together
+
+To shut down many guests the waiting can overlap: start every task, then wait for all of them.
+
+```csharp
+// start: each call returns as soon as its task is accepted
+var started = new List<(long VmId, string Name, Result Result)>();
+foreach (var vm in vms.Where(a => a.IsRunning))
+{
+    var result = await VmHelper.ChangeStatusVmAsync(client, vm.Node, vm.VmType, vm.VmId, VmStatus.Shutdown);
+    started.Add((vm.VmId, vm.Name, result));
+}
+
+// wait: all the tasks at the same time
+var outcomes = await Task.WhenAll(started.Select(async item =>
+{
+    if (!item.Result.IsSuccessStatusCode) { return (item.VmId, item.Name, Outcome: item.Result.ReasonPhrase); }
+
+    var upid = (string)item.Result.ToData();
+    var finished = await client.WaitForTaskToFinishAsync(upid, wait: 2000, timeout: 300_000);
+
+    return (item.VmId, item.Name, Outcome: finished
+                                            ? await client.GetExitStatusTaskAsync(upid)
+                                            : "still running after 5 minutes");
+}));
+
+// report
+foreach (var (vmId, name, outcome) in outcomes.OrderBy(a => a.VmId))
+{
+    Console.WriteLine($"{vmId} {name}: {outcome}");
+}
+```
+
+The calls that start the tasks are made one after the other on purpose: they are quick, and their
+order stays readable in the log. Only the waiting runs in parallel.
+
+## How many at once
+
+Proxmox VE accepts all the tasks you start, and runs them together. For operations that are heavy on
+disk or network (backup, clone, migration) limit how many run at the same time, in batches:
+
+```csharp
+foreach (var batch in vms.Chunk(4))
+{
+    var results = new List<Result>();
+    foreach (var vm in batch)
+    {
+        results.Add(await client.Nodes[vm.Node].Vzdump.Vzdump(vmid: vm.VmId.ToString(),
+                                                              storage: "backup",
+                                                              mode: "snapshot"));
+    }
+
+    // an hour for each batch
+    await Task.WhenAll(results.Where(a => a.IsSuccessStatusCode)
+                              .Select(a => client.WaitForTaskToFinishAsync((string)a.ToData(), timeout: 3_600_000)));
+}
+```
+
+For backups on a schedule, a backup job of Proxmox VE itself is the better tool. For snapshots with
+retention see [cv4pve-autosnap](https://corsinvest.github.io/cv4pve-autosnap/), built on this library.
+
+## A report at the end
+
+`TableGenerator` turns the outcomes into a table for the console, for a Markdown message or for JSON:
+
+```csharp
+using Corsinvest.ProxmoxVE.Api.Shared.Utils;
+
+Console.Write(TableGenerator.From(outcomes)
+                            .Column(a => a.VmId).Title("VMID")
+                            .Column(a => a.Name).Title("NAME")
+                            .Column(a => a.Outcome).Title("OUTCOME")
+                            .ToText());
+```

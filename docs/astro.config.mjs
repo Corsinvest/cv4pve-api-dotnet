@@ -49,6 +49,10 @@ export default defineConfig({
           label: 'Packages',
           items: ['packages/api', 'packages/extension', 'packages/shared', 'packages/console', 'packages/metadata'],
         },
+        {
+          label: 'Examples',
+          items: ['examples/common-tasks', 'examples/create-vm', 'examples/bulk-operations'],
+        },
       ],
     }),
   ],
