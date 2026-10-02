@@ -28,3 +28,6 @@ License: MIT
 
 The braces pictogram in `icon.svg` / `icon.png` comes from [Lucide](https://lucide.dev) (icon `braces`)
 License: ISC
+
+The C# logo in `docs/src/assets/csharp.svg` comes from [Devicon](https://devicon.dev) (icon `csharp-original`). C# and its logo are trademarks of Microsoft.
+License: MIT
