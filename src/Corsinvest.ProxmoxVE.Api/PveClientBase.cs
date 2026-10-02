@@ -431,8 +431,9 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
                 default: throw new InvalidEnumArgumentException();
             }
         }
-        catch (TaskCanceledException ex) when (!cts.Token.IsCancellationRequested)
+        catch (OperationCanceledException ex)
         {
+            //timeout of this client (cts) or of the HttpClient: nothing else cancels the request
             sw.Stop();
             _logger.LogError(ex, "{Message}", ex.Message);
 
@@ -519,11 +520,28 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     public static string GetNodeFromTask(string task) => task.Split(':')[1];
 
     /// <summary>
-    /// Waits for a background task to finish.
+    /// Waits for the background task started by a call to finish.
     /// </summary>
+    /// <param name="result">Result of the call.</param>
+    /// <param name="wait">Millisecond wait next check</param>
+    /// <param name="timeout">Millisecond timeout</param>
+    /// <returns>True when the task is finished or there is nothing to wait for (the call failed or started no task),
+    /// false when the task is still running at the timeout.</returns>
+    /// <exception cref="PveResultException">Task status cannot be read.</exception>
     public async Task<bool> WaitForTaskToFinishAsync(Result result, int wait = 500, long timeout = 10000)
-        => !(result?.ResponseInError is false && timeout > 0) ||
-                await WaitForTaskToFinishAsync(result.ToData(), wait, timeout);
+        => GetTaskFromResult(result) is not { } task
+            || timeout <= 0
+            || await WaitForTaskToFinishAsync(task, wait, timeout);
+
+    /// <summary>
+    /// Task identifier (UPID) returned by a call: null when the call failed or started no task.
+    /// </summary>
+    internal static string GetTaskFromResult(Result result)
+        => result is { IsSuccessStatusCode: true, ResponseInError: false, ResponseHasData: true }
+            && result.ResponseToDictionary["data"] is string task
+            && task.StartsWith("UPID:")
+                ? task
+                : null;
 
     /// <summary>
     /// Waits for a background task to finish by its ID.
@@ -560,9 +578,13 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// <summary>
     /// Gets the exit status of a task.
     /// </summary>
+    /// <returns>Exit status ('OK', 'WARNINGS: n' or the error); null while the task is running.</returns>
     /// <exception cref="PveResultException">Task status cannot be read.</exception>
     public async Task<string> GetExitStatusTaskAsync(string task)
-        => EnsureTaskStatus(await ReadTaskStatusAsync(task), task).Response.data.exitstatus;
+        => EnsureTaskStatus(await ReadTaskStatusAsync(task), task).ResponseToDictionary["data"] is IDictionary<string, object> data
+            && data.TryGetValue("exitstatus", out var exitStatus)
+                ? exitStatus as string
+                : null;
 
     /// <summary>
     /// Reads the current status of a task.

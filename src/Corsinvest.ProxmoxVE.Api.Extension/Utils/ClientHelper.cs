@@ -288,7 +288,7 @@ public static class ClientHelper
             using var tcpClient = new TcpClient();
             using var timeoutCts = new CancellationTokenSource(timeout);
             using var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
-            await tcpClient.ConnectAsync(endpoint.Host, endpoint.Port).ConfigureAwait(false);
+            await tcpClient.ConnectAsync(endpoint.Host, endpoint.Port, combinedCts.Token).ConfigureAwait(false);
             return tcpClient.Connected;
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
