@@ -18,10 +18,5 @@ public enum ResponseType
     /// <summary>
     /// Png
     /// </summary>
-    Png,
-
-    /// <summary>
-    /// Response
-    /// </summary>
-    Response
+    Png
 }
