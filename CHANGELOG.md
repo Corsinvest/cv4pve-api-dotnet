@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 The major and minor version follow Proxmox VE (9.2.x targets Proxmox VE 9.2); the patch number can include breaking changes, listed under "Changed (breaking)".
 
+## [9.2.5] - 2026-10-03
+
+### Added
+- Documentation site: https://corsinvest.github.io/cv4pve-api-dotnet/, replaces the Markdown pages of `docs/`; every C# sample compiled against the library ([#107](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/107))
+- CI: unit tests run on .NET 8, 9 and 10 for every pull request; the publish workflow can be run by hand for a tag ([#107](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/107))
+
+### Changed (breaking)
+- Api: `ResponseType.Response` removed: it called `/api2/response/`, which Proxmox VE does not have, so no call could work with it ([#109](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/109))
+- Extension: `ApiExplorerHelper` removed, obsolete since 9.2.4: use `ApiRequest`, `ApiCommandLine` and `ApiSchema` of `Corsinvest.ProxmoxVE.Api.Extension.Shell` ([#109](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/109))
+
+### Changed
+- Api: when `PveClient.Timeout` expires the `Result` has status 408, as for the timeout of `HttpClient`; it was 500 ([#108](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/108))
+- `PackageProjectUrl` points to the documentation site ([#107](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/107))
+
+### Fixed
+- Api: `WaitForTaskToFinishAsync(Result)` threw `RuntimeBinderException` when the call started no task: a call refused by Proxmox VE, a request that never reached the node, or a successful call without a task. It now returns `true`, nothing to wait for ([#108](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/108))
+- Extension: `SnapshotHelper.CreateSnapshotAsync`, `RemoveSnapshotAsync` and `RollbackSnapshotAsync` return the refused `Result` instead of throwing ([#108](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/108))
+- Api: `GetExitStatusTaskAsync` threw `RuntimeBinderException` for a task still running; it returns `null` ([#108](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/108))
+- Extension: `ClientHelper` did not apply its timeout to the connection check: a host that does not answer was given up after the TCP timeout of the system (21 seconds on Windows) instead of 4 seconds, for each dead host of `--host` ([#108](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/108))
+
+### Removed
+- `Corsinvest.ProxmoxVE.Api.Test`, a console program used as a scratch pad, not part of any package ([#108](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/108))
+
 ## [9.2.4] - 2026-09-30
 
 ### Added
