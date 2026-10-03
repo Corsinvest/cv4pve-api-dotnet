@@ -61,7 +61,7 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     public bool ValidateCertificate { get; set; } = false;
 
     /// <summary>
-    /// Response type (Json, Png or Raw).
+    /// Response type (Json or Png).
     /// </summary>
     public ResponseType ResponseType { get; set; } = ResponseType.Json;
 
@@ -425,8 +425,6 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
                     result = "data:image/png;base64," + Convert.ToBase64String(await response.Content.ReadAsByteArrayAsync());
                     if (_logger.IsEnabled(LogLevel.Trace)) { _logger.LogTrace("{Data}", (string)result); }
                     break;
-
-                case ResponseType.Response: result = response; break;
 
                 default: throw new InvalidEnumArgumentException();
             }
