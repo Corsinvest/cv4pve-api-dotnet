@@ -4,8 +4,6 @@
  */
 
 using System.CommandLine;
-using System.Security.Cryptography;
-using System.Text;
 using Corsinvest.ProxmoxVE.Api.Console.Helpers;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 using Microsoft.Extensions.Logging;
@@ -196,14 +194,8 @@ public class ConsoleHelperTests
     [Fact]
     public void Password_file_of_the_old_format_is_still_read()
     {
-#pragma warning disable CA5351 // the old format, kept readable
-        using var tDes = TripleDES.Create();
-        tDes.Mode = CipherMode.ECB;
-        tDes.Key = Encoding.UTF8.GetBytes(Key);
-        tDes.Padding = PaddingMode.PKCS7;
-        var data = Encoding.UTF8.GetBytes("old-secret");
-        var old = Convert.ToBase64String(tDes.CreateEncryptor().TransformFinalBlock(data, 0, data.Length));
-#pragma warning restore CA5351
+        // "old-secret" as the versions before the 'v2:' prefix wrote it: a file written then must still open
+        const string old = "cJ8ZEGCBIyvy7bWXdmmfxQ==";
 
         Assert.Equal("old-secret", StringHelper.Decrypt(old, Key));
     }
