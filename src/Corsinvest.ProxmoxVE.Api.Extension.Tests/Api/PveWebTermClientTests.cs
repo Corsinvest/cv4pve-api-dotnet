@@ -31,6 +31,10 @@ public class PveWebTermClientTests
         /// <summary>The login line, then every command the terminal received.</summary>
         public List<string> Received { get; } = [];
 
+        /// <summary>Pings received, and whether the client said that it was closing.</summary>
+        public int Pings;
+        public bool ClosedByClient;
+
         public Terminal(Func<string, string?> answer)
         {
             Server.Rest = request => request.Path switch
@@ -51,7 +55,12 @@ public class PveWebTermClientTests
                 {
                     // "0:length:text" are keys, "2" is the ping
                     var parts = Encoding.UTF8.GetString(message).Split(':', 3);
-                    if (parts.Length < 3) { continue; }
+                    if (parts.Length < 3)
+                    {
+                        Assert.Equal("2", parts[0]);
+                        Interlocked.Increment(ref Pings);
+                        continue;
+                    }
                     Assert.Equal(Encoding.UTF8.GetByteCount(parts[2]), int.Parse(parts[1]));
 
                     if (parts[2] != "\n")
@@ -71,6 +80,9 @@ public class PveWebTermClientTests
                     var reply = answer(command);
                     if (reply != null) { await LocalPveServer.SendTextAsync(socket, reply, cancellationToken); }
                 }
+
+                // the loop ends without an error only when the client sends the close
+                ClosedByClient = true;
             };
 
             Client = Server.Client();
@@ -385,6 +397,7 @@ public class PveWebTermClientTests
         await terminal.Term.DisconnectAsync();
 
         await terminal.Server.SocketClosed.WaitAsync(TimeSpan.FromSeconds(10));
+        Assert.True(terminal.ClosedByClient);
         await terminal.Server.DisposeAsync();
     }
 
@@ -400,5 +413,23 @@ public class PveWebTermClientTests
         // the certificate of the test server is self-signed: the request does not leave
         Assert.False(result.IsSuccessStatusCode);
         Assert.Empty(server.Requests);
+    }
+
+    [Fact]
+    public async Task Open_terminal_is_kept_alive_with_pings()
+    {
+        var terminal = new Terminal(_ => null);
+        terminal.Term.PingInterval = TimeSpan.FromMilliseconds(50);
+        await using (await terminal.ConnectAsync())
+        {
+            for (var i = 0; i < 100 && Volatile.Read(ref terminal.Pings) < 3; i++) { await Task.Delay(50); }
+
+            Assert.True(Volatile.Read(ref terminal.Pings) >= 3);
+        }
+
+        // no ping after the disconnection
+        var pings = Volatile.Read(ref terminal.Pings);
+        await Task.Delay(200);
+        Assert.Equal(pings, Volatile.Read(ref terminal.Pings));
     }
 }

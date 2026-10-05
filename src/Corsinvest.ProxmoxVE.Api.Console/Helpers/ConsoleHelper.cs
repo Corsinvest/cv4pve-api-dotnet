@@ -48,6 +48,9 @@ Good job";
 {title}{space}(Made in Italy)";
     }
 
+    //a key of the console without showing it: replaced by the tests
+    internal static Func<ConsoleKeyInfo> ReadKey { get; set; } = () => System.Console.ReadKey(intercept: true);
+
     /// <summary>
     /// Read password from console
     /// </summary>
@@ -57,7 +60,7 @@ Good job";
         ConsoleKey key;
         do
         {
-            var keyInfo = System.Console.ReadKey(intercept: true);
+            var keyInfo = ReadKey();
             key = keyInfo.Key;
 
             if (key == ConsoleKey.Backspace && pass.Length > 0)

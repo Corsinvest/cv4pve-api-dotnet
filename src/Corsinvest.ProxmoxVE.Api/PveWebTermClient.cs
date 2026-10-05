@@ -37,6 +37,9 @@ public partial class PveWebTermClient(PveClient client, string node) : IAsyncDis
 
     private ILogger<PveWebTermClient> Logger => _logger ??= client.LoggerFactory.CreateLogger<PveWebTermClient>();
 
+    //time between the pings that keep the terminal open: shorter in the tests
+    internal TimeSpan PingInterval { get; set; } = TimeSpan.FromSeconds(30);
+
     /// <summary>
     /// Get Output buffer
     /// </summary>
@@ -100,7 +103,7 @@ public partial class PveWebTermClient(PveClient client, string node) : IAsyncDis
 
         _connected = true;
         _ = Task.Run(ReceiveLoop);
-        StartPing(TimeSpan.FromSeconds(30));
+        StartPing(PingInterval);
 
         return await WaitForPromptAsync();
     }
@@ -313,12 +316,22 @@ echo '{endMarker}'
     public async Task DisconnectAsync()
     {
         Logger.LogDebug("Disconnecting WebSocket");
-        _cts.Cancel();
 
+        //the close is sent before the cancellation: a cancelled receive aborts the socket and the node would not get it
         if (_ws.State == WebSocketState.Open)
         {
-            await _ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Disconnecting", CancellationToken.None);
+            try
+            {
+                using var closeCts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                await _ws.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Disconnecting", closeCts.Token);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug(ex, "Close not sent");
+            }
         }
+
+        _cts.Cancel();
 
         _pingTimer?.Dispose();
         _ws.Dispose();

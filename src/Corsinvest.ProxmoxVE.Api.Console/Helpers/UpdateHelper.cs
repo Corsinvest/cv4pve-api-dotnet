@@ -24,6 +24,9 @@ internal static class UpdateHelper
 
     internal static Func<string> CurrentVersion { get; set; } = ConsoleHelper.GetCurrentVersionApp;
 
+    //the notice is only for a person at a terminal: replaced by the tests
+    internal static Func<bool> IsOutputRedirected { get; set; } = () => System.Console.IsOutputRedirected;
+
     /// <summary>
     /// Starts a background task that checks for a newer GitHub release (if cache is stale).
     /// </summary>
@@ -45,7 +48,7 @@ internal static class UpdateHelper
             if (!checkTask.IsCompleted) { cts.Cancel(); }
 
             var notice = GetNotice(appName);
-            if (notice != null && !System.Console.IsOutputRedirected)
+            if (notice != null && !IsOutputRedirected())
             {
                 System.Console.Out.WriteLine();
                 System.Console.Out.WriteLine(notice);
