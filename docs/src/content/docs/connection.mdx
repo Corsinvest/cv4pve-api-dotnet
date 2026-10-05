@@ -110,12 +110,14 @@ Set `ValidateCertificate` before the first call: the client reads it when it cre
 
 ## Timeout
 
-`Timeout` is the longest time a single request may take. Without it the limit is the one of
-`HttpClient`, 100 seconds:
+`Timeout` is the longest time a single request may take. Without it the limit is 100 seconds:
 
 ```csharp
 client.Timeout = TimeSpan.FromSeconds(30);
 ```
+
+An `HttpClient` that you pass to the constructor keeps also its own `Timeout`: the shorter of the two
+wins, so raise both for a request longer than 100 seconds.
 
 A request that runs out of time does not throw: it returns a `Result` with status 408 and the reason in
 `ReasonPhrase`. This is the time of the HTTP request, not of the operation it starts: a

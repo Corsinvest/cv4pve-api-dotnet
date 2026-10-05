@@ -335,14 +335,14 @@ public static class ClientExtension
 
         mpfdContent.Headers.ContentType = MediaTypeHeaderValue.Parse($"multipart/form-data; boundary={boundary}");
 
-        var httpClient = client.GetHttpClient();
-        httpClient.Timeout = TimeSpan.FromSeconds(secondsTimeout);
+        //the timeout of the HttpClient cannot change after the first request: the time of the upload is counted here
+        using var cts = client.CreateTimeoutTokenSource(TimeSpan.FromSeconds(secondsTimeout), cancellationToken);
 
         var resource = $"/nodes/{node}/storage/{storage}/upload";
         var request = client.CreateHttpRequestMessage(HttpMethod.Post, client.GetApiUrl() + resource);
         request.Content = mpfdContent;
 
-        var response = await httpClient.SendAsync(request, cancellationToken);
+        var response = await client.GetHttpClient().SendAsync(request, cts.Token);
         var result = new Result(JsonConvert.DeserializeObject<ExpandoObject>(await response.Content.ReadAsStringAsync()),
                                 response.StatusCode,
                                 response.ReasonPhrase,

@@ -51,9 +51,13 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     public int Port { get; } = port;
 
     /// <summary>
-    /// Optional timeout for HTTP requests.
+    /// Optional timeout for HTTP requests. Without a value the requests of the internal HttpClient stop after 100 seconds.
+    /// An HttpClient passed to the constructor keeps also its own timeout.
     /// </summary>
     public TimeSpan? Timeout { get; set; }
+
+    //the timeout of an HttpClient cannot change after its first request: the internal one has none and the time is counted here
+    private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(100);
 
     /// <summary>
     /// If true, validates the certificate of the Proxmox API server.
@@ -325,6 +329,20 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
         => ExecuteRequestAsync(resource, MethodType.Delete, parameters);
 
     /// <summary>
+    /// Token source that cancels a request after the timeout: the one asked, the one of this client,
+    /// or 100 seconds with the internal HttpClient. An HttpClient passed to the constructor keeps also its own timeout.
+    /// </summary>
+    /// <param name="timeout">Timeout of the request, null for the one of this client</param>
+    /// <param name="cancellationToken">Token of the caller</param>
+    public CancellationTokenSource CreateTimeoutTokenSource(TimeSpan? timeout = null, CancellationToken cancellationToken = default)
+    {
+        var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeout ??= Timeout ?? (httpClient == null ? DefaultTimeout : null);
+        if (timeout.HasValue) { cts.CancelAfter(timeout.Value); }
+        return cts;
+    }
+
+    /// <summary>
     /// Get http client
     /// </summary>
     public virtual HttpClient GetHttpClient()
@@ -340,7 +358,10 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
                                                                 ? (_, _, _, _) => true
                                                                 : null
             };
-            _internalHttpClient = new HttpClient(_internalHttpClientHandler);
+            _internalHttpClient = new HttpClient(_internalHttpClientHandler)
+            {
+                Timeout = System.Threading.Timeout.InfiniteTimeSpan
+            };
         }
 
         return _internalHttpClient;
@@ -413,9 +434,7 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
             request.Content = new StringContent(JsonConvert.SerializeObject(@params), Encoding.UTF8, "application/json");
         }
 
-        using var cts = Timeout.HasValue
-                ? new CancellationTokenSource(Timeout.Value)
-                : new CancellationTokenSource();
+        using var cts = CreateTimeoutTokenSource(Timeout);
 
         HttpResponseMessage response = null!;
         dynamic result = null;

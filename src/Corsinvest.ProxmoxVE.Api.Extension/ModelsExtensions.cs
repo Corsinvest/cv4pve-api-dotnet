@@ -206,7 +206,7 @@ public static class ModelsExtensions
         var content = response.IsSuccessStatusCode
                         ? "[virt-viewer]" +
                             Environment.NewLine +
-                            string.Join(Environment.NewLine, ((IDictionary<string, object>)response.ToData()).Select(a => $"{a.Key}={a.Value}"))
+                            string.Join(Environment.NewLine, (response.ToModel<Dictionary<string, object>>() ?? []).Select(a => $"{a.Key}={a.Value}"))
                         : string.Empty;
 
         return (response.IsSuccessStatusCode, response.ReasonPhrase, content);
@@ -227,13 +227,10 @@ public static class ModelsExtensions
 
         var permissions = new Dictionary<string, IReadOnlyList<string>>();
 
-        foreach (var data in (IDictionary<string, object>)result.ToData())
+        //ToModel throws PveResultException with the reason when the request is refused
+        foreach (var data in result.ToModel<Dictionary<string, Dictionary<string, object>>>() ?? [])
         {
-            permissions.Add(data.Key,
-                            ((IDictionary<string, object>)data.Value)
-                                .Select(a => a.Key)
-                                .ToList()
-                                .AsReadOnly());
+            permissions.Add(data.Key, (data.Value ?? []).Select(a => a.Key).ToList().AsReadOnly());
         }
 
         return permissions;
