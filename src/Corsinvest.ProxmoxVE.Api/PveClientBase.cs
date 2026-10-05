@@ -98,8 +98,13 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// <param name="realm">Realm</param>
     /// <param name="otp">Second factor of a user with two-factor authentication: a TOTP code (e.g. 123456)
     /// or 'type:value' (e.g. recovery:abcd-1234).</param>
+    /// <returns>True when Proxmox VE gave a ticket; when false the reason is in <see cref="LastResult"/>.</returns>
+    /// <exception cref="PveAuthenticationException">The user needs a second factor and otp is missing.</exception>
     public async Task<bool> LoginAsync(string userName, string password, string realm, string otp = null)
     {
+        //a new login does not send, and on failure does not keep, the ticket of the previous one
+        ClearTicket();
+
         var result = await CreateAsync("/access/ticket", new Dictionary<string, object>
         {
             {"password", password},
@@ -107,41 +112,72 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
             {"realm", realm},
         });
 
-        if (result.IsSuccessStatusCode)
+        if (result.IsSuccessStatusCode && GetDataObject(result) is { } data && data.ContainsKey("NeedTFA"))
         {
-            var data = (IDictionary<string, object>)result.Response.data;
-            if (data.ContainsKey("NeedTFA"))
+            if (string.IsNullOrWhiteSpace(otp))
             {
-                if (string.IsNullOrWhiteSpace(otp))
-                {
-                    throw new PveAuthenticationException(result, "Missing Two Factor Authentication (TFA)");
-                }
-
-                //second step: the response to the challenge of the first one
-                result = await CreateAsync("/access/ticket", new Dictionary<string, object>
-                {
-                    {"password", GetTfaResponse(otp)},
-                    {"username", userName},
-                    {"realm", realm},
-                    {"tfa-challenge", result.Response.data.ticket},
-                });
+                throw new PveAuthenticationException(result, "Missing Two Factor Authentication (TFA)");
             }
+
+            //second step: the response to the challenge of the first one
+            result = await CreateAsync("/access/ticket", new Dictionary<string, object>
+            {
+                {"password", GetTfaResponse(otp)},
+                {"username", userName},
+                {"realm", realm},
+                {"tfa-challenge", data.TryGetValue("ticket", out var challenge) ? challenge : null},
+            });
         }
 
-        if (result.IsSuccessStatusCode)
+        return StoreTicket(result);
+    }
+
+    /// <summary>
+    /// 'data' of an answer when it is an object: null for a failed call, an empty body, a value or a list.
+    /// </summary>
+    private static IDictionary<string, object> GetDataObject(Result result)
+        => result is { ResponseHasData: true } && result.ResponseToDictionary["data"] is IDictionary<string, object> data
+            ? data
+            : null;
+
+    /// <summary>
+    /// Forget the ticket of a previous login.
+    /// </summary>
+    private void ClearTicket()
+    {
+        CSRFPreventionToken = null;
+        PVEAuthCookie = null;
+
+        if (_internalHttpClientHandler?.CookieContainer != null)
         {
-
-            CSRFPreventionToken = result.Response.data.CSRFPreventionToken;
-            PVEAuthCookie = result.Response.data.ticket;
-
-            // Add cookie to CookieContainer for proper authentication in subsequent requests
-            if (_internalHttpClientHandler?.CookieContainer != null)
+            foreach (Cookie cookie in _internalHttpClientHandler.CookieContainer.GetCookies(new Uri(BaseAddress)))
             {
-                _internalHttpClientHandler.CookieContainer.Add(new Uri(BaseAddress), new Cookie("PVEAuthCookie", PVEAuthCookie));
+                cookie.Expired = true;
             }
         }
+    }
 
-        return result.IsSuccessStatusCode;
+    /// <summary>
+    /// Keep the ticket of a login answer. Logged only with a ticket: a success status alone
+    /// (e.g. the page of a proxy, an answer without data) is not a login.
+    /// </summary>
+    private bool StoreTicket(Result result)
+    {
+        if (!result.IsSuccessStatusCode
+            || GetDataObject(result) is not { } data
+            || !data.TryGetValue("ticket", out var ticket) || ticket is not string { Length: > 0 } ticketText
+            || !data.TryGetValue("CSRFPreventionToken", out var csrf) || csrf is not string { Length: > 0 } csrfText)
+        {
+            return false;
+        }
+
+        CSRFPreventionToken = csrfText;
+        PVEAuthCookie = ticketText;
+
+        // Add cookie to CookieContainer for proper authentication in subsequent requests
+        _internalHttpClientHandler?.CookieContainer?.Add(new Uri(BaseAddress), new Cookie("PVEAuthCookie", PVEAuthCookie));
+
+        return true;
     }
 
     /// <summary>
@@ -160,6 +196,8 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// <returns>True if login succeeded</returns>
     public async Task<bool> LoginOpenIdAsync(string code, string state, string redirectUrl)
     {
+        ClearTicket();
+
         var result = await CreateAsync("/access/openid/login", new Dictionary<string, object>
         {
             { "code", code },
@@ -167,18 +205,7 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
             { "redirect-url", redirectUrl }
         });
 
-        if (result.IsSuccessStatusCode)
-        {
-            CSRFPreventionToken = result.Response.data.CSRFPreventionToken;
-            PVEAuthCookie = result.Response.data.ticket;
-
-            if (_internalHttpClientHandler?.CookieContainer != null)
-            {
-                _internalHttpClientHandler.CookieContainer.Add(new Uri(BaseAddress), new Cookie("PVEAuthCookie", PVEAuthCookie));
-            }
-        }
-
-        return result.IsSuccessStatusCode;
+        return StoreTicket(result);
     }
 
     /// <summary>
@@ -204,7 +231,7 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
             { "redirect-url", redirectUrl }
         });
 
-        var authUrl = result.IsSuccessStatusCode ? (string)result.Response.data : null;
+        var authUrl = result.IsSuccessStatusCode && result.ResponseHasData ? result.ResponseToDictionary["data"] as string : null;
         if (string.IsNullOrEmpty(authUrl)) { return false; }
 
         var listener = new HttpListener();
@@ -247,18 +274,20 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// <param name="userName">User name</param>
     /// <param name="password">The secret password. This can also be a valid ticket.</param>
     /// <param name="opt">One-time password for Two-factor authentication.</param>
+    /// <returns>True when Proxmox VE gave a ticket; when false the reason is in <see cref="LastResult"/>.</returns>
+    /// <exception cref="PveAuthenticationException">The user needs a second factor and opt is missing.</exception>
     public async Task<bool> LoginAsync(string userName, string password, string opt = null)
     {
         _logger.LogDebug("Login: {userName}", userName);
 
         var realm = "pam";
 
-        //check username
-        var data = userName.Split('@');
-        if (data.Length > 1)
+        //user@realm: the realm is what follows the last @
+        var at = userName.LastIndexOf('@');
+        if (at > 0)
         {
-            userName = data[0];
-            realm = data[1];
+            realm = userName[(at + 1)..];
+            userName = userName[..at];
         }
         return await LoginAsync(userName, password, realm, opt);
     }
@@ -357,7 +386,9 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
             }
         }
 
-        var uriString = GetApiUrl() + resource;
+        //the url without the query string is the one written in the log: the query repeats the parameters as they are
+        var resourceUrl = GetApiUrl() + resource;
+        var uriString = resourceUrl;
         if ((httpMethod == HttpMethod.Get || httpMethod == HttpMethod.Delete) && @params.Count > 0)
         {
             uriString += "?" + string.Join("&", @params.Select(a => $"{a.Key}={HttpUtility.UrlEncode(a.Value.ToString())}"));
@@ -365,17 +396,13 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug("Method: {httpMethod}, Url: {uriString}", httpMethod, uriString);
-            if (httpMethod != HttpMethod.Get)
+            _logger.LogDebug("Method: {httpMethod}, Url: {uriString}", httpMethod, resourceUrl);
+            if (@params.Count > 0)
             {
-                var sensitiveParams = new[] { "password", "token", "ticket", "otp", "apitoken", "tfa-challenge" };
                 _logger.LogDebug("Parameters: {parameters}", string.Join(Environment.NewLine, @params.Select(a =>
-                {
-                    var paramName = a.Key.ToLower();
-                    return sensitiveParams.Any(p => paramName.Contains(p))
+                    IsSensitive(a.Key)
                         ? $"{a.Key} : ****"
-                        : $"{a.Key} : {a.Value}";
-                })));
+                        : $"{a.Key} : {a.Value}")));
             }
         }
 
@@ -417,7 +444,7 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
                     }
                     if (_logger.IsEnabled(LogLevel.Trace))
                     {
-                        _logger.LogTrace("{Json}", JsonConvert.SerializeObject(result, Formatting.Indented) as string);
+                        _logger.LogTrace("{Json}", MaskSensitiveResponse((object)result, resource));
                     }
                     break;
 
@@ -475,6 +502,34 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
         RequestCompleted?.Invoke(this, LastResult);
 
         return LastResult;
+    }
+
+    private static readonly string[] SensitiveNames = ["password", "token", "ticket", "otp", "apitoken", "tfa-challenge"];
+
+    private static bool IsSensitive(string name)
+        => SensitiveNames.Any(a => name.Contains(a, StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>
+    /// Answer as indented JSON for the log, without the secrets it carries: the ticket and the
+    /// CSRF token of a login, the value of a new API token.
+    /// </summary>
+    internal static string MaskSensitiveResponse(object response, string resource)
+    {
+        if (response == null) { return "null"; }
+
+        var json = Newtonsoft.Json.Linq.JToken.FromObject(response);
+        if (json is Newtonsoft.Json.Linq.JObject root && root["data"] is Newtonsoft.Json.Linq.JObject data)
+        {
+            foreach (var property in data.Properties())
+            {
+                if (IsSensitive(property.Name) || (property.Name == "value" && resource.Contains("/token/")))
+                {
+                    property.Value = "****";
+                }
+            }
+        }
+
+        return json.ToString(Formatting.Indented);
     }
 
     /// <summary>
