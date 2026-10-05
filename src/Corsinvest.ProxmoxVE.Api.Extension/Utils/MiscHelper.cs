@@ -19,15 +19,18 @@ public static class MiscHelper
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true });
+            StartProcess(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true });
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            System.Diagnostics.Process.Start("xdg-open", url);
+            StartProcess(new System.Diagnostics.ProcessStartInfo("xdg-open", url));
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            System.Diagnostics.Process.Start("open", url);
+            StartProcess(new System.Diagnostics.ProcessStartInfo("open", url));
         }
     }
+
+    //starts the program that opens the address: replaced by the tests
+    internal static Action<System.Diagnostics.ProcessStartInfo> StartProcess { get; set; } = a => System.Diagnostics.Process.Start(a);
 }
