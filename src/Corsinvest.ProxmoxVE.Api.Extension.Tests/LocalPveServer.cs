@@ -52,7 +52,7 @@ internal sealed class LocalPveServer : IAsyncDisposable
 
     public IReadOnlyList<Request> Requests => [.. _requests];
 
-    /// <summary>Completed when the first WebSocket connection is over.</summary>
+    /// <summary>Completed when the first WebSocket connection is over, or a client went away before asking for one.</summary>
     public Task SocketClosed => _socketClosed.Task;
 
     public PveClient Client() => new(Host, Port);
@@ -117,7 +117,12 @@ internal sealed class LocalPveServer : IAsyncDisposable
             await stream.AuthenticateAsServerAsync(new SslServerAuthenticationOptions { ServerCertificate = _certificate }, _cts.Token);
 
             var request = await ReadRequestAsync(stream);
-            if (request == null) { return; }
+            if (request == null)
+            {
+                // a client that refuses the certificate closes without a request
+                _socketClosed.TrySetResult();
+                return;
+            }
             _requests.Enqueue(request);
 
             if (request.Headers.TryGetValue("Sec-WebSocket-Key", out var key))

@@ -60,7 +60,7 @@ public class RemoteViewerTests
 
             // only the file of the viewer is left in the temporary folder
             Assert.False(File.Exists(Path.ChangeExtension(fileName, ".tmp")));
-            Assert.Empty(TempFiles().Except(before).Where(a => Path.GetFileNameWithoutExtension(a) == Path.GetFileNameWithoutExtension(fileName)));
+            Assert.DoesNotContain(TempFiles().Except(before), a => Path.GetFileNameWithoutExtension(a) == Path.GetFileNameWithoutExtension(fileName));
         }
         finally
         {
