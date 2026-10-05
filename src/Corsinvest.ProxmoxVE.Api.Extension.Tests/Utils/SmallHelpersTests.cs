@@ -152,4 +152,33 @@ public class SmallHelpersTests
             CultureInfo.CurrentCulture = culture;
         }
     }
+
+    [Fact]
+    public void Console_of_something_that_is_not_a_guest_is_refused()
+        => Assert.Throws<System.ComponentModel.InvalidEnumArgumentException>(() => NoVncHelper.GetConsoleType((VmType)99));
+
+    [Fact]
+    public void Sum_and_average_of_sizes_bigger_than_a_long()
+    {
+        ulong[] sizes = [ulong.MaxValue / 2, 10, 20];
+
+        Assert.Equal((ulong.MaxValue / 2) + 30, sizes.Sum(a => a));
+        Assert.Equal(20UL, new ulong[] { 10, 20, 30 }.Average(a => a));
+        Assert.Equal(0UL, Array.Empty<ulong>().Sum(a => a));
+    }
+
+    [Fact]
+    public void Errors_of_the_library_keep_message_cause_and_result()
+    {
+        var cause = new InvalidOperationException("cause");
+        var result = new Result(null, System.Net.HttpStatusCode.Unauthorized, "authentication failure", false, "/access/ticket",
+                                new Dictionary<string, object>(), MethodType.Create, ResponseType.Json, TimeSpan.Zero);
+
+        Assert.NotNull(new Corsinvest.ProxmoxVE.Api.Shared.PveException().Message);
+        Assert.Equal("message", new Corsinvest.ProxmoxVE.Api.Shared.PveException("message").Message);
+        Assert.Same(cause, new Corsinvest.ProxmoxVE.Api.Shared.PveException("message", cause).InnerException);
+        Assert.Same(result, new PveResultException(result).Result);
+        Assert.Same(result, new PveAuthenticationException(result).Result);
+        Assert.IsAssignableFrom<PveResultException>(new PveAuthenticationException(result));
+    }
 }

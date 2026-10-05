@@ -22,7 +22,7 @@ namespace Corsinvest.ProxmoxVE.Api;
 public class PveClientBase(string host, int port = 8006, HttpClient? httpClient = null)
 {
     private ILogger<PveClientBase> _logger = NullLoggerFactory.Instance.CreateLogger<PveClientBase>();
-    private ILoggerFactory _loggerFactory;
+    private ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
 
     private HttpClient _internalHttpClient;
     private HttpClientHandler _internalHttpClientHandler;

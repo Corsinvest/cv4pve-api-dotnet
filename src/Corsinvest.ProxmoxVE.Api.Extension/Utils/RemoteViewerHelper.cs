@@ -45,9 +45,7 @@ public static class RemoteViewerHelper
 
         if (output != null) { await output.WriteLineAsync($"SPICE proxy: {proxy}"); }
 
-        var fileName = Path.GetTempFileName().Replace(".tmp", ".vv");
-        await File.WriteAllTextAsync(fileName, content);
-        return (null, fileName);
+        return (null, await WriteViewerFileAsync(content));
     }
 
     /// <summary>
@@ -109,9 +107,7 @@ public static class RemoteViewerHelper
 
         if (output != null) { await output.WriteLineAsync($"SPICE proxy: {proxy}"); }
 
-        var fileName = Path.GetTempFileName().Replace(".tmp", ".vv");
-        await File.WriteAllTextAsync(fileName, content);
-        return (null, fileName);
+        return (null, await WriteViewerFileAsync(content));
     }
 
     /// <summary>
@@ -159,12 +155,21 @@ public static class RemoteViewerHelper
             delete-this-file=1
             """;
 
-        var fileName = Path.GetTempFileName().Replace(".tmp", ".vv");
-        await File.WriteAllTextAsync(fileName, vvContent);
+        var fileName = await WriteViewerFileAsync(vvContent);
 
         if (output != null) { await output.WriteLineAsync($"VNC local port: {bridge.LocalPort}"); }
 
         return (null, fileName, bridge);
+    }
+
+    //GetTempFileName creates the file: it is renamed, so no empty .tmp file is left behind
+    private static async Task<string> WriteViewerFileAsync(string content)
+    {
+        var tempFileName = Path.GetTempFileName();
+        var fileName = Path.ChangeExtension(tempFileName, ".vv");
+        File.Move(tempFileName, fileName, true);
+        await File.WriteAllTextAsync(fileName, content);
+        return fileName;
     }
 
     /// <summary>

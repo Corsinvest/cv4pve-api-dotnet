@@ -349,4 +349,37 @@ public class ModelsExtensionsTests
         Assert.Equal(100, resources["storage/pve01/empty"].HealthScoreCalculated);
         Assert.Null(resources["/pool/customer1"].HealthScoreCalculated);
     }
+
+    [Fact]
+    public async Task Resources_are_asked_by_type()
+    {
+        var (client, handler) = ClientAnswering(("/cluster/resources", """{"data":[{"id":"node/pve01","type":"node","node":"pve01","status":"online"}]}"""));
+
+        Assert.Single(await client.GetResourcesAsync("node"));
+        Assert.Equal("node", QueryOf(handler.Requests.Last())["type"]);
+
+        await client.GetResourcesAsync(ClusterResourceType.Storage);
+        Assert.Equal("storage", QueryOf(handler.Requests.Last())["type"]);
+
+        await client.GetResourcesAsync(ClusterResourceType.All);
+        Assert.Null(QueryOf(handler.Requests.Last())["type"]);
+
+        // pools and sdn are in the answer of every resource, not a type that can be asked
+        await Assert.ThrowsAsync<System.ComponentModel.InvalidEnumArgumentException>(() => client.GetResourcesAsync(ClusterResourceType.Pool));
+    }
+
+    [Fact]
+    public async Task Picture_is_returned_as_a_data_address()
+    {
+        byte[] png = [0x89, 0x50, 0x4E, 0x47, 1, 2, 3];
+        var handler = new FakeHandler(_ => new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent(png) });
+        var client = FakeHandler.Client(handler);
+        client.ResponseType = ResponseType.Png;
+
+        var result = await client.GetAsync("/nodes/pve01/rrd", new Dictionary<string, object> { ["ds"] = "cpu", ["timeframe"] = "day" });
+
+        Assert.True(result.IsSuccessStatusCode);
+        Assert.Equal("data:image/png;base64," + Convert.ToBase64String(png), (string)result.Response);
+        Assert.Equal("/api2/png/nodes/pve01/rrd", handler.Requests.Single().RequestUri!.AbsolutePath);
+    }
 }

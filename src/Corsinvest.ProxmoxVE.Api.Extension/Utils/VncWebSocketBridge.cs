@@ -48,7 +48,8 @@ public sealed class VncWebSocketBridge : IAsyncDisposable
     {
         try
         {
-            var ws = new ClientWebSocket();
+            //disposed when the viewer or the node closes: the console session on the node ends with it
+            using var ws = new ClientWebSocket();
             ws.Options.AddSubProtocol("binary");
             var cookies = new CookieContainer();
             cookies.Add(new Cookie("PVEAuthCookie", pveAuthCookie, "/", host) { Secure = true });

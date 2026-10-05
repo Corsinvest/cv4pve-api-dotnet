@@ -87,11 +87,12 @@ public static partial class NetworkDiagramBuilder
                                 .Where(br => PortsOf(br).Any(p => bondByName.ContainsKey(p) || nicByName.ContainsKey(p)))
                                 .Select(br => br.Interface).ToHashSet();
 
-        var internalBridges = bridgeByName.Keys.Where(b => !externalBridges.Contains(b)).ToHashSet();
-
         // Fallback: when no bridge has physical uplinks (e.g. lab/SDN-only setups),
         // treat all bridges as external so the diagram still has anchor points.
+        // No bridge is internal then, so no VM is a gateway.
         if (externalBridges.Count == 0) { externalBridges = [.. bridgeByName.Keys]; }
+
+        var internalBridges = bridgeByName.Keys.Where(b => !externalBridges.Contains(b)).ToHashSet();
 
         // A VM is treated as a gateway (firewall/router) when it attaches to both an
         // external and an internal bridge, i.e. it bridges traffic between segments.
