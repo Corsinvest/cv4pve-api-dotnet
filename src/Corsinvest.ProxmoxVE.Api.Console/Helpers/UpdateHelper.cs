@@ -16,9 +16,13 @@ internal static class UpdateHelper
 {
     private static readonly TimeSpan CacheTtl = TimeSpan.FromHours(24);
 
-    private static string CacheFilePath
-        => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                        ".cv4pve", "update-check.json");
+    //the three members below are replaced by the tests: file of the cache, HTTP handler, version of the running tool
+    internal static string CacheFilePath { get; set; }
+        = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".cv4pve", "update-check.json");
+
+    internal static Func<HttpMessageHandler>? CreateHandler { get; set; }
+
+    internal static Func<string> CurrentVersion { get; set; } = ConsoleHelper.GetCurrentVersionApp;
 
     /// <summary>
     /// Starts a background task that checks for a newer GitHub release (if cache is stale).
@@ -40,24 +44,35 @@ internal static class UpdateHelper
         {
             if (!checkTask.IsCompleted) { cts.Cancel(); }
 
-            var latestVersion = ReadCache().GetValueOrDefault(appName)?.LatestVersion;
-            if (string.IsNullOrEmpty(latestVersion)) { return; }
-
-            var currentVersion = ConsoleHelper.GetCurrentVersionApp();
-            if (IsNewer(latestVersion, currentVersion) && !System.Console.IsOutputRedirected)
+            var notice = GetNotice(appName);
+            if (notice != null && !System.Console.IsOutputRedirected)
             {
                 System.Console.Out.WriteLine();
-                System.Console.Out.WriteLine($"*** New version available: {latestVersion} (current: {currentVersion}) ***");
+                System.Console.Out.WriteLine(notice);
             }
         }
         catch { }
         finally { cts.Dispose(); }
     }
 
+    /// <summary>
+    /// The update notice from the cache, null when the running tool is the latest version or nothing is known.
+    /// </summary>
+    internal static string? GetNotice(string appName)
+    {
+        var latestVersion = ReadCache().GetValueOrDefault(appName)?.LatestVersion;
+        if (string.IsNullOrEmpty(latestVersion)) { return null; }
+
+        var currentVersion = CurrentVersion();
+        return IsNewer(latestVersion, currentVersion)
+                ? $"*** New version available: {latestVersion} (current: {currentVersion}) ***"
+                : null;
+    }
+
     private static async Task RefreshCacheIfStaleAsync(string appName, CancellationToken ct)
     {
         var cache = ReadCache();
-        var currentVersion = ConsoleHelper.GetCurrentVersionApp();
+        var currentVersion = CurrentVersion();
 
         // Self-heal: if the running binary is newer than the cached "latest"
         // (the user upgraded since the last check), refresh the cache locally
@@ -78,7 +93,7 @@ internal static class UpdateHelper
         string? newVersion = null;
         try
         {
-            using var client = new HttpClient();
+            using var client = CreateHandler == null ? new HttpClient() : new HttpClient(CreateHandler());
             client.DefaultRequestHeaders.UserAgent.ParseAdd("cv4pve-app");
             var json = await client.GetStringAsync($"https://api.github.com/repos/Corsinvest/{appName}/releases", ct);
             var releases = JsonConvert.DeserializeObject<List<GitHubRelease>>(json);

@@ -53,6 +53,20 @@ public partial class PveWebTermClient(PveClient client, string node) : IAsyncDis
         }
     }
 
+    //the receive loop writes the buffer from another thread
+    private async Task ClearOutputAsync()
+    {
+        await _bufferLock.WaitAsync();
+        try
+        {
+            _outputBuffer.Clear();
+        }
+        finally
+        {
+            _bufferLock.Release();
+        }
+    }
+
     /// <summary>
     /// Connect to the terminal
     /// </summary>
@@ -60,6 +74,7 @@ public partial class PveWebTermClient(PveClient client, string node) : IAsyncDis
     {
         // Get terminal proxy ticket
         var termproxy = await client.Nodes[node].Termproxy.Termproxy();
+        if (!termproxy.IsSuccessStatusCode) { throw new PveResultException(termproxy, termproxy.ReasonPhrase); }
         var vncTicket = Convert.ToString(termproxy.Response.data.ticket);
         var port = Convert.ToInt32(termproxy.Response.data.port);
         var ticket = HttpUtility.UrlEncode(vncTicket);
@@ -251,11 +266,11 @@ echo '{endMarker}'
         await Task.Delay(50);
         if (!await WaitForPromptAsync(timeoutMs)) { return (string.Empty, "[ERROR] Timeout during execution", -1); }
 
-        _outputBuffer.Clear();
+        await ClearOutputAsync();
         await SendCommandAsync($"chmod +x {scriptFile}\n");
         if (!await WaitForPromptAsync(timeoutMs)) { return (string.Empty, "[ERROR] Timeout during execution", -1); }
 
-        _outputBuffer.Clear();
+        await ClearOutputAsync();
         await SendCommandAsync($"{scriptFile}\n");
         //await Task.Delay(50);
         if (!await WaitForPromptAsync(timeoutMs)) { return (string.Empty, "[ERROR] Timeout during execution", -1); }
@@ -331,7 +346,7 @@ echo '{endMarker}'
 
         try
         {
-            _outputBuffer.Clear();
+            await ClearOutputAsync();
             await SendCommandAsync($"sha256sum \"{remotePath}\" 2>/dev/null");
             if (!await WaitForPromptAsync(timeoutMs)) { return (false, "Timeout waiting for shell prompt after sha256sum command."); }
 
@@ -346,7 +361,7 @@ echo '{endMarker}'
 
             for (var chunkIndex = 0; ; chunkIndex++)
             {
-                _outputBuffer.Clear();
+                await ClearOutputAsync();
 
                 var command = $"dd if={remotePath} bs={chunkSizeKB}K skip={chunkIndex} count=1 2>/dev/null | base64 -w 0";
 

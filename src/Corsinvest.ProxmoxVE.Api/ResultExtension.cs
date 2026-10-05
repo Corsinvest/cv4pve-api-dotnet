@@ -18,7 +18,14 @@ public static class ResultExtension
     /// endpoint has no data (data is null or absent).
     /// </summary>
     public static IEnumerable<dynamic> ToEnumerable(this Result result)
-        => result?.ToData() is IEnumerable<dynamic> seq ? seq : [];
+        => GetData(result) is IEnumerable<dynamic> seq ? seq : [];
+
+    /// <summary>
+    /// 'data' of the answer as an object, not dynamic: null when the answer has none
+    /// (a failed call, an empty body, a request that got no answer).
+    /// </summary>
+    private static object GetData(Result result)
+        => result is { ResponseHasData: true } ? result.ResponseToDictionary["data"] : null;
 
     /// <summary>
     /// Enumerable result data.
@@ -36,7 +43,7 @@ public static class ResultExtension
     /// </summary>
     public static IEnumerable<string> ToLogs(this Result result)
     {
-        var data = result?.ToData();
+        var data = GetData(result);
         if (data == null) { return []; }
         if (data is ExpandoObject) { return [((dynamic)data).t as string]; }
         return ((IEnumerable<dynamic>)data).OrderBy(a => a.n).Select(a => a.t as string);
@@ -53,7 +60,8 @@ public static class ResultExtension
     public static T ToModel<T>(this Result result)
         => result.InError() || !result.IsSuccessStatusCode //check exists error
             ? throw new PveResultException(result, !result.IsSuccessStatusCode ? result.ReasonPhrase : result.GetError())
-            : JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(result.ToData()), new JsonSerializerSettings
+            //the data as object, not dynamic: a dynamic call cannot return a type that is not public (a model of the caller)
+            : JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(GetData(result)), new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
                 Converters = [new CustomBooleanJsonConverter()]

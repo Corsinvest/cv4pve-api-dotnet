@@ -56,9 +56,9 @@ foreach (var vm in vms.Where(a => a.status == "running"))
 string upid = (await client.Nodes["pve01"].Qemu[100].Status.Start.VmStart()).ToData();
 ```
 
-`ToEnumerable()` returns an empty sequence when a call that succeeded has no data, so the `foreach`
-needs no check for `null`. On a failed call these shortcuts throw like any other read of `data`: check
-`IsSuccessStatusCode` first.
+`ToEnumerable()` returns an empty sequence when there is no list to read: no data, or a call that
+failed. The `foreach` needs no check for `null`, but an empty list is not a successful call: check
+`IsSuccessStatusCode`. `ToData()` reads `Response.data` as it is and throws when the answer has none.
 
 <Aside type="caution">
 Dynamic members are resolved at run time: a wrong name compiles and then throws

@@ -91,8 +91,11 @@ For more information visit https://www.corsinvest.it/cv4pve";
         return opt;
     }
 
+    //the arguments of the process: replaced by the tests
+    internal static Func<string[]> CommandLineArgs { get; set; } = Environment.GetCommandLineArgs;
+
     private static T GetValue<T>(this Command command, Option<T> option)
-        => command.Parse(Environment.GetCommandLineArgs()).GetValue(option);
+        => command.Parse(CommandLineArgs()).GetValue(option);
 
     /// <summary>
     /// Id or name option
@@ -264,7 +267,7 @@ range 100:107,-105,200:204
     /// <param name="loggerFactory"></param>
     public static async Task<PveClient> ClientTryLoginAsync(this Command command, ILoggerFactory loggerFactory)
     {
-        var result = command.Parse(Environment.GetCommandLineArgs());
+        var result = command.Parse(CommandLineArgs());
         var inApiToken = result.GetValue(command.GetApiTokenOption()) != null;
         return await ClientHelper.GetClientAndTryLoginAsync(result.GetValue(command.GetHostOption()),
                                                             inApiToken ? string.Empty : result.GetValue(command.GetUsernameOption()),

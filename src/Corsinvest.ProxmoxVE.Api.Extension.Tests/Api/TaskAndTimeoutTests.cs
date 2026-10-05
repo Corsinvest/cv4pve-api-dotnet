@@ -117,6 +117,25 @@ public class TaskAndTimeoutTests
     }
 
     [Fact]
+    public void Internal_HttpClient_leaves_the_timeout_to_the_client()
+    {
+        //the HttpClient would stop every request at 100 seconds, also with a longer Timeout of the client
+        var client = new PveClient("pve01");
+
+        Assert.Equal(Timeout.InfiniteTimeSpan, client.GetHttpClient().Timeout);
+    }
+
+    [Fact]
+    public async Task Upload_stops_at_its_own_timeout()
+    {
+        var client = new PveClient("pve01", 8006, new HttpClient(new HangingHandler()));
+        using var file = new MemoryStream([1, 2, 3]);
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(
+            () => client.UploadFileToStorageAsync("pve01", "local", "iso", file, "debian.iso", CancellationToken.None, secondsTimeout: 1));
+    }
+
+    [Fact]
     public async Task Wait_on_a_result_with_a_task_reads_the_status_of_the_task()
     {
         var handler = new FakeHandler(request => request.Method == HttpMethod.Post
