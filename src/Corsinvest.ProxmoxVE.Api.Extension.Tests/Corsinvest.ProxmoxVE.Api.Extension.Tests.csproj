@@ -18,5 +18,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Extension\Corsinvest.ProxmoxVE.Api.Extension.csproj" />
+		<ProjectReference Include="..\Corsinvest.ProxmoxVE.Api.Console\Corsinvest.ProxmoxVE.Api.Console.csproj" />
 	</ItemGroup>
 </Project>

@@ -6,6 +6,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<InternalsVisibleTo Include="Corsinvest.ProxmoxVE.Api.Extension.Tests" />
+	</ItemGroup>
+	<ItemGroup>
 		<ProjectReference
 			Include="..\Corsinvest.ProxmoxVE.Api.Extension\Corsinvest.ProxmoxVE.Api.Extension.csproj" />
 	</ItemGroup>
