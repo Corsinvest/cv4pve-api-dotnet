@@ -21,13 +21,17 @@ installed on the nodes.
 
 <Steps>
 
-1. Add the package from [NuGet](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api):
+1. **Add the package**
+
+   Add the package from [NuGet](https://www.nuget.org/packages/Corsinvest.ProxmoxVE.Api):
 
    ```bash
    dotnet add package Corsinvest.ProxmoxVE.Api
    ```
 
-2. Create the client with an API token. With a token there is no login call:
+2. **Create the client**
+
+   Create the client with an API token. With a token there is no login call:
 
    ```csharp
    using Corsinvest.ProxmoxVE.Api;
@@ -42,7 +46,9 @@ installed on the nodes.
    self-signed certificate works as it is. All the ways to connect are in
    [Connection](/cv4pve-api-dotnet/connection/).
 
-3. Make the first call and check its outcome:
+3. **Make the first call**
+
+   Make the first call and check its outcome:
 
    ```csharp
    var result = await client.Version.Version();
@@ -57,7 +63,9 @@ installed on the nodes.
    }
    ```
 
-4. Read some data. The path of the API is the path in the code:
+4. **Read some data**
+
+   Read some data. The path of the API is the path in the code:
 
    ```csharp
    // GET /nodes/{node}/qemu/{vmid}/status/current
