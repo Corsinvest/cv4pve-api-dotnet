@@ -31,17 +31,28 @@ import { Image } from 'astro:assets';
 import { LinkCard } from '@astrojs/starlight/components';
 import FeatureGrid from '@corsinvest/cv4pve-docs-theme/components/FeatureGrid.astro';
 import CtaBand from '@corsinvest/cv4pve-docs-theme/components/CtaBand.astro';
+import Motto from '@corsinvest/cv4pve-docs-theme/components/Motto.astro';
 import proxmoxLogo from '../../assets/proxmox-logo.svg';
 import dotnetLogo from '../../assets/dotnet.svg';
 
 export const features = [
-  { title: 'The whole API', text: 'A method for every endpoint and HTTP method, generated from the Proxmox VE API schema, placed where the API has it: the path of an endpoint is the path in the code.', href: 'concepts/api-structure/' },
-  { title: 'One Result for every call', text: 'The HTTP outcome and the Proxmox VE data together: read it as dynamic, as a dictionary or as a typed model. A failed call does not throw.', href: 'concepts/results/' },
-  { title: 'API token or password', text: 'Connect with an API token or a user and password, with two-factor authentication, OpenID, your own HttpClient, and a list of nodes to try.', href: 'connection/' },
-  { title: 'Tasks', text: 'Start a backup, a clone or a migration, wait for its task to finish and read whether it succeeded.', href: 'concepts/tasks/' },
-  { title: 'VMs by id, name or pattern', text: 'The Extension package finds VMs and containers without knowing their node, by id, name, range, pool or tag, and reads the data as typed models.', href: 'packages/extension/' },
-  { title: 'Command line tools', text: 'The Console package gives a tool the connection options, the logging and the behaviour of the cv4pve suite.', href: 'packages/console/' },
+  { icon: 'mdi:api', title: 'The whole API', text: 'A method for every endpoint and HTTP method, generated from the Proxmox VE API schema, placed where the API has it: the path of an endpoint is the path in the code.', href: 'concepts/api-structure/' },
+  { icon: 'mdi:code-braces-box', title: 'One Result for every call', text: 'The HTTP outcome and the Proxmox VE data together: read it as dynamic, as a dictionary or as a typed model. A failed call does not throw.', href: 'concepts/results/' },
+  { icon: 'mdi:key-outline', title: 'API token or password', text: 'Connect with an API token or a user and password, with two-factor authentication, OpenID, your own HttpClient, and a list of nodes to try.', href: 'connection/' },
+  { icon: 'mdi:timer-sand', title: 'Tasks', text: 'Start a backup, a clone or a migration, wait for its task to finish and read whether it succeeded.', href: 'concepts/tasks/' },
+  { icon: 'mdi:card-search-outline', title: 'VMs by id, name or pattern', text: 'The Extension package finds VMs and containers without knowing their node, by id, name, range, pool or tag, and reads the data as typed models.', href: 'packages/extension/' },
+  { icon: 'mdi:console', title: 'Command line tools', text: 'The Console package gives a tool the connection options, the logging and the behaviour of the cv4pve suite.', href: 'packages/console/' },
 ];
+
+<Motto />
+
+```bash
+# add the client to your project
+dotnet add package Corsinvest.ProxmoxVE.Api
+
+# helpers for VMs, containers and tasks
+dotnet add package Corsinvest.ProxmoxVE.Api.Extension
+```
 
 <div style="text-align: center">
   <Image src={dotnetLogo} alt=".NET logo" width={140} style="display: inline-block" />
