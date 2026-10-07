@@ -15,6 +15,9 @@ export default defineConfig({
       plugins: [
         corsinvestTheme({
           repo: 'cv4pve-api-dotnet',
+          // End of the <title> of the pages, in place of the site name: what people search for.
+          // A page with its own <title> in the frontmatter keeps it.
+          titleSuffix: 'Proxmox VE API client for .NET',
           // Product icon: favicon and header, dark variant for the dark theme.
           icon: { light: '/icon.svg', dark: '/icon-dark.svg' },
           // The readers of a library are developers: the motto says "By developers, for developers."
