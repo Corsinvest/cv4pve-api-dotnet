@@ -45,6 +45,203 @@ public static class ClientExtension
                 .ToDictionary(a => a.Name, a => a.IpAddress);
     #endregion
 
+    #region HA
+    /// <summary>
+    /// Check if HA status endpoint is responsive.
+    /// </summary>
+    public static async Task<bool> CheckHaStatusAsync(this PveClient client)
+    {
+        var result = await client.Cluster.Ha.Status.Current.Status();
+        return result.IsSuccessStatusCode;
+    }
+
+    /// <summary>
+    /// Get a specific HA resource by its SID (e.g. vm:100 or ct:101).
+    /// Returns null if the resource is not found (404); throws PveResultException on other API errors.
+    /// </summary>
+    public static async Task<ClusterHaResource> GetHaResourceAsync(this PveClient client, string sid)
+    {
+        var result = await client.Cluster.Ha.Resources[sid].Read();
+        if (result.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+
+        return result.ToModel<ClusterHaResource>();
+    }
+
+    /// <summary>
+    /// Get a specific HA resource by VMID and type.
+    /// Returns null if the resource is not found (404); throws PveResultException on other API errors.
+    /// </summary>
+    public static Task<ClusterHaResource> GetHaResourceAsync(this PveClient client, long vmId, VmType vmType = VmType.Qemu)
+    {
+        string typeStr = vmType == VmType.Lxc ? "ct" : "vm";
+        return client.GetHaResourceAsync($"{typeStr}:{vmId}");
+    }
+
+    /// <summary>
+    /// Create an HA resource for a guest.
+    /// </summary>
+    public static Task<Result> CreateHaResourceAsync(
+        this PveClient client,
+        long vmId,
+        VmType vmType = VmType.Qemu,
+        string state = "started",
+        string comment = null,
+        int? maxRestart = null,
+        int? maxRelocate = null,
+        bool? autoRebalance = null,
+        bool? failback = null,
+        string group = null)
+    {
+        string typeStr = vmType == VmType.Lxc ? "ct" : "vm";
+        string sid = $"{typeStr}:{vmId}";
+        return client.Cluster.Ha.Resources.Create(
+            sid: sid,
+            state: state,
+            comment: comment,
+            max_restart: maxRestart,
+            max_relocate: maxRelocate,
+            auto_rebalance: autoRebalance,
+            failback: failback,
+            group: group
+        );
+    }
+
+    /// <summary>
+    /// Ensure an HA resource exists: creates it if absent, or updates its configuration if it already exists.
+    /// </summary>
+    public static async Task<Result> EnsureHaResourceAsync(
+        this PveClient client,
+        long vmId,
+        VmType vmType = VmType.Qemu,
+        string state = "started",
+        string comment = null,
+        int? maxRestart = null,
+        int? maxRelocate = null,
+        bool? autoRebalance = null,
+        bool? failback = null,
+        string group = null)
+    {
+        string typeStr = vmType == VmType.Lxc ? "ct" : "vm";
+        string sid = $"{typeStr}:{vmId}";
+
+        var createResult = await client.Cluster.Ha.Resources.Create(
+            sid: sid,
+            state: state,
+            comment: comment,
+            max_restart: maxRestart,
+            max_relocate: maxRelocate,
+            auto_rebalance: autoRebalance,
+            failback: failback,
+            group: group
+        );
+
+        if (createResult.IsSuccessStatusCode)
+        {
+            return createResult;
+        }
+
+        if (createResult.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        {
+            string errorMessage = null;
+            try
+            {
+                errorMessage = createResult.GetError();
+            }
+            catch
+            {
+                // Fall back if Response.errors is not a dictionary
+            }
+
+            errorMessage ??= createResult.ReasonPhrase;
+
+            if (errorMessage?.Contains("already exists", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                return await client.Cluster.Ha.Resources[sid].Update(
+                    state: state,
+                    comment: comment,
+                    max_restart: maxRestart,
+                    max_relocate: maxRelocate,
+                    auto_rebalance: autoRebalance,
+                    failback: failback,
+                    group: group
+                );
+            }
+        }
+
+        return createResult;
+    }
+
+    /// <summary>
+    /// Update configuration of an HA resource.
+    /// </summary>
+    public static Task<Result> UpdateHaResourceAsync(
+        this PveClient client,
+        long vmId,
+        VmType vmType = VmType.Qemu,
+        string state = null,
+        string comment = null,
+        int? maxRestart = null,
+        int? maxRelocate = null,
+        bool? autoRebalance = null,
+        bool? failback = null,
+        string group = null)
+    {
+        string typeStr = vmType == VmType.Lxc ? "ct" : "vm";
+        string sid = $"{typeStr}:{vmId}";
+        return client.Cluster.Ha.Resources[sid].Update(
+            state: state,
+            comment: comment,
+            max_restart: maxRestart,
+            max_relocate: maxRelocate,
+            auto_rebalance: autoRebalance,
+            failback: failback,
+            group: group
+        );
+    }
+
+    /// <summary>
+    /// Delete an HA resource by sid (e.g. vm:100 or ct:100).
+    /// </summary>
+    public static async Task<bool> DeleteHaResourceAsync(
+        this PveClient client,
+        string sid,
+        bool? purge = null,
+        bool ignoreNotFound = true)
+    {
+        var result = await client.Cluster.Ha.Resources[sid].Delete(purge: purge);
+
+        if (result.IsSuccessStatusCode)
+        {
+            return true;
+        }
+
+        if (ignoreNotFound && (result.StatusCode == System.Net.HttpStatusCode.NotFound ||
+            result.GetError()?.Contains("not found", StringComparison.OrdinalIgnoreCase) == true))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Delete an HA resource by VM ID and type.
+    /// </summary>
+    public static Task<bool> DeleteHaResourceAsync(
+        this PveClient client,
+        long vmId,
+        VmType vmType = VmType.Qemu,
+        bool? purge = null,
+        bool ignoreNotFound = true)
+    {
+        string typeStr = vmType == VmType.Lxc ? "ct" : "vm";
+        return client.DeleteHaResourceAsync($"{typeStr}:{vmId}", purge, ignoreNotFound);
+    }
+    #endregion
+
     #region Nodes
     /// <summary>
     /// Return all nodes info.
