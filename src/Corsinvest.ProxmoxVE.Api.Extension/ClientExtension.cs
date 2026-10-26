@@ -46,39 +46,29 @@ public static class ClientExtension
     #endregion
 
     #region HA
-    /// <summary>
-    /// Check if HA status endpoint is responsive.
-    /// </summary>
-    public static async Task<bool> CheckHaStatusAsync(this PveClient client)
-    {
-        var result = await client.Cluster.Ha.Status.Current.Status();
-        return result.IsSuccessStatusCode;
-    }
+    private static string FormatHaSid(long vmId, VmType vmType) => $"{(vmType == VmType.Lxc ? "ct" : "vm")}:{vmId}";
 
     /// <summary>
     /// Get a specific HA resource by its SID (e.g. vm:100 or ct:101).
-    /// Returns null if the resource is not found (404); throws PveResultException on other API errors.
+    /// Returns null if the resource is not found; throws PveResultException on API errors.
     /// </summary>
     public static async Task<ClusterHaResource> GetHaResourceAsync(this PveClient client, string sid)
     {
-        var result = await client.Cluster.Ha.Resources[sid].Read();
-        if (result.StatusCode == System.Net.HttpStatusCode.NotFound)
+        if (string.IsNullOrWhiteSpace(sid))
         {
             return null;
         }
 
-        return result.ToModel<ClusterHaResource>();
+        var resources = await client.Cluster.Ha.Resources.GetAsync();
+        return resources?.FirstOrDefault(r => string.Equals(r.Sid, sid, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>
     /// Get a specific HA resource by VMID and type.
-    /// Returns null if the resource is not found (404); throws PveResultException on other API errors.
+    /// Returns null if the resource is not found; throws PveResultException on API errors.
     /// </summary>
     public static Task<ClusterHaResource> GetHaResourceAsync(this PveClient client, long vmId, VmType vmType = VmType.Qemu)
-    {
-        string typeStr = vmType == VmType.Lxc ? "ct" : "vm";
-        return client.GetHaResourceAsync($"{typeStr}:{vmId}");
-    }
+        => client.GetHaResourceAsync(FormatHaSid(vmId, vmType));
 
     /// <summary>
     /// Create an HA resource for a guest.
@@ -92,22 +82,16 @@ public static class ClientExtension
         int? maxRestart = null,
         int? maxRelocate = null,
         bool? autoRebalance = null,
-        bool? failback = null,
-        string group = null)
-    {
-        string typeStr = vmType == VmType.Lxc ? "ct" : "vm";
-        string sid = $"{typeStr}:{vmId}";
-        return client.Cluster.Ha.Resources.Create(
-            sid: sid,
+        bool? failback = null)
+        => client.Cluster.Ha.Resources.Create(
+            sid: FormatHaSid(vmId, vmType),
             state: state,
             comment: comment,
             max_restart: maxRestart,
             max_relocate: maxRelocate,
             auto_rebalance: autoRebalance,
-            failback: failback,
-            group: group
+            failback: failback
         );
-    }
 
     /// <summary>
     /// Ensure an HA resource exists: creates it if absent, or updates its configuration if it already exists.
@@ -121,57 +105,34 @@ public static class ClientExtension
         int? maxRestart = null,
         int? maxRelocate = null,
         bool? autoRebalance = null,
-        bool? failback = null,
-        string group = null)
+        bool? failback = null)
     {
-        string typeStr = vmType == VmType.Lxc ? "ct" : "vm";
-        string sid = $"{typeStr}:{vmId}";
+        string sid = FormatHaSid(vmId, vmType);
+        var existing = await client.GetHaResourceAsync(sid);
+        if (existing == null)
+        {
+            return await client.CreateHaResourceAsync(
+                vmId: vmId,
+                vmType: vmType,
+                state: state,
+                comment: comment,
+                maxRestart: maxRestart,
+                maxRelocate: maxRelocate,
+                autoRebalance: autoRebalance,
+                failback: failback
+            );
+        }
 
-        var createResult = await client.Cluster.Ha.Resources.Create(
-            sid: sid,
+        return await client.UpdateHaResourceAsync(
+            vmId: vmId,
+            vmType: vmType,
             state: state,
             comment: comment,
-            max_restart: maxRestart,
-            max_relocate: maxRelocate,
-            auto_rebalance: autoRebalance,
-            failback: failback,
-            group: group
+            maxRestart: maxRestart,
+            maxRelocate: maxRelocate,
+            autoRebalance: autoRebalance,
+            failback: failback
         );
-
-        if (createResult.IsSuccessStatusCode)
-        {
-            return createResult;
-        }
-
-        if (createResult.StatusCode == System.Net.HttpStatusCode.BadRequest)
-        {
-            string errorMessage = null;
-            try
-            {
-                errorMessage = createResult.GetError();
-            }
-            catch
-            {
-                // Fall back if Response.errors is not a dictionary
-            }
-
-            errorMessage ??= createResult.ReasonPhrase;
-
-            if (errorMessage?.Contains("already exists", StringComparison.OrdinalIgnoreCase) == true)
-            {
-                return await client.Cluster.Ha.Resources[sid].Update(
-                    state: state,
-                    comment: comment,
-                    max_restart: maxRestart,
-                    max_relocate: maxRelocate,
-                    auto_rebalance: autoRebalance,
-                    failback: failback,
-                    group: group
-                );
-            }
-        }
-
-        return createResult;
     }
 
     /// <summary>
@@ -186,21 +147,15 @@ public static class ClientExtension
         int? maxRestart = null,
         int? maxRelocate = null,
         bool? autoRebalance = null,
-        bool? failback = null,
-        string group = null)
-    {
-        string typeStr = vmType == VmType.Lxc ? "ct" : "vm";
-        string sid = $"{typeStr}:{vmId}";
-        return client.Cluster.Ha.Resources[sid].Update(
+        bool? failback = null)
+        => client.Cluster.Ha.Resources[FormatHaSid(vmId, vmType)].Update(
             state: state,
             comment: comment,
             max_restart: maxRestart,
             max_relocate: maxRelocate,
             auto_rebalance: autoRebalance,
-            failback: failback,
-            group: group
+            failback: failback
         );
-    }
 
     /// <summary>
     /// Delete an HA resource by sid (e.g. vm:100 or ct:100).
@@ -211,20 +166,22 @@ public static class ClientExtension
         bool? purge = null,
         bool ignoreNotFound = true)
     {
+        if (string.IsNullOrWhiteSpace(sid))
+        {
+            return ignoreNotFound;
+        }
+
+        if (ignoreNotFound)
+        {
+            var existing = await client.GetHaResourceAsync(sid);
+            if (existing == null)
+            {
+                return true;
+            }
+        }
+
         var result = await client.Cluster.Ha.Resources[sid].Delete(purge: purge);
-
-        if (result.IsSuccessStatusCode)
-        {
-            return true;
-        }
-
-        if (ignoreNotFound && (result.StatusCode == System.Net.HttpStatusCode.NotFound ||
-            result.GetError()?.Contains("not found", StringComparison.OrdinalIgnoreCase) == true))
-        {
-            return true;
-        }
-
-        return false;
+        return result.IsSuccessStatusCode;
     }
 
     /// <summary>
@@ -236,10 +193,7 @@ public static class ClientExtension
         VmType vmType = VmType.Qemu,
         bool? purge = null,
         bool ignoreNotFound = true)
-    {
-        string typeStr = vmType == VmType.Lxc ? "ct" : "vm";
-        return client.DeleteHaResourceAsync($"{typeStr}:{vmId}", purge, ignoreNotFound);
-    }
+        => client.DeleteHaResourceAsync(FormatHaSid(vmId, vmType), purge, ignoreNotFound);
     #endregion
 
     #region Nodes
