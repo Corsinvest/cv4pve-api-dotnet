@@ -72,12 +72,13 @@ public static class ClientExtension
 
     /// <summary>
     /// Create an HA resource for a guest.
+    /// When <paramref name="state"/> is null (default), Proxmox VE applies its server-side default ('started').
     /// </summary>
     public static Task<Result> CreateHaResourceAsync(
         this PveClient client,
         long vmId,
         VmType vmType = VmType.Qemu,
-        string state = "started",
+        string state = null,
         string comment = null,
         int? maxRestart = null,
         int? maxRelocate = null,
@@ -95,12 +96,14 @@ public static class ClientExtension
 
     /// <summary>
     /// Ensure an HA resource exists: creates it if absent, or updates its configuration if it already exists.
+    /// When <paramref name="state"/> is null (default), an existing resource retains its current state on update,
+    /// while an absent resource is created with Proxmox VE's server-side default state ('started').
     /// </summary>
     public static async Task<Result> EnsureHaResourceAsync(
         this PveClient client,
         long vmId,
         VmType vmType = VmType.Qemu,
-        string state = "started",
+        string state = null,
         string comment = null,
         int? maxRestart = null,
         int? maxRelocate = null,

@@ -171,6 +171,20 @@ public class ClientExtensionHaTests
         Assert.Equal(1, (int)body["auto-rebalance"]);
         Assert.Equal(0, (int)body["failback"]);
         Assert.Null(body["group"]);
+
+        requests.Clear();
+        createBody = null;
+        var resultWithoutState = await client.EnsureHaResourceAsync(100);
+        Assert.True(resultWithoutState.IsSuccessStatusCode);
+        Assert.Equal(2, requests.Count);
+        Assert.Equal(HttpMethod.Get, requests[0].Method);
+        Assert.Equal(HttpMethod.Post, requests[1].Method);
+        Assert.EndsWith("/cluster/ha/resources", requests[1].RequestUri!.AbsolutePath);
+        Assert.NotNull(createBody);
+        var bodyWithoutState = JObject.Parse(createBody);
+        Assert.Equal("vm:100", (string)bodyWithoutState["sid"]);
+        Assert.False(bodyWithoutState.ContainsKey("state"));
+        Assert.Null(bodyWithoutState["state"]);
     }
 
     [Fact]
@@ -221,6 +235,60 @@ public class ClientExtensionHaTests
         Assert.Equal(0, (int)body["auto-rebalance"]);
         Assert.Equal(1, (int)body["failback"]);
         Assert.Null(body["group"]);
+    }
+
+    [Fact]
+    public async Task EnsureHaResourceAsync_WhenResourceExistsAndStateNull_DoesNotSendStateInPut()
+    {
+        var requests = new List<HttpRequestMessage>();
+        string updateBody = null;
+
+        var handler = new FakeHandler(request =>
+        {
+            requests.Add(request);
+            if (request.Method == HttpMethod.Get && request.RequestUri!.AbsolutePath.EndsWith("/cluster/ha/resources"))
+            {
+                return FakeHandler.Json(HttpStatusCode.OK, """{"data":[{"sid":"vm:100","state":"stopped"}]}""");
+            }
+            if (request.Method == HttpMethod.Put && request.RequestUri!.AbsolutePath.EndsWith("/cluster/ha/resources/vm:100"))
+            {
+                updateBody = request.Content?.ReadAsStringAsync().Result;
+                return FakeHandler.Json(HttpStatusCode.OK, """{"data":null}""");
+            }
+            return FakeHandler.Json(HttpStatusCode.BadRequest, "{}");
+        });
+
+        var client = FakeHandler.Client(handler);
+        var result = await client.EnsureHaResourceAsync(
+            vmId: 100,
+            vmType: VmType.Qemu,
+            comment: "maintenance mode"
+        );
+
+        Assert.True(result.IsSuccessStatusCode);
+        Assert.Equal(2, requests.Count);
+        Assert.Equal(HttpMethod.Get, requests[0].Method);
+        Assert.Equal(HttpMethod.Put, requests[1].Method);
+        Assert.EndsWith("/cluster/ha/resources/vm:100", requests[1].RequestUri!.AbsolutePath);
+
+        Assert.NotNull(updateBody);
+        var body = JObject.Parse(updateBody);
+        Assert.False(body.ContainsKey("state"));
+        Assert.Null(body["state"]);
+        Assert.Equal("maintenance mode", (string)body["comment"]);
+
+        requests.Clear();
+        updateBody = null;
+        var resultWithoutArgs = await client.EnsureHaResourceAsync(100);
+        Assert.True(resultWithoutArgs.IsSuccessStatusCode);
+        Assert.Equal(2, requests.Count);
+        Assert.Equal(HttpMethod.Get, requests[0].Method);
+        Assert.Equal(HttpMethod.Put, requests[1].Method);
+        Assert.EndsWith("/cluster/ha/resources/vm:100", requests[1].RequestUri!.AbsolutePath);
+        Assert.NotNull(updateBody);
+        var bodyWithoutArgs = JObject.Parse(updateBody);
+        Assert.False(bodyWithoutArgs.ContainsKey("state"));
+        Assert.Null(bodyWithoutArgs["state"]);
     }
 
     [Fact]
@@ -366,7 +434,8 @@ public class ClientExtensionHaTests
         Assert.NotNull(requestBody);
         var body = JObject.Parse(requestBody);
         Assert.Equal("ct:200", (string)body["sid"]);
-        Assert.Equal("started", (string)body["state"]);
+        Assert.False(body.ContainsKey("state"));
+        Assert.Null(body["state"]);
         Assert.Null(body["comment"]);
         Assert.Null(body["max_restart"]);
         Assert.Null(body["max_relocate"]);
