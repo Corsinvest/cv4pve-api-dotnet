@@ -248,6 +248,62 @@ public static class ClientExtension
     public static async Task<IClusterResourceStorage> GetStorageAsync(this PveClient client, string storage)
         => (await GetStoragesAsync(client)).FirstOrDefault(a => a.Storage == storage) ??
                     throw new ArgumentException($"Storage '{storage}' not found!");
+
+    /// <summary>
+    /// Allocate a disk volume in storage for a VM or Container.
+    /// </summary>
+    /// <param name="client">The Proxmox VE client.</param>
+    /// <param name="node">Node name.</param>
+    /// <param name="storage">Storage identifier (e.g. "local-zfs", "local-lvm").</param>
+    /// <param name="vmId">Owner VM or Container ID.</param>
+    /// <param name="size">Disk size (e.g. "10G", "1024M").</param>
+    /// <param name="filename">Optional volume filename. When null, Proxmox VE allocates the name automatically.</param>
+    /// <param name="format">Optional disk image format (raw, qcow2, subvol, vmdk).</param>
+    /// <returns>Result of the storage allocation.</returns>
+    public static Task<Result> CreateDiskAsync(this PveClient client,
+                                               string node,
+                                               string storage,
+                                               long vmId,
+                                               string size,
+                                               string filename = null,
+                                               string format = null)
+        => client.Nodes[node].Storage[storage].Content.Create(filename, size, (int)vmId, format);
+
+    /// <summary>
+    /// Allocate a disk volume in storage for a VM or Container.
+    /// </summary>
+    /// <param name="client">The Proxmox VE client.</param>
+    /// <param name="node">Node name.</param>
+    /// <param name="storage">Storage identifier (e.g. "local-zfs", "local-lvm").</param>
+    /// <param name="vmId">Owner VM or Container ID.</param>
+    /// <param name="sizeGb">Disk size in gigabytes.</param>
+    /// <param name="filename">Optional volume filename. When null, Proxmox VE allocates the name automatically.</param>
+    /// <param name="format">Optional disk image format (raw, qcow2, subvol, vmdk).</param>
+    /// <returns>Result of the storage allocation.</returns>
+    public static Task<Result> CreateDiskAsync(this PveClient client,
+                                               string node,
+                                               string storage,
+                                               long vmId,
+                                               int sizeGb,
+                                               string filename = null,
+                                               string format = null)
+        => client.CreateDiskAsync(node, storage, vmId, $"{sizeGb}G", filename, format);
+
+    /// <summary>
+    /// Delete a disk volume from storage.
+    /// </summary>
+    /// <param name="client">The Proxmox VE client.</param>
+    /// <param name="node">Node name.</param>
+    /// <param name="storage">Storage identifier (e.g. "local-zfs").</param>
+    /// <param name="volume">Volume identifier or filename (e.g. "vm-100-disk-0" or "local-zfs:vm-100-disk-0").</param>
+    /// <param name="delay">Optional delay in seconds to wait for background task.</param>
+    /// <returns>Result of the volume deletion.</returns>
+    public static Task<Result> DeleteDiskVolumeAsync(this PveClient client,
+                                                     string node,
+                                                     string storage,
+                                                     string volume,
+                                                     int? delay = null)
+        => client.Nodes[node].Storage[storage].Content[volume].Delete(delay);
     #endregion
 
     #region Vm
@@ -386,6 +442,348 @@ public static class ClientExtension
             VmType.Lxc => await client.Nodes[node].Lxc[vmId].Rrddata.GetAsync(rrdDataTimeFrame, rrdDataConsolidation),
             _ => throw new InvalidEnumArgumentException(),
         };
+
+    /// <summary>
+    /// Find the first free SCSI bus slot (scsi0..scsi30) on a QEMU VM, checking both current and pending configurations.
+    /// </summary>
+    /// <param name="client">The Proxmox VE client.</param>
+    /// <param name="node">Node name.</param>
+    /// <param name="vmId">VM ID.</param>
+    /// <param name="maxSlots">Maximum number of SCSI slots to check (default: 31, representing scsi0..scsi30).</param>
+    /// <returns>Free SCSI slot name (e.g. "scsi0", "scsi1").</returns>
+    public static async Task<string> FindFirstFreeScsiSlotAsync(this PveClient client,
+                                                                string node,
+                                                                long vmId,
+                                                                int maxSlots = 31)
+    {
+        var configResult = await client.Nodes[node].Qemu[vmId].Config.VmConfig();
+        if (!configResult.IsSuccessStatusCode)
+        {
+            throw new PveResultException(configResult, !string.IsNullOrWhiteSpace(configResult.ReasonPhrase) ? configResult.ReasonPhrase : configResult.GetError());
+        }
+
+        var takenSlots = new HashSet<int>();
+        if (configResult.ResponseHasData && configResult.ResponseToDictionary["data"] is IDictionary<string, object> dict)
+        {
+            foreach (var key in dict.Keys)
+            {
+                if (key.StartsWith("scsi", StringComparison.OrdinalIgnoreCase) && int.TryParse(key[4..], out var slot))
+                {
+                    takenSlots.Add(slot);
+                }
+            }
+        }
+
+        try
+        {
+            var pendingResult = await client.Nodes[node].Qemu[vmId].Pending.VmPending();
+            if (pendingResult.IsSuccessStatusCode)
+            {
+                foreach (var item in pendingResult.ToEnumerable())
+                {
+                    if (item is IDictionary<string, object> pendingDict &&
+                        pendingDict.TryGetValue("key", out var keyObj) &&
+                        keyObj is string key &&
+                        key.StartsWith("scsi", StringComparison.OrdinalIgnoreCase) &&
+                        int.TryParse(key[4..], out var pendingSlot))
+                    {
+                        takenSlots.Add(pendingSlot);
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // Pending endpoint is best-effort for compatibility with older PVE nodes or mock handlers
+        }
+
+        for (var i = 0; i < maxSlots; i++)
+        {
+            if (!takenSlots.Contains(i))
+            {
+                return $"scsi{i}";
+            }
+        }
+
+        throw new InvalidOperationException($"No free SCSI slots available on VM {vmId} (scsi0..scsi{maxSlots - 1} are occupied).");
+    }
+
+    /// <summary>
+    /// Find the first free mount point slot (mp0..mp31) on an LXC container, checking both current and pending configurations.
+    /// </summary>
+    /// <param name="client">The Proxmox VE client.</param>
+    /// <param name="node">Node name.</param>
+    /// <param name="containerId">Container ID.</param>
+    /// <param name="maxMountPoints">Maximum number of mount points to check (default: 32, representing mp0..mp31).</param>
+    /// <returns>Free mount point slot name (e.g. "mp0", "mp1").</returns>
+    public static async Task<string> FindFirstFreeMountPointAsync(this PveClient client,
+                                                                  string node,
+                                                                  long containerId,
+                                                                  int maxMountPoints = 32)
+    {
+        var configResult = await client.Nodes[node].Lxc[containerId].Config.VmConfig();
+        if (!configResult.IsSuccessStatusCode)
+        {
+            throw new PveResultException(configResult, !string.IsNullOrWhiteSpace(configResult.ReasonPhrase) ? configResult.ReasonPhrase : configResult.GetError());
+        }
+
+        var takenSlots = new HashSet<int>();
+        if (configResult.ResponseHasData && configResult.ResponseToDictionary["data"] is IDictionary<string, object> dict)
+        {
+            foreach (var key in dict.Keys)
+            {
+                if (key.StartsWith("mp", StringComparison.OrdinalIgnoreCase) && int.TryParse(key[2..], out var slot))
+                {
+                    takenSlots.Add(slot);
+                }
+            }
+        }
+
+        try
+        {
+            var pendingResult = await client.Nodes[node].Lxc[containerId].Pending.VmPending();
+            if (pendingResult.IsSuccessStatusCode)
+            {
+                foreach (var item in pendingResult.ToEnumerable())
+                {
+                    if (item is IDictionary<string, object> pendingDict &&
+                        pendingDict.TryGetValue("key", out var keyObj) &&
+                        keyObj is string key &&
+                        key.StartsWith("mp", StringComparison.OrdinalIgnoreCase) &&
+                        int.TryParse(key[2..], out var pendingSlot))
+                    {
+                        takenSlots.Add(pendingSlot);
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // Pending endpoint is best-effort for compatibility with older PVE nodes or mock handlers
+        }
+
+        for (var i = 0; i < maxMountPoints; i++)
+        {
+            if (!takenSlots.Contains(i))
+            {
+                return $"mp{i}";
+            }
+        }
+
+        throw new InvalidOperationException($"No free mount points available on Container {containerId} (mp0..mp{maxMountPoints - 1} are occupied).");
+    }
+
+    /// <summary>
+    /// Attach a disk volume to a QEMU VM.
+    /// </summary>
+    /// <param name="client">The Proxmox VE client.</param>
+    /// <param name="node">Node name.</param>
+    /// <param name="vmId">VM ID.</param>
+    /// <param name="volumeId">Storage volume identifier (e.g. "local-zfs:vm-100-disk-0").</param>
+    /// <param name="busSlot">Target bus slot (e.g. "scsi0", "sata1", "virtio0"). When null, auto-assigns the first free SCSI slot.</param>
+    /// <param name="options">Optional disk options (e.g. "discard=on,ssd=1", "backup=0").</param>
+    /// <param name="digest">Optional configuration digest to prevent race conditions.</param>
+    /// <returns>Result of the update operation.</returns>
+    public static async Task<Result> AttachDiskToVmAsync(this PveClient client,
+                                                         string node,
+                                                         long vmId,
+                                                         string volumeId,
+                                                         string busSlot = null,
+                                                         string options = null,
+                                                         string digest = null)
+    {
+        busSlot ??= await client.FindFirstFreeScsiSlotAsync(node, vmId);
+
+        var diskValue = string.IsNullOrWhiteSpace(options) ? volumeId : $"{volumeId},{options}";
+
+        IDictionary<int, string> scsiN = null;
+        IDictionary<int, string> sataN = null;
+        IDictionary<int, string> virtioN = null;
+        IDictionary<int, string> ideN = null;
+
+        var lowerSlot = busSlot.ToLowerInvariant();
+        if (lowerSlot.StartsWith("scsi") && int.TryParse(lowerSlot[4..], out var scsiIdx))
+        {
+            scsiN = new Dictionary<int, string> { { scsiIdx, diskValue } };
+        }
+        else if (lowerSlot.StartsWith("sata") && int.TryParse(lowerSlot[4..], out var sataIdx))
+        {
+            sataN = new Dictionary<int, string> { { sataIdx, diskValue } };
+        }
+        else if (lowerSlot.StartsWith("virtio") && int.TryParse(lowerSlot[6..], out var virtioIdx))
+        {
+            virtioN = new Dictionary<int, string> { { virtioIdx, diskValue } };
+        }
+        else if (lowerSlot.StartsWith("ide") && int.TryParse(lowerSlot[3..], out var ideIdx))
+        {
+            ideN = new Dictionary<int, string> { { ideIdx, diskValue } };
+        }
+        else
+        {
+            throw new ArgumentException($"Unsupported or invalid bus slot '{busSlot}'. Expected scsiN, sataN, virtioN, or ideN.", nameof(busSlot));
+        }
+
+        return await client.Nodes[node].Qemu[vmId].Config.UpdateVmAsync(scsiN: scsiN,
+                                                                       sataN: sataN,
+                                                                       virtioN: virtioN,
+                                                                       ideN: ideN,
+                                                                       digest: digest);
+    }
+
+    /// <summary>
+    /// Detach a disk from a QEMU VM.
+    /// </summary>
+    /// <param name="client">The Proxmox VE client.</param>
+    /// <param name="node">Node name.</param>
+    /// <param name="vmId">VM ID.</param>
+    /// <param name="busSlot">Bus slot name (e.g. "scsi0", "sata1", "virtio0").</param>
+    /// <param name="digest">Optional configuration digest to prevent race conditions.</param>
+    /// <returns>Result of the update operation.</returns>
+    public static Task<Result> DetachDiskFromVmAsync(this PveClient client,
+                                                     string node,
+                                                     long vmId,
+                                                     string busSlot,
+                                                     string digest = null)
+        => client.Nodes[node].Qemu[vmId].Config.UpdateVmAsync(delete: busSlot, digest: digest);
+
+    /// <summary>
+    /// Attach a disk volume as a mount point to an LXC container.
+    /// </summary>
+    /// <param name="client">The Proxmox VE client.</param>
+    /// <param name="node">Node name.</param>
+    /// <param name="containerId">Container ID.</param>
+    /// <param name="volumeId">Storage volume identifier (e.g. "local-zfs:subvol-100-disk-0").</param>
+    /// <param name="mountPath">Destination directory path inside container (e.g. "/mnt/data").</param>
+    /// <param name="mpSlot">Mount point slot name (e.g. "mp0"). If null, auto-assigns the first free mount point.</param>
+    /// <param name="options">Optional extra mount point options (e.g. "backup=1,ro=1").</param>
+    /// <param name="digest">Optional configuration digest to prevent race conditions.</param>
+    /// <returns>Result of the update operation.</returns>
+    public static async Task<Result> AttachDiskToLxcAsync(this PveClient client,
+                                                          string node,
+                                                          long containerId,
+                                                          string volumeId,
+                                                          string mountPath,
+                                                          string mpSlot = null,
+                                                          string options = null,
+                                                          string digest = null)
+    {
+        mpSlot ??= await client.FindFirstFreeMountPointAsync(node, containerId);
+
+        var lowerSlot = mpSlot.ToLowerInvariant();
+        if (!lowerSlot.StartsWith("mp") || !int.TryParse(lowerSlot[2..], out var mpIdx))
+        {
+            throw new ArgumentException($"Invalid mount point slot '{mpSlot}'. Expected mpN (e.g. mp0..mp31).", nameof(mpSlot));
+        }
+
+        var mpValue = string.IsNullOrWhiteSpace(options)
+            ? $"{volumeId},mp={mountPath}"
+            : $"{volumeId},mp={mountPath},{options}";
+
+        var mpN = new Dictionary<int, string> { { mpIdx, mpValue } };
+        return await client.Nodes[node].Lxc[containerId].Config.UpdateVm(mpN: mpN, digest: digest);
+    }
+
+    /// <summary>
+    /// Detach a mount point disk from an LXC container.
+    /// </summary>
+    /// <param name="client">The Proxmox VE client.</param>
+    /// <param name="node">Node name.</param>
+    /// <param name="containerId">Container ID.</param>
+    /// <param name="mpSlot">Mount point slot name (e.g. "mp0", "mp1").</param>
+    /// <param name="digest">Optional configuration digest to prevent race conditions.</param>
+    /// <returns>Result of the update operation.</returns>
+    public static Task<Result> DetachDiskFromLxcAsync(this PveClient client,
+                                                      string node,
+                                                      long containerId,
+                                                      string mpSlot,
+                                                      string digest = null)
+        => client.Nodes[node].Lxc[containerId].Config.UpdateVm(delete: mpSlot, digest: digest);
+
+    /// <summary>
+    /// Purge an unused disk entry from a VM or Container by exact volume ID match.
+    /// <para>
+    /// CAUTION: On Proxmox VE QEMU VMs, deleting an "unused[n]" configuration entry triggers
+    /// physical removal and permanent deletion of the underlying disk volume from storage.
+    /// </para>
+    /// </summary>
+    /// <param name="client">The Proxmox VE client.</param>
+    /// <param name="node">Node name.</param>
+    /// <param name="guestId">VM or Container ID.</param>
+    /// <param name="vmType">QEMU or LXC.</param>
+    /// <param name="exactVolumeId">Exact volume ID or filename to purge (e.g. "local-zfs:vm-100-disk-1" or "vm-100-disk-1").</param>
+    /// <param name="digest">Optional configuration digest to prevent race conditions.</param>
+    /// <returns>Result of the purge operation.</returns>
+    public static async Task<Result> PurgeUnusedDiskAsync(this PveClient client,
+                                                          string node,
+                                                          long guestId,
+                                                          VmType vmType,
+                                                          string exactVolumeId,
+                                                          string digest = null)
+    {
+        var configResult = vmType switch
+        {
+            VmType.Qemu => await client.Nodes[node].Qemu[guestId].Config.VmConfig(),
+            VmType.Lxc => await client.Nodes[node].Lxc[guestId].Config.VmConfig(),
+            _ => throw new InvalidEnumArgumentException(nameof(vmType), (int)vmType, typeof(VmType))
+        };
+
+        if (!configResult.IsSuccessStatusCode)
+        {
+            throw new PveResultException(configResult, !string.IsNullOrWhiteSpace(configResult.ReasonPhrase) ? configResult.ReasonPhrase : configResult.GetError());
+        }
+
+        string matchedSlot = null;
+        if (configResult.ResponseHasData && configResult.ResponseToDictionary["data"] is IDictionary<string, object> dict)
+        {
+            foreach (var kvp in dict)
+            {
+                if (kvp.Key.StartsWith("unused", StringComparison.OrdinalIgnoreCase) &&
+                    MatchExactVolume(kvp.Value + string.Empty, exactVolumeId))
+                {
+                    matchedSlot = kvp.Key;
+                    break;
+                }
+            }
+        }
+
+        if (matchedSlot == null)
+        {
+            throw new ArgumentException($"Unused disk '{exactVolumeId}' not found on {vmType} {guestId}.");
+        }
+
+        return vmType switch
+        {
+            VmType.Qemu => await client.Nodes[node].Qemu[guestId].Config.UpdateVmAsync(delete: matchedSlot, digest: digest),
+            VmType.Lxc => await client.Nodes[node].Lxc[guestId].Config.UpdateVm(delete: matchedSlot, digest: digest),
+            _ => throw new InvalidEnumArgumentException(nameof(vmType), (int)vmType, typeof(VmType))
+        };
+    }
+
+    private static bool MatchExactVolume(string configValue, string exactVolumeId)
+    {
+        if (string.IsNullOrWhiteSpace(configValue) || string.IsNullOrWhiteSpace(exactVolumeId))
+        {
+            return false;
+        }
+
+        var volId = configValue.Split(',')[0].Trim();
+        if (string.Equals(volId, exactVolumeId, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        var colonIndex = volId.IndexOf(':');
+        if (colonIndex >= 0)
+        {
+            var nameWithoutStorage = volId[(colonIndex + 1)..];
+            if (string.Equals(nameWithoutStorage, exactVolumeId, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
     #endregion
 
     /// <summary>
