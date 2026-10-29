@@ -45,6 +45,160 @@ public static class ClientExtension
                 .ToDictionary(a => a.Name, a => a.IpAddress);
     #endregion
 
+    #region HA
+    private static string FormatHaSid(long vmId, VmType vmType) => $"{(vmType == VmType.Lxc ? "ct" : "vm")}:{vmId}";
+
+    /// <summary>
+    /// Get a specific HA resource by its SID (e.g. vm:100 or ct:101).
+    /// Returns null if the resource is not found; throws PveResultException on API errors.
+    /// </summary>
+    public static async Task<ClusterHaResource> GetHaResourceAsync(this PveClient client, string sid)
+    {
+        if (string.IsNullOrWhiteSpace(sid))
+        {
+            return null;
+        }
+
+        var resources = await client.Cluster.Ha.Resources.GetAsync();
+        return resources?.FirstOrDefault(r => string.Equals(r.Sid, sid, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Get a specific HA resource by VMID and type.
+    /// Returns null if the resource is not found; throws PveResultException on API errors.
+    /// </summary>
+    public static Task<ClusterHaResource> GetHaResourceAsync(this PveClient client, long vmId, VmType vmType = VmType.Qemu)
+        => client.GetHaResourceAsync(FormatHaSid(vmId, vmType));
+
+    /// <summary>
+    /// Create an HA resource for a guest.
+    /// When <paramref name="state"/> is null (default), Proxmox VE applies its server-side default ('started').
+    /// </summary>
+    public static Task<Result> CreateHaResourceAsync(
+        this PveClient client,
+        long vmId,
+        VmType vmType = VmType.Qemu,
+        string state = null,
+        string comment = null,
+        int? maxRestart = null,
+        int? maxRelocate = null,
+        bool? autoRebalance = null,
+        bool? failback = null)
+        => client.Cluster.Ha.Resources.Create(
+            sid: FormatHaSid(vmId, vmType),
+            state: state,
+            comment: comment,
+            max_restart: maxRestart,
+            max_relocate: maxRelocate,
+            auto_rebalance: autoRebalance,
+            failback: failback
+        );
+
+    /// <summary>
+    /// Ensure an HA resource exists: creates it if absent, or updates its configuration if it already exists.
+    /// When <paramref name="state"/> is null (default), an existing resource retains its current state on update,
+    /// while an absent resource is created with Proxmox VE's server-side default state ('started').
+    /// </summary>
+    public static async Task<Result> EnsureHaResourceAsync(
+        this PveClient client,
+        long vmId,
+        VmType vmType = VmType.Qemu,
+        string state = null,
+        string comment = null,
+        int? maxRestart = null,
+        int? maxRelocate = null,
+        bool? autoRebalance = null,
+        bool? failback = null)
+    {
+        string sid = FormatHaSid(vmId, vmType);
+        var existing = await client.GetHaResourceAsync(sid);
+        if (existing == null)
+        {
+            return await client.CreateHaResourceAsync(
+                vmId: vmId,
+                vmType: vmType,
+                state: state,
+                comment: comment,
+                maxRestart: maxRestart,
+                maxRelocate: maxRelocate,
+                autoRebalance: autoRebalance,
+                failback: failback
+            );
+        }
+
+        return await client.UpdateHaResourceAsync(
+            vmId: vmId,
+            vmType: vmType,
+            state: state,
+            comment: comment,
+            maxRestart: maxRestart,
+            maxRelocate: maxRelocate,
+            autoRebalance: autoRebalance,
+            failback: failback
+        );
+    }
+
+    /// <summary>
+    /// Update configuration of an HA resource.
+    /// </summary>
+    public static Task<Result> UpdateHaResourceAsync(
+        this PveClient client,
+        long vmId,
+        VmType vmType = VmType.Qemu,
+        string state = null,
+        string comment = null,
+        int? maxRestart = null,
+        int? maxRelocate = null,
+        bool? autoRebalance = null,
+        bool? failback = null)
+        => client.Cluster.Ha.Resources[FormatHaSid(vmId, vmType)].Update(
+            state: state,
+            comment: comment,
+            max_restart: maxRestart,
+            max_relocate: maxRelocate,
+            auto_rebalance: autoRebalance,
+            failback: failback
+        );
+
+    /// <summary>
+    /// Delete an HA resource by sid (e.g. vm:100 or ct:100).
+    /// </summary>
+    public static async Task<bool> DeleteHaResourceAsync(
+        this PveClient client,
+        string sid,
+        bool? purge = null,
+        bool ignoreNotFound = true)
+    {
+        if (string.IsNullOrWhiteSpace(sid))
+        {
+            return ignoreNotFound;
+        }
+
+        if (ignoreNotFound)
+        {
+            var existing = await client.GetHaResourceAsync(sid);
+            if (existing == null)
+            {
+                return true;
+            }
+        }
+
+        var result = await client.Cluster.Ha.Resources[sid].Delete(purge: purge);
+        return result.IsSuccessStatusCode;
+    }
+
+    /// <summary>
+    /// Delete an HA resource by VM ID and type.
+    /// </summary>
+    public static Task<bool> DeleteHaResourceAsync(
+        this PveClient client,
+        long vmId,
+        VmType vmType = VmType.Qemu,
+        bool? purge = null,
+        bool ignoreNotFound = true)
+        => client.DeleteHaResourceAsync(FormatHaSid(vmId, vmType), purge, ignoreNotFound);
+    #endregion
+
     #region Nodes
     /// <summary>
     /// Return all nodes info.
