@@ -149,6 +149,38 @@ result = await SnapshotHelper.RemoveSnapshotAsync(client, vm.Node, vm.VmType, vm
 request: check it, and read the exit status of the task as in
 [Tasks](/cv4pve-api-dotnet/concepts/tasks/#did-it-succeed).
 
+## Disks
+
+`DiskHelper` provides unified disk lifecycle helpers for QEMU VMs and LXC containers, following
+the same pattern as `SnapshotHelper`:
+
+```csharp
+using Corsinvest.ProxmoxVE.Api.Extension.Utils;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
+
+var vm = await client.GetVmAsync("web01");
+
+// Find the first free slot (scsi0..scsi30, virtio0..virtio15, sata0..sata5, ide0..ide3 for QEMU; mp0..mp255 for LXC)
+var slot = await DiskHelper.GetFreeSlotAsync(client, vm.Node, vm.VmType, vm.VmId, bus: "scsi");
+
+// Attach an existing storage volume (slot is auto-assigned when omitted)
+await DiskHelper.AttachDiskAsync(client, vm.Node, vm.VmType, vm.VmId,
+                                 volume: "local-zfs:vm-100-disk-1",
+                                 options: "discard=on,ssd=1");
+
+// For LXC containers, mountPath is required:
+// await DiskHelper.AttachDiskAsync(client, ct.Node, VmType.Lxc, ct.VmId,
+//                                  volume: "local-zfs:subvol-200-disk-1",
+//                                  mountPath: "/mnt/data");
+
+// Detach the disk from the VM/CT config (becomes unused[n])
+await DiskHelper.DetachDiskAsync(client, vm.Node, vm.VmType, vm.VmId, slot: "scsi1");
+
+// Remove an unused disk from the configuration
+// CAUTION: On QEMU VMs, deleting an unused[n] entry permanently deletes the volume from storage!
+await DiskHelper.RemoveUnusedDiskAsync(client, vm.Node, vm.VmType, vm.VmId, volume: "vm-100-disk-1");
+```
+
 ## Several nodes
 
 `ClientHelper.GetClientAndTryLoginAsync` takes a list of hosts and returns a client connected to the
