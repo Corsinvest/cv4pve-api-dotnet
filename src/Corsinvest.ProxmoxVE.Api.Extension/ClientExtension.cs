@@ -361,15 +361,13 @@ public static class ClientExtension
     /// <summary>
     /// Unlock vm
     /// </summary>
-    public static async Task VmUnlockAsync(this PveClient client, string node, VmType vmType, long vmId)
-    {
-        switch (vmType)
+    public static async Task<Result> VmUnlockAsync(this PveClient client, string node, VmType vmType, long vmId)
+        => vmType switch
         {
-            case VmType.Qemu: await client.Nodes[node].Qemu[vmId].Config.UpdateVm(delete: "lock", skiplock: true); break;
-            case VmType.Lxc: await client.Nodes[node].Lxc[vmId].Config.UpdateVm(delete: "lock"); break;
-            default: throw new InvalidEnumArgumentException();
-        }
-    }
+            VmType.Qemu => await client.Nodes[node].Qemu[vmId].Config.UpdateVm(delete: "lock", skiplock: true),
+            VmType.Lxc => await client.Nodes[node].Lxc[vmId].Config.UpdateVm(delete: "lock"),
+            _ => throw new InvalidEnumArgumentException(),
+        };
 
     /// <summary>
     /// Get Vm RrdData
@@ -437,13 +435,13 @@ public static class ClientExtension
     }
 
     /// <summary>
-    /// Upload templates and ISO images.
+    /// Upload templates, ISO images and disks to import.
     /// </summary>
     /// <param name="client"></param>
     /// <param name="node">Node.</param>
     /// <param name="storage">Node.</param>
     /// <param name="content">Content type.
-    ///   Enum: iso,vztmpl</param>
+    ///   Enum: iso,vztmpl,import</param>
     /// <param name="fileStream">Stream of file</param>
     /// <param name="fileName">The name of the file to create. Caution: This will be normalized!</param>
     /// <param name="cancellationToken"></param>
@@ -452,7 +450,8 @@ public static class ClientExtension
     /// <param name="checksumAlgorithm">The algorithm to calculate the checksum of the file.
     ///   Enum: md5,sha1,sha224,sha256,sha384,sha512</param>
     /// <param name="tmpFileName">The source file name. This parameter is usually set by the REST handler.
-    /// You can only overwrite it when connecting to the trusted port on localhost.</param>
+    /// You can only overwrite it when connecting to the trusted port on localhost.
+    /// Not sent: the form of an upload has no such field.</param>
     public static async Task<Result> UploadFileToStorageAsync(this PveClient client,
                                                           string node,
                                                           string storage,
@@ -465,14 +464,16 @@ public static class ClientExtension
                                                           string checksumAlgorithm = null,
                                                           string tmpFileName = null)
     {
-        if (!new[] { "iso", "vztmpl" }.Contains(content)) { throw new PveException("Content type non valid! 'iso' or 'vztmpl'"); }
+        if (!new[] { "iso", "vztmpl", "import" }.Contains(content)) { throw new PveException("Content type non valid! 'iso', 'vztmpl' or 'import'"); }
 
         var boundary = Guid.NewGuid().ToString();
-        var mpfdContent = new MultipartFormDataContent(boundary)
-        {
-            { new StringContent(content), "\"content\"" },
-            { new StreamContent(fileStream), "\"filename\"", $"\"{fileName}\"" }
-        };
+        var mpfdContent = new MultipartFormDataContent(boundary) { { new StringContent(content), "\"content\"" } };
+
+        //Proxmox VE reads the fields before the file and in this order
+        if (checksumAlgorithm != null) { mpfdContent.Add(new StringContent(checksumAlgorithm), "\"checksum-algorithm\""); }
+        if (checksum != null) { mpfdContent.Add(new StringContent(checksum), "\"checksum\""); }
+
+        mpfdContent.Add(new StreamContent(fileStream), "\"filename\"", $"\"{fileName}\"");
 
         var parameters = new Dictionary<string, object>
         {
@@ -481,11 +482,6 @@ public static class ClientExtension
              { "checksum-algorithm", checksumAlgorithm },
              { "tmpfilename", tmpFileName }
         };
-
-        // foreach (var item in parameters.Where(a => a.Value != null))
-        // {
-        //     mpfdContent.Add(new StringContent(item.Value.ToString()), $"\"{item.Key}\"");
-        // }
 
         mpfdContent.Headers.ContentType = MediaTypeHeaderValue.Parse($"multipart/form-data; boundary={boundary}");
 

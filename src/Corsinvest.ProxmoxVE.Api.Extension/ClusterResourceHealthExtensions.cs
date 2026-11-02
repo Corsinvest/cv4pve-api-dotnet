@@ -18,7 +18,7 @@ public static class ClusterResourceHealthExtensions
         /// <summary>
         /// Health score 0-100 (higher = healthier) for a Node or running VM, computed from
         /// CPU, memory and (Node only) disk usage. Returns <c>null</c> when not measurable
-        /// (stopped VM, or a resource type that is neither Node nor VM).
+        /// (stopped VM, Node not online, or a resource type that is neither Node nor VM).
         ///   Node         = 100 − (CPU·0.4 + RAM·0.4 + Disk·0.2)
         ///   VM (running) = 100 − (CPU·0.5 + RAM·0.5)
         /// </summary>
@@ -34,7 +34,9 @@ public static class ClusterResourceHealthExtensions
 
                 double? score = resource.ResourceType switch
                 {
-                    ClusterResourceType.Node => 100 - ((cpu * 0.4) + (ram * 0.4) + (disk * 0.2)),
+                    ClusterResourceType.Node => resource.Status == PveConstants.StatusOnline
+                                                ? 100 - ((cpu * 0.4) + (ram * 0.4) + (disk * 0.2))
+                                                : null,
                     ClusterResourceType.Vm => resource.Status == PveConstants.StatusVmRunning
                                                 ? 100 - ((cpu * 0.5) + (ram * 0.5))
                                                 : null,
@@ -50,13 +52,15 @@ public static class ClusterResourceHealthExtensions
     {
         /// <summary>
         /// Health score 0-100 (higher = healthier) for a Storage resource, computed from
-        /// disk usage (100 − Disk%). Returns <c>null</c> for non-storage resource types.
+        /// disk usage (100 − Disk%). Returns <c>null</c> for a storage that is not available
+        /// and for non-storage resource types.
         /// </summary>
         public double? HealthScoreStorage
         {
             get
             {
-                if (resource.ResourceType != ClusterResourceType.Storage) { return null; }
+                if (resource.ResourceType != ClusterResourceType.Storage
+                    || resource.Status != PveConstants.StatusAvailable) { return null; }
 
                 var disk = resource.DiskSize > 0
                             ? (double)resource.DiskUsage / resource.DiskSize * 100
@@ -71,7 +75,8 @@ public static class ClusterResourceHealthExtensions
     {
         /// <summary>
         /// Overall health score 0-100 (higher = healthier) dispatched by resource type.
-        /// Returns <c>null</c> when not measurable (stopped VM, or an unsupported type);
+        /// Returns <c>null</c> when not measurable (stopped VM, Node not online, storage
+        /// not available, or an unsupported type);
         /// callers should render this as "not available" rather than a low score.
         /// Same formula as cv4pve-admin so the number matches across tools.
         /// </summary>
