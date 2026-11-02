@@ -167,7 +167,9 @@ public static class VmHelper
         }
         else
         {
-            //string check name
+            //string check name: Proxmox VE gives no name for a guest without statistics
+            if (data.Name == null) { return false; }
+
             var name = data.Name.ToLower();
             var vmIdOrNameLower = vmIdOrName.Replace("%", string.Empty).ToLower();
             if (vmIdOrName.Contains('%'))

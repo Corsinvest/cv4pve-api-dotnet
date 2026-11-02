@@ -327,6 +327,73 @@ public class ModelsExtensionsTests
     }
 
     [Fact]
+    public async Task Upload_sends_the_checksum_before_the_file_in_the_order_read_by_proxmox()
+    {
+        string? body = null;
+        var handler = new FakeHandler(request =>
+        {
+            body = request.Content!.ReadAsStringAsync().Result;
+            return FakeHandler.Json(HttpStatusCode.OK, """{"data":"UPID:pve01:0012A3F4:05C1B2D3:6720F1A0:imgcopy::root@pam:"}""");
+        });
+        var client = FakeHandler.Client(handler);
+        using var file = new MemoryStream(Encoding.UTF8.GetBytes("ISO-CONTENT"));
+
+        await client.UploadFileToStorageAsync("pve01", "local", "iso", file, "debian.iso", CancellationToken.None,
+                                              checksum: "abc123", checksumAlgorithm: "sha256");
+
+        var positions = new[] { "name=\"content\"", "name=\"checksum-algorithm\"", "name=\"checksum\"", "name=\"filename\"" }
+                            .Select(a => body!.IndexOf(a, StringComparison.Ordinal))
+                            .ToArray();
+        Assert.DoesNotContain(-1, positions);
+        Assert.Equal(positions.Order(), positions);
+        Assert.Contains("abc123", body);
+        Assert.Contains("sha256", body);
+    }
+
+    [Fact]
+    public async Task Upload_without_a_checksum_sends_only_the_content_and_the_file()
+    {
+        string? body = null;
+        var handler = new FakeHandler(request =>
+        {
+            body = request.Content!.ReadAsStringAsync().Result;
+            return FakeHandler.Json(HttpStatusCode.OK, """{"data":null}""");
+        });
+        var client = FakeHandler.Client(handler);
+        using var file = new MemoryStream([1, 2, 3]);
+
+        await client.UploadFileToStorageAsync("pve01", "local", "iso", file, "x.iso", CancellationToken.None);
+
+        Assert.DoesNotContain("checksum", body);
+    }
+
+    [Fact]
+    public async Task Upload_of_a_disk_to_import_is_accepted()
+    {
+        var (client, handler) = ClientAnswering(("/upload", """{"data":"UPID:pve01:0012A3F4:05C1B2D3:6720F1A0:imgcopy::root@pam:"}"""));
+        using var file = new MemoryStream([1, 2, 3]);
+
+        var result = await client.UploadFileToStorageAsync("pve01", "local", "import", file, "disk.ova", CancellationToken.None);
+
+        Assert.True(result.IsSuccessStatusCode);
+        Assert.Single(handler.Requests);
+    }
+
+    [Fact]
+    public async Task Health_score_is_not_measured_on_a_node_or_a_storage_that_gives_no_data()
+    {
+        var (client, _) = ClientAnswering(("/cluster/resources", """
+            {"data":[
+                {"id":"node/pve02","type":"node","node":"pve02","status":"offline","maxcpu":8,"maxmem":1000,"maxdisk":100},
+                {"id":"node/pve03","type":"node","node":"pve03","status":"unknown"},
+                {"id":"storage/pve02/local","type":"storage","storage":"local","node":"pve02","status":"unknown"}
+            ]}
+            """));
+
+        Assert.All(await client.GetResourcesAsync(ClusterResourceType.All), a => Assert.Null(a.HealthScoreCalculated));
+    }
+
+    [Fact]
     public async Task Health_score_of_nodes_guests_and_storages()
     {
         var (client, _) = ClientAnswering(("/cluster/resources", """

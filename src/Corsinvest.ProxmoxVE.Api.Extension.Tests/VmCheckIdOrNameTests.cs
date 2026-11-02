@@ -14,6 +14,14 @@ public class VmCheckIdOrNameTests
     private static ClusterResource Vm(long vmId, string name) => new() { VmId = vmId, Name = name };
 
     [Theory]
+    [InlineData("web-01")]
+    [InlineData("%web%")]
+    [InlineData("web%")]
+    [InlineData("%web")]
+    public void Vm_without_a_name_matches_no_name(string pattern)
+        => Assert.False(VmHelper.CheckIdOrName(Vm(100, null!), pattern));
+
+    [Theory]
     [InlineData("%web%", "my-web-01", true)]
     [InlineData("%WEB%", "my-web-01", true)]
     [InlineData("%web%", "db-01", false)]

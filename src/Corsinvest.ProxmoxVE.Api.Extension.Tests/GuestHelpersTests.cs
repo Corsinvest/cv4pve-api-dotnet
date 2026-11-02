@@ -63,6 +63,18 @@ public class GuestHelpersTests
         Assert.Equal(["a", "b"], snapshots.Where(a => a.Name != "current").Select(a => a.Name));
     }
 
+    [Theory]
+    [InlineData(VmType.Qemu, "/qemu/100/config")]
+    [InlineData(VmType.Lxc, "/lxc/100/config")]
+    public async Task Unlock_returns_the_result_of_the_refused_request(VmType vmType, string path)
+    {
+        _refused.Add(path);
+
+        var result = await _client.VmUnlockAsync("pve01", vmType, 100);
+
+        Assert.False(result.IsSuccessStatusCode);
+    }
+
     [Fact]
     public async Task Snapshot_of_a_vm_can_keep_the_memory_and_the_one_of_a_container_cannot()
     {
