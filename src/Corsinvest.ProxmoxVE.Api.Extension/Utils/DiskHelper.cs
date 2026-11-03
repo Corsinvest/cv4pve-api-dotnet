@@ -14,6 +14,16 @@ namespace Corsinvest.ProxmoxVE.Api.Extension.Utils;
 /// </summary>
 public static partial class DiskHelper
 {
+    private static readonly IReadOnlyDictionary<string, int> QemuBusLimits = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+    {
+        { "scsi", 31 },
+        { "virtio", 16 },
+        { "sata", 6 },
+        { "ide", 4 },
+    };
+
+    private const int LxcMountPointLimit = 256;
+
     [GeneratedRegex(@"^mp(?<index>\d+)$", RegexOptions.IgnoreCase)]
     private static partial Regex LxcSlotRegex();
 
@@ -27,9 +37,9 @@ public static partial class DiskHelper
     /// <param name="node">Node name.</param>
     /// <param name="vmType">VM type (Qemu or Lxc).</param>
     /// <param name="vmId">VM or Container ID.</param>
-    /// <param name="bus">Bus type to find free slot for. Defaults to "scsi".
+    /// <param name="bus">Bus type to find free slot for. Defaults to null, which selects "scsi" for QEMU and "mp" for LXC.
     /// For QEMU, valid buses are "scsi" (0..30), "virtio" (0..15), "sata" (0..5), and "ide" (0..3).
-    /// For LXC, valid bus is "mp" (0..255); "scsi" is also accepted as the default and mapped to "mp".</param>
+    /// For LXC, valid bus is "mp" (0..255).</param>
     /// <returns>First free slot identifier (e.g. "scsi0", "virtio1", "mp0").</returns>
     /// <exception cref="ArgumentException">Thrown when an invalid bus is requested.</exception>
     /// <exception cref="InvalidOperationException">Thrown when all available slots for the specified bus are occupied.</exception>
@@ -39,8 +49,15 @@ public static partial class DiskHelper
         string node,
         VmType vmType,
         long vmId,
-        string bus = "scsi")
+        string bus = null)
     {
+        bus ??= vmType switch
+        {
+            VmType.Qemu => "scsi",
+            VmType.Lxc => "mp",
+            _ => throw new InvalidEnumArgumentException(nameof(vmType), (int)vmType, typeof(VmType)),
+        };
+
         if (string.IsNullOrWhiteSpace(bus))
         {
             throw new ArgumentException("Bus cannot be null or empty.", nameof(bus));
@@ -52,26 +69,18 @@ public static partial class DiskHelper
         switch (vmType)
         {
             case VmType.Qemu:
-                maxSlots = normalizedBus switch
+                if (!QemuBusLimits.TryGetValue(normalizedBus, out maxSlots))
                 {
-                    "scsi" => 31,
-                    "virtio" => 16,
-                    "sata" => 6,
-                    "ide" => 4,
-                    _ => throw new ArgumentException($"Invalid bus '{bus}' for QEMU VM. Supported buses are scsi, virtio, sata, ide.", nameof(bus)),
-                };
+                    throw new ArgumentException($"Invalid bus '{bus}' for QEMU VM. Supported buses are scsi, virtio, sata, ide.", nameof(bus));
+                }
                 break;
 
             case VmType.Lxc:
-                if (normalizedBus == "scsi" || normalizedBus == "mp")
-                {
-                    normalizedBus = "mp";
-                    maxSlots = 256;
-                }
-                else
+                if (normalizedBus != "mp")
                 {
                     throw new ArgumentException($"Invalid bus '{bus}' for LXC container. Supported bus is mp.", nameof(bus));
                 }
+                maxSlots = LxcMountPointLimit;
                 break;
 
             default:
@@ -167,12 +176,7 @@ public static partial class DiskHelper
         slot = slot?.Trim();
         if (string.IsNullOrWhiteSpace(slot))
         {
-            slot = vmType switch
-            {
-                VmType.Qemu => await GetFreeSlotAsync(client, node, vmType, vmId, "scsi"),
-                VmType.Lxc => await GetFreeSlotAsync(client, node, vmType, vmId, "mp"),
-                _ => throw new InvalidEnumArgumentException(nameof(vmType), (int)vmType, typeof(VmType)),
-            };
+            slot = await GetFreeSlotAsync(client, node, vmType, vmId);
         }
 
         switch (vmType)
@@ -185,9 +189,9 @@ public static partial class DiskHelper
                 }
 
                 var match = LxcSlotRegex().Match(slot);
-                if (!match.Success || !int.TryParse(match.Groups["index"].Value, out var mpIdx) || mpIdx < 0 || mpIdx > 255)
+                if (!match.Success || !int.TryParse(match.Groups["index"].Value, out var mpIdx) || mpIdx < 0 || mpIdx >= LxcMountPointLimit)
                 {
-                    throw new ArgumentException($"Invalid mount point slot '{slot}'. Expected mpN (e.g. mp0..mp255).", nameof(slot));
+                    throw new ArgumentException($"Invalid mount point slot '{slot}'. Expected mpN (e.g. mp0..mp{LxcMountPointLimit - 1}).", nameof(slot));
                 }
 
                 var mpValue = $"{volume},mp={mountPath}";
@@ -210,14 +214,10 @@ public static partial class DiskHelper
 
                 var bus = match.Groups["bus"].Value.ToLowerInvariant();
                 var idx = int.Parse(match.Groups["index"].Value);
-                var maxSlots = bus switch
+                if (!QemuBusLimits.TryGetValue(bus, out var maxSlots))
                 {
-                    "scsi" => 31,
-                    "virtio" => 16,
-                    "sata" => 6,
-                    "ide" => 4,
-                    _ => throw new ArgumentException($"Invalid bus '{bus}'.", nameof(slot)),
-                };
+                    throw new ArgumentException($"Invalid bus '{bus}'.", nameof(slot));
+                }
 
                 if (idx < 0 || idx >= maxSlots)
                 {
@@ -282,16 +282,15 @@ public static partial class DiskHelper
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>DESTRUCTIVE OPERATION:</b> On Proxmox VE QEMU VMs, deleting an <c>unused[n]</c> configuration
-    /// entry triggers physical removal and permanent deletion of the underlying disk volume from storage.
-    /// On LXC containers, it removes the unused volume reference from the configuration.
+    /// <b>DESTRUCTIVE OPERATION:</b> On both Proxmox VE QEMU VMs and LXC containers, deleting an <c>unused[n]</c>
+    /// configuration entry triggers physical removal and permanent deletion of the underlying disk volume from storage.
     /// </para>
     /// </remarks>
     /// <param name="client">The Proxmox VE client.</param>
     /// <param name="node">Node name.</param>
     /// <param name="vmType">VM type (Qemu or Lxc).</param>
     /// <param name="vmId">VM or Container ID.</param>
-    /// <param name="volume">Volume identifier or file name to remove (e.g. "local-zfs:vm-100-disk-1" or "vm-100-disk-1").</param>
+    /// <param name="volume">Full volume identifier to remove (e.g. "local-zfs:vm-100-disk-1" or "local-lvm:subvol-200-disk-0").</param>
     /// <param name="digest">Optional configuration digest to prevent concurrent modifications.</param>
     /// <returns>Result of the removal operation.</returns>
     /// <exception cref="ArgumentException">Thrown when volume is null, empty, or cannot be found among unused disks.</exception>
@@ -317,7 +316,7 @@ public static partial class DiskHelper
         }
 
         var config = await client.GetVmConfigAsync(node, vmType, vmId);
-        var matched = config?.Disks?.FirstOrDefault(d => MatchUnusedDisk(d, volume));
+        var matched = config?.Disks?.FirstOrDefault(d => d.IsUnused && $"{d.Storage}:{d.FileName}" == volume);
 
         if (matched == null)
         {
@@ -332,64 +331,5 @@ public static partial class DiskHelper
             VmType.Lxc => await client.Nodes[node].Lxc[vmId].Config.UpdateVm(delete: slot, digest: digest),
             _ => throw new InvalidEnumArgumentException(nameof(vmType), (int)vmType, typeof(VmType)),
         };
-    }
-
-    private static bool MatchUnusedDisk(VmDisk disk, string volume)
-    {
-        if (!disk.IsUnused)
-        {
-            return false;
-        }
-
-        var target = volume.Trim();
-        if (!string.IsNullOrEmpty(disk.Storage) && !string.IsNullOrEmpty(disk.FileName))
-        {
-            var fullId = $"{disk.Storage}:{disk.FileName}";
-            if (string.Equals(fullId, target, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-        }
-
-        if (!string.IsNullOrEmpty(disk.FileName))
-        {
-            if (string.Equals(disk.FileName, target, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-
-            var lastSlash = disk.FileName.LastIndexOfAny(['/', '\\']);
-            if (lastSlash >= 0 && string.Equals(disk.FileName[(lastSlash + 1)..], target, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-        }
-
-        if (!string.IsNullOrEmpty(disk.RawDefinition))
-        {
-            var rawVol = disk.RawDefinition.Split(',')[0].Trim();
-            if (string.Equals(rawVol, target, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-
-            var colonIndex = rawVol.IndexOf(':');
-            if (colonIndex >= 0)
-            {
-                var rawFile = rawVol[(colonIndex + 1)..];
-                if (string.Equals(rawFile, target, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-
-                var rawLastSlash = rawFile.LastIndexOfAny(['/', '\\']);
-                if (rawLastSlash >= 0 && string.Equals(rawFile[(rawLastSlash + 1)..], target, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 }

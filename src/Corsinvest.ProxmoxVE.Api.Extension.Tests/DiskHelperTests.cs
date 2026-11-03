@@ -286,7 +286,7 @@ public class DiskHelperTests
     }
 
     [Fact]
-    public async Task GetFreeSlotAsync_Lxc_DefaultBusMapsToMp_AndFindsSlot()
+    public async Task GetFreeSlotAsync_Lxc_DefaultBusChoosesMp_AndFindsSlot()
     {
         var handler = new FakeHandler(req =>
         {
@@ -307,10 +307,19 @@ public class DiskHelperTests
         });
 
         var client = FakeHandler.Client(handler);
-        // Default bus is "scsi", which DiskHelper maps to "mp" for LXC
+        // Default bus is null, which DiskHelper chooses as "mp" for LXC
         var slot = await DiskHelper.GetFreeSlotAsync(client, "pve01", VmType.Lxc, 200);
 
         Assert.Equal("mp2", slot);
+    }
+
+    [Fact]
+    public async Task GetFreeSlotAsync_Lxc_ThrowsOnScsiBus()
+    {
+        var client = FakeHandler.Client(new FakeHandler(req => FakeHandler.Json(HttpStatusCode.OK, "{}")));
+        var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
+            DiskHelper.GetFreeSlotAsync(client, "pve01", VmType.Lxc, 200, bus: "scsi"));
+        Assert.Contains("Invalid bus 'scsi' for LXC container. Supported bus is mp.", ex.Message);
     }
 
     [Fact]
@@ -662,19 +671,19 @@ public class DiskHelperTests
     #region RemoveUnusedDiskAsync
 
     [Fact]
-    public async Task RemoveUnusedDiskAsync_Qemu_MatchesExactVolume_AndDoesNotMatchSubstring()
+    public async Task RemoveUnusedDiskAsync_Qemu_MatchesExactFullVolumeId_WhenMultipleStoragesHaveSameDiskName()
     {
         var handler = new FakeHandler(req =>
         {
             var path = req.RequestUri!.AbsolutePath;
             if (req.Method == HttpMethod.Get && path.EndsWith("/config"))
             {
-                // unused0 has vm-100-disk-10 (should NOT match vm-100-disk-1)
-                // unused1 has vm-100-disk-1 (exact match!)
+                // unused0 has local-lvm:vm-100-disk-1
+                // unused1 has ceph:vm-100-disk-1
                 return FakeHandler.Json(HttpStatusCode.OK, """
                     {"data":{
-                        "unused0":"local-zfs:vm-100-disk-10",
-                        "unused1":"local-zfs:vm-100-disk-1"
+                        "unused0":"local-lvm:vm-100-disk-1",
+                        "unused1":"ceph:vm-100-disk-1"
                     }}
                     """);
             }
@@ -689,9 +698,31 @@ public class DiskHelperTests
         });
 
         var client = FakeHandler.Client(handler);
-        var result = await DiskHelper.RemoveUnusedDiskAsync(client, "pve01", VmType.Qemu, 100, "vm-100-disk-1", digest: "digestPurge");
+        // Specifying full volume ID "ceph:vm-100-disk-1" targets unused1 precisely
+        var result = await DiskHelper.RemoveUnusedDiskAsync(client, "pve01", VmType.Qemu, 100, "ceph:vm-100-disk-1", digest: "digestPurge");
 
         Assert.True(result.IsSuccessStatusCode);
+    }
+
+    [Fact]
+    public async Task RemoveUnusedDiskAsync_ThrowsWhenBareNameProvidedWithoutStorage()
+    {
+        var handler = new FakeHandler(req =>
+        {
+            return FakeHandler.Json(HttpStatusCode.OK, """
+                {"data":{
+                    "unused0":"local-lvm:vm-100-disk-1",
+                    "unused1":"ceph:vm-100-disk-1"
+                }}
+                """);
+        });
+
+        var client = FakeHandler.Client(handler);
+        // Bare name without storage prefix must throw because names are only unique per storage
+        var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
+            DiskHelper.RemoveUnusedDiskAsync(client, "pve01", VmType.Qemu, 100, "vm-100-disk-1"));
+
+        Assert.Contains("Unused disk 'vm-100-disk-1' not found on Qemu 100", ex.Message);
     }
 
     [Fact]
@@ -737,9 +768,9 @@ public class DiskHelperTests
 
         var client = FakeHandler.Client(handler);
         var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
-            DiskHelper.RemoveUnusedDiskAsync(client, "pve01", VmType.Qemu, 100, "vm-100-disk-1"));
+            DiskHelper.RemoveUnusedDiskAsync(client, "pve01", VmType.Qemu, 100, "local-zfs:vm-100-disk-1"));
 
-        Assert.Contains("Unused disk 'vm-100-disk-1' not found on Qemu 100", ex.Message);
+        Assert.Contains("Unused disk 'local-zfs:vm-100-disk-1' not found on Qemu 100", ex.Message);
     }
 
     [Fact]
@@ -782,7 +813,7 @@ public class DiskHelperTests
         });
 
         var client = FakeHandler.Client(handler);
-        var result = await DiskHelper.RemoveUnusedDiskAsync(client, "pve01", VmType.Qemu, 100, "vm-100-disk-1.qcow2");
+        var result = await DiskHelper.RemoveUnusedDiskAsync(client, "pve01", VmType.Qemu, 100, "local:100/vm-100-disk-1.qcow2");
 
         Assert.True(result.IsSuccessStatusCode);
     }

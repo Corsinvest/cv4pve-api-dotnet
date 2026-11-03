@@ -161,7 +161,8 @@ using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 var vm = await client.GetVmAsync("web01");
 
 // Find the first free slot (scsi0..scsi30, virtio0..virtio15, sata0..sata5, ide0..ide3 for QEMU; mp0..mp255 for LXC)
-var slot = await DiskHelper.GetFreeSlotAsync(client, vm.Node, vm.VmType, vm.VmId, bus: "scsi");
+// The bus defaults to null (chosen automatically by guest type: scsi for QEMU, mp for LXC)
+var slot = await DiskHelper.GetFreeSlotAsync(client, vm.Node, vm.VmType, vm.VmId);
 
 // Attach an existing storage volume (slot is auto-assigned when omitted)
 await DiskHelper.AttachDiskAsync(client, vm.Node, vm.VmType, vm.VmId,
@@ -177,9 +178,11 @@ await DiskHelper.AttachDiskAsync(client, vm.Node, vm.VmType, vm.VmId,
 await DiskHelper.DetachDiskAsync(client, vm.Node, vm.VmType, vm.VmId, slot: "scsi1");
 
 // Remove an unused disk from the configuration
-// CAUTION: On QEMU VMs, deleting an unused[n] entry permanently deletes the volume from storage!
-await DiskHelper.RemoveUnusedDiskAsync(client, vm.Node, vm.VmType, vm.VmId, volume: "vm-100-disk-1");
+// CAUTION: On both QEMU VMs and LXC containers, deleting an unused[n] entry permanently deletes the volume from storage!
+await DiskHelper.RemoveUnusedDiskAsync(client, vm.Node, vm.VmType, vm.VmId, volume: "local-zfs:vm-100-disk-1");
 ```
+
+> On QEMU VMs, disk modification operations (`AttachDiskAsync`, `DetachDiskAsync`, `RemoveUnusedDiskAsync`) return a task UPID. The background task may still be running when the method returns: check it and read the exit status as in [Tasks](/cv4pve-api-dotnet/concepts/tasks/#did-it-succeed).
 
 ## Several nodes
 
