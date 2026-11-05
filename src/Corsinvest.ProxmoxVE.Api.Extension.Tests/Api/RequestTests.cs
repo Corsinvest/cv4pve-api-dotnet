@@ -260,4 +260,34 @@ public class RequestTests
         Assert.Contains("visible-comment", text);
         Assert.Contains("/nodes/pve01/qemu/100/vncwebsocket", text);
     }
+
+    [Fact]
+    public async Task Log_does_not_show_email_addresses()
+    {
+        var client = FakeHandler.Client(Ok("""{"data":{"email":"answer@corp.example","firstname":"Visible"}}"""));
+        var log = LogOf(client);
+
+        await client.SetAsync("/cluster/options", new Dictionary<string, object> { ["email_from"] = "from@corp.example" });
+        await client.SetAsync("/access/users/a@pve", new Dictionary<string, object> { ["email"] = "user@corp.example", ["comment"] = "visible-comment" });
+        await client.GetAsync("/access/users/a@pve");
+
+        var text = string.Join(Environment.NewLine, log.Lines);
+        Assert.DoesNotContain("corp.example", text);
+        Assert.Contains("visible-comment", text);
+        Assert.Contains("Visible", text);
+    }
+
+    [Fact]
+    public async Task Log_keeps_a_parameter_with_new_lines_on_its_own_line()
+    {
+        var client = FakeHandler.Client(Ok());
+        var log = LogOf(client);
+
+        await client.SetAsync("/nodes/pve01/qemu/100/config", new Dictionary<string, object> { ["description"] = "first\r\nInformation: forged line" });
+
+        var text = string.Join(Environment.NewLine, log.Lines);
+        Assert.DoesNotContain("first\r\nInformation", text);
+        Assert.DoesNotContain("first\nInformation", text);
+        Assert.Contains("description : first\\r\\nInformation: forged line", text);
+    }
 }
