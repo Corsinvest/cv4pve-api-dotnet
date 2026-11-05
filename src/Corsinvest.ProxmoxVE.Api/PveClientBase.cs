@@ -423,7 +423,7 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
                 _logger.LogDebug("Parameters: {parameters}", string.Join(Environment.NewLine, @params.Select(a =>
                     IsSensitive(a.Key)
                         ? $"{a.Key} : ****"
-                        : $"{a.Key} : {a.Value}")));
+                        : $"{a.Key} : {EscapeNewLines(a.Value + string.Empty)}")));
             }
         }
 
@@ -523,10 +523,13 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
         return LastResult;
     }
 
-    private static readonly string[] SensitiveNames = ["password", "token", "ticket", "otp", "apitoken", "tfa-challenge"];
+    private static readonly string[] SensitiveNames = ["password", "token", "ticket", "otp", "apitoken", "tfa-challenge", "email"];
 
     private static bool IsSensitive(string name)
         => SensitiveNames.Any(a => name.Contains(a, StringComparison.OrdinalIgnoreCase));
+
+    //a value with new lines would add lines of its own to the log
+    private static string EscapeNewLines(string value) => value.Replace("\r", "\\r").Replace("\n", "\\n");
 
     /// <summary>
     /// Answer as indented JSON for the log, without the secrets it carries: the ticket and the
