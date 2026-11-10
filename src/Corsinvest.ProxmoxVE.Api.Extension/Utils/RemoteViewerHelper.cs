@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Web;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Utils;
 
@@ -142,7 +143,7 @@ public static class RemoteViewerHelper
                                       string title,
                                       TextWriter? output = null)
     {
-        var bridge = new VncWebSocketBridge();
+        var bridge = new VncWebSocketBridge(client.LoggerFactory.CreateLogger<VncWebSocketBridge>());
         bridge.Start(wsUrl, client.Host, client.PVEAuthCookie, client.ValidateCertificate);
 
         var vvContent = $"""
