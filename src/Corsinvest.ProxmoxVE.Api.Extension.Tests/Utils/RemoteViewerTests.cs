@@ -213,6 +213,37 @@ public class RemoteViewerTests
         Assert.Contains("PVEAuthCookie=PVE:root@pam:TICKET", server.Requests.Single().Headers["Cookie"]);
     }
 
+    // a UI thread that is busy: what is posted to it never runs
+    private sealed class BlockedContext : SynchronizationContext
+    {
+        public override void Post(SendOrPostCallback d, object state) { }
+        public override void Send(SendOrPostCallback d, object state) { }
+    }
+
+    [Fact]
+    public async Task Bridge_started_from_a_busy_ui_thread_still_carries_the_session()
+    {
+        await using var server = VncServer();
+        await using var bridge = new VncWebSocketBridge();
+
+        // like cv4pve-vdi, that starts the bridge from a click handler
+        var previous = SynchronizationContext.Current;
+        SynchronizationContext.SetSynchronizationContext(new BlockedContext());
+        try
+        {
+            bridge.Start($"wss://127.0.0.1:{server.Port}/vncwebsocket", "127.0.0.1", "PVE:root@pam:TICKET");
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(previous);
+        }
+
+        using var viewer = new TcpClient();
+        await viewer.ConnectAsync(IPAddress.Loopback, bridge.LocalPort);
+        Assert.Equal("hello", await ExchangeAsync(viewer.GetStream(), "hello"));
+        Assert.Equal("second", await ExchangeAsync(viewer.GetStream(), "second"));
+    }
+
     [Fact]
     public async Task Node_that_closes_the_session_closes_the_viewer()
     {
@@ -240,9 +271,9 @@ public class RemoteViewerTests
         private readonly TaskCompletionSource<string> _problem = new(TaskCreationOptions.RunContinuationsAsynchronously);
         public ConcurrentQueue<(LogLevel Level, string Message)> Entries { get; } = new();
         public Task<string> Problem => _problem.Task.WaitAsync(TimeSpan.FromSeconds(30));
-        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+        public IDisposable BeginScope<TState>(TState state) where TState : notnull => null;
         public bool IsEnabled(LogLevel logLevel) => true;
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             var message = formatter(state, exception);
             Entries.Enqueue((logLevel, message));

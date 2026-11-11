@@ -54,9 +54,12 @@ public sealed class VncWebSocketBridge : IAsyncDisposable
     /// The node's certificate is checked when <paramref name="validateCertificate"/> is true: pass
     /// <c>PveClient.ValidateCertificate</c>, since the session cookie is sent on this connection too.
     /// Default false, the same default as <c>PveClient</c>.
+    /// The bridge runs on the thread pool: it does not depend on the context of the caller, such as a UI thread.
     /// </summary>
     public void Start(string wsUrl, string host, string pveAuthCookie, bool validateCertificate = false)
-        => _acceptLoop = AcceptLoopAsync(wsUrl, host, pveAuthCookie, validateCertificate, _cts.Token);
+        //without Task.Run every await of the relay would go back to the context of the caller:
+        //a busy or throttled UI thread would stop the session without an error or a close
+        => _acceptLoop = Task.Run(() => AcceptLoopAsync(wsUrl, host, pveAuthCookie, validateCertificate, _cts.Token));
 
     private async Task AcceptLoopAsync(string wsUrl,
                                        string host,
@@ -80,11 +83,11 @@ public sealed class VncWebSocketBridge : IAsyncDisposable
             ws.Options.KeepAliveTimeout = KeepAlive;
 #endif
 
-            await ws.ConnectAsync(new Uri(wsUrl), ct);
+            await ws.ConnectAsync(new Uri(wsUrl), ct).ConfigureAwait(false);
             _logger.LogDebug("VNC bridge: connected to the node, waiting for the viewer on port {Port}", LocalPort);
 
             //disposed before the websocket: the viewer sees the TCP close whenever the session is gone
-            using var tcp = await _listener.AcceptTcpClientAsync(ct);
+            using var tcp = await _listener.AcceptTcpClientAsync(ct).ConfigureAwait(false);
             tcp.NoDelay = true;
 
             //a single viewer per session: a second one is refused instead of hanging on a dead port
@@ -94,7 +97,7 @@ public sealed class VncWebSocketBridge : IAsyncDisposable
             //when either direction ends or fails, the other one is cancelled
             using var session = CancellationTokenSource.CreateLinkedTokenSource(ct);
             var stream = tcp.GetStream();
-            await Task.WhenAll(TcpToWsAsync(stream, ws, session), WsToTcpAsync(ws, stream, session));
+            await Task.WhenAll(TcpToWsAsync(stream, ws, session), WsToTcpAsync(ws, stream, session)).ConfigureAwait(false);
 
             _logger.LogDebug("VNC bridge: session ended");
         }
@@ -118,13 +121,13 @@ public sealed class VncWebSocketBridge : IAsyncDisposable
         try
         {
             int read;
-            while ((read = await src.ReadAsync(buf, session.Token)) > 0)
+            while ((read = await src.ReadAsync(buf, session.Token).ConfigureAwait(false)) > 0)
             {
-                await dst.SendAsync(buf.AsMemory(0, read), WebSocketMessageType.Binary, true, session.Token);
+                await dst.SendAsync(buf.AsMemory(0, read), WebSocketMessageType.Binary, true, session.Token).ConfigureAwait(false);
             }
 
             _logger.LogDebug("VNC bridge: the viewer closed the connection");
-            await CloseAsync(dst);
+            await CloseAsync(dst).ConfigureAwait(false);
         }
         catch (OperationCanceledException) when (session.IsCancellationRequested)
         {
@@ -147,16 +150,16 @@ public sealed class VncWebSocketBridge : IAsyncDisposable
         {
             while (true)
             {
-                var result = await src.ReceiveAsync(buf.AsMemory(), session.Token);
+                var result = await src.ReceiveAsync(buf.AsMemory(), session.Token).ConfigureAwait(false);
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
                     _logger.LogDebug("VNC bridge: the node closed the session ({Status} {Description})",
                                      src.CloseStatus,
                                      src.CloseStatusDescription);
-                    await CloseAsync(src);
+                    await CloseAsync(src).ConfigureAwait(false);
                     break;
                 }
-                await dst.WriteAsync(buf.AsMemory(0, result.Count), session.Token);
+                await dst.WriteAsync(buf.AsMemory(0, result.Count), session.Token).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException) when (session.IsCancellationRequested)
@@ -181,7 +184,7 @@ public sealed class VncWebSocketBridge : IAsyncDisposable
         using var timeout = new CancellationTokenSource(CloseTimeout);
         try
         {
-            await ws.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, timeout.Token);
+            await ws.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, timeout.Token).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
