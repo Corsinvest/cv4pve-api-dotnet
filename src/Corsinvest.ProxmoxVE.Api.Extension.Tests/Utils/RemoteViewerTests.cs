@@ -3,11 +3,13 @@
  * SPDX-License-Identifier: MIT
  */
 
+using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Corsinvest.ProxmoxVE.Api.Extension.Utils;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Tests.Utils;
@@ -227,6 +229,81 @@ public class RemoteViewerTests
         await stream.WriteAsync(Encoding.ASCII.GetBytes("bye"));
 
         Assert.Equal(0, await stream.ReadAsync(new byte[16]).AsTask().WaitAsync(TimeSpan.FromSeconds(10)));
+
+        // the session is over: a second viewer is refused instead of hanging on a port that nobody reads
+        await AssertRefusedAsync(bridge.LocalPort);
+    }
+
+    // what the bridge writes in the log; Problem completes with the first warning or error
+    private sealed class Logs : ILogger
+    {
+        private readonly TaskCompletionSource<string> _problem = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public ConcurrentQueue<(LogLevel Level, string Message)> Entries { get; } = new();
+        public Task<string> Problem => _problem.Task.WaitAsync(TimeSpan.FromSeconds(30));
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+        public bool IsEnabled(LogLevel logLevel) => true;
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        {
+            var message = formatter(state, exception);
+            Entries.Enqueue((logLevel, message));
+            if (logLevel >= LogLevel.Warning) { _problem.TrySetResult(message); }
+        }
+    }
+
+    private static async Task AssertRefusedAsync(int port)
+    {
+        using var viewer = new TcpClient();
+        await Assert.ThrowsAnyAsync<SocketException>(() => viewer.ConnectAsync(IPAddress.Loopback, port).WaitAsync(TimeSpan.FromSeconds(30)));
+    }
+
+    // a port where nothing listens
+    private static int ClosedPort()
+    {
+        var listener = new TcpListener(IPAddress.Loopback, 0);
+        listener.Start();
+        var port = ((IPEndPoint)listener.LocalEndpoint).Port;
+        listener.Stop();
+        return port;
+    }
+
+    [Fact]
+    public async Task Node_that_cannot_be_reached_logs_the_error_and_closes_the_local_port()
+    {
+        var logs = new Logs();
+        await using var bridge = new VncWebSocketBridge(logs);
+        bridge.Start($"wss://127.0.0.1:{ClosedPort()}/vncwebsocket", "127.0.0.1", "PVE:root@pam:TICKET");
+
+        Assert.StartsWith("VNC bridge: ", await logs.Problem);
+        Assert.Contains(logs.Entries, a => a.Level == LogLevel.Error);
+
+        // without this the viewer connects into the backlog, writes the handshake and nothing answers
+        await AssertRefusedAsync(bridge.LocalPort);
+    }
+
+    [Fact]
+    public async Task Node_that_drops_the_connection_logs_the_error_and_closes_the_viewer()
+    {
+        var logs = new Logs();
+        await using var server = new LocalPveServer
+        {
+            // the connection ends without the close of the websocket
+            Socket = async (socket, _, cancellationToken) =>
+            {
+                var message = (await LocalPveServer.ReceiveAsync(socket, cancellationToken))!;
+                await socket.SendAsync(message, System.Net.WebSockets.WebSocketMessageType.Binary, true, cancellationToken);
+                throw new IOException("node gone");
+            },
+        };
+        await using var bridge = new VncWebSocketBridge(logs);
+        bridge.Start($"wss://127.0.0.1:{server.Port}/vncwebsocket", "127.0.0.1", "PVE:root@pam:TICKET");
+
+        using var viewer = new TcpClient();
+        await viewer.ConnectAsync(IPAddress.Loopback, bridge.LocalPort);
+        var stream = viewer.GetStream();
+        Assert.Equal("hello", await ExchangeAsync(stream, "hello"));
+
+        Assert.Equal(0, await stream.ReadAsync(new byte[16]).AsTask().WaitAsync(TimeSpan.FromSeconds(10)));
+        Assert.StartsWith("VNC bridge: node to viewer stopped: ", await logs.Problem);
     }
 
     [Fact]
