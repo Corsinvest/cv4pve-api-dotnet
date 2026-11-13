@@ -7,6 +7,7 @@ using System.ComponentModel;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Utils;
 
@@ -299,4 +300,130 @@ public static class VmHelper
             default: throw new InvalidEnumArgumentException();
         }
     }
+
+    /// <summary>
+    /// Safely destroys a VM or LXC container.
+    /// If the guest is running, stops it first and waits for the stop task to complete to prevent disk locking contention.
+    /// Initiates destroy with purge and destroy-unreferenced-disks enabled by default, and awaits the destroy background task.
+    /// </summary>
+    /// <param name="client">The Proxmox VE client.</param>
+    /// <param name="node">Node name.</param>
+    /// <param name="vmType">VM type (Qemu or Lxc).</param>
+    /// <param name="vmId">VM or Container ID.</param>
+    /// <param name="stopIfRunning">Gracefully stop the guest before destroying if it is running. Default true.</param>
+    /// <param name="purge">Remove from backup jobs, replication, and HA. Default true.</param>
+    /// <param name="destroyUnreferencedDisks">Remove disks with matching VMID not referenced in config. Default true.</param>
+    /// <param name="skiplock">For QEMU: ignore locks. Default null.</param>
+    /// <param name="force">For LXC: force destroy. Default null.</param>
+    /// <param name="timeout">Timeout in milliseconds to wait for the destroy task. Default 300,000 (5 minutes). 0 to not wait.</param>
+    /// <param name="stopTimeout">Timeout in milliseconds to wait for the stop task if running. Default 120,000 (2 minutes).</param>
+    /// <param name="wait">Polling interval in milliseconds when awaiting tasks. Default 500.</param>
+    /// <returns>The Result of the destroy API operation.</returns>
+    public static async Task<Result> DestroyVmAsync(
+        PveClient client,
+        string node,
+        VmType vmType,
+        long vmId,
+        bool stopIfRunning = true,
+        bool purge = true,
+        bool destroyUnreferencedDisks = true,
+        bool? skiplock = null,
+        bool? force = null,
+        long timeout = 300000,
+        long stopTimeout = 120000,
+        int wait = 500)
+    {
+        ArgumentNullException.ThrowIfNull(client);
+        if (string.IsNullOrWhiteSpace(node)) { throw new ArgumentException("Node cannot be null or empty.", nameof(node)); }
+        if (vmId <= 0) { throw new ArgumentOutOfRangeException(nameof(vmId), "VM ID must be greater than zero."); }
+        if (vmType != VmType.Qemu && vmType != VmType.Lxc)
+        {
+            throw new InvalidEnumArgumentException(nameof(vmType), (int)vmType, typeof(VmType));
+        }
+
+        node = node.Trim();
+
+        // 1. If running and stopIfRunning is requested, stop and wait
+        if (stopIfRunning)
+        {
+            try
+            {
+                var status = await client.GetVmStatusAsync(node, vmType, vmId);
+                if (status != null && (status.IsRunning || status.IsPaused))
+                {
+                    var stopResult = await ChangeStatusVmAsync(client, node, vmType, vmId, VmStatus.Stop);
+                    if (stopResult.IsSuccessStatusCode)
+                    {
+                        var stopped = await client.WaitForTaskToFinishAsync(stopResult, wait, stopTimeout);
+                        if (!stopped)
+                        {
+                            throw new TimeoutException($"Timed out waiting {stopTimeout}ms for {vmType} {vmId} on node '{node}' to stop.");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) when (ex is not TimeoutException)
+            {
+                // If status check or stop fails, log warning and proceed to destroy attempt
+                var logger = client.LoggerFactory.CreateLogger(typeof(VmHelper));
+                logger.LogWarning(ex, "Could not verify stop status for {VmType} {VmId} before destroying.", vmType, vmId);
+            }
+        }
+
+        // 2. Issue destroy
+        var destroyResult = vmType switch
+        {
+            VmType.Qemu => await client.Nodes[node].Qemu[vmId].DestroyVm(
+                destroy_unreferenced_disks: destroyUnreferencedDisks,
+                purge: purge,
+                skiplock: skiplock),
+            VmType.Lxc => await client.Nodes[node].Lxc[vmId].DestroyVm(
+                destroy_unreferenced_disks: destroyUnreferencedDisks,
+                force: force,
+                purge: purge),
+            _ => throw new InvalidEnumArgumentException(nameof(vmType), (int)vmType, typeof(VmType)),
+        };
+
+        // 3. Await destroy task if requested
+        if (destroyResult.IsSuccessStatusCode && timeout > 0)
+        {
+            var finished = await client.WaitForTaskToFinishAsync(destroyResult, wait, timeout);
+            if (!finished)
+            {
+                throw new TimeoutException($"Timed out waiting {timeout}ms for destroy task of {vmType} {vmId} on node '{node}' to finish.");
+            }
+
+            // 4. Check destroy task log for warnings (e.g. unremoved disks)
+            var upid = GetTaskId(destroyResult);
+            if (!string.IsNullOrEmpty(upid))
+            {
+                try
+                {
+                    var logLines = await client.Nodes[node].Tasks[upid].Log.GetAsync();
+                    var logger = client.LoggerFactory.CreateLogger(typeof(VmHelper));
+                    foreach (var line in logLines)
+                    {
+                        if (line.Contains("could not remove disk", StringComparison.OrdinalIgnoreCase) ||
+                            line.Contains("unable to remove", StringComparison.OrdinalIgnoreCase))
+                        {
+                            logger.LogWarning("VM {VmId} destroy completed with warning: {Line}", vmId, line);
+                        }
+                    }
+                }
+                catch
+                {
+                    // Ignore task log read failures
+                }
+            }
+        }
+
+        return destroyResult;
+    }
+
+    private static string GetTaskId(Result result)
+        => result is { IsSuccessStatusCode: true, ResponseInError: false, ResponseHasData: true }
+           && result.ResponseToDictionary.TryGetValue("data", out var data)
+           && data is string task && task.StartsWith("UPID:")
+            ? task
+            : null;
 }

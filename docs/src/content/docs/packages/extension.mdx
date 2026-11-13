@@ -111,7 +111,8 @@ if (result.IsSuccessStatusCode)
 available for containers). The call returns the `Result` of the request, with the task to wait for.
 
 With node and type known, `GetVmStatusAsync` and `GetVmConfigAsync` return the status and the
-configuration of a VM or a container through one method, and `VmUnlockAsync` removes a lock:
+configuration of a VM or a container through one method, `VmUnlockAsync` removes a lock, and
+`DestroyVmAsync` safely deletes a guest:
 
 ```csharp
 foreach (var vm in await client.GetVmsAsync("@pool-customer1"))
@@ -120,6 +121,10 @@ foreach (var vm in await client.GetVmsAsync("@pool-customer1"))
     var config = await client.GetVmConfigAsync(vm.Node, vm.VmType, vm.VmId);
     Console.WriteLine($"{vm.VmId} {vm.Name} {current.Status} {config.Memory} MB");
 }
+
+// Safely destroy a VM or container: stops it if running (awaiting shutdown to release disk locks),
+// enables purge and destroy_unreferenced_disks, and awaits the destroy background task
+await client.DestroyVmAsync(vmId: 100);
 ```
 
 ## Snapshots
@@ -180,6 +185,22 @@ await DiskHelper.DetachDiskAsync(client, vm.Node, vm.VmType, vm.VmId, slot: "scs
 // Remove an unused disk from the configuration
 // CAUTION: On both QEMU VMs and LXC containers, deleting an unused[n] entry permanently deletes the volume from storage!
 await DiskHelper.RemoveUnusedDiskAsync(client, vm.Node, vm.VmType, vm.VmId, volume: "local-zfs:vm-100-disk-1");
+
+// Scan cluster storages for dangling/orphaned disk volumes whose VM no longer exists
+var orphans = await DiskHelper.GetOrphanedDisksAsync(client);
+foreach (var orphan in orphans)
+{
+    Console.WriteLine($"Orphaned {orphan.Volume} ({orphan.SizeInfo}) on {orphan.Storage} (VMID {orphan.VmId})");
+}
+
+// Safely remove a specific orphaned disk volume from physical storage
+await DiskHelper.RemoveOrphanedDiskAsync(client, "pve01", "local-zfs", "local-zfs:vm-999-disk-0");
+
+// Purge all orphaned disks across storages (dryRun: true by default to preview safely)
+var preview = await DiskHelper.PurgeOrphanedDisksAsync(client, dryRun: true);
+
+// Execute cleanup when ready
+var results = await DiskHelper.PurgeOrphanedDisksAsync(client, dryRun: false);
 ```
 
 > On QEMU VMs, disk modification operations (`AttachDiskAsync`, `DetachDiskAsync`, `RemoveUnusedDiskAsync`) return a task UPID. The background task may still be running when the method returns: check it and read the exit status as in [Tasks](/cv4pve-api-dotnet/concepts/tasks/#did-it-succeed).
