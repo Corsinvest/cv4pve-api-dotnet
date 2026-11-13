@@ -370,6 +370,45 @@ public static class ClientExtension
         };
 
     /// <summary>
+    /// Safely destroys a VM or LXC container, stopping it first if running, purging resources and unreferenced disks.
+    /// </summary>
+    public static Task<Result> DestroyVmAsync(this PveClient client,
+                                             string node,
+                                             VmType vmType,
+                                             long vmId,
+                                             bool stopIfRunning = true,
+                                             bool purge = true,
+                                             bool destroyUnreferencedDisks = true,
+                                             bool? skiplock = null,
+                                             bool? force = null,
+                                             long timeout = 300000,
+                                             long stopTimeout = 120000,
+                                             int wait = 500)
+        => VmHelper.DestroyVmAsync(client, node, vmType, vmId, stopIfRunning, purge, destroyUnreferencedDisks, skiplock, force, timeout, stopTimeout, wait);
+
+    /// <summary>
+    /// Safely destroys a VM or LXC container by looking up its node and guest type automatically from cluster resources.
+    /// </summary>
+    public static async Task<Result> DestroyVmAsync(this PveClient client,
+                                                   long vmId,
+                                                   bool stopIfRunning = true,
+                                                   bool purge = true,
+                                                   bool destroyUnreferencedDisks = true,
+                                                   bool? skiplock = null,
+                                                   bool? force = null,
+                                                   long timeout = 300000,
+                                                   long stopTimeout = 120000,
+                                                   int wait = 500)
+    {
+        var vm = await client.GetVmAsync(vmId);
+        if (vm == null)
+        {
+            throw new ArgumentException($"VM or Container ID {vmId} not found in cluster resources.", nameof(vmId));
+        }
+        return await VmHelper.DestroyVmAsync(client, vm.Node, vm.VmType, vmId, stopIfRunning, purge, destroyUnreferencedDisks, skiplock, force, timeout, stopTimeout, wait);
+    }
+
+    /// <summary>
     /// Get Vm RrdData
     /// </summary>
     public static async Task<IEnumerable<VmRrdData>> GetVmRrdDataAsync(this PveClient client,
