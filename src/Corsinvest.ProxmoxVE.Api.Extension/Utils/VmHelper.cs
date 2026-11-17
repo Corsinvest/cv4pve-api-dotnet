@@ -304,15 +304,15 @@ public static class VmHelper
     /// <summary>
     /// Safely destroys a VM or LXC container.
     /// If the guest is running, stops it first and waits for the stop task to complete to prevent disk locking contention.
-    /// Initiates destroy with purge and destroy-unreferenced-disks enabled by default, and awaits the destroy background task.
+    /// Awaits the destroy background task and checks its exit status.
     /// </summary>
     /// <param name="client">The Proxmox VE client.</param>
     /// <param name="node">Node name.</param>
     /// <param name="vmType">VM type (Qemu or Lxc).</param>
     /// <param name="vmId">VM or Container ID.</param>
     /// <param name="stopIfRunning">Gracefully stop the guest before destroying if it is running. Default true.</param>
-    /// <param name="purge">Remove from backup jobs, replication, and HA. Default true.</param>
-    /// <param name="destroyUnreferencedDisks">Remove disks with matching VMID not referenced in config. Default true.</param>
+    /// <param name="purge">Remove from backup jobs, replication, and HA. Default false.</param>
+    /// <param name="destroyUnreferencedDisks">Remove disks with matching VMID not referenced in config. Default false.</param>
     /// <param name="skiplock">For QEMU: ignore locks. Default null.</param>
     /// <param name="force">For LXC: force destroy. Default null.</param>
     /// <param name="timeout">Timeout in milliseconds to wait for the destroy task. Default 300,000 (5 minutes). 0 to not wait.</param>
@@ -325,8 +325,8 @@ public static class VmHelper
         VmType vmType,
         long vmId,
         bool stopIfRunning = true,
-        bool purge = true,
-        bool destroyUnreferencedDisks = true,
+        bool purge = false,
+        bool destroyUnreferencedDisks = false,
         bool? skiplock = null,
         bool? force = null,
         long timeout = 300000,
@@ -343,34 +343,35 @@ public static class VmHelper
 
         node = node.Trim();
 
-        // 1. If running and stopIfRunning is requested, stop and wait
         if (stopIfRunning)
         {
-            try
+            var status = await client.GetVmStatusAsync(node, vmType, vmId);
+            if (status != null && (status.IsRunning || status.IsPaused))
             {
-                var status = await client.GetVmStatusAsync(node, vmType, vmId);
-                if (status != null && (status.IsRunning || status.IsPaused))
+                var stopResult = await ChangeStatusVmAsync(client, node, vmType, vmId, VmStatus.Stop);
+                if (!stopResult.IsSuccessStatusCode)
                 {
-                    var stopResult = await ChangeStatusVmAsync(client, node, vmType, vmId, VmStatus.Stop);
-                    if (stopResult.IsSuccessStatusCode)
+                    return stopResult;
+                }
+
+                var stopUpid = PveClientBase.GetTaskFromResult(stopResult);
+                var stopped = await client.WaitForTaskToFinishAsync(stopResult, wait, stopTimeout);
+                if (!stopped)
+                {
+                    throw new TimeoutException($"Timed out waiting {stopTimeout}ms for {vmType} {vmId} on node '{node}' to stop.");
+                }
+
+                if (!string.IsNullOrEmpty(stopUpid))
+                {
+                    var stopExitStatus = await client.GetExitStatusTaskAsync(stopUpid);
+                    if (!string.Equals(stopExitStatus, "OK", StringComparison.OrdinalIgnoreCase))
                     {
-                        var stopped = await client.WaitForTaskToFinishAsync(stopResult, wait, stopTimeout);
-                        if (!stopped)
-                        {
-                            throw new TimeoutException($"Timed out waiting {stopTimeout}ms for {vmType} {vmId} on node '{node}' to stop.");
-                        }
+                        throw new PveResultException(stopResult, $"Stop task for {vmType} {vmId} failed with exit status: {stopExitStatus}");
                     }
                 }
             }
-            catch (Exception ex) when (ex is not TimeoutException)
-            {
-                // If status check or stop fails, log warning and proceed to destroy attempt
-                var logger = client.LoggerFactory.CreateLogger(typeof(VmHelper));
-                logger.LogWarning(ex, "Could not verify stop status for {VmType} {VmId} before destroying.", vmType, vmId);
-            }
         }
 
-        // 2. Issue destroy
         var destroyResult = vmType switch
         {
             VmType.Qemu => await client.Nodes[node].Qemu[vmId].DestroyVm(
@@ -384,7 +385,6 @@ public static class VmHelper
             _ => throw new InvalidEnumArgumentException(nameof(vmType), (int)vmType, typeof(VmType)),
         };
 
-        // 3. Await destroy task if requested
         if (destroyResult.IsSuccessStatusCode && timeout > 0)
         {
             var finished = await client.WaitForTaskToFinishAsync(destroyResult, wait, timeout);
@@ -393,10 +393,16 @@ public static class VmHelper
                 throw new TimeoutException($"Timed out waiting {timeout}ms for destroy task of {vmType} {vmId} on node '{node}' to finish.");
             }
 
-            // 4. Check destroy task log for warnings (e.g. unremoved disks)
-            var upid = GetTaskId(destroyResult);
+            var upid = PveClientBase.GetTaskFromResult(destroyResult);
             if (!string.IsNullOrEmpty(upid))
             {
+                var exitStatus = await client.GetExitStatusTaskAsync(upid);
+                if (!string.Equals(exitStatus, "OK", StringComparison.OrdinalIgnoreCase) &&
+                    !(exitStatus?.StartsWith("WARNINGS", StringComparison.OrdinalIgnoreCase) ?? false))
+                {
+                    throw new PveResultException(destroyResult, $"Destroy task for {vmType} {vmId} failed with exit status: {exitStatus}");
+                }
+
                 try
                 {
                     var logLines = await client.Nodes[node].Tasks[upid].Log.GetAsync();
@@ -419,11 +425,4 @@ public static class VmHelper
 
         return destroyResult;
     }
-
-    private static string GetTaskId(Result result)
-        => result is { IsSuccessStatusCode: true, ResponseInError: false, ResponseHasData: true }
-           && result.ResponseToDictionary.TryGetValue("data", out var data)
-           && data is string task && task.StartsWith("UPID:")
-            ? task
-            : null;
 }

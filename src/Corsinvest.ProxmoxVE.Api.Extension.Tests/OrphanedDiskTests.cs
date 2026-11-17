@@ -5,7 +5,6 @@
 
 using System.Net;
 using Corsinvest.ProxmoxVE.Api.Extension.Utils;
-using Corsinvest.ProxmoxVE.Api.Shared.Models.Storage;
 using Xunit;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Tests;
@@ -113,13 +112,20 @@ public class OrphanedDiskTests
     }
 
     [Fact]
-    public async Task GetOrphanedDisksAsync_SkipsTemplateBaseDisk_WhenReferencedAsParent()
+    public async Task GetOrphanedDisksAsync_UnknownVmOnOfflineNode_IsCountedAsActive_DiskNotOrphaned()
     {
-        const string templateStorageContentJson = """
+        const string unknownVmsJson = """
         {
             "data": [
-                { "volid": "local-lvm:base-777-disk-0", "vmid": 777, "content": "images", "format": "raw", "size": 10737418240 },
-                { "volid": "local-lvm:vm-100-disk-1", "vmid": 100, "content": "images", "format": "raw", "size": 10737418240, "parent": "local-lvm:base-777-disk-0" }
+                { "type": "qemu", "vmid": 500, "node": "pve02", "name": "offline-node-vm", "status": "unknown" }
+            ]
+        }
+        """;
+
+        const string sharedStorageContentJson = """
+        {
+            "data": [
+                { "volid": "local-lvm:vm-500-disk-0", "vmid": 500, "content": "images", "format": "raw", "size": 10737418240 }
             ]
         }
         """;
@@ -134,17 +140,67 @@ public class OrphanedDiskTests
                 {
                     return FakeHandler.Json(HttpStatusCode.OK, ClusterNodesJson);
                 }
-                return FakeHandler.Json(HttpStatusCode.OK, ClusterVmsJson);
+                return FakeHandler.Json(HttpStatusCode.OK, unknownVmsJson);
             }
             if (path.EndsWith("/storage")) { return FakeHandler.Json(HttpStatusCode.OK, NodeStoragesJson); }
-            if (path.EndsWith("/content")) { return FakeHandler.Json(HttpStatusCode.OK, templateStorageContentJson); }
+            if (path.EndsWith("/content")) { return FakeHandler.Json(HttpStatusCode.OK, sharedStorageContentJson); }
             return FakeHandler.Json(HttpStatusCode.NotFound, "{}");
         });
 
         var client = FakeHandler.Client(handler);
         var orphans = await DiskHelper.GetOrphanedDisksAsync(client);
 
-        // Base disk 777 is parent of active VM 100's linked clone, so it must not be treated as orphan
+        // VM 500 is unknown on offline node pve02, but must count as active so its disk is not reported as orphan
+        Assert.Empty(orphans);
+    }
+
+    [Fact]
+    public async Task GetOrphanedDisksAsync_CrossStorage_BaseImageProtectedByLinkedCloneOnAnotherStorage()
+    {
+        const string twoStoragesJson = """
+        {
+            "data": [
+                { "storage": "local-zfs", "active": 1, "content": "images", "enabled": 1 },
+                { "storage": "ceph", "active": 1, "content": "images", "enabled": 1 }
+            ]
+        }
+        """;
+
+        const string localZfsContentJson = """
+        {
+            "data": [
+                { "volid": "local-zfs:base-777-disk-0", "vmid": 777, "content": "images", "format": "raw", "size": 10737418240 }
+            ]
+        }
+        """;
+
+        const string cephContentJson = """
+        {
+            "data": [
+                { "volid": "ceph:vm-100-disk-1", "vmid": 100, "content": "images", "format": "raw", "size": 10737418240, "parent": "local-zfs:base-777-disk-0" }
+            ]
+        }
+        """;
+
+        var handler = new FakeHandler(req =>
+        {
+            var path = req.RequestUri!.AbsolutePath;
+            var query = req.RequestUri.Query;
+            if (path.Contains("/cluster/resources"))
+            {
+                if (query.Contains("type=node")) { return FakeHandler.Json(HttpStatusCode.OK, ClusterNodesJson); }
+                return FakeHandler.Json(HttpStatusCode.OK, ClusterVmsJson);
+            }
+            if (path.EndsWith("/storage")) { return FakeHandler.Json(HttpStatusCode.OK, twoStoragesJson); }
+            if (path.Contains("/storage/local-zfs/content")) { return FakeHandler.Json(HttpStatusCode.OK, localZfsContentJson); }
+            if (path.Contains("/storage/ceph/content")) { return FakeHandler.Json(HttpStatusCode.OK, cephContentJson); }
+            return FakeHandler.Json(HttpStatusCode.NotFound, "{}");
+        });
+
+        var client = FakeHandler.Client(handler);
+        var orphans = await DiskHelper.GetOrphanedDisksAsync(client);
+
+        // Base disk 777 on local-zfs is protected by clone on ceph across different storages
         Assert.Empty(orphans);
     }
 

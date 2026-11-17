@@ -123,8 +123,8 @@ foreach (var vm in await client.GetVmsAsync("@pool-customer1"))
 }
 
 // Safely destroy a VM or container: stops it if running (awaiting shutdown to release disk locks),
-// enables purge and destroy_unreferenced_disks, and awaits the destroy background task
-await client.DestroyVmAsync(vmId: 100);
+// and awaits the destroy background task
+await VmHelper.DestroyVmAsync(client, vm.Node, vm.VmType, vm.VmId);
 ```
 
 ## Snapshots

@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-#nullable enable
-
 using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 
 namespace Corsinvest.ProxmoxVE.Api.Shared.Models.Storage;
@@ -62,5 +60,5 @@ public class OrphanedDisk : ModelBase
     /// <summary>
     /// Parent volume identifier if this volume is a linked clone.
     /// </summary>
-    public string? Parent { get; set; }
+    public string Parent { get; set; }
 }

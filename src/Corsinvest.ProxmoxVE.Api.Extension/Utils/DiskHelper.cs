@@ -33,7 +33,7 @@ public static partial class DiskHelper
     [GeneratedRegex(@"^(?<bus>scsi|virtio|sata|ide)(?<index>\d+)$", RegexOptions.IgnoreCase)]
     private static partial Regex QemuSlotRegex();
 
-    [GeneratedRegex(@"^(?:vm|subvol)-(?<vmid>\d+)-disk-", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"^(?:vm|subvol|base)-(?<vmid>\d+)-disk-", RegexOptions.IgnoreCase)]
     private static partial Regex VmDiskVolumeRegex();
 
     /// <summary>
@@ -188,60 +188,60 @@ public static partial class DiskHelper
         switch (vmType)
         {
             case VmType.Lxc:
+            {
+                if (string.IsNullOrWhiteSpace(mountPath))
                 {
-                    if (string.IsNullOrWhiteSpace(mountPath))
-                    {
-                        throw new ArgumentException("Mount path is required when attaching a disk to an LXC container.", nameof(mountPath));
-                    }
-
-                    var match = LxcSlotRegex().Match(slot);
-                    if (!match.Success || !int.TryParse(match.Groups["index"].Value, out var mpIdx) || mpIdx < 0 || mpIdx >= LxcMountPointLimit)
-                    {
-                        throw new ArgumentException($"Invalid mount point slot '{slot}'. Expected mpN (e.g. mp0..mp{LxcMountPointLimit - 1}).", nameof(slot));
-                    }
-
-                    var mpValue = $"{volume},mp={mountPath}";
-                    if (!string.IsNullOrWhiteSpace(options))
-                    {
-                        mpValue += $",{options}";
-                    }
-
-                    var mpN = new Dictionary<int, string> { { mpIdx, mpValue } };
-                    return await client.Nodes[node].Lxc[vmId].Config.UpdateVm(mpN: mpN, digest: digest);
+                    throw new ArgumentException("Mount path is required when attaching a disk to an LXC container.", nameof(mountPath));
                 }
+
+                var match = LxcSlotRegex().Match(slot);
+                if (!match.Success || !int.TryParse(match.Groups["index"].Value, out var mpIdx) || mpIdx < 0 || mpIdx >= LxcMountPointLimit)
+                {
+                    throw new ArgumentException($"Invalid mount point slot '{slot}'. Expected mpN (e.g. mp0..mp{LxcMountPointLimit - 1}).", nameof(slot));
+                }
+
+                var mpValue = $"{volume},mp={mountPath}";
+                if (!string.IsNullOrWhiteSpace(options))
+                {
+                    mpValue += $",{options}";
+                }
+
+                var mpN = new Dictionary<int, string> { { mpIdx, mpValue } };
+                return await client.Nodes[node].Lxc[vmId].Config.UpdateVm(mpN: mpN, digest: digest);
+            }
 
             case VmType.Qemu:
+            {
+                var match = QemuSlotRegex().Match(slot);
+                if (!match.Success)
                 {
-                    var match = QemuSlotRegex().Match(slot);
-                    if (!match.Success)
-                    {
-                        throw new ArgumentException($"Invalid bus slot '{slot}'. Expected scsiN, virtioN, sataN, or ideN.", nameof(slot));
-                    }
-
-                    var bus = match.Groups["bus"].Value.ToLowerInvariant();
-                    var idx = int.Parse(match.Groups["index"].Value);
-                    if (!QemuBusLimits.TryGetValue(bus, out var maxSlots))
-                    {
-                        throw new ArgumentException($"Invalid bus '{bus}'.", nameof(slot));
-                    }
-
-                    if (idx < 0 || idx >= maxSlots)
-                    {
-                        throw new ArgumentException($"Slot index {idx} exceeds maximum allowed slots for bus '{bus}' (0..{maxSlots - 1}).", nameof(slot));
-                    }
-
-                    var diskValue = string.IsNullOrWhiteSpace(options) ? volume : $"{volume},{options}";
-                    var diskDict = new Dictionary<int, string> { { idx, diskValue } };
-
-                    return bus switch
-                    {
-                        "scsi" => await client.Nodes[node].Qemu[vmId].Config.UpdateVmAsync(scsiN: diskDict, digest: digest),
-                        "virtio" => await client.Nodes[node].Qemu[vmId].Config.UpdateVmAsync(virtioN: diskDict, digest: digest),
-                        "sata" => await client.Nodes[node].Qemu[vmId].Config.UpdateVmAsync(sataN: diskDict, digest: digest),
-                        "ide" => await client.Nodes[node].Qemu[vmId].Config.UpdateVmAsync(ideN: diskDict, digest: digest),
-                        _ => throw new ArgumentException($"Unsupported bus '{bus}'.", nameof(slot)),
-                    };
+                    throw new ArgumentException($"Invalid bus slot '{slot}'. Expected scsiN, virtioN, sataN, or ideN.", nameof(slot));
                 }
+
+                var bus = match.Groups["bus"].Value.ToLowerInvariant();
+                var idx = int.Parse(match.Groups["index"].Value);
+                if (!QemuBusLimits.TryGetValue(bus, out var maxSlots))
+                {
+                    throw new ArgumentException($"Invalid bus '{bus}'.", nameof(slot));
+                }
+
+                if (idx < 0 || idx >= maxSlots)
+                {
+                    throw new ArgumentException($"Slot index {idx} exceeds maximum allowed slots for bus '{bus}' (0..{maxSlots - 1}).", nameof(slot));
+                }
+
+                var diskValue = string.IsNullOrWhiteSpace(options) ? volume : $"{volume},{options}";
+                var diskDict = new Dictionary<int, string> { { idx, diskValue } };
+
+                return bus switch
+                {
+                    "scsi" => await client.Nodes[node].Qemu[vmId].Config.UpdateVmAsync(scsiN: diskDict, digest: digest),
+                    "virtio" => await client.Nodes[node].Qemu[vmId].Config.UpdateVmAsync(virtioN: diskDict, digest: digest),
+                    "sata" => await client.Nodes[node].Qemu[vmId].Config.UpdateVmAsync(sataN: diskDict, digest: digest),
+                    "ide" => await client.Nodes[node].Qemu[vmId].Config.UpdateVmAsync(ideN: diskDict, digest: digest),
+                    _ => throw new ArgumentException($"Unsupported bus '{bus}'.", nameof(slot)),
+                };
+            }
 
             default:
                 throw new InvalidEnumArgumentException(nameof(vmType), (int)vmType, typeof(VmType));
@@ -355,7 +355,7 @@ public static partial class DiskHelper
         ArgumentNullException.ThrowIfNull(client);
 
         var vms = await client.GetResourcesAsync(ClusterResourceType.Vm);
-        var activeVmIds = vms.Where(v => !v.IsUnknown).Select(v => v.VmId).ToHashSet();
+        var activeVmIds = vms.Select(v => v.VmId).ToHashSet();
 
         IEnumerable<string> targetNodes;
         if (!string.IsNullOrWhiteSpace(node))
@@ -368,8 +368,7 @@ public static partial class DiskHelper
             targetNodes = clusterNodes.Where(n => n.IsOnline).Select(n => n.Node);
         }
 
-        var orphanedDisks = new List<OrphanedDisk>();
-        var seenVolumes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var allStorageContents = new List<(string Node, string Storage, NodeStorageContent Content)>();
 
         foreach (var currentNode in targetNodes)
         {
@@ -392,73 +391,74 @@ public static partial class DiskHelper
 
             foreach (var currentStorage in targetStorages)
             {
-                IEnumerable<NodeStorageContent> contents;
-                try
-                {
-                    contents = await client.Nodes[currentNode].Storage[currentStorage].Content.GetAsync();
-                }
-                catch
-                {
-                    continue;
-                }
-
+                var contents = await client.Nodes[currentNode].Storage[currentStorage].Content.GetAsync();
                 if (contents == null) { continue; }
 
-                var contentList = contents.ToList();
-                var parentVolumes = contentList
-                    .Where(c => !string.IsNullOrEmpty(c.Parent))
-                    .Select(c => c.Parent)
-                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-                foreach (var item in contentList)
+                foreach (var item in contents)
                 {
-                    // Only examine VM/CT disks (images or rootdir)
-                    if (string.IsNullOrEmpty(item.Content) ||
-                        (!item.Content.Equals("images", StringComparison.OrdinalIgnoreCase) &&
-                         !item.Content.Equals("rootdir", StringComparison.OrdinalIgnoreCase)))
+                    if (item != null)
                     {
-                        continue;
+                        allStorageContents.Add((currentNode, currentStorage, item));
                     }
-
-                    if (string.IsNullOrEmpty(item.Volume) || !seenVolumes.Add(item.Volume))
-                    {
-                        continue;
-                    }
-
-                    // Determine VMID
-                    long vmid = item.VmId;
-                    if (vmid <= 0)
-                    {
-                        var fileName = item.FileName ?? (item.Volume.Contains(':') ? item.Volume.Split(':')[1] : item.Volume);
-                        var match = VmDiskVolumeRegex().Match(fileName);
-                        if (match.Success && long.TryParse(match.Groups["vmid"].Value, out var parsedId))
-                        {
-                            vmid = parsedId;
-                        }
-                    }
-
-                    if (vmid <= 0) { continue; }
-
-                    // Check if VMID exists in active cluster resources
-                    if (activeVmIds.Contains(vmid)) { continue; }
-
-                    // Safety: if this volume is referenced as Parent by any clone, do not treat as orphan
-                    if (parentVolumes.Contains(item.Volume)) { continue; }
-
-                    orphanedDisks.Add(new OrphanedDisk
-                    {
-                        Storage = currentStorage,
-                        Volume = item.Volume,
-                        FileName = item.FileName ?? (item.Volume.Contains(':') ? item.Volume.Split(':')[1] : item.Volume),
-                        VmId = vmid,
-                        Content = item.Content,
-                        Format = item.Format ?? string.Empty,
-                        Size = item.Size,
-                        Node = currentNode,
-                        Parent = item.Parent,
-                    });
                 }
             }
+        }
+
+        var allParentVolumes = allStorageContents
+            .Where(c => !string.IsNullOrEmpty(c.Content.Parent))
+            .Select(c => c.Content.Parent)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var orphanedDisks = new List<OrphanedDisk>();
+        var seenVolumes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var (currentNode, currentStorage, item) in allStorageContents)
+        {
+            // Only examine VM/CT disks (images or rootdir)
+            if (string.IsNullOrEmpty(item.Content) ||
+                (!item.Content.Equals("images", StringComparison.OrdinalIgnoreCase) &&
+                 !item.Content.Equals("rootdir", StringComparison.OrdinalIgnoreCase)))
+            {
+                continue;
+            }
+
+            if (string.IsNullOrEmpty(item.Volume) || !seenVolumes.Add(item.Volume))
+            {
+                continue;
+            }
+
+            // Determine VMID
+            long vmid = item.VmId;
+            if (vmid <= 0)
+            {
+                var fileName = item.FileName ?? (item.Volume.Contains(':') ? item.Volume.Split(':')[1] : item.Volume);
+                var match = VmDiskVolumeRegex().Match(fileName);
+                if (match.Success && long.TryParse(match.Groups["vmid"].Value, out var parsedId))
+                {
+                    vmid = parsedId;
+                }
+            }
+
+            if (vmid <= 0) { continue; }
+
+            // Check if VMID exists in active cluster resources
+            if (activeVmIds.Contains(vmid)) { continue; }
+
+            // Safety: if this volume is referenced as Parent by any clone across any storage, do not treat as orphan
+            if (allParentVolumes.Contains(item.Volume)) { continue; }
+
+            orphanedDisks.Add(new OrphanedDisk
+            {
+                Storage = currentStorage,
+                Volume = item.Volume,
+                FileName = item.FileName ?? (item.Volume.Contains(':') ? item.Volume.Split(':')[1] : item.Volume),
+                VmId = vmid,
+                Content = item.Content,
+                Format = item.Format ?? string.Empty,
+                Size = item.Size,
+                Node = currentNode,
+                Parent = item.Parent,
+            });
         }
 
         return orphanedDisks;
