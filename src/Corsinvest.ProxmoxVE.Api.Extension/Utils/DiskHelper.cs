@@ -5,6 +5,8 @@
 
 using System.ComponentModel;
 using System.Text.RegularExpressions;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Storage;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 
 namespace Corsinvest.ProxmoxVE.Api.Extension.Utils;
@@ -29,6 +31,9 @@ public static partial class DiskHelper
 
     [GeneratedRegex(@"^(?<bus>scsi|virtio|sata|ide)(?<index>\d+)$", RegexOptions.IgnoreCase)]
     private static partial Regex QemuSlotRegex();
+
+    [GeneratedRegex(@"^(?:vm|subvol|base)-(?<vmid>\d+)-disk-", RegexOptions.IgnoreCase)]
+    private static partial Regex VmDiskVolumeRegex();
 
     /// <summary>
     /// Finds the first free disk slot or mount point for a VM or LXC container, checking both current and pending configurations.
@@ -331,5 +336,160 @@ public static partial class DiskHelper
             VmType.Lxc => await client.Nodes[node].Lxc[vmId].Config.UpdateVm(delete: slot, digest: digest),
             _ => throw new InvalidEnumArgumentException(nameof(vmType), (int)vmType, typeof(VmType)),
         };
+    }
+
+    /// <summary>
+    /// Scans storages for orphaned or dangling VM and container disk volumes whose VM/CT ID
+    /// no longer exists in the Proxmox VE cluster.
+    /// </summary>
+    /// <remarks>
+    /// Every guest listed in the cluster resources counts as existing, whatever its status: a guest on an
+    /// offline node is reported as unknown but still owns its disks.
+    /// A base volume that still has linked clones is never reported.
+    /// The account needs VM.Audit on /vms: guests it cannot audit are filtered out of the cluster resources
+    /// without an error, so their disks would look orphaned.
+    /// </remarks>
+    /// <param name="client">The Proxmox VE client.</param>
+    /// <param name="node">Optional node name to limit scanning. If null, scans every node.</param>
+    /// <param name="storage">Optional storage identifier to limit scanning. If null, scans all available storages holding disk images or container volumes.</param>
+    /// <returns>A read-only list of orphaned disk volumes.</returns>
+    /// <exception cref="InvalidOperationException">The account lacks VM.Audit on /vms.</exception>
+    /// <exception cref="PveResultException">A storage content cannot be read.</exception>
+    public static async Task<IReadOnlyList<OrphanedDisk>> GetOrphanedDisksAsync(
+        PveClient client,
+        string node = null,
+        string storage = null)
+    {
+        ArgumentNullException.ThrowIfNull(client);
+
+        var permissions = await client.Access.Permissions.GetPermissionsAsync("/vms");
+        if (!permissions.TryGetValue("/vms", out var privileges)
+            || !privileges.Contains("VM.Audit", StringComparer.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException("VM.Audit on /vms is required: guests the account cannot audit are hidden from the cluster resources and their disks would look orphaned.");
+        }
+
+        node = string.IsNullOrWhiteSpace(node) ? null : node.Trim();
+        storage = string.IsNullOrWhiteSpace(storage) ? null : storage.Trim();
+
+        var resources = (await client.Cluster.Resources.GetAsync()).ToList();
+        var activeVmIds = resources.Where(a => a.ResourceType == ClusterResourceType.Vm)
+                                   .Select(a => a.VmId)
+                                   .ToHashSet();
+
+        // One entry per storage and node: a shared storage is read once, a local one on each node that has it.
+        var targetStorages = resources.Where(a => a.ResourceType == ClusterResourceType.Storage
+                                                  && a.IsAvailable
+                                                  && (node == null || a.Node == node)
+                                                  && (storage == null || a.Storage == storage)
+                                                  && a.Content != null
+                                                  && a.Content.Split(',').Any(c => c is "images" or "rootdir"))
+                                      .GroupBy(a => a.Shared ? a.Storage : $"{a.Node}/{a.Storage}")
+                                      .Select(a => a.First());
+
+        var orphanedDisks = new List<OrphanedDisk>();
+        foreach (var item in targetStorages)
+        {
+            var disks = (await client.Nodes[item.Node].Storage[item.Storage].Content.GetAsync())
+                            .Where(a => a.Content is "images" or "rootdir" && !string.IsNullOrEmpty(a.Volume))
+                            .ToList();
+
+            foreach (var disk in disks)
+            {
+                var vmid = disk.VmId;
+                if (vmid <= 0)
+                {
+                    // A linked clone carries its base in the volume name (base-100-disk-0/vm-101-disk-0): read the last part
+                    var match = VmDiskVolumeRegex().Match(disk.FileName.Split('/')[^1]);
+                    if (match.Success) { vmid = long.Parse(match.Groups["vmid"].Value); }
+                }
+
+                if (vmid <= 0 || activeVmIds.Contains(vmid)) { continue; }
+
+                // A base volume still in use: the volume of each linked clone starts with the volume of its base
+                if (disks.Any(a => a.Volume.StartsWith(disk.Volume + "/", StringComparison.Ordinal))) { continue; }
+
+                orphanedDisks.Add(new OrphanedDisk
+                {
+                    Storage = item.Storage,
+                    Volume = disk.Volume,
+                    FileName = disk.FileName,
+                    VmId = vmid,
+                    Content = disk.Content,
+                    Format = disk.Format ?? string.Empty,
+                    Size = disk.Size,
+                    Node = item.Node,
+                    Parent = disk.Parent,
+                });
+            }
+        }
+
+        return orphanedDisks;
+    }
+
+    /// <summary>
+    /// Safely removes an orphaned disk volume from physical storage via the Proxmox storage content API.
+    /// </summary>
+    /// <param name="client">The Proxmox VE client.</param>
+    /// <param name="node">Node name where storage is accessible.</param>
+    /// <param name="storage">Storage identifier (e.g. "local-lvm", "ceph").</param>
+    /// <param name="volume">Full volume identifier (e.g. "local-lvm:vm-100-disk-0") or volume name.</param>
+    /// <param name="delay">Optional delay in seconds to wait for background task.</param>
+    /// <returns>Result of the storage content delete API call.</returns>
+    public static async Task<Result> RemoveOrphanedDiskAsync(
+        PveClient client,
+        string node,
+        string storage,
+        string volume,
+        int? delay = null)
+    {
+        ArgumentNullException.ThrowIfNull(client);
+        if (string.IsNullOrWhiteSpace(node)) { throw new ArgumentException("Node cannot be null or empty.", nameof(node)); }
+        if (string.IsNullOrWhiteSpace(storage)) { throw new ArgumentException("Storage cannot be null or empty.", nameof(storage)); }
+        if (string.IsNullOrWhiteSpace(volume)) { throw new ArgumentException("Volume cannot be null or empty.", nameof(volume)); }
+
+        return await client.Nodes[node.Trim()].Storage[storage.Trim()].Content[volume.Trim()].Delete(delay: delay);
+    }
+
+    /// <summary>
+    /// Scans and purges all orphaned disks across the specified or all storages in the cluster.
+    /// Supports dry-run mode (default: true) to preview which volumes will be affected without deleting them.
+    /// </summary>
+    /// <param name="client">The Proxmox VE client.</param>
+    /// <param name="node">Optional node name to limit scanning.</param>
+    /// <param name="storage">Optional storage name to limit scanning.</param>
+    /// <param name="dryRun">If true (default), returns orphaned disks without deleting them.</param>
+    /// <param name="timeout">Timeout in milliseconds to wait for each delete task. Default 60,000 (1 minute).</param>
+    /// <returns>List of results for each orphaned disk volume found. Removed is true only when the delete task ended with exit status OK.</returns>
+    public static async Task<IReadOnlyList<(OrphanedDisk Disk, Result Result, bool Removed)>> PurgeOrphanedDisksAsync(
+        PveClient client,
+        string node = null,
+        string storage = null,
+        bool dryRun = true,
+        long timeout = 60000)
+    {
+        var orphanedDisks = await GetOrphanedDisksAsync(client, node, storage);
+        var results = new List<(OrphanedDisk Disk, Result Result, bool Removed)>();
+
+        foreach (var disk in orphanedDisks)
+        {
+            if (dryRun)
+            {
+                results.Add((disk, null, false));
+            }
+            else
+            {
+                var result = await RemoveOrphanedDiskAsync(client, disk.Node, disk.Storage, disk.Volume);
+                var removed = false;
+                if (PveClientBase.GetTaskFromResult(result) is { } task
+                    && await client.WaitForTaskToFinishAsync(task, timeout: timeout))
+                {
+                    removed = await client.GetExitStatusTaskAsync(task) == "OK";
+                }
+                results.Add((disk, result, removed));
+            }
+        }
+
+        return results;
     }
 }

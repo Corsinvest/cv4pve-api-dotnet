@@ -611,7 +611,7 @@ public class PveClientBase(string host, int port = 8006, HttpClient? httpClient 
     /// <summary>
     /// Task identifier (UPID) returned by a call: null when the call failed or started no task.
     /// </summary>
-    internal static string GetTaskFromResult(Result result)
+    public static string GetTaskFromResult(Result result)
         => result is { IsSuccessStatusCode: true, ResponseInError: false, ResponseHasData: true }
             && result.ResponseToDictionary["data"] is string task
             && task.StartsWith("UPID:")
