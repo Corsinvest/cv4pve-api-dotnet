@@ -354,20 +354,17 @@ public static class VmHelper
                     return stopResult;
                 }
 
-                var stopUpid = PveClientBase.GetTaskFromResult(stopResult);
-                var stopped = await client.WaitForTaskToFinishAsync(stopResult, wait, stopTimeout);
-                if (!stopped)
+                var stopUpid = PveClientBase.GetTaskFromResult(stopResult)
+                                ?? throw new PveResultException(stopResult, $"Stop of {vmType} {vmId} returned no task to wait for");
+                if (!await client.WaitForTaskToFinishAsync(stopUpid, wait, stopTimeout))
                 {
                     throw new TimeoutException($"Timed out waiting {stopTimeout}ms for {vmType} {vmId} on node '{node}' to stop.");
                 }
 
-                if (!string.IsNullOrEmpty(stopUpid))
+                var stopExitStatus = await client.GetExitStatusTaskAsync(stopUpid);
+                if (!string.Equals(stopExitStatus, "OK", StringComparison.OrdinalIgnoreCase))
                 {
-                    var stopExitStatus = await client.GetExitStatusTaskAsync(stopUpid);
-                    if (!string.Equals(stopExitStatus, "OK", StringComparison.OrdinalIgnoreCase))
-                    {
-                        throw new PveResultException(stopResult, $"Stop task for {vmType} {vmId} failed with exit status: {stopExitStatus}");
-                    }
+                    throw new PveResultException(stopResult, $"Stop task for {vmType} {vmId} failed with exit status: {stopExitStatus}");
                 }
             }
         }
@@ -387,39 +384,36 @@ public static class VmHelper
 
         if (destroyResult.IsSuccessStatusCode && timeout > 0)
         {
-            var finished = await client.WaitForTaskToFinishAsync(destroyResult, wait, timeout);
-            if (!finished)
+            var upid = PveClientBase.GetTaskFromResult(destroyResult)
+                        ?? throw new PveResultException(destroyResult, $"Destroy of {vmType} {vmId} returned no task to wait for");
+            if (!await client.WaitForTaskToFinishAsync(upid, wait, timeout))
             {
                 throw new TimeoutException($"Timed out waiting {timeout}ms for destroy task of {vmType} {vmId} on node '{node}' to finish.");
             }
 
-            var upid = PveClientBase.GetTaskFromResult(destroyResult);
-            if (!string.IsNullOrEmpty(upid))
+            var exitStatus = await client.GetExitStatusTaskAsync(upid);
+            if (!string.Equals(exitStatus, "OK", StringComparison.OrdinalIgnoreCase) &&
+                !(exitStatus?.StartsWith("WARNINGS", StringComparison.OrdinalIgnoreCase) ?? false))
             {
-                var exitStatus = await client.GetExitStatusTaskAsync(upid);
-                if (!string.Equals(exitStatus, "OK", StringComparison.OrdinalIgnoreCase) &&
-                    !(exitStatus?.StartsWith("WARNINGS", StringComparison.OrdinalIgnoreCase) ?? false))
-                {
-                    throw new PveResultException(destroyResult, $"Destroy task for {vmType} {vmId} failed with exit status: {exitStatus}");
-                }
+                throw new PveResultException(destroyResult, $"Destroy task for {vmType} {vmId} failed with exit status: {exitStatus}");
+            }
 
-                try
+            try
+            {
+                var logLines = await client.Nodes[node].Tasks[upid].Log.GetAsync();
+                var logger = client.LoggerFactory.CreateLogger(typeof(VmHelper));
+                foreach (var line in logLines)
                 {
-                    var logLines = await client.Nodes[node].Tasks[upid].Log.GetAsync();
-                    var logger = client.LoggerFactory.CreateLogger(typeof(VmHelper));
-                    foreach (var line in logLines)
+                    if (line.Contains("could not remove disk", StringComparison.OrdinalIgnoreCase) ||
+                        line.Contains("unable to remove", StringComparison.OrdinalIgnoreCase))
                     {
-                        if (line.Contains("could not remove disk", StringComparison.OrdinalIgnoreCase) ||
-                            line.Contains("unable to remove", StringComparison.OrdinalIgnoreCase))
-                        {
-                            logger.LogWarning("VM {VmId} destroy completed with warning: {Line}", vmId, line);
-                        }
+                        logger.LogWarning("VM {VmId} destroy completed with warning: {Line}", vmId, line);
                     }
                 }
-                catch
-                {
-                    // Ignore task log read failures
-                }
+            }
+            catch
+            {
+                // Ignore task log read failures
             }
         }
 

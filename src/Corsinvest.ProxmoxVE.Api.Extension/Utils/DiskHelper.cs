@@ -6,7 +6,6 @@
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster;
-using Corsinvest.ProxmoxVE.Api.Shared.Models.Node;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Storage;
 using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
 
@@ -343,10 +342,19 @@ public static partial class DiskHelper
     /// Scans storages for orphaned or dangling VM and container disk volumes whose VM/CT ID
     /// no longer exists in the Proxmox VE cluster.
     /// </summary>
+    /// <remarks>
+    /// Every guest listed in the cluster resources counts as existing, whatever its status: a guest on an
+    /// offline node is reported as unknown but still owns its disks.
+    /// A base volume that still has linked clones is never reported.
+    /// The account needs VM.Audit on /vms: guests it cannot audit are filtered out of the cluster resources
+    /// without an error, so their disks would look orphaned.
+    /// </remarks>
     /// <param name="client">The Proxmox VE client.</param>
-    /// <param name="node">Optional node name to limit scanning. If null, scans all online nodes.</param>
-    /// <param name="storage">Optional storage identifier to limit scanning. If null, scans all active storages supporting disk images or rootdir.</param>
+    /// <param name="node">Optional node name to limit scanning. If null, scans every node.</param>
+    /// <param name="storage">Optional storage identifier to limit scanning. If null, scans all available storages holding disk images or container volumes.</param>
     /// <returns>A read-only list of orphaned disk volumes.</returns>
+    /// <exception cref="InvalidOperationException">The account lacks VM.Audit on /vms.</exception>
+    /// <exception cref="PveResultException">A storage content cannot be read.</exception>
     public static async Task<IReadOnlyList<OrphanedDisk>> GetOrphanedDisksAsync(
         PveClient client,
         string node = null,
@@ -354,111 +362,66 @@ public static partial class DiskHelper
     {
         ArgumentNullException.ThrowIfNull(client);
 
-        var vms = await client.GetResourcesAsync(ClusterResourceType.Vm);
-        var activeVmIds = vms.Select(v => v.VmId).ToHashSet();
-
-        IEnumerable<string> targetNodes;
-        if (!string.IsNullOrWhiteSpace(node))
+        var permissions = await client.Access.Permissions.GetPermissionsAsync("/vms");
+        if (!permissions.TryGetValue("/vms", out var privileges)
+            || !privileges.Contains("VM.Audit", StringComparer.OrdinalIgnoreCase))
         {
-            targetNodes = [node.Trim()];
-        }
-        else
-        {
-            var clusterNodes = await client.GetNodesAsync();
-            targetNodes = clusterNodes.Where(n => n.IsOnline).Select(n => n.Node);
+            throw new InvalidOperationException("VM.Audit on /vms is required: guests the account cannot audit are hidden from the cluster resources and their disks would look orphaned.");
         }
 
-        var allStorageContents = new List<(string Node, string Storage, NodeStorageContent Content)>();
+        node = string.IsNullOrWhiteSpace(node) ? null : node.Trim();
+        storage = string.IsNullOrWhiteSpace(storage) ? null : storage.Trim();
 
-        foreach (var currentNode in targetNodes)
-        {
-            IEnumerable<string> targetStorages;
-            if (!string.IsNullOrWhiteSpace(storage))
-            {
-                targetStorages = [storage.Trim()];
-            }
-            else
-            {
-                var nodeStorages = await client.Nodes[currentNode].Storage.GetAsync(enabled: true);
-                targetStorages = nodeStorages
-                    .Where(s => s.Active &&
-                                !string.IsNullOrEmpty(s.Content) &&
-                                (s.Content.Contains("images", StringComparison.OrdinalIgnoreCase) ||
-                                 s.Content.Contains("rootdir", StringComparison.OrdinalIgnoreCase)))
-                    .Select(s => s.Storage)
-                    .Distinct(StringComparer.OrdinalIgnoreCase);
-            }
+        var resources = (await client.Cluster.Resources.GetAsync()).ToList();
+        var activeVmIds = resources.Where(a => a.ResourceType == ClusterResourceType.Vm)
+                                   .Select(a => a.VmId)
+                                   .ToHashSet();
 
-            foreach (var currentStorage in targetStorages)
-            {
-                var contents = await client.Nodes[currentNode].Storage[currentStorage].Content.GetAsync();
-                if (contents == null) { continue; }
-
-                foreach (var item in contents)
-                {
-                    if (item != null)
-                    {
-                        allStorageContents.Add((currentNode, currentStorage, item));
-                    }
-                }
-            }
-        }
-
-        var allParentVolumes = allStorageContents
-            .Where(c => !string.IsNullOrEmpty(c.Content.Parent))
-            .Select(c => c.Content.Parent)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        // One entry per storage and node: a shared storage is read once, a local one on each node that has it.
+        var targetStorages = resources.Where(a => a.ResourceType == ClusterResourceType.Storage
+                                                  && a.IsAvailable
+                                                  && (node == null || a.Node == node)
+                                                  && (storage == null || a.Storage == storage)
+                                                  && a.Content != null
+                                                  && a.Content.Split(',').Any(c => c is "images" or "rootdir"))
+                                      .GroupBy(a => a.Shared ? a.Storage : $"{a.Node}/{a.Storage}")
+                                      .Select(a => a.First());
 
         var orphanedDisks = new List<OrphanedDisk>();
-        var seenVolumes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        foreach (var (currentNode, currentStorage, item) in allStorageContents)
+        foreach (var item in targetStorages)
         {
-            // Only examine VM/CT disks (images or rootdir)
-            if (string.IsNullOrEmpty(item.Content) ||
-                (!item.Content.Equals("images", StringComparison.OrdinalIgnoreCase) &&
-                 !item.Content.Equals("rootdir", StringComparison.OrdinalIgnoreCase)))
-            {
-                continue;
-            }
+            var disks = (await client.Nodes[item.Node].Storage[item.Storage].Content.GetAsync())
+                            .Where(a => a.Content is "images" or "rootdir" && !string.IsNullOrEmpty(a.Volume))
+                            .ToList();
 
-            if (string.IsNullOrEmpty(item.Volume) || !seenVolumes.Add(item.Volume))
+            foreach (var disk in disks)
             {
-                continue;
-            }
-
-            // Determine VMID
-            long vmid = item.VmId;
-            if (vmid <= 0)
-            {
-                var fileName = item.FileName ?? (item.Volume.Contains(':') ? item.Volume.Split(':')[1] : item.Volume);
-                var match = VmDiskVolumeRegex().Match(fileName);
-                if (match.Success && long.TryParse(match.Groups["vmid"].Value, out var parsedId))
+                var vmid = disk.VmId;
+                if (vmid <= 0)
                 {
-                    vmid = parsedId;
+                    // A linked clone carries its base in the volume name (base-100-disk-0/vm-101-disk-0): read the last part
+                    var match = VmDiskVolumeRegex().Match(disk.FileName.Split('/')[^1]);
+                    if (match.Success) { vmid = long.Parse(match.Groups["vmid"].Value); }
                 }
+
+                if (vmid <= 0 || activeVmIds.Contains(vmid)) { continue; }
+
+                // A base volume still in use: the volume of each linked clone starts with the volume of its base
+                if (disks.Any(a => a.Volume.StartsWith(disk.Volume + "/", StringComparison.Ordinal))) { continue; }
+
+                orphanedDisks.Add(new OrphanedDisk
+                {
+                    Storage = item.Storage,
+                    Volume = disk.Volume,
+                    FileName = disk.FileName,
+                    VmId = vmid,
+                    Content = disk.Content,
+                    Format = disk.Format ?? string.Empty,
+                    Size = disk.Size,
+                    Node = item.Node,
+                    Parent = disk.Parent,
+                });
             }
-
-            if (vmid <= 0) { continue; }
-
-            // Check if VMID exists in active cluster resources
-            if (activeVmIds.Contains(vmid)) { continue; }
-
-            // Safety: if this volume is referenced as Parent by any clone across any storage, do not treat as orphan
-            if (allParentVolumes.Contains(item.Volume)) { continue; }
-
-            orphanedDisks.Add(new OrphanedDisk
-            {
-                Storage = currentStorage,
-                Volume = item.Volume,
-                FileName = item.FileName ?? (item.Volume.Contains(':') ? item.Volume.Split(':')[1] : item.Volume),
-                VmId = vmid,
-                Content = item.Content,
-                Format = item.Format ?? string.Empty,
-                Size = item.Size,
-                Node = currentNode,
-                Parent = item.Parent,
-            });
         }
 
         return orphanedDisks;
@@ -496,12 +459,14 @@ public static partial class DiskHelper
     /// <param name="node">Optional node name to limit scanning.</param>
     /// <param name="storage">Optional storage name to limit scanning.</param>
     /// <param name="dryRun">If true (default), returns orphaned disks without deleting them.</param>
-    /// <returns>List of results for each orphaned disk volume found.</returns>
+    /// <param name="timeout">Timeout in milliseconds to wait for each delete task. Default 60,000 (1 minute).</param>
+    /// <returns>List of results for each orphaned disk volume found. Removed is true only when the delete task ended with exit status OK.</returns>
     public static async Task<IReadOnlyList<(OrphanedDisk Disk, Result Result, bool Removed)>> PurgeOrphanedDisksAsync(
         PveClient client,
         string node = null,
         string storage = null,
-        bool dryRun = true)
+        bool dryRun = true,
+        long timeout = 60000)
     {
         var orphanedDisks = await GetOrphanedDisksAsync(client, node, storage);
         var results = new List<(OrphanedDisk Disk, Result Result, bool Removed)>();
@@ -515,7 +480,13 @@ public static partial class DiskHelper
             else
             {
                 var result = await RemoveOrphanedDiskAsync(client, disk.Node, disk.Storage, disk.Volume);
-                results.Add((disk, result, result.IsSuccessStatusCode));
+                var removed = false;
+                if (PveClientBase.GetTaskFromResult(result) is { } task
+                    && await client.WaitForTaskToFinishAsync(task, timeout: timeout))
+                {
+                    removed = await client.GetExitStatusTaskAsync(task) == "OK";
+                }
+                results.Add((disk, result, removed));
             }
         }
 
