@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 The major and minor version follow Proxmox VE (9.2.x targets Proxmox VE 9.2); the patch number can include breaking changes, listed under "Changed (breaking)".
 
+## [9.2.6] - 2026-11-25
+
+### Added
+- Extension: High Availability helpers on `PveClient`: `GetHaResourceAsync` (by `sid` or by VM id, `null` when the resource does not exist), `CreateHaResourceAsync`, `EnsureHaResourceAsync` (creates or updates), `UpdateHaResourceAsync`, `DeleteHaResourceAsync` (with `purge` and `ignoreNotFound`); Proxmox VE 9 options `auto_rebalance` and `failback` ([#116](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/116))
+- Extension: `DiskHelper` for VM and LXC disks: `GetFreeSlotAsync` (active and pending configuration, slot limits of each bus), `AttachDiskAsync`, `DetachDiskAsync`, `RemoveUnusedDiskAsync` ([#117](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/117))
+- Extension: `VmHelper.DestroyVmAsync` stops a running guest, waits for it and checks the exit status of the stop and destroy tasks ([#126](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/126))
+- Extension: `DiskHelper.GetOrphanedDisksAsync`, `RemoveOrphanedDiskAsync` and `PurgeOrphanedDisksAsync` (dry run by default) find and remove disk volumes whose VMID no longer exists in the cluster; base volumes of linked clones are kept ([#126](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/126))
+- Api: `PveClientBase.GetTaskFromResult` is public ([#126](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/126))
+- Extension: `VncWebSocketBridge(ILogger?)` constructor; `RemoteViewerHelper` passes `PveClient.LoggerFactory` ([#124](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/124))
+- Documentation: titles of the pages carry the search terms, social card image; steps to a first result on the home page and in Getting started ([#113](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/113)) ([#114](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/114))
+
+### Changed (breaking)
+- Extension: `VmUnlockAsync` returns `Task<Result>` instead of `Task`: callers compile unchanged, recompile for the binary change ([#120](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/120))
+
+### Changed
+- Extension: the health score of a Node or running VM is the one of its worst resource (CPU, memory, Node root disk) instead of a weighted average, on the bands of the usage colors (70% warning, 80% danger); guest memory uses 85/95 because it includes the page cache; CPU never goes below 60. Storage uses the same bands. A Node with a full root disk now scores 0 instead of 80 ([#128](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/128))
+- Api: email addresses are masked and new lines of parameter values escaped in the debug log ([#122](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/122))
+- Tests: about 99% of the hand-written code covered, 897 tests ([#111](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/111)) ([#112](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/112))
+
+### Fixed
+- Api: a login answered without a ticket (proxy page, `{"data":null}`, empty body) threw `RuntimeBinderException` or `NullReferenceException`; `LoginAsync` and `LoginOpenIdAsync` return `false` ([#111](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/111))
+- Api: the realm of `john@example.com@ldap` is what follows the last `@` ([#111](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/111))
+- Api: a failed login after a successful one kept the old ticket and sent it with the next requests ([#111](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/111))
+- Api: the log wrote in clear the ticket and CSRF token of the login, the value of a new API token (`Trace`) and the query string of GET and DELETE requests (`Debug`) ([#111](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/111))
+- Api: `ToModel<T>()` threw `RuntimeBinderException` with a model that is not public; `ToEnumerable()` and `ToLogs()` threw when the answer had no `data` instead of returning an empty sequence ([#111](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/111))
+- Api: `PveWebTermClient.DisconnectAsync` cancelled the connection before closing it, so the node never received the WebSocket close ([#112](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/112))
+- Extension: `UploadFileToStorageAsync` did not send `checksum` and `checksumAlgorithm`, and refused the `import` content type ([#120](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/120))
+- Extension: a Node `offline` or `unknown` and a storage `unknown` had a health score of 100; they give `null` ([#120](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/120))
+- Extension: `VmHelper.CheckIdOrName` threw `NullReferenceException` on a guest without a name ([#120](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/120))
+- Extension: `VncWebSocketBridge` left the viewer connected to a dead port when the session ended on the node or one direction failed, and swallowed every error; it now closes the viewer, refuses a second viewer and logs the direction that stopped ([#124](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/124))
+- Extension: `VncWebSocketBridge` ran on the caller's context, so a busy UI thread stopped the relay without an error; it runs on the thread pool ([#125](https://github.com/Corsinvest/cv4pve-api-dotnet/pull/125))
+
 ## [9.2.5] - 2026-10-03
 
 ### Added
