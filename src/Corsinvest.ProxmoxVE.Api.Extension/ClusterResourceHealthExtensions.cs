@@ -9,41 +9,76 @@ using Corsinvest.ProxmoxVE.Api.Shared.Utils;
 namespace Corsinvest.ProxmoxVE.Api.Extension;
 
 /// <summary>
-/// Cluster resource health score extensions
+/// Cluster resource health score extensions.
 /// </summary>
+/// <remarks>
+/// The score is the one of the worst resource, not an average: a single saturated
+/// resource makes the whole score critical. Each resource maps its usage to a score
+/// whose bands match the usage colors (score 80 = warning threshold, score 60 = danger
+/// threshold), so 80 and above is good, 60 to 80 is warning, below 60 is critical.
+/// </remarks>
 public static class ClusterResourceHealthExtensions
 {
+    private const double UsageWarning = 70;
+    private const double UsageDanger = 80;
+
+    // Guest memory includes the page cache, so a healthy guest often sits above 70%.
+    private const double GuestMemoryWarning = 85;
+    private const double GuestMemoryDanger = 95;
+
+    // CPU is an instant sample: a spike must not turn the score critical.
+    private const double CpuMinScore = 60;
+
+    /// <summary>
+    /// Maps a usage percentage to a score 0-100: 100 to 80 up to <paramref name="warning"/>,
+    /// 80 to 60 up to <paramref name="danger"/>, 60 to 0 up to 100%.
+    /// </summary>
+    private static double UsageScore(double usage, double warning, double danger)
+    {
+        usage = Math.Clamp(usage, 0, 100);
+        var score = usage <= warning
+                        ? 100 - (usage * 20 / warning)
+                        : usage <= danger
+                            ? 80 - ((usage - warning) * 20 / (danger - warning))
+                            : 60 - ((usage - danger) * 60 / (100 - danger));
+
+        return Math.Clamp(score, 0, 100);
+    }
+
+    private static double CpuScore(double cpuUsagePercentage)
+        => Math.Max(UsageScore(cpuUsagePercentage * 100, UsageWarning, UsageDanger), CpuMinScore);
+
+    private static double DiskScore(ulong diskUsage, ulong diskSize)
+        => diskSize > 0
+            ? UsageScore((double)diskUsage / diskSize * 100, UsageWarning, UsageDanger)
+            : 100;
+
     extension(IClusterResourceHost resource)
     {
         /// <summary>
-        /// Health score 0-100 (higher = healthier) for a Node or running VM, computed from
-        /// CPU, memory and (Node only) disk usage. Returns <c>null</c> when not measurable
-        /// (stopped VM, Node not online, or a resource type that is neither Node nor VM).
-        ///   Node         = 100 − (CPU·0.4 + RAM·0.4 + Disk·0.2)
-        ///   VM (running) = 100 − (CPU·0.5 + RAM·0.5)
+        /// Health score 0-100 (higher = healthier) for a Node or running VM: the score of the
+        /// worst resource among CPU, memory and (Node only) root disk. Returns <c>null</c> when
+        /// not measurable (stopped VM, Node not online, or a resource type that is neither Node nor VM).
         /// </summary>
         public double? HealthScoreHost
         {
             get
             {
-                var cpu = resource.CpuUsagePercentage * 100;
-                var ram = resource.MemoryUsagePercentage * 100;
-                var disk = resource.DiskSize > 0
-                            ? (double)resource.DiskUsage / resource.DiskSize * 100
-                            : 0;
-
                 double? score = resource.ResourceType switch
                 {
                     ClusterResourceType.Node => resource.Status == PveConstants.StatusOnline
-                                                ? 100 - ((cpu * 0.4) + (ram * 0.4) + (disk * 0.2))
+                                                ? Math.Min(CpuScore(resource.CpuUsagePercentage),
+                                                           Math.Min(UsageScore(resource.MemoryUsagePercentage * 100, UsageWarning, UsageDanger),
+                                                                    DiskScore(resource.DiskUsage, resource.DiskSize)))
                                                 : null,
                     ClusterResourceType.Vm => resource.Status == PveConstants.StatusVmRunning
-                                                ? 100 - ((cpu * 0.5) + (ram * 0.5))
+                                                ? Math.Min(CpuScore(resource.CpuUsagePercentage),
+                                                           UsageScore(resource.MemoryUsagePercentage * 100, GuestMemoryWarning, GuestMemoryDanger))
                                                 : null,
                     _ => null,
                 };
 
-                return score is double s ? Math.Round(Math.Clamp(s, 0, 100), 1) : null;
+                return score is double s ? Math.Round(s, 1) : null;
             }
         }
     }
@@ -52,7 +87,7 @@ public static class ClusterResourceHealthExtensions
     {
         /// <summary>
         /// Health score 0-100 (higher = healthier) for a Storage resource, computed from
-        /// disk usage (100 − Disk%). Returns <c>null</c> for a storage that is not available
+        /// disk usage. Returns <c>null</c> for a storage that is not available
         /// and for non-storage resource types.
         /// </summary>
         public double? HealthScoreStorage
@@ -62,11 +97,7 @@ public static class ClusterResourceHealthExtensions
                 if (resource.ResourceType != ClusterResourceType.Storage
                     || resource.Status != PveConstants.StatusAvailable) { return null; }
 
-                var disk = resource.DiskSize > 0
-                            ? (double)resource.DiskUsage / resource.DiskSize * 100
-                            : 0;
-
-                return Math.Round(Math.Clamp(100 - disk, 0, 100), 1);
+                return Math.Round(DiskScore(resource.DiskUsage, resource.DiskSize), 1);
             }
         }
     }
@@ -78,7 +109,7 @@ public static class ClusterResourceHealthExtensions
         /// Returns <c>null</c> when not measurable (stopped VM, Node not online, storage
         /// not available, or an unsupported type);
         /// callers should render this as "not available" rather than a low score.
-        /// Same formula as cv4pve-admin so the number matches across tools.
+        /// See the class remarks for how the score maps to the usage bands.
         /// </summary>
         public double? HealthScoreCalculated
             => resource.ResourceType switch
