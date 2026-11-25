@@ -409,12 +409,36 @@ public class ModelsExtensionsTests
 
         var resources = (await client.GetResourcesAsync(ClusterResourceType.All)).ToDictionary(a => a.Id);
 
-        Assert.Equal(60, resources["node/pve01"].HealthScoreCalculated);          // 100 - (50*0.4 + 25*0.4 + 50*0.2)
-        Assert.Equal(65, resources["qemu/100"].HealthScoreCalculated);            // 100 - (20*0.5 + 50*0.5)
-        Assert.Null(resources["qemu/101"].HealthScoreCalculated);                 // not running: nothing to measure
-        Assert.Equal(70, resources["storage/pve01/local"].HealthScoreCalculated); // 100 - 30
+        Assert.Equal(85.7, resources["node/pve01"].HealthScoreCalculated);          // worst of CPU 50%, RAM 25%, disk 50%
+        Assert.Equal(88.2, resources["qemu/100"].HealthScoreCalculated);            // guest RAM 50% on the 85/95 bands
+        Assert.Null(resources["qemu/101"].HealthScoreCalculated);                   // not running: nothing to measure
+        Assert.Equal(91.4, resources["storage/pve01/local"].HealthScoreCalculated); // 30% used
         Assert.Equal(100, resources["storage/pve01/empty"].HealthScoreCalculated);
         Assert.Null(resources["/pool/customer1"].HealthScoreCalculated);
+    }
+
+    [Fact]
+    public async Task Health_score_follows_the_worst_resource()
+    {
+        var (client, _) = ClientAnswering(("/cluster/resources", """
+            {"data":[
+                {"id":"node/full","type":"node","node":"full","status":"online","cpu":0.1,"maxcpu":8,"mem":100,"maxmem":1000,"disk":100,"maxdisk":100},
+                {"id":"node/busy","type":"node","node":"busy","status":"online","cpu":1.0,"maxcpu":8,"mem":100,"maxmem":1000,"disk":10,"maxdisk":100},
+                {"id":"node/ram","type":"node","node":"ram","status":"online","cpu":0.1,"maxcpu":8,"mem":900,"maxmem":1000,"disk":10,"maxdisk":100},
+                {"id":"qemu/100","type":"qemu","vmid":100,"node":"full","status":"running","cpu":0.01,"maxcpu":2,"mem":800,"maxmem":1000},
+                {"id":"storage/full/warn","type":"storage","storage":"warn","node":"full","status":"available","disk":75,"maxdisk":100},
+                {"id":"storage/full/crit","type":"storage","storage":"crit","node":"full","status":"available","disk":90,"maxdisk":100}
+            ]}
+            """));
+
+        var resources = (await client.GetResourcesAsync(ClusterResourceType.All)).ToDictionary(a => a.Id);
+
+        Assert.Equal(0, resources["node/full"].HealthScoreCalculated);              // root disk full: critical despite idle CPU and RAM
+        Assert.Equal(60, resources["node/busy"].HealthScoreCalculated);             // CPU spike stops at warning
+        Assert.Equal(30, resources["node/ram"].HealthScoreCalculated);              // RAM 90%
+        Assert.Equal(81.2, resources["qemu/100"].HealthScoreCalculated);            // guest RAM 80% (cache) is still good
+        Assert.Equal(70, resources["storage/full/warn"].HealthScoreCalculated);     // 75% used: warning
+        Assert.Equal(30, resources["storage/full/crit"].HealthScoreCalculated);     // 90% used: critical
     }
 
     [Fact]
