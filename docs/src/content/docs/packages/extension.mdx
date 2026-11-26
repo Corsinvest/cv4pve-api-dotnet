@@ -205,6 +205,30 @@ var results = await DiskHelper.PurgeOrphanedDisksAsync(client, dryRun: false);
 
 > On QEMU VMs, disk modification operations (`AttachDiskAsync`, `DetachDiskAsync`, `RemoveUnusedDiskAsync`) return a task UPID. The background task may still be running when the method returns: check it and read the exit status as in [Tasks](/cv4pve-api-dotnet/concepts/tasks/#did-it-succeed).
 
+## Cloning & Templates
+
+`CloneHelper` unifies QEMU VM and LXC container cloning (including automatic `/cluster/nextid` allocation, task awaiting, and exit status verification) as well as template conversion:
+
+```csharp
+using Corsinvest.ProxmoxVE.Api.Extension.Utils;
+using Corsinvest.ProxmoxVE.Api.Shared.Models.Vm;
+
+var template = await client.GetVmAsync("ubuntu-template");
+
+// Clone with automatic VMID allocation and task awaiting
+var (newVmId, result) = await CloneHelper.CloneAsync(
+    client,
+    template.Node,
+    template.VmType,
+    template.VmId,
+    name: "web-01",
+    targetStorage: "local-zfs",
+    fullClone: true);
+
+// Convert a stopped VM or container into a template
+await CloneHelper.ConvertToTemplateAsync(client, "pve01", VmType.Qemu, newVmId);
+```
+
 ## Several nodes
 
 `ClientHelper.GetClientAndTryLoginAsync` takes a list of hosts and returns a client connected to the
